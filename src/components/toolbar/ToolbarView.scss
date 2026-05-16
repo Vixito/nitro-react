@@ -39,6 +39,9 @@
     }
 
     #toolbar-chat-input-container {
+        .nitro-chat-input-container {
+            width: auto;
+        }
 
         @include media-breakpoint-down(sm) {
             width: 0px;

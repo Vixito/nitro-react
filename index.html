@@ -15,20 +15,47 @@
     <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <base href="./">
+    <base href="/game/">
     <title>Nitro</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root" class="w-100 h-100"></div>
     <script>
-      const NitroConfig = {
-        "config.urls": [ '/renderer-config.json', '/ui-config.json' ],
-        "sso.ticket": (new URLSearchParams(window.location.search).get('sso') || null),
-        "forward.type": (new URLSearchParams(window.location.search).get('room') ? 2 : -1),
-        "forward.id": (new URLSearchParams(window.location.search).get('room') || 0),
-        "friend.id": (new URLSearchParams(window.location.search).get('friend') || 0),
-      };
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var fromQuery = params.get('sso');
+        var fromCookie = null;
+        var m = document.cookie.match(/(?:^|; )habbten_sso=([^;]*)/);
+        if (m) {
+          try { fromCookie = decodeURIComponent(m[1]); } catch (e) { fromCookie = m[1]; }
+          document.cookie = 'habbten_sso=; Max-Age=0; Path=/game';
+        }
+        var ticket = fromQuery || fromCookie || null;
+        var path = window.location.pathname || '';
+        var gamePrefix = path.indexOf('/game') === 0 ? '/game' : '';
+        var origin = window.location.origin;
+        var proto = window.location.protocol;
+        var host = window.location.host;
+        var wsProto = proto === 'https:' ? 'wss:' : 'ws:';
+        var cfg = {
+          'config.urls': gamePrefix
+            ? [ origin + gamePrefix + '/renderer-config.json', origin + gamePrefix + '/ui-config.json' ]
+            : [ '/renderer-config.json', '/ui-config.json' ],
+          'sso.ticket': ticket,
+          'forward.type': (params.get('room') ? 2 : -1),
+          'forward.id': (params.get('room') || 0),
+          'friend.id': (params.get('friend') || 0),
+        };
+        if (gamePrefix) {
+          var root = origin + gamePrefix;
+          cfg['socket.url'] = wsProto + '//' + host + gamePrefix + '/ws';
+          cfg['asset.url'] = root + '/assets';
+          cfg['image.library.url'] = root + '/swf/c_images/';
+          cfg['hof.furni.url'] = root + '/swf/dcr/hof_furni';
+        }
+        window.NitroConfig = cfg;
+      })();
     </script>
     <script type="module" src="./src/index.tsx"></script>
   </body>

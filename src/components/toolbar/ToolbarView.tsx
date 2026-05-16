@@ -92,8 +92,8 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         { isMod &&
                             <Base pointer className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
                     </Flex>
-                    <Flex alignItems="center" id="toolbar-chat-input-container" />
                 </Flex>
+                <Flex alignItems="center" id="toolbar-chat-input-container" />
                 <Flex alignItems="center" gap={ 2 }>
                     <Flex gap={ 2 }>
                         <Base pointer className="navigation-item icon icon-friendall" onClick={ event => CreateLinkEvent('friends/toggle') }>

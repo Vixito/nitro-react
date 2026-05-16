@@ -4,7 +4,9 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+    base: '/game/',
     plugins: [ react() ],
+
     resolve: {
         alias: {
             '@': resolve(__dirname, 'src'),
