@@ -31,6 +31,59 @@ export const App: FC<{}> = props =>
             case ConfigurationEvent.LOADED:
                 GetNitroInstance().localization.init();
                 setPercent(prevValue => (prevValue + 20));
+                
+                // Fetch dynamic client configuration from CMS
+                fetch('/game/api/client_config.json')
+                    .then(res => res.json())
+                    .then(data => {
+                        (window as any).HabbtenConfig = data;
+                    })
+                    .catch(err => console.error('Failed to load Habbten config', err));
+
+                // Fetch dynamic chat bubbles
+                fetch('/api/chat-bubbles')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.success && data.bubbles) {
+                            const configManager = GetNitroInstance().core.configuration;
+                            const existingStyles = configManager.getValue<any[]>('chat.styles') || [];
+                            
+                            let dynamicCss = '';
+                            
+                            data.bubbles.forEach((b: any) => {
+                                // Add to configuration
+                                existingStyles.push({
+                                    styleId: b.bubble_id,
+                                    minRank: b.min_rank || 0,
+                                    isSystemStyle: false,
+                                    isHcOnly: !!b.is_vip,
+                                    isAmbassadorOnly: false
+                                });
+                                
+                                // Generate CSS for the bubble
+                                dynamicCss += `
+                                    .chat-bubble-${b.bubble_id} {
+                                        border-image-source: url('${b.image_url}') !important;
+                                        color: #${b.text_color || '000'} !important;
+                                    }
+                                    .chat-bubble-${b.bubble_id} .chat-bubble-pointer {
+                                        background: url('${b.image_url}') !important; /* Adjust if pointer image logic is different */
+                                    }
+                                `;
+                            });
+                            
+                            configManager.setValue('chat.styles', existingStyles);
+                            
+                            // Inject CSS
+                            if (dynamicCss.length > 0) {
+                                const styleEl = document.createElement('style');
+                                styleEl.innerHTML = dynamicCss;
+                                document.head.appendChild(styleEl);
+                            }
+                        }
+                    })
+                    .catch(err => console.error('Failed to load chat bubbles', err));
+                
                 return;
             case ConfigurationEvent.FAILED:
                 setIsError(true);

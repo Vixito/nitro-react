@@ -124,6 +124,12 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = p
                 case 'unignore':
                     GetSessionDataManager().unignoreUser(avatarInfo.name);
                     break;
+                case 'action_kiss':
+                    roomSession.sendChatMessage(`:beso ${avatarInfo.name}`);
+                    break;
+                case 'action_hug':
+                    roomSession.sendChatMessage(`:abrazo ${avatarInfo.name}`);
+                    break;
                 case 'kick':
                     roomSession.sendKickMessage(avatarInfo.webID);
                     break;
@@ -235,6 +241,12 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = p
                         <ContextMenuListItemView onClick={ event => processAction('unignore') }>
                             { LocalizeText('infostand.button.unignore') }
                         </ContextMenuListItemView> }
+                    <ContextMenuListItemView onClick={ event => processAction('action_kiss') }>
+                        Besar
+                    </ContextMenuListItemView>
+                    <ContextMenuListItemView onClick={ event => processAction('action_hug') }>
+                        Abrazar
+                    </ContextMenuListItemView>
                     <ContextMenuListItemView onClick={ event => processAction('report') }>
                         { LocalizeText('infostand.button.report') }
                     </ContextMenuListItemView>

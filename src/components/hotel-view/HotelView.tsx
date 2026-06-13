@@ -29,7 +29,8 @@ export const HotelView: FC<{}> = props =>
 
     if(!isVisible) return null;
 
-    const backgroundColor = GetConfiguration('hotelview')['images']['background.colour'];
+    const habbtenConfig = (window as any).HabbtenConfig;
+    const backgroundColor = habbtenConfig?.hotel_view?.backgroundColor || GetConfiguration('hotelview')['images']['background.colour'];
     const background = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['background']);
     const sun = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['sun']);
     const drape = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['drape']);
@@ -99,6 +100,11 @@ export const HotelView: FC<{}> = props =>
             { GetConfiguration('hotelview')['show.avatar'] && (
                 <div className="avatar-image">
                     <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
+                </div>
+            ) }
+            { habbtenConfig?.hotel_view?.banner && (
+                <div className="custom-banner position-absolute" style={{ top: 20, left: 20, zIndex: 10 }}>
+                    <img src={habbtenConfig.hotel_view.banner} alt="Hotel Banner" style={{ maxWidth: 350, borderRadius: 8, boxShadow: '0 4px 6px rgba(0,0,0,0.3)' }} />
                 </div>
             ) }
         </div>
