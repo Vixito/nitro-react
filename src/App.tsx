@@ -45,8 +45,7 @@ export const App: FC<{}> = props =>
                     .then(res => res.json())
                     .then(data => {
                         if (data && data.success && data.bubbles) {
-                            const configManager = GetNitroInstance().core.configuration;
-                            const existingStyles = configManager.getValue<any[]>('chat.styles') || [];
+                            const existingStyles = NitroConfiguration.getValue<any[]>('chat.styles') || [];
                             
                             let dynamicCss = '';
                             
@@ -72,7 +71,7 @@ export const App: FC<{}> = props =>
                                 `;
                             });
                             
-                            configManager.setValue('chat.styles', existingStyles);
+                            NitroConfiguration.setValue('chat.styles', existingStyles);
                             
                             // Inject CSS
                             if (dynamicCss.length > 0) {
