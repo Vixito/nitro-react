@@ -6,6 +6,8 @@ import { useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
 import { WidgetSlotView } from './views/widgets/WidgetSlotView';
 
 const widgetSlotCount = 7;
+const CANVAS_W = 1024;
+const CANVAS_H = 768;
 
 export const HotelView: FC<{}> = props =>
 {
@@ -80,88 +82,124 @@ export const HotelView: FC<{}> = props =>
         </>
     );
 
+    // Helper: Build CSS shadow string from Fabric.js shadow object
+    const buildShadow = (shadow: any): string => {
+        if (!shadow) return '';
+        // Fabric.js stores shadow as: { color, blur, offsetX, offsetY }
+        if (typeof shadow === 'string') return shadow;
+        const { color = 'rgba(0,0,0,0.5)', blur = 0, offsetX = 0, offsetY = 0 } = shadow;
+        return `${offsetX}px ${offsetY}px ${blur}px ${color}`;
+    };
+
     if (habbtenConfig?.hotel_view?.custom_layout && habbtenConfig.hotel_view.custom_layout.objects) {
         const layout = habbtenConfig.hotel_view.custom_layout;
-        const customBg = (layout.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') ? layout.background : backgroundColor;
+        // Don't override the default sky color with transparent canvas background
+        const customBg = (layout.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') 
+            ? layout.background 
+            : backgroundColor;
         
         return (
             <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
                 { backgrounds }
                 <div className="custom-landing-view position-absolute" style={{ zIndex: 1, pointerEvents: 'none', left: 0, top: 0, right: 0, bottom: 0 }}>
                     {layout.objects.map((el: any, i: number) => {
-                        let actualLeft: any = el.left;
-                        let actualTop: any = el.top;
-                        let actualRight: any = 'auto';
-                        let actualBottom: any = 'auto';
-                        
-                        const elWidth = el.width * (el.scaleX || 1);
-                        const elHeight = el.height * (el.scaleY || 1);
+                        // Skip invisible or empty image objects
+                        if (el.visible === false) return null;
+                        if (el.type === 'image' && (!el.src || el.width === 0 || el.height === 0)) return null;
 
-                        // Auto-anchoring: convert 1024x768 absolute coordinates to responsive corner-pinned coordinates
-                        // We ALWAYS anchor to BOTTOM because the hotel buildings (ts.png, US_right.png) 
-                        // are pinned to the bottom of the screen in Nitro.
-                        actualTop = 'auto';
-                        actualBottom = 768 - (el.top + elHeight);
+                        const scaleX = el.scaleX || 1;
+                        const scaleY = el.scaleY || 1;
+                        const elWidth = el.width * scaleX;
+                        const elHeight = el.height * scaleY;
 
-                        if (el.left > 1024 / 2) {
-                            actualLeft = 'auto';
-                            actualRight = 1024 - (el.left + elWidth);
-                        }
+                        // Percentage-based positioning: map 1024x768 canvas coords → viewport %
+                        // This preserves the exact visual position from the designer at any screen size
+                        const leftPct = (el.left / CANVAS_W) * 100;
+                        const topPct = (el.top / CANVAS_H) * 100;
 
                         const style: React.CSSProperties = {
                             position: 'absolute',
-                            left: actualLeft,
-                            right: actualRight,
-                            top: actualTop,
-                            bottom: actualBottom,
-                            width: elWidth,
-                            height: elHeight,
+                            left: `${leftPct}%`,
+                            top: `${topPct}%`,
+                            width: `${(elWidth / CANVAS_W) * 100}%`,
+                            height: `${(elHeight / CANVAS_H) * 100}%`,
                             transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg)`,
                             transformOrigin: '0 0',
-                            opacity: el.opacity,
+                            opacity: el.opacity ?? 1,
                             pointerEvents: el.hyperlink || el.type === 'custom-widget' ? 'auto' : 'none',
                             cursor: el.hyperlink ? 'pointer' : 'default',
+                            zIndex: i + 1,
                         };
+
+                        // Shadow support
+                        const shadowStr = buildShadow(el.shadow);
 
                         const onClick = el.hyperlink ? () => window.open(el.hyperlink, '_blank') : undefined;
 
+                        // Data Binding
                         let boundText = el.text;
-                        let boundHeight = el.height * (el.scaleY || 1);
-                        let boundWidth = el.width * (el.scaleX || 1);
+                        let boundWidthPct = (elWidth / CANVAS_W) * 100;
+                        let boundHeightPct = (elHeight / CANVAS_H) * 100;
 
-                        // Data Binding Logic
-                        const MAX_USERS_TERM = 50; // Meta visual para llenar el 100% del termómetro
+                        const MAX_USERS_TERM = 50;
                         if (el.dataBinding === 'online_users_text') {
-                            boundText = boundText.replace(/\{online\}/g, onlineUsers.toString());
-                            if (!boundText.includes(onlineUsers.toString())) {
+                            if (boundText && boundText.includes('{online}')) {
+                                boundText = boundText.replace(/\{online\}/g, onlineUsers.toString());
+                            } else {
                                 boundText = `${onlineUsers} usuarios en línea`;
                             }
                         } else if (el.dataBinding === 'online_users_width') {
                             const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
-                            boundWidth = boundWidth * (percent / 100);
+                            boundWidthPct = boundWidthPct * (percent / 100);
                         } else if (el.dataBinding === 'online_users_height') {
                             const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
-                            const newHeight = boundHeight * (percent / 100);
-                            // Ajustar posición 'top' para que crezca desde abajo
-                            style.top = el.top + (boundHeight - newHeight);
-                            boundHeight = newHeight;
+                            boundHeightPct = boundHeightPct * (percent / 100);
                         }
 
-                        style.width = boundWidth;
-                        style.height = boundHeight;
+                        style.width = `${boundWidthPct}%`;
+                        style.height = `${boundHeightPct}%`;
 
                         if (el.type === 'i-text' || el.type === 'text') {
+                            // Use vw-based font size so text scales with viewport
+                            const fontSizePx = el.fontSize * scaleX;
+                            const fontSizeVw = (fontSizePx / CANVAS_W) * 100;
+
                             return (
-                                <div key={i} style={{ ...style, color: el.fill, fontFamily: el.fontFamily, fontSize: el.fontSize * (el.scaleX || 1), fontWeight: el.fontWeight, fontStyle: el.fontStyle, textAlign: el.textAlign, whiteSpace: 'pre-wrap' }} onClick={onClick}>
+                                <div key={i} style={{
+                                    ...style,
+                                    color: el.fill,
+                                    fontFamily: el.fontFamily,
+                                    fontSize: `${fontSizeVw}vw`,
+                                    fontWeight: el.fontWeight,
+                                    fontStyle: el.fontStyle,
+                                    textAlign: el.textAlign,
+                                    whiteSpace: 'pre-wrap',
+                                    lineHeight: 1.16,
+                                    textShadow: shadowStr || undefined,
+                                }} onClick={onClick}>
                                     {boundText}
                                 </div>
                             );
                         } else if (el.type === 'rect') {
-                            return <div key={i} style={{ ...style, backgroundColor: el.fill }} onClick={onClick} />;
+                            return <div key={i} style={{
+                                ...style,
+                                backgroundColor: el.fill,
+                                borderRadius: el.rx ? `${el.rx}px` : undefined,
+                                boxShadow: shadowStr || undefined,
+                            }} onClick={onClick} />;
                         } else if (el.type === 'circle') {
-                            return <div key={i} style={{ ...style, backgroundColor: el.fill, borderRadius: '50%' }} onClick={onClick} />;
+                            return <div key={i} style={{
+                                ...style,
+                                backgroundColor: el.fill,
+                                borderRadius: '50%',
+                                boxShadow: shadowStr || undefined,
+                            }} onClick={onClick} />;
                         } else if (el.type === 'image') {
-                            return <img key={i} src={el.src} style={{ ...style }} onClick={onClick} />;
+                            return <img key={i} src={el.src} alt="" style={{
+                                ...style,
+                                objectFit: 'fill',
+                                filter: shadowStr ? `drop-shadow(${shadowStr})` : undefined,
+                            }} onClick={onClick} />;
                         } else if (el.type === 'custom-widget') {
                             return (
                                 <div key={i} style={{ ...style, pointerEvents: 'auto' }}>
@@ -172,7 +210,6 @@ export const HotelView: FC<{}> = props =>
                         return null;
                     })}
                 </div>
-                {/* Widgets predeterminados si se habilitan más adelante */}
                 { GetConfiguration('hotelview')['show.avatar'] && (
                     <div className="avatar-image" style={{ zIndex: 2 }}>
                         <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
