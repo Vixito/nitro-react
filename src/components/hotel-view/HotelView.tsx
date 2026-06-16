@@ -87,18 +87,38 @@ export const HotelView: FC<{}> = props =>
         return (
             <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
                 { backgrounds }
-                <div className="custom-landing-view position-absolute" style={{ zIndex: 1, pointerEvents: 'none', left: '50%', top: '50%', width: '1024px', height: '768px', transform: 'translate(-50%, -50%)' }}>
+                <div className="custom-landing-view position-absolute" style={{ zIndex: 1, pointerEvents: 'none', left: 0, top: 0, right: 0, bottom: 0 }}>
                     {layout.objects.map((el: any, i: number) => {
+                        let actualLeft: any = el.left;
+                        let actualTop: any = el.top;
+                        let actualRight: any = 'auto';
+                        let actualBottom: any = 'auto';
+                        
+                        const elWidth = el.width * (el.scaleX || 1);
+                        const elHeight = el.height * (el.scaleY || 1);
+
+                        // Auto-anchoring: convert 1024x768 absolute coordinates to responsive corner-pinned coordinates
+                        if (el.left > 1024 / 2) {
+                            actualLeft = 'auto';
+                            actualRight = 1024 - (el.left + elWidth);
+                        }
+                        if (el.top > 768 / 2) {
+                            actualTop = 'auto';
+                            actualBottom = 768 - (el.top + elHeight);
+                        }
+
                         const style: React.CSSProperties = {
                             position: 'absolute',
-                            left: el.left,
-                            top: el.top,
-                            width: el.width * (el.scaleX || 1),
-                            height: el.height * (el.scaleY || 1),
+                            left: actualLeft,
+                            right: actualRight,
+                            top: actualTop,
+                            bottom: actualBottom,
+                            width: elWidth,
+                            height: elHeight,
                             transform: `rotate(${el.angle || 0}deg)`,
                             transformOrigin: '0 0',
                             opacity: el.opacity,
-                            pointerEvents: el.hyperlink ? 'auto' : 'none',
+                            pointerEvents: el.hyperlink || el.type === 'custom-widget' ? 'auto' : 'none',
                             cursor: el.hyperlink ? 'pointer' : 'default',
                         };
 
