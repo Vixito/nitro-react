@@ -1,5 +1,5 @@
 import { NitroConfiguration, RoomSessionEvent } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { GetConfiguration } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
@@ -14,6 +14,8 @@ export const HotelView: FC<{}> = props =>
     const [ isVisible, setIsVisible ] = useState(true);
     const { userFigure = null } = useSessionInfo();
     const [ onlineUsers, setOnlineUsers ] = useState(0);
+    const hotelViewRef = useRef<HTMLDivElement>(null);
+    const [ overlayScale, setOverlayScale ] = useState({ x: 1, y: 1 });
 
     useRoomSessionManagerEvent<RoomSessionEvent>([
         RoomSessionEvent.CREATED,
@@ -42,8 +44,25 @@ export const HotelView: FC<{}> = props =>
             }
         };
         fetchStats();
-        const interval = setInterval(fetchStats, 10000); // Actualizar cada 10 seg
+        const interval = setInterval(fetchStats, 10000);
         return () => clearInterval(interval);
+    }, [isVisible]);
+
+    // ResizeObserver: scale the 1024x768 overlay to fill the actual viewport
+    useEffect(() => {
+        if (!isVisible) return;
+        const updateScale = () => {
+            const el = hotelViewRef.current;
+            if (!el) return;
+            const w = el.clientWidth;
+            const h = el.clientHeight;
+            setOverlayScale({ x: w / CANVAS_W, y: h / CANVAS_H });
+        };
+        updateScale();
+        const ro = new ResizeObserver(updateScale);
+        if (hotelViewRef.current) ro.observe(hotelViewRef.current);
+        window.addEventListener('resize', updateScale);
+        return () => { ro.disconnect(); window.removeEventListener('resize', updateScale); };
     }, [isVisible]);
 
     if(!isVisible) return null;
@@ -71,6 +90,14 @@ export const HotelView: FC<{}> = props =>
         return GetConfiguration('hotelview')['widgets']['slot.' + slotId + '.widget'];
     };
 
+    // Helper: Build CSS shadow string from Fabric.js shadow object
+    const buildShadow = (shadow: any): string => {
+        if (!shadow) return '';
+        if (typeof shadow === 'string') return shadow;
+        const { color = 'rgba(0,0,0,0.5)', blur = 0, offsetX = 0, offsetY = 0 } = shadow;
+        return `${offsetX}px ${offsetY}px ${blur}px ${color}`;
+    };
+
     const backgrounds = (
         <>
             <div className="background position-absolute" style={ (background && background.length) ? { backgroundImage: `url(${ background })` } : {} } />
@@ -82,47 +109,46 @@ export const HotelView: FC<{}> = props =>
         </>
     );
 
-    // Helper: Build CSS shadow string from Fabric.js shadow object
-    const buildShadow = (shadow: any): string => {
-        if (!shadow) return '';
-        // Fabric.js stores shadow as: { color, blur, offsetX, offsetY }
-        if (typeof shadow === 'string') return shadow;
-        const { color = 'rgba(0,0,0,0.5)', blur = 0, offsetX = 0, offsetY = 0 } = shadow;
-        return `${offsetX}px ${offsetY}px ${blur}px ${color}`;
-    };
-
     if (habbtenConfig?.hotel_view?.custom_layout && habbtenConfig.hotel_view.custom_layout.objects) {
         const layout = habbtenConfig.hotel_view.custom_layout;
-        // Don't override the default sky color with transparent canvas background
         const customBg = (layout.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') 
             ? layout.background 
             : backgroundColor;
+
+        // Filter out invisible and broken image objects
+        const validObjects = layout.objects.filter((el: any) => {
+            if (el.visible === false) return false;
+            if (el.type === 'image' && (!el.src || el.width === 0 || el.height === 0)) return false;
+            return true;
+        });
         
         return (
-            <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
+            <div ref={hotelViewRef} className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
                 { backgrounds }
-                <div className="custom-landing-view position-absolute" style={{ zIndex: 1, pointerEvents: 'none', left: 0, top: 0, right: 0, bottom: 0 }}>
-                    {layout.objects.map((el: any, i: number) => {
-                        // Skip invisible or empty image objects
-                        if (el.visible === false) return null;
-                        if (el.type === 'image' && (!el.src || el.width === 0 || el.height === 0)) return null;
-
+                {/* Overlay: a 1024x768 box scaled to fill the viewport, anchored bottom-left to match the buildings */}
+                <div className="custom-landing-overlay" style={{
+                    position: 'absolute',
+                    left: 0,
+                    bottom: 0,
+                    width: CANVAS_W,
+                    height: CANVAS_H,
+                    transformOrigin: 'left bottom',
+                    transform: `scale(${overlayScale.x}, ${overlayScale.y})`,
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                }}>
+                    {validObjects.map((el: any, i: number) => {
                         const scaleX = el.scaleX || 1;
                         const scaleY = el.scaleY || 1;
                         const elWidth = el.width * scaleX;
                         const elHeight = el.height * scaleY;
 
-                        // Percentage-based positioning: map 1024x768 canvas coords → viewport %
-                        // This preserves the exact visual position from the designer at any screen size
-                        const leftPct = (el.left / CANVAS_W) * 100;
-                        const topPct = (el.top / CANVAS_H) * 100;
-
                         const style: React.CSSProperties = {
                             position: 'absolute',
-                            left: `${leftPct}%`,
-                            top: `${topPct}%`,
-                            width: `${(elWidth / CANVAS_W) * 100}%`,
-                            height: `${(elHeight / CANVAS_H) * 100}%`,
+                            left: el.left,
+                            top: el.top,
+                            width: elWidth,
+                            height: elHeight,
                             transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg)`,
                             transformOrigin: '0 0',
                             opacity: el.opacity ?? 1,
@@ -131,15 +157,13 @@ export const HotelView: FC<{}> = props =>
                             zIndex: i + 1,
                         };
 
-                        // Shadow support
                         const shadowStr = buildShadow(el.shadow);
-
                         const onClick = el.hyperlink ? () => window.open(el.hyperlink, '_blank') : undefined;
 
                         // Data Binding
                         let boundText = el.text;
-                        let boundWidthPct = (elWidth / CANVAS_W) * 100;
-                        let boundHeightPct = (elHeight / CANVAS_H) * 100;
+                        let boundWidth = elWidth;
+                        let boundHeight = elHeight;
 
                         const MAX_USERS_TERM = 50;
                         if (el.dataBinding === 'online_users_text') {
@@ -150,26 +174,24 @@ export const HotelView: FC<{}> = props =>
                             }
                         } else if (el.dataBinding === 'online_users_width') {
                             const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
-                            boundWidthPct = boundWidthPct * (percent / 100);
+                            boundWidth = elWidth * (percent / 100);
                         } else if (el.dataBinding === 'online_users_height') {
                             const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
-                            boundHeightPct = boundHeightPct * (percent / 100);
+                            const newHeight = elHeight * (percent / 100);
+                            style.top = el.top + (elHeight - newHeight);
+                            boundHeight = newHeight;
                         }
 
-                        style.width = `${boundWidthPct}%`;
-                        style.height = `${boundHeightPct}%`;
+                        style.width = boundWidth;
+                        style.height = boundHeight;
 
                         if (el.type === 'i-text' || el.type === 'text') {
-                            // Use vw-based font size so text scales with viewport
-                            const fontSizePx = el.fontSize * scaleX;
-                            const fontSizeVw = (fontSizePx / CANVAS_W) * 100;
-
                             return (
                                 <div key={i} style={{
                                     ...style,
                                     color: el.fill,
                                     fontFamily: el.fontFamily,
-                                    fontSize: `${fontSizeVw}vw`,
+                                    fontSize: el.fontSize * scaleX,
                                     fontWeight: el.fontWeight,
                                     fontStyle: el.fontStyle,
                                     textAlign: el.textAlign,

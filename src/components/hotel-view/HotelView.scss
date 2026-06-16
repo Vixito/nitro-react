@@ -4,6 +4,10 @@
 	width: 100%;
 	height: calc(100% - 55px);
 	background: rgba($black, 1);
+
+	// Scale factors for the 1024x768 custom layout overlay
+	--hv-scale-x: 1;
+	--hv-scale-y: 1;
 	
 	.avatar-image {
 		bottom: 12px;
