@@ -3,6 +3,7 @@ import { BonusRareWidgetView } from './bonus-rare/BonusRareWidgetView';
 import { HallOfFameWidgetView } from './hall-of-fame/HallOfFameWidgetView';
 import { PromoArticleWidgetView } from './promo-article/PromoArticleWidgetView';
 import { WidgetContainerView } from './widget-container/WidgetContainerView';
+import { OnlineThermometerWidgetView } from './online-thermometer/OnlineThermometerWidgetView';
 
 export interface GetWidgetLayoutProps
 {
@@ -23,6 +24,8 @@ export const GetWidgetLayout: FC<GetWidgetLayoutProps> = props =>
             return <BonusRareWidgetView />;
         case 'widgetcontainer':
             return <WidgetContainerView conf={ props.widgetConf } />
+        case 'online_thermometer':
+            return <OnlineThermometerWidgetView />;
         default:
             return null;
     }

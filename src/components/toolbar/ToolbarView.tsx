@@ -1,5 +1,5 @@
 import { Dispose, DropBounce, EaseOut, JumpBy, Motions, NitroToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait } from '@nitrots/nitro-renderer';
-import { FC, useState } from 'react';
+import { FC, useState, useRef, useEffect } from 'react';
 import { CreateLinkEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, VisitDesktop } from '../../api';
 import { Base, Flex, LayoutAvatarImageView, LayoutItemCountView, TransitionAnimation, TransitionAnimationTypes } from '../../common';
 import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useRoomEngineEvent, useSessionInfo } from '../../hooks';
@@ -17,8 +17,33 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
     const isMod = GetSessionDataManager().isModerator;
     
+    const [isPlayingRadio, setIsPlayingRadio] = useState(false);
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const [radioVolume, setRadioVolume] = useState(0.5);
+
     const habbtenConfig = (window as any).HabbtenConfig;
+    const radioUrl = habbtenConfig?.radio?.url;
     const isGameCenterEnabled = habbtenConfig?.client?.toolbar_icons?.game_center ?? GetConfiguration('game.center.enabled');
+    
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.volume = radioVolume;
+        }
+    }, [radioVolume]);
+
+    const toggleRadio = () => {
+        if (audioRef.current && radioUrl) {
+            if (isPlayingRadio) {
+                audioRef.current.pause();
+                // Reset source to avoid downloading in background
+                audioRef.current.src = "";
+            } else {
+                audioRef.current.src = radioUrl;
+                audioRef.current.play().catch(e => console.error("Radio play failed:", e));
+            }
+            setIsPlayingRadio(!isPlayingRadio);
+        }
+    };
     
     useMessageEvent<PerkAllowancesMessageEvent>(PerkAllowancesMessageEvent, event =>
     {
@@ -94,6 +119,23 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <Base pointer className="navigation-item icon icon-camera" onClick={ event => CreateLinkEvent('camera/toggle') } /> }
                         { isMod &&
                             <Base pointer className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
+                        { radioUrl && (
+                            <Flex alignItems="center" gap={ 1 } className="navigation-item" style={{ background: 'rgba(0,0,0,0.6)', padding: '0 8px', borderRadius: '4px', height: '30px' }}>
+                                <audio ref={audioRef} preload="none" />
+                                <Base pointer onClick={toggleRadio} className="text-white text-sm font-bold" style={{ whiteSpace: 'nowrap' }}>
+                                    {isPlayingRadio ? '⏸ Radio' : '▶ Radio'}
+                                </Base>
+                                {isPlayingRadio && (
+                                    <input 
+                                        type="range" 
+                                        min="0" max="1" step="0.01" 
+                                        value={radioVolume} 
+                                        onChange={(e) => setRadioVolume(parseFloat(e.target.value))} 
+                                        style={{ width: '50px', height: '4px', cursor: 'pointer' }}
+                                    />
+                                )}
+                            </Flex>
+                        )}
                     </Flex>
                 </Flex>
                 <Flex alignItems="center" id="toolbar-chat-input-container" />

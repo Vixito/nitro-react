@@ -26,7 +26,10 @@ const MODE_SIGNS = 4;
 export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProps> = props =>
 {
     const { avatarInfo = null, isDancing = false, setIsDecorating = null, onClose = null } = props;
-    const [ mode, setMode ] = useState((isDancing && HasHabboClub()) ? MODE_CLUB_DANCES : MODE_NORMAL);
+    const habbtenConfig = (window as any).HabbtenConfig || (window.parent as any).HabbtenConfig;
+    const dancesEnabled = habbtenConfig?.dances_enabled !== false;
+    const canDanceAll = dancesEnabled || HasHabboClub();
+    const [ mode, setMode ] = useState((isDancing && canDanceAll) ? MODE_CLUB_DANCES : MODE_NORMAL);
     const { roomSession = null } = useRoom();
 
     const processAction = (name: string) =>
@@ -133,16 +136,16 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                     <ContextMenuListItemView onClick={ event => processAction('change_looks') }>
                         { LocalizeText('widget.memenu.myclothes') }
                     </ContextMenuListItemView>
-                    { (HasHabboClub() && !isRidingHorse) &&
+                    { (canDanceAll && !isRidingHorse) &&
                         <ContextMenuListItemView onClick={ event => processAction('dance_menu') }>
                             <FaChevronRight className="right fa-icon" />
                             { LocalizeText('widget.memenu.dance') }
                         </ContextMenuListItemView> }
-                    { (!isDancing && !HasHabboClub() && !isRidingHorse) &&
+                    { (!isDancing && !canDanceAll && !isRidingHorse) &&
                         <ContextMenuListItemView onClick={ event => processAction('dance') }>
                             { LocalizeText('widget.memenu.dance') }
                         </ContextMenuListItemView> }
-                    { (isDancing && !HasHabboClub() && !isRidingHorse) &&
+                    { (isDancing && !canDanceAll && !isRidingHorse) &&
                         <ContextMenuListItemView onClick={ event => processAction('dance_stop') }>
                             { LocalizeText('widget.memenu.dance.stop') }
                         </ContextMenuListItemView> }

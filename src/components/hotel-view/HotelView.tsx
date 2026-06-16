@@ -1,5 +1,5 @@
 import { NitroConfiguration, RoomSessionEvent } from '@nitrots/nitro-renderer';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { GetConfiguration } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
@@ -11,6 +11,7 @@ export const HotelView: FC<{}> = props =>
 {
     const [ isVisible, setIsVisible ] = useState(true);
     const { userFigure = null } = useSessionInfo();
+    const [ onlineUsers, setOnlineUsers ] = useState(0);
 
     useRoomSessionManagerEvent<RoomSessionEvent>([
         RoomSessionEvent.CREATED,
@@ -26,6 +27,22 @@ export const HotelView: FC<{}> = props =>
                 return;
         }
     });
+
+    useEffect(() => {
+        if (!isVisible) return;
+        const fetchStats = async () => {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                setOnlineUsers(data.online_users || 0);
+            } catch (err) {
+                console.error('Failed to fetch online stats', err);
+            }
+        };
+        fetchStats();
+        const interval = setInterval(fetchStats, 10000); // Actualizar cada 10 seg
+        return () => clearInterval(interval);
+    }, [isVisible]);
 
     if(!isVisible) return null;
 
@@ -87,10 +104,35 @@ export const HotelView: FC<{}> = props =>
 
                         const onClick = el.hyperlink ? () => window.open(el.hyperlink, '_blank') : undefined;
 
+                        let boundText = el.text;
+                        let boundHeight = el.height * (el.scaleY || 1);
+                        let boundWidth = el.width * (el.scaleX || 1);
+
+                        // Data Binding Logic
+                        const MAX_USERS_TERM = 50; // Meta visual para llenar el 100% del termómetro
+                        if (el.dataBinding === 'online_users_text') {
+                            boundText = boundText.replace(/\{online\}/g, onlineUsers.toString());
+                            if (!boundText.includes(onlineUsers.toString())) {
+                                boundText = `${onlineUsers} usuarios en línea`;
+                            }
+                        } else if (el.dataBinding === 'online_users_width') {
+                            const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
+                            boundWidth = boundWidth * (percent / 100);
+                        } else if (el.dataBinding === 'online_users_height') {
+                            const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
+                            const newHeight = boundHeight * (percent / 100);
+                            // Ajustar posición 'top' para que crezca desde abajo
+                            style.top = el.top + (boundHeight - newHeight);
+                            boundHeight = newHeight;
+                        }
+
+                        style.width = boundWidth;
+                        style.height = boundHeight;
+
                         if (el.type === 'i-text' || el.type === 'text') {
                             return (
                                 <div key={i} style={{ ...style, color: el.fill, fontFamily: el.fontFamily, fontSize: el.fontSize * (el.scaleX || 1), fontWeight: el.fontWeight, fontStyle: el.fontStyle, textAlign: el.textAlign, whiteSpace: 'pre-wrap' }} onClick={onClick}>
-                                    {el.text}
+                                    {boundText}
                                 </div>
                             );
                         } else if (el.type === 'rect') {
