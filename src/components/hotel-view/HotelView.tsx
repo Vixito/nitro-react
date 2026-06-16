@@ -14,8 +14,7 @@ export const HotelView: FC<{}> = props =>
     const [ isVisible, setIsVisible ] = useState(true);
     const { userFigure = null } = useSessionInfo();
     const [ onlineUsers, setOnlineUsers ] = useState(0);
-    const hotelViewRef = useRef<HTMLDivElement>(null);
-    const [ overlayScale, setOverlayScale ] = useState({ x: 1, y: 1 });
+    const [ layoutState, setLayoutState ] = useState<Record<string, any>>({});
 
     useRoomSessionManagerEvent<RoomSessionEvent>([
         RoomSessionEvent.CREATED,
@@ -46,23 +45,6 @@ export const HotelView: FC<{}> = props =>
         fetchStats();
         const interval = setInterval(fetchStats, 10000);
         return () => clearInterval(interval);
-    }, [isVisible]);
-
-    // ResizeObserver: scale the 1024x768 overlay to fill the actual viewport
-    useEffect(() => {
-        if (!isVisible) return;
-        const updateScale = () => {
-            const el = hotelViewRef.current;
-            if (!el) return;
-            const w = el.clientWidth;
-            const h = el.clientHeight;
-            setOverlayScale({ x: w / CANVAS_W, y: h / CANVAS_H });
-        };
-        updateScale();
-        const ro = new ResizeObserver(updateScale);
-        if (hotelViewRef.current) ro.observe(hotelViewRef.current);
-        window.addEventListener('resize', updateScale);
-        return () => { ro.disconnect(); window.removeEventListener('resize', updateScale); };
     }, [isVisible]);
 
     if(!isVisible) return null;
@@ -123,42 +105,75 @@ export const HotelView: FC<{}> = props =>
         });
         
         return (
-            <div ref={hotelViewRef} className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
+            <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
                 { backgrounds }
-                {/* Overlay: a 1024x768 box scaled to fill the viewport, anchored bottom-left to match the buildings */}
+                {/* Overlay: Anchored bottom-left to match the background buildings exact pixel positioning */}
                 <div className="custom-landing-overlay" style={{
                     position: 'absolute',
                     left: 0,
                     bottom: 0,
-                    width: CANVAS_W,
-                    height: CANVAS_H,
-                    transformOrigin: 'left bottom',
-                    transform: `scale(${overlayScale.x}, ${overlayScale.y})`,
+                    width: '100%',
+                    height: '100%',
                     pointerEvents: 'none',
                     zIndex: 1,
                 }}>
                     {validObjects.map((el: any, i: number) => {
+                        // Interactive Engine: Evaluate visibility condition
+                        if (el.condition) {
+                            try {
+                                const keys = Object.keys(layoutState);
+                                const values = Object.values(layoutState);
+                                const fn = new Function(...keys, `return ${el.condition};`);
+                                if (!fn(...values)) {
+                                    // Hidden elements keep their state but have 0 opacity and pointer-events none to allow CSS fade transitions
+                                    el._hiddenByCondition = true;
+                                } else {
+                                    el._hiddenByCondition = false;
+                                }
+                            } catch(e) { el._hiddenByCondition = false; }
+                        } else {
+                            el._hiddenByCondition = false;
+                        }
+
                         const scaleX = el.scaleX || 1;
                         const scaleY = el.scaleY || 1;
                         const elWidth = el.width * scaleX;
                         const elHeight = el.height * scaleY;
+                        
+                        // Exact pixel positioning anchored to bottom-left
+                        const bottomPx = CANVAS_H - el.top - elHeight;
 
                         const style: React.CSSProperties = {
                             position: 'absolute',
                             left: el.left,
-                            top: el.top,
+                            bottom: bottomPx,
                             width: elWidth,
                             height: elHeight,
                             transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg)`,
                             transformOrigin: '0 0',
-                            opacity: el.opacity ?? 1,
-                            pointerEvents: el.hyperlink || el.type === 'custom-widget' ? 'auto' : 'none',
-                            cursor: el.hyperlink ? 'pointer' : 'default',
+                            opacity: el._hiddenByCondition ? 0 : (el.opacity ?? 1),
+                            pointerEvents: el._hiddenByCondition ? 'none' : (el.hyperlink || el.clickAction || el.type === 'custom-widget' ? 'auto' : 'none'),
+                            cursor: (el.hyperlink || el.clickAction) && !el._hiddenByCondition ? 'pointer' : 'default',
+                            transition: 'all 0.4s ease-in-out',
                             zIndex: i + 1,
                         };
 
                         const shadowStr = buildShadow(el.shadow);
-                        const onClick = el.hyperlink ? () => window.open(el.hyperlink, '_blank') : undefined;
+                        
+                        // Interactive Engine: Click Actions
+                        const onClick = () => {
+                            if (el._hiddenByCondition) return;
+                            if (el.hyperlink) window.open(el.hyperlink, '_blank');
+                            if (el.clickAction) {
+                                try {
+                                    const parts = el.clickAction.split('=').map((s: string) => s.trim());
+                                    if (parts.length === 2) {
+                                        let val = isNaN(Number(parts[1])) ? parts[1].replace(/['"]/g, '') : Number(parts[1]);
+                                        setLayoutState(prev => ({ ...prev, [parts[0]]: val }));
+                                    }
+                                } catch(e) {}
+                            }
+                        };
 
                         // Data Binding
                         let boundText = el.text;
@@ -178,7 +193,9 @@ export const HotelView: FC<{}> = props =>
                         } else if (el.dataBinding === 'online_users_height') {
                             const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
                             const newHeight = elHeight * (percent / 100);
-                            style.top = el.top + (elHeight - newHeight);
+                            style.height = newHeight;
+                            // Need to adjust bottom if we want it to grow from bottom, but default scales from top
+                            // If we want it to grow from bottom, we don't need to change bottom, just the height.
                             boundHeight = newHeight;
                         }
 
@@ -307,4 +324,4 @@ export const HotelView: FC<{}> = props =>
             ) }
         </div>
     );
-}
+};
