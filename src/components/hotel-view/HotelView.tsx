@@ -184,41 +184,63 @@ export const HotelView: FC<{}> = props =>
                             }
                         };
 
-                        // Data Binding
-                        let boundText = el.text;
+                        // Parse Data Binding Variables
+                        const parseTemplate = (str: string) => {
+                            if (!str) return '';
+                            let parsed = str.replace(/\{\{\s*online_users\s*\}\}/g, onlineUsers.toString());
+                            parsed = parsed.replace(/\{\{\s*user\.username\s*\}\}/g, userInfo?.username || '');
+                            return parsed;
+                        };
+
+                        let boundText = parseTemplate(el.text);
                         let boundWidth = elWidth;
                         let boundHeight = elHeight;
 
-                        const MAX_USERS_TERM = 50;
-                        if (el.dataBinding === 'online_users_text') {
-                            if (boundText && boundText.includes('{online}')) {
-                                boundText = boundText.replace(/\{online\}/g, onlineUsers.toString());
-                            } else {
+                        // Support legacy or custom JS eval in dataBinding if it starts with '='
+                        if (el.dataBinding) {
+                            const dbStr = parseTemplate(el.dataBinding);
+                            if (dbStr === 'online_users_text') {
                                 boundText = `${onlineUsers} usuarios en línea`;
+                            } else if (dbStr === 'online_users_width') {
+                                boundWidth = elWidth * (Math.min(100, (onlineUsers / 50) * 100) / 100);
+                            } else if (dbStr === 'online_users_height') {
+                                boundHeight = elHeight * (Math.min(100, (onlineUsers / 50) * 100) / 100);
+                            } else if (dbStr.startsWith('=')) {
+                                // e.g. "=online_users * 2"
+                                try {
+                                    const evaluated = Function('"use strict"; const online_users=' + onlineUsers + '; return (' + dbStr.substring(1) + ')')();
+                                    if (!isNaN(evaluated)) boundWidth = evaluated; // Default apply to width if just a number
+                                } catch(e) {}
+                            } else if (dbStr !== '') {
+                                // If they just wrote a template string in dataBinding, override the text
+                                boundText = dbStr;
                             }
-                        } else if (el.dataBinding === 'online_users_width') {
-                            const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
-                            boundWidth = elWidth * (percent / 100);
-                        } else if (el.dataBinding === 'online_users_height') {
-                            const percent = Math.min(100, (onlineUsers / MAX_USERS_TERM) * 100);
-                            const newHeight = elHeight * (percent / 100);
-                            style.height = newHeight;
-                            // Need to adjust bottom if we want it to grow from bottom, but default scales from top
-                            // If we want it to grow from bottom, we don't need to change bottom, just the height.
-                            boundHeight = newHeight;
                         }
 
                         style.width = boundWidth;
                         style.height = boundHeight;
 
-                        const customClasses = el.cssClasses ? ` ${el.cssClasses}` : '';
+                        const customClasses = el.cssClasses ? ` ${parseTemplate(el.cssClasses)}` : '';
+                        if (el.cssStyle) {
+                            try {
+                                const parsedStyle = parseTemplate(el.cssStyle);
+                                const extraStyles = parsedStyle.split(';').filter((s: string) => s.trim().length > 0).reduce((acc: any, rule: string) => {
+                                    const [key, val] = rule.split(':').map((s: string) => s.trim());
+                                    if (key && val) {
+                                        const camelKey = key.replace(/-([a-z])/g, (g: string) => g[1].toUpperCase());
+                                        acc[camelKey] = val;
+                                    }
+                                    return acc;
+                                }, {});
+                                Object.assign(style, extraStyles);
+                            } catch(e) {}
+                        }
 
                         if (el.type === 'custom-widget') {
                             if (el.widgetType === 'promo_article') {
                                 return (
                                     <div key={'w'+i} className={`custom-landing-widget${customClasses}`} style={style} onClick={onClick}>
                                         <div className="custom-widget-promo">
-                                            {/* Example implementation, usually bound to data */}
                                         </div>
                                     </div>
                                 );
