@@ -142,6 +142,15 @@ export const HotelView: FC<{}> = props =>
                         
                         // Exact pixel positioning anchored to bottom-left
                         const bottomPx = CANVAS_H - el.top - elHeight;
+                        
+                        const customCssProps = el.cssStyle ? el.cssStyle.split(';').reduce((acc: any, rule: string) => {
+                            const match = rule.match(/^\s*([\w-]+)\s*:\s*(.+?)\s*$/);
+                            if (match) {
+                                const camelKey = match[1].replace(/-([a-z])/g, g => g[1].toUpperCase());
+                                acc[camelKey] = match[2];
+                            }
+                            return acc;
+                        }, {}) : {};
 
                         const style: React.CSSProperties = {
                             position: 'absolute',
@@ -202,48 +211,67 @@ export const HotelView: FC<{}> = props =>
                         style.width = boundWidth;
                         style.height = boundHeight;
 
+                        const customClasses = el.cssClasses ? ` ${el.cssClasses}` : '';
+
+                        if (el.type === 'custom-widget') {
+                            if (el.widgetType === 'promo_article') {
+                                return (
+                                    <div key={'w'+i} className={`custom-landing-widget${customClasses}`} style={style} onClick={onClick}>
+                                        <div className="custom-widget-promo">
+                                            {/* Example implementation, usually bound to data */}
+                                        </div>
+                                    </div>
+                                );
+                            }
+                            return (
+                                <div key={i} className={`custom-widget-container${customClasses}`} style={{ ...style, pointerEvents: 'auto' }}>
+                                    <WidgetSlotView widgetSlot={el.slotId || 1} widgetType={el.widgetType || ''} widgetConf={el.widgetConf || ''} />
+                                </div>
+                            );
+                        }
+
                         if (el.type === 'i-text' || el.type === 'text') {
                             return (
-                                <div key={i} style={{
+                                <div key={'t'+i} className={`custom-landing-text${customClasses}`} style={{
                                     ...style,
                                     color: el.fill,
                                     fontFamily: el.fontFamily,
                                     fontSize: el.fontSize * scaleX,
-                                    fontWeight: el.fontWeight,
-                                    fontStyle: el.fontStyle,
+                                    lineHeight: 1.16,
                                     textAlign: el.textAlign,
                                     whiteSpace: 'pre-wrap',
-                                    lineHeight: 1.16,
-                                    textShadow: shadowStr || undefined,
+                                    textShadow: buildShadow(el.shadow) || undefined,
                                 }} onClick={onClick}>
                                     {boundText}
                                 </div>
                             );
-                        } else if (el.type === 'rect') {
-                            return <div key={i} style={{
+                        }
+
+                        if (el.type === 'rect') {
+                            return <div key={'r'+i} className={`custom-landing-shape custom-rect${customClasses}`} style={{
                                 ...style,
                                 backgroundColor: el.fill,
                                 borderRadius: el.rx ? `${el.rx}px` : undefined,
-                                boxShadow: shadowStr || undefined,
+                                boxShadow: buildShadow(el.shadow) || undefined,
                             }} onClick={onClick} />;
-                        } else if (el.type === 'circle') {
-                            return <div key={i} style={{
+                        }
+                        
+                        if (el.type === 'circle') {
+                            return <div key={'c'+i} className={`custom-landing-shape custom-circle${customClasses}`} style={{
                                 ...style,
                                 backgroundColor: el.fill,
                                 borderRadius: '50%',
-                                boxShadow: shadowStr || undefined,
+                                boxShadow: buildShadow(el.shadow) || undefined,
                             }} onClick={onClick} />;
-                        } else if (el.type === 'image') {
-                            return <img key={i} src={el.src} alt="" style={{
-                                ...style,
-                                objectFit: 'fill',
-                                filter: shadowStr ? `drop-shadow(${shadowStr})` : undefined,
-                            }} onClick={onClick} />;
-                        } else if (el.type === 'custom-widget') {
+                        }
+
+                        if (el.type === 'image' && el.src) {
                             return (
-                                <div key={i} style={{ ...style, pointerEvents: 'auto' }}>
-                                    <WidgetSlotView widgetSlot={el.slotId || 1} widgetType={el.widgetType || ''} widgetConf={el.widgetConf || ''} />
-                                </div>
+                                <img key={'i'+i} src={el.src} className={`custom-landing-img${customClasses}`} style={{
+                                    ...style,
+                                    // Shadows natively applied to images using CSS filter drop-shadow
+                                    filter: el.shadow ? `drop-shadow(${el.shadow.offsetX}px ${el.shadow.offsetY}px ${el.shadow.blur}px ${el.shadow.color})` : 'none'
+                                }} onClick={onClick} alt="hotel-widget" />
                             );
                         }
                         return null;
