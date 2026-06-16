@@ -98,13 +98,14 @@ export const HotelView: FC<{}> = props =>
                         const elHeight = el.height * (el.scaleY || 1);
 
                         // Auto-anchoring: convert 1024x768 absolute coordinates to responsive corner-pinned coordinates
+                        // We ALWAYS anchor to BOTTOM because the hotel buildings (ts.png, US_right.png) 
+                        // are pinned to the bottom of the screen in Nitro.
+                        actualTop = 'auto';
+                        actualBottom = 768 - (el.top + elHeight);
+
                         if (el.left > 1024 / 2) {
                             actualLeft = 'auto';
                             actualRight = 1024 - (el.left + elWidth);
-                        }
-                        if (el.top > 768 / 2) {
-                            actualTop = 'auto';
-                            actualBottom = 768 - (el.top + elHeight);
                         }
 
                         const style: React.CSSProperties = {
