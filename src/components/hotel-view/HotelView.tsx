@@ -116,7 +116,7 @@ export const HotelView: FC<{}> = props =>
                             bottom: actualBottom,
                             width: elWidth,
                             height: elHeight,
-                            transform: `rotate(${el.angle || 0}deg)`,
+                            transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg)`,
                             transformOrigin: '0 0',
                             opacity: el.opacity,
                             pointerEvents: el.hyperlink || el.type === 'custom-widget' ? 'auto' : 'none',
