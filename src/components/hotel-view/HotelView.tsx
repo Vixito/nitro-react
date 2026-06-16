@@ -82,7 +82,7 @@ export const HotelView: FC<{}> = props =>
 
     if (habbtenConfig?.hotel_view?.custom_layout && habbtenConfig.hotel_view.custom_layout.objects) {
         const layout = habbtenConfig.hotel_view.custom_layout;
-        const customBg = layout.background || backgroundColor;
+        const customBg = (layout.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') ? layout.background : backgroundColor;
         
         return (
             <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
