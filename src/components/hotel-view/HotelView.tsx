@@ -297,6 +297,7 @@ export const HotelView: FC<{}> = props =>
                             return (
                                 <img key={'i'+i} src={el.src} className={`custom-landing-img${customClasses}`} style={{
                                     ...style,
+                                    objectFit: 'fill',
                                     // Shadows natively applied to images using CSS filter drop-shadow
                                     filter: el.shadow ? `drop-shadow(${el.shadow.offsetX}px ${el.shadow.offsetY}px ${el.shadow.blur}px ${el.shadow.color})` : 'none'
                                 }} onClick={onClick} alt="hotel-widget" />
