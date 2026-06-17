@@ -111,11 +111,11 @@ export const HotelView: FC<{}> = props =>
                 <div className="custom-landing-overlay" style={{
                     position: 'absolute',
                     left: 0,
-                    bottom: 0,
-                    width: '1024px',
-                    height: '768px',
+                    top: 0,
+                    width: '100%',
+                    height: '100%',
                     pointerEvents: 'none',
-                    zIndex: 1,
+                    zIndex: 10,
                 }}>
                     {validObjects.map((el: any, i: number) => {
                         // Interactive Engine: Evaluate visibility condition
@@ -140,8 +140,8 @@ export const HotelView: FC<{}> = props =>
                         const elWidth = el.width * scaleX;
                         const elHeight = el.height * scaleY;
                         
-                        // Exact pixel positioning anchored to bottom-left
-                        const bottomPx = CANVAS_H - el.top - elHeight;
+                        // Exact pixel positioning matching CMS designer
+                        const topPx = el.top;
                         
                         const customCssProps = el.cssStyle ? el.cssStyle.split(';').reduce((acc: any, rule: string) => {
                             const match = rule.match(/^\s*([\w-]+)\s*:\s*(.+?)\s*$/);
@@ -155,7 +155,7 @@ export const HotelView: FC<{}> = props =>
                         const style: React.CSSProperties = {
                             position: 'absolute',
                             left: el.left,
-                            bottom: bottomPx,
+                            top: topPx,
                             width: elWidth,
                             height: elHeight,
                             transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg)`,
@@ -306,7 +306,7 @@ export const HotelView: FC<{}> = props =>
                     })}
                 </div>
                 { GetConfiguration('hotelview')['show.avatar'] && (
-                    <div className="avatar-image" style={{ zIndex: 2 }}>
+                    <div className="avatar-image" style={{ zIndex: 11 }}>
                         <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
                     </div>
                 ) }
@@ -369,12 +369,12 @@ export const HotelView: FC<{}> = props =>
             </div>
             { backgrounds }
             { GetConfiguration('hotelview')['show.avatar'] && (
-                <div className="avatar-image" style={{ zIndex: 2 }}>
+                <div className="avatar-image" style={{ zIndex: 11 }}>
                     <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
                 </div>
             ) }
             { habbtenConfig?.hotel_view?.banner && (
-                <div className="custom-banner position-absolute" style={{ top: 20, left: 20, zIndex: 10 }}>
+                <div className="custom-banner position-absolute" style={{ top: 20, left: 20, zIndex: 12 }}>
                     <img src={habbtenConfig.hotel_view.banner} alt="Hotel Banner" style={{ maxWidth: 350, borderRadius: 8, boxShadow: '0 4px 6px rgba(0,0,0,0.3)' }} />
                 </div>
             ) }
