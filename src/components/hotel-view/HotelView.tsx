@@ -135,10 +135,8 @@ export const HotelView: FC<{}> = props =>
                             el._hiddenByCondition = false;
                         }
 
-                        const scaleX = el.scaleX || 1;
-                        const scaleY = el.scaleY || 1;
-                        const elWidth = el.width * scaleX;
-                        const elHeight = el.height * scaleY;
+                        const elWidth = el.width;
+                        const elHeight = el.height;
                         
                         // Exact pixel positioning matching CMS designer
                         const topPx = el.top;
@@ -158,12 +156,13 @@ export const HotelView: FC<{}> = props =>
                             top: topPx,
                             width: elWidth,
                             height: elHeight,
-                            transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg)`,
-                            transformOrigin: '0 0',
+                            transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg) scaleX(${el.scaleX || 1}) scaleY(${el.scaleY || 1})`,
+                            transformOrigin: 'top left',
+                            zIndex: i + 1,
                             opacity: el._hiddenByCondition ? 0 : (el.opacity ?? 1),
                             pointerEvents: el._hiddenByCondition ? 'none' : (el.hyperlink || el.clickAction || el.type === 'custom-widget' ? 'auto' : 'none'),
                             cursor: (el.hyperlink || el.clickAction) && !el._hiddenByCondition ? 'pointer' : 'default',
-                            zIndex: i + 1,
+                            ...customCssProps
                         };
 
                         const shadowStr = buildShadow(el.shadow);
@@ -264,7 +263,7 @@ export const HotelView: FC<{}> = props =>
                                     ...style,
                                     color: el.fill,
                                     fontFamily: el.fontFamily,
-                                    fontSize: el.fontSize * scaleX,
+                                    fontSize: el.fontSize,
                                     lineHeight: 1.16,
                                     textAlign: el.textAlign,
                                     whiteSpace: 'pre-wrap',
