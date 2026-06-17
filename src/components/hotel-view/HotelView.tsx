@@ -12,7 +12,7 @@ const CANVAS_H = 768;
 export const HotelView: FC<{}> = props =>
 {
     const [ isVisible, setIsVisible ] = useState(true);
-    const { userFigure = null } = useSessionInfo();
+    const { userFigure = null, userInfo = null } = useSessionInfo();
     const [ onlineUsers, setOnlineUsers ] = useState(0);
     const [ layoutState, setLayoutState ] = useState<Record<string, any>>({});
 
@@ -107,13 +107,13 @@ export const HotelView: FC<{}> = props =>
         return (
             <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : {} }>
                 { backgrounds }
-                {/* Overlay: Anchored bottom-left to match the background buildings exact pixel positioning */}
+                {/* Overlay: Anchored bottom-center with exact 1024x768 dimensions to match CMS designer */}
                 <div className="custom-landing-overlay" style={{
                     position: 'absolute',
                     left: 0,
                     bottom: 0,
-                    width: '100%',
-                    height: '100%',
+                    width: '1024px',
+                    height: '768px',
                     pointerEvents: 'none',
                     zIndex: 1,
                 }}>
@@ -163,7 +163,6 @@ export const HotelView: FC<{}> = props =>
                             opacity: el._hiddenByCondition ? 0 : (el.opacity ?? 1),
                             pointerEvents: el._hiddenByCondition ? 'none' : (el.hyperlink || el.clickAction || el.type === 'custom-widget' ? 'auto' : 'none'),
                             cursor: (el.hyperlink || el.clickAction) && !el._hiddenByCondition ? 'pointer' : 'default',
-                            transition: 'all 0.4s ease-in-out',
                             zIndex: i + 1,
                         };
 
@@ -196,29 +195,36 @@ export const HotelView: FC<{}> = props =>
                         let boundWidth = elWidth;
                         let boundHeight = elHeight;
 
-                        // Support legacy or custom JS eval in dataBinding if it starts with '='
+                        // Support advanced Data Binding via JS Expression
                         if (el.dataBinding) {
                             const dbStr = parseTemplate(el.dataBinding);
-                            if (dbStr === 'online_users_text') {
-                                boundText = `${onlineUsers} usuarios en línea`;
-                            } else if (dbStr === 'online_users_width') {
-                                boundWidth = elWidth * (Math.min(100, (onlineUsers / 50) * 100) / 100);
-                            } else if (dbStr === 'online_users_height') {
-                                boundHeight = elHeight * (Math.min(100, (onlineUsers / 50) * 100) / 100);
-                            } else if (dbStr.startsWith('=')) {
-                                // e.g. "=online_users * 2"
-                                try {
-                                    const evaluated = Function('"use strict"; const online_users=' + onlineUsers + '; return (' + dbStr.substring(1) + ')')();
-                                    if (!isNaN(evaluated)) boundWidth = evaluated; // Default apply to width if just a number
-                                } catch(e) {}
-                            } else if (dbStr !== '') {
-                                // If they just wrote a template string in dataBinding, override the text
+                            try {
+                                const keys = Object.keys(layoutState);
+                                const values = Object.values(layoutState);
+                                const args = ['onlineUsers', 'userInfo', 'Math', 'window', ...keys];
+                                const fnArgs = [onlineUsers, userInfo, Math, window, ...values];
+                                
+                                // Evaluate the string as a JS expression
+                                const evaluated = new Function(...args, `return ${dbStr}`);
+                                const res = evaluated(...fnArgs);
+                                
+                                if (res !== null && typeof res === 'object') {
+                                    // If it returns an object, merge with styles
+                                    Object.assign(style, res);
+                                    if (res.text !== undefined) boundText = res.text;
+                                } else if (res !== undefined) {
+                                    // If primitive, use as text
+                                    boundText = String(res);
+                                }
+                            } catch(e) { 
+                                // Fallback to template replacement if it's just text
                                 boundText = dbStr;
                             }
                         }
 
-                        style.width = boundWidth;
-                        style.height = boundHeight;
+                        style.width = style.width !== undefined ? style.width : boundWidth;
+                        style.height = style.height !== undefined ? style.height : boundHeight;
+
 
                         const customClasses = el.cssClasses ? ` ${parseTemplate(el.cssClasses)}` : '';
                         if (el.cssStyle) {
