@@ -156,7 +156,7 @@ export const HotelView: FC<{}> = props =>
                             top: topPx,
                             width: elWidth,
                             height: elHeight,
-                            transform: `rotate(${el.angle || 0}deg) skewX(${el.skewX || 0}deg) skewY(${el.skewY || 0}deg) scaleX(${el.scaleX || 1}) scaleY(${el.scaleY || 1})`,
+                            transform: `skew(${el.skewX || 0}deg, ${el.skewY || 0}deg) rotate(${el.angle || 0}deg) scaleX(${el.scaleX || 1}) scaleY(${el.scaleY || 1})`,
                             transformOrigin: 'top left',
                             zIndex: i + 1,
                             opacity: el._hiddenByCondition ? 0 : (el.opacity ?? 1),
