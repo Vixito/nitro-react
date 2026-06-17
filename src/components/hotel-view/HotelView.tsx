@@ -54,7 +54,7 @@ export const HotelView: FC<{}> = props =>
     const background = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['background']);
     const sun = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['sun']);
     const drape = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['drape']);
-    const left = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['left']);
+    const left = habbtenConfig?.hotel_view?.custom_layout?.background_image || NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['left']);
     const rightRepeat = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['right.repeat']);
     const right = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['right']);
 
