@@ -48,13 +48,7 @@ const useGameCenterState = () =>
 
         if(!parser) return;
 
-        switch(parser.gameTypeId) 
-        {
-            case 2:
-                return console.log('snowwar')
-            default:
-                return setGameURL(parser.url);
-        }
+        setGameURL(parser.url);
     });
 
     useEffect(()=>

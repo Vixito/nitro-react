@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habbten - SnowStorm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-ui">
+        <div class="ui-panel top-left">
+            <h1 class="logo">SNOWSTORM</h1>
+            <div class="score">Score: <span id="score-val">0</span></div>
+        </div>
+        <div class="ui-panel top-right">
+            <div class="health-bar-container">
+                <div class="health-bar" id="health-bar"></div>
+            </div>
+        </div>
+        <div class="ui-panel bottom-center">
+            <p class="controls">Use <strong>WASD</strong> to move, click to throw</p>
+        </div>
+    </div>
+    
+    <canvas id="game-canvas"></canvas>
+
+    <script src="engine.js"></script>
+</body>
+</html>
