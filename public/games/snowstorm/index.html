@@ -13,19 +13,15 @@
              1. PANTALLA PRINCIPAL: VENTANA "GAMES!" (Screenshot 1)
         ============================================================ -->
         <div id="screen-lobby" class="habbo-screen">
-            <!-- Fondo Hotel View / Nieve -->
             <div class="lobby-backdrop"></div>
 
             <div class="habbo-window">
-                <!-- Barra de título -->
                 <div class="window-titlebar">
                     <span class="window-title">Games!</span>
                     <button id="btn-close-window" class="window-close-btn" title="Cerrar">✕</button>
                 </div>
 
-                <!-- Contenido de la ventana -->
                 <div class="window-content">
-                    <!-- Banner con Logo Oficial de SnowStorm -->
                     <div class="snowstorm-banner">
                         <div class="snow-mountains-bg"></div>
                         <div class="official-logo">
@@ -38,7 +34,6 @@
                         </div>
                     </div>
 
-                    <!-- Mensaje y mini avatares peleando con nieve -->
                     <div class="lobby-body">
                         <h2 class="lobby-headline">Hit or get hit!</h2>
                         <p class="lobby-subtext">Play against other Habbos in epic snowball battles!</p>
@@ -58,7 +53,6 @@
                         </div>
                     </div>
 
-                    <!-- Pie de ventana con botón Play Now -->
                     <div class="window-footer">
                         <div class="games-left-info">
                             <span class="games-count">Total Games Left: <strong>38</strong></span>
@@ -96,9 +90,8 @@
                     <div class="queue-body">
                         <h2 class="queue-headline">Waiting for more players...</h2>
 
-                        <!-- Grid de 10 jugadores (2 filas de 5) -->
                         <div class="player-slots-grid" id="queue-slots">
-                            <!-- Inyectado por JS: 10 slots -->
+                            <!-- 10 slots -->
                         </div>
 
                         <div class="queue-footer">
@@ -114,7 +107,6 @@
         ============================================================ -->
         <div id="screen-roster" class="habbo-screen hidden">
             <div class="roster-container">
-                <!-- Header con logo y guantes grandes -->
                 <div class="roster-header">
                     <div class="team-glove-big blue-glove"></div>
                     <div class="official-logo medium">
@@ -131,14 +123,9 @@
                 <h1 class="roster-title">Get ready!</h1>
                 <p class="roster-subtitle" id="roster-countdown-text">Waiting for players...</p>
 
-                <!-- Columnas de Equipos vs Mapa -->
                 <div class="roster-teams-layout">
-                    <!-- Equipo Azul -->
-                    <div class="team-column blue-team" id="blue-roster-list">
-                        <!-- 4 jugadores azules -->
-                    </div>
+                    <div class="team-column blue-team" id="blue-roster-list"></div>
 
-                    <!-- Previsualización del Mapa -->
                     <div class="map-preview-card">
                         <div class="map-thumbnail">
                             <div class="spotlight-glow"></div>
@@ -146,10 +133,7 @@
                         </div>
                     </div>
 
-                    <!-- Equipo Rojo -->
-                    <div class="team-column red-team" id="red-roster-list">
-                        <!-- 4 jugadores rojos -->
-                    </div>
+                    <div class="team-column red-team" id="red-roster-list"></div>
                 </div>
 
                 <div class="roster-footer">
@@ -162,17 +146,13 @@
              4. PANTALLA: ARENA DE JUEGO (Screenshot 4)
         ============================================================ -->
         <div id="screen-arena" class="habbo-screen hidden">
-            <!-- Canvas de la partida -->
             <canvas id="arena-canvas"></canvas>
 
-            <!-- HUD de la Arena -->
             <div id="arena-hud">
-                <!-- Top-Left: Botón Bandera Naranja (Salir) -->
                 <button id="btn-flag-exit" class="hud-flag-box" title="Abandonar partida">
                     <div class="orange-flag-icon">🏳️</div>
                 </button>
 
-                <!-- Top-Right: Marcador Equipos y Tiempo -->
                 <div class="hud-scoreboard-container">
                     <div class="scoreboard-teams">
                         <div class="score-team blue">
@@ -189,9 +169,7 @@
                     </div>
                 </div>
 
-                <!-- Barra Lateral Izquierda: Munición y Botón Hacer Bolas -->
                 <div class="hud-left-controls">
-                    <!-- 5 slots verticales de bolas de nieve -->
                     <div class="vertical-ammo-rack" id="ammo-rack-vertical">
                         <div class="ammo-circle active"></div>
                         <div class="ammo-circle active"></div>
@@ -199,13 +177,11 @@
                         <div class="ammo-circle active"></div>
                         <div class="ammo-circle active"></div>
                     </div>
-                    <!-- Botón verde "Hacer bolas" -->
                     <button id="btn-make-snowballs" class="btn-make-snow" title="Hacer bolas de nieve (ESPACIO)">
                         <div class="hand-icon">🖐️</div>
                     </button>
                 </div>
 
-                <!-- Bottom-Left: Estado del Jugador (Avatar, Barra de Vida, Puntos) -->
                 <div class="hud-player-status">
                     <div class="player-avatar-box">
                         <img id="player-avatar-img" src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-115-42.hd-195-19.ch-215-66.lg-270-110.sh-305-62&headonly=1&direction=2&head_direction=2" alt="Avatar">
@@ -218,29 +194,88 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Modal de Fin de Partida / Victoria -->
-            <div id="modal-match-result" class="match-result-overlay hidden">
-                <div class="result-card">
-                    <div class="result-trophy" id="result-trophy-icon">🏆</div>
-                    <h2 class="result-title" id="result-title-text">BLUE TEAM WINS!</h2>
-                    
-                    <div class="result-scores-row">
-                        <div class="result-score-box blue">
-                            <span class="res-team-name">BLUE TEAM</span>
-                            <span class="res-score" id="res-blue-score">140</span>
+        <!-- ============================================================
+             5. PANTALLA: RESULTADOS / FINAL DE PARTIDA (Screenshot 5)
+        ============================================================ -->
+        <div id="screen-postmatch" class="habbo-screen hidden">
+            <div class="postmatch-container">
+                <!-- Burbujas de Chat Retro de Habbo arriba -->
+                <div class="postmatch-chat-bubbles">
+                    <div class="chat-bubble left bubble-1"><strong>Rc-Marco:</strong> ahahahha</div>
+                    <div class="chat-bubble left bubble-2"><strong>Rc-Marco:</strong> ruuun</div>
+                    <div class="chat-bubble right bubble-3"><strong>diavo:</strong> vi uccido</div>
+                    <div class="chat-bubble right bubble-4"><strong>okki-blu96:</strong> combatti!</div>
+                </div>
+
+                <!-- Cabecera con Logo y Guantes con Puntuaciones Totales -->
+                <div class="postmatch-header">
+                    <div class="team-glove-scored blue-glove-scored">
+                        <span id="postmatch-blue-total">106</span>
+                    </div>
+
+                    <div class="official-logo medium">
+                        <span class="logo-snow">SNOW</span>
+                        <div class="logo-gloves-crossing">
+                            <div class="glove-mini blue"></div>
+                            <div class="glove-mini red"></div>
                         </div>
-                        <div class="result-vs">VS</div>
-                        <div class="result-score-box red">
-                            <span class="res-team-name">RED TEAM</span>
-                            <span class="res-score" id="res-red-score">90</span>
+                        <span class="logo-storm">STORM</span>
+                    </div>
+
+                    <div class="team-glove-scored red-glove-scored">
+                        <span id="postmatch-red-total">96</span>
+                    </div>
+                </div>
+
+                <!-- Layout Principal: Columna Azul, Centro (Ganador + MVP) y Columna Roja -->
+                <div class="postmatch-body-layout">
+                    <!-- Equipo Azul (Izquierda) -->
+                    <div class="postmatch-team-col blue" id="postmatch-blue-list">
+                        <!-- Generado por JS: 4 tarjetas de jugadores azules -->
+                    </div>
+
+                    <!-- Centro: Ganador, MVPs y Pases -->
+                    <div class="postmatch-center-panel">
+                        <h1 class="winner-headline" id="postmatch-winner-text">Blue Team wins!</h1>
+
+                        <!-- Tarjetas de MVP (Most K.O.'s & Most Hits) -->
+                        <div class="mvp-cards-row">
+                            <div class="mvp-card blue">
+                                <span class="mvp-badge-title">Most K.O.'s</span>
+                                <div class="mvp-avatar-box">
+                                    <img id="mvp-ko-avatar" src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-893-45.hd-180-1.ch-804-82.lg-280-92.sh-300-64&size=m&action=wav&direction=2&head_direction=2" alt="MVP KO">
+                                </div>
+                                <span class="mvp-username" id="mvp-ko-name">Savel</span>
+                            </div>
+
+                            <div class="mvp-card red">
+                                <span class="mvp-badge-title">Most Hits</span>
+                                <div class="mvp-avatar-box">
+                                    <img id="mvp-hits-avatar" src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-100-45.hd-209-1.ch-255-66.lg-280-110.sh-305-62&size=m&action=wav&direction=4&head_direction=4" alt="MVP Hits">
+                                </div>
+                                <span class="mvp-username" id="mvp-hits-name">Arci</span>
+                            </div>
+                        </div>
+
+                        <!-- Info de Partidas Restantes y HC -->
+                        <div class="postmatch-games-info">
+                            <span class="games-left-label">Total Games Left: <strong>37</strong></span>
+                            <span class="hc-bonus-text">Get additional 3 free daily games with HC!</span>
                         </div>
                     </div>
 
-                    <div class="result-actions">
-                        <button id="btn-play-again" class="btn-habbo-green">Play Again</button>
-                        <button id="btn-return-hotel" class="btn-habbo-secondary">Return to Hotel</button>
+                    <!-- Equipo Rojo (Derecha) -->
+                    <div class="postmatch-team-col red" id="postmatch-red-list">
+                        <!-- Generado por JS: 4 tarjetas de jugadores rojos -->
                     </div>
+                </div>
+
+                <!-- Footer: Leave game & Rematch Button con cuenta regresiva -->
+                <div class="postmatch-footer">
+                    <button id="btn-leave-postmatch" class="link-btn-leave">◄ Leave game?</button>
+                    <button id="btn-rematch" class="btn-habbo-green btn-rematch">Rematch (30)</button>
                 </div>
             </div>
         </div>

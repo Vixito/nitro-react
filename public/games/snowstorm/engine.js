@@ -1,6 +1,6 @@
 /**
  * Habbten SnowStorm - Official 2021 Arcade Engine
- * 1:1 Recreation of the Official Habbo SnowStorm (Lobby, Queue, Roster, Fight Night Arena)
+ * 1:1 Recreation of the Official Habbo SnowStorm (Lobby, Queue, Roster, Fight Night Arena & Post-Match Results)
  */
 
 // ============================================================
@@ -113,6 +113,10 @@ function getAvatarHeadUrl(figure) {
     return `https://www.habbo.com/habbo-imaging/avatarimage?figure=${figure}&headonly=1&direction=2&head_direction=2&size=m`;
 }
 
+function getAvatarFullUrl(figure, direction = 2, action = 'std') {
+    return `https://www.habbo.com/habbo-imaging/avatarimage?figure=${figure}&direction=${direction}&head_direction=${direction}&size=m&action=${action}`;
+}
+
 // ============================================================
 // 3. Game Flow & Screen Transitions
 // ============================================================
@@ -120,7 +124,8 @@ const screens = {
     lobby: document.getElementById('screen-lobby'),
     queue: document.getElementById('screen-queue'),
     roster: document.getElementById('screen-roster'),
-    arena: document.getElementById('screen-arena')
+    arena: document.getElementById('screen-arena'),
+    postmatch: document.getElementById('screen-postmatch')
 };
 
 function showScreen(name) {
@@ -137,23 +142,26 @@ function exitToHotel() {
     }
 }
 
-// Setup Lobby & Window Buttons
+// Button Handlers
 document.getElementById('btn-close-window').addEventListener('click', exitToHotel);
 document.getElementById('btn-flag-exit').addEventListener('click', exitToHotel);
-document.getElementById('btn-return-hotel').addEventListener('click', exitToHotel);
+document.getElementById('btn-leave-postmatch').addEventListener('click', exitToHotel);
+document.getElementById('btn-cancel-queue').addEventListener('click', () => showScreen('lobby'));
+document.getElementById('btn-cancel-queue-x').addEventListener('click', () => showScreen('lobby'));
+document.getElementById('btn-leave-roster').addEventListener('click', () => showScreen('lobby'));
 
 document.getElementById('btn-play-now').addEventListener('click', () => {
     sfx.init();
     startQueue();
 });
 
-document.getElementById('btn-cancel-queue').addEventListener('click', () => showScreen('lobby'));
-document.getElementById('btn-cancel-queue-x').addEventListener('click', () => showScreen('lobby'));
-document.getElementById('btn-leave-roster').addEventListener('click', () => showScreen('lobby'));
-document.getElementById('btn-play-again').addEventListener('click', () => startQueue());
+document.getElementById('btn-rematch').addEventListener('click', () => {
+    if (rematchInterval) clearInterval(rematchInterval);
+    startQueue();
+});
 
 // ============================================================
-// 4. Queue / Matchmaking Flow (Screenshot 2)
+// 4. Matchmaking Flow (Screenshot 2)
 // ============================================================
 let queueInterval = null;
 
@@ -162,7 +170,6 @@ function startQueue() {
     const container = document.getElementById('queue-slots');
     container.innerHTML = '';
 
-    // Create 10 empty slot cards
     for (let i = 0; i < 10; i++) {
         const slot = document.createElement('div');
         slot.className = 'player-slot-card';
@@ -171,7 +178,6 @@ function startQueue() {
         container.appendChild(slot);
     }
 
-    // Fill slots progressively to simulate players joining
     let filled = 0;
     if (queueInterval) clearInterval(queueInterval);
 
@@ -183,7 +189,6 @@ function startQueue() {
         slot.innerHTML = `<img class="slot-avatar-img" src="${getAvatarHeadUrl(player.figure)}" alt="${player.name}">`;
     }
 
-    // First player is user
     addPlayerToSlot(0);
     filled = 1;
 
@@ -193,7 +198,7 @@ function startQueue() {
             filled++;
         } else {
             clearInterval(queueInterval);
-            setTimeout(() => startRoster(), 800);
+            setTimeout(() => startRoster(), 700);
         }
     }, 350);
 }
@@ -209,7 +214,6 @@ function startRoster() {
     blueList.innerHTML = '';
     redList.innerHTML = '';
 
-    // 4 Blue Players
     for (let i = 0; i < 4; i++) {
         const p = AVATAR_FIGURES[i];
         const card = document.createElement('div');
@@ -226,7 +230,6 @@ function startRoster() {
         blueList.appendChild(card);
     }
 
-    // 4 Red Players
     for (let i = 4; i < 8; i++) {
         const p = AVATAR_FIGURES[i];
         const card = document.createElement('div');
@@ -243,7 +246,6 @@ function startRoster() {
         redList.appendChild(card);
     }
 
-    // Countdown 3.. 2.. 1..
     let count = 3;
     const subText = document.getElementById('roster-countdown-text');
     subText.innerText = `Starting match in ${count}...`;
@@ -278,7 +280,7 @@ resizeArena();
 
 const TILE_W = 64;
 const TILE_H = 32;
-const MAP_RADIUS = 7.5; // Circular clearing
+const MAP_RADIUS = 7.5;
 
 function toIso(x, y) {
     return {
@@ -295,27 +297,25 @@ function fromIso(screenX, screenY, originX, originY) {
     return { x, y };
 }
 
-// In-Game State
-let matchTimeLeft = 120; // 2 minutes
+let matchTimeLeft = 120;
 let matchTimerInterval = null;
+let rematchInterval = null;
 let blueTeamScore = 0;
 let redTeamScore = 0;
 let personalScore = 0;
 let matchActive = false;
 
-// Entities
 let fighters = [];
 let snowballs = [];
 let particles = [];
 let mouseIso = { x: 0, y: 0 };
-let hoveredFighter = null;
 
 class Fighter {
     constructor(id, name, figure, team, startX, startY, isHuman = false) {
         this.id = id;
         this.name = name;
         this.figure = figure;
-        this.team = team; // 'blue' or 'red'
+        this.team = team;
         this.x = startX;
         this.y = startY;
         this.targetX = startX;
@@ -336,6 +336,11 @@ class Fighter {
         this.aiMoveTimer = Math.random() * 2 + 1;
         this.isKO = false;
         this.respawnTimer = 0;
+
+        // Match Statistics
+        this.hits = 0;
+        this.kos = 0;
+        this.score = 0;
     }
 
     update(dt) {
@@ -352,7 +357,7 @@ class Fighter {
 
         if (this.stunTimer > 0) {
             this.stunTimer -= dt;
-            return; // Can't move while stunned
+            return;
         }
 
         if (this.isReloading) {
@@ -369,12 +374,10 @@ class Fighter {
             return;
         }
 
-        // AI Control
         if (!this.isHuman) {
             this.updateAI(dt);
         }
 
-        // Move towards target position
         const dx = this.targetX - this.x;
         const dy = this.targetY - this.y;
         const dist = Math.hypot(dx, dy);
@@ -392,7 +395,6 @@ class Fighter {
     }
 
     updateAI(dt) {
-        // Find closest enemy
         const enemyTeam = this.team === 'blue' ? 'red' : 'blue';
         const enemies = fighters.filter(f => f.team === enemyTeam && !f.isKO);
         if (enemies.length === 0) return;
@@ -407,18 +409,15 @@ class Fighter {
             }
         }
 
-        // Periodic AI movement
         this.aiMoveTimer -= dt;
         if (this.aiMoveTimer <= 0) {
             this.aiMoveTimer = Math.random() * 2.5 + 1.5;
-            // Wander within arena boundary
             const angle = Math.random() * Math.PI * 2;
             const r = Math.random() * (MAP_RADIUS - 1.5);
             this.targetX = 8 + Math.cos(angle) * r;
             this.targetY = 8 + Math.sin(angle) * r;
         }
 
-        // Periodic AI throwing
         this.aiShootTimer -= dt;
         if (this.aiShootTimer <= 0) {
             this.aiShootTimer = Math.random() * 3 + 2;
@@ -446,9 +445,15 @@ class Fighter {
         this.stunTimer = 0.8;
         sfx.playHit();
 
-        // Particle splash
         const iso = toIso(this.x, this.y);
         addSnowImpactParticles(iso.x, iso.y);
+
+        // Score attribution
+        const attacker = fighters.find(f => f.id === attackerId);
+        if (attacker) {
+            attacker.hits++;
+            attacker.score += 2;
+        }
 
         if (attackerTeam === 'blue') {
             blueTeamScore += 10;
@@ -460,6 +465,10 @@ class Fighter {
         if (this.hp <= 0) {
             this.isKO = true;
             this.respawnTimer = 3.5;
+            if (attacker) {
+                attacker.kos++;
+                attacker.score += 10;
+            }
             if (attackerTeam === 'blue') {
                 blueTeamScore += 100;
                 if (attackerId === 0) personalScore += 100;
@@ -546,7 +555,6 @@ function addSnowImpactParticles(screenX, screenY) {
     }
 }
 
-// Setup Arena Map & Obstacles
 const arenaObstacles = [
     { x: 5, y: 5, type: 'tree' },
     { x: 11, y: 11, type: 'tree' },
@@ -569,14 +577,11 @@ function startFightNightArena() {
     snowballs = [];
     particles = [];
 
-    // Initialize 8 Fighters (4 Blue, 4 Red)
     fighters = [
-        // Blue Team (Fighter 0 is Human Player)
         new Fighter(0, 'Vixis', AVATAR_FIGURES[0].figure, 'blue', 6, 8, true),
         new Fighter(1, 'Savel', AVATAR_FIGURES[1].figure, 'blue', 5, 7, false),
         new Fighter(2, 'Rc-Marco', AVATAR_FIGURES[2].figure, 'blue', 5, 9, false),
         new Fighter(3, 'JaviliyoLol', AVATAR_FIGURES[3].figure, 'blue', 4, 8, false),
-        // Red Team
         new Fighter(4, 'diavo', AVATAR_FIGURES[4].figure, 'red', 10, 8, false),
         new Fighter(5, 'okki-blu96', AVATAR_FIGURES[5].figure, 'red', 11, 7, false),
         new Fighter(6, 'DJ-Crew.', AVATAR_FIGURES[6].figure, 'red', 11, 9, false),
@@ -585,7 +590,6 @@ function startFightNightArena() {
 
     updateScoreboard();
     updatePlayerHUD();
-    document.getElementById('modal-match-result').classList.add('hidden');
 
     if (matchTimerInterval) clearInterval(matchTimerInterval);
     matchTimerInterval = setInterval(() => {
@@ -596,7 +600,7 @@ function startFightNightArena() {
             document.getElementById('match-timer-box').innerText = `${mins}:${secs}`;
         } else {
             clearInterval(matchTimerInterval);
-            endMatch();
+            endMatchAndShowPostMatch();
         }
     }, 1000);
 }
@@ -611,11 +615,9 @@ function updatePlayerHUD() {
     const p = fighters[0];
     if (!p) return;
 
-    // Health Fill
     const fill = document.getElementById('player-health-fill');
     fill.style.height = `${Math.max(0, (p.hp / p.maxHp) * 100)}%`;
 
-    // Vertical Ammo Rack
     const rack = document.getElementById('ammo-rack-vertical');
     rack.innerHTML = '';
     for (let i = 0; i < p.maxAmmo; i++) {
@@ -625,24 +627,121 @@ function updatePlayerHUD() {
     }
 }
 
-function endMatch() {
+// ============================================================
+// 7. Post-Match Results Flow (Screenshot 5)
+// ============================================================
+function endMatchAndShowPostMatch() {
     matchActive = false;
-    const modal = document.getElementById('modal-match-result');
-    const title = document.getElementById('result-title-text');
-    const trophy = document.getElementById('result-trophy-icon');
+    showScreen('postmatch');
+    sfx.playWhistle();
 
-    document.getElementById('res-blue-score').innerText = blueTeamScore;
-    document.getElementById('res-red-score').innerText = redTeamScore;
+    // Ensure realistic score numbers if match ended quickly
+    const blueFighters = fighters.slice(0, 4);
+    const redFighters = fighters.slice(4, 8);
 
-    if (blueTeamScore >= redTeamScore) {
-        title.innerText = 'BLUE TEAM WINS!';
-        trophy.innerText = '🏆';
+    blueFighters.forEach(f => {
+        if (f.score === 0) {
+            f.hits = Math.floor(Math.random() * 15 + 5);
+            f.kos = Math.floor(Math.random() * 4 + 1);
+            f.score = f.hits * 2 + f.kos * 5;
+        }
+    });
+
+    redFighters.forEach(f => {
+        if (f.score === 0) {
+            f.hits = Math.floor(Math.random() * 15 + 4);
+            f.kos = Math.floor(Math.random() * 3 + 1);
+            f.score = f.hits * 2 + f.kos * 5;
+        }
+    });
+
+    // Sort by score
+    blueFighters.sort((a, b) => b.score - a.score);
+    redFighters.sort((a, b) => b.score - a.score);
+
+    const totalBlue = blueFighters.reduce((acc, f) => acc + f.score, 0);
+    const totalRed = redFighters.reduce((acc, f) => acc + f.score, 0);
+
+    document.getElementById('postmatch-blue-total').innerText = totalBlue;
+    document.getElementById('postmatch-red-total').innerText = totalRed;
+
+    // Winner Headline
+    const winnerText = document.getElementById('postmatch-winner-text');
+    if (totalBlue >= totalRed) {
+        winnerText.innerText = 'Blue Team wins!';
+        winnerText.className = 'winner-headline blue-win';
     } else {
-        title.innerText = 'RED TEAM WINS!';
-        trophy.innerText = '❄️';
+        winnerText.innerText = 'Red Team wins!';
+        winnerText.className = 'winner-headline red-win';
     }
 
-    modal.classList.remove('hidden');
+    // Top MVPs
+    const allFighters = [...fighters];
+    allFighters.sort((a, b) => b.kos - a.kos);
+    const topKo = allFighters[0];
+    document.getElementById('mvp-ko-name').innerText = topKo.name;
+    document.getElementById('mvp-ko-avatar').src = getAvatarFullUrl(topKo.figure, 2, 'wav');
+
+    allFighters.sort((a, b) => b.hits - a.hits);
+    const topHits = allFighters[0];
+    document.getElementById('mvp-hits-name').innerText = topHits.name;
+    document.getElementById('mvp-hits-avatar').src = getAvatarFullUrl(topHits.figure, 4, 'wav');
+
+    // Populate Blue Team List
+    const blueList = document.getElementById('postmatch-blue-list');
+    blueList.innerHTML = '';
+    blueFighters.forEach(f => {
+        const row = document.createElement('div');
+        row.className = 'postmatch-player-row blue';
+        row.innerHTML = `
+            <div class="postmatch-friend-btn">+</div>
+            <div class="postmatch-avatar-col">
+                <img src="${getAvatarFullUrl(f.figure, 2, 'std')}" alt="${f.name}">
+            </div>
+            <div class="postmatch-card-pill">
+                <span class="postmatch-pname">${f.name}</span>
+                <span class="postmatch-pstats">HITS: ${f.hits} &nbsp; K.O.'s: ${f.kos}</span>
+            </div>
+            <div class="postmatch-score-badge">${f.score}</div>
+        `;
+        blueList.appendChild(row);
+    });
+
+    // Populate Red Team List
+    const redList = document.getElementById('postmatch-red-list');
+    redList.innerHTML = '';
+    redFighters.forEach(f => {
+        const row = document.createElement('div');
+        row.className = 'postmatch-player-row red';
+        row.innerHTML = `
+            <div class="postmatch-score-badge">${f.score}</div>
+            <div class="postmatch-card-pill">
+                <span class="postmatch-pname">${f.name}</span>
+                <span class="postmatch-pstats">HITS: ${f.hits} &nbsp; K.O.'s: ${f.kos}</span>
+            </div>
+            <div class="postmatch-avatar-col">
+                <img src="${getAvatarFullUrl(f.figure, 4, 'std')}" alt="${f.name}">
+            </div>
+            <div class="postmatch-friend-btn">+</div>
+        `;
+        redList.appendChild(row);
+    });
+
+    // Rematch 30s Countdown
+    let rematchCd = 30;
+    const btnRematch = document.getElementById('btn-rematch');
+    btnRematch.innerText = `Rematch (${rematchCd})`;
+
+    if (rematchInterval) clearInterval(rematchInterval);
+    rematchInterval = setInterval(() => {
+        rematchCd--;
+        if (rematchCd > 0) {
+            btnRematch.innerText = `Rematch (${rematchCd})`;
+        } else {
+            clearInterval(rematchInterval);
+            startQueue();
+        }
+    }, 1000);
 }
 
 // Mouse Controls in Arena
@@ -661,13 +760,11 @@ canvas.addEventListener('mousedown', e => {
     const originY = height / 2.3;
     const targetMap = fromIso(e.clientX, e.clientY, originX, originY);
 
-    if (e.button === 0) { // Left Click
-        // If clicking far, throw snowball. If near, move player!
+    if (e.button === 0) {
         const d = Math.hypot(targetMap.x - player.x, targetMap.y - player.y);
         if (d > 2.5 && player.ammo > 0) {
             player.throwSnowballAt(targetMap.x, targetMap.y);
         } else {
-            // Move player to target within map boundary
             const distCenter = Math.hypot(targetMap.x - 8, targetMap.y - 8);
             if (distCenter < MAP_RADIUS) {
                 player.targetX = targetMap.x;
@@ -677,7 +774,6 @@ canvas.addEventListener('mousedown', e => {
     }
 });
 
-// Keyboard & Button Reload
 window.addEventListener('keydown', e => {
     if (e.key === ' ' && matchActive) {
         const player = fighters[0];
@@ -699,7 +795,7 @@ document.getElementById('btn-make-snowballs').addEventListener('click', () => {
 });
 
 // ============================================================
-// 7. Arena Rendering Loop
+// 8. Arena Rendering Loop
 // ============================================================
 let lastLoopTime = performance.now();
 
@@ -715,7 +811,6 @@ function renderArenaLoop(now) {
         }
     }
 
-    // Update particles
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
@@ -725,25 +820,17 @@ function renderArenaLoop(now) {
         if (p.life <= 0) particles.splice(i, 1);
     }
 
-    // Clear Canvas
     ctx.clearRect(0, 0, width, height);
 
     const originX = width / 2;
     const originY = height / 2.3;
 
-    // 1. Draw Night Background & Mountain Silhouette (Screenshot 4)
     drawArenaSky(ctx, width, height);
-
-    // 2. Draw Spotlight Cones from Towers
     drawSpotlights(ctx, originX, originY);
-
-    // 3. Draw Circular Snow Clearing Floor
     drawCircularSnowFloor(ctx, originX, originY);
 
-    // 4. Render Entities with Isometric Z-Sorting
     const renderList = [];
 
-    // Obstacles
     arenaObstacles.forEach(obs => {
         const iso = toIso(obs.x, obs.y);
         renderList.push({
@@ -755,7 +842,6 @@ function renderArenaLoop(now) {
         });
     });
 
-    // Fighters
     fighters.forEach(f => {
         const iso = toIso(f.x, f.y);
         renderList.push({
@@ -767,7 +853,6 @@ function renderArenaLoop(now) {
         });
     });
 
-    // Snowballs
     snowballs.forEach(b => {
         const iso = toIso(b.currX, b.currY);
         renderList.push({
@@ -780,10 +865,8 @@ function renderArenaLoop(now) {
         });
     });
 
-    // Sort by isometric depth
     renderList.sort((a, b) => a.zIndex - b.zIndex);
 
-    // Draw sorted items
     renderList.forEach(item => {
         if (item.type === 'obs') {
             if (item.obsType === 'tree') drawSnowTree(ctx, item.cx, item.cy);
@@ -793,12 +876,11 @@ function renderArenaLoop(now) {
         } else if (item.type === 'fighter') {
             drawHabboFighter(ctx, item.cx, item.cy, item.fighter);
         } else if (item.type === 'ball') {
-            // Shadow
             ctx.fillStyle = 'rgba(0, 20, 40, 0.3)';
             ctx.beginPath();
             ctx.ellipse(item.cx, item.cy, 6, 3, 0, 0, Math.PI * 2);
             ctx.fill();
-            // Ball
+
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.arc(item.cx, item.cy - item.height, 6, 0, Math.PI * 2);
@@ -809,10 +891,8 @@ function renderArenaLoop(now) {
         }
     });
 
-    // Draw Tile Cursor (Habbo ◇ selector)
     drawTileCursor(ctx, originX, originY, mouseIso.x, mouseIso.y);
 
-    // Draw Particles
     particles.forEach(p => {
         ctx.globalAlpha = p.life;
         ctx.fillStyle = p.color;
@@ -825,11 +905,7 @@ function renderArenaLoop(now) {
     requestAnimationFrame(renderArenaLoop);
 }
 
-// -------------------------------------------------------------
-// Graphic Helper Functions
-// -------------------------------------------------------------
 function drawArenaSky(ctx, w, h) {
-    // Twilight Mountain Gradient
     const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.45);
     skyGrad.addColorStop(0, '#0a101d');
     skyGrad.addColorStop(0.6, '#1a2436');
@@ -837,7 +913,6 @@ function drawArenaSky(ctx, w, h) {
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, w, h);
 
-    // Mountain silhouettes in background
     ctx.fillStyle = '#0f1827';
     ctx.beginPath();
     ctx.moveTo(0, h * 0.35);
@@ -853,13 +928,11 @@ function drawArenaSky(ctx, w, h) {
 }
 
 function drawSpotlights(ctx, originX, originY) {
-    // Left & Right Giant Floodlights (Screenshot 4)
     const leftTowerX = originX - 380;
     const leftTowerY = originY - 140;
     const rightTowerX = originX + 380;
     const rightTowerY = originY - 140;
 
-    // Spot Cones
     const spotGradLeft = ctx.createRadialGradient(leftTowerX, leftTowerY, 10, originX, originY, 450);
     spotGradLeft.addColorStop(0, 'rgba(255, 255, 240, 0.45)');
     spotGradLeft.addColorStop(0.7, 'rgba(255, 255, 240, 0.1)');
@@ -886,7 +959,6 @@ function drawSpotlights(ctx, originX, originY) {
 }
 
 function drawCircularSnowFloor(ctx, originX, originY) {
-    // Stadium Circular Snow Clearing
     ctx.fillStyle = 'rgba(2, 6, 12, 0.85)';
     ctx.beginPath();
     ctx.ellipse(originX, originY + 10, 360, 180, 0, 0, Math.PI * 2);
@@ -897,7 +969,6 @@ function drawCircularSnowFloor(ctx, originX, originY) {
     ctx.ellipse(originX, originY, 340, 170, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Subtle isometric grid lines on snow
     ctx.strokeStyle = 'rgba(180, 215, 235, 0.4)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 16; i++) {
@@ -912,7 +983,6 @@ function drawCircularSnowFloor(ctx, originX, originY) {
 
 function drawHabboFighter(ctx, cx, cy, f) {
     if (f.isKO) {
-        // Render snow mound when knocked out
         drawSnowMound(ctx, cx, cy);
         return;
     }
@@ -920,7 +990,6 @@ function drawHabboFighter(ctx, cx, cy, f) {
     ctx.save();
     ctx.translate(cx, cy);
 
-    // Soft Shadow
     ctx.fillStyle = 'rgba(0, 20, 40, 0.35)';
     ctx.beginPath();
     ctx.ellipse(0, 4, 15, 7, 0, 0, Math.PI * 2);
@@ -930,7 +999,6 @@ function drawHabboFighter(ctx, cx, cy, f) {
     const jacketColor = f.team === 'blue' ? '#0077b6' : '#c1121f';
     const hatColor = f.team === 'blue' ? '#00b4d8' : '#780000';
 
-    // Body / Parka
     ctx.fillStyle = jacketColor;
     ctx.beginPath();
     ctx.roundRect(-9, -22 + bounce, 18, 22, 5);
@@ -939,40 +1007,34 @@ function drawHabboFighter(ctx, cx, cy, f) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // White fur trim
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.roundRect(-10, -5 + bounce, 20, 5, 2);
     ctx.fill();
 
-    // Head
     ctx.fillStyle = '#fbd1a2';
     ctx.beginPath();
     ctx.arc(0, -28 + bounce, 8, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Eyes
     ctx.fillStyle = '#111111';
     ctx.beginPath();
     ctx.arc(-2.5, -28 + bounce, 1.2, 0, Math.PI * 2);
     ctx.arc(2.5, -28 + bounce, 1.2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Winter Hat
     ctx.fillStyle = hatColor;
     ctx.beginPath();
     ctx.arc(0, -32 + bounce, 9, Math.PI, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Pompom
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(0, -41 + bounce, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // Stun Stars if hit
     if (f.stunTimer > 0) {
         ctx.fillStyle = '#ffd60a';
         const starAng = Date.now() / 150;
@@ -985,7 +1047,6 @@ function drawHabboFighter(ctx, cx, cy, f) {
         }
     }
 
-    // Name tag
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.font = 'bold 10px "Ubuntu", sans-serif';
     ctx.textAlign = 'center';
@@ -1030,7 +1091,6 @@ function drawSnowman(ctx, cx, cy) {
     ctx.ellipse(cx, cy + 2, 14, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Bottom ball
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
     ctx.arc(cx, cy - 10, 11, 0, Math.PI * 2);
@@ -1038,13 +1098,11 @@ function drawSnowman(ctx, cx, cy) {
     ctx.strokeStyle = '#bce2f5';
     ctx.stroke();
 
-    // Top ball
     ctx.beginPath();
     ctx.arc(cx, cy - 26, 7.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Carrot nose
     ctx.fillStyle = '#ff7b00';
     ctx.beginPath();
     ctx.moveTo(cx, cy - 26);
