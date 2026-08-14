@@ -44,6 +44,15 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = props
     {
         const parser = event.getParser();
 
+        if(parser.url && base64Url)
+        {
+            fetch('/api/camera', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: parser.url, image: base64Url })
+            }).catch(e => console.error('Error syncing photo to CMS:', e));
+        }
+
         setPictureUrl(GetConfiguration<string>('camera.url') + '/' + parser.url);
     });
 
@@ -88,10 +97,10 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = props
             <NitroCardHeaderView headerText={ LocalizeText('camera.confirm_phase.title') } onCloseClick={ event => processAction('close') } />
             <NitroCardContentView>
                 <Flex center>
-                    { (pictureUrl && pictureUrl.length && !pictureUrl.endsWith('/')) ? (
-                        <LayoutImage className="picture-preview border" imageUrl={ pictureUrl } />
-                    ) : (base64Url && base64Url.length) ? (
+                    { (base64Url && base64Url.length) ? (
                         <img className="picture-preview border" src={ base64Url } alt="Camera Preview" style={{ maxWidth: '100%', maxHeight: 260, objectFit: 'contain', imageRendering: 'pixelated' }} />
+                    ) : (pictureUrl && pictureUrl.length && !pictureUrl.endsWith('/')) ? (
+                        <LayoutImage className="picture-preview border" imageUrl={ pictureUrl } />
                     ) : (
                         <Flex center className="picture-preview border">
                             <Text bold>{ LocalizeText('camera.loading') }</Text>
