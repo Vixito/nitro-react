@@ -18,6 +18,27 @@
     min-height: 150px;
     max-height: 350px;
 
+    &.commands-alert {
+        width: 480px;
+        height: 520px;
+        max-height: 85vh;
+        max-width: 90vw;
+        min-width: 320px;
+        min-height: 220px;
+        resize: both;
+        overflow: hidden;
+
+        .card-content {
+            height: 100%;
+        }
+
+        .notification-text {
+            min-width: auto;
+            flex-grow: 1;
+            height: 100%;
+        }
+    }
+
     .notification-frank {
         background-image: url('@/assets/images/notifications/frank.gif');
         width:47px;

@@ -54,7 +54,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
     const hasFrank = (item.alertType === NotificationAlertType.DEFAULT);
 
     return (
-        <LayoutNotificationAlertView title={ title } onClose={ onClose } { ...rest } type={ hasFrank ? NotificationAlertType.DEFAULT : item.alertType }>
+        <LayoutNotificationAlertView title={ title } onClose={ onClose } { ...rest } type={ hasFrank ? NotificationAlertType.DEFAULT : item.alertType } classNames={ isCommandsList ? ['commands-alert'] : [] }>
             <Flex fullHeight overflow="auto" gap={ hasFrank || (item.imageUrl && !imageFailed) ? 2 : 0 }>
                 { hasFrank && !item.imageUrl && <Base className="notification-frank flex-shrink-0" /> }
                 { item.imageUrl && !imageFailed && <img src={ item.imageUrl } alt={ item.title } onError={ () => 
