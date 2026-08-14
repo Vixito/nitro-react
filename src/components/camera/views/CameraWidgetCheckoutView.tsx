@@ -58,12 +58,14 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = props
                 if(isWaiting) return;
 
                 setIsWaiting(true);
+                setTimeout(() => setIsWaiting(false), 5000);
                 SendMessageComposer(new PurchasePhotoMessageComposer(''));
                 return;
             case 'publish':
                 if(isWaiting) return;
 
                 setIsWaiting(true);
+                setTimeout(() => setIsWaiting(false), 5000);
                 SendMessageComposer(new PublishPhotoMessageComposer());
                 return;
             case 'cancel':
@@ -86,12 +88,15 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = props
             <NitroCardHeaderView headerText={ LocalizeText('camera.confirm_phase.title') } onCloseClick={ event => processAction('close') } />
             <NitroCardContentView>
                 <Flex center>
-                    { (pictureUrl && pictureUrl.length) &&
-                        <LayoutImage className="picture-preview border" imageUrl={ pictureUrl } /> }
-                    { (!pictureUrl || !pictureUrl.length) &&
+                    { (pictureUrl && pictureUrl.length && !pictureUrl.endsWith('/')) ? (
+                        <LayoutImage className="picture-preview border" imageUrl={ pictureUrl } />
+                    ) : (base64Url && base64Url.length) ? (
+                        <img className="picture-preview border" src={ base64Url } alt="Camera Preview" style={{ maxWidth: '100%', maxHeight: 240, objectFit: 'contain' }} />
+                    ) : (
                         <Flex center className="picture-preview border">
                             <Text bold>{ LocalizeText('camera.loading') }</Text>
-                        </Flex> }
+                        </Flex>
+                    ) }
                 </Flex>
                 <Flex justifyContent="between" alignItems="center" className="bg-muted rounded p-2">
                     <Column size={ publishDisabled ? 10 : 6 } gap={ 1 }>
