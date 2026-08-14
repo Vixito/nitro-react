@@ -91,7 +91,7 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = props
                     { (pictureUrl && pictureUrl.length && !pictureUrl.endsWith('/')) ? (
                         <LayoutImage className="picture-preview border" imageUrl={ pictureUrl } />
                     ) : (base64Url && base64Url.length) ? (
-                        <img className="picture-preview border" src={ base64Url } alt="Camera Preview" style={{ maxWidth: '100%', maxHeight: 240, objectFit: 'contain' }} />
+                        <img className="picture-preview border" src={ base64Url } alt="Camera Preview" style={{ maxWidth: '100%', maxHeight: 260, objectFit: 'contain', imageRendering: 'pixelated' }} />
                     ) : (
                         <Flex center className="picture-preview border">
                             <Text bold>{ LocalizeText('camera.loading') }</Text>
