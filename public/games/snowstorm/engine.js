@@ -1,12 +1,12 @@
 /**
- * Habbten SnowStorm - Arcade Edition
- * Authentic Isometric Snowball Fighting Engine
+ * Habbten SnowStorm - Official 2021 Arcade Engine
+ * 1:1 Recreation of the Official Habbo SnowStorm (Lobby, Queue, Roster, Fight Night Arena)
  */
 
-// ==========================================
+// ============================================================
 // 1. Audio Synthesizer (Web Audio API)
-// ==========================================
-class SoundFX {
+// ============================================================
+class HabboSoundFX {
     constructor() {
         this.ctx = null;
         this.enabled = true;
@@ -17,14 +17,9 @@ class SoundFX {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             this.ctx = new AudioContext();
         }
-        if (this.ctx.state === 'suspended') {
+        if (this.ctx && this.ctx.state === 'suspended') {
             this.ctx.resume();
         }
-    }
-
-    toggle() {
-        this.enabled = !this.enabled;
-        return this.enabled;
     }
 
     playThrow() {
@@ -33,7 +28,7 @@ class SoundFX {
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(450, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.15);
+        osc.frequency.exponentialRampToValueAtTime(140, this.ctx.currentTime + 0.15);
         gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
         osc.connect(gain);
@@ -44,22 +39,21 @@ class SoundFX {
 
     playHit() {
         if (!this.enabled || !this.ctx) return;
-        // White noise splat
-        const bufferSize = this.ctx.sampleRate * 0.1;
+        const bufferSize = this.ctx.sampleRate * 0.12;
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
         }
         const noise = this.ctx.createBufferSource();
         noise.buffer = buffer;
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1000, this.ctx.currentTime);
-        filter.frequency.exponentialRampToValueAtTime(200, this.ctx.currentTime + 0.1);
+        filter.frequency.setValueAtTime(900, this.ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(150, this.ctx.currentTime + 0.12);
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
         noise.connect(filter);
         filter.connect(gain);
         gain.connect(this.ctx.destination);
@@ -68,73 +62,223 @@ class SoundFX {
 
     playReload() {
         if (!this.enabled || !this.ctx) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(250, this.ctx.currentTime);
-        osc.frequency.setValueAtTime(380, this.ctx.currentTime + 0.08);
-        osc.frequency.setValueAtTime(520, this.ctx.currentTime + 0.16);
-        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.25);
-    }
-
-    playHurt() {
-        if (!this.enabled || !this.ctx) return;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(200, this.ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(80, this.ctx.currentTime + 0.2);
-        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.2);
-    }
-
-    playWave() {
-        if (!this.enabled || !this.ctx) return;
-        [440, 554, 659, 880].forEach((freq, i) => {
+        [240, 360, 480].forEach((freq, i) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.08);
-            gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.08);
-            gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.08 + 0.2);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.07);
+            gain.gain.setValueAtTime(0.2, this.ctx.currentTime + i * 0.07);
+            gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.07 + 0.12);
             osc.connect(gain);
             gain.connect(this.ctx.destination);
-            osc.start(this.ctx.currentTime + i * 0.08);
-            osc.stop(this.ctx.currentTime + i * 0.08 + 0.2);
+            osc.start(this.ctx.currentTime + i * 0.07);
+            osc.stop(this.ctx.currentTime + i * 0.07 + 0.12);
         });
+    }
+
+    playWhistle() {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(2200, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(2800, this.ctx.currentTime + 0.2);
+        osc.frequency.setValueAtTime(2800, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.4);
     }
 }
 
-const sfx = new SoundFX();
+const sfx = new HabboSoundFX();
 
-// ==========================================
-// 2. Isometric Math & Canvas Setup
-// ==========================================
-const canvas = document.getElementById('game-canvas');
+// ============================================================
+// 2. Avatar Looks & Player Roster Data
+// ============================================================
+const AVATAR_FIGURES = [
+    { name: 'Vixis', figure: 'hr-115-42.hd-195-19.ch-215-66.lg-270-110.sh-305-62', stars: '★★★★★' },
+    { name: 'Savel', figure: 'hr-893-45.hd-180-1.ch-804-82.lg-280-92.sh-300-64', stars: '★★★★☆' },
+    { name: 'Rc-Marco', figure: 'hr-831-45.hd-600-1.ch-685-71.lg-715-74.sh-730-74', stars: '★★★☆☆' },
+    { name: 'JaviliyoLol', figure: 'hr-125-45.hd-209-1.ch-255-66.lg-280-110.sh-305-62', stars: '★★★★★' },
+    { name: 'diavo', figure: 'hr-890-42.hd-180-19.ch-215-66.lg-275-110.sh-300-62', stars: '★★★★☆' },
+    { name: 'okki-blu96', figure: 'hr-800-45.hd-600-1.ch-685-71.lg-700-74.sh-730-74', stars: '★★★☆☆' },
+    { name: 'DJ-Crew.', figure: 'hr-828-45.hd-180-1.ch-804-82.lg-280-92.sh-300-64', stars: '★★★★☆' },
+    { name: 'Arci', figure: 'hr-100-45.hd-209-1.ch-255-66.lg-280-110.sh-305-62', stars: '★★★★★' }
+];
+
+function getAvatarHeadUrl(figure) {
+    return `https://www.habbo.com/habbo-imaging/avatarimage?figure=${figure}&headonly=1&direction=2&head_direction=2&size=m`;
+}
+
+// ============================================================
+// 3. Game Flow & Screen Transitions
+// ============================================================
+const screens = {
+    lobby: document.getElementById('screen-lobby'),
+    queue: document.getElementById('screen-queue'),
+    roster: document.getElementById('screen-roster'),
+    arena: document.getElementById('screen-arena')
+};
+
+function showScreen(name) {
+    Object.keys(screens).forEach(key => {
+        if (key === name) screens[key].classList.remove('hidden');
+        else screens[key].classList.add('hidden');
+    });
+}
+
+function exitToHotel() {
+    if (window.parent) {
+        window.parent.postMessage('EXIT_GAME', '*');
+        window.parent.postMessage({ type: 'EXIT_GAME' }, '*');
+    }
+}
+
+// Setup Lobby & Window Buttons
+document.getElementById('btn-close-window').addEventListener('click', exitToHotel);
+document.getElementById('btn-flag-exit').addEventListener('click', exitToHotel);
+document.getElementById('btn-return-hotel').addEventListener('click', exitToHotel);
+
+document.getElementById('btn-play-now').addEventListener('click', () => {
+    sfx.init();
+    startQueue();
+});
+
+document.getElementById('btn-cancel-queue').addEventListener('click', () => showScreen('lobby'));
+document.getElementById('btn-cancel-queue-x').addEventListener('click', () => showScreen('lobby'));
+document.getElementById('btn-leave-roster').addEventListener('click', () => showScreen('lobby'));
+document.getElementById('btn-play-again').addEventListener('click', () => startQueue());
+
+// ============================================================
+// 4. Queue / Matchmaking Flow (Screenshot 2)
+// ============================================================
+let queueInterval = null;
+
+function startQueue() {
+    showScreen('queue');
+    const container = document.getElementById('queue-slots');
+    container.innerHTML = '';
+
+    // Create 10 empty slot cards
+    for (let i = 0; i < 10; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'player-slot-card';
+        slot.id = `slot-${i}`;
+        slot.innerHTML = '<div class="slot-spinner"></div>';
+        container.appendChild(slot);
+    }
+
+    // Fill slots progressively to simulate players joining
+    let filled = 0;
+    if (queueInterval) clearInterval(queueInterval);
+
+    function addPlayerToSlot(idx) {
+        const slot = document.getElementById(`slot-${idx}`);
+        if (!slot) return;
+        const player = AVATAR_FIGURES[idx % AVATAR_FIGURES.length];
+        slot.className = 'player-slot-card filled';
+        slot.innerHTML = `<img class="slot-avatar-img" src="${getAvatarHeadUrl(player.figure)}" alt="${player.name}">`;
+    }
+
+    // First player is user
+    addPlayerToSlot(0);
+    filled = 1;
+
+    queueInterval = setInterval(() => {
+        if (filled < 8) {
+            addPlayerToSlot(filled);
+            filled++;
+        } else {
+            clearInterval(queueInterval);
+            setTimeout(() => startRoster(), 800);
+        }
+    }, 350);
+}
+
+// ============================================================
+// 5. Team Roster Flow (Screenshot 3)
+// ============================================================
+function startRoster() {
+    showScreen('roster');
+
+    const blueList = document.getElementById('blue-roster-list');
+    const redList = document.getElementById('red-roster-list');
+    blueList.innerHTML = '';
+    redList.innerHTML = '';
+
+    // 4 Blue Players
+    for (let i = 0; i < 4; i++) {
+        const p = AVATAR_FIGURES[i];
+        const card = document.createElement('div');
+        card.className = 'roster-player-card';
+        card.innerHTML = `
+            <div class="roster-avatar-box">
+                <img src="${getAvatarHeadUrl(p.figure)}" alt="${p.name}">
+            </div>
+            <div class="roster-player-info">
+                <span class="roster-username">${p.name}</span>
+                <span class="roster-stars">${p.stars}</span>
+            </div>
+        `;
+        blueList.appendChild(card);
+    }
+
+    // 4 Red Players
+    for (let i = 4; i < 8; i++) {
+        const p = AVATAR_FIGURES[i];
+        const card = document.createElement('div');
+        card.className = 'roster-player-card';
+        card.innerHTML = `
+            <div class="roster-avatar-box">
+                <img src="${getAvatarHeadUrl(p.figure)}" alt="${p.name}">
+            </div>
+            <div class="roster-player-info">
+                <span class="roster-username">${p.name}</span>
+                <span class="roster-stars">${p.stars}</span>
+            </div>
+        `;
+        redList.appendChild(card);
+    }
+
+    // Countdown 3.. 2.. 1..
+    let count = 3;
+    const subText = document.getElementById('roster-countdown-text');
+    subText.innerText = `Starting match in ${count}...`;
+
+    const cdInterval = setInterval(() => {
+        count--;
+        if (count > 0) {
+            subText.innerText = `Starting match in ${count}...`;
+        } else {
+            clearInterval(cdInterval);
+            sfx.playWhistle();
+            startFightNightArena();
+        }
+    }, 900);
+}
+
+// ============================================================
+// 6. Fight Night Arena Engine (Screenshot 4)
+// ============================================================
+const canvas = document.getElementById('arena-canvas');
 const ctx = canvas.getContext('2d');
 
 let width, height;
-function resizeCanvas() {
+function resizeArena() {
     width = window.innerWidth;
     height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+window.addEventListener('resize', resizeArena);
+resizeArena();
 
 const TILE_W = 64;
 const TILE_H = 32;
-const MAP_SIZE = 14;
+const MAP_RADIUS = 7.5; // Circular clearing
 
 function toIso(x, y) {
     return {
@@ -151,127 +295,210 @@ function fromIso(screenX, screenY, originX, originY) {
     return { x, y };
 }
 
-// ==========================================
-// 3. Game State & Entities
-// ==========================================
-let gameState = 'START'; // 'START', 'PLAYING', 'GAMEOVER'
-let score = 0;
-let highScore = parseInt(localStorage.getItem('snowstorm_highscore') || '0', 10);
-let wave = 1;
-let lastTime = performance.now();
+// In-Game State
+let matchTimeLeft = 120; // 2 minutes
+let matchTimerInterval = null;
+let blueTeamScore = 0;
+let redTeamScore = 0;
+let personalScore = 0;
+let matchActive = false;
 
-// Keyboard state
-const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false, ' ': false };
-window.addEventListener('keydown', e => {
-    if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.key.toLowerCase())) {
-        keys[e.key] = true;
-        keys[e.key.toLowerCase()] = true;
-    }
-    if (e.key === ' ' && gameState === 'PLAYING') {
-        player.startReload();
-    }
-});
-window.addEventListener('keyup', e => {
-    if (keys.hasOwnProperty(e.key) || keys.hasOwnProperty(e.key.toLowerCase())) {
-        keys[e.key] = false;
-        keys[e.key.toLowerCase()] = false;
-    }
-});
+// Entities
+let fighters = [];
+let snowballs = [];
+let particles = [];
+let mouseIso = { x: 0, y: 0 };
+let hoveredFighter = null;
 
-let mousePos = { x: width / 2, y: height / 2 };
-canvas.addEventListener('mousemove', e => {
-    mousePos.x = e.clientX;
-    mousePos.y = e.clientY;
-});
-canvas.addEventListener('mousedown', e => {
-    sfx.init();
-    if (e.button === 0 && gameState === 'PLAYING') {
-        player.throwSnowball(mousePos);
+class Fighter {
+    constructor(id, name, figure, team, startX, startY, isHuman = false) {
+        this.id = id;
+        this.name = name;
+        this.figure = figure;
+        this.team = team; // 'blue' or 'red'
+        this.x = startX;
+        this.y = startY;
+        this.targetX = startX;
+        this.targetY = startY;
+        this.isHuman = isHuman;
+        this.hp = 100;
+        this.maxHp = 100;
+        this.ammo = 5;
+        this.maxAmmo = 5;
+        this.speed = 3.2;
+        this.isReloading = false;
+        this.reloadTimer = 0;
+        this.stunTimer = 0;
+        this.dir = team === 'blue' ? 2 : 6;
+        this.walkFrame = 0;
+        this.walkTime = 0;
+        this.aiShootTimer = Math.random() * 2 + 1.5;
+        this.aiMoveTimer = Math.random() * 2 + 1;
+        this.isKO = false;
+        this.respawnTimer = 0;
     }
-});
 
-// Map definition: 0 = Snow, 1 = Ice Block, 2 = Snow Mound, 3 = Tree
-let map = [];
-function generateMap() {
-    map = [];
-    for (let i = 0; i < MAP_SIZE; i++) {
-        map[i] = [];
-        for (let j = 0; j < MAP_SIZE; j++) {
-            // Keep center spawn clear
-            if ((i >= 5 && i <= 8) && (j >= 5 && j <= 8)) {
-                map[i][j] = 0;
-            } else if (Math.random() < 0.08) {
-                map[i][j] = 1; // Ice block
-            } else if (Math.random() < 0.06) {
-                map[i][j] = 2; // Snow mound
-            } else if (Math.random() < 0.04) {
-                map[i][j] = 3; // Tree
-            } else {
-                map[i][j] = 0; // Snow tile
+    update(dt) {
+        if (this.isKO) {
+            this.respawnTimer -= dt;
+            if (this.respawnTimer <= 0) {
+                this.isKO = false;
+                this.hp = this.maxHp;
+                this.ammo = this.maxAmmo;
+                if (this.isHuman) updatePlayerHUD();
+            }
+            return;
+        }
+
+        if (this.stunTimer > 0) {
+            this.stunTimer -= dt;
+            return; // Can't move while stunned
+        }
+
+        if (this.isReloading) {
+            this.reloadTimer += dt;
+            if (this.reloadTimer >= 1.2) {
+                this.ammo = this.maxAmmo;
+                this.isReloading = false;
+                if (this.isHuman) {
+                    document.getElementById('btn-make-snowballs').classList.remove('reloading');
+                    updatePlayerHUD();
+                }
+                sfx.playReload();
+            }
+            return;
+        }
+
+        // AI Control
+        if (!this.isHuman) {
+            this.updateAI(dt);
+        }
+
+        // Move towards target position
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > 0.08) {
+            const step = Math.min(dist, this.speed * dt);
+            this.x += (dx / dist) * step;
+            this.y += (dy / dist) * step;
+            this.walkTime += dt;
+            this.walkFrame = Math.floor(this.walkTime * 8) % 4;
+            this.dir = calcDirection(dx, dy);
+        } else {
+            this.walkFrame = 0;
+        }
+    }
+
+    updateAI(dt) {
+        // Find closest enemy
+        const enemyTeam = this.team === 'blue' ? 'red' : 'blue';
+        const enemies = fighters.filter(f => f.team === enemyTeam && !f.isKO);
+        if (enemies.length === 0) return;
+
+        let closest = enemies[0];
+        let minDist = Math.hypot(closest.x - this.x, closest.y - this.y);
+        for (let i = 1; i < enemies.length; i++) {
+            const d = Math.hypot(enemies[i].x - this.x, enemies[i].y - this.y);
+            if (d < minDist) {
+                minDist = d;
+                closest = enemies[i];
+            }
+        }
+
+        // Periodic AI movement
+        this.aiMoveTimer -= dt;
+        if (this.aiMoveTimer <= 0) {
+            this.aiMoveTimer = Math.random() * 2.5 + 1.5;
+            // Wander within arena boundary
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * (MAP_RADIUS - 1.5);
+            this.targetX = 8 + Math.cos(angle) * r;
+            this.targetY = 8 + Math.sin(angle) * r;
+        }
+
+        // Periodic AI throwing
+        this.aiShootTimer -= dt;
+        if (this.aiShootTimer <= 0) {
+            this.aiShootTimer = Math.random() * 3 + 2;
+            if (this.ammo > 0 && minDist < 9.0) {
+                this.throwSnowballAt(closest.x, closest.y);
+            } else if (this.ammo === 0) {
+                this.isReloading = true;
+                this.reloadTimer = 0;
             }
         }
     }
-}
 
-// Falling Snowflakes in Background
-const snowflakes = [];
-for (let i = 0; i < 80; i++) {
-    snowflakes.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        radius: Math.random() * 2.5 + 1,
-        speedY: Math.random() * 1.2 + 0.8,
-        speedX: Math.random() * 0.6 - 0.3,
-        alpha: Math.random() * 0.6 + 0.4
-    });
-}
+    throwSnowballAt(targetMapX, targetMapY) {
+        if (this.ammo <= 0 || this.isReloading || this.stunTimer > 0 || this.isKO) return;
+        this.ammo--;
+        if (this.isHuman) updatePlayerHUD();
+        sfx.playThrow();
 
-// Particle System
-const particles = [];
-function addSnowExplosion(x, y, count = 16, color = '#ffffff') {
-    for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 4 + 1.5;
-        particles.push({
-            x, y,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed - 1.5,
-            gravity: 0.15,
-            radius: Math.random() * 3 + 2,
-            life: 1.0,
-            decay: Math.random() * 0.04 + 0.02,
-            color
-        });
+        snowballs.push(new ArenaSnowball(this.x, this.y, targetMapX, targetMapY, this.team, this.id));
+    }
+
+    takeHit(damage = 25, attackerTeam, attackerId) {
+        if (this.isKO) return;
+        this.hp -= damage;
+        this.stunTimer = 0.8;
+        sfx.playHit();
+
+        // Particle splash
+        const iso = toIso(this.x, this.y);
+        addSnowImpactParticles(iso.x, iso.y);
+
+        if (attackerTeam === 'blue') {
+            blueTeamScore += 10;
+            if (attackerId === 0) personalScore += 10;
+        } else {
+            redTeamScore += 10;
+        }
+
+        if (this.hp <= 0) {
+            this.isKO = true;
+            this.respawnTimer = 3.5;
+            if (attackerTeam === 'blue') {
+                blueTeamScore += 100;
+                if (attackerId === 0) personalScore += 100;
+            } else {
+                redTeamScore += 100;
+            }
+        }
+
+        updateScoreboard();
+        if (this.isHuman) updatePlayerHUD();
     }
 }
 
-// Floating score popups
-const popups = [];
-function addScorePopup(x, y, text, color = '#ffeb3b') {
-    popups.push({
-        x, y, text, color,
-        life: 1.0,
-        vy: -1.2
-    });
+function calcDirection(dx, dy) {
+    if (dx > 0 && dy > 0) return 4;
+    if (dx < 0 && dy < 0) return 0;
+    if (dx > 0 && dy < 0) return 2;
+    if (dx < 0 && dy > 0) return 6;
+    if (dx > 0) return 3;
+    if (dx < 0) return 7;
+    if (dy > 0) return 5;
+    return 1;
 }
 
-// Projectiles (Snowballs)
-const snowballs = [];
-
-class Snowball {
-    constructor(startX, startY, targetX, targetY, isPlayer = true) {
+class ArenaSnowball {
+    constructor(startX, startY, targetX, targetY, team, attackerId) {
         this.startX = startX;
         this.startY = startY;
         this.targetX = targetX;
         this.targetY = targetY;
         this.currX = startX;
         this.currY = startY;
-        this.isPlayer = isPlayer;
+        this.team = team;
+        this.attackerId = attackerId;
         
         const dist = Math.hypot(targetX - startX, targetY - startY);
-        this.duration = Math.max(0.35, dist * 0.15); // Duration in seconds
+        this.duration = Math.max(0.35, dist * 0.16);
         this.elapsed = 0;
-        this.maxHeight = Math.min(100, dist * 15 + 30);
+        this.maxHeight = Math.min(90, dist * 14 + 25);
         this.active = true;
     }
 
@@ -279,11 +506,8 @@ class Snowball {
         this.elapsed += dt;
         const t = Math.min(1, this.elapsed / this.duration);
 
-        // Linear interpolation in map space
         this.currX = this.startX + (this.targetX - this.startX) * t;
         this.currY = this.startY + (this.targetY - this.startY) * t;
-        
-        // Parabolic arc height
         this.height = 4 * this.maxHeight * t * (1 - t);
 
         if (t >= 1) {
@@ -293,354 +517,405 @@ class Snowball {
     }
 
     onImpact() {
-        const originX = width / 2;
-        const originY = height / 3.2;
-        const iso = toIso(this.currX, this.currY);
-        const screenX = iso.x + originX;
-        const screenY = iso.y + originY;
-
-        sfx.playHit();
-        addSnowExplosion(screenX, screenY, 14, '#e0f7fa');
-
-        // Check hits on enemy bots or player
-        if (this.isPlayer) {
-            for (let i = enemies.length - 1; i >= 0; i--) {
-                const enemy = enemies[i];
-                const d = Math.hypot(enemy.x - this.currX, enemy.y - this.currY);
-                if (d < 0.9) {
-                    enemy.takeHit();
-                    break;
+        fighters.forEach(f => {
+            if (f.team !== this.team && !f.isKO) {
+                const d = Math.hypot(f.x - this.currX, f.y - this.currY);
+                if (d < 0.85) {
+                    f.takeHit(25, this.team, this.attackerId);
                 }
             }
-        } else {
-            const d = Math.hypot(player.x - this.currX, player.y - this.currY);
-            if (d < 0.85) {
-                player.takeHit();
-            }
-        }
+        });
     }
 }
 
-// ==========================================
-// 4. Player & Enemy Classes
-// ==========================================
-class Player {
-    constructor() {
-        this.reset();
-    }
-
-    reset() {
-        this.x = 7.0;
-        this.y = 7.0;
-        this.speed = 3.8;
-        this.hp = 3;
-        this.maxHp = 3;
-        this.ammo = 5;
-        this.maxAmmo = 5;
-        this.isReloading = false;
-        this.reloadTimer = 0;
-        this.reloadDuration = 1.2;
-        this.dir = 2; // 0-7 directions
-        this.invulnerableTimer = 0;
-        this.walkFrame = 0;
-        this.walkTime = 0;
-        this.isMoving = false;
-    }
-
-    update(dt) {
-        if (this.invulnerableTimer > 0) {
-            this.invulnerableTimer -= dt;
-        }
-
-        if (this.isReloading) {
-            this.reloadTimer += dt;
-            const progress = Math.min(1, this.reloadTimer / this.reloadDuration);
-            document.getElementById('reload-text').innerText = `Haciendo bolas... ${Math.round(progress * 100)}%`;
-            if (this.reloadTimer >= this.reloadDuration) {
-                this.ammo = this.maxAmmo;
-                this.isReloading = false;
-                document.getElementById('reload-btn').classList.remove('active-reloading');
-                document.getElementById('reload-text').innerText = 'Recargar [ESPACIO]';
-                updateAmmoUI();
-                sfx.playReload();
-            }
-        }
-
-        // Movement input
-        let dx = 0;
-        let dy = 0;
-
-        if (keys.w || keys.ArrowUp) { dx -= 1; dy -= 1; }
-        if (keys.s || keys.ArrowDown) { dx += 1; dy += 1; }
-        if (keys.a || keys.ArrowLeft) { dx -= 1; dy += 1; }
-        if (keys.d || keys.ArrowRight) { dx += 1; dy -= 1; }
-
-        if (dx !== 0 || dy !== 0) {
-            // Normalize
-            const len = Math.hypot(dx, dy);
-            dx /= len;
-            dy /= len;
-
-            const nextX = this.x + dx * this.speed * dt;
-            const nextY = this.y + dy * this.speed * dt;
-
-            // Boundary collision
-            if (nextX >= 0.5 && nextX < MAP_SIZE - 0.5 && this.canMoveTo(nextX, this.y)) {
-                this.x = nextX;
-            }
-            if (nextY >= 0.5 && nextY < MAP_SIZE - 0.5 && this.canMoveTo(this.x, nextY)) {
-                this.y = nextY;
-            }
-
-            this.isMoving = true;
-            this.walkTime += dt;
-            this.walkFrame = Math.floor(this.walkTime * 8) % 4;
-
-            // Determine direction based on movement
-            this.dir = this.calcDirection(dx, dy);
-        } else {
-            this.isMoving = false;
-            this.walkFrame = 0;
-        }
-    }
-
-    canMoveTo(x, y) {
-        const gridX = Math.floor(x);
-        const gridY = Math.floor(y);
-        if (gridX < 0 || gridX >= MAP_SIZE || gridY < 0 || gridY >= MAP_SIZE) return false;
-        // Obstacles (1 = Ice block, 3 = Tree)
-        const type = map[gridX][gridY];
-        return type !== 1 && type !== 3;
-    }
-
-    calcDirection(dx, dy) {
-        if (dx > 0 && dy > 0) return 4; // South
-        if (dx < 0 && dy < 0) return 0; // North
-        if (dx > 0 && dy < 0) return 2; // East
-        if (dx < 0 && dy > 0) return 6; // West
-        if (dx > 0) return 3; // SE
-        if (dx < 0) return 7; // NW
-        if (dy > 0) return 5; // SW
-        return 1; // NE
-    }
-
-    throwSnowball(mouseScreen) {
-        if (this.ammo <= 0) {
-            this.startReload();
-            return;
-        }
-        if (this.isReloading) return;
-
-        const originX = width / 2;
-        const originY = height / 3.2;
-        const targetMap = fromIso(mouseScreen.x, mouseScreen.y, originX, originY);
-
-        this.ammo--;
-        updateAmmoUI();
-        sfx.playThrow();
-
-        snowballs.push(new Snowball(this.x, this.y, targetMap.x, targetMap.y, true));
-
-        // Auto reload prompt if empty
-        if (this.ammo === 0) {
-            document.getElementById('reload-text').innerText = '¡Pulsa ESPACIO para recargar!';
-        }
-    }
-
-    startReload() {
-        if (this.isReloading || this.ammo === this.maxAmmo) return;
-        this.isReloading = true;
-        this.reloadTimer = 0;
-        document.getElementById('reload-btn').classList.add('active-reloading');
-    }
-
-    takeHit() {
-        if (this.invulnerableTimer > 0) return;
-        this.hp--;
-        this.invulnerableTimer = 1.2;
-        sfx.playHurt();
-        updateHealthUI();
-
-        if (this.hp <= 0) {
-            gameOver(false);
-        }
+function addSnowImpactParticles(screenX, screenY) {
+    for (let i = 0; i < 14; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const spd = Math.random() * 3.5 + 1.5;
+        particles.push({
+            x: screenX,
+            y: screenY,
+            vx: Math.cos(angle) * spd,
+            vy: Math.sin(angle) * spd - 1.5,
+            gravity: 0.15,
+            radius: Math.random() * 3 + 2,
+            life: 1.0,
+            decay: Math.random() * 0.04 + 0.03,
+            color: '#ffffff'
+        });
     }
 }
 
-const player = new Player();
+// Setup Arena Map & Obstacles
+const arenaObstacles = [
+    { x: 5, y: 5, type: 'tree' },
+    { x: 11, y: 11, type: 'tree' },
+    { x: 5, y: 11, type: 'tree' },
+    { x: 11, y: 5, type: 'tree' },
+    { x: 8, y: 8, type: 'snowman' },
+    { x: 6, y: 8, type: 'fence' },
+    { x: 10, y: 8, type: 'fence' },
+    { x: 8, y: 6, type: 'mound' },
+    { x: 8, y: 10, type: 'mound' }
+];
 
-class Enemy {
-    constructor(type = 'cadet') {
-        this.type = type; // 'cadet', 'ranger', 'golem'
-        this.hp = type === 'golem' ? 3 : 1;
-        this.maxHp = this.hp;
-        this.speed = type === 'ranger' ? 2.6 : (type === 'golem' ? 1.4 : 2.0);
-        this.color = type === 'golem' ? '#00b4d8' : '#e63946';
-        this.size = type === 'golem' ? 1.4 : 1.0;
-        this.cooldown = Math.random() * 2.0 + 1.5;
-        this.shootTimer = 0;
-        this.dir = 4;
-        this.walkFrame = 0;
-        this.walkTime = 0;
+function startFightNightArena() {
+    showScreen('arena');
+    matchActive = true;
+    matchTimeLeft = 120;
+    blueTeamScore = 0;
+    redTeamScore = 0;
+    personalScore = 0;
+    snowballs = [];
+    particles = [];
 
-        // Spawn along perimeter
-        const side = Math.floor(Math.random() * 4);
-        if (side === 0) { this.x = Math.random() * 12 + 1; this.y = 1; }
-        else if (side === 1) { this.x = Math.random() * 12 + 1; this.y = 12; }
-        else if (side === 2) { this.x = 1; this.y = Math.random() * 12 + 1; }
-        else { this.x = 12; this.y = Math.random() * 12 + 1; }
-    }
+    // Initialize 8 Fighters (4 Blue, 4 Red)
+    fighters = [
+        // Blue Team (Fighter 0 is Human Player)
+        new Fighter(0, 'Vixis', AVATAR_FIGURES[0].figure, 'blue', 6, 8, true),
+        new Fighter(1, 'Savel', AVATAR_FIGURES[1].figure, 'blue', 5, 7, false),
+        new Fighter(2, 'Rc-Marco', AVATAR_FIGURES[2].figure, 'blue', 5, 9, false),
+        new Fighter(3, 'JaviliyoLol', AVATAR_FIGURES[3].figure, 'blue', 4, 8, false),
+        // Red Team
+        new Fighter(4, 'diavo', AVATAR_FIGURES[4].figure, 'red', 10, 8, false),
+        new Fighter(5, 'okki-blu96', AVATAR_FIGURES[5].figure, 'red', 11, 7, false),
+        new Fighter(6, 'DJ-Crew.', AVATAR_FIGURES[6].figure, 'red', 11, 9, false),
+        new Fighter(7, 'Arci', AVATAR_FIGURES[7].figure, 'red', 12, 8, false)
+    ];
 
-    update(dt) {
-        // AI movement: Seek distance around player, dodge slightly
-        const dx = player.x - this.x;
-        const dy = player.y - this.y;
-        const dist = Math.hypot(dx, dy);
+    updateScoreboard();
+    updatePlayerHUD();
+    document.getElementById('modal-match-result').classList.add('hidden');
 
-        let moveX = 0;
-        let moveY = 0;
-
-        if (dist > 5.5) {
-            moveX = dx / dist;
-            moveY = dy / dist;
-        } else if (dist < 3.0) {
-            moveX = -dx / dist;
-            moveY = -dy / dist;
+    if (matchTimerInterval) clearInterval(matchTimerInterval);
+    matchTimerInterval = setInterval(() => {
+        if (matchTimeLeft > 0) {
+            matchTimeLeft--;
+            const mins = String(Math.floor(matchTimeLeft / 60)).padStart(2, '0');
+            const secs = String(matchTimeLeft % 60).padStart(2, '0');
+            document.getElementById('match-timer-box').innerText = `${mins}:${secs}`;
         } else {
-            // Strafe
-            moveX = -dy / dist * 0.7;
-            moveY = dx / dist * 0.7;
+            clearInterval(matchTimerInterval);
+            endMatch();
         }
+    }, 1000);
+}
 
-        const nextX = this.x + moveX * this.speed * dt;
-        const nextY = this.y + moveY * this.speed * dt;
+function updateScoreboard() {
+    document.getElementById('blue-score-num').innerText = blueTeamScore;
+    document.getElementById('red-score-num').innerText = redTeamScore;
+    document.getElementById('player-personal-score').innerText = personalScore;
+}
 
-        if (nextX >= 0.5 && nextX < MAP_SIZE - 0.5 && player.canMoveTo(nextX, this.y)) {
-            this.x = nextX;
-        }
-        if (nextY >= 0.5 && nextY < MAP_SIZE - 0.5 && player.canMoveTo(this.x, nextY)) {
-            this.y = nextY;
-        }
+function updatePlayerHUD() {
+    const p = fighters[0];
+    if (!p) return;
 
-        this.walkTime += dt;
-        this.walkFrame = Math.floor(this.walkTime * 8) % 4;
-        this.dir = player.calcDirection(moveX, moveY);
+    // Health Fill
+    const fill = document.getElementById('player-health-fill');
+    fill.style.height = `${Math.max(0, (p.hp / p.maxHp) * 100)}%`;
 
-        // Shooting logic
-        this.shootTimer += dt;
-        if (this.shootTimer >= this.cooldown) {
-            this.shootTimer = 0;
-            this.cooldown = Math.random() * 2.5 + (this.type === 'golem' ? 1.2 : 2.0);
-            
-            // Aim slightly ahead of player
-            const leadX = player.x + (keys.d ? 1 : (keys.a ? -1 : 0)) * 0.5;
-            const leadY = player.y + (keys.s ? 1 : (keys.w ? -1 : 0)) * 0.5;
-            
-            snowballs.push(new Snowball(this.x, this.y, leadX, leadY, false));
-            sfx.playThrow();
-        }
-    }
-
-    takeHit() {
-        this.hp--;
-        const originX = width / 2;
-        const originY = height / 3.2;
-        const iso = toIso(this.x, this.y);
-        
-        if (this.hp <= 0) {
-            const pts = this.type === 'golem' ? 300 : (this.type === 'ranger' ? 150 : 100);
-            addScore(pts);
-            addScorePopup(iso.x + originX, iso.y + originY - 30, `+${pts}`, '#00e676');
-            addSnowExplosion(iso.x + originX, iso.y + originY, 25, this.color);
-            
-            const idx = enemies.indexOf(this);
-            if (idx >= 0) enemies.splice(idx, 1);
-
-            // Check if wave cleared
-            if (enemies.length === 0) {
-                nextWave();
-            }
-        } else {
-            addScore(50);
-            addScorePopup(iso.x + originX, iso.y + originY - 30, `+50`, '#ffea00');
-            addSnowExplosion(iso.x + originX, iso.y + originY, 10, '#ffffff');
-        }
+    // Vertical Ammo Rack
+    const rack = document.getElementById('ammo-rack-vertical');
+    rack.innerHTML = '';
+    for (let i = 0; i < p.maxAmmo; i++) {
+        const dot = document.createElement('div');
+        dot.className = `ammo-circle ${i < p.ammo ? 'active' : 'empty'}`;
+        rack.appendChild(dot);
     }
 }
 
-let enemies = [];
+function endMatch() {
+    matchActive = false;
+    const modal = document.getElementById('modal-match-result');
+    const title = document.getElementById('result-title-text');
+    const trophy = document.getElementById('result-trophy-icon');
 
-function spawnWave(w) {
-    enemies = [];
-    const count = 3 + w * 2;
-    for (let i = 0; i < count; i++) {
-        let type = 'cadet';
-        if (w >= 2 && Math.random() < 0.35) type = 'ranger';
-        if (w >= 3 && i === count - 1) type = 'golem';
-        enemies.push(new Enemy(type));
+    document.getElementById('res-blue-score').innerText = blueTeamScore;
+    document.getElementById('res-red-score').innerText = redTeamScore;
+
+    if (blueTeamScore >= redTeamScore) {
+        title.innerText = 'BLUE TEAM WINS!';
+        trophy.innerText = '🏆';
+    } else {
+        title.innerText = 'RED TEAM WINS!';
+        trophy.innerText = '❄️';
     }
-    sfx.playWave();
+
+    modal.classList.remove('hidden');
 }
 
-function nextWave() {
-    wave++;
-    document.getElementById('wave-val').innerText = wave;
-    addScore(wave * 250);
+// Mouse Controls in Arena
+canvas.addEventListener('mousemove', e => {
     const originX = width / 2;
-    const originY = height / 3.2;
-    addScorePopup(originX, originY, `¡RONDA ${wave}!`, '#00b4d8');
-    setTimeout(() => spawnWave(wave), 1000);
+    const originY = height / 2.3;
+    mouseIso = fromIso(e.clientX, e.clientY, originX, originY);
+});
+
+canvas.addEventListener('mousedown', e => {
+    if (!matchActive) return;
+    const player = fighters[0];
+    if (!player || player.isKO) return;
+
+    const originX = width / 2;
+    const originY = height / 2.3;
+    const targetMap = fromIso(e.clientX, e.clientY, originX, originY);
+
+    if (e.button === 0) { // Left Click
+        // If clicking far, throw snowball. If near, move player!
+        const d = Math.hypot(targetMap.x - player.x, targetMap.y - player.y);
+        if (d > 2.5 && player.ammo > 0) {
+            player.throwSnowballAt(targetMap.x, targetMap.y);
+        } else {
+            // Move player to target within map boundary
+            const distCenter = Math.hypot(targetMap.x - 8, targetMap.y - 8);
+            if (distCenter < MAP_RADIUS) {
+                player.targetX = targetMap.x;
+                player.targetY = targetMap.y;
+            }
+        }
+    }
+});
+
+// Keyboard & Button Reload
+window.addEventListener('keydown', e => {
+    if (e.key === ' ' && matchActive) {
+        const player = fighters[0];
+        if (player && player.ammo < player.maxAmmo && !player.isReloading) {
+            player.isReloading = true;
+            player.reloadTimer = 0;
+            document.getElementById('btn-make-snowballs').classList.add('reloading');
+        }
+    }
+});
+
+document.getElementById('btn-make-snowballs').addEventListener('click', () => {
+    const player = fighters[0];
+    if (player && player.ammo < player.maxAmmo && !player.isReloading) {
+        player.isReloading = true;
+        player.reloadTimer = 0;
+        document.getElementById('btn-make-snowballs').classList.add('reloading');
+    }
+});
+
+// ============================================================
+// 7. Arena Rendering Loop
+// ============================================================
+let lastLoopTime = performance.now();
+
+function renderArenaLoop(now) {
+    const dt = Math.min(0.1, (now - lastLoopTime) / 1000);
+    lastLoopTime = now;
+
+    if (matchActive) {
+        fighters.forEach(f => f.update(dt));
+        for (let i = snowballs.length - 1; i >= 0; i--) {
+            snowballs[i].update(dt);
+            if (!snowballs[i].active) snowballs.splice(i, 1);
+        }
+    }
+
+    // Update particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    // Clear Canvas
+    ctx.clearRect(0, 0, width, height);
+
+    const originX = width / 2;
+    const originY = height / 2.3;
+
+    // 1. Draw Night Background & Mountain Silhouette (Screenshot 4)
+    drawArenaSky(ctx, width, height);
+
+    // 2. Draw Spotlight Cones from Towers
+    drawSpotlights(ctx, originX, originY);
+
+    // 3. Draw Circular Snow Clearing Floor
+    drawCircularSnowFloor(ctx, originX, originY);
+
+    // 4. Render Entities with Isometric Z-Sorting
+    const renderList = [];
+
+    // Obstacles
+    arenaObstacles.forEach(obs => {
+        const iso = toIso(obs.x, obs.y);
+        renderList.push({
+            type: 'obs',
+            obsType: obs.type,
+            zIndex: obs.x + obs.y,
+            cx: iso.x + originX,
+            cy: iso.y + originY
+        });
+    });
+
+    // Fighters
+    fighters.forEach(f => {
+        const iso = toIso(f.x, f.y);
+        renderList.push({
+            type: 'fighter',
+            fighter: f,
+            zIndex: f.x + f.y,
+            cx: iso.x + originX,
+            cy: iso.y + originY
+        });
+    });
+
+    // Snowballs
+    snowballs.forEach(b => {
+        const iso = toIso(b.currX, b.currY);
+        renderList.push({
+            type: 'ball',
+            ball: b,
+            zIndex: b.currX + b.currY + 0.5,
+            cx: iso.x + originX,
+            cy: iso.y + originY,
+            height: b.height
+        });
+    });
+
+    // Sort by isometric depth
+    renderList.sort((a, b) => a.zIndex - b.zIndex);
+
+    // Draw sorted items
+    renderList.forEach(item => {
+        if (item.type === 'obs') {
+            if (item.obsType === 'tree') drawSnowTree(ctx, item.cx, item.cy);
+            else if (item.obsType === 'snowman') drawSnowman(ctx, item.cx, item.cy);
+            else if (item.obsType === 'fence') drawWoodenFence(ctx, item.cx, item.cy);
+            else if (item.obsType === 'mound') drawSnowMound(ctx, item.cx, item.cy);
+        } else if (item.type === 'fighter') {
+            drawHabboFighter(ctx, item.cx, item.cy, item.fighter);
+        } else if (item.type === 'ball') {
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 20, 40, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(item.cx, item.cy, 6, 3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // Ball
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(item.cx, item.cy - item.height, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#bce2f5';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+    });
+
+    // Draw Tile Cursor (Habbo ◇ selector)
+    drawTileCursor(ctx, originX, originY, mouseIso.x, mouseIso.y);
+
+    // Draw Particles
+    particles.forEach(p => {
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1.0;
+
+    requestAnimationFrame(renderArenaLoop);
 }
 
-// ==========================================
-// 5. Drawing & Rendering Pipeline
-// ==========================================
-function drawIsoDiamond(originX, originY, gridX, gridY, topColor, leftColor, rightColor, heightOffset = 0) {
-    const iso = toIso(gridX, gridY);
-    const cx = iso.x + originX;
-    const cy = iso.y + originY - heightOffset;
+// -------------------------------------------------------------
+// Graphic Helper Functions
+// -------------------------------------------------------------
+function drawArenaSky(ctx, w, h) {
+    // Twilight Mountain Gradient
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.45);
+    skyGrad.addColorStop(0, '#0a101d');
+    skyGrad.addColorStop(0.6, '#1a2436');
+    skyGrad.addColorStop(1, '#3b253b');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, w, h);
 
-    // Top face
-    ctx.fillStyle = topColor;
+    // Mountain silhouettes in background
+    ctx.fillStyle = '#0f1827';
     ctx.beginPath();
-    ctx.moveTo(cx, cy - TILE_H / 2);
-    ctx.lineTo(cx + TILE_W / 2, cy);
-    ctx.lineTo(cx, cy + TILE_H / 2);
-    ctx.lineTo(cx - TILE_W / 2, cy);
+    ctx.moveTo(0, h * 0.35);
+    ctx.lineTo(w * 0.2, h * 0.22);
+    ctx.lineTo(w * 0.45, h * 0.38);
+    ctx.lineTo(w * 0.7, h * 0.2);
+    ctx.lineTo(w * 0.9, h * 0.36);
+    ctx.lineTo(w, h * 0.25);
+    ctx.lineTo(w, h * 0.5);
+    ctx.lineTo(0, h * 0.5);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawSpotlights(ctx, originX, originY) {
+    // Left & Right Giant Floodlights (Screenshot 4)
+    const leftTowerX = originX - 380;
+    const leftTowerY = originY - 140;
+    const rightTowerX = originX + 380;
+    const rightTowerY = originY - 140;
+
+    // Spot Cones
+    const spotGradLeft = ctx.createRadialGradient(leftTowerX, leftTowerY, 10, originX, originY, 450);
+    spotGradLeft.addColorStop(0, 'rgba(255, 255, 240, 0.45)');
+    spotGradLeft.addColorStop(0.7, 'rgba(255, 255, 240, 0.1)');
+    spotGradLeft.addColorStop(1, 'rgba(255, 255, 240, 0)');
+    ctx.fillStyle = spotGradLeft;
+    ctx.beginPath();
+    ctx.moveTo(leftTowerX, leftTowerY);
+    ctx.lineTo(originX + 260, originY + 120);
+    ctx.lineTo(originX - 260, originY + 120);
     ctx.closePath();
     ctx.fill();
 
-    // Tile outline
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+    const spotGradRight = ctx.createRadialGradient(rightTowerX, rightTowerY, 10, originX, originY, 450);
+    spotGradRight.addColorStop(0, 'rgba(255, 255, 240, 0.45)');
+    spotGradRight.addColorStop(0.7, 'rgba(255, 255, 240, 0.1)');
+    spotGradRight.addColorStop(1, 'rgba(255, 255, 240, 0)');
+    ctx.fillStyle = spotGradRight;
+    ctx.beginPath();
+    ctx.moveTo(rightTowerX, rightTowerY);
+    ctx.lineTo(originX - 260, originY + 120);
+    ctx.lineTo(originX + 260, originY + 120);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawCircularSnowFloor(ctx, originX, originY) {
+    // Stadium Circular Snow Clearing
+    ctx.fillStyle = 'rgba(2, 6, 12, 0.85)';
+    ctx.beginPath();
+    ctx.ellipse(originX, originY + 10, 360, 180, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#eaf4fc';
+    ctx.beginPath();
+    ctx.ellipse(originX, originY, 340, 170, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Subtle isometric grid lines on snow
+    ctx.strokeStyle = 'rgba(180, 215, 235, 0.4)';
     ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Side 3D extrusion if heightOffset > 0
-    if (heightOffset > 0) {
-        // Left side
-        ctx.fillStyle = leftColor;
+    for (let i = 0; i <= 16; i++) {
+        const startIso = toIso(i, 0);
+        const endIso = toIso(i, 16);
         ctx.beginPath();
-        ctx.moveTo(cx - TILE_W / 2, cy);
-        ctx.lineTo(cx, cy + TILE_H / 2);
-        ctx.lineTo(cx, cy + TILE_H / 2 + heightOffset);
-        ctx.lineTo(cx - TILE_W / 2, cy + heightOffset);
-        ctx.closePath();
-        ctx.fill();
-
-        // Right side
-        ctx.fillStyle = rightColor;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy + TILE_H / 2);
-        ctx.lineTo(cx + TILE_W / 2, cy);
-        ctx.lineTo(cx + TILE_W / 2, cy + heightOffset);
-        ctx.lineTo(cx, cy + TILE_H / 2 + heightOffset);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(startIso.x + originX, startIso.y + originY);
+        ctx.lineTo(endIso.x + originX, endIso.y + originY);
+        ctx.stroke();
     }
 }
 
-function drawHabboAvatar(ctx, cx, cy, isPlayer = true, dir = 4, isWalking = false, walkFrame = 0, isInvulnerable = false) {
-    if (isInvulnerable && Math.floor(Date.now() / 100) % 2 === 0) return; // Blink
+function drawHabboFighter(ctx, cx, cy, f) {
+    if (f.isKO) {
+        // Render snow mound when knocked out
+        drawSnowMound(ctx, cx, cy);
+        return;
+    }
 
     ctx.save();
     ctx.translate(cx, cy);
@@ -648,124 +923,90 @@ function drawHabboAvatar(ctx, cx, cy, isPlayer = true, dir = 4, isWalking = fals
     // Soft Shadow
     ctx.fillStyle = 'rgba(0, 20, 40, 0.35)';
     ctx.beginPath();
-    ctx.ellipse(0, 6, 16, 8, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 4, 15, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    const bodyColor = isPlayer ? '#0077b6' : '#c1121f';
-    const hatColor = isPlayer ? '#00b4d8' : '#780000';
-    const bounce = isWalking ? Math.sin(walkFrame * Math.PI) * 2 : 0;
+    const bounce = f.walkFrame % 2 !== 0 ? -2 : 0;
+    const jacketColor = f.team === 'blue' ? '#0077b6' : '#c1121f';
+    const hatColor = f.team === 'blue' ? '#00b4d8' : '#780000';
 
     // Body / Parka
-    ctx.fillStyle = bodyColor;
+    ctx.fillStyle = jacketColor;
     ctx.beginPath();
-    ctx.roundRect(-10, -22 + bounce, 20, 22, 6);
+    ctx.roundRect(-9, -22 + bounce, 18, 22, 5);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
     // White fur trim
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.roundRect(-11, -5 + bounce, 22, 5, 3);
+    ctx.roundRect(-10, -5 + bounce, 20, 5, 2);
     ctx.fill();
 
     // Head
-    ctx.fillStyle = '#fbd1a2'; // Skin tone
+    ctx.fillStyle = '#fbd1a2';
     ctx.beginPath();
-    ctx.arc(0, -28 + bounce, 9, 0, Math.PI * 2);
+    ctx.arc(0, -28 + bounce, 8, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
     // Eyes
-    ctx.fillStyle = '#222222';
-    const eyeOffset = (dir === 2 || dir === 3) ? 3 : ((dir === 6 || dir === 7) ? -3 : 0);
+    ctx.fillStyle = '#111111';
     ctx.beginPath();
-    ctx.arc(-3 + eyeOffset, -28 + bounce, 1.5, 0, Math.PI * 2);
-    ctx.arc(3 + eyeOffset, -28 + bounce, 1.5, 0, Math.PI * 2);
+    ctx.arc(-2.5, -28 + bounce, 1.2, 0, Math.PI * 2);
+    ctx.arc(2.5, -28 + bounce, 1.2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Winter Beanie / Hat
+    // Winter Hat
     ctx.fillStyle = hatColor;
     ctx.beginPath();
-    ctx.arc(0, -32 + bounce, 10, Math.PI, Math.PI * 2);
+    ctx.arc(0, -32 + bounce, 9, Math.PI, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Hat Pompom
+    // Pompom
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(0, -42 + bounce, 4, 0, Math.PI * 2);
+    ctx.arc(0, -41 + bounce, 3.5, 0, Math.PI * 2);
     ctx.fill();
+
+    // Stun Stars if hit
+    if (f.stunTimer > 0) {
+        ctx.fillStyle = '#ffd60a';
+        const starAng = Date.now() / 150;
+        for (let i = 0; i < 3; i++) {
+            const sx = Math.cos(starAng + (i * Math.PI * 2) / 3) * 14;
+            const sy = Math.sin(starAng + (i * Math.PI * 2) / 3) * 6 - 44;
+            ctx.beginPath();
+            ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // Name tag
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.font = 'bold 10px "Ubuntu", sans-serif';
+    ctx.textAlign = 'center';
+    const tagW = ctx.measureText(f.name).width + 8;
+    ctx.fillRect(-tagW / 2, -56, tagW, 13);
+    ctx.fillStyle = f.team === 'blue' ? '#90e0ef' : '#ffb3ba';
+    ctx.fillText(f.name, 0, -46);
 
     ctx.restore();
 }
 
-function drawIceBlock(ctx, cx, cy) {
-    // 3D Ice Pillar
-    const h = 28;
-    ctx.fillStyle = 'rgba(144, 224, 239, 0.85)';
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - TILE_H / 2 - h);
-    ctx.lineTo(cx + TILE_W / 2, cy - h);
-    ctx.lineTo(cx, cy + TILE_H / 2 - h);
-    ctx.lineTo(cx - TILE_W / 2, cy - h);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = '#caf0f8';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Left face
-    ctx.fillStyle = 'rgba(0, 150, 199, 0.85)';
-    ctx.beginPath();
-    ctx.moveTo(cx - TILE_W / 2, cy - h);
-    ctx.lineTo(cx, cy + TILE_H / 2 - h);
-    ctx.lineTo(cx, cy + TILE_H / 2);
-    ctx.lineTo(cx - TILE_W / 2, cy);
-    ctx.closePath();
-    ctx.fill();
-
-    // Right face
-    ctx.fillStyle = 'rgba(0, 119, 182, 0.85)';
-    ctx.beginPath();
-    ctx.moveTo(cx, cy + TILE_H / 2 - h);
-    ctx.lineTo(cx + TILE_W / 2, cy - h);
-    ctx.lineTo(cx + TILE_W / 2, cy);
-    ctx.lineTo(cx, cy + TILE_H / 2);
-    ctx.closePath();
-    ctx.fill();
-}
-
-function drawSnowMound(ctx, cx, cy) {
-    ctx.fillStyle = '#e2f6fd';
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, 20, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = '#bfe3f9';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Top shine
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.ellipse(cx - 3, cy - 3, 10, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-}
-
-function drawPineTree(ctx, cx, cy) {
-    // Tree Shadow
+function drawSnowTree(ctx, cx, cy) {
     ctx.fillStyle = 'rgba(0, 20, 40, 0.3)';
     ctx.beginPath();
-    ctx.ellipse(cx, cy + 4, 18, 10, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, cy + 4, 18, 9, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // 3 Snow-Covered Tree Cones
     for (let i = 0; i < 3; i++) {
         const yOff = cy - i * 16 - 10;
         const w = 24 - i * 4;
-        
-        ctx.fillStyle = '#1b4332'; // Deep pine green
+        ctx.fillStyle = '#1e3f30';
         ctx.beginPath();
         ctx.moveTo(cx, yOff - 20);
         ctx.lineTo(cx + w, yOff);
@@ -773,7 +1014,6 @@ function drawPineTree(ctx, cx, cy) {
         ctx.closePath();
         ctx.fill();
 
-        // Snow layer on top of branches
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.moveTo(cx, yOff - 20);
@@ -784,294 +1024,69 @@ function drawPineTree(ctx, cx, cy) {
     }
 }
 
-// ==========================================
-// 6. Main Game Loop
-// ==========================================
-function gameLoop(time) {
-    const dt = Math.min(0.1, (time - lastTime) / 1000);
-    lastTime = time;
-
-    // 1. Update logic
-    if (gameState === 'PLAYING') {
-        player.update(dt);
-        enemies.forEach(e => e.update(dt));
-
-        for (let i = snowballs.length - 1; i >= 0; i--) {
-            snowballs[i].update(dt);
-            if (!snowballs[i].active) snowballs.splice(i, 1);
-        }
-    }
-
-    // Update Particles
-    for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += p.gravity;
-        p.life -= p.decay;
-        if (p.life <= 0) particles.splice(i, 1);
-    }
-
-    // Update Popups
-    for (let i = popups.length - 1; i >= 0; i--) {
-        const pop = popups[i];
-        pop.y += pop.vy;
-        pop.life -= dt * 1.5;
-        if (pop.life <= 0) popups.splice(i, 1);
-    }
-
-    // Update Background Snowflakes
-    snowflakes.forEach(f => {
-        f.y += f.speedY;
-        f.x += f.speedX;
-        if (f.y > height) { f.y = -10; f.x = Math.random() * width; }
-    });
-
-    // 2. Render Scene
-    ctx.clearRect(0, 0, width, height);
-
-    // Draw Falling Snowflakes Background
-    ctx.fillStyle = '#ffffff';
-    snowflakes.forEach(f => {
-        ctx.globalAlpha = f.alpha;
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    ctx.globalAlpha = 1.0;
-
-    const originX = width / 2;
-    const originY = height / 3.2;
-
-    // Ground Shadow under Arena
-    ctx.fillStyle = 'rgba(2, 10, 20, 0.45)';
+function drawSnowman(ctx, cx, cy) {
+    ctx.fillStyle = 'rgba(0, 20, 40, 0.3)';
     ctx.beginPath();
-    const topIso = toIso(0, 0);
-    const rightIso = toIso(MAP_SIZE, 0);
-    const bottomIso = toIso(MAP_SIZE, MAP_SIZE);
-    const leftIso = toIso(0, MAP_SIZE);
-    ctx.moveTo(topIso.x + originX, topIso.y + originY - 10);
-    ctx.lineTo(rightIso.x + originX + 20, rightIso.y + originY + 10);
-    ctx.lineTo(bottomIso.x + originX, bottomIso.y + originY + 30);
-    ctx.lineTo(leftIso.x + originX - 20, leftIso.y + originY + 10);
-    ctx.closePath();
+    ctx.ellipse(cx, cy + 2, 14, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Render Tiles
-    for (let i = 0; i < MAP_SIZE; i++) {
-        for (let j = 0; j < MAP_SIZE; j++) {
-            const isAlt = (i + j) % 2 === 0;
-            const topColor = isAlt ? '#edf6f9' : '#d8eefe';
-            drawIsoDiamond(originX, originY, i, j, topColor, '#a2d2ff', '#83bdf5', 0);
-        }
-    }
+    // Bottom ball
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(cx, cy - 10, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#bce2f5';
+    ctx.stroke();
 
-    // Queue Objects & Entities for Z-Sorting (Painter's Algorithm)
-    const renderQueue = [];
+    // Top ball
+    ctx.beginPath();
+    ctx.arc(cx, cy - 26, 7.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
 
-    // Map obstacles
-    for (let i = 0; i < MAP_SIZE; i++) {
-        for (let j = 0; j < MAP_SIZE; j++) {
-            const type = map[i][j];
-            if (type !== 0) {
-                const iso = toIso(i, j);
-                renderQueue.push({
-                    type: 'obstacle',
-                    subType: type,
-                    x: i, y: j,
-                    zIndex: i + j + 0.1,
-                    cx: iso.x + originX,
-                    cy: iso.y + originY
-                });
-            }
-        }
-    }
-
-    // Player
-    const playerIso = toIso(player.x, player.y);
-    renderQueue.push({
-        type: 'player',
-        zIndex: player.x + player.y,
-        cx: playerIso.x + originX,
-        cy: playerIso.y + originY
-    });
-
-    // Enemies
-    enemies.forEach(e => {
-        const eIso = toIso(e.x, e.y);
-        renderQueue.push({
-            type: 'enemy',
-            enemy: e,
-            zIndex: e.x + e.y,
-            cx: eIso.x + originX,
-            cy: eIso.y + originY
-        });
-    });
-
-    // Snowballs (Sorted by ground pos)
-    snowballs.forEach(b => {
-        const bIso = toIso(b.currX, b.currY);
-        renderQueue.push({
-            type: 'snowball',
-            ball: b,
-            zIndex: b.currX + b.currY + 0.5,
-            cx: bIso.x + originX,
-            cy: bIso.y + originY,
-            height: b.height
-        });
-    });
-
-    // Sort by Z-Index
-    renderQueue.sort((a, b) => a.zIndex - b.zIndex);
-
-    // Draw sorted items
-    renderQueue.forEach(item => {
-        if (item.type === 'obstacle') {
-            if (item.subType === 1) drawIceBlock(ctx, item.cx, item.cy);
-            else if (item.subType === 2) drawSnowMound(ctx, item.cx, item.cy);
-            else if (item.subType === 3) drawPineTree(ctx, item.cx, item.cy);
-        } else if (item.type === 'player') {
-            drawHabboAvatar(ctx, item.cx, item.cy, true, player.dir, player.isMoving, player.walkFrame, player.invulnerableTimer > 0);
-        } else if (item.type === 'enemy') {
-            drawHabboAvatar(ctx, item.cx, item.cy, false, item.enemy.dir, true, item.enemy.walkFrame, false);
-            // Enemy HP bar for Boss
-            if (item.enemy.type === 'golem') {
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.fillRect(item.cx - 15, item.cy - 52, 30, 5);
-                ctx.fillStyle = '#00e676';
-                ctx.fillRect(item.cx - 15, item.cy - 52, (item.enemy.hp / item.enemy.maxHp) * 30, 5);
-            }
-        } else if (item.type === 'snowball') {
-            // Shadow on floor
-            ctx.fillStyle = 'rgba(0, 20, 40, 0.3)';
-            ctx.beginPath();
-            ctx.ellipse(item.cx, item.cy, 6, 3, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Flying Snowball
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(item.cx, item.cy - item.height, 6, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#caf0f8';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        }
-    });
-
-    // Draw Particles on top
-    particles.forEach(p => {
-        ctx.globalAlpha = p.life;
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    ctx.globalAlpha = 1.0;
-
-    // Draw Popups
-    popups.forEach(pop => {
-        ctx.globalAlpha = pop.life;
-        ctx.font = 'bold 16px "Ubuntu", sans-serif';
-        ctx.fillStyle = pop.color;
-        ctx.textAlign = 'center';
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
-        ctx.shadowBlur = 4;
-        ctx.fillText(pop.text, pop.x, pop.y);
-        ctx.shadowBlur = 0;
-    });
-    ctx.globalAlpha = 1.0;
-
-    requestAnimationFrame(gameLoop);
+    // Carrot nose
+    ctx.fillStyle = '#ff7b00';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - 26);
+    ctx.lineTo(cx + 6, cy - 25);
+    ctx.lineTo(cx, cy - 24);
+    ctx.closePath();
+    ctx.fill();
 }
 
-// ==========================================
-// 7. UI Updates & Game Lifecycle
-// ==========================================
-function updateHealthUI() {
-    const container = document.getElementById('hearts-container');
-    container.innerHTML = '';
-    for (let i = 0; i < player.maxHp; i++) {
-        const heart = document.createElement('span');
-        heart.className = `heart ${i < player.hp ? 'full' : 'empty'}`;
-        heart.innerText = '❤️';
-        container.appendChild(heart);
-    }
+function drawWoodenFence(ctx, cx, cy) {
+    ctx.fillStyle = '#8b5a2b';
+    ctx.fillRect(cx - 16, cy - 14, 32, 5);
+    ctx.fillRect(cx - 12, cy - 20, 5, 20);
+    ctx.fillRect(cx + 7, cy - 20, 5, 20);
 }
 
-function updateAmmoUI() {
-    const rack = document.getElementById('snowballs-rack');
-    rack.innerHTML = '';
-    for (let i = 0; i < player.maxAmmo; i++) {
-        const slot = document.createElement('div');
-        slot.className = `snowball-slot ${i < player.ammo ? 'active' : 'empty'}`;
-        rack.appendChild(slot);
-    }
+function drawSnowMound(ctx, cx, cy) {
+    ctx.fillStyle = '#e2f6fd';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 18, 10, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#bfe3f9';
+    ctx.stroke();
 }
 
-function addScore(pts) {
-    score += pts;
-    document.getElementById('score-val').innerText = score;
-    if (score > highScore) {
-        highScore = score;
-        localStorage.setItem('snowstorm_highscore', highScore);
-        document.getElementById('highscore-val').innerText = highScore;
-    }
+function drawTileCursor(ctx, originX, originY, gridX, gridY) {
+    const gx = Math.round(gridX);
+    const gy = Math.round(gridY);
+    const iso = toIso(gx, gy);
+    const cx = iso.x + originX;
+    const cy = iso.y + originY;
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - TILE_H / 2);
+    ctx.lineTo(cx + TILE_W / 2, cy);
+    ctx.lineTo(cx, cy + TILE_H / 2);
+    ctx.lineTo(cx - TILE_W / 2, cy);
+    ctx.closePath();
+    ctx.stroke();
 }
 
-function startGame() {
-    sfx.init();
-    score = 0;
-    wave = 1;
-    document.getElementById('score-val').innerText = '0';
-    document.getElementById('wave-val').innerText = '1';
-    document.getElementById('highscore-val').innerText = highScore;
-
-    player.reset();
-    generateMap();
-    spawnWave(wave);
-    updateHealthUI();
-    updateAmmoUI();
-
-    document.getElementById('start-overlay').classList.add('hidden');
-    document.getElementById('gameover-overlay').classList.add('hidden');
-    gameState = 'PLAYING';
-}
-
-function gameOver(isWin = false) {
-    gameState = 'GAMEOVER';
-    document.getElementById('final-score').innerText = score;
-    document.getElementById('final-wave').innerText = wave;
-    
-    if (isWin) {
-        document.getElementById('gameover-title').innerText = '¡VICTORIA INVERNAL!';
-        document.getElementById('gameover-subtitle').innerText = '¡Has derrotado a todas las rondas de nieve!';
-    } else {
-        document.getElementById('gameover-title').innerText = '¡PARTIDA TERMINADA!';
-        document.getElementById('gameover-subtitle').innerText = '¡Te han congelado! Inténtalo de nuevo.';
-    }
-
-    document.getElementById('gameover-overlay').classList.remove('hidden');
-}
-
-function exitToHotel() {
-    if (window.parent) {
-        window.parent.postMessage({ type: 'EXIT_GAME' }, '*');
-        window.parent.postMessage('EXIT_GAME', '*');
-    }
-}
-
-// Button listeners
-document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('restart-btn').addEventListener('click', startGame);
-document.getElementById('exit-btn').addEventListener('click', exitToHotel);
-document.getElementById('modal-exit-btn').addEventListener('click', exitToHotel);
-document.getElementById('reload-btn').addEventListener('click', () => player.startReload());
-document.getElementById('sound-btn').addEventListener('click', (e) => {
-    const isMuted = !sfx.toggle();
-    e.target.innerText = isMuted ? '🔇' : '🔊';
-});
-
-// Start Engine Loop
-document.getElementById('highscore-val').innerText = highScore;
-requestAnimationFrame(gameLoop);
+// Start Main Rendering Loop
+requestAnimationFrame(renderArenaLoop);

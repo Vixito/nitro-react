@@ -1,9 +1,10 @@
 .game-center-stage {
-    width: 100%;
-    height: calc(100% - 55px);
+    width: 100vw;
+    height: 100vh;
     background-color: black;
-    position: absolute;
+    position: fixed;
     inset: 0;
+    z-index: 99999;
 }
 .game-center-main {
     width: 1280px;

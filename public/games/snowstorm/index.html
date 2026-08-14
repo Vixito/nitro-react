@@ -4,125 +4,243 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habbten - SnowStorm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700;800&family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <!-- Canvas de Renderizado Isométrico -->
-        <canvas id="game-canvas"></canvas>
+    <div id="game-app">
+        <!-- ============================================================
+             1. PANTALLA PRINCIPAL: VENTANA "GAMES!" (Screenshot 1)
+        ============================================================ -->
+        <div id="screen-lobby" class="habbo-screen">
+            <!-- Fondo Hotel View / Nieve -->
+            <div class="lobby-backdrop"></div>
 
-        <!-- Interfaz HUD Superior -->
-        <div id="game-ui">
-            <!-- Top Left: Score & Wave -->
-            <div class="hud-box top-left-box">
-                <div class="game-badge">
-                    <span class="badge-icon">❄️</span>
-                    <span class="badge-title">SNOWSTORM</span>
+            <div class="habbo-window">
+                <!-- Barra de título -->
+                <div class="window-titlebar">
+                    <span class="window-title">Games!</span>
+                    <button id="btn-close-window" class="window-close-btn" title="Cerrar">✕</button>
                 </div>
-                <div class="hud-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">PUNTOS</span>
-                        <span class="stat-val" id="score-val">0</span>
+
+                <!-- Contenido de la ventana -->
+                <div class="window-content">
+                    <!-- Banner con Logo Oficial de SnowStorm -->
+                    <div class="snowstorm-banner">
+                        <div class="snow-mountains-bg"></div>
+                        <div class="official-logo">
+                            <span class="logo-snow">SNOW</span>
+                            <div class="logo-gloves-crossing">
+                                <div class="glove-mini blue"></div>
+                                <div class="glove-mini red"></div>
+                            </div>
+                            <span class="logo-storm">STORM</span>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">RONDA</span>
-                        <span class="stat-val" id="wave-val">1</span>
+
+                    <!-- Mensaje y mini avatares peleando con nieve -->
+                    <div class="lobby-body">
+                        <h2 class="lobby-headline">Hit or get hit!</h2>
+                        <p class="lobby-subtext">Play against other Habbos in epic snowball battles!</p>
+
+                        <div class="battle-preview">
+                            <div class="mini-habbo habbo-left"></div>
+                            <div class="mini-habbo habbo-center-left"></div>
+                            <div class="snowball-flying-preview"></div>
+                            <div class="mini-habbo habbo-center-right"></div>
+                            <div class="mini-habbo habbo-right"></div>
+                        </div>
+
+                        <div class="lobby-links">
+                            <a href="#" id="link-how-to-play">How To Play</a>
+                            <span class="link-divider">|</span>
+                            <a href="#" id="link-leaderboard">Leaderboard</a>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">RECORD</span>
-                        <span class="stat-val" id="highscore-val">0</span>
+
+                    <!-- Pie de ventana con botón Play Now -->
+                    <div class="window-footer">
+                        <div class="games-left-info">
+                            <span class="games-count">Total Games Left: <strong>38</strong></span>
+                            <a href="#" class="buy-games-link">Buy 10 games</a>
+                        </div>
+                        <button id="btn-play-now" class="btn-habbo-green">Play now!</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Top Right: Health & Actions -->
-            <div class="hud-box top-right-box">
-                <div class="health-container">
-                    <span class="stat-label">VIDAS</span>
-                    <div class="hearts-row" id="hearts-container">
-                        <span class="heart full">❤️</span>
-                        <span class="heart full">❤️</span>
-                        <span class="heart full">❤️</span>
-                    </div>
+        <!-- ============================================================
+             2. PANTALLA: BUSCANDO JUGADORES (Screenshot 2)
+        ============================================================ -->
+        <div id="screen-queue" class="habbo-screen hidden">
+            <div class="habbo-window matchmaking-window">
+                <div class="window-titlebar">
+                    <span class="window-title">Games!</span>
+                    <button id="btn-cancel-queue-x" class="window-close-btn">✕</button>
                 </div>
-                <div class="hud-buttons">
-                    <button id="sound-btn" class="hud-icon-btn" title="Activar/Desactivar Sonido">🔊</button>
-                    <button id="exit-btn" class="hud-exit-btn">✕ Salir</button>
+
+                <div class="window-content">
+                    <div class="snowstorm-banner compact">
+                        <div class="snow-mountains-bg"></div>
+                        <div class="official-logo small">
+                            <span class="logo-snow">SNOW</span>
+                            <div class="logo-gloves-crossing">
+                                <div class="glove-mini blue"></div>
+                                <div class="glove-mini red"></div>
+                            </div>
+                            <span class="logo-storm">STORM</span>
+                        </div>
+                    </div>
+
+                    <div class="queue-body">
+                        <h2 class="queue-headline">Waiting for more players...</h2>
+
+                        <!-- Grid de 10 jugadores (2 filas de 5) -->
+                        <div class="player-slots-grid" id="queue-slots">
+                            <!-- Inyectado por JS: 10 slots -->
+                        </div>
+
+                        <div class="queue-footer">
+                            <button id="btn-cancel-queue" class="link-btn-cancel">Cancel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Bottom Center: Ammo & Controls -->
-            <div class="hud-box bottom-center-box">
-                <div class="ammo-bar">
-                    <span class="ammo-label">BOLAS DE NIEVE:</span>
-                    <div class="snowballs-rack" id="snowballs-rack">
-                        <div class="snowball-slot active"></div>
-                        <div class="snowball-slot active"></div>
-                        <div class="snowball-slot active"></div>
-                        <div class="snowball-slot active"></div>
-                        <div class="snowball-slot active"></div>
+        <!-- ============================================================
+             3. PANTALLA: GET READY / ROSTER DE EQUIPOS (Screenshot 3)
+        ============================================================ -->
+        <div id="screen-roster" class="habbo-screen hidden">
+            <div class="roster-container">
+                <!-- Header con logo y guantes grandes -->
+                <div class="roster-header">
+                    <div class="team-glove-big blue-glove"></div>
+                    <div class="official-logo medium">
+                        <span class="logo-snow">SNOW</span>
+                        <div class="logo-gloves-crossing">
+                            <div class="glove-mini blue"></div>
+                            <div class="glove-mini red"></div>
+                        </div>
+                        <span class="logo-storm">STORM</span>
                     </div>
-                    <button id="reload-btn" class="reload-btn">
-                        <span class="reload-icon">🔄</span>
-                        <span id="reload-text">Recargar [ESPACIO]</span>
+                    <div class="team-glove-big red-glove"></div>
+                </div>
+
+                <h1 class="roster-title">Get ready!</h1>
+                <p class="roster-subtitle" id="roster-countdown-text">Waiting for players...</p>
+
+                <!-- Columnas de Equipos vs Mapa -->
+                <div class="roster-teams-layout">
+                    <!-- Equipo Azul -->
+                    <div class="team-column blue-team" id="blue-roster-list">
+                        <!-- 4 jugadores azules -->
+                    </div>
+
+                    <!-- Previsualización del Mapa -->
+                    <div class="map-preview-card">
+                        <div class="map-thumbnail">
+                            <div class="spotlight-glow"></div>
+                            <span class="map-name-label">Fight Night</span>
+                        </div>
+                    </div>
+
+                    <!-- Equipo Rojo -->
+                    <div class="team-column red-team" id="red-roster-list">
+                        <!-- 4 jugadores rojos -->
+                    </div>
+                </div>
+
+                <div class="roster-footer">
+                    <button id="btn-leave-roster" class="link-btn-leave">◄ Leave game?</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             4. PANTALLA: ARENA DE JUEGO (Screenshot 4)
+        ============================================================ -->
+        <div id="screen-arena" class="habbo-screen hidden">
+            <!-- Canvas de la partida -->
+            <canvas id="arena-canvas"></canvas>
+
+            <!-- HUD de la Arena -->
+            <div id="arena-hud">
+                <!-- Top-Left: Botón Bandera Naranja (Salir) -->
+                <button id="btn-flag-exit" class="hud-flag-box" title="Abandonar partida">
+                    <div class="orange-flag-icon">🏳️</div>
+                </button>
+
+                <!-- Top-Right: Marcador Equipos y Tiempo -->
+                <div class="hud-scoreboard-container">
+                    <div class="scoreboard-teams">
+                        <div class="score-team blue">
+                            <div class="hud-glove-icon blue"></div>
+                            <span class="team-score-num" id="blue-score-num">0</span>
+                        </div>
+                        <div class="score-team red">
+                            <span class="team-score-num" id="red-score-num">0</span>
+                            <div class="hud-glove-icon red"></div>
+                        </div>
+                    </div>
+                    <div class="scoreboard-timer" id="match-timer-box">
+                        02:00
+                    </div>
+                </div>
+
+                <!-- Barra Lateral Izquierda: Munición y Botón Hacer Bolas -->
+                <div class="hud-left-controls">
+                    <!-- 5 slots verticales de bolas de nieve -->
+                    <div class="vertical-ammo-rack" id="ammo-rack-vertical">
+                        <div class="ammo-circle active"></div>
+                        <div class="ammo-circle active"></div>
+                        <div class="ammo-circle active"></div>
+                        <div class="ammo-circle active"></div>
+                        <div class="ammo-circle active"></div>
+                    </div>
+                    <!-- Botón verde "Hacer bolas" -->
+                    <button id="btn-make-snowballs" class="btn-make-snow" title="Hacer bolas de nieve (ESPACIO)">
+                        <div class="hand-icon">🖐️</div>
                     </button>
                 </div>
-                <div class="controls-hint">
-                    <span>Mover: <strong>W, A, S, D</strong> o <strong>Flechas</strong></span>
-                    <span class="dot-separator">•</span>
-                    <span>Lanzar: <strong>Clic Izquierdo</strong></span>
-                    <span class="dot-separator">•</span>
-                    <span>Recargar: <strong>ESPACIO</strong></span>
+
+                <!-- Bottom-Left: Estado del Jugador (Avatar, Barra de Vida, Puntos) -->
+                <div class="hud-player-status">
+                    <div class="player-avatar-box">
+                        <img id="player-avatar-img" src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-115-42.hd-195-19.ch-215-66.lg-270-110.sh-305-62&headonly=1&direction=2&head_direction=2" alt="Avatar">
+                    </div>
+                    <div class="player-health-gauge">
+                        <div class="health-bar-fill" id="player-health-fill"></div>
+                    </div>
+                    <div class="player-score-badge" id="player-personal-score">
+                        0
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Pantalla de Inicio / Menú -->
-        <div id="start-overlay" class="modal-overlay">
-            <div class="modal-card">
-                <div class="modal-logo">❄️ SNOWSTORM ❄️</div>
-                <p class="modal-subtitle">¡La clásica batalla de bolas de nieve en Habbten!</p>
-                
-                <div class="instructions-card">
-                    <div class="instruction-row">
-                        <div class="key-badge">WASD</div>
-                        <span>Muévete por la arena de nieve y esquiva disparos</span>
+            <!-- Modal de Fin de Partida / Victoria -->
+            <div id="modal-match-result" class="match-result-overlay hidden">
+                <div class="result-card">
+                    <div class="result-trophy" id="result-trophy-icon">🏆</div>
+                    <h2 class="result-title" id="result-title-text">BLUE TEAM WINS!</h2>
+                    
+                    <div class="result-scores-row">
+                        <div class="result-score-box blue">
+                            <span class="res-team-name">BLUE TEAM</span>
+                            <span class="res-score" id="res-blue-score">140</span>
+                        </div>
+                        <div class="result-vs">VS</div>
+                        <div class="result-score-box red">
+                            <span class="res-team-name">RED TEAM</span>
+                            <span class="res-score" id="res-red-score">90</span>
+                        </div>
                     </div>
-                    <div class="instruction-row">
-                        <div class="key-badge">CLIC</div>
-                        <span>Apunta con el ratón y lanza bolas de nieve a los rivales</span>
-                    </div>
-                    <div class="instruction-row">
-                        <div class="key-badge">ESPACIO</div>
-                        <span>Recoge más nieve cuando te quedes sin munición</span>
-                    </div>
-                </div>
 
-                <button id="start-btn" class="btn-play">¡JUGAR AHORA!</button>
-            </div>
-        </div>
-
-        <!-- Pantalla de Fin de Juego / Victoria -->
-        <div id="gameover-overlay" class="modal-overlay hidden">
-            <div class="modal-card">
-                <div class="modal-logo" id="gameover-title">¡PARTIDA TERMINADA!</div>
-                <p class="modal-subtitle" id="gameover-subtitle">¡Buen intento, soldado de nieve!</p>
-                
-                <div class="score-summary">
-                    <div class="summary-item">
-                        <span class="summary-label">Puntuación Final</span>
-                        <span class="summary-val" id="final-score">0</span>
+                    <div class="result-actions">
+                        <button id="btn-play-again" class="btn-habbo-green">Play Again</button>
+                        <button id="btn-return-hotel" class="btn-habbo-secondary">Return to Hotel</button>
                     </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Ronda Alcanzada</span>
-                        <span class="summary-val" id="final-wave">1</span>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button id="restart-btn" class="btn-play">Jugar de Nuevo</button>
-                    <button id="modal-exit-btn" class="btn-secondary">Volver al Hotel</button>
                 </div>
             </div>
         </div>

@@ -1,441 +1,935 @@
+/* ============================================================
+   HABBO SNOWSTORM - AUTHENTIC PIXEL STYLING
+============================================================ */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     user-select: none;
+    font-family: 'Ubuntu', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-body {
+body, html {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background: radial-gradient(circle at center, #1b3a5b 0%, #0d1e30 60%, #060e18 100%);
-    font-family: 'Ubuntu', 'Poppins', sans-serif;
-    color: white;
+    background-color: #0b1726;
 }
 
-#game-container {
+#game-app {
     position: relative;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
 }
 
-#game-canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    cursor: crosshair;
-}
-
-/* ===================================================
-   HUD Elements
-=================================================== */
-#game-ui {
+.habbo-screen {
     position: absolute;
     inset: 0;
-    pointer-events: none;
-    z-index: 20;
+    width: 100%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.25s ease;
 }
 
-.hud-box {
-    background: rgba(13, 30, 48, 0.75);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-    border-radius: 16px;
-    padding: 12px 20px;
-    pointer-events: auto;
+.habbo-screen.hidden {
+    display: none !important;
+}
+
+/* ============================================================
+   1. HABBO RETRO WINDOW (Lobby & Matchmaking)
+============================================================ */
+.lobby-backdrop {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, #235882 0%, #102d44 60%, #06131f 100%);
+    z-index: 1;
+}
+
+.habbo-window {
+    position: relative;
+    z-index: 10;
+    width: 480px;
+    background: #e9e9e9;
+    border: 2px solid #233544;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 1px 1px 0 #ffffff;
+    overflow: hidden;
+}
+
+.window-titlebar {
+    height: 32px;
+    background: linear-gradient(180deg, #3d6a85 0%, #294c63 100%);
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 0 14px;
+    border-bottom: 2px solid #1c3647;
+}
+
+.window-title {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0 #11232f;
+}
+
+.window-close-btn {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%);
+    border: 1px solid #7d1a10;
+    border-radius: 4px;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 1px 1px 0 #ff7675;
+}
+
+.window-close-btn:hover {
+    background: linear-gradient(180deg, #ff6b6b 0%, #d63031 100%);
+}
+
+.window-content {
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* SnowStorm Banner */
+.snowstorm-banner {
+    position: relative;
+    height: 140px;
+    background: linear-gradient(180deg, #bfe3f9 0%, #dcf1fc 60%, #ffffff 100%);
+    border-bottom: 2px solid #9dc8e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.snowstorm-banner.compact {
+    height: 100px;
+}
+
+.snow-mountains-bg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: radial-gradient(ellipse at 50% 100%, #ffffff 40%, rgba(255,255,255,0) 75%);
+}
+
+/* Official 3D Logo Styling */
+.official-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 5;
+}
+
+.logo-snow, .logo-storm {
+    font-size: 40px;
+    font-weight: 900;
+    font-family: 'Ubuntu', sans-serif;
+    letter-spacing: 1px;
+}
+
+.logo-snow {
+    color: #00a8e8;
+    text-shadow: 2px 2px 0 #005082, -2px -2px 0 #ffffff, 2px -2px 0 #005082, -2px 2px 0 #005082, 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.logo-storm {
+    color: #e63946;
+    text-shadow: 2px 2px 0 #780000, -2px -2px 0 #ffffff, 2px -2px 0 #780000, -2px 2px 0 #780000, 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.logo-gloves-crossing {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 38px;
+    height: 40px;
+}
+
+.glove-mini {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50% 50% 20% 20%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.glove-mini.blue {
+    background: #0096c7;
+    left: 2px;
+    transform: rotate(-25deg);
+    z-index: 2;
+}
+
+.glove-mini.red {
+    background: #d90429;
+    right: 2px;
+    transform: rotate(25deg);
+    z-index: 1;
+}
+
+.official-logo.small .logo-snow, .official-logo.small .logo-storm {
+    font-size: 28px;
+}
+.official-logo.medium .logo-snow, .official-logo.medium .logo-storm {
+    font-size: 34px;
+}
+
+/* Lobby Body */
+.lobby-body {
+    padding: 20px 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.lobby-headline {
+    color: #0077b6;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.lobby-subtext {
+    font-size: 13px;
+    color: #555555;
+}
+
+/* Battle Preview with pixel snowballs */
+.battle-preview {
+    position: relative;
+    width: 100%;
+    height: 80px;
+    background: #eef7fc;
+    border: 1px solid #c9e4f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 20px;
+    margin: 8px 0;
+}
+
+.mini-habbo {
+    width: 32px;
+    height: 45px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+}
+
+.habbo-left {
+    background-image: url('https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-115-42.hd-195-19.ch-215-66.lg-270-110.sh-305-62&direction=2&head_direction=2&size=m&action=std');
+}
+.habbo-center-left {
+    background-image: url('https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-893-45.hd-180-1.ch-804-82.lg-280-92.sh-300-64&direction=2&head_direction=2&size=m&action=std');
+}
+.habbo-center-right {
+    background-image: url('https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-831-45.hd-600-1.ch-685-71.lg-715-74.sh-730-74&direction=4&head_direction=4&size=m&action=std');
+}
+.habbo-right {
+    background-image: url('https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-125-45.hd-209-1.ch-255-66.lg-280-110.sh-305-62&direction=4&head_direction=4&size=m&action=std');
+}
+
+.snowball-flying-preview {
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border: 1px solid #bce2f5;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    animation: flySnowball 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes flySnowball {
+    0% { transform: translate(-80px, 10px); }
+    50% { transform: translate(0, -18px); }
+    100% { transform: translate(80px, 8px); }
+}
+
+.lobby-links {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.lobby-links a {
+    color: #0077b6;
+    text-decoration: underline;
+}
+
+/* Window Footer */
+.window-footer {
+    background: #f4f4f4;
+    border-top: 2px solid #dedede;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.games-left-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+}
+
+.games-count {
+    font-size: 13px;
+    color: #333333;
+}
+
+.games-count strong {
+    color: #0077b6;
+    font-size: 15px;
+}
+
+.buy-games-link {
+    font-size: 11px;
+    color: #666666;
+    text-decoration: underline;
+}
+
+/* Habbo Green Button */
+.btn-habbo-green {
+    background: linear-gradient(180deg, #74bf43 0%, #468c22 100%);
+    border: 2px solid #2e6015;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 10px 24px;
+    cursor: pointer;
+    box-shadow: inset 1px 1px 0 #95d46c, 0 3px 6px rgba(0,0,0,0.25);
+    text-shadow: 1px 1px 0 #285412;
+    transition: all 0.15s ease;
+}
+
+.btn-habbo-green:hover {
+    background: linear-gradient(180deg, #85d64f 0%, #51a327 100%);
+    transform: translateY(-1px);
+}
+
+.btn-habbo-green:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* ============================================================
+   2. MATCHMAKING SCREEN (Screenshot 2)
+============================================================ */
+.matchmaking-window {
+    width: 440px;
+}
+
+.queue-body {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.queue-headline {
+    color: #0077b6;
+    font-size: 20px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* 10 Player Slots Grid */
+.player-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+
+.player-slot-card {
+    height: 64px;
+    background: #e2f1fb;
+    border: 2px solid #b8daf0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.player-slot-card.filled {
+    background: #d0ebfa;
+    border-color: #79bae6;
+}
+
+.slot-avatar-img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.slot-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(0, 150, 214, 0.25);
+    border-top: 3px solid #0096c7;
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.link-btn-cancel {
+    background: none;
+    border: none;
+    color: #333333;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* ============================================================
+   3. GET READY / TEAM ROSTER (Screenshot 3)
+============================================================ */
+#screen-roster {
+    background: linear-gradient(180deg, #d3ebfa 0%, #eef7fc 50%, #ffffff 100%);
+}
+
+.roster-container {
+    width: 900px;
+    max-width: 95%;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 16px;
 }
 
-/* Top Left */
-.top-left-box {
-    align-self: flex-start;
-}
-
-.game-badge {
+.roster-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #2b7fff, #00b4d8);
-    padding: 6px 14px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 180, 216, 0.35);
-}
-
-.badge-icon {
-    font-size: 18px;
-}
-
-.badge-title {
-    font-weight: 800;
-    font-size: 14px;
-    letter-spacing: 1.5px;
-    color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-.hud-stats {
-    display: flex;
     gap: 20px;
 }
 
-.stat-item {
+.team-glove-big {
+    width: 60px;
+    height: 60px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.blue-glove {
+    background-image: radial-gradient(circle, #0096c7 60%, #0077b6 100%);
+    border-radius: 50% 50% 20% 20%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transform: rotate(-15deg);
+}
+
+.red-glove {
+    background-image: radial-gradient(circle, #e63946 60%, #c1121f 100%);
+    border-radius: 50% 50% 20% 20%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    transform: rotate(15deg);
+}
+
+.roster-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: #0077b6;
+    letter-spacing: 0.5px;
+}
+
+.roster-subtitle {
+    font-size: 15px;
+    color: #555555;
+    font-weight: bold;
+}
+
+.roster-teams-layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 20px;
+}
+
+.team-column {
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    flex: 1;
 }
 
-.stat-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #90e0ef;
-    text-transform: uppercase;
+.roster-player-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 2px solid rgba(0,0,0,0.15);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
 }
 
-.stat-val {
-    font-size: 18px;
-    font-weight: 800;
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+.blue-team .roster-player-card {
+    background: linear-gradient(90deg, #6bb9e8 0%, #4a9fd4 100%);
+    border-color: #3884b3;
 }
 
-/* Top Right */
-.top-right-box {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+.red-team .roster-player-card {
+    background: linear-gradient(90deg, #f07171 0%, #e25050 100%);
+    border-color: #b83737;
+    flex-direction: row-reverse;
 }
 
-.health-container {
+.roster-avatar-box {
+    width: 42px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.roster-avatar-box img {
+    width: 44px;
+    height: 44px;
+}
+
+.roster-player-info {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.hearts-row {
-    display: flex;
-    gap: 4px;
-    font-size: 18px;
+.red-team .roster-player-info {
+    text-align: right;
 }
 
-.heart {
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.heart.empty {
-    opacity: 0.3;
-    filter: grayscale(1);
-}
-
-.hud-buttons {
-    display: flex;
-    gap: 8px;
-    margin-left: 8px;
-}
-
-.hud-icon-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.hud-icon-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.hud-exit-btn {
-    background: #e63946;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    font-weight: 700;
-    font-size: 13px;
-    padding: 0 16px;
-    height: 36px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(230, 57, 70, 0.35);
-}
-
-.hud-exit-btn:hover {
-    background: #d62828;
-    transform: translateY(-2px);
-}
-
-/* Bottom Center */
-.bottom-center-box {
-    align-self: center;
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px 24px;
-    margin-bottom: 5px;
-}
-
-.ammo-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.ammo-label {
-    font-size: 12px;
+.roster-username {
+    font-size: 14px;
     font-weight: 800;
-    color: #caf0f8;
-    letter-spacing: 1px;
+    color: #ffffff;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
 }
 
-.snowballs-rack {
-    display: flex;
-    gap: 8px;
-}
-
-.snowball-slot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #caf0f8 60%, #90e0ef 100%);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 -2px 4px rgba(0, 180, 216, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    transition: all 0.2s ease;
-}
-
-.snowball-slot.empty {
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-    border: 1px dashed rgba(255, 255, 255, 0.3);
-    transform: scale(0.85);
-}
-
-.reload-btn {
-    background: linear-gradient(135deg, #0077b6, #0096c7);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 6px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-}
-
-.reload-btn:hover {
-    background: linear-gradient(135deg, #0096c7, #48cae4);
-    transform: translateY(-2px);
-}
-
-.reload-btn.active-reloading {
-    background: linear-gradient(135deg, #ffb703, #fb8500);
-    animation: pulse 0.8s infinite alternate;
-}
-
-@keyframes pulse {
-    from { transform: scale(1); }
-    to { transform: scale(1.05); }
-}
-
-.controls-hint {
+.roster-stars {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.7);
+    color: #ffeb3b;
+    letter-spacing: 2px;
+}
+
+.map-preview-card {
+    width: 190px;
+    height: 130px;
+    background: #112233;
+    border: 3px solid #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    overflow: hidden;
+    position: relative;
+}
+
+.map-thumbnail {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #162a45 0%, #08111d 100%);
     display: flex;
-    gap: 8px;
+    flex-direction: column;
     align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 12px;
 }
 
-.controls-hint strong {
-    color: #90e0ef;
+.spotlight-glow {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
 }
 
-.dot-separator {
-    color: rgba(255, 255, 255, 0.3);
+.map-name-label {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    z-index: 2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
 }
 
-/* ===================================================
-   Modals & Overlays
-=================================================== */
-.modal-overlay {
+.link-btn-leave {
+    background: none;
+    border: none;
+    color: #333333;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ============================================================
+   4. IN-GAME ARENA: FIGHT NIGHT (Screenshot 4)
+============================================================ */
+#screen-arena {
+    background: #020b14;
+}
+
+#arena-canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    cursor: crosshair;
+}
+
+/* Arena HUD Elements */
+#arena-hud {
     position: absolute;
     inset: 0;
-    background: rgba(4, 13, 23, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.3s ease;
-}
-
-.modal-overlay.hidden {
-    opacity: 0;
     pointer-events: none;
-    display: none;
+    z-index: 50;
 }
 
-.modal-card {
-    background: linear-gradient(145deg, #102a43, #0b1d2e);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 180, 216, 0.2);
-    border-radius: 24px;
-    padding: 36px 44px;
-    max-width: 480px;
-    width: 90%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes popIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.modal-logo {
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    background: linear-gradient(135deg, #ffffff 0%, #caf0f8 50%, #90e0ef 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(144, 224, 239, 0.4);
-}
-
-.modal-subtitle {
-    font-size: 14px;
-    color: #caf0f8;
-    line-height: 1.4;
-}
-
-.instructions-card {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 16px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    text-align: left;
-}
-
-.instruction-row {
+/* Top-Left: Orange Flag Box */
+.hud-flag-box {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(180deg, #ff9f43 0%, #ee5253 100%);
+    border: 2px solid #ffffff;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.9);
-}
-
-.key-badge {
-    background: #0077b6;
-    border: 1px solid #90e0ef;
-    color: white;
-    font-weight: 800;
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    min-width: 60px;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.score-summary {
-    display: flex;
-    gap: 20px;
-    width: 100%;
     justify-content: center;
-    margin: 8px 0;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: transform 0.15s ease;
 }
 
-.summary-item {
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 14px 20px;
+.hud-flag-box:hover {
+    transform: scale(1.08);
+}
+
+.orange-flag-icon {
+    font-size: 22px;
+}
+
+/* Top-Right: Team Scoreboard & Clock */
+.hud-scoreboard-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    pointer-events: auto;
+}
+
+.scoreboard-teams {
+    display: flex;
+    background: rgba(14, 30, 48, 0.85);
+    border: 2px solid #ffffff;
+    border-radius: 16px;
+    padding: 6px 16px;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.score-team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hud-glove-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50% 50% 20% 20%;
+    border: 2px solid #ffffff;
+}
+
+.hud-glove-icon.blue {
+    background: #0096c7;
+}
+
+.hud-glove-icon.red {
+    background: #d90429;
+}
+
+.team-score-num {
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffffff;
+    min-width: 24px;
+    text-align: center;
+}
+
+.scoreboard-timer {
+    background: #5dade2;
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    padding: 4px 18px;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* Left Sidebar: Vertical Ammo Rack & Make Snowballs */
+.hud-left-controls {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    pointer-events: auto;
+}
+
+.vertical-ammo-rack {
+    background: rgba(14, 30, 48, 0.8);
+    border: 2px solid #ffffff;
     border-radius: 14px;
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.ammo-circle {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1px solid #bce2f5;
+    box-shadow: inset -2px -2px 4px rgba(0, 150, 214, 0.4);
+    transition: all 0.2s ease;
+}
+
+.ammo-circle.empty {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px dashed rgba(255, 255, 255, 0.4);
+    box-shadow: none;
+}
+
+.btn-make-snow {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(180deg, #74bf43 0%, #468c22 100%);
+    border: 2px solid #ffffff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: transform 0.15s ease;
+}
+
+.btn-make-snow:hover {
+    transform: scale(1.08);
+}
+
+.btn-make-snow.reloading {
+    animation: reloadPulse 0.6s infinite alternate;
+}
+
+@keyframes reloadPulse {
+    from { transform: scale(1); filter: brightness(1); }
+    to { transform: scale(1.1); filter: brightness(1.3); }
+}
+
+.hand-icon {
+    font-size: 22px;
+}
+
+/* Bottom-Left: Player Status Box */
+.hud-player-status {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    background: rgba(14, 30, 48, 0.85);
+    border: 2px solid #ffffff;
+    border-radius: 12px;
+    padding: 6px 12px;
+    gap: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    pointer-events: auto;
+}
+
+.player-avatar-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+.player-avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.player-health-gauge {
+    width: 12px;
+    height: 38px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #ffffff;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.health-bar-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(0deg, #e74c3c 0%, #f1c40f 50%, #2ecc71 100%);
+    transition: height 0.3s ease;
+}
+
+.player-score-badge {
+    background: #5dade2;
+    border: 1px solid #ffffff;
+    border-radius: 6px;
+    padding: 4px 12px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+/* Post Match Result Modal */
+.match-result-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 10, 20, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.result-card {
+    background: #ffffff;
+    border: 3px solid #294c63;
+    border-radius: 16px;
+    padding: 30px 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    max-width: 420px;
+    width: 90%;
+}
+
+.result-trophy {
+    font-size: 48px;
+}
+
+.result-title {
+    font-size: 26px;
+    font-weight: 900;
+    color: #0077b6;
+}
+
+.result-scores-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 10px 0;
+}
+
+.result-score-box {
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: white;
     display: flex;
     flex-direction: column;
     gap: 4px;
-    min-width: 130px;
 }
 
-.summary-label {
+.result-score-box.blue {
+    background: #0096c7;
+}
+
+.result-score-box.red {
+    background: #d90429;
+}
+
+.res-team-name {
     font-size: 11px;
-    font-weight: 700;
-    color: #90e0ef;
+    font-weight: bold;
 }
 
-.summary-val {
-    font-size: 26px;
+.res-score {
+    font-size: 28px;
     font-weight: 900;
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
 }
 
-.modal-actions {
+.result-vs {
+    font-size: 18px;
+    font-weight: 900;
+    color: #666666;
+}
+
+.result-actions {
     display: flex;
     gap: 12px;
     width: 100%;
 }
 
-.btn-play {
-    background: linear-gradient(135deg, #00b4d8, #0077b6);
-    border: 2px solid #caf0f8;
-    color: white;
-    font-weight: 800;
-    font-size: 16px;
-    padding: 14px 28px;
-    border-radius: 14px;
-    cursor: pointer;
-    width: 100%;
-    box-shadow: 0 8px 24px rgba(0, 180, 216, 0.4);
-    transition: all 0.2s ease;
-    letter-spacing: 1px;
-}
-
-.btn-play:hover {
-    background: linear-gradient(135deg, #48cae4, #0096c7);
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 30px rgba(0, 180, 216, 0.6);
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    font-weight: 700;
+.btn-habbo-secondary {
+    background: #e0e0e0;
+    border: 2px solid #999999;
+    border-radius: 6px;
+    color: #333333;
     font-size: 14px;
-    padding: 14px 20px;
-    border-radius: 14px;
+    font-weight: bold;
+    padding: 10px 18px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 140px;
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    flex: 1;
 }

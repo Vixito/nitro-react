@@ -65,14 +65,8 @@ export const GameStageView = () =>
     if(!gameURL) return null;
 
     return (
-        <div className="position-absolute top-0 bottom-0 start-0 end-0 z-index-1">
+        <div className="position-fixed top-0 bottom-0 start-0 end-0" style={{ zIndex: 99999, width: '100vw', height: '100vh', background: '#000' }}>
             <Base innerRef={ ref } className="game-center-stage w-100 h-100" />
-            <button 
-                onClick={ exitGame }
-                className="position-absolute top-3 end-3 btn btn-danger btn-sm shadow font-weight-bold d-flex align-items-center gap-1 z-index-2"
-                style={{ zIndex: 9999, borderRadius: 8, padding: '6px 14px', background: '#dc3545', border: '1px solid rgba(255,255,255,0.3)', color: '#fff', cursor: 'pointer' }}>
-                ✕ Salir al Hotel
-            </button>
         </div>
     );
 }
