@@ -21,10 +21,20 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const audioRef = useRef<HTMLAudioElement>(null);
     const [radioVolume, setRadioVolume] = useState(0.5);
 
-    const habbtenConfig = (window as any).HabbtenConfig;
+    const [ habbtenConfig, setHabbtenConfig ] = useState<any>((window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig);
     const radioUrl = habbtenConfig?.radio?.url;
-    const isGameCenterEnabled = habbtenConfig?.client?.toolbar_icons?.game_center ?? GetConfiguration('game.center.enabled');
+    const isGameCenterEnabled = habbtenConfig?.client?.toolbar_icons?.game_center ?? (habbtenConfig?.toolbar_icons?.game_center ?? GetConfiguration('game.center.enabled', true));
     
+    useEffect(() => {
+        const updateConfig = () => {
+            const cfg = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
+            if (cfg) setHabbtenConfig(cfg);
+        };
+        updateConfig();
+        const interval = setInterval(updateConfig, 1000);
+        return () => clearInterval(interval);
+    }, []);
+
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.volume = radioVolume;

@@ -27,7 +27,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
 {
     const { avatarInfo = null, isDancing = false, setIsDecorating = null, onClose = null } = props;
     const habbtenConfig = (window as any).HabbtenConfig || (window.parent as any).HabbtenConfig;
-    const canDanceAll = HasHabboClub();
+    const canDanceAll = habbtenConfig?.client?.dances_enabled ?? (habbtenConfig?.dances_enabled ?? true);
     const [ mode, setMode ] = useState((isDancing && canDanceAll) ? MODE_CLUB_DANCES : MODE_NORMAL);
     const { roomSession = null } = useRoom();
 
