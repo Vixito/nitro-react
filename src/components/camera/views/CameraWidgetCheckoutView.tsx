@@ -66,6 +66,16 @@ export const CameraWidgetCheckoutView: FC<CameraWidgetCheckoutViewProps> = props
             case 'buy':
                 if(isWaiting) return;
 
+                if(pictureUrl && base64Url)
+                {
+                    const fname = pictureUrl.split('/').pop();
+                    fetch('/api/camera', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename: fname, image: base64Url })
+                    }).catch(e => console.error('Error syncing photo on buy:', e));
+                }
+
                 setIsWaiting(true);
                 setTimeout(() => setIsWaiting(false), 5000);
                 SendMessageComposer(new PurchasePhotoMessageComposer(''));
