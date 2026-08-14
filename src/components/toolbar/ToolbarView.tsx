@@ -28,7 +28,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     useEffect(() => {
         const updateConfig = () => {
             const cfg = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
-            if (cfg) setHabbtenConfig(cfg);
+            if (cfg) setHabbtenConfig({ ...cfg });
         };
         updateConfig();
         const interval = setInterval(updateConfig, 1000);
