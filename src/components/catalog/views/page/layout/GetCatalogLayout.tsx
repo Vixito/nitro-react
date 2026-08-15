@@ -31,7 +31,8 @@ export const GetCatalogLayout = (page: ICatalogPage, hideNavigation: () => void)
     switch(page.layoutCode)
     {
         case 'frontpage_featured':
-            return null
+            return null;
+        case 'frontpage':
         case 'frontpage4':
             return <CatalogLayoutFrontpage4View { ...layoutProps } />;
         case 'pets':

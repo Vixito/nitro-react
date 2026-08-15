@@ -984,13 +984,21 @@ const useCatalogState = () =>
         {
             setSearchResult(null);
             setCurrentOffer(null);
+            setNavigationHidden(false);
+            if(currentPage && (currentPage.pageId === -1))
+            {
+                setCurrentPage(null);
+            }
         }
-    }, [ isVisible ]);
+    }, [ isVisible, currentPage ]);
 
     useEffect(() =>
     {
-        if(!searchResult && currentPage && (currentPage.pageId === -1)) openPageById(previousPageId);
-    }, [ searchResult, currentPage, previousPageId, openPageById ]);
+        if(isVisible && !searchResult && currentPage && (currentPage.pageId === -1) && (previousPageId !== -1))
+        {
+            openPageById(previousPageId);
+        }
+    }, [ isVisible, searchResult, currentPage, previousPageId, openPageById ]);
 
     useEffect(() =>
     {

@@ -1,8 +1,9 @@
 import { FrontPageItem } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect } from 'react';
 import { CreateLinkEvent } from '../../../../../../api';
-import { Column, Grid } from '../../../../../../common';
+import { Column, Grid, Text } from '../../../../../../common';
 import { useCatalog } from '../../../../../../hooks';
+import { CatalogHeaderView } from '../../../catalog-header/CatalogHeaderView';
 import { CatalogRedeemVoucherView } from '../../common/CatalogRedeemVoucherView';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
 import { CatalogLayoutFrontPageItemView } from './CatalogLayoutFrontPageItemView';
@@ -36,13 +37,10 @@ export const CatalogLayoutFrontpage4View: FC<CatalogLayoutProps> = props =>
     if(!frontPageItems || !frontPageItems.length)
     {
         return (
-            <Column fullHeight gap={ 2 } className="p-3">
-                { page?.localization?.getImage(0) &&
-                    <div className="d-flex justify-content-center">
-                        <img src={ page.localization.getImage(0) } alt="Frontpage" style={ { maxWidth: '100%', borderRadius: 8 } } />
-                    </div> }
+            <Column fullHeight gap={ 2 } className="p-2 overflow-y-auto">
+                <CatalogHeaderView imageUrl={ page?.localization?.getImage(0) } />
                 { page?.localization?.getText(0) &&
-                    <div className="text-center" dangerouslySetInnerHTML={ { __html: page.localization.getText(0) } } /> }
+                    <Text center dangerouslySetInnerHTML={ { __html: page.localization.getText(0) } } /> }
                 <CatalogRedeemVoucherView text={ page?.localization?.getText(1) } />
             </Column>
         );
