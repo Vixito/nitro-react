@@ -284,11 +284,11 @@ const useCatalogState = () =>
         {
             for(const offer of catalogPage.offers)
             {
-                if(offer.offerId !== offerId) continue;
-
-                setCurrentOffer(offer)
-
-                break;
+                if((offer.offerId === offerId) || offer.products?.some(p => (p.furniClassId === offerId) || (p.furnitureData?.purchaseOfferId === offerId) || (p.furnitureData?.id === offerId)))
+                {
+                    setCurrentOffer(offer);
+                    break;
+                }
             }
         }
     }, []);
@@ -428,33 +428,24 @@ const useCatalogState = () =>
             }
             else
             {
-                if(rootNode && rootNode.children && rootNode.children.length)
-                {
-                    for(const child of rootNode.children)
-                    {
-                        if(child && child.isVisible)
-                        {
-                            activateNode(child);
-                            break;
-                        }
-                    }
-                }
-
                 const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
                 const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
 
                 if(furni)
                 {
-                    const offer = new FurnitureOffer(furni);
-                    const offers = [ offer ];
-                    setSearchResult(new SearchResult(furni.name || furni.className, offers, []));
-                    const searchPage = new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), offers, false, 1);
-                    setCurrentPage(searchPage as ICatalogPage);
-                    setCurrentOffer(offer);
+                    openSearchByName(furni.className);
+                }
+                else
+                {
+                    if(rootNode && rootNode.children && rootNode.children.length)
+                    {
+                        const first = rootNode.children.find(c => c.isVisible) || rootNode.children[0];
+                        if(first) activateNode(first);
+                    }
                 }
             }
         }
-    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, setSearchResult, setCurrentPage, setCurrentOffer ]);
+    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, openSearchByName ]);
 
     const openSearchByName = useCallback((query: string) =>
     {
@@ -504,6 +495,15 @@ const useCatalogState = () =>
         let nodes: ICatalogNode[] = [];
         if(rootNode) FilterCatalogNode(search, foundFurniLines, rootNode, nodes);
 
+        if(!activeNodes || !activeNodes.length)
+        {
+            if(rootNode && rootNode.children && rootNode.children.length)
+            {
+                const first = rootNode.children.find(c => c.isVisible) || rootNode.children[0];
+                if(first) setActiveNodes([ first ]);
+            }
+        }
+
         setSearchResult(new SearchResult(cleanQuery, offers, nodes.filter(node => (node.isVisible))));
         const page = (new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), offers, false, 1) as ICatalogPage);
         setCurrentPage(page);
@@ -513,7 +513,7 @@ const useCatalogState = () =>
             const exactOffer = offers.find(o => o.localizationId?.toLowerCase() === query.toLowerCase() || (o as any)._furniData?.className?.toLowerCase() === query.toLowerCase()) || offers[0];
             setCurrentOffer(exactOffer);
         }
-    }, [ currentType, rootNode, isVisible, setIsVisible, setSearchResult, setCurrentPage, setCurrentOffer ]);
+    }, [ currentType, rootNode, isVisible, setIsVisible, setSearchResult, setCurrentPage, setCurrentOffer, activeNodes, setActiveNodes ]);
 
     const refreshBuilderStatus = useCallback(() =>
     {
