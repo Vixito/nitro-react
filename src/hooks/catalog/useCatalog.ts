@@ -456,6 +456,58 @@ const useCatalogState = () =>
         }
     }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, setSearchResult, setCurrentPage, setCurrentOffer ]);
 
+    const openSearchByName = useCallback((query: string) =>
+    {
+        if(!query || !query.length) return;
+
+        setIsVisible(true);
+
+        const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+        if(!furnitureDatas || !furnitureDatas.length) return;
+
+        const cleanQuery = query.toLowerCase().replace(/_/g, ' ').trim();
+        const search = query.toLowerCase().replace(/ /g, '');
+
+        const foundFurniture: IFurnitureData[] = [];
+        const foundFurniLines: string[] = [];
+
+        for(const furniture of furnitureDatas)
+        {
+            if((currentType === CatalogType.BUILDER) && !furniture.availableForBuildersClub) continue;
+            if((currentType === CatalogType.NORMAL) && furniture.excludeDynamic) continue;
+
+            const searchValues = [ furniture.className, furniture.name, furniture.description ].join(' ').replace(/ /gi, '').toLowerCase();
+
+            if((searchValues.indexOf(search) >= 0) || (furniture.className.toLowerCase() === query.toLowerCase()))
+            {
+                foundFurniture.push(furniture);
+
+                if((furniture.furniLine !== '') && (foundFurniLines.indexOf(furniture.furniLine) < 0))
+                {
+                    foundFurniLines.push(furniture.furniLine);
+                }
+
+                if(foundFurniture.length === 250) break;
+            }
+        }
+
+        const offers: IPurchasableOffer[] = [];
+        for(const furniture of foundFurniture) offers.push(new FurnitureOffer(furniture));
+
+        let nodes: ICatalogNode[] = [];
+        if(rootNode) FilterCatalogNode(search, foundFurniLines, rootNode, nodes);
+
+        setSearchResult(new SearchResult(cleanQuery, offers, nodes.filter(node => (node.isVisible))));
+        const page = (new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), offers, false, 1) as ICatalogPage);
+        setCurrentPage(page);
+
+        if(offers.length > 0)
+        {
+            const exactOffer = offers.find(o => o.localizationId?.toLowerCase() === query.toLowerCase() || (o as any)._furniData?.className?.toLowerCase() === query.toLowerCase()) || offers[0];
+            setCurrentOffer(exactOffer);
+        }
+    }, [ currentType, rootNode, setIsVisible, setSearchResult, setCurrentPage, setCurrentOffer ]);
+
     const refreshBuilderStatus = useCallback(() =>
     {
 
@@ -952,7 +1004,7 @@ const useCatalogState = () =>
         }
     }, []);
 
-    return { isVisible, setIsVisible, isBusy, pageId, previousPageId, currentType, rootNode, offersToNodes, currentPage, setCurrentPage, currentOffer, setCurrentOffer, activeNodes, searchResult, setSearchResult, frontPageItems, roomPreviewer, navigationHidden, setNavigationHidden, purchaseOptions, setPurchaseOptions, catalogOptions, setCatalogOptions, getNodeById, getNodeByName, activateNode, openPageById, openPageByName, openPageByOfferId, requestOfferToMover };
+    return { isVisible, setIsVisible, isBusy, pageId, previousPageId, currentType, rootNode, offersToNodes, currentPage, setCurrentPage, currentOffer, setCurrentOffer, activeNodes, searchResult, setSearchResult, frontPageItems, roomPreviewer, navigationHidden, setNavigationHidden, purchaseOptions, setPurchaseOptions, catalogOptions, setCatalogOptions, getNodeById, getNodeByName, activateNode, openPageById, openPageByName, openPageByOfferId, openSearchByName, requestOfferToMover };
 }
 
 export const useCatalog = () => useBetween(useCatalogState);

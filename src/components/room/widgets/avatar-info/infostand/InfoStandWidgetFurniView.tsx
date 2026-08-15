@@ -260,7 +260,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
         switch(action)
         {
             case 'buy_one':
-                CreateLinkEvent(`catalog/open/offerId/${ avatarInfo.purchaseOfferId }`);
+                CreateLinkEvent(`catalog/open/furni/${ avatarInfo.name || avatarInfo.purchaseOfferId }`);
                 return;
             case 'move':
                 GetRoomEngine().processRoomObjectOperation(avatarInfo.id, avatarInfo.category, RoomObjectOperationType.OBJECT_MOVE);
