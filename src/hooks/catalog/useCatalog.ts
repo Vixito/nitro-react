@@ -403,13 +403,35 @@ const useCatalogState = () =>
         }
         else
         {
-            const nodes = getNodesByOfferId(offerId);
+            let nodes = getNodesByOfferId(offerId);
 
-            if(!nodes || !nodes.length) return;
+            if(!nodes || !nodes.length)
+            {
+                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
 
-            activateNode(nodes[0], offerId);
+                if(furni)
+                {
+                    const foundNodes = [
+                        ...GetOfferNodes(offersToNodes, furni.purchaseOfferId),
+                        ...GetOfferNodes(offersToNodes, furni.rentOfferId),
+                        ...GetOfferNodes(offersToNodes, furni.id)
+                    ];
+
+                    if(foundNodes && foundNodes.length) nodes = foundNodes;
+                }
+            }
+
+            if(nodes && nodes.length)
+            {
+                activateNode(nodes[0], offerId);
+            }
+            else
+            {
+                SendMessageComposer(new GetProductOfferComposer(offerId));
+            }
         }
-    }, [ isVisible, getNodesByOfferId, activateNode ]);
+    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes ]);
 
     const refreshBuilderStatus = useCallback(() =>
     {

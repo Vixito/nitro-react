@@ -40,26 +40,16 @@ export const CatalogSearchView: FC<{}> = props =>
 
                 const searchValues = [ furniture.className, furniture.name, furniture.description ].join(' ').replace(/ /gi, '').toLowerCase();
 
-                if((currentType === CatalogType.BUILDER) && (furniture.purchaseOfferId === -1) && (furniture.rentOfferId === -1))
+                if(searchValues.indexOf(search) >= 0)
                 {
+                    foundFurniture.push(furniture);
+
                     if((furniture.furniLine !== '') && (foundFurniLines.indexOf(furniture.furniLine) < 0))
                     {
-                        if(searchValues.indexOf(search) >= 0) foundFurniLines.push(furniture.furniLine);
+                        foundFurniLines.push(furniture.furniLine);
                     }
-                }
-                else
-                {
-                    const foundNodes = [
-                        ...GetOfferNodes(offersToNodes, furniture.purchaseOfferId),
-                        ...GetOfferNodes(offersToNodes, furniture.rentOfferId)
-                    ];
 
-                    if(foundNodes.length)
-                    {
-                        if(searchValues.indexOf(search) >= 0) foundFurniture.push(furniture);
-
-                        if(foundFurniture.length === 250) break;
-                    }
+                    if(foundFurniture.length === 250) break;
                 }
             }
 
