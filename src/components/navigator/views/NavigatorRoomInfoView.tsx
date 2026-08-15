@@ -105,8 +105,11 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                 { navigatorData.enteredGuestRoom &&
                     <>
                         <Flex gap={ 2 } overflow="hidden">
-                            <LayoutRoomThumbnailView roomId={ navigatorData.enteredGuestRoom.roomId } customUrl={ navigatorData.enteredGuestRoom.officialRoomPicRef }>
-                                { hasPermission('settings') && <i className="icon icon-camera-small position-absolute b-0 r-0 m-1 cursor-pointer top-0" onClick={ () => processAction('open_room_thumbnail_camera') } /> }
+                            <LayoutRoomThumbnailView roomId={ navigatorData.enteredGuestRoom.roomId } customUrl={ navigatorData.enteredGuestRoom.officialRoomPicRef } position="relative">
+                                { (hasPermission('settings') || navigatorData.currentRoomOwner || (navigatorData.enteredGuestRoom.ownerId === GetSessionDataManager().userId)) &&
+                                    <Flex center position="absolute" className="top-0 end-0 m-1 p-1 bg-dark bg-opacity-75 rounded cursor-pointer" title="Tomar / cambiar miniatura" onClick={ () => processAction('open_room_thumbnail_camera') } style={ { zIndex: 10 } }>
+                                        <i className="icon icon-camera-small" />
+                                    </Flex> }
                             </LayoutRoomThumbnailView>
                             <Column grow gap={ 1 } overflow="hidden">
                                 <Flex gap={ 1 }>

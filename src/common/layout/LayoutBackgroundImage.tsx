@@ -14,7 +14,11 @@ export const LayoutBackgroundImage: FC<LayoutBackgroundImageProps> = props =>
     {
         const newStyle = { ...style };
 
-        if(imageUrl) newStyle.background = `url(${ imageUrl }) center no-repeat`;
+        if(imageUrl)
+        {
+            newStyle.background = `url(${ imageUrl }) center no-repeat`;
+            newStyle.backgroundSize = 'cover';
+        }
 
         return newStyle;
     }, [ style, imageUrl ]);

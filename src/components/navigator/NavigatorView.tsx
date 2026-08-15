@@ -1,7 +1,7 @@
 import { ConvertGlobalRoomIdMessageComposer, HabboWebTools, ILinkEventTracker, LegacyExternalInterface, NavigatorInitComposer, NavigatorSearchComposer, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { AddEventLinkTracker, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, TryVisitRoom } from '../../api';
+import { AddEventLinkTracker, GetConfiguration, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, TryVisitRoom } from '../../api';
 import { Base, Column, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useNavigator, useRoomSessionManagerEvent } from '../../hooks';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
@@ -114,9 +114,15 @@ export const NavigatorView: FC<{}> = props =>
                         switch(parts[2])
                         {
                             case 'home':
-                                if(navigatorData.homeRoomId <= 0) return;
-        
-                                TryVisitRoom(navigatorData.homeRoomId);
+                                if(navigatorData.homeRoomId > 0)
+                                {
+                                    TryVisitRoom(navigatorData.homeRoomId);
+                                }
+                                else
+                                {
+                                    const defaultHome = parseInt(GetConfiguration<string>('hotel.home.room', '51'));
+                                    if(defaultHome > 0) TryVisitRoom(defaultHome);
+                                }
                                 break;
                             default: {
                                 const roomId = parseInt(parts[2]);

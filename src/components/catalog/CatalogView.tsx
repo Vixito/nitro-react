@@ -1,7 +1,7 @@
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useEffect } from 'react';
 import { AddEventLinkTracker, GetConfiguration, LocalizeText, RemoveLinkEventTracker } from '../../api';
-import { Column, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
+import { Column, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, Text } from '../../common';
 import { useCatalog } from '../../hooks';
 import { CatalogIconView } from './views/catalog-icon/CatalogIconView';
 import { CatalogGiftView } from './views/gift/CatalogGiftView';
@@ -84,6 +84,7 @@ export const CatalogView: FC<{}> = props =>
                                 <NitroCardTabsItemView key={ child.pageId } isActive={ child.isActive } onClick={ event =>
                                 {
                                     if(searchResult) setSearchResult(null);
+                                    if(setNavigationHidden) setNavigationHidden(false);
 
                                     activateNode(child);
                                 } } >
@@ -97,13 +98,17 @@ export const CatalogView: FC<{}> = props =>
                     </NitroCardTabsView>
                     <NitroCardContentView>
                         <Grid>
-                            { !navigationHidden &&
+                            { !navigationHidden && ((searchResult && searchResult.filteredNodes.length > 0) || (activeNodes && (activeNodes.length > 0) && (activeNodes[0]?.children?.length > 0))) &&
                                 <Column size={ 3 } overflow="hidden">
                                     { activeNodes && (activeNodes.length > 0) &&
                                         <CatalogNavigationView node={ activeNodes[0] } /> }
                                 </Column> }
-                            <Column size={ !navigationHidden ? 9 : 12 } overflow="hidden">
-                                { GetCatalogLayout(currentPage, () => setNavigationHidden(true)) }
+                            <Column size={ (!navigationHidden && ((searchResult && searchResult.filteredNodes.length > 0) || (activeNodes && (activeNodes.length > 0) && (activeNodes[0]?.children?.length > 0)))) ? 9 : 12 } overflow="hidden">
+                                { currentPage ? GetCatalogLayout(currentPage, () => setNavigationHidden(true)) : (
+                                    <Flex center fullHeight fullWidth>
+                                        <Text variant="muted">Cargando...</Text>
+                                    </Flex>
+                                ) }
                             </Column>
                         </Grid>
                     </NitroCardContentView>

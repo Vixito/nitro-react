@@ -33,12 +33,17 @@ export const App: FC<{}> = props =>
                 setPercent(prevValue => (prevValue + 20));
                 
                 // Fetch dynamic client configuration from CMS
-                fetch('/game/api/client_config.json')
-                    .then(res => res.json())
-                    .then(data => {
-                        (window as any).HabbtenConfig = data;
-                    })
-                    .catch(err => console.error('Failed to load Habbten config', err));
+                const loadHabbtenConfig = () => {
+                    fetch('/game/api/client_config.json')
+                        .then(res => res.json())
+                        .then(data => {
+                            (window as any).HabbtenConfig = data;
+                            window.dispatchEvent(new CustomEvent('habbten-config-updated', { detail: data }));
+                        })
+                        .catch(err => console.error('Failed to load Habbten config', err));
+                };
+                loadHabbtenConfig();
+                setInterval(loadHabbtenConfig, 5000);
 
                 // Fetch dynamic chat bubbles
                 fetch('/api/chat-bubbles')

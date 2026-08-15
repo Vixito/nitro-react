@@ -23,16 +23,20 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
 
     const [ habbtenConfig, setHabbtenConfig ] = useState<any>((window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig);
     const radioUrl = habbtenConfig?.radio?.url;
-    const isGameCenterEnabled = habbtenConfig?.client?.toolbar_icons?.game_center ?? (habbtenConfig?.toolbar_icons?.game_center ?? GetConfiguration('game.center.enabled', true));
+    const isGameCenterEnabled = habbtenConfig?.client ? (habbtenConfig.client.toolbar_icons?.game_center === true) : (habbtenConfig?.toolbar_icons?.game_center === true);
     
     useEffect(() => {
-        const updateConfig = () => {
-            const cfg = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
+        const updateConfig = (e?: any) => {
+            const cfg = e?.detail || (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
             if (cfg) setHabbtenConfig({ ...cfg });
         };
         updateConfig();
-        const interval = setInterval(updateConfig, 1000);
-        return () => clearInterval(interval);
+        window.addEventListener('habbten-config-updated', updateConfig);
+        const interval = setInterval(updateConfig, 2000);
+        return () => {
+            window.removeEventListener('habbten-config-updated', updateConfig);
+            clearInterval(interval);
+        };
     }, []);
 
     useEffect(() => {

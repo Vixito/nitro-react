@@ -29,7 +29,7 @@ export const LayoutRoomThumbnailView: FC<LayoutRoomThumbnailViewProps> = props =
     }, [ customUrl, roomId ]);
 
     return (
-        <Base shrink={ shrink } overflow={ overflow } classNames={ getClassNames } { ...rest }>
+        <Base position="relative" shrink={ shrink } overflow={ overflow } classNames={ getClassNames } { ...rest }>
             { getImageUrl && <img alt="" src={ getImageUrl } /> }
             { children }
         </Base>

@@ -55,8 +55,12 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = pro
         setDisplayMode(searchResult.mode);
     }, [ searchResult ]);
 
+    const isEventsView = (topLevelContext?.code === 'events_view') || (searchResult?.code === 'events_view') || (searchResult?.data === 'events_view');
+    const displayRooms = (isEventsView && searchResult?.rooms)
+        ? searchResult.rooms.filter(room => (room.hasEvent || room.staffPick || !!room.officialRoomPicRef))
+        : (searchResult?.rooms || []);
     const gridHasTwoColumns = (displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS);
-    
+
     return (
         <Column className="bg-white rounded border border-muted" gap={ 0 }>
             <Flex fullWidth alignItems="center" justifyContent="between" className="px-2 py-1">
@@ -76,9 +80,9 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = pro
                 <>
                     {
                         gridHasTwoColumns ? <AutoGrid columnCount={ 3 } { ...rest } columnMinWidth={ 110 } columnMinHeight={ 130 } className="mx-2">
-                            { searchResult.rooms.length > 0 && searchResult.rooms.map((room, index) => <NavigatorSearchResultItemView key={ index } roomData={ room } thumbnail={ true } />) }
+                            { displayRooms.length > 0 && displayRooms.map((room, index) => <NavigatorSearchResultItemView key={ index } roomData={ room } thumbnail={ true } />) }
                         </AutoGrid> : <Grid columnCount={ 1 } className="navigator-grid" gap={ 0 }>
-                            { searchResult.rooms.length > 0 && searchResult.rooms.map((room, index) => <NavigatorSearchResultItemView key={ index } roomData={ room } />) }
+                            { displayRooms.length > 0 && displayRooms.map((room, index) => <NavigatorSearchResultItemView key={ index } roomData={ room } />) }
                         </Grid>
                     }
                 </>

@@ -29,7 +29,16 @@ export class PageLocalization implements IPageLocalization
 
         let assetUrl = GetConfiguration<string>('catalog.asset.image.url');
 
-        assetUrl = assetUrl.replace('%name%', imageName);
+        if(!assetUrl)
+        {
+            const imgLib = GetConfiguration<string>('image.library.url', 'http://127.0.0.1:1080/game/swf/c_images/');
+            assetUrl = `${ imgLib }catalogue/%name%.png`;
+        }
+
+        if(assetUrl && (assetUrl.indexOf('%name%') >= 0))
+        {
+            assetUrl = assetUrl.replace('%name%', imageName);
+        }
 
         return assetUrl;
     }

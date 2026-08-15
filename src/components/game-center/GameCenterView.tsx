@@ -11,12 +11,25 @@ export const GameCenterView = () =>
 {
     const{ isVisible, setIsVisible, games, accountStatus } = useGameCenter();
 
+    useEffect(() => {
+        const checkEnabled = (e?: any) => {
+            const cfg = e?.detail || (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
+            if (cfg?.client?.toolbar_icons?.game_center === false && isVisible) {
+                setIsVisible(false);
+            }
+        };
+        window.addEventListener('habbten-config-updated', checkEnabled);
+        return () => window.removeEventListener('habbten-config-updated', checkEnabled);
+    }, [isVisible, setIsVisible]);
+
     useEffect(() =>
     {
         const toggleGameCenter = () =>
         {
+            const cfg = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
+            if (cfg?.client?.toolbar_icons?.game_center === false) return;
             setIsVisible(prev => !prev);
-        }
+        };
 
         const linkTracker: ILinkEventTracker = {
             linkReceived: (url: string) =>
@@ -36,7 +49,7 @@ export const GameCenterView = () =>
         AddEventLinkTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [ ]);
+    }, [ setIsVisible ]);
 
     if(!isVisible || !games || !accountStatus) return;
     

@@ -16,6 +16,7 @@ const useCatalogState = () =>
     const [ isVisible, setIsVisible ] = useState(false);
     const [ isBusy, setIsBusy ] = useState(false);
     const [ pageId, setPageId ] = useState(-1);
+    const pendingPageId = useRef(-1);
     const [ previousPageId, setPreviousPageId ] = useState(-1);
     const [ currentType, setCurrentType ] = useState(CatalogType.NORMAL);
     const [ rootNode, setRootNode ] = useState<ICatalogNode>(null);
@@ -267,7 +268,7 @@ const useCatalogState = () =>
         if(pageId < 0) return;
 
         setIsBusy(true);
-        setPageId(pageId);
+        pendingPageId.current = pageId;
 
         if(pageId > -1) SendMessageComposer(new GetCatalogPageComposer(pageId, offerId, currentType));
     }, [ currentType ]);
@@ -282,14 +283,34 @@ const useCatalogState = () =>
 
         if((offerId > -1) && catalogPage.offers.length)
         {
+            let matchedOffer: IPurchasableOffer = null;
+
             for(const offer of catalogPage.offers)
             {
                 if((offer.offerId === offerId) || offer.products?.some(p => (p.productClassId === offerId) || (p.furnitureData?.purchaseOfferId === offerId) || (p.furnitureData?.id === offerId)))
                 {
-                    setCurrentOffer(offer);
+                    matchedOffer = offer;
                     break;
                 }
             }
+
+            if(!matchedOffer && catalogPage.offers.length)
+            {
+                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+                const targetFurni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
+
+                if(targetFurni)
+                {
+                    matchedOffer = catalogPage.offers.find(offer => 
+                        offer.localizationId?.toLowerCase() === targetFurni.className?.toLowerCase() ||
+                        offer.products?.some(p => p.furnitureData?.className?.toLowerCase() === targetFurni.className?.toLowerCase() || p.furnitureData?.name?.toLowerCase() === targetFurni.name?.toLowerCase())
+                    );
+                }
+            }
+
+            if(!matchedOffer) matchedOffer = catalogPage.offers[0];
+
+            setCurrentOffer(matchedOffer);
         }
     }, []);
 
@@ -346,7 +367,7 @@ const useCatalogState = () =>
                 if((n === targetNode.parent) && n.children.length) n.open();
             }
 
-            if(isActive && isOpen) targetNode.close();
+            if(isActive && isOpen && (targetNode.children.length > 0)) targetNode.close();
             else targetNode.open();
 
             return nodes;
@@ -577,10 +598,9 @@ const useCatalogState = () =>
 
         setIsBusy(false);
 
-        if(pageId === parser.pageId)
-        {
-            showCatalogPage(parser.pageId, parser.layoutCode, new PageLocalization(parser.localization.images.concat(), parser.localization.texts.concat()), purchasableOffers, parser.offerId, parser.acceptSeasonCurrencyAsCredits);
-        }
+        pendingPageId.current = parser.pageId;
+        setPageId(parser.pageId);
+        showCatalogPage(parser.pageId, parser.layoutCode, new PageLocalization(parser.localization.images.concat(), parser.localization.texts.concat()), purchasableOffers, parser.offerId, parser.acceptSeasonCurrencyAsCredits);
     });
 
     useMessageEvent<PurchaseOKMessageEvent>(PurchaseOKMessageEvent, event =>
@@ -944,7 +964,17 @@ const useCatalogState = () =>
         switch(requestedPage.current.requestType)
         {
             case RequestedPage.REQUEST_TYPE_NONE:
-                if(currentPage && (currentPage.pageId !== -1) && activeNodes && (activeNodes.length > 0)) return;
+                if(currentPage && (currentPage.pageId !== -1)) return;
+
+                if(activeNodes && (activeNodes.length > 0))
+                {
+                    const lastNode = activeNodes[activeNodes.length - 1];
+                    if(lastNode && (lastNode.pageId > -1))
+                    {
+                        loadCatalogPage(lastNode.pageId, -1);
+                        return;
+                    }
+                }
 
                 if(rootNode.isBranch)
                 {
@@ -958,25 +988,33 @@ const useCatalogState = () =>
                         }
                     }
                 }
-                return;
-            case RequestedPage.REQUEST_TYPE_ID:
-                openPageById(requestedPage.current.requestById);
+                break;
+            case RequestedPage.REQUEST_TYPE_ID: {
+                const reqId = requestedPage.current.requestById;
                 requestedPage.current.resetRequest();
-                return;
-            case RequestedPage.REQUEST_TYPE_OFFER:
-                openPageByOfferId(requestedPage.current.requestedByOfferId);
+                openPageById(reqId);
+                break;
+            }
+            case RequestedPage.REQUEST_TYPE_OFFER: {
+                const reqOfferId = requestedPage.current.requestedByOfferId;
                 requestedPage.current.resetRequest();
-                return;
-            case RequestedPage.REQUEST_TYPE_NAME:
-                openPageByName(requestedPage.current.requestByName);
+                openPageByOfferId(reqOfferId);
+                break;
+            }
+            case RequestedPage.REQUEST_TYPE_NAME: {
+                const reqName = requestedPage.current.requestByName;
                 requestedPage.current.resetRequest();
-                return;
-            case RequestedPage.REQUEST_TYPE_SEARCH:
-                openSearchByName(requestedPage.current.requestBySearch);
+                openPageByName(reqName);
+                break;
+            }
+            case RequestedPage.REQUEST_TYPE_SEARCH: {
+                const reqSearch = requestedPage.current.requestBySearch;
                 requestedPage.current.resetRequest();
-                return;
+                openSearchByName(reqSearch);
+                break;
+            }
         }
-    }, [ isVisible, rootNode, offersToNodes, currentPage, activateNode, openPageById, openPageByOfferId, openPageByName, openSearchByName ]);
+    }, [ isVisible, rootNode, offersToNodes, currentPage, activeNodes, activateNode, openPageById, openPageByOfferId, openPageByName, openSearchByName ]);
 
     useEffect(() =>
     {

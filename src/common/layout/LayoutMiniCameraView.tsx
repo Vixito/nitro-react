@@ -27,7 +27,11 @@ export const LayoutMiniCameraView: FC<LayoutMiniCameraViewProps> = props =>
     const takePicture = () =>
     {
         PlaySound(SoundNames.CAMERA_SHUTTER);
-        textureReceiver(GetRoomEngine().createTextureFromRoom(roomId, 1, getCameraBounds()));
+        const texture = GetRoomEngine().createTextureFromRoom(roomId, 1, getCameraBounds());
+        if(textureReceiver && texture)
+        {
+            textureReceiver(texture);
+        }
     }
     
     return (
