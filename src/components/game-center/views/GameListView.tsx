@@ -39,11 +39,11 @@ export const GameListView = () =>
                             className={ `game-dock-card ${ isSelected ? 'selected' : '' }` } 
                             onClick={ () => setSelectedGame(game) }
                         >
-                            <Base className="game-dock-logo-container">
+                            <Base className="game-dock-icon-container">
                                 <img 
-                                    src={ `${ game.assetUrl }${ game.gameNameId }_logo.png?v=4` } 
+                                    src={ `${ game.assetUrl }${ game.gameNameId }_icon.png?v=5` } 
                                     alt={ game.gameNameId }
-                                    className="game-dock-logo" 
+                                    className="game-dock-icon" 
                                 />
                             </Base>
                             <Text variant="white" bold className="game-dock-title">{ getGameTitle(game) }</Text>
