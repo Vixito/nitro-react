@@ -11,6 +11,46 @@ export const UserSettingsView: FC<{}> = props =>
     const [ userSettings, setUserSettings ] = useState<NitroSettingsEvent>(null);
     const [ catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects ] = useCatalogPlaceMultipleItems();
     const [ catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation ] = useCatalogSkipPurchaseConfirmation();
+    const [ infinitePermissions, setInfinitePermissions ] = useState<{ credits: { rankHas: boolean, enabled: boolean }, pixels: { rankHas: boolean, enabled: boolean }, points: { rankHas: boolean, enabled: boolean } }>(null);
+
+    const loadInfinitePermissions = async () =>
+    {
+        try
+        {
+            const response = await fetch('/api/user/permissions');
+
+            if(response.ok)
+            {
+                const data = await response.json();
+
+                if(data.success) setInfinitePermissions(data.permissions);
+            }
+        }
+        catch(e)
+        {
+            // ignore
+        }
+    };
+
+    const toggleInfinitePermission = async (name: string, enabled: boolean) =>
+    {
+        if(!infinitePermissions || !infinitePermissions[name]) return;
+
+        setInfinitePermissions(prevValue => ({ ...prevValue, [ name ]: { ...prevValue[ name ], enabled } }));
+
+        try
+        {
+            await fetch('/api/user/permissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [ name ]: enabled })
+            });
+        }
+        catch(e)
+        {
+            setInfinitePermissions(prevValue => ({ ...prevValue, [ name ]: { ...prevValue[ name ], enabled: !enabled } }));
+        }
+    };
 
     const processAction = (type: string, value?: boolean | number | string) =>
     {
@@ -99,12 +139,20 @@ export const UserSettingsView: FC<{}> = props =>
                 {
                     case 'show':
                         setIsVisible(true);
+                        loadInfinitePermissions();
                         return;
                     case 'hide':
                         setIsVisible(false);
                         return;
                     case 'toggle':
-                        setIsVisible(prevValue => !prevValue);
+                        setIsVisible(prevValue =>
+                        {
+                            const newValue = !prevValue;
+
+                            if(newValue) loadInfinitePermissions();
+
+                            return newValue;
+                        });
                         return;
                 }
             },
@@ -150,6 +198,26 @@ export const UserSettingsView: FC<{}> = props =>
                         <input className="form-check-input" type="checkbox" checked={ catalogSkipPurchaseConfirmation } onChange={ event => setCatalogSkipPurchaseConfirmation(event.target.checked) } />
                         <Text>{ LocalizeText('memenu.settings.other.skip.purchase.confirmation') }</Text>
                     </Flex>
+                    { infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) &&
+                        <>
+                            <HorizontalRule />
+                            <Text bold>{ LocalizeText('memenu.settings.other.infinite.permissions.title') }</Text>
+                            { infinitePermissions.credits.rankHas &&
+                                <Flex alignItems="center" gap={ 1 }>
+                                    <input className="form-check-input" type="checkbox" checked={ infinitePermissions.credits.enabled } onChange={ event => toggleInfinitePermission('credits', event.target.checked) } />
+                                    <Text>{ LocalizeText('memenu.settings.other.infinite.credits') }</Text>
+                                </Flex> }
+                            { infinitePermissions.pixels.rankHas &&
+                                <Flex alignItems="center" gap={ 1 }>
+                                    <input className="form-check-input" type="checkbox" checked={ infinitePermissions.pixels.enabled } onChange={ event => toggleInfinitePermission('pixels', event.target.checked) } />
+                                    <Text>{ LocalizeText('memenu.settings.other.infinite.pixels') }</Text>
+                                </Flex> }
+                            { infinitePermissions.points.rankHas &&
+                                <Flex alignItems="center" gap={ 1 }>
+                                    <input className="form-check-input" type="checkbox" checked={ infinitePermissions.points.enabled } onChange={ event => toggleInfinitePermission('points', event.target.checked) } />
+                                    <Text>{ LocalizeText('memenu.settings.other.infinite.points') }</Text>
+                                </Flex> }
+                        </> }
                 </Column>
                 <Column>
                     <Text bold>{ LocalizeText('widget.memenu.settings.volume') }</Text>
