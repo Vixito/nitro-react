@@ -428,10 +428,22 @@ const useCatalogState = () =>
             }
             else
             {
+                // Fallback to first visible category so catalog is never white/empty
+                if(rootNode && rootNode.children && rootNode.children.length)
+                {
+                    for(const child of rootNode.children)
+                    {
+                        if(child && child.isVisible)
+                        {
+                            activateNode(child);
+                            break;
+                        }
+                    }
+                }
                 SendMessageComposer(new GetProductOfferComposer(offerId));
             }
         }
-    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes ]);
+    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode ]);
 
     const refreshBuilderStatus = useCallback(() =>
     {
@@ -862,7 +874,7 @@ const useCatalogState = () =>
         switch(requestedPage.current.requestType)
         {
             case RequestedPage.REQUEST_TYPE_NONE:
-                if(currentPage) return;
+                if(currentPage && activeNodes && (activeNodes.length > 0)) return;
 
                 if(rootNode.isBranch)
                 {
