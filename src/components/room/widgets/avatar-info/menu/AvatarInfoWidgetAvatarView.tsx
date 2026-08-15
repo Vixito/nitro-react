@@ -125,10 +125,10 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = p
                     GetSessionDataManager().unignoreUser(avatarInfo.name);
                     break;
                 case 'action_kiss':
-                    roomSession.sendChatMessage(`:beso ${avatarInfo.name}`);
+                    roomSession.sendChatMessage(`:beso ${avatarInfo.name}`, 0);
                     break;
                 case 'action_hug':
-                    roomSession.sendChatMessage(`:abrazo ${avatarInfo.name}`);
+                    roomSession.sendChatMessage(`:abrazo ${avatarInfo.name}`, 0);
                     break;
                 case 'kick':
                     roomSession.sendKickMessage(avatarInfo.webID);
