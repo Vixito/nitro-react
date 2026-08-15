@@ -41,7 +41,7 @@ export const GameListView = () =>
                         >
                             <Base className="game-dock-icon-container">
                                 <img 
-                                    src={ `${ game.assetUrl }${ game.gameNameId }_icon.png?v=5` } 
+                                    src={ `${ game.assetUrl }${ game.gameNameId }_icon.png?v=6` } 
                                     alt={ game.gameNameId }
                                     className="game-dock-icon" 
                                 />

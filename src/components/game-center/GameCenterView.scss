@@ -139,28 +139,22 @@
         }
 
         .btn-play-game {
-            background: linear-gradient(180deg, #10b981 0%, #059669 100%) !important;
-            border: 1px solid #34d399 !important;
-            color: #ffffff !important;
             font-size: 15px !important;
             font-weight: 800 !important;
             letter-spacing: 0.5px;
+            padding: 10px 36px !important;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
-            transition: all 0.15s ease-in-out;
             cursor: pointer;
+            transition: filter 0.15s ease, transform 0.15s ease;
 
             &:hover:not(:disabled) {
-                background: linear-gradient(180deg, #34d399 0%, #10b981 100%) !important;
-                filter: brightness(1.08);
+                filter: brightness(1.12);
                 transform: translateY(-1px);
-                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5) !important;
             }
 
             &:active:not(:disabled) {
+                filter: brightness(0.92);
                 transform: translateY(1px);
-                background: linear-gradient(180deg, #059669 0%, #047857 100%) !important;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
             }
         }
 
