@@ -68,7 +68,7 @@ export const CatalogView: FC<{}> = props =>
         AddEventLinkTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [ setIsVisible, openPageByOfferId, openPageByName ]);
+    }, [ setIsVisible, openPageByOfferId, openPageByName, openSearchByName ]);
 
     return (
         <>

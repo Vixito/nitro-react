@@ -944,7 +944,7 @@ const useCatalogState = () =>
         switch(requestedPage.current.requestType)
         {
             case RequestedPage.REQUEST_TYPE_NONE:
-                if(currentPage && activeNodes && (activeNodes.length > 0)) return;
+                if(currentPage && (currentPage.pageId !== -1) && activeNodes && (activeNodes.length > 0)) return;
 
                 if(rootNode.isBranch)
                 {
@@ -977,6 +977,15 @@ const useCatalogState = () =>
                 return;
         }
     }, [ isVisible, rootNode, offersToNodes, currentPage, activateNode, openPageById, openPageByOfferId, openPageByName, openSearchByName ]);
+
+    useEffect(() =>
+    {
+        if(!isVisible)
+        {
+            setSearchResult(null);
+            setCurrentOffer(null);
+        }
+    }, [ isVisible ]);
 
     useEffect(() =>
     {
