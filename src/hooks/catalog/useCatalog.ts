@@ -391,62 +391,6 @@ const useCatalogState = () =>
         }
     }, [ isVisible, rootNode, getNodeByName, activateNode ]);
 
-    const openPageByOfferId = useCallback((offerId: number) =>
-    {
-        setSearchResult(null);
-
-        if(!isVisible)
-        {
-            requestedPage.current.requestedByOfferId = offerId;
-
-            setIsVisible(true);
-        }
-        else
-        {
-            let nodes = getNodesByOfferId(offerId);
-
-            if(!nodes || !nodes.length)
-            {
-                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
-
-                if(furni)
-                {
-                    const foundNodes = [
-                        ...GetOfferNodes(offersToNodes, furni.purchaseOfferId),
-                        ...GetOfferNodes(offersToNodes, furni.rentOfferId),
-                        ...GetOfferNodes(offersToNodes, furni.id)
-                    ];
-
-                    if(foundNodes && foundNodes.length) nodes = foundNodes;
-                }
-            }
-
-            if(nodes && nodes.length)
-            {
-                activateNode(nodes[0], offerId);
-            }
-            else
-            {
-                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
-
-                if(furni)
-                {
-                    openSearchByName(furni.className);
-                }
-                else
-                {
-                    if(rootNode && rootNode.children && rootNode.children.length)
-                    {
-                        const first = rootNode.children.find(c => c.isVisible) || rootNode.children[0];
-                        if(first) activateNode(first);
-                    }
-                }
-            }
-        }
-    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, openSearchByName ]);
-
     const openSearchByName = useCallback((query: string) =>
     {
         if(!query || !query.length) return;
@@ -514,6 +458,62 @@ const useCatalogState = () =>
             setCurrentOffer(exactOffer);
         }
     }, [ currentType, rootNode, isVisible, setIsVisible, setSearchResult, setCurrentPage, setCurrentOffer, activeNodes, setActiveNodes ]);
+
+    const openPageByOfferId = useCallback((offerId: number) =>
+    {
+        setSearchResult(null);
+
+        if(!isVisible)
+        {
+            requestedPage.current.requestedByOfferId = offerId;
+
+            setIsVisible(true);
+        }
+        else
+        {
+            let nodes = getNodesByOfferId(offerId);
+
+            if(!nodes || !nodes.length)
+            {
+                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
+
+                if(furni)
+                {
+                    const foundNodes = [
+                        ...GetOfferNodes(offersToNodes, furni.purchaseOfferId),
+                        ...GetOfferNodes(offersToNodes, furni.rentOfferId),
+                        ...GetOfferNodes(offersToNodes, furni.id)
+                    ];
+
+                    if(foundNodes && foundNodes.length) nodes = foundNodes;
+                }
+            }
+
+            if(nodes && nodes.length)
+            {
+                activateNode(nodes[0], offerId);
+            }
+            else
+            {
+                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
+
+                if(furni)
+                {
+                    openSearchByName(furni.className);
+                }
+                else
+                {
+                    if(rootNode && rootNode.children && rootNode.children.length)
+                    {
+                        const first = rootNode.children.find(c => c.isVisible) || rootNode.children[0];
+                        if(first) activateNode(first);
+                    }
+                }
+            }
+        }
+    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, openSearchByName ]);
 
     const refreshBuilderStatus = useCallback(() =>
     {
