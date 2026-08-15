@@ -18,6 +18,11 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    color: #f8fafc !important;
+
+    .text-black, .nitro-text {
+        color: #f8fafc !important;
+    }
 
     .game-center-header {
         background: rgba(15, 23, 42, 0.9);
@@ -70,7 +75,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.75) 50%, rgba(15, 23, 42, 0.4) 100%);
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.88) 45%, rgba(15, 23, 42, 0.5) 100%);
             pointer-events: none;
         }
 
@@ -100,31 +105,34 @@
 
         .game-logo-wrapper {
             .game-hero-logo {
-                max-width: 320px;
-                max-height: 120px;
+                max-width: 280px;
+                max-height: 110px;
                 object-fit: contain;
-                filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6));
+                filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.7));
             }
         }
 
-        .game-tagline {
-            font-size: 20px;
-            font-weight: 800;
-            color: #ffffff;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
-        }
-
-        .game-description-card {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .game-info-box {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
             max-width: 520px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+
+            .game-tagline {
+                font-size: 18px !important;
+                font-weight: 800 !important;
+                color: #38bdf8 !important;
+                display: block;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+            }
 
             .game-description-text {
-                font-size: 13px;
+                font-size: 13.5px !important;
                 line-height: 1.6;
-                color: #cbd5e1;
+                color: #f8fafc !important;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
             }
         }
 
@@ -142,55 +150,64 @@
         }
 
         .game-status-label {
-            font-size: 13px;
-            color: #f1f5f9;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
         }
 
         .game-server-status {
-            font-size: 11px;
-            color: #94a3b8;
+            font-size: 11.5px !important;
+            color: #94a3b8 !important;
         }
 
         .game-info-card {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
 
             .info-card-title {
-                font-size: 13px;
-                color: #f8fafc;
-                letter-spacing: 0.3px;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+                color: #38bdf8 !important;
+                letter-spacing: 0.5px;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
             }
 
             .info-card-desc {
-                font-size: 12px;
-                line-height: 1.5;
-                color: #94a3b8;
+                font-size: 12.5px !important;
+                line-height: 1.6;
+                color: #e2e8f0 !important;
 
-                b {
-                    color: #e2e8f0;
+                div, span {
+                    color: #e2e8f0 !important;
+                }
+
+                b, strong {
+                    color: #ffffff !important;
                 }
             }
         }
     }
 
     .gameList-container {
-        background: rgba(15, 23, 42, 0.95);
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 23, 42, 0.96);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
         min-height: 120px;
 
         .game-list-title {
-            font-size: 12px;
+            font-size: 12px !important;
+            font-weight: 800 !important;
             letter-spacing: 0.5px;
-            color: #94a3b8;
+            color: #94a3b8 !important;
             text-transform: uppercase;
         }
 
         .game-list-subtitle {
-            font-size: 11px;
-            color: #64748b;
+            font-size: 11.5px !important;
+            color: #64748b !important;
         }
 
         .game-cards-row {
@@ -198,7 +215,7 @@
             padding: 4px 0 8px 0;
 
             .game-dock-card {
-                background: rgba(30, 41, 59, 0.6);
+                background: rgba(30, 41, 59, 0.7);
                 border: 2px solid rgba(255, 255, 255, 0.08);
                 border-radius: 12px;
                 padding: 10px 16px;
@@ -212,13 +229,14 @@
                     background-position: center;
                     background-repeat: no-repeat;
                     background-size: contain;
-                    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+                    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
                     transition: transform 0.2s ease;
                 }
 
                 .game-dock-title {
-                    font-size: 12px;
-                    color: #cbd5e1;
+                    font-size: 12px !important;
+                    font-weight: 700 !important;
+                    color: #cbd5e1 !important;
                     margin-top: 6px;
                     transition: color 0.2s ease;
                 }
@@ -233,7 +251,7 @@
                     }
 
                     .game-dock-title {
-                        color: #ffffff;
+                        color: #ffffff !important;
                     }
                 }
 
@@ -243,7 +261,7 @@
                     box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
 
                     .game-dock-title {
-                        color: #38bdf8;
+                        color: #38bdf8 !important;
                     }
                 }
             }

@@ -24,8 +24,8 @@ export const GameListView = () =>
     return (
         <Base fullWidth className="gameList-container px-4 py-3">
             <Flex justifyContent="between" alignItems="center" className="mb-2">
-                <Text bold className="game-list-title">🎮 SELECCIONA UN JUEGO</Text>
-                <Text small className="game-list-subtitle">Compite con jugadores en tiempo real</Text>
+                <Text variant="white" bold className="game-list-title">SELECCIONA UN JUEGO</Text>
+                <Text variant="white" small className="game-list-subtitle">Compite con jugadores en tiempo real</Text>
             </Flex>
             <Flex gap={ 3 } className="game-cards-row">
                 { games.map((game, index) => {
@@ -41,9 +41,9 @@ export const GameListView = () =>
                         >
                             <Base 
                                 className="game-dock-icon" 
-                                style={{ backgroundImage: `url(${ game.assetUrl }${ game.gameNameId }_icon.png)` }}
+                                style={{ backgroundImage: `url(${ game.assetUrl }${ game.gameNameId }_icon.png?v=4)` }}
                             />
-                            <Text bold className="game-dock-title">{ getGameTitle(game) }</Text>
+                            <Text variant="white" bold className="game-dock-title">{ getGameTitle(game) }</Text>
                         </Flex>
                     );
                 }) }

@@ -56,20 +56,14 @@ export const GameCenterView = () =>
     return (
         <Flex position="absolute" className="top-0 bottom-0 start-0 end-0 game-center-root" justifyContent="center" alignItems="center">
             <Flex className="game-center-main" column>
-                <Flex className="game-center-header px-4 py-2" justifyContent="between" alignItems="center">
-                    <Flex alignItems="center" gap={ 2 }>
-                        <Base className="game-center-logo-icon" />
-                        <Text bold className="game-center-header-title">HABBTEN GAME CENTER</Text>
-                    </Flex>
-                    <Flex alignItems="center" gap={ 3 }>
-                        <Base 
-                            pointer 
-                            className="game-center-close-btn px-3 py-1" 
-                            onClick={ () => setIsVisible(false) }
-                        >
-                            ✕ Volver al Hotel
-                        </Base>
-                    </Flex>
+                <Flex className="game-center-header px-4 py-2" justifyContent="end" alignItems="center">
+                    <Base 
+                        pointer 
+                        className="game-center-close-btn px-3 py-1" 
+                        onClick={ () => setIsVisible(false) }
+                    >
+                        ✕ Volver al Hotel
+                    </Base>
                 </Flex>
                 { (games && games.length > 0) ? (
                     <>
