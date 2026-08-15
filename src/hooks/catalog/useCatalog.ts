@@ -428,7 +428,6 @@ const useCatalogState = () =>
             }
             else
             {
-                // Fallback to first visible category so catalog is never white/empty
                 if(rootNode && rootNode.children && rootNode.children.length)
                 {
                     for(const child of rootNode.children)
@@ -440,10 +439,22 @@ const useCatalogState = () =>
                         }
                     }
                 }
-                SendMessageComposer(new GetProductOfferComposer(offerId));
+
+                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
+
+                if(furni)
+                {
+                    const offer = new FurnitureOffer(furni);
+                    const offers = [ offer ];
+                    setSearchResult(new SearchResult(furni.name || furni.className, offers, []));
+                    const searchPage = new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), offers, false, 1);
+                    setCurrentPage(searchPage as ICatalogPage);
+                    setCurrentOffer(offer);
+                }
             }
         }
-    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode ]);
+    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, setSearchResult, setCurrentPage, setCurrentOffer ]);
 
     const refreshBuilderStatus = useCallback(() =>
     {
