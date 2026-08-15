@@ -1,8 +1,30 @@
 import { Game2GetAccountGameStatusMessageComposer, GetGameStatusMessageComposer, JoinQueueMessageComposer } from '@nitrots/nitro-renderer';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ColorUtils, LocalizeText, SendMessageComposer } from '../../../api';
 import { Base, Button, Flex, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
+
+const GAME_CONTROLS: { [ gameNameId: string ]: { action: string; keys: string }[] } = {
+    snowwar: [
+        { action: 'Mover personaje', keys: 'W A S D / Flechas' },
+        { action: 'Lanzar bola de nieve', keys: 'Clic del ratón' },
+        { action: 'Recargar bolas', keys: 'Espacio' }
+    ],
+    basejump: [
+        { action: 'Esquivar obstáculos', keys: 'A / D o Flechas Izq/Der' },
+        { action: 'Abrir / cerrar paracaídas', keys: 'Espacio' }
+    ],
+    slotcar: [
+        { action: 'Acelerar', keys: 'Espacio / Flecha Arriba / W' }
+    ],
+    battleball: [
+        { action: 'Mover tu bola', keys: 'W A S D / Flechas' }
+    ]
+};
+
+const DEFAULT_CONTROLS: { action: string; keys: string }[] = [
+    { action: 'Mover personaje / vehículo', keys: 'W A S D / Flechas' }
+];
 
 export const GameView = () => {
     const { selectedGame, accountStatus, gameOffline } = useGameCenter();
@@ -31,6 +53,8 @@ export const GameView = () => {
 
     const hasUnlimited = accountStatus ? accountStatus.hasUnlimitedGames : true;
     const freeGamesLeft = accountStatus ? accountStatus.freeGamesLeft : 5;
+
+    const controls = useMemo(() => GAME_CONTROLS[ selectedGame.gameNameId ] || DEFAULT_CONTROLS, [ selectedGame ]);
 
     return (
         <Flex 
@@ -82,9 +106,9 @@ export const GameView = () => {
                             <Text variant="white" bold className="info-card-title">CONTROLES RÁPIDOS</Text>
                         </Flex>
                         <Flex column gap={ 1 } className="info-card-desc">
-                            <div>• <b>W A S D / Flechas:</b> Mover personaje / vehículo</div>
-                            <div>• <b>Clic Izquierdo:</b> Disparo / Acción principal</div>
-                            <div>• <b>Espacio:</b> Habilidad especial / Recargar</div>
+                            { controls.map((control, index) => (
+                                <div key={ index }>• <b>{ control.keys }:</b> { control.action }</div>
+                            )) }
                         </Flex>
                     </Base>
                 </Flex>
