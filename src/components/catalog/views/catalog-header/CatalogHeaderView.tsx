@@ -14,13 +14,30 @@ export const CatalogHeaderView: FC<CatalogHeaderViewProps> = props =>
 
     useEffect(() =>
     {
-        setDisplayImageUrl(imageUrl ?? GetConfiguration<string>('catalog.asset.image.url').replace('%name%', 'catalog_header_roombuilder'));
+        const imageTemplate = GetConfiguration<string>('catalog.asset.image.url', 'http://127.0.0.1:8080/c_images/catalogue/%name%.png');
+        if(imageUrl && (imageUrl.length > 0))
+        {
+            const resolved = (imageUrl.startsWith('http://') || imageUrl.startsWith('https://') || imageUrl.startsWith('/'))
+                ? imageUrl
+                : imageTemplate.replace('%name%', imageUrl);
+            setDisplayImageUrl(resolved);
+        }
+        else
+        {
+            setDisplayImageUrl(imageTemplate.replace('%name%', 'catalog_header_roombuilder'));
+        }
     }, [ imageUrl ]);
 
-    return <Flex center fullWidth className="nitro-catalog-header">
-        <img src={ displayImageUrl } onError={ ({ currentTarget }) => 
-        {
-            currentTarget.src = GetConfiguration<string>('catalog.asset.image.url').replace('%name%', 'catalog_header_roombuilder');
-        } } />
-    </Flex>;
+    return (
+        <Flex center fullWidth className="nitro-catalog-header">
+            <img src={ displayImageUrl } onError={ ({ currentTarget }) => 
+            {
+                const fallback = GetConfiguration<string>('catalog.asset.image.url', 'http://127.0.0.1:8080/c_images/catalogue/%name%.png').replace('%name%', 'catalog_header_roombuilder');
+                if(currentTarget.src !== fallback)
+                {
+                    currentTarget.src = fallback;
+                }
+            } } />
+        </Flex>
+    );
 }
