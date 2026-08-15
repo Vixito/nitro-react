@@ -38,7 +38,8 @@ export const GameStageView = () =>
 
         let frame: HTMLIFrameElement = document.createElement('iframe');
 
-        frame.src = gameURL;
+        const cacheBuster = gameURL.includes('?') ? `&t=${ Date.now() }` : `?t=${ Date.now() }`;
+        frame.src = `${ gameURL }${ cacheBuster }`;
         frame.classList.add('game-center-stage');
         frame.classList.add('h-100');
         frame.classList.add('w-100');
