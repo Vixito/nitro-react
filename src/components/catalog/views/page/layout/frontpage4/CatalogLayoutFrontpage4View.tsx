@@ -27,8 +27,26 @@ export const CatalogLayoutFrontpage4View: FC<CatalogLayoutProps> = props =>
 
     useEffect(() =>
     {
-        hideNavigation();
-    }, [ page, hideNavigation ]);
+        if(frontPageItems && (frontPageItems.length > 0))
+        {
+            hideNavigation();
+        }
+    }, [ page, hideNavigation, frontPageItems ]);
+
+    if(!frontPageItems || !frontPageItems.length)
+    {
+        return (
+            <Column fullHeight gap={ 2 } className="p-3">
+                { page?.localization?.getImage(0) &&
+                    <div className="d-flex justify-content-center">
+                        <img src={ page.localization.getImage(0) } alt="Frontpage" style={ { maxWidth: '100%', borderRadius: 8 } } />
+                    </div> }
+                { page?.localization?.getText(0) &&
+                    <div className="text-center" dangerouslySetInnerHTML={ { __html: page.localization.getText(0) } } /> }
+                <CatalogRedeemVoucherView text={ page?.localization?.getText(1) } />
+            </Column>
+        );
+    }
 
     return (
         <Grid>
@@ -43,7 +61,7 @@ export const CatalogLayoutFrontpage4View: FC<CatalogLayoutProps> = props =>
                     <CatalogLayoutFrontPageItemView item={ frontPageItems[2] } onClick={ event => selectItem(frontPageItems[2]) } /> }
                 { frontPageItems[3] &&
                     <CatalogLayoutFrontPageItemView item={ frontPageItems[3] } onClick={ event => selectItem(frontPageItems[3]) } /> }
-                <CatalogRedeemVoucherView text={ page.localization.getText(1) } />
+                <CatalogRedeemVoucherView text={ page?.localization?.getText(1) } />
             </Column>
         </Grid>
     );
