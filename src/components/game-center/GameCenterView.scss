@@ -143,9 +143,9 @@
             z-index: 10;
 
             .btn-play-game {
-                background: #16a34a !important;
-                background-color: #16a34a !important;
-                border: 1px solid #15803d !important;
+                background: #15803d !important;
+                background-color: #15803d !important;
+                border: 1px solid #166534 !important;
                 color: #ffffff !important;
                 font-size: 16px !important;
                 font-weight: 800 !important;
@@ -157,15 +157,15 @@
                 transition: background-color 0.15s ease, transform 0.15s ease;
 
                 &:hover:not(:disabled) {
-                    background: #22c55e !important;
-                    background-color: #22c55e !important;
-                    border-color: #16a34a !important;
+                    background: #16a34a !important;
+                    background-color: #16a34a !important;
+                    border-color: #15803d !important;
                     transform: translateY(-1px);
                 }
 
                 &:active:not(:disabled) {
-                    background: #15803d !important;
-                    background-color: #15803d !important;
+                    background: #14532d !important;
+                    background-color: #14532d !important;
                     transform: translateY(1px);
                 }
             }
