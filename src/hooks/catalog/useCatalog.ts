@@ -460,7 +460,14 @@ const useCatalogState = () =>
     {
         if(!query || !query.length) return;
 
-        setIsVisible(true);
+        if(!isVisible)
+        {
+            requestedPage.current.requestBySearch = query;
+
+            setIsVisible(true);
+
+            return;
+        }
 
         const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
         if(!furnitureDatas || !furnitureDatas.length) return;
@@ -506,7 +513,7 @@ const useCatalogState = () =>
             const exactOffer = offers.find(o => o.localizationId?.toLowerCase() === query.toLowerCase() || (o as any)._furniData?.className?.toLowerCase() === query.toLowerCase()) || offers[0];
             setCurrentOffer(exactOffer);
         }
-    }, [ currentType, rootNode, setIsVisible, setSearchResult, setCurrentPage, setCurrentOffer ]);
+    }, [ currentType, rootNode, isVisible, setIsVisible, setSearchResult, setCurrentPage, setCurrentOffer ]);
 
     const refreshBuilderStatus = useCallback(() =>
     {
@@ -964,8 +971,12 @@ const useCatalogState = () =>
                 openPageByName(requestedPage.current.requestByName);
                 requestedPage.current.resetRequest();
                 return;
+            case RequestedPage.REQUEST_TYPE_SEARCH:
+                openSearchByName(requestedPage.current.requestBySearch);
+                requestedPage.current.resetRequest();
+                return;
         }
-    }, [ isVisible, rootNode, offersToNodes, currentPage, activateNode, openPageById, openPageByOfferId, openPageByName ]);
+    }, [ isVisible, rootNode, offersToNodes, currentPage, activateNode, openPageById, openPageByOfferId, openPageByName, openSearchByName ]);
 
     useEffect(() =>
     {

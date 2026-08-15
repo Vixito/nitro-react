@@ -4,11 +4,13 @@ export class RequestedPage
     public static REQUEST_TYPE_ID: number = 1;
     public static REQUEST_TYPE_OFFER: number = 2;
     public static REQUEST_TYPE_NAME: number = 3;
+    public static REQUEST_TYPE_SEARCH: number = 4;
 
     private _requestType: number;
     private _requestById: number;
     private _requestedByOfferId: number;
     private _requestByName: string;
+    private _requestBySearch: string;
 
     constructor()
     {
@@ -21,6 +23,7 @@ export class RequestedPage
         this._requestById = -1;
         this._requestedByOfferId = -1;
         this._requestByName = null;
+        this._requestBySearch = null;
     }
 
     public get requestType(): number
@@ -59,5 +62,16 @@ export class RequestedPage
     {
         this._requestType = RequestedPage.REQUEST_TYPE_NAME;
         this._requestByName = name;
+    }
+
+    public get requestBySearch(): string
+    {
+        return this._requestBySearch;
+    }
+
+    public set requestBySearch(search: string)
+    {
+        this._requestType = RequestedPage.REQUEST_TYPE_SEARCH;
+        this._requestBySearch = search;
     }
 }
