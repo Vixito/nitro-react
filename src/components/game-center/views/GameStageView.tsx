@@ -13,7 +13,6 @@ export const GameStageView = () =>
     const exitGame = () =>
     {
         setGameURL(null);
-        setIsVisible(false);
         SendMessageComposer(new Game2ExitGameMessageComposer());
     };
 
@@ -68,29 +67,6 @@ export const GameStageView = () =>
 
     return (
         <div className="position-fixed top-0 bottom-0 start-0 end-0" style={{ zIndex: 99999, width: '100vw', height: '100vh', background: '#000' }}>
-            <button 
-                onClick={ exitGame }
-                style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '16px',
-                    zIndex: 100000,
-                    background: 'rgba(225, 29, 72, 0.9)',
-                    color: '#fff',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    borderRadius: '8px',
-                    padding: '6px 14px',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                }}
-            >
-                ✕ Salir del Juego
-            </button>
             <Base innerRef={ ref } className="game-center-stage w-100 h-100" />
         </div>
     );
