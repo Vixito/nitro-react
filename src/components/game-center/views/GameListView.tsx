@@ -39,10 +39,13 @@ export const GameListView = () =>
                             className={ `game-dock-card ${ isSelected ? 'selected' : '' }` } 
                             onClick={ () => setSelectedGame(game) }
                         >
-                            <Base 
-                                className="game-dock-icon" 
-                                style={{ backgroundImage: `url(${ game.assetUrl }${ game.gameNameId }_icon.png?v=4)` }}
-                            />
+                            <Base className="game-dock-logo-container">
+                                <img 
+                                    src={ `${ game.assetUrl }${ game.gameNameId }_logo.png?v=4` } 
+                                    alt={ game.gameNameId }
+                                    className="game-dock-logo" 
+                                />
+                            </Base>
                             <Text variant="white" bold className="game-dock-title">{ getGameTitle(game) }</Text>
                         </Flex>
                     );

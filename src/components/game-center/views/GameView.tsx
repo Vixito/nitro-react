@@ -41,75 +41,79 @@ export const GameView = () =>
     return (
         <Flex 
             className="game-view p-4" 
+            column
             fullHeight 
+            justifyContent="between"
             style={{ 
                 backgroundColor: getBgColour(), 
                 backgroundImage: getBgImage()
             }}
         >
-            <Flex className="game-view-left-col w-60" column justifyContent="center" gap={ 3 }>
-                <Base className="game-tag-badge">
-                    MINIJUEGO OFICIAL
-                </Base>
+            <Flex className="game-view-top-row" fullWidth justifyContent="between" alignItems="center" gap={ 5 }>
+                <Flex className="game-view-left-col" column gap={ 2 } style={{ maxWidth: '480px' }}>
+                    <Base className="game-tag-badge">
+                        MINIJUEGO OFICIAL
+                    </Base>
 
-                <Base className="game-logo-wrapper">
-                    <img 
-                        src={ `${ selectedGame.assetUrl }${ selectedGame.gameNameId }_logo.png?v=4` } 
-                        alt={ selectedGame.gameNameId }
-                        className="game-hero-logo" 
-                    />
-                </Base>
+                    <Base className="game-logo-wrapper">
+                        <img 
+                            src={ `${ selectedGame.assetUrl }${ selectedGame.gameNameId }_logo.png?v=4` } 
+                            alt={ selectedGame.gameNameId }
+                            className="game-hero-logo" 
+                        />
+                    </Base>
 
-                <Base className="game-info-box p-3">
-                    <Text variant="white" bold className="game-tagline mb-2">
-                        { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_title`) || '¡Prepárate para la acción!' }
-                    </Text>
-                    <Text variant="white" className="game-description-text">
-                        { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_content`) || 'Disfruta de este clásico minijuego multijugador con tus amigos en Habbten.' }
-                    </Text>
-                </Base>
+                    <Base className="game-info-box p-3">
+                        <div className="game-tagline mb-2">
+                            { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_title`) || '¡Prepárate para la acción!' }
+                        </div>
+                        <div className="game-description-text">
+                            { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_content`) || 'Disfruta de este clásico minijuego multijugador con tus amigos en Habbten.' }
+                        </div>
+                    </Base>
+                </Flex>
 
-                <Flex alignItems="center" gap={ 3 } className="mt-2">
-                    <Button 
-                        variant={ gameOffline ? 'secondary' : 'success' } 
-                        disabled={ gameOffline }
-                        className="btn-play-game px-4 py-3" 
-                        onClick={ onPlay }
-                    >
-                        { gameOffline ? 'En Mantenimiento' : '¡JUGAR AHORA!' }
-                    </Button>
-
-                    <Flex column gap={ 1 }>
-                        <Text variant="white" bold className="game-status-label">
-                            { hasUnlimited ? 'Partidas ilimitadas activas (Club HC)' : `${ freeGamesLeft } partidas gratuitas restantes hoy` }
+                <Flex className="game-view-right-col" column gap={ 3 } style={{ maxWidth: '380px', width: '380px' }}>
+                    <Base className="game-info-card p-3">
+                        <Flex alignItems="center" gap={ 2 } className="mb-2">
+                            <Text variant="white" bold className="info-card-title">PREMIO DE LA SEMANA</Text>
+                        </Flex>
+                        <Text variant="white" small className="info-card-desc">
+                            ¡El jugador con el mejor récord semanal recibirá <b>200 Créditos</b> y una <b>Placa Exclusiva</b>!
                         </Text>
-                        <Text variant="white" small className="game-server-status">
-                            { gameOffline ? 'Servidor temporalmente pausado' : 'Servidor en línea' }
-                        </Text>
-                    </Flex>
+                    </Base>
+
+                    <Base className="game-info-card p-3">
+                        <Flex alignItems="center" gap={ 2 } className="mb-2">
+                            <Text variant="white" bold className="info-card-title">CONTROLES RÁPIDOS</Text>
+                        </Flex>
+                        <Flex column gap={ 1 } className="info-card-desc">
+                            <div>• <b>W A S D / Flechas:</b> Mover personaje / vehículo</div>
+                            <div>• <b>Clic Izquierdo:</b> Disparo / Acción principal</div>
+                            <div>• <b>Espacio:</b> Habilidad especial / Recargar</div>
+                        </Flex>
+                    </Base>
                 </Flex>
             </Flex>
 
-            <Flex className="game-view-right-col w-40" column justifyContent="center" gap={ 3 }>
-                <Base className="game-info-card p-3">
-                    <Flex alignItems="center" gap={ 2 } className="mb-2">
-                        <Text variant="white" bold className="info-card-title">PREMIO DE LA SEMANA</Text>
-                    </Flex>
-                    <Text variant="white" small className="info-card-desc">
-                        ¡El jugador con el mejor récord semanal recibirá <b>200 Créditos</b> y una <b>Placa Exclusiva</b>!
-                    </Text>
-                </Base>
+            <Flex column alignItems="center" justifyContent="center" gap={ 2 } className="game-view-cta-row mt-auto pt-3">
+                <Button 
+                    variant={ gameOffline ? 'secondary' : 'success' } 
+                    disabled={ gameOffline }
+                    className="btn-play-game px-5 py-2" 
+                    onClick={ onPlay }
+                >
+                    { gameOffline ? 'En Mantenimiento' : '¡JUGAR AHORA!' }
+                </Button>
 
-                <Base className="game-info-card p-3">
-                    <Flex alignItems="center" gap={ 2 } className="mb-2">
-                        <Text variant="white" bold className="info-card-title">CONTROLES RÁPIDOS</Text>
-                    </Flex>
-                    <Flex column gap={ 1 } className="info-card-desc">
-                        <div>• <b>W A S D / Flechas:</b> Mover personaje / vehículo</div>
-                        <div>• <b>Clic Izquierdo:</b> Disparo / Acción principal</div>
-                        <div>• <b>Espacio:</b> Habilidad especial / Recargar</div>
-                    </Flex>
-                </Base>
+                <Flex column alignItems="center" gap={ 0 }>
+                    <Text variant="white" bold className="game-status-label text-center">
+                        { hasUnlimited ? 'Partidas ilimitadas activas (Club HC)' : `${ freeGamesLeft } partidas gratuitas restantes hoy` }
+                    </Text>
+                    <Text variant="white" small className="game-server-status text-center">
+                        { gameOffline ? 'Servidor temporalmente pausado' : 'Servidor en línea' }
+                    </Text>
+                </Flex>
             </Flex>
         </Flex>
     );

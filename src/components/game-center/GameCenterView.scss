@@ -124,7 +124,9 @@
                 font-size: 18px !important;
                 font-weight: 800 !important;
                 color: #38bdf8 !important;
-                display: block;
+                display: block !important;
+                margin-bottom: 8px !important;
+                line-height: 1.3;
                 text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
             }
 
@@ -140,12 +142,13 @@
             font-size: 15px;
             font-weight: 800;
             letter-spacing: 0.5px;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
             transition: all 0.2s ease;
 
             &:hover:not(:disabled) {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(16, 185, 129, 0.6);
+                box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
             }
         }
 
@@ -218,35 +221,46 @@
                 background: rgba(30, 41, 59, 0.7);
                 border: 2px solid rgba(255, 255, 255, 0.08);
                 border-radius: 12px;
-                padding: 10px 16px;
-                min-width: 130px;
+                padding: 8px 16px;
+                min-width: 140px;
+                height: 80px;
                 cursor: pointer;
                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
 
-                .game-dock-icon {
-                    width: 52px;
-                    height: 52px;
-                    background-position: center;
-                    background-repeat: no-repeat;
-                    background-size: contain;
-                    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-                    transition: transform 0.2s ease;
+                .game-dock-logo-container {
+                    width: 100%;
+                    height: 38px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    .game-dock-logo {
+                        max-width: 96px;
+                        max-height: 36px;
+                        object-fit: contain;
+                        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+                        transition: transform 0.2s ease;
+                    }
                 }
 
                 .game-dock-title {
-                    font-size: 12px !important;
+                    font-size: 11px !important;
                     font-weight: 700 !important;
-                    color: #cbd5e1 !important;
-                    margin-top: 6px;
+                    color: #94a3b8 !important;
+                    margin-top: 4px;
                     transition: color 0.2s ease;
                 }
 
                 &:hover {
                     background: rgba(30, 41, 59, 0.95);
                     border-color: rgba(56, 189, 248, 0.4);
-                    transform: translateY(-3px);
+                    transform: translateY(-2px);
 
-                    .game-dock-icon {
+                    .game-dock-logo {
                         transform: scale(1.08);
                     }
 
@@ -256,9 +270,9 @@
                 }
 
                 &.selected {
-                    background: rgba(14, 165, 233, 0.15);
+                    background: rgba(14, 165, 233, 0.18);
                     border-color: #38bdf8;
-                    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+                    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
 
                     .game-dock-title {
                         color: #38bdf8 !important;
