@@ -1,32 +1,53 @@
 import { GameConfigurationData } from '@nitrots/nitro-renderer';
 import { LocalizeText } from '../../../api';
-import { Base, Flex } from '../../../common';
+import { Base, Flex, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
 
 export const GameListView = () => 
 {
-    const { games,selectedGame, setSelectedGame } = useGameCenter();
+    const { games, selectedGame, setSelectedGame } = useGameCenter();
 
-    const getClasses = (game: GameConfigurationData) => 
+    if(!games || !games.length) return null;
+
+    const getGameTitle = (game: GameConfigurationData): string =>
     {
-        let classes = [ 'game-icon' ];
+        switch(game.gameNameId)
+        {
+            case 'snowwar': return 'SnowStorm';
+            case 'basejump': return 'Fast Food';
+            case 'slotcar': return 'Speedway';
+            case 'battleball': return 'Battle Ball';
+            default: return LocalizeText(`gamecenter.${ game.gameNameId }.name`) || game.gameNameId;
+        }
+    };
 
-        if(selectedGame === game) classes.push('selected');
-
-        return classes.join(' ');
-    }
-    
-    const getIconImage = (game: GameConfigurationData): string => 
-    {
-        return `url(${ game.assetUrl }${ game.gameNameId }_icon.png)`
-    }
-
-    return <Base fullWidth className="gameList-container bg-dark p-1">
-        { LocalizeText('gamecenter.game_list_title') }
-        <Flex gap={ 3 }>
-            { games && games.map((game,index) => 
-                <Base key={ index } className={ getClasses(game) } onClick={ evt => setSelectedGame(game) } style={ { backgroundImage: getIconImage(game) } }/>
-            ) }
-        </Flex>
-    </Base>
-}
+    return (
+        <Base fullWidth className="gameList-container px-4 py-3">
+            <Flex justifyContent="between" alignItems="center" className="mb-2">
+                <Text bold className="game-list-title">🎮 SELECCIONA UN JUEGO</Text>
+                <Text small className="game-list-subtitle">Compite con jugadores en tiempo real</Text>
+            </Flex>
+            <Flex gap={ 3 } className="game-cards-row">
+                { games.map((game, index) => {
+                    const isSelected = selectedGame?.gameId === game.gameId;
+                    return (
+                        <Flex 
+                            key={ index } 
+                            column 
+                            alignItems="center" 
+                            justifyContent="center"
+                            className={ `game-dock-card ${ isSelected ? 'selected' : '' }` } 
+                            onClick={ () => setSelectedGame(game) }
+                        >
+                            <Base 
+                                className="game-dock-icon" 
+                                style={{ backgroundImage: `url(${ game.assetUrl }${ game.gameNameId }_icon.png)` }}
+                            />
+                            <Text bold className="game-dock-title">{ getGameTitle(game) }</Text>
+                        </Flex>
+                    );
+                }) }
+            </Flex>
+        </Base>
+    );
+};

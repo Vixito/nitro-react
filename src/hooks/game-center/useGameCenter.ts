@@ -17,11 +17,16 @@ const useGameCenterState = () =>
     {
         let parser = event.getParser();
 
-        if(!parser || parser && !parser.games.length) return;
-
-        setSelectedGame(parser.games[0]);
+        if(!parser || !parser.games || !parser.games.length) return;
 
         setGames(parser.games);
+        
+        if(!selectedGame)
+        {
+            setSelectedGame(parser.games[0]);
+            SendMessageComposer(new GetGameStatusMessageComposer(parser.games[0].gameId));
+            SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(parser.games[0].gameId));
+        }
     });
 
     useMessageEvent<Game2AccountGameStatusMessageEvent>(Game2AccountGameStatusMessageEvent, event => 
@@ -40,7 +45,7 @@ const useGameCenterState = () =>
         if(!parser) return;
 
         setGameOffline(parser.isInMaintenance);
-    })
+    });
 
     useMessageEvent<LoadGameUrlEvent>(LoadGameUrlEvent, event => 
     {
@@ -51,6 +56,14 @@ const useGameCenterState = () =>
         setGameURL(parser.url);
     });
 
+    const selectGame = (game: GameConfigurationData) =>
+    {
+        if(!game) return;
+        setSelectedGame(game);
+        SendMessageComposer(new GetGameStatusMessageComposer(game.gameId));
+        SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(game.gameId));
+    };
+
     useEffect(()=>
     {
         if(isVisible) 
@@ -58,17 +71,13 @@ const useGameCenterState = () =>
             SendMessageComposer(new GetGameListMessageComposer());
             VisitDesktop();
         }
-        else 
-        {
-            // dispose or wtv
-        }
     },[ isVisible ]);
 
     return {
         isVisible, setIsVisible,
         games,
         accountStatus,
-        selectedGame, setSelectedGame,
+        selectedGame, setSelectedGame: selectGame,
         gameOffline,
         gameURL, setGameURL
     }

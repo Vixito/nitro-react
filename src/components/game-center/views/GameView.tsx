@@ -1,58 +1,117 @@
 import { Game2GetAccountGameStatusMessageComposer, GetGameStatusMessageComposer, JoinQueueMessageComposer } from '@nitrots/nitro-renderer';
 import { useEffect } from 'react';
 import { ColorUtils, LocalizeText, SendMessageComposer } from '../../../api';
-import { Base, Button, Flex, LayoutItemCountView, Text } from '../../../common';
+import { Base, Button, Flex, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
 
 export const GameView = () => 
 {
-    const { selectedGame, accountStatus } = useGameCenter();
+    const { selectedGame, accountStatus, gameOffline } = useGameCenter();
 
-    useEffect(()=>
+    useEffect(() =>
     {
         if(selectedGame) 
         {
             SendMessageComposer(new GetGameStatusMessageComposer(selectedGame.gameId));
             SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(selectedGame.gameId));
         }
-    },[ selectedGame ])
+    }, [ selectedGame ]);
+
+    if(!selectedGame) return null;
 
     const getBgColour = (): string => 
     {
-        return ColorUtils.uintHexColor(selectedGame.bgColor)
-    }
+        return selectedGame.bgColor ? ColorUtils.uintHexColor(selectedGame.bgColor) : '#1e293b';
+    };
 
     const getBgImage = (): string => 
     {
-        return `url(${ selectedGame.assetUrl }${ selectedGame.gameNameId }_theme.png)`
-    }
-
-    const getColor = () => 
-    {
-        return ColorUtils.uintHexColor(selectedGame.textColor);
-    }
+        return `url(${ selectedGame.assetUrl }${ selectedGame.gameNameId }_theme.png)`;
+    };
 
     const onPlay = () => 
     {
+        if(gameOffline) return;
         SendMessageComposer(new JoinQueueMessageComposer(selectedGame.gameId));
-    }
+    };
 
-    return <Flex className="game-view py-4" fullHeight style={ { backgroundColor: getBgColour(), backgroundImage: getBgImage(), color: getColor() } }>
-        <Flex className="w-75" column alignItems="center" gap={ 2 }>
-            <Text bold>{ LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_title`) }</Text>
-            <img src={ selectedGame.assetUrl + selectedGame.gameNameId + '_logo.png' } style={{ maxWidth: '250px', maxHeight: '120px', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
-            { (accountStatus.hasUnlimitedGames || accountStatus.freeGamesLeft > 0) && <>
-                <Button variant="light" position="relative" className="px-4" onClick={ onPlay }>
-                    { LocalizeText('gamecenter.play_now') }
-                    { !accountStatus.hasUnlimitedGames && 
-                    <LayoutItemCountView className="me-n1 mt-n1" count={ accountStatus.freeGamesLeft }/> }
-                </Button>
-            </> }
-            <Text bold className="w-50" center>{ LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_content`) }</Text>
+    const hasUnlimited = accountStatus ? accountStatus.hasUnlimitedGames : true;
+    const freeGamesLeft = accountStatus ? accountStatus.freeGamesLeft : 5;
+
+    return (
+        <Flex 
+            className="game-view p-4" 
+            fullHeight 
+            style={{ 
+                backgroundColor: getBgColour(), 
+                backgroundImage: getBgImage()
+            }}
+        >
+            <Flex className="game-view-left-col w-60" column justifyContent="center" gap={ 3 }>
+                <Base className="game-tag-badge">
+                    🎮 MINIJUEGO OFICIAL HABBTEN
+                </Base>
+
+                <Base className="game-logo-wrapper">
+                    <img 
+                        src={ `${ selectedGame.assetUrl }${ selectedGame.gameNameId }_logo.png` } 
+                        alt={ selectedGame.gameNameId }
+                        className="game-hero-logo" 
+                    />
+                </Base>
+
+                <Text bold className="game-tagline">
+                    { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_title`) || '¡Prepárate para la acción!' }
+                </Text>
+
+                <Base className="game-description-card p-3">
+                    <Text className="game-description-text">
+                        { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_content`) || 'Disfruta de este clásico minijuego multijugador con tus amigos en Habbten.' }
+                    </Text>
+                </Base>
+
+                <Flex alignItems="center" gap={ 3 } className="mt-2">
+                    <Button 
+                        variant={ gameOffline ? 'secondary' : 'success' } 
+                        disabled={ gameOffline }
+                        className="btn-play-game px-4 py-3" 
+                        onClick={ onPlay }
+                    >
+                        { gameOffline ? '🔧 En Mantenimiento' : '▶ ¡JUGAR AHORA!' }
+                    </Button>
+
+                    <Flex column gap={ 1 }>
+                        <Text bold className="game-status-label">
+                            { hasUnlimited ? '⭐ Partidas ilimitadas activas (Club HC)' : `🎟️ ${ freeGamesLeft } partidas gratuitas restantes hoy` }
+                        </Text>
+                        <Text small className="game-server-status">
+                            { gameOffline ? '🔴 Servidor temporalmente pausado' : '🟢 Servidor en línea (0ms)' }
+                        </Text>
+                    </Flex>
+                </Flex>
+            </Flex>
+
+            <Flex className="game-view-right-col w-40" column justifyContent="center" gap={ 3 }>
+                <Base className="game-info-card p-3">
+                    <Flex alignItems="center" gap={ 2 } className="mb-2">
+                        <Text bold className="info-card-title">🏆 PREMIO DE LA SEMANA</Text>
+                    </Flex>
+                    <Text small className="info-card-desc">
+                        ¡El jugador con el mejor récord semanal recibirá <b>200 Créditos</b> y una <b>Placa Exclusiva</b>!
+                    </Text>
+                </Base>
+
+                <Base className="game-info-card p-3">
+                    <Flex alignItems="center" gap={ 2 } className="mb-2">
+                        <Text bold className="info-card-title">🕹️ CONTROLES RÁPIDOS</Text>
+                    </Flex>
+                    <Flex column gap={ 1 } className="info-card-desc">
+                        <div>• <b>W A S D / Flechas:</b> Mover personaje / vehículo</div>
+                        <div>• <b>Clic Izquierdo:</b> Disparo / Acción principal</div>
+                        <div>• <b>Espacio:</b> Habilidad especial / Recargar bolas</div>
+                    </Flex>
+                </Base>
+            </Flex>
         </Flex>
-        <Base className="w-25">
-
-        </Base>
-        
-    </Flex>
-}
+    );
+};
