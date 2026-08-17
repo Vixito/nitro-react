@@ -36,11 +36,11 @@ export const LayoutMiniCameraView: FC<LayoutMiniCameraViewProps> = props =>
     
     return (
         <DraggableWindow handleSelector=".nitro-room-thumbnail-camera">
-            <div className="nitro-room-thumbnail-camera px-2">
+            <div className="nitro-room-thumbnail-camera">
                 <div ref={ elementRef } className={ 'camera-frame' } />
-                <div className="d-flex align-items-end h-100 pb-2">
-                    <button className="btn btn-sm btn-danger w-100 mb-1 me-2" onClick={ onClose }>{ LocalizeText('cancel') }</button>
-                    <button className="btn btn-sm btn-success w-100 mb-1" onClick={ takePicture }>{ LocalizeText('navigator.thumbeditor.save') }</button>
+                <div className="camera-buttons">
+                    <button className="btn btn-sm btn-danger flex-grow-1" onClick={ onClose }>{ LocalizeText('cancel') }</button>
+                    <button className="btn btn-sm btn-success flex-grow-1" onClick={ takePicture }>{ LocalizeText('navigator.thumbeditor.save') }</button>
                 </div>
             </div>
         </DraggableWindow>

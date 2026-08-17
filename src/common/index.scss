@@ -45,6 +45,7 @@
 }
 
 .nitro-room-thumbnail-camera {
+    position: relative;
     width: 132px;
     height: 192px;
     background-image: url('@/assets/images/room-widgets/thumbnail-widget/thumbnail-camera-spritesheet.png');
@@ -55,6 +56,24 @@
         height: 110px;
         margin-top: 30px;
         margin-left: 3px;
+    }
+
+    .camera-buttons {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        display: flex;
+        gap: 4px;
+
+        button {
+            padding: 2px 4px;
+            font-size: 11px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 }
 
