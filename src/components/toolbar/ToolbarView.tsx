@@ -1,6 +1,6 @@
-import { Dispose, DropBounce, EaseOut, JumpBy, Motions, NitroToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait } from '@nitrots/nitro-renderer';
+import { Dispose, DropBounce, EaseOut, ILinkEventTracker, JumpBy, Motions, NitroToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait } from '@nitrots/nitro-renderer';
 import { FC, useState, useRef, useEffect } from 'react';
-import { CreateLinkEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, VisitDesktop } from '../../api';
+import { AddEventLinkTracker, CreateLinkEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, RemoveLinkEventTracker, VisitDesktop } from '../../api';
 import { Base, Flex, LayoutAvatarImageView, LayoutItemCountView, TransitionAnimation, TransitionAnimationTypes } from '../../common';
 import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useRoomEngineEvent, useSessionInfo } from '../../hooks';
 import { ToolbarMeView } from './ToolbarMeView';
@@ -24,6 +24,51 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const [ habbtenConfig, setHabbtenConfig ] = useState<any>((window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig);
     const radioUrl = habbtenConfig?.radio?.url;
     const isGameCenterEnabled = habbtenConfig?.client ? (habbtenConfig.client.toolbar_icons?.game_center === true) : (habbtenConfig?.toolbar_icons?.game_center === true);
+    
+    useEffect(() =>
+    {
+        const linkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) =>
+            {
+                const parts = url.split('/');
+                if(parts.length < 2) return;
+
+                switch(parts[1])
+                {
+                    case 'memenu':
+                    case 'me':
+                    case 'toggle-me':
+                    case 'toggle':
+                        setMeExpanded(prev => !prev);
+                        return;
+                    case 'show-me':
+                    case 'show':
+                    case 'open':
+                        setMeExpanded(true);
+                        return;
+                    case 'hide-me':
+                    case 'hide':
+                    case 'close':
+                        setMeExpanded(false);
+                        return;
+                }
+            },
+            eventUrlPrefix: 'toolbar/'
+        };
+
+        const linkTrackerAlias: ILinkEventTracker = {
+            ...linkTracker,
+            eventUrlPrefix: 'memenu/'
+        };
+
+        AddEventLinkTracker(linkTracker);
+        AddEventLinkTracker(linkTrackerAlias);
+
+        return () => {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(linkTrackerAlias);
+        };
+    }, []);
     
     useEffect(() => {
         const updateConfig = (e?: any) => {
@@ -102,39 +147,8 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
             Motions.runMotion(motion);
         }
 
-    useEffect(() =>
-    {
-        const linkTracker = {
-            linkReceived: (url: string) =>
-            {
-                const parts = url.split('/');
-                if(parts.length < 2) return;
-
-                switch(parts[1])
-                {
-                    case 'memenu':
-                    case 'me':
-                    case 'toggle-me':
-                        setMeExpanded(prev => !prev);
-                        return;
-                    case 'show-me':
-                        setMeExpanded(true);
-                        return;
-                    case 'hide-me':
-                        setMeExpanded(false);
-                        return;
-                }
-            },
-            eventUrlPrefix: 'toolbar/'
-        };
-
-        AddEventLinkTracker(linkTracker);
-
-        return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
-
-    animationIconToToolbar('icon-inventory', event.image, event.x, event.y);
-});
+        animationIconToToolbar('icon-inventory', event.image, event.x, event.y);
+    });
 
     return (
         <>
