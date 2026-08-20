@@ -23,9 +23,24 @@ export const AchievementsCategoryListItemView: FC<AchievementCategoryListItemVie
     return (
         <LayoutGridItem itemActive={ (selectedCategoryCode === category.code) } itemCount={ getTotalUnseen } itemCountMinimum={ 0 } gap={ 1 } onClick={ event => setSelectedCategoryCode(category.code) }>
             <Text fullWidth center small className="pt-1">{ LocalizeText(`quests.${ category.code }.name`) }</Text>
-            <LayoutBackgroundImage position="relative" imageUrl={ getCategoryImage }>
-                <Text fullWidth center position="absolute" variant="white" style={ { fontSize: 12, bottom: 9 } }>{ progress } / { maxProgress }</Text>
-            </LayoutBackgroundImage>
+            <div className="d-flex justify-content-center align-items-center flex-grow-1 w-100 position-relative pb-1">
+                <div
+                    style={ {
+                        width: '68px',
+                        height: '64px',
+                        backgroundImage: `url(${ getCategoryImage })`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        backgroundSize: 'contain',
+                        imageRendering: 'pixelated',
+                        position: 'relative'
+                    } }
+                >
+                    <Text fullWidth center position="absolute" variant="white" style={ { fontSize: 11, bottom: 4, textShadow: '1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000' } }>
+                        { progress } / { maxProgress }
+                    </Text>
+                </div>
+            </div>
         </LayoutGridItem>
     );
 }
