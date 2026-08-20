@@ -1,7 +1,7 @@
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
-import { Base, Button, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { Button, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
 import { useSessionInfo } from '../../hooks';
 
 interface Mission {
@@ -42,18 +42,9 @@ interface ClaimedReward {
     claimed_at: number;
 }
 
-interface RankingUser {
-    id: number;
-    username: string;
-    look: string;
-    level: number;
-    xp: number;
-}
-
 export const BattlePassView: FC<{}> = () =>
 {
     const [ isVisible, setIsVisible ] = useState(false);
-    const [ activeTab, setActiveTab ] = useState<'rewards' | 'missions' | 'ranking'>('rewards');
     const [ selectedCategory, setSelectedCategory ] = useState<number | null>(null);
     const [ loading, setLoading ] = useState(false);
     const [ claiming, setClaiming ] = useState<string | null>(null);
@@ -61,7 +52,7 @@ export const BattlePassView: FC<{}> = () =>
     const [ previewReward, setPreviewReward ] = useState<{ reward: Reward; isVip: boolean } | null>(null);
 
     const { userInfo = null, userFigure = null } = useSessionInfo();
-    const [ timeRemaining, setTimeRemaining ] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' });
+    const [ timeRemaining, setTimeRemaining ] = useState({ days: '11', hours: '00', minutes: '33', seconds: '50' });
     
     const [ bpData, setBpData ] = useState<{
         seasonEnd: number;
@@ -70,15 +61,13 @@ export const BattlePassView: FC<{}> = () =>
         claimedRewards: ClaimedReward[];
         missions: Mission[];
         rewards: Reward[];
-        ranking: RankingUser[];
     }>({
         seasonEnd: 0,
         user: { level: 1, xp: 0, xpNext: 100, rankPosition: 1 },
         isVip: false,
         claimedRewards: [],
         missions: [],
-        rewards: [],
-        ranking: []
+        rewards: []
     });
 
     const updateCountdown = () =>
@@ -115,8 +104,7 @@ export const BattlePassView: FC<{}> = () =>
                     isVip: !!data.isVip,
                     claimedRewards: data.claimedRewards || [],
                     missions: data.missions || [],
-                    rewards: data.rewards || [],
-                    ranking: data.ranking || []
+                    rewards: data.rewards || []
                 });
             }
         }
@@ -165,40 +153,6 @@ export const BattlePassView: FC<{}> = () =>
         {
             console.error('Error claiming reward:', err);
             setStatusMessage({ text: 'Error de conexión al reclamar recompensa.', type: 'danger' });
-        }
-        finally
-        {
-            setClaiming(null);
-        }
-    };
-
-    const handleClaimAll = async () =>
-    {
-        try
-        {
-            setClaiming('all');
-            setStatusMessage(null);
-            const userId = GetSessionDataManager().userId;
-            const res = await fetch('/api/battlepass/claim', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: userId, claim_all: true })
-            });
-            const data = await res.json();
-            if(data.success)
-            {
-                setStatusMessage({ text: data.message || '¡Todas las recompensas disponibles han sido reclamadas!', type: 'success' });
-                fetchData();
-            }
-            else
-            {
-                setStatusMessage({ text: data.error || 'No hay recompensas disponibles para reclamar.', type: 'danger' });
-            }
-        }
-        catch(err)
-        {
-            console.error('Error claiming all rewards:', err);
-            setStatusMessage({ text: 'Error al procesar el reclamo múltiple.', type: 'danger' });
         }
         finally
         {
@@ -259,40 +213,32 @@ export const BattlePassView: FC<{}> = () =>
         return set;
     }, [ bpData.claimedRewards ]);
 
-    // Total claimable rewards count
-    const claimableCount = useMemo(() =>
-    {
-        let count = 0;
-        for(const r of bpData.rewards)
-        {
-            if(bpData.user.level >= r.level_required)
-            {
-                if(!claimedSet.has(`${ r.id }_0`)) count++;
-                if(bpData.isVip && !claimedSet.has(`${ r.id }_1`)) count++;
-            }
-        }
-        return count;
-    }, [ bpData.rewards, bpData.user.level, bpData.isVip, claimedSet ]);
-
     if(!isVisible) return null;
 
     const completedMissions = bpData.missions.filter(m => m.completed);
     const pendingMissions = bpData.missions.filter(m => !m.completed);
+    const quickPending = pendingMissions.slice(0, 2);
 
-    const categoryNames: { [key: number]: string } = {
-        1: 'Principiante',
-        2: 'Diarios',
-        3: 'Semanales',
-        4: 'Especiales'
+    const categoryTitles: { [key: number]: string } = {
+        1: 'PRIMEROS RETOS',
+        2: 'RETOS DIARIOS',
+        3: 'RETOS SEMANALES',
+        4: 'RETOS ESPECIALES',
+        5: 'RETOS COMUNIDAD',
+        6: 'RETOS LEGENDARIOS'
     };
 
-    const getFilteredMissions = () =>
-    {
-        if(selectedCategory === null) return bpData.missions;
-        if(selectedCategory === 4) return bpData.missions.filter(m => m.category === 4 || m.category === 5);
-        return bpData.missions.filter(m => m.category === selectedCategory);
+    const getCategoryMissions = (cat: number) => {
+        if(cat === 4) return bpData.missions.filter(m => m.category === 4 || m.category === 5);
+        return bpData.missions.filter(m => m.category === cat);
     };
 
+    const getCategoryCompleted = (cat: number) => {
+        return getCategoryMissions(cat).filter(m => m.completed).length;
+    };
+
+    const nextReward = bpData.rewards.find(r => r.level_required > bpData.user.level) || bpData.rewards[0];
+    const currentCategoryMissions = selectedCategory !== null ? getCategoryMissions(selectedCategory) : [];
     const xpPercent = Math.min(100, Math.round((bpData.user.xp / (bpData.user.xpNext || 100)) * 100));
 
     const renderRewardIcon = (type: string, imgUrl: string, badgeCode: string, pointType: number = 0, isVip: boolean = false) =>
@@ -315,130 +261,144 @@ export const BattlePassView: FC<{}> = () =>
         }
         if(imgUrl && imgUrl.length > 0)
         {
-            return <img src={ imgUrl } alt="" style={ { maxWidth: '30px', maxHeight: '30px', objectFit: 'contain' } } />;
+            return <img src={ imgUrl } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />;
         }
         return <LayoutCurrencyIcon type={ isVip ? 5 : -1 } />;
     };
 
     return (
         <NitroCardView uniqueKey="battle-pass" className="nitro-battle-pass" theme="primary-slim">
-            <NitroCardHeaderView headerText="PASE DE BATALLA HABBTIEN" onCloseClick={ () => setIsVisible(false) } />
+            <NitroCardHeaderView headerText="PASE DE BATALLA - Llegar al máximo nivel" onCloseClick={ () => setIsVisible(false) } />
             
-            <NitroCardContentView className="p-2 bp-content d-flex flex-column gap-2">
+            <NitroCardContentView className="p-2 bp-container d-flex flex-column gap-2">
                 
-                { /* Top Bar: Profile, Level, XP, Season countdown */ }
-                <div className="bp-hero-card p-2 d-flex align-items-center justify-content-between gap-3">
-                    
-                    { /* Avatar & Level Progress */ }
-                    <div className="d-flex align-items-center gap-2 flex-grow-1 min-w-0">
-                        <div className="bp-avatar-frame">
-                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } scale={ 0.95 } />
+                { /* Top Season Notice Bar */ }
+                <div className="bp-season-banner d-flex align-items-center justify-content-between">
+                    <span className="text-secondary fw-semibold" style={ { fontSize: '11px' } }>
+                        Actualmente nos encontramos en <strong>Capítulo 1, Temporada 1</strong> la experiencia y los premios serán reiniciados en:
+                    </span>
+                    <div className="d-flex align-items-center gap-1.5 flex-shrink-0">
+                        <div className="d-flex flex-column align-items-center">
+                            <span className="bp-countdown-digit">{ timeRemaining.days }</span>
+                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Días</span>
                         </div>
-                        <div className="flex-grow-1 min-w-0" style={ { maxWidth: '340px' } }>
-                            <div className="d-flex align-items-center gap-2 mb-1">
-                                <span className="fw-bold text-dark text-truncate" style={ { fontSize: '13px' } }>
-                                    { userInfo?.username || 'Habbten' }
-                                </span>
-                                <span className="badge bg-primary text-white fw-bold px-2 py-0.5 rounded-pill" style={ { fontSize: '10px' } }>
-                                    Nivel { bpData.user.level }
-                                </span>
-                                { bpData.isVip ? (
-                                    <span className="badge bg-warning text-dark fw-bold px-2 py-0.5 rounded-pill" style={ { fontSize: '10px' } }>
-                                        Pase VIP Activo
-                                    </span>
-                                ) : (
-                                    <span className="badge bg-secondary text-white px-2 py-0.5 rounded-pill" style={ { fontSize: '10px' } }>
-                                        Pase Estándar
-                                    </span>
+                        <span className="fw-bold text-muted" style={ { marginTop: '-8px' } }>:</span>
+                        <div className="d-flex flex-column align-items-center">
+                            <span className="bp-countdown-digit">{ timeRemaining.hours }</span>
+                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Horas</span>
+                        </div>
+                        <span className="fw-bold text-muted" style={ { marginTop: '-8px' } }>:</span>
+                        <div className="d-flex flex-column align-items-center">
+                            <span className="bp-countdown-digit">{ timeRemaining.minutes }</span>
+                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Minutos</span>
+                        </div>
+                    </div>
+                </div>
+
+                { /* Top Section: MI EXPERIENCIA + RETOS POR COMPLETAR */ }
+                <div className="row g-2">
+                    
+                    { /* Left Box: Mi Experiencia */ }
+                    <div className="col-12 col-md-6">
+                        <div className="bp-card-box h-100 d-flex flex-column justify-content-between">
+                            <div className="bp-box-header-title mb-1">
+                                MI EXPERIENCIA
+                            </div>
+                            <div className="d-flex align-items-center justify-content-between gap-2">
+                                
+                                { /* Avatar + Username + XP Progress */ }
+                                <div className="d-flex flex-column gap-1" style={ { minWidth: '155px' } }>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <div className="bp-avatar-circle">
+                                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } scale={ 0.9 } />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="fw-bold text-dark text-truncate" style={ { fontSize: '13px', maxWidth: '95px' } }>
+                                                { userInfo?.username || 'Habbten' }
+                                            </div>
+                                            <span className="badge bg-light text-dark border fw-bold px-2 py-0.5 rounded-pill" style={ { fontSize: '9px' } }>
+                                                NIVEL { bpData.user.level }
+                                            </span>
+                                        </div>
+                                    </div>
+                                    { /* XP Progress bar */ }
+                                    <div className="d-flex align-items-center gap-1 mt-0.5">
+                                        <div className="bp-xp-bar flex-grow-1">
+                                            <div className="bp-xp-fill" style={ { width: `${ xpPercent }%` } } />
+                                            <span className="position-absolute w-100 top-0 text-center text-white fw-bold" style={ { fontSize: '9px', lineHeight: '14px', textShadow: '0 1px 2px rgba(0,0,0,0.8)' } }>
+                                                { bpData.user.xp } / { bpData.user.xpNext || 100 }
+                                            </span>
+                                        </div>
+                                        <span className="badge bg-dark text-white fw-bold px-1.5 py-0.5 rounded-1" style={ { fontSize: '9px' } }>
+                                            { bpData.user.level + 1 }
+                                        </span>
+                                    </div>
+                                </div>
+
+                                { /* Next Reward Box */ }
+                                { nextReward && (
+                                    <div className="d-flex flex-column align-items-center text-center">
+                                        <span className="text-secondary fw-semibold mb-0.5" style={ { fontSize: '9px' } }>Tu próximo premio es:</span>
+                                        <div className="bp-mini-reward">
+                                            <div className="position-relative d-flex align-items-center justify-content-center" style={ { width: 28, height: 28 } }>
+                                                { renderRewardIcon(nextReward.type, nextReward.image, nextReward.badge, nextReward.point_type, false) }
+                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7px', lineHeight: 1 } }>x1</span>
+                                            </div>
+                                            <span className="fw-bold text-dark text-truncate" style={ { fontSize: '10px', maxWidth: '85px' } }>{ nextReward.name }</span>
+                                        </div>
+                                        <div className="d-flex align-items-center gap-1 mt-1 text-success fw-bold" style={ { fontSize: '10px' } }>
+                                            <span>▲▲▲▲▲</span>
+                                        </div>
+                                    </div>
+                                ) }
+
+                                { /* Ranking Star */ }
+                                <div className="d-flex flex-column align-items-center text-center">
+                                    <span className="text-secondary fw-semibold mb-0.5" style={ { fontSize: '9px' } }>Vas en el puesto</span>
+                                    <div className="bp-ranking-star my-0.5">
+                                        { bpData.user.rankPosition || 1 }°
+                                    </div>
+                                    <span className="text-muted" style={ { fontSize: '8px' } }>del ranking</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    { /* Right Box: Retos por completar */ }
+                    <div className="col-12 col-md-6">
+                        <div className="bp-card-box h-100 d-flex flex-column justify-content-between">
+                            <div className="d-flex align-items-center justify-content-between mb-1">
+                                <span className="bp-box-header-title">RETOS POR COMPLETAR ({ pendingMissions.length })</span>
+                                <span className="badge bg-primary text-white" style={ { fontSize: '9px' } }>{ completedMissions.length }/{ bpData.missions.length }</span>
+                            </div>
+                            <div className="d-flex flex-column gap-1 flex-grow-1 justify-content-center">
+                                { quickPending.length > 0 ? quickPending.map(m => (
+                                    <div key={ m.id } className="bp-quick-mission">
+                                        <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                            <div className="p-0.5 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 28, height: 28 } }>
+                                                { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <span>🎯</span> }
+                                            </div>
+                                            <span className="badge bg-danger text-white mt-0.5" style={ { fontSize: '7px', padding: '1px 3px' } }>{ m.progress }/{ m.task }</span>
+                                        </div>
+                                        <div className="flex-grow-1 min-w-0">
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <span className="fw-bold text-dark text-truncate" style={ { fontSize: '10px' } }>{ m.name }</span>
+                                                <span className="badge bg-danger text-white fw-bold px-1 py-0.5 rounded-1" style={ { fontSize: '8px' } }>+{ m.reward_xp } XP</span>
+                                            </div>
+                                            <div className="text-muted text-truncate" style={ { fontSize: '9px' } }>{ m.description }</div>
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <div className="text-center text-muted py-2" style={ { fontSize: '11px' } }>¡Has completado todos los retos activos!</div>
                                 ) }
                             </div>
-                            
-                            { /* XP Bar */ }
-                            <div className="bp-xp-bar-container">
-                                <div className="bp-xp-bar-fill" style={ { width: `${ xpPercent }%` } } />
-                                <span className="position-absolute w-100 top-0 text-center text-white fw-bold" style={ { fontSize: '10px', lineHeight: '16px', textShadow: '0 1px 2px rgba(0,0,0,0.8)' } }>
-                                    { bpData.user.xp } / { bpData.user.xpNext || 100 } XP ({ xpPercent }%)
-                                </span>
-                            </div>
                         </div>
                     </div>
 
-                    { /* Quick Stats & Season Timer */ }
-                    <div className="d-flex align-items-center gap-3 flex-shrink-0">
-                        { /* Rank Position */ }
-                        <div className="d-flex flex-column align-items-center text-center px-2 py-1 bg-light border rounded">
-                            <span className="text-secondary fw-semibold" style={ { fontSize: '9px', textTransform: 'uppercase' } }>Puesto</span>
-                            <span className="fw-bold text-dark" style={ { fontSize: '13px' } }>
-                                #{ bpData.user.rankPosition || 1 }
-                            </span>
-                        </div>
-
-                        { /* Season Countdown */ }
-                        <div className="d-flex flex-column align-items-end">
-                            <span className="text-secondary fw-semibold mb-0.5" style={ { fontSize: '10px' } }>
-                                Temporada 1 finaliza en:
-                            </span>
-                            <div className="d-flex align-items-center gap-1">
-                                <div className="d-flex flex-column align-items-center">
-                                    <span className="bp-timer-block">{ timeRemaining.days }</span>
-                                    <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Días</span>
-                                </div>
-                                <span className="fw-bold text-muted" style={ { marginTop: '-8px' } }>:</span>
-                                <div className="d-flex flex-column align-items-center">
-                                    <span className="bp-timer-block">{ timeRemaining.hours }</span>
-                                    <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Horas</span>
-                                </div>
-                                <span className="fw-bold text-muted" style={ { marginTop: '-8px' } }>:</span>
-                                <div className="d-flex flex-column align-items-center">
-                                    <span className="bp-timer-block">{ timeRemaining.minutes }</span>
-                                    <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Min</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                { /* Navigation Tabs */ }
-                <div className="d-flex align-items-center justify-content-between">
-                    <div className="bp-tabs-bar flex-grow-1">
-                        <button 
-                            className={ `bp-tab-btn ${ activeTab === 'rewards' ? 'active' : '' }` }
-                            onClick={ () => setActiveTab('rewards') }>
-                            <span>Pase de Recompensas</span>
-                            { claimableCount > 0 && (
-                                <span className="badge bg-danger text-white rounded-pill px-1.5 py-0.5" style={ { fontSize: '9px' } }>
-                                    { claimableCount }
-                                </span>
-                            ) }
-                        </button>
-                        <button 
-                            className={ `bp-tab-btn ${ activeTab === 'missions' ? 'active' : '' }` }
-                            onClick={ () => setActiveTab('missions') }>
-                            <span>Retos y Misiones</span>
-                            <span className="badge bg-secondary text-white rounded-pill px-1.5 py-0.5" style={ { fontSize: '9px' } }>
-                                { pendingMissions.length }
-                            </span>
-                        </button>
-                        <button 
-                            className={ `bp-tab-btn ${ activeTab === 'ranking' ? 'active' : '' }` }
-                            onClick={ () => setActiveTab('ranking') }>
-                            <span>Clasificación</span>
-                        </button>
-                    </div>
-
-                    { activeTab === 'rewards' && claimableCount > 0 && (
-                        <Button 
-                            variant="success" 
-                            size="sm" 
-                            disabled={ claiming === 'all' }
-                            onClick={ handleClaimAll }
-                            className="px-3 py-1 fw-bold shadow-xs">
-                            { claiming === 'all' ? 'Reclamando...' : `Reclamar Todo (${ claimableCount })` }
-                        </Button>
-                    ) }
-                </div>
-
-                { /* Status Notification Banner */ }
+                { /* Status message */ }
                 { statusMessage && (
                     <div className={ `alert alert-${ statusMessage.type } py-1 px-3 mb-0 d-flex align-items-center justify-content-between rounded` } style={ { fontSize: '11px' } }>
                         <span>{ statusMessage.text }</span>
@@ -446,286 +406,282 @@ export const BattlePassView: FC<{}> = () =>
                     </div>
                 ) }
 
-                { /* Tab 1: Rewards Track */ }
-                { activeTab === 'rewards' && (
-                    <div className="bp-track-wrapper flex-grow-1 d-flex flex-column">
-                        { /* Track Legend */ }
-                        <div className="d-flex align-items-center justify-content-between px-3 py-1.5 bg-light border-bottom">
-                            <div className="d-flex align-items-center gap-3">
-                                <div className="d-flex align-items-center gap-1.5">
-                                    <div className="rounded" style={ { width: 12, height: 12, background: '#2563eb' } } />
-                                    <span className="fw-bold text-dark" style={ { fontSize: '11px' } }>Pase Gratuito</span>
-                                </div>
-                                <div className="d-flex align-items-center gap-1.5">
-                                    <div className="rounded" style={ { width: 12, height: 12, background: '#f59e0b' } } />
-                                    <span className="fw-bold text-dark" style={ { fontSize: '11px' } }>Pase VIP (Oro)</span>
-                                </div>
+                { /* Main Body: PREMIOS Vertical Track (Left) + RETOS (Right) */ }
+                <div className="d-flex gap-2 flex-grow-1 bp-bottom-section">
+                    
+                    { /* Left Column: Premios Track */ }
+                    <div className="bp-rewards-column bp-card-box">
+                        <div className="d-flex align-items-center justify-content-between pb-1 border-bottom mb-1">
+                            <span className="bp-box-header-title">PREMIOS</span>
+                            <div className="d-flex gap-3">
+                                <span className="text-primary fw-bold" style={ { fontSize: '9px' } }>GRATIS</span>
+                                <span className="text-warning fw-bold" style={ { fontSize: '9px' } }>VIP</span>
                             </div>
-                            <span className="text-secondary" style={ { fontSize: '11px' } }>
-                                Sube de nivel completando retos para desbloquear cada premio.
-                            </span>
                         </div>
+                        
+                        <div className="bp-rewards-scroll-track flex-grow-1">
+                            { /* Connecting background line */ }
+                            <div className="bp-vertical-line" />
 
-                        { /* Horizontal Scrollable Progression Grid */ }
-                        <div className="bp-track-scroll flex-grow-1">
-                            { bpData.rewards.map(reward => {
-                                const isUnlocked = bpData.user.level >= reward.level_required;
-                                const isFreeClaimed = claimedSet.has(`${ reward.id }_0`);
-                                const isVipClaimed = claimedSet.has(`${ reward.id }_1`);
-                                const isFreeClaimable = isUnlocked && !isFreeClaimed;
-                                const isVipClaimable = isUnlocked && bpData.isVip && !isVipClaimed;
+                            <div className="d-flex flex-column position-relative">
+                                { bpData.rewards.map(r => {
+                                    const isUnlocked = bpData.user.level >= r.level_required;
+                                    const isFreeClaimed = claimedSet.has(`${ r.id }_0`);
+                                    const isVipClaimed = claimedSet.has(`${ r.id }_1`);
+                                    const isFreeClaimable = isUnlocked && !isFreeClaimed;
+                                    const isVipClaimable = isUnlocked && bpData.isVip && !isVipClaimed;
+                                    const isCurrentLevel = bpData.user.level === r.level_required;
 
-                                return (
-                                    <div key={ reward.id } className="bp-tier-column">
-                                        
-                                        { /* Free Track Card (Top) */ }
-                                        <div 
-                                            className={ `bp-reward-card ${ isFreeClaimed ? 'claimed' : (isFreeClaimable ? 'claimable' : (isUnlocked ? 'unlocked' : 'locked')) }` }
-                                            onClick={ () => setPreviewReward({ reward, isVip: false }) }
-                                            title={ `${ reward.name } (Clic para ver detalles)` }>
-                                            <div className="d-flex align-items-center justify-content-between w-100">
-                                                <span className="badge bg-primary text-white" style={ { fontSize: '8px', padding: '2px 4px' } }>GRATIS</span>
-                                                { reward.amount && reward.amount > 1 ? (
-                                                    <span className="badge bg-secondary text-white" style={ { fontSize: '8px' } }>x{ reward.amount }</span>
-                                                ) : null }
-                                            </div>
+                                    return (
+                                        <div key={ r.id } className="bp-level-row">
                                             
-                                            <div className="bp-reward-icon-box my-1">
-                                                { renderRewardIcon(reward.type, reward.image, reward.badge, reward.point_type, false) }
-                                            </div>
-                                            
-                                            <span className="fw-bold text-dark text-truncate text-center w-100" style={ { fontSize: '10px', lineHeight: 1.2 } }>
-                                                { reward.name }
-                                            </span>
-
-                                            <div className="mt-1 w-100">
-                                                { isFreeClaimed ? (
-                                                    <span className="badge bg-secondary text-white w-100 py-1" style={ { fontSize: '9px' } }>Reclamado</span>
-                                                ) : isFreeClaimable ? (
-                                                    <Button 
-                                                        variant="success" 
-                                                        size="sm" 
-                                                        disabled={ claiming === `${ reward.id }_0` }
-                                                        onClick={ (e) => { e.stopPropagation(); handleClaimReward(reward.id, false); } }
-                                                        className="w-100 py-0.5 fw-bold" 
-                                                        style={ { fontSize: '9px' } }>
-                                                        { claiming === `${ reward.id }_0` ? '...' : 'Reclamar' }
-                                                    </Button>
-                                                ) : (
-                                                    <span className="badge bg-light text-muted border w-100 py-1" style={ { fontSize: '8px' } }>Bloqueado</span>
-                                                ) }
-                                            </div>
-                                        </div>
-
-                                        { /* Level Milestone Node (Center) */ }
-                                        <div className={ `bp-tier-indicator ${ bpData.user.level === reward.level_required ? 'current' : (isUnlocked ? 'reached' : '') }` }>
-                                            { reward.level_required }
-                                        </div>
-
-                                        { /* VIP Track Card (Bottom) */ }
-                                        <div 
-                                            className={ `bp-reward-card vip-card ${ isVipClaimed ? 'claimed' : (isVipClaimable ? 'claimable' : (isUnlocked ? 'unlocked' : 'locked')) }` }
-                                            onClick={ () => setPreviewReward({ reward, isVip: true }) }
-                                            title={ `${ reward.name_vip || reward.name } (Pase VIP)` }>
-                                            <div className="d-flex align-items-center justify-content-between w-100">
-                                                <span className="badge bg-warning text-dark fw-bold" style={ { fontSize: '8px', padding: '2px 4px' } }>VIP</span>
-                                                { reward.amount_vip && reward.amount_vip > 1 ? (
-                                                    <span className="badge bg-dark text-warning" style={ { fontSize: '8px' } }>x{ reward.amount_vip }</span>
-                                                ) : null }
-                                            </div>
-                                            
-                                            <div className="bp-reward-icon-box my-1">
-                                                { renderRewardIcon(reward.type_vip || reward.type, reward.image_vip, reward.badge_vip, reward.point_type_vip, true) }
-                                            </div>
-                                            
-                                            <span className="fw-bold text-dark text-truncate text-center w-100" style={ { fontSize: '10px', lineHeight: 1.2 } }>
-                                                { reward.name_vip || reward.name }
-                                            </span>
-
-                                            <div className="mt-1 w-100">
-                                                { isVipClaimed ? (
-                                                    <span className="badge bg-secondary text-white w-100 py-1" style={ { fontSize: '9px' } }>Reclamado</span>
-                                                ) : isVipClaimable ? (
-                                                    <Button 
-                                                        variant="warning" 
-                                                        size="sm" 
-                                                        disabled={ claiming === `${ reward.id }_1` }
-                                                        onClick={ (e) => { e.stopPropagation(); handleClaimReward(reward.id, true); } }
-                                                        className="w-100 py-0.5 fw-bold text-dark" 
-                                                        style={ { fontSize: '9px' } }>
-                                                        { claiming === `${ reward.id }_1` ? '...' : 'Reclamar VIP' }
-                                                    </Button>
-                                                ) : (
-                                                    <span className="badge bg-light text-muted border w-100 py-1" style={ { fontSize: '8px' } }>
-                                                        { !bpData.isVip ? 'VIP Requerido' : 'Bloqueado' }
-                                                    </span>
-                                                ) }
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                );
-                            }) }
-                        </div>
-                    </div>
-                ) }
-
-                { /* Tab 2: Missions & Quests */ }
-                { activeTab === 'missions' && (
-                    <div className="p-2.5 bg-white border rounded flex-grow-1 d-flex flex-column gap-2 overflow-hidden">
-                        { /* Category Filter Pills */ }
-                        <div className="d-flex align-items-center gap-2 flex-wrap pb-1 border-bottom">
-                            <button 
-                                className={ `bp-mission-filter-btn ${ selectedCategory === null ? 'active' : '' }` }
-                                onClick={ () => setSelectedCategory(null) }>
-                                Todos ({ bpData.missions.length })
-                            </button>
-                            <button 
-                                className={ `bp-mission-filter-btn ${ selectedCategory === 1 ? 'active' : '' }` }
-                                onClick={ () => setSelectedCategory(1) }>
-                                Principiante
-                            </button>
-                            <button 
-                                className={ `bp-mission-filter-btn ${ selectedCategory === 2 ? 'active' : '' }` }
-                                onClick={ () => setSelectedCategory(2) }>
-                                Diarios
-                            </button>
-                            <button 
-                                className={ `bp-mission-filter-btn ${ selectedCategory === 3 ? 'active' : '' }` }
-                                onClick={ () => setSelectedCategory(3) }>
-                                Semanales
-                            </button>
-                            <button 
-                                className={ `bp-mission-filter-btn ${ selectedCategory === 4 ? 'active' : '' }` }
-                                onClick={ () => setSelectedCategory(4) }>
-                                Especiales
-                            </button>
-                        </div>
-
-                        { /* Missions Grid / List */ }
-                        <div className="overflow-auto pe-1 flex-grow-1 d-flex flex-column gap-2" style={ { maxHeight: '350px' } }>
-                            { getFilteredMissions().length > 0 ? getFilteredMissions().map(mission => (
-                                <div key={ mission.id } className={ `bp-mission-card ${ mission.completed ? 'completed' : '' }` }>
-                                    <div className="bp-mission-icon-box">
-                                        { mission.image && mission.image.length > 0 ? (
-                                            <img src={ mission.image } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />
-                                        ) : (
-                                            <span style={ { fontSize: '16px' } }>🎯</span>
-                                        ) }
-                                    </div>
-
-                                    <div className="flex-grow-1 min-w-0">
-                                        <div className="d-flex align-items-center justify-content-between mb-0.5">
-                                            <div className="d-flex align-items-center gap-2">
-                                                <span className="fw-bold text-dark" style={ { fontSize: '12px' } }>{ mission.name }</span>
-                                                <span className="badge bg-light text-secondary border" style={ { fontSize: '9px' } }>
-                                                    { categoryNames[mission.category] || 'Misión' }
+                                            { /* Free Reward Box (Left) */ }
+                                            <div 
+                                                className={ `bp-square-box ${ isFreeClaimed ? 'claimed' : (isFreeClaimable ? 'claimable' : (isUnlocked ? 'unlocked' : '')) }` }
+                                                onClick={ () => {
+                                                    if(isFreeClaimable) handleClaimReward(r.id, false);
+                                                    else setPreviewReward({ reward: r, isVip: false });
+                                                } }
+                                                title={ `${ r.name } ${ isFreeClaimable ? '(¡Clic para reclamar!)' : '' }` }>
+                                                { renderRewardIcon(r.type, r.image, r.badge, r.point_type, false) }
+                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7px', lineHeight: 1 } }>
+                                                    x{ r.amount || 1 }
                                                 </span>
+                                                { isFreeClaimed && (
+                                                    <span className="badge bg-success text-white position-absolute top-0 start-0 p-0.5" style={ { fontSize: '6px' } }>✓</span>
+                                                ) }
                                             </div>
-                                            <span className="badge bg-danger text-white fw-bold px-2 py-0.5" style={ { fontSize: '10px' } }>
-                                                +{ mission.reward_xp } XP
-                                            </span>
-                                        </div>
 
-                                        <div className="text-secondary text-truncate mb-1" style={ { fontSize: '11px' } }>
-                                            { mission.description }
-                                        </div>
+                                            { /* Level Node in Center */ }
+                                            { isCurrentLevel ? (
+                                                <div className="bp-level-node current-node" title={ `Nivel Actual: ${ r.level_required }` }>
+                                                    <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } scale={ 0.65 } />
+                                                </div>
+                                            ) : (
+                                                <div className={ `bp-level-node ${ isUnlocked ? 'reached' : '' }` }>
+                                                    { r.level_required }
+                                                </div>
+                                            ) }
 
-                                        <div className="d-flex align-items-center gap-2">
-                                            <div className="progress flex-grow-1" style={ { height: '8px', backgroundColor: '#e2e8f0' } }>
-                                                <div 
-                                                    className={ `progress-bar ${ mission.completed ? 'bg-success' : 'bg-primary' }` }
-                                                    style={ { width: `${ Math.min(100, Math.round((mission.progress / mission.task) * 100)) }%` } }
-                                                />
+                                            { /* VIP Reward Box (Right) */ }
+                                            <div 
+                                                className={ `bp-square-box vip-square ${ isVipClaimed ? 'claimed' : (isVipClaimable ? 'claimable' : (isUnlocked ? 'unlocked' : '')) }` }
+                                                onClick={ () => {
+                                                    if(isVipClaimable) handleClaimReward(r.id, true);
+                                                    else setPreviewReward({ reward: r, isVip: true });
+                                                } }
+                                                title={ `${ r.name_vip || r.name } ${ isVipClaimable ? '(¡Clic para reclamar VIP!)' : '' }` }>
+                                                { renderRewardIcon(r.type_vip || r.type, r.image_vip, r.badge_vip, r.point_type_vip, true) }
+                                                <span className="badge bg-warning text-dark position-absolute top-0 end-0 p-0.5 fw-bold" style={ { fontSize: '6px', lineHeight: 1 } }>VIP</span>
+                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7px', lineHeight: 1 } }>
+                                                    x{ r.amount_vip || 1 }
+                                                </span>
+                                                { !isUnlocked && (
+                                                    <span className="position-absolute bottom-0 start-0 p-0.5" style={ { fontSize: '8px' } }>🔒</span>
+                                                ) }
+                                                { isVipClaimed && (
+                                                    <span className="badge bg-success text-white position-absolute top-0 start-0 p-0.5" style={ { fontSize: '6px' } }>✓</span>
+                                                ) }
                                             </div>
-                                            <span className="text-muted fw-bold" style={ { fontSize: '10px', minWidth: '40px', textAlign: 'right' } }>
-                                                { mission.progress } / { mission.task }
-                                            </span>
+
+                                        </div>
+                                    );
+                                }) }
+                            </div>
+                        </div>
+                    </div>
+
+                    { /* Right Column: Retos Area */ }
+                    <div className="bp-challenges-column bp-card-box">
+                        
+                        { selectedCategory === null ? (
+                            <>
+                                { /* Header: Retos Info */ }
+                                <div className="d-flex align-items-center gap-2 pb-1.5 mb-1.5 border-bottom">
+                                    <span style={ { fontSize: '20px' } }>🏆</span>
+                                    <div>
+                                        <div className="fw-bold text-dark" style={ { fontSize: '12px' } }>Retos</div>
+                                        <div className="text-muted" style={ { fontSize: '10px' } }>Aquí encontrarás todo tipo de retos ¡cuantos más te pases más rápido subirás de nivel!</div>
+                                    </div>
+                                </div>
+
+                                { /* 2x3 Grid of Category Cards */ }
+                                <div className="row g-2 flex-grow-1">
+                                    
+                                    { /* Card 1: Primeros Retos */ }
+                                    <div className="col-6">
+                                        <div onClick={ () => setSelectedCategory(1) } className="bp-category-card h-100">
+                                            <div className="d-flex gap-2">
+                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                    <div className="bp-category-icon-box">📋</div>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(1) }/{ getCategoryMissions(1).length || 6 }</span>
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <span className="fw-bold text-dark text-xs d-block">PRIMEROS RETOS</span>
+                                                    <span className="text-muted" style={ { fontSize: '9px', lineHeight: 1.2 } }>
+                                                        Estas recompensas son para aquellos usuarios nuevos, te ayudarán a familiarizarte con este juego.
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    { mission.completed && (
-                                        <span className="badge bg-success text-white px-2 py-1 rounded" style={ { fontSize: '10px' } }>
-                                            Completada
-                                        </span>
-                                    ) }
-                                </div>
-                            )) : (
-                                <div className="text-center text-muted py-4" style={ { fontSize: '12px' } }>
-                                    No hay misiones disponibles en esta categoría.
-                                </div>
-                            ) }
-                        </div>
-                    </div>
-                ) }
-
-                { /* Tab 3: Ranking */ }
-                { activeTab === 'ranking' && (
-                    <div className="p-2.5 bg-white border rounded flex-grow-1 d-flex flex-column gap-2 overflow-hidden">
-                        <div className="d-flex align-items-center justify-content-between pb-1 border-bottom">
-                            <div>
-                                <span className="fw-bold text-dark d-block" style={ { fontSize: '13px' } }>Tabla de Clasificación Habbten</span>
-                                <span className="text-secondary" style={ { fontSize: '11px' } }>Los usuarios con mayor nivel y experiencia del Pase de Batalla</span>
-                            </div>
-                            <span className="badge bg-primary text-white px-2 py-1">Top 10 Hotel</span>
-                        </div>
-
-                        <div className="overflow-auto flex-grow-1" style={ { maxHeight: '350px' } }>
-                            <table className="bp-ranking-table">
-                                <thead>
-                                    <tr>
-                                        <th style={ { width: '60px' } }>Puesto</th>
-                                        <th>Usuario</th>
-                                        <th style={ { width: '120px' } }>Nivel</th>
-                                        <th style={ { width: '120px' } }>Experiencia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    { bpData.ranking && bpData.ranking.length > 0 ? bpData.ranking.map((user, index) => {
-                                        const isCurrentUser = userInfo?.username === user.username;
-                                        return (
-                                            <tr key={ user.id } className={ isCurrentUser ? 'current-user-row' : '' }>
-                                                <td>
-                                                    <span className={ `badge ${ index === 0 ? 'bg-warning text-dark' : (index === 1 ? 'bg-secondary text-white' : (index === 2 ? 'bg-danger text-white' : 'bg-light text-dark border')) } fw-bold px-2 py-1` } style={ { fontSize: '11px' } }>
-                                                        { index + 1 }º
+                                    { /* Card 2: Retos Legendarios */ }
+                                    <div className="col-6">
+                                        <div onClick={ () => setSelectedCategory(6) } className="bp-category-card h-100">
+                                            <div className="d-flex gap-2">
+                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                    <div className="bp-category-icon-box">🏅</div>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(6) }/{ getCategoryMissions(6).length || 10 }</span>
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <span className="fw-bold text-dark text-xs d-block">RETOS LEGENDARIOS</span>
+                                                    <span className="text-muted" style={ { fontSize: '9px', lineHeight: 1.2 } }>
+                                                        Estos retos son una verdadera leyenda en Habbten, subirás de nivel muy rápido si los desbloqueas todos.
                                                     </span>
-                                                </td>
-                                                <td>
-                                                    <div className="d-flex align-items-center gap-2">
-                                                        <div className="bp-avatar-frame" style={ { width: 32, height: 32 } }>
-                                                            <LayoutAvatarImageView figure={ user.look || '' } direction={ 2 } headOnly={ true } scale={ 0.8 } />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    { /* Card 3: Retos Diarios */ }
+                                    <div className="col-6">
+                                        <div onClick={ () => setSelectedCategory(2) } className="bp-category-card h-100">
+                                            <div className="d-flex gap-2">
+                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                    <div className="bp-category-icon-box">📅</div>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length || 10 }</span>
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="d-flex align-items-center justify-content-between">
+                                                        <span className="fw-bold text-dark text-xs">RETOS DIARIOS</span>
+                                                        <div className="d-flex align-items-center gap-0.5 bg-dark text-white px-1 py-0.5 rounded font-monospace fw-bold" style={ { fontSize: '8px' } }>
+                                                            <span>{ timeRemaining.hours }</span>:<span>{ timeRemaining.minutes }</span>:<span>{ timeRemaining.seconds }</span>
                                                         </div>
-                                                        <span className="fw-bold text-dark" style={ { fontSize: '12px' } }>{ user.username }</span>
-                                                        { isCurrentUser && <span className="badge bg-primary text-white" style={ { fontSize: '9px' } }>Tú</span> }
                                                     </div>
-                                                </td>
-                                                <td>
-                                                    <span className="badge bg-primary text-white fw-bold px-2 py-1" style={ { fontSize: '11px' } }>
-                                                        Nivel { user.level }
+                                                    <span className="text-muted" style={ { fontSize: '9px', lineHeight: 1.2 } }>
+                                                        Estos retos aparecerán cada 24h en el hotel ¡cúmplelos cada día! Son muy sencillos.
                                                     </span>
-                                                </td>
-                                                <td>
-                                                    <span className="fw-bold text-secondary" style={ { fontSize: '11px' } }>
-                                                        { user.xp } XP
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    { /* Card 4: Retos Comunidad / Rol */ }
+                                    <div className="col-6">
+                                        <div onClick={ () => setSelectedCategory(5) } className="bp-category-card h-100">
+                                            <div className="d-flex gap-2">
+                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                    <div className="bp-category-icon-box">🛡️</div>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(5) }/{ getCategoryMissions(5).length || 8 }</span>
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <span className="fw-bold text-dark text-xs d-block">RETOS COMUNIDAD</span>
+                                                    <span className="text-muted" style={ { fontSize: '9px', lineHeight: 1.2 } }>
+                                                        Desafíos especiales de salas, interacción social, amistades y eventos de Habbten.
                                                     </span>
-                                                </td>
-                                            </tr>
-                                        );
-                                    }) : (
-                                        <tr>
-                                            <td colSpan={ 4 } className="text-center text-muted py-4">No hay datos de clasificación disponibles aún.</td>
-                                        </tr>
-                                    ) }
-                                </tbody>
-                            </table>
-                        </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    { /* Card 5: Retos Semanales */ }
+                                    <div className="col-6">
+                                        <div onClick={ () => setSelectedCategory(3) } className="bp-category-card h-100">
+                                            <div className="d-flex gap-2">
+                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                    <div className="bp-category-icon-box">⭐</div>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length || 7 }</span>
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="d-flex align-items-center justify-content-between">
+                                                        <span className="fw-bold text-dark text-xs">RETOS SEMANALES</span>
+                                                        <div className="d-flex align-items-center gap-0.5 bg-dark text-white px-1 py-0.5 rounded font-monospace fw-bold" style={ { fontSize: '8px' } }>
+                                                            <span>{ timeRemaining.days }d</span> <span>{ timeRemaining.hours }h</span>
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-muted" style={ { fontSize: '9px', lineHeight: 1.2 } }>
+                                                        Estos retos aparecerán cada 7 días en el hotel ¡requieren más dedicación pero dan más experiencia!
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    { /* Card 6: Retos Especiales */ }
+                                    <div className="col-6">
+                                        <div onClick={ () => setSelectedCategory(4) } className="bp-category-card h-100">
+                                            <div className="d-flex gap-2">
+                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                    <div className="bp-category-icon-box">🎮</div>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(4) }/{ getCategoryMissions(4).length || 6 }</span>
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <span className="fw-bold text-dark text-xs d-block">RETOS ESPECIALES</span>
+                                                    <span className="text-muted" style={ { fontSize: '9px', lineHeight: 1.2 } }>
+                                                        Estos retos aparecen y desaparecen de la nada ¡son temporales y raros! ¡Estate muy atento!
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                { /* Header with Back Button */ }
+                                <div className="d-flex align-items-center justify-content-between pb-1.5 mb-1.5 border-bottom">
+                                    <div className="d-flex align-items-center gap-2">
+                                        <Button size="sm" variant="secondary" onClick={ () => setSelectedCategory(null) } className="py-0.5 px-2 text-xs">
+                                            « Volver
+                                        </Button>
+                                        <span className="fw-bold text-dark text-sm">{ categoryTitles[selectedCategory] || 'Retos' }</span>
+                                    </div>
+                                    <span className="badge bg-primary text-white">
+                                        { getCategoryCompleted(selectedCategory) } / { currentCategoryMissions.length } Completados
+                                    </span>
+                                </div>
+
+                                { /* Challenges List */ }
+                                <div className="overflow-auto pe-1 flex-grow-1 d-flex flex-column gap-1.5" style={ { maxHeight: '275px' } }>
+                                    { currentCategoryMissions.map(m => (
+                                        <div key={ m.id } className={ `bp-mission-row ${ m.completed ? 'completed' : '' }` }>
+                                            <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 34, height: 34 } }>
+                                                    { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <span>🎯</span> }
+                                                </div>
+                                                <span className="badge bg-danger text-white mt-0.5" style={ { fontSize: '8px' } }>{ m.progress }/{ m.task }</span>
+                                            </div>
+                                            <div className="flex-grow-1 min-w-0">
+                                                <div className="d-flex align-items-center justify-content-between">
+                                                    <span className="fw-bold text-dark text-truncate text-xs">{ m.name }</span>
+                                                    <span className="badge bg-danger text-white fw-bold px-1.5 py-0.5 rounded-1" style={ { fontSize: '9px' } }>
+                                                        +{ m.reward_xp } XP
+                                                    </span>
+                                                </div>
+                                                <div className="text-muted text-truncate" style={ { fontSize: '10px' } }>{ m.description }</div>
+                                                <div className="progress mt-1" style={ { height: '8px', backgroundColor: '#e2e8f0' } }>
+                                                    <div 
+                                                        className={ `progress-bar ${ m.completed ? 'bg-success' : 'bg-primary' }` } 
+                                                        style={ { width: `${ Math.min(100, Math.round((m.progress / m.task) * 100)) }%` } }
+                                                    />
+                                                </div>
+                                            </div>
+                                            { m.completed && <span className="badge bg-success text-white flex-shrink-0" style={ { fontSize: '9px' } }>✓ Hecho</span> }
+                                        </div>
+                                    )) }
+                                </div>
+                            </>
+                        ) }
                     </div>
-                ) }
+
+                </div>
 
                 { /* Reward Preview Detail Modal */ }
                 { previewReward && (
-                    <div className="bp-preview-modal-backdrop" onClick={ () => setPreviewReward(null) }>
-                        <div className="bp-preview-modal" onClick={ (e) => e.stopPropagation() }>
+                    <div className="bp-modal-backdrop" onClick={ () => setPreviewReward(null) }>
+                        <div className="bp-preview-dialog" onClick={ (e) => e.stopPropagation() }>
                             <div className="d-flex align-items-center justify-content-between w-100 mb-2">
                                 <span className={ `badge ${ previewReward.isVip ? 'bg-warning text-dark' : 'bg-primary text-white' } fw-bold` }>
                                     { previewReward.isVip ? 'Pase VIP' : 'Pase Gratuito' } • Nivel { previewReward.reward.level_required }
@@ -733,7 +689,7 @@ export const BattlePassView: FC<{}> = () =>
                                 <button type="button" className="btn-close" style={ { fontSize: '10px' } } onClick={ () => setPreviewReward(null) } />
                             </div>
 
-                            <div className="bp-reward-icon-box my-2" style={ { width: 64, height: 64 } }>
+                            <div className="bp-square-box my-2" style={ { width: 56, height: 56 } }>
                                 { renderRewardIcon(
                                     previewReward.isVip ? (previewReward.reward.type_vip || previewReward.reward.type) : previewReward.reward.type,
                                     previewReward.isVip ? previewReward.reward.image_vip : previewReward.reward.image,
@@ -743,17 +699,17 @@ export const BattlePassView: FC<{}> = () =>
                                 ) }
                             </div>
 
-                            <span className="fw-bold text-dark mb-1" style={ { fontSize: '14px' } }>
+                            <span className="fw-bold text-dark mb-1" style={ { fontSize: '13px' } }>
                                 { previewReward.isVip ? (previewReward.reward.name_vip || previewReward.reward.name) : previewReward.reward.name }
                             </span>
 
                             <span className="text-muted mb-3" style={ { fontSize: '11px' } }>
                                 { previewReward.isVip 
-                                    ? 'Recompensa especial exclusiva para miembros VIP de Habbten.' 
-                                    : 'Recompensa desbloqueable para todos los usuarios de Habbten.' }
+                                    ? 'Recompensa exclusiva del Pase VIP de Habbten.' 
+                                    : 'Recompensa desbloqueable para todos los usuarios.' }
                             </span>
 
-                            { /* Claim button in modal */ }
+                            { /* Claim button */ }
                             { (() => {
                                 const isUnlocked = bpData.user.level >= previewReward.reward.level_required;
                                 const isClaimed = claimedSet.has(`${ previewReward.reward.id }_${ previewReward.isVip ? 1 : 0 }`);
@@ -761,7 +717,7 @@ export const BattlePassView: FC<{}> = () =>
 
                                 if(isClaimed)
                                 {
-                                    return <span className="badge bg-secondary text-white py-2 px-4 w-100" style={ { fontSize: '11px' } }>Recompensa ya reclamada</span>;
+                                    return <span className="badge bg-secondary text-white py-1.5 px-3 w-100" style={ { fontSize: '11px' } }>Recompensa ya reclamada</span>;
                                 }
                                 if(canClaim)
                                 {
@@ -777,8 +733,8 @@ export const BattlePassView: FC<{}> = () =>
                                     );
                                 }
                                 return (
-                                    <span className="badge bg-light text-muted border py-2 px-4 w-100" style={ { fontSize: '11px' } }>
-                                        { !isUnlocked ? `Requiere Nivel ${ previewReward.reward.level_required }` : 'Requiere Membresía VIP' }
+                                    <span className="badge bg-light text-muted border py-1.5 px-3 w-100" style={ { fontSize: '11px' } }>
+                                        { !isUnlocked ? `Requiere Nivel ${ previewReward.reward.level_required }` : 'Requiere Pase VIP' }
                                     </span>
                                 );
                             })() }
