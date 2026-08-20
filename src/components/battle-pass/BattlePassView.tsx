@@ -1,7 +1,7 @@
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
-import { Base, Button, Column, Flex, LayoutAvatarImageView, LayoutProgressBar, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
+import { Base, Button, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, LayoutProgressBar, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
 import { useSessionInfo } from '../../hooks';
 
 interface Mission {
@@ -36,6 +36,7 @@ export const BattlePassView: FC<{}> = props =>
     const [ selectedCategory, setSelectedCategory ] = useState<number | null>(null);
     const [ loading, setLoading ] = useState(false);
     const { userInfo = null, userFigure = null } = useSessionInfo();
+    const [ timeRemaining, setTimeRemaining ] = useState({ days: '10', hours: '23', minutes: '29' });
     const [ bpData, setBpData ] = useState<{
         seasonEnd: number;
         user: { level: number; xp: number; xpNext: number };
@@ -48,11 +49,27 @@ export const BattlePassView: FC<{}> = props =>
         rewards: []
     });
 
+    const updateCountdown = () =>
+    {
+        const now = new Date();
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
+        const diffMs = Math.max(0, nextMonth.getTime() - now.getTime());
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        setTimeRemaining({
+            days: String(days).padStart(2, '0'),
+            hours: String(hours).padStart(2, '0'),
+            minutes: String(minutes).padStart(2, '0')
+        });
+    };
+
     const fetchData = async () =>
     {
         try
         {
             setLoading(true);
+            updateCountdown();
             const userId = GetSessionDataManager().userId;
             const res = await fetch(`/api/battlepass/data?user_id=${ userId }`);
             const data = await res.json();
@@ -140,6 +157,16 @@ export const BattlePassView: FC<{}> = props =>
 
     const xpPercent = Math.min(100, Math.round((bpData.user.xp / (bpData.user.xpNext || 100)) * 100));
 
+    const renderRewardItem = (imgUrl: string, badgeCode: string, name: string) => {
+        if(badgeCode && badgeCode.length > 0 && badgeCode !== 'BR058') {
+            return <LayoutBadgeImageView badgeCode={ badgeCode } isGroup={ false } />;
+        }
+        if(imgUrl && imgUrl.length > 0) {
+            return <img src={ imgUrl } alt={ name } style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } />;
+        }
+        return <LayoutCurrencyIcon type={ -1 } />;
+    };
+
     return (
         <NitroCardView uniqueKey="battle-pass" className="nitro-battle-pass" theme="primary-slim" style={ { width: '750px', maxWidth: '96vw', minHeight: '520px' } }>
             <NitroCardHeaderView headerText="PASE DE BATALLA - Llegar al máximo nivel" onCloseClick={ () => setIsVisible(false) } />
@@ -147,12 +174,31 @@ export const BattlePassView: FC<{}> = props =>
             <NitroCardContentView className="p-3" style={ { backgroundColor: '#ededed', color: '#333' } } gap={ 2 }>
                 
                 { /* Top Bar: Temporada y Cuenta Regresiva */ }
-                <div className="d-flex align-items-center justify-content-between px-3 py-1 bg-white border rounded shadow-sm text-xs">
-                    <span className="text-secondary fw-semibold">
-                        Actualmente nos encontramos en <strong>Temporada 1</strong>, la experiencia y los premios se reiniciarán en:
+                <div className="d-flex align-items-center justify-content-between px-3 py-1.5 bg-white border rounded shadow-sm">
+                    <span className="text-secondary fw-semibold text-xs">
+                        Actualmente nos encontramos en <strong>Capítulo 1</strong>, la experiencia y los premios se reiniciarán en:
                     </span>
-                    <div className="d-flex align-items-center gap-1 bg-dark text-white px-2 py-0.5 rounded font-monospace fw-bold" style={ { letterSpacing: '1px' } }>
-                        <span>11</span>:<span>00</span>:<span>33</span>
+                    <div className="d-flex align-items-center gap-1">
+                        <div className="d-flex flex-column align-items-center">
+                            <div className="bg-dark text-white fw-bold px-2 py-1 rounded font-monospace" style={ { minWidth: '32px', textAlign: 'center', fontSize: '13px', background: '#181818', border: '1px solid #333', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)' } }>
+                                { timeRemaining.days }
+                            </div>
+                            <span style={ { fontSize: '8px', color: '#666', marginTop: '1px', fontWeight: 600 } }>Días</span>
+                        </div>
+                        <span className="fw-bold text-muted mb-2">:</span>
+                        <div className="d-flex flex-column align-items-center">
+                            <div className="bg-dark text-white fw-bold px-2 py-1 rounded font-monospace" style={ { minWidth: '32px', textAlign: 'center', fontSize: '13px', background: '#181818', border: '1px solid #333', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)' } }>
+                                { timeRemaining.hours }
+                            </div>
+                            <span style={ { fontSize: '8px', color: '#666', marginTop: '1px', fontWeight: 600 } }>Horas</span>
+                        </div>
+                        <span className="fw-bold text-muted mb-2">:</span>
+                        <div className="d-flex flex-column align-items-center">
+                            <div className="bg-dark text-white fw-bold px-2 py-1 rounded font-monospace" style={ { minWidth: '32px', textAlign: 'center', fontSize: '13px', background: '#181818', border: '1px solid #333', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)' } }>
+                                { timeRemaining.minutes }
+                            </div>
+                            <span style={ { fontSize: '8px', color: '#666', marginTop: '1px', fontWeight: 600 } }>Minutos</span>
+                        </div>
                     </div>
                 </div>
 
@@ -194,7 +240,9 @@ export const BattlePassView: FC<{}> = props =>
                                 <div className="d-flex align-items-center justify-content-between mt-2 pt-1 border-top text-xs">
                                     <span className="text-muted" style={ { fontSize: '11px' } }>Próximo premio:</span>
                                     <div className="d-flex align-items-center gap-1.5 bg-light px-2 py-0.5 border rounded">
-                                        <img src={ nextReward.image } alt="" style={ { width: 18, height: 18, objectFit: 'contain' } } />
+                                        <div style={ { width: 18, height: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+                                            { renderRewardItem(nextReward.image, nextReward.badge, nextReward.name) }
+                                        </div>
                                         <span className="fw-bold text-dark" style={ { fontSize: '11px' } }>{ nextReward.name }</span>
                                     </div>
                                 </div>
@@ -237,7 +285,7 @@ export const BattlePassView: FC<{}> = props =>
                     <div className="col-12 col-md-4">
                         <div className="p-2 bg-white border rounded shadow-sm h-100 d-flex flex-column">
                             <div className="d-flex align-items-center justify-content-between text-uppercase text-secondary fw-bold pb-1 border-bottom mb-1" style={ { fontSize: '10px', letterSpacing: '0.5px' } }>
-                                <span>Premios (Free)</span>
+                                <span>GRATIS</span>
                                 <span>VIP</span>
                             </div>
                             <div className="overflow-auto pe-1 flex-grow-1" style={ { maxHeight: '255px' } }>
@@ -251,7 +299,9 @@ export const BattlePassView: FC<{}> = props =>
                                                     className={ `p-1 rounded border d-flex align-items-center justify-content-center position-relative ${ isUnlocked ? 'bg-white border-success' : 'bg-white border-secondary-subtle' }` }
                                                     style={ { width: 40, height: 40 } }
                                                     title={ r.name }>
-                                                    <img src={ r.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } />
+                                                    <div style={ { width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+                                                        { renderRewardItem(r.image, r.badge, r.name) }
+                                                    </div>
                                                     <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '8px', lineHeight: 1 } }>x1</span>
                                                 </div>
 
@@ -265,7 +315,9 @@ export const BattlePassView: FC<{}> = props =>
                                                     className={ `p-1 rounded border d-flex align-items-center justify-content-center position-relative ${ isUnlocked ? 'bg-warning-subtle border-warning' : 'bg-white border-secondary-subtle opacity-75' }` }
                                                     style={ { width: 40, height: 40 } }
                                                     title={ r.name_vip }>
-                                                    <img src={ r.image_vip } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } />
+                                                    <div style={ { width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+                                                        { renderRewardItem(r.image_vip, r.badge_vip, r.name_vip) }
+                                                    </div>
                                                     <span className="badge bg-warning text-dark position-absolute top-0 end-0 p-0.5" style={ { fontSize: '7px', lineHeight: 1 } }>VIP</span>
                                                 </div>
                                             </div>
@@ -286,8 +338,8 @@ export const BattlePassView: FC<{}> = props =>
                                     <div className="d-flex align-items-center gap-2 pb-2 mb-2 border-bottom">
                                         <div className="badge bg-warning text-dark p-2 rounded-circle">🏆</div>
                                         <div>
-                                            <div className="fw-bold text-dark text-sm">Categorías de Retos</div>
-                                            <div className="text-muted text-xs">Cumple retos para subir de nivel y desbloquear recompensas.</div>
+                                            <div className="fw-bold text-dark text-sm">Retos</div>
+                                            <div className="text-muted text-xs">Aquí encontrarás todo tipo de retos ¡cuantos más te pases más rápido subirás de nivel!</div>
                                         </div>
                                     </div>
 
