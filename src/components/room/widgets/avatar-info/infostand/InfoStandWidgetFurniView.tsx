@@ -431,10 +431,11 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                                 <Column gap={ 1 }>
                                     { customKeys.map((key, index) =>
                                     {
+                                        const label = key === 'internalLink' ? 'Enlace:' : key;
                                         return (
-                                            <Flex key={ index } alignItems="center" gap={ 1 }>
-                                                <Text small wrap align="end" variant="white" className="col-4">{ key }</Text>
-                                                <input type="text" className="form-control form-control-sm" value={ customValues[index] } onChange={ event => onCustomVariableChange(index, event.target.value) }/>
+                                            <Flex key={ index } alignItems="center" gap={ 1 } className="w-100">
+                                                <Text small variant="white" className="text-nowrap" style={ { minWidth: '50px' } }>{ label }</Text>
+                                                <input type="text" className="form-control form-control-sm flex-grow-1" value={ customValues[index] } onChange={ event => onCustomVariableChange(index, event.target.value) }/>
                                             </Flex>);
                                     }) }
                                 </Column>

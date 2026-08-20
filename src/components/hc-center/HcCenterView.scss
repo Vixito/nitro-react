@@ -3,13 +3,15 @@
     resize: none;
 
     .hc-logo {
-        width: 213px;
+        width: 257px;
         height: 37px;
         background-image: url('@/assets/images/hc-center/hc_logo.gif');
+        background-repeat: no-repeat;
     }
 
     .payday-special {
-        height: 128px;
+        min-height: 150px;
+        height: 150px;
     }
 
     .payday {

@@ -13,6 +13,30 @@ interface ModToolsUserViewProps
     onCloseClick: () => void;
 }
 
+const USER_INFO_FALLBACKS: Record<string, string> = {
+    'modtools.userinfo.userName': 'Nombre de usuario',
+    'modtools.userinfo.cfhCount': 'Peticiones de ayuda (CFH)',
+    'modtools.userinfo.abusiveCfhCount': 'Peticiones CFH abusivas',
+    'modtools.userinfo.cautionCount': 'Advertencias recibidas',
+    'modtools.userinfo.banCount': 'Baneos recibidos',
+    'modtools.userinfo.lastSanctionTime': 'Última sanción',
+    'modtools.userinfo.tradingLockCount': 'Bloqueos de trade',
+    'modtools.userinfo.tradingExpiryDate': 'Exp. bloqueo trade',
+    'modtools.userinfo.minutesSinceLastLogin': 'Última conexión',
+    'modtools.userinfo.lastPurchaseDate': 'Última compra',
+    'modtools.userinfo.primaryEmailAddress': 'Correo electrónico',
+    'modtools.userinfo.identityRelatedBanCount': 'Baneos por IP/ID',
+    'modtools.userinfo.registrationAgeInMinutes': 'Fecha de registro',
+    'modtools.userinfo.userClassification': 'Clasificación de usuario'
+};
+
+const getPropertyLabel = (key: string) =>
+{
+    const localized = LocalizeText(key);
+    if(localized && (localized !== key)) return localized;
+    return USER_INFO_FALLBACKS[key] || key;
+};
+
 export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
 {
     const { onCloseClick = null, userId = null } = props;
@@ -49,7 +73,7 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
             },
             {
                 localeKey: 'modtools.userinfo.lastSanctionTime',
-                value: userInfo.lastSanctionTime
+                value: userInfo.lastSanctionTime || 'Ninguna'
             },
             {
                 localeKey: 'modtools.userinfo.tradingLockCount',
@@ -57,7 +81,7 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
             },
             {
                 localeKey: 'modtools.userinfo.tradingExpiryDate',
-                value: userInfo.tradingExpiryDate
+                value: userInfo.tradingExpiryDate || 'Ninguna'
             },
             {
                 localeKey: 'modtools.userinfo.minutesSinceLastLogin',
@@ -65,11 +89,11 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
             },
             {
                 localeKey: 'modtools.userinfo.lastPurchaseDate',
-                value: userInfo.lastPurchaseDate
+                value: userInfo.lastPurchaseDate || 'Ninguna'
             },
             {
                 localeKey: 'modtools.userinfo.primaryEmailAddress',
-                value: userInfo.primaryEmailAddress
+                value: userInfo.primaryEmailAddress || 'No disponible'
             },
             {
                 localeKey: 'modtools.userinfo.identityRelatedBanCount',
@@ -81,7 +105,7 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
             },
             {
                 localeKey: 'modtools.userinfo.userClassification',
-                value: userInfo.userClassification
+                value: userInfo.userClassification || 'Normal'
             }
         ];
     }, [ userInfo ]);
@@ -102,10 +126,12 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
 
     if(!userInfo) return null;
 
+    const titleText = `Información del usuario: ${ userInfo.userName }`;
+
     return (
         <>
             <NitroCardView className="nitro-mod-tools-user" theme="primary-slim" windowPosition={ DraggableWindowPosition.TOP_LEFT }>
-                <NitroCardHeaderView headerText={ LocalizeText('modtools.userinfo.title', [ 'username' ], [ userInfo.userName ]) } onCloseClick={ () => onCloseClick() } />
+                <NitroCardHeaderView headerText={ titleText } onCloseClick={ () => onCloseClick() } />
                 <NitroCardContentView className="text-black">
                     <Grid overflow="hidden">
                         <Column size={ 8 } overflow="auto">
@@ -116,7 +142,7 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
 
                                         return (
                                             <tr key={ index }>
-                                                <th scope="row">{ LocalizeText(property.localeKey) }</th>
+                                                <th scope="row">{ getPropertyLabel(property.localeKey) }</th>
                                                 <td>
                                                     { property.value }
                                                     { property.showOnline &&
@@ -130,16 +156,16 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
                         </Column>
                         <Column size={ 4 } gap={ 1 }>
                             <Button onClick={ event => CreateLinkEvent(`mod-tools/open-user-chatlog/${ userId }`) }>
-                                Room Chat
+                                Chat de Salas
                             </Button>
                             <Button onClick={ event => setSendMessageVisible(!sendMessageVisible) }>
-                                Send Message
+                                Enviar Mensaje
                             </Button>
                             <Button onClick={ event => setRoomVisitsVisible(!roomVisitsVisible) }>
-                                Room Visits
+                                Visitas a Salas
                             </Button>
                             <Button onClick={ event => setModActionVisible(!modActionVisible) }>
-                                Mod Action
+                                Acción de Moderación
                             </Button>
                         </Column>
                     </Grid>

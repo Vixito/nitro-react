@@ -35,19 +35,30 @@ export const App: FC<{}> = props =>
                 // Fetch dynamic client configuration from CMS
                 const loadHabbtenConfig = () => {
                     fetch('/game/api/client_config.json')
-                        .then(res => res.json())
+                        .then(res => {
+                            if (!res.ok) return null;
+                            const ct = res.headers.get('content-type');
+                            if (ct && ct.includes('application/json')) return res.json();
+                            return null;
+                        })
                         .then(data => {
+                            if (!data) return;
                             (window as any).HabbtenConfig = data;
                             window.dispatchEvent(new CustomEvent('habbten-config-updated', { detail: data }));
                         })
-                        .catch(err => console.error('Failed to load Habbten config', err));
+                        .catch(() => {});
                 };
                 loadHabbtenConfig();
                 setInterval(loadHabbtenConfig, 5000);
 
                 // Fetch dynamic chat bubbles
                 fetch('/api/chat-bubbles')
-                    .then(res => res.json())
+                    .then(res => {
+                        if (!res.ok) return null;
+                        const ct = res.headers.get('content-type');
+                        if (ct && ct.includes('application/json')) return res.json();
+                        return null;
+                    })
                     .then(data => {
                         if (data && data.success && data.bubbles) {
                             const existingStyles = NitroConfiguration.getValue<any[]>('chat.styles') || [];

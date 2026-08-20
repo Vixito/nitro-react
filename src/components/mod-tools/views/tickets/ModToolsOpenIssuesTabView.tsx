@@ -1,4 +1,4 @@
-import { IssueMessageData, PickIssuesMessageComposer } from '@nitrots/nitro-renderer';
+import { FriendlyTime, IssueMessageData, PickIssuesMessageComposer } from '@nitrots/nitro-renderer';
 import { FC } from 'react';
 import { SendMessageComposer } from '../../../../api';
 import { Base, Button, Column, Grid } from '../../../../common';
@@ -16,9 +16,9 @@ export const ModToolsOpenIssuesTabView: FC<ModToolsOpenIssuesTabViewProps> = pro
         <Column gap={ 0 } overflow="hidden">
             <Column gap={ 2 }>
                 <Grid gap={ 1 } className="text-black fw-bold border-bottom pb-1">
-                    <Base className="g-col-2">Type</Base>
-                    <Base className="g-col-3">Room/Player</Base>
-                    <Base className="g-col-4">Opened</Base>
+                    <Base className="g-col-2">Tipo</Base>
+                    <Base className="g-col-3">Sala / Usuario</Base>
+                    <Base className="g-col-4">Tiempo</Base>
                     <Base className="g-col-3"></Base>
                 </Grid>
             </Column>
@@ -29,9 +29,9 @@ export const ModToolsOpenIssuesTabView: FC<ModToolsOpenIssuesTabViewProps> = pro
                         <Grid key={ issue.issueId } gap={ 1 } alignItems="center" className="text-black py-1 border-bottom">
                             <Base className="g-col-2">{ issue.categoryId }</Base>
                             <Base className="g-col-3">{ issue.reportedUserName }</Base>
-                            <Base className="g-col-4">{ new Date(Date.now() - issue.issueAgeInMilliseconds).toLocaleTimeString() }</Base>
+                            <Base className="g-col-4">{ FriendlyTime.format(issue.issueAgeInMilliseconds / 1000, '.ago', 2) }</Base>
                             <Base className="g-col-3">
-                                <Button variant="success" onClick={ event => SendMessageComposer(new PickIssuesMessageComposer([ issue.issueId ], false, 0, 'pick issue button')) }>Pick Issue</Button>
+                                <Button variant="success" onClick={ event => SendMessageComposer(new PickIssuesMessageComposer([ issue.issueId ], false, 0, 'pick issue button')) }>Atender</Button>
                             </Base>
                         </Grid>
                     );

@@ -1,50 +1,70 @@
-# Nitro React v2.1
+# Nitro React (Habbten Client)
 
-## Prerequisites
+Cliente web moderno para Habbten basado en React, TypeScript y Nitro Renderer.
 
--   [Git](https://git-scm.com/)
--   [NodeJS](https://nodejs.org/) >= 18
-    - If using NodeJS < 18 remove `--openssl-legacy-provider` from the package.json scripts
--   [Yarn](https://yarnpkg.com/) `npm i yarn -g`
+---
 
-## Installation
+## 🛠️ Guía de Personalización: Vistas, Diseños, Textos y Páginas
 
--   First you should open terminal and navigate to the folder where you want to clone Nitro
--   Clone Nitro
-    -   `git clone https://git.krews.org/nitro/nitro-react.git`
--   Install the dependencies
-    -   `yarn install`
-    -   This may take some time, please be patient
--   Rename a few files
-    -   Rename `public/renderer-config.json.example` to `public/renderer-config.json`
-    -   Rename `public/ui-config.json.example` to `public/ui-config.json`
--   Set your links
-    -   Open `public/renderer-config.json`
-        -   Update `socket.url, asset.url, image.library.url, & hof.furni.url`
-    -   Open `public/ui-config.json`
-        -   Update `camera.url, thumbnails.url, url.prefix, habbopages.url`
-    -   You can override any variable by passing it to `NitroConfig` in the index.html
+Esta sección documenta dónde y cómo modificar cada capa del cliente de juego.
 
-## Usage
+### 1. Vistas y Componentes del Juego (React / TypeScript)
+Todas las interfaces del cliente están estructuradas como componentes de React en `src/components/`:
+- **Catálogo:** `src/components/catalog/`
+- **Inventario:** `src/components/inventory/`
+- **Navegador de Salas:** `src/components/navigator/`
+- **Perfil de Usuario:** `src/components/user-profile/`
+- **Logros y Placas:** `src/components/achievements/`
+- **Centro HC (Habbten Club):** `src/components/hc-center/`
+- **Infostand (Widgets de sala/furnis):** `src/components/room/widgets/avatar-info/`
+- **Chat y Consola:** `src/components/chat/`, `src/components/friends/`
+- **Herramientas de Moderación:** `src/components/mod-tools/`
 
--   To use Nitro you need `.nitro` assets generated, see [nitro-converter](https://git.krews.org/nitro/nitro-converter) for instructions
--   See [Morningstar Websockets](https://git.krews.org/nitro/ms-websockets) for instructions on configuring websockets on your server
+Cada componente cuenta con su archivo de estilos SCSS asociado o estilos globales en `src/assets/styles/`.
 
-### Development
+---
 
-Run Nitro in development mode when you are editing the files, this way you can see the changes in your browser instantly
+### 2. Textos, Traducciones y Mensajes del Juego (Gamedata)
+Los textos del juego se cargan a través del endpoint dinámico del CMS que fusiona los diccionarios estáticos con las anulaciones en base de datos:
+- **Diccionarios Estáticos:**
+  - `nitro/nitro-assets/gamedata/UITexts.json`: Textos de interfaz, botones, descripciones de logros y recompensas.
+  - `nitro/nitro-assets/gamedata/ExternalTexts.json`: Textos generales de la flash interface original de Habbo.
+- **Anulaciones desde Base de Datos (Housekeeping):**
+  - Tabla `cms_external_texts` en MySQL o desde el panel de Housekeeping en la sección *"Textos y traducciones"*.
+- **Endpoint del CMS:**
+  - `http://127.0.0.1:8083/game/api/external_texts.json`
 
+---
+
+### 3. Nombres, Descripciones y Propiedades de Furnis
+- **Definición de Furnis:** `nitro/nitro-assets/gamedata/FurnitureData.json`
+- Contiene los nombres, descripciones y tipos de interacción de todos los ítems de sala (`roomitemtypes`) y pared (`wallitemtypes`).
+
+---
+
+### 4. Páginas de Ayuda y Terminales de Información (Nitropedia / HabbtenPages)
+Las páginas internas que se abren mediante `habbtenpages/[ruta]` (o enlaces como `habbopages/[ruta]`, por ejemplo en la Terminal de Información o los botones del Centro HC) se procesan en el backend del CMS:
+- **Archivo de Rutas:** `cms/src/index.js` bajo el endpoint `/habbtenpages/*` y `/habbopages/*`.
+- **Formato Oficial de Nitropedia:**
+  ```text
+  Título de la Ventana|ancho;alto
+  <HTML con contenido y estilos limpios>
+  ```
+  *Nota:* No incluir `<!DOCTYPE html>`, `<html>` o etiquetas `<style>` globales con selectores como `table` o `body`, ya que Nitropedia inyecta el contenido directamente en el DOM de React.
+
+---
+
+## 🚀 Entorno de Desarrollo y Construcción
+
+### Desarrollo (Dev Container / Docker)
+Ejecutar dentro del contenedor de Nitro:
+```bash
+docker exec -it habbten-nitro yarn start
 ```
-yarn start
+
+### Producción
+Para compilar la versión optimizada de producción:
+```bash
+docker exec -it habbten-nitro yarn build:prod
 ```
-
-### Production
-
-To build a production version of Nitro just run the following command
-
-```
-yarn build:prod
-```
-
--   A `dist` folder will be generated, these are the files that must be uploaded to your webserver
--   Consult your CMS documentation for compatibility with Nitro and how to add the production files
+Los archivos generados se ubicarán en `dist/`.

@@ -14,9 +14,9 @@ interface ModToolsTicketsViewProps
 }
 
 const TABS: string[] = [
-    'Open Issues',
-    'My Issues',
-    'Picked Issues'
+    'Tickets Abiertos',
+    'Mis Tickets',
+    'Tickets en Curso'
 ];
 
 export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = props =>
@@ -72,7 +72,7 @@ export const ModToolsTicketsView: FC<ModToolsTicketsViewProps> = props =>
     return (
         <>
             <NitroCardView className="nitro-mod-tools-tickets">
-                <NitroCardHeaderView headerText={ 'Tickets' } onCloseClick={ onCloseClick } />
+                <NitroCardHeaderView headerText={ 'Tickets de Ayuda' } onCloseClick={ onCloseClick } />
                 <NitroCardTabsView>
                     { TABS.map((tab, index) =>
                     {

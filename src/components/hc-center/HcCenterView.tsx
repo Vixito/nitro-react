@@ -113,15 +113,17 @@ export const HcCenterView: FC<{}> = props =>
     if(!isVisible) return null;
 
     const popover = (
-        <Popover id="popover-basic">
+        <Popover id="popover-basic" style={ { zIndex: 1060, maxWidth: '280px' } }>
             <Popover.Body className="text-black py-2 px-3">
-                <h5>{ LocalizeText('hccenter.breakdown.title') }</h5>
-                <div>{ LocalizeText('hccenter.breakdown.creditsspent', [ 'credits' ], [ kickbackData?.totalCreditsSpent.toString() ]) }</div>
-                <div>{ LocalizeText('hccenter.breakdown.paydayfactor.percent', [ 'percent' ], [ (kickbackData?.kickbackPercentage * 100).toString() ]) }</div>
-                <div>{ LocalizeText('hccenter.breakdown.streakbonus', [ 'credits' ], [ kickbackData?.creditRewardForStreakBonus.toString() ]) }</div>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                    <h6 className="mb-0 fw-bold">{ LocalizeText('hccenter.breakdown.title') }</h6>
+                </div>
+                <div className="small">{ LocalizeText('hccenter.breakdown.creditsspent', [ 'credits' ], [ kickbackData?.totalCreditsSpent.toString() ]) }</div>
+                <div className="small">{ LocalizeText('hccenter.breakdown.paydayfactor.percent', [ 'percent' ], [ (kickbackData?.kickbackPercentage * 100).toString() ]) }</div>
+                <div className="small">{ LocalizeText('hccenter.breakdown.streakbonus', [ 'credits' ], [ kickbackData?.creditRewardForStreakBonus.toString() ]) }</div>
                 <hr className="w-100 text-black my-1" />
-                <div>{ LocalizeText('hccenter.breakdown.total', [ 'credits', 'actual' ], [ getHcPaydayAmount(), ((((kickbackData?.kickbackPercentage * kickbackData?.totalCreditsSpent) + kickbackData?.creditRewardForStreakBonus) * 100) / 100).toString() ]) }</div>
-                <div className="btn btn-link text-primary p-0" onClick={ () => CreateLinkEvent('habbopages/' + GetConfiguration('hc.center')['payday.habbopage']) }>
+                <div className="fw-bold small">{ LocalizeText('hccenter.breakdown.total', [ 'credits', 'actual' ], [ getHcPaydayAmount(), ((((kickbackData?.kickbackPercentage * kickbackData?.totalCreditsSpent) + kickbackData?.creditRewardForStreakBonus) * 100) / 100).toString() ]) }</div>
+                <div className="btn btn-link text-primary p-0 small text-decoration-underline mt-1" style={ { cursor: 'pointer' } } onClick={ () => { document.body.click(); CreateLinkEvent('habbopages/' + GetConfiguration('hc.center')['payday.habbopage']); } }>
                     { LocalizeText('hccenter.special.infolink') }
                 </div>
             </Popover.Body>
@@ -157,8 +159,8 @@ export const HcCenterView: FC<{}> = props =>
 
                         <Column className="rounded-start bg-primary p-2 payday-special mb-1">
                             <h4 className="mb-1">{ LocalizeText('hccenter.special.title') }</h4>
-                            <div>{ LocalizeText('hccenter.special.info') }</div>
-                            <div className="btn btn-link text-white p-0 mt-auto align-self-baseline" onClick={ () => CreateLinkEvent('habbopages/' + GetConfiguration('hc.center')['payday.habbopage']) }>{ LocalizeText('hccenter.special.infolink') }</div>
+                            <div className="small mb-1">{ LocalizeText('hccenter.special.info') }</div>
+                            <div className="btn btn-link text-white p-0 mt-auto align-self-baseline text-decoration-underline fw-bold" style={ { zIndex: 4, cursor: 'pointer' } } onClick={ () => CreateLinkEvent('habbopages/' + GetConfiguration('hc.center')['payday.habbopage']) }>{ LocalizeText('hccenter.special.infolink') }</div>
                         </Column>
                         <div className="payday flex-shrink-0 p-2">
                             <h5 className="mb-2 ms-2">{ LocalizeText('hccenter.special.time.title') }</h5>
@@ -171,8 +173,8 @@ export const HcCenterView: FC<{}> = props =>
                                     <h5 className="ms-2 mb-1 bolder">{ LocalizeText('hccenter.special.amount.title') }</h5>
                                     <div className="d-flex flex-column">
                                         <div className="w-100 text-center ms-4n">{ getHcPaydayAmount() }</div>
-                                        <OverlayTrigger trigger={ [ 'hover', 'focus' ] } placement="left" overlay={ popover }>
-                                            <div className="btn btn-link align-self-end text-primary">
+                                        <OverlayTrigger trigger="click" rootClose placement="left" overlay={ popover }>
+                                            <div className="btn btn-link align-self-end text-primary fw-bold text-decoration-underline p-0" style={ { cursor: 'pointer' } }>
                                                 { LocalizeText('hccenter.breakdown.infolink') }
                                             </div>
                                         </OverlayTrigger>
