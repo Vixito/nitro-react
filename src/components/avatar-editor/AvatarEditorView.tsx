@@ -159,10 +159,12 @@ export const AvatarEditorView: FC<{}> = props =>
         
                 switch(parts[1])
                 {
+                    case 'open':
                     case 'show':
                         setIsVisible(true);
                         return;
                     case 'hide':
+                    case 'close':
                         setIsVisible(false);
                         return;
                     case 'toggle':
@@ -173,9 +175,18 @@ export const AvatarEditorView: FC<{}> = props =>
             eventUrlPrefix: 'avatar-editor/'
         };
 
-        AddEventLinkTracker(linkTracker);
+        const linkTrackerAlias: ILinkEventTracker = {
+            ...linkTracker,
+            eventUrlPrefix: 'avatareditor/'
+        };
 
-        return () => RemoveLinkEventTracker(linkTracker);
+        AddEventLinkTracker(linkTracker);
+        AddEventLinkTracker(linkTrackerAlias);
+
+        return () => {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(linkTrackerAlias);
+        };
     }, []);
 
     useEffect(() =>

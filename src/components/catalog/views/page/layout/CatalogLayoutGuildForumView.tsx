@@ -32,7 +32,7 @@ export const CatalogLayouGuildForumView: FC<CatalogLayoutProps> = props =>
                     { !!currentOffer &&
                         <>
                             <Column grow gap={ 1 }>
-                                <Text truncate>{ currentOffer.localizationName }</Text>
+                                <Text truncate>{ (currentOffer.localizationName === 'guild_forum' || currentOffer.localizationName === 'Forum Furni') ? 'Terminal de Foro' : currentOffer.localizationName }</Text>
                                 <Base grow>
                                     <CatalogGuildSelectorWidgetView />
                                 </Base>

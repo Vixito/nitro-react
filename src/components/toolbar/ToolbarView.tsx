@@ -102,8 +102,39 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
             Motions.runMotion(motion);
         }
 
-        animationIconToToolbar('icon-inventory', event.image, event.x, event.y);
-    });
+    useEffect(() =>
+    {
+        const linkTracker = {
+            linkReceived: (url: string) =>
+            {
+                const parts = url.split('/');
+                if(parts.length < 2) return;
+
+                switch(parts[1])
+                {
+                    case 'memenu':
+                    case 'me':
+                    case 'toggle-me':
+                        setMeExpanded(prev => !prev);
+                        return;
+                    case 'show-me':
+                        setMeExpanded(true);
+                        return;
+                    case 'hide-me':
+                        setMeExpanded(false);
+                        return;
+                }
+            },
+            eventUrlPrefix: 'toolbar/'
+        };
+
+        AddEventLinkTracker(linkTracker);
+
+        return () => RemoveLinkEventTracker(linkTracker);
+    }, []);
+
+    animationIconToToolbar('icon-inventory', event.image, event.x, event.y);
+});
 
     return (
         <>
