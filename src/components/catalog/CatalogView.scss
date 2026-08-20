@@ -2,6 +2,17 @@
     width: $catalog-width;
     height: $catalog-height;
 
+    a {
+        color: #0284c7 !important;
+        text-decoration: underline !important;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:hover {
+            color: #0369a1 !important;
+        }
+    }
+
     font[size='16'] {
         font-size: 20px;
     }
