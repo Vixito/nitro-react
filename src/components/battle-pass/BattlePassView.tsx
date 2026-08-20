@@ -1,6 +1,7 @@
+import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
-import { AddEventLinkTracker, CreateLinkEvent, GetSessionDataManager, ILinkEventTracker, LocalizeText, RemoveLinkEventTracker } from '../../api';
-import { AutoGrid, Base, Button, Column, Flex, Grid, LayoutBadgeImageView, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, Text } from '../../common';
+import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
+import { Base, Button, Column, Flex, LayoutProgressBar, NitroCardContentView, NitroCardHeaderView, NitroCardSubHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, Text } from '../../common';
 
 interface Mission {
     id: number;
@@ -116,142 +117,111 @@ export const BattlePassView: FC<{}> = props =>
         ? bpData.missions 
         : bpData.missions.filter(m => m.category === missionFilter);
 
-    const xpPercent = Math.min(100, Math.round((bpData.user.xp / (bpData.user.xpNext || 100)) * 100));
+    const completedCount = bpData.missions.filter(m => m.completed).length;
 
     return (
-        <NitroCardView uniqueKey="battle-pass" className="nitro-battle-pass w-[540px] max-w-[95vw] shadow-2xl">
+        <NitroCardView uniqueKey="battle-pass" className="nitro-battle-pass" theme="primary" style={ { width: '520px', minHeight: '440px' } }>
             <NitroCardHeaderView headerText="Pase de Batalla Habbten" onCloseClick={ () => setIsVisible(false) } />
             
-            { /* Header con nivel y progreso de XP */ }
-            <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 p-3 text-white border-b border-indigo-700/50">
-                <div className="flex items-center justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2.5">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center font-black text-lg shadow-lg border border-amber-300">
-                            { bpData.user.level }
-                        </div>
-                        <div>
-                            <div className="font-bold text-sm text-amber-300">Nivel de Temporada { bpData.user.level }</div>
-                            <div className="text-xs text-indigo-200">{ bpData.user.xp } / { bpData.user.xpNext } XP para el siguiente nivel</div>
-                        </div>
+            <NitroCardSubHeaderView className="p-2 align-items-center justify-content-between">
+                <Flex alignItems="center" gap={ 2 } className="w-100">
+                    <div className="badge bg-warning text-dark p-2 fs-6 fw-bold">
+                        Nv. { bpData.user.level }
                     </div>
-                    <div className="text-right">
-                        <span className="text-[11px] bg-indigo-950/80 px-2.5 py-1 rounded-full border border-indigo-500/30 text-indigo-200">
-                            🏆 Temporada Activa
-                        </span>
-                    </div>
-                </div>
-                <div className="w-full bg-indigo-950 rounded-full h-3 overflow-hidden border border-indigo-500/40">
-                    <div 
-                        className="bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 h-full transition-all duration-500 shadow-sm"
-                        style={{ width: `${ xpPercent }%` }}
-                    />
-                </div>
-            </div>
+                    <Column grow gap={ 0 }>
+                        <Flex justifyContent="between" alignItems="center">
+                            <Text bold>Nivel de Temporada { bpData.user.level }</Text>
+                            <span className="badge bg-primary">🏆 Temporada Activa</span>
+                        </Flex>
+                        <LayoutProgressBar 
+                            text={ `${ bpData.user.xp } / ${ bpData.user.xpNext } XP` } 
+                            progress={ bpData.user.xp } 
+                            maxProgress={ bpData.user.xpNext || 100 } 
+                        />
+                    </Column>
+                </Flex>
+            </NitroCardSubHeaderView>
 
             <NitroCardTabsView>
                 <NitroCardTabsItemView isActive={ currentTab === 'missions' } onClick={ () => setCurrentTab('missions') }>
-                    🎯 Misiones ({ bpData.missions.filter(m => m.completed).length }/{ bpData.missions.length })
+                    🎯 Misiones ({ completedCount }/{ bpData.missions.length })
                 </NitroCardTabsItemView>
                 <NitroCardTabsItemView isActive={ currentTab === 'rewards' } onClick={ () => setCurrentTab('rewards') }>
                     🎁 Recompensas de Nivel
                 </NitroCardTabsItemView>
             </NitroCardTabsView>
 
-            <NitroCardContentView className="h-[360px] overflow-y-auto p-3 bg-[#1e293b]/95 text-white">
+            <NitroCardContentView className="p-2" gap={ 1 }>
                 { loading && (
-                    <div className="flex items-center justify-center h-full text-indigo-300 text-sm">
-                        <div className="animate-spin w-5 h-5 border-2 border-indigo-400 border-t-transparent rounded-full mr-2" />
-                        Cargando Pase de Batalla...
-                    </div>
+                    <Flex center className="p-4">
+                        <Text>Cargando información del Pase de Batalla...</Text>
+                    </Flex>
                 ) }
 
                 { !loading && currentTab === 'missions' && (
-                    <div className="space-y-3">
-                        { /* Categorias de misiones */ }
-                        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                            <button 
-                                onClick={ () => setMissionFilter(0) }
-                                className={ `px-2.5 py-1 rounded-lg font-medium transition ${ missionFilter === 0 ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }` }>
+                    <Column gap={ 1 } grow>
+                        <Flex gap={ 1 } className="mb-1">
+                            <Button size="sm" variant={ missionFilter === 0 ? 'primary' : 'secondary' } onClick={ () => setMissionFilter(0) }>
                                 Todas ({ bpData.missions.length })
-                            </button>
-                            <button 
-                                onClick={ () => setMissionFilter(1) }
-                                className={ `px-2.5 py-1 rounded-lg font-medium transition ${ missionFilter === 1 ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }` }>
+                            </Button>
+                            <Button size="sm" variant={ missionFilter === 1 ? 'primary' : 'secondary' } onClick={ () => setMissionFilter(1) }>
                                 Diarias
-                            </button>
-                            <button 
-                                onClick={ () => setMissionFilter(2) }
-                                className={ `px-2.5 py-1 rounded-lg font-medium transition ${ missionFilter === 2 ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }` }>
+                            </Button>
+                            <Button size="sm" variant={ missionFilter === 2 ? 'primary' : 'secondary' } onClick={ () => setMissionFilter(2) }>
                                 Semanales
-                            </button>
-                            <button 
-                                onClick={ () => setMissionFilter(3) }
-                                className={ `px-2.5 py-1 rounded-lg font-medium transition ${ missionFilter === 3 ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700' }` }>
+                            </Button>
+                            <Button size="sm" variant={ missionFilter === 3 ? 'primary' : 'secondary' } onClick={ () => setMissionFilter(3) }>
                                 Especiales
-                            </button>
-                        </div>
+                            </Button>
+                        </Flex>
 
-                        { /* Lista de Misiones */ }
-                        <div className="grid grid-cols-1 gap-2">
-                            { filteredMissions.map(m => {
-                                const progPercent = Math.min(100, Math.round((m.progress / m.task) * 100));
-                                return (
-                                    <div key={ m.id } className={ `p-2.5 rounded-xl border flex items-center gap-3 transition ${ m.completed ? 'bg-emerald-950/40 border-emerald-500/40' : 'bg-slate-800/80 border-slate-700/60 hover:border-indigo-500/50' }` }>
-                                        <div className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center shrink-0 p-1">
-                                            <img src={ m.image } alt="" className="max-w-full max-h-full object-contain" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between gap-2">
-                                                <span className="font-bold text-xs text-slate-100 truncate">{ m.name }</span>
-                                                <span className="text-[11px] font-black text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/30 shrink-0">
-                                                    +{ m.reward_xp } XP
-                                                </span>
-                                            </div>
-                                            <div className="text-[11px] text-slate-400 mt-0.5 truncate">{ m.description }</div>
-                                            <div className="flex items-center gap-2 mt-1.5">
-                                                <div className="flex-1 bg-slate-900 rounded-full h-1.5 overflow-hidden">
-                                                    <div className={ `h-full rounded-full ${ m.completed ? 'bg-emerald-400' : 'bg-indigo-400' }` } style={{ width: `${ progPercent }%` }} />
-                                                </div>
-                                                <span className="text-[10px] font-medium text-slate-400 shrink-0">{ m.progress } / { m.task }</span>
-                                            </div>
-                                        </div>
+                        <Column gap={ 1 } overflow="auto" style={ { maxHeight: '280px' } }>
+                            { filteredMissions.map(m => (
+                                <Flex key={ m.id } alignItems="center" gap={ 2 } className={ "p-2 rounded border " + (m.completed ? "bg-success-subtle border-success" : "bg-light border-muted") }>
+                                    <div style={ { width: 36, height: 36, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' } }>
+                                        <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } />
                                     </div>
-                                );
-                            }) }
-                        </div>
-                    </div>
+                                    <Column grow gap={ 0 }>
+                                        <Flex justifyContent="between" alignItems="center">
+                                            <Text bold>{ m.name }</Text>
+                                            <span className="badge bg-warning text-dark font-bold">+{ m.reward_xp } XP</span>
+                                        </Flex>
+                                        <Text small className="text-muted mb-1">{ m.description }</Text>
+                                        <LayoutProgressBar 
+                                            text={ `${ m.progress } / ${ m.task }` } 
+                                            progress={ m.progress } 
+                                            maxProgress={ m.task } 
+                                        />
+                                    </Column>
+                                    { m.completed && <span className="badge bg-success ms-1">✓</span> }
+                                </Flex>
+                            )) }
+                        </Column>
+                    </Column>
                 ) }
 
                 { !loading && currentTab === 'rewards' && (
-                    <div className="space-y-2.5">
+                    <Column gap={ 1 } overflow="auto" style={ { maxHeight: '310px' } }>
                         { bpData.rewards.map(r => {
                             const isUnlocked = bpData.user.level >= r.level_required;
                             return (
-                                <div key={ r.id } className={ `p-3 rounded-xl border flex items-center justify-between gap-3 ${ isUnlocked ? 'bg-indigo-950/50 border-indigo-500/50' : 'bg-slate-800/60 border-slate-700/50 opacity-75' }` }>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center font-bold text-xs text-amber-400">
+                                <Flex key={ r.id } alignItems="center" justifyContent="between" gap={ 2 } className={ "p-2 rounded border " + (isUnlocked ? "bg-success-subtle border-success" : "bg-light border-muted opacity-75") }>
+                                    <Flex alignItems="center" gap={ 2 }>
+                                        <div className="badge bg-primary fs-6 p-2">
                                             Nv. { r.level_required }
                                         </div>
-                                        <div>
-                                            <div className="text-xs font-bold text-slate-200">Recompensa Gratuita: <span className="text-amber-300">{ r.name }</span></div>
-                                            <div className="text-[11px] text-purple-300 font-medium">Recompensa VIP: <span>{ r.name_vip }</span></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        { isUnlocked ? (
-                                            <span className="text-xs px-2.5 py-1 rounded bg-emerald-900/60 border border-emerald-500/40 text-emerald-300 font-semibold">
-                                                ✓ Desbloqueado
-                                            </span>
-                                        ) : (
-                                            <span className="text-xs px-2.5 py-1 rounded bg-slate-800 border border-slate-600 text-slate-400 font-medium">
-                                                🔒 Requiere Nv. { r.level_required }
-                                            </span>
-                                        ) }
-                                    </div>
-                                </div>
+                                        <Column gap={ 0 }>
+                                            <Text bold>{ r.name } <span className="text-muted">(Pase Gratuito)</span></Text>
+                                            <Text small className="text-primary fw-semibold">{ r.name_vip } <span className="badge bg-warning text-dark">VIP</span></Text>
+                                        </Column>
+                                    </Flex>
+                                    <span className={ "badge " + (isUnlocked ? "bg-success" : "bg-secondary") }>
+                                        { isUnlocked ? "✓ Desbloqueado" : `🔒 Nv. ${ r.level_required }` }
+                                    </span>
+                                </Flex>
                             );
                         }) }
-                    </div>
+                    </Column>
                 ) }
             </NitroCardContentView>
         </NitroCardView>

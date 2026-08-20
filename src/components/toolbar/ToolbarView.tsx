@@ -176,7 +176,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         </Base>
                         { isInRoom &&
                             <Base pointer className="navigation-item icon icon-camera" onClick={ event => CreateLinkEvent('camera/toggle') } /> }
-                        <Base pointer title="Pase de Batalla" className="navigation-item icon icon-campaign" onClick={ event => CreateLinkEvent('battlepass/toggle') } />
                         { isMod &&
                             <Base pointer className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
                         { radioUrl && (

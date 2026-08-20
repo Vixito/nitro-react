@@ -13,6 +13,7 @@ export const LayoutRoomPreviewerView: FC<LayoutRoomPreviewerViewProps> = props =
     const { roomPreviewer = null, height = 0, children = null } = props;
     const [ renderingCanvas, setRenderingCanvas ] = useState<IRoomRenderingCanvas>(null);
     const elementRef = useRef<HTMLDivElement>();
+    const canvasRef = useRef<HTMLCanvasElement>();
 
     const onClick = (event: MouseEvent<HTMLDivElement>) =>
     {
@@ -34,7 +35,29 @@ export const LayoutRoomPreviewerView: FC<LayoutRoomPreviewerViewProps> = props =
 
             if(!renderingCanvas.canvasUpdated) return;
 
-            elementRef.current.style.backgroundImage = `url(${ TextureUtils.generateImageUrl(renderingCanvas.master) })`;
+            if(canvasRef.current)
+            {
+                const source = TextureUtils.generateCanvas(renderingCanvas.master);
+                if(source)
+                {
+                    const dest = canvasRef.current;
+                    if(dest.width !== source.width || dest.height !== source.height)
+                    {
+                        dest.width = source.width;
+                        dest.height = source.height;
+                    }
+                    const ctx = dest.getContext('2d');
+                    if(ctx)
+                    {
+                        ctx.clearRect(0, 0, dest.width, dest.height);
+                        ctx.drawImage(source, 0, 0);
+                    }
+                }
+            }
+            else
+            {
+                elementRef.current.style.backgroundImage = `url(${ TextureUtils.generateImageUrl(renderingCanvas.master) })`;
+            }
         }
 
         if(!renderingCanvas)
@@ -90,7 +113,9 @@ export const LayoutRoomPreviewerView: FC<LayoutRoomPreviewerViewProps> = props =
 
     return (
         <div className="room-preview-container">
-            <div ref={ elementRef } className="room-preview-image" style={ { height } } onClick={ onClick } />
+            <div ref={ elementRef } className="room-preview-image" style={ { height, display: 'flex', alignItems: 'center', justifyContent: 'center' } } onClick={ onClick }>
+                <canvas ref={ canvasRef } style={ { width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none' } } />
+            </div>
             { children }
         </div>
     );
