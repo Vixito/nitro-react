@@ -158,29 +158,29 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
             <Flex alignItems="center" justifyContent="between" gap={ 2 } className="nitro-toolbar py-1 px-3">
                 <Flex gap={ 2 } alignItems="center">
                     <Flex alignItems="center" gap={ 2 }>
-                        <Flex center pointer className={ 'navigation-item item-avatar ' + (isMeExpanded ? 'active ' : '') } onClick={ event => setMeExpanded(!isMeExpanded) }>
+                        <Flex center pointer title="Mi Personaje" className={ 'navigation-item item-avatar ' + (isMeExpanded ? 'active ' : '') } onClick={ event => setMeExpanded(!isMeExpanded) }>
                             <LayoutAvatarImageView figure={ userFigure } direction={ 2 } position="absolute" />
                             { (getTotalUnseen > 0) &&
                                 <LayoutItemCountView count={ getTotalUnseen } /> }
                         </Flex>
                         { isInRoom &&
-                            <Base pointer className="navigation-item icon icon-habbo" onClick={ event => VisitDesktop() } /> }
+                            <Base pointer title="Vista del Hotel" className="navigation-item icon icon-habbo" onClick={ event => VisitDesktop() } /> }
                         { !isInRoom &&
-                            <Base pointer className="navigation-item icon icon-house" onClick={ event => CreateLinkEvent('navigator/goto/home') } /> }
-                        <Base pointer className="navigation-item icon icon-rooms" onClick={ event => CreateLinkEvent('navigator/toggle') } />
-                        { isGameCenterEnabled && <Base pointer className="navigation-item icon icon-game" onClick={ event => CreateLinkEvent('games/toggle') } /> }
-                        <Base pointer className="navigation-item icon icon-catalog" onClick={ event => CreateLinkEvent('catalog/toggle') } />
-                        <Base pointer className="navigation-item icon icon-inventory" onClick={ event => CreateLinkEvent('inventory/toggle') }>
+                            <Base pointer title="Mi Sala" className="navigation-item icon icon-house" onClick={ event => CreateLinkEvent('navigator/goto/home') } /> }
+                        <Base pointer title="Navegador de Salas" className="navigation-item icon icon-rooms" onClick={ event => CreateLinkEvent('navigator/toggle') } />
+                        { isGameCenterEnabled && <Base pointer title="Centro de Juegos" className="navigation-item icon icon-game" onClick={ event => CreateLinkEvent('games/toggle') } /> }
+                        <Base pointer title="Tienda de Habbten" className="navigation-item icon icon-catalog" onClick={ event => CreateLinkEvent('catalog/toggle') } />
+                        <Base pointer title="Inventario" className="navigation-item icon icon-inventory" onClick={ event => CreateLinkEvent('inventory/toggle') }>
                             { (getFullCount > 0) &&
                                 <LayoutItemCountView count={ getFullCount } /> }
                         </Base>
                         { isInRoom &&
-                            <Base pointer className="navigation-item icon icon-camera" onClick={ event => CreateLinkEvent('camera/toggle') } /> }
+                            <Base pointer title="Cámara" className="navigation-item icon icon-camera" onClick={ event => CreateLinkEvent('camera/toggle') } /> }
                         <Base pointer title="Pase de Batalla" className="navigation-item icon icon-battlepass" onClick={ event => CreateLinkEvent('battlepass/toggle') } />
                         { isMod &&
-                            <Base pointer className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
+                            <Base pointer title="Herramientas de Moderación" className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
                         { radioUrl && (
-                            <Flex alignItems="center" gap={ 1 } className="navigation-item" style={{ background: 'rgba(0,0,0,0.6)', padding: '0 8px', borderRadius: '4px', height: '30px' }}>
+                            <Flex alignItems="center" gap={ 1 } title="Radio Habbten" className="navigation-item" style={{ background: 'rgba(0,0,0,0.6)', padding: '0 8px', borderRadius: '4px', height: '30px' }}>
                                 <audio ref={audioRef} preload="none" />
                                 <Base pointer onClick={toggleRadio} className="text-white text-sm font-bold" style={{ whiteSpace: 'nowrap' }}>
                                     {isPlayingRadio ? '⏸ Radio' : '▶ Radio'}
@@ -201,12 +201,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 <Flex alignItems="center" id="toolbar-chat-input-container" />
                 <Flex alignItems="center" gap={ 2 }>
                     <Flex gap={ 2 }>
-                        <Base pointer className="navigation-item icon icon-friendall" onClick={ event => CreateLinkEvent('friends/toggle') }>
+                        <Base pointer title="Amigos" className="navigation-item icon icon-friendall" onClick={ event => CreateLinkEvent('friends/toggle') }>
                             { (requests.length > 0) &&
                                 <LayoutItemCountView count={ requests.length } /> }
                         </Base>
                         { ((iconState === MessengerIconState.SHOW) || (iconState === MessengerIconState.UNREAD)) &&
-                            <Base pointer className={ `navigation-item icon icon-message ${ (iconState === MessengerIconState.UNREAD) && 'is-unseen' }` } onClick={ event => OpenMessengerChat() } /> }
+                            <Base pointer title="Mensajes" className={ `navigation-item icon icon-message ${ (iconState === MessengerIconState.UNREAD) && 'is-unseen' }` } onClick={ event => OpenMessengerChat() } /> }
                     </Flex>
                     <Base id="toolbar-friend-bar-container" className="d-none d-lg-block" />
                 </Flex>
