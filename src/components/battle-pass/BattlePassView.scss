@@ -1,11 +1,11 @@
 .nitro-battle-pass {
-    width: 850px;
+    width: 860px;
     max-width: 96vw;
-    height: 585px;
-    min-height: 550px;
+    height: 590px;
+    min-height: 560px;
 
     .bp-container {
-        background-color: #eef2f6;
+        background-color: #f1f4f8;
         color: #334155;
         font-family: inherit;
         overflow: hidden;
@@ -16,12 +16,12 @@
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
-        padding: 5px 12px;
+        padding: 6px 14px;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
 
     .bp-countdown-digit {
-        min-width: 26px;
+        min-width: 28px;
         text-align: center;
         background: #1e293b;
         color: #ffffff;
@@ -29,7 +29,7 @@
         font-size: 13px;
         border-radius: 4px;
         border: 1px solid #0f172a;
-        padding: 1px 4px;
+        padding: 2px 4px;
         font-family: monospace;
         line-height: 1.2;
     }
@@ -39,12 +39,12 @@
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
-        padding: 8px 10px;
+        padding: 9px 12px;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
 
     .bp-box-header-title {
-        font-size: 9px;
+        font-size: 10px;
         font-weight: 800;
         letter-spacing: 0.6px;
         color: #64748b;
@@ -53,8 +53,8 @@
 
     /* Avatar Frame */
     .bp-avatar-circle {
-        width: 44px;
-        height: 44px;
+        width: 52px;
+        height: 52px;
         border-radius: 50%;
         border: 2px solid #1e293b;
         background: #f1f5f9;
@@ -63,12 +63,12 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
     }
 
     /* XP Bar */
     .bp-xp-bar {
-        height: 14px;
+        height: 16px;
         background-color: #1e293b;
         border-radius: 8px;
         border: 1px solid #0f172a;
@@ -86,28 +86,42 @@
     /* Mini Next Reward Box */
     .bp-mini-reward {
         background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        border: 1px solid #cbd5e1;
         border-radius: 6px;
-        padding: 3px 6px;
+        padding: 4px 8px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     }
 
     /* Star Ranking Badge */
+    .bp-ranking-star-btn {
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+
+        &:hover {
+            transform: scale(1.08);
+        }
+    }
+
     .bp-ranking-star {
-        width: 38px;
-        height: 38px;
-        background: #fbbf24;
-        border: 2px solid #d97706;
+        width: 44px;
+        height: 44px;
+        background: radial-gradient(circle, #fde047 0%, #eab308 70%, #ca8a04 100%);
+        border: 2px solid #a16207;
         border-radius: 50%;
-        color: #78350f;
+        color: #713f12;
         font-weight: 900;
-        font-size: 11px;
+        font-size: 13px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 1px 3px rgba(217, 119, 6, 0.3);
+        box-shadow: 0 2px 5px rgba(202, 138, 4, 0.35);
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
     /* Quick Mission Item */
@@ -115,22 +129,22 @@
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 6px;
-        padding: 4px 8px;
+        padding: 5px 9px;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
     }
 
     /* Bottom Section Layout */
     .bp-bottom-section {
-        min-height: 320px;
+        min-height: 330px;
     }
 
     /* Vertical Rewards Track */
     .bp-rewards-column {
-        width: 295px;
-        min-width: 295px;
-        max-width: 295px;
+        width: 305px;
+        min-width: 305px;
+        max-width: 305px;
         display: flex;
         flex-direction: column;
     }
@@ -138,7 +152,7 @@
     .bp-rewards-scroll-track {
         overflow-y: auto;
         overflow-x: hidden;
-        padding: 8px 6px 12px 6px;
+        padding: 8px 8px 14px 8px;
         position: relative;
 
         &::-webkit-scrollbar {
@@ -160,24 +174,13 @@
     /* Vertical Line running down the center */
     .bp-vertical-line {
         position: absolute;
-        top: 20px;
-        bottom: 20px;
+        top: 24px;
+        bottom: 24px;
         left: 50%;
         width: 3px;
         transform: translateX(-50%);
         background: #cbd5e1;
         z-index: 1;
-    }
-
-    .bp-vertical-line-progress {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        width: 3px;
-        transform: translateX(-50%);
-        background: #22c55e;
-        z-index: 1;
-        transition: height 0.3s ease;
     }
 
     .bp-level-row {
@@ -186,13 +189,13 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     /* Square Reward Box */
     .bp-square-box {
-        width: 44px;
-        height: 44px;
+        width: 48px;
+        height: 48px;
         background: #ffffff;
         border: 1.5px solid #cbd5e1;
         border-radius: 6px;
@@ -202,12 +205,12 @@
         position: relative;
         cursor: pointer;
         transition: all 0.15s ease;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
         &:hover {
-            transform: scale(1.05);
+            transform: scale(1.06);
             border-color: #3b82f6;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
         }
 
         &.unlocked {
@@ -245,8 +248,8 @@
     }
 
     .bp-level-node {
-        width: 32px;
-        height: 32px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
         background: #ffffff;
         border: 2px solid #cbd5e1;
@@ -254,7 +257,7 @@
         align-items: center;
         justify-content: center;
         font-weight: 800;
-        font-size: 11px;
+        font-size: 12px;
         color: #475569;
         z-index: 3;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -269,8 +272,8 @@
             background: #ffffff;
             border-color: #22c55e;
             overflow: hidden;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.35);
         }
     }
@@ -286,7 +289,7 @@
         background: #f8fafc;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
-        padding: 8px 10px;
+        padding: 9px 12px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -303,8 +306,8 @@
     }
 
     .bp-category-icon-box {
-        width: 34px;
-        height: 34px;
+        width: 38px;
+        height: 38px;
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
@@ -319,10 +322,10 @@
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 6px;
-        padding: 8px 10px;
+        padding: 8px 12px;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
 
         &.completed {
             background: #f0fdf4;
@@ -330,33 +333,55 @@
         }
     }
 
-    /* Reward Preview Modal */
+    /* Modal dialogs */
     .bp-modal-backdrop {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(15, 23, 42, 0.45);
+        background: rgba(15, 23, 42, 0.5);
         z-index: 100;
         display: flex;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(1.5px);
+        backdrop-filter: blur(2px);
     }
 
-    .bp-preview-dialog {
+    .bp-dialog {
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 8px;
         padding: 16px;
-        width: 290px;
-        max-width: 92%;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
+    }
+
+    .bp-ranking-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 4px;
+
+        tr {
+            background: #f8fafc;
+            border-radius: 4px;
+
+            &.current-user-row {
+                background: #eff6ff;
+                border: 1px solid #93c5fd;
+            }
+        }
+
+        td, th {
+            padding: 6px 10px;
+            vertical-align: middle;
+            font-size: 11px;
+        }
+
+        th {
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+        }
     }
 }
 

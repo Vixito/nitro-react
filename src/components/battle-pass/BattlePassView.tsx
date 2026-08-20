@@ -42,10 +42,19 @@ interface ClaimedReward {
     claimed_at: number;
 }
 
+interface RankingUser {
+    id: number;
+    username: string;
+    look: string;
+    level: number;
+    xp: number;
+}
+
 export const BattlePassView: FC<{}> = () =>
 {
     const [ isVisible, setIsVisible ] = useState(false);
     const [ selectedCategory, setSelectedCategory ] = useState<number | null>(null);
+    const [ showRankingModal, setShowRankingModal ] = useState(false);
     const [ loading, setLoading ] = useState(false);
     const [ claiming, setClaiming ] = useState<string | null>(null);
     const [ statusMessage, setStatusMessage ] = useState<{ text: string; type: 'success' | 'danger' } | null>(null);
@@ -55,30 +64,46 @@ export const BattlePassView: FC<{}> = () =>
     const [ timeRemaining, setTimeRemaining ] = useState({ days: '11', hours: '00', minutes: '33', seconds: '50' });
     
     const [ bpData, setBpData ] = useState<{
+        chapter: number;
+        season: number;
         seasonEnd: number;
         user: { level: number; xp: number; xpNext: number; rankPosition?: number };
         isVip: boolean;
         claimedRewards: ClaimedReward[];
         missions: Mission[];
         rewards: Reward[];
+        ranking: RankingUser[];
     }>({
+        chapter: 1,
+        season: 1,
         seasonEnd: 0,
         user: { level: 1, xp: 0, xpNext: 100, rankPosition: 1 },
         isVip: false,
         claimedRewards: [],
         missions: [],
-        rewards: []
+        rewards: [],
+        ranking: []
     });
 
     const updateCountdown = () =>
     {
-        const now = new Date();
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
-        const diffMs = Math.max(0, nextMonth.getTime() - now.getTime());
+        const now = Date.now();
+        let targetMs = bpData.seasonEnd ? bpData.seasonEnd * 1000 : 0;
+        
+        if(!targetMs || targetMs <= now)
+        {
+            // Default: 1st day of next month at 00:00:00
+            const nowDate = new Date();
+            const nextMonth = new Date(nowDate.getFullYear(), nowDate.getMonth() + 1, 1, 0, 0, 0);
+            targetMs = nextMonth.getTime();
+        }
+
+        const diffMs = Math.max(0, targetMs - now);
         const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
         const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
         setTimeRemaining({
             days: String(days).padStart(2, '0'),
             hours: String(hours).padStart(2, '0'),
@@ -92,19 +117,21 @@ export const BattlePassView: FC<{}> = () =>
         try
         {
             setLoading(true);
-            updateCountdown();
             const userId = GetSessionDataManager().userId;
             const res = await fetch(`/api/battlepass/data?user_id=${ userId }`);
             const data = await res.json();
             if(data.success)
             {
                 setBpData({
+                    chapter: data.chapter || 1,
+                    season: data.season || 1,
                     seasonEnd: data.seasonEnd || 0,
                     user: data.user || { level: 1, xp: 0, xpNext: 100, rankPosition: 1 },
                     isVip: !!data.isVip,
                     claimedRewards: data.claimedRewards || [],
                     missions: data.missions || [],
-                    rewards: data.rewards || []
+                    rewards: data.rewards || [],
+                    ranking: data.ranking || []
                 });
             }
         }
@@ -198,9 +225,10 @@ export const BattlePassView: FC<{}> = () =>
     useEffect(() =>
     {
         if(!isVisible) return;
+        updateCountdown();
         const timer = setInterval(updateCountdown, 1000);
         return () => clearInterval(timer);
-    }, [ isVisible ]);
+    }, [ isVisible, bpData.seasonEnd ]);
 
     // Claimed set lookup
     const claimedSet = useMemo(() =>
@@ -228,6 +256,15 @@ export const BattlePassView: FC<{}> = () =>
         6: 'RETOS LEGENDARIOS'
     };
 
+    const categoryIcons: { [key: number]: string } = {
+        1: 'https://images.habbo.com/c_images/album1584/ACH_SafetyQuizPassed1.gif',
+        2: 'https://images.habbo.com/c_images/album1584/ACH_Login1.gif',
+        3: 'https://images.habbo.com/c_images/album1584/ACH_AllTimeHotelPresence1.gif',
+        4: 'https://images.habbo.com/c_images/album1584/ACH_GamePlayed1.gif',
+        5: 'https://images.habbo.com/c_images/album1584/ACH_RespectGiven1.gif',
+        6: 'https://images.habbo.com/c_images/album1584/ACH_Graduate1.gif'
+    };
+
     const getCategoryMissions = (cat: number) => {
         if(cat === 4) return bpData.missions.filter(m => m.category === 4 || m.category === 5);
         return bpData.missions.filter(m => m.category === cat);
@@ -243,25 +280,25 @@ export const BattlePassView: FC<{}> = () =>
 
     const renderRewardIcon = (type: string, imgUrl: string, badgeCode: string, pointType: number = 0, isVip: boolean = false) =>
     {
-        if(badgeCode && badgeCode.length > 0 && badgeCode !== 'BR058')
+        if(type === 'badge' || (badgeCode && badgeCode.length > 0 && badgeCode !== 'BR058'))
         {
-            return <LayoutBadgeImageView badgeCode={ badgeCode } isGroup={ false } />;
+            return <LayoutBadgeImageView badgeCode={ badgeCode || 'ACH_BattlePass1' } isGroup={ false } />;
         }
-        if(type === 'points')
-        {
-            return <LayoutCurrencyIcon type={ pointType || 5 } />;
-        }
-        if(type === 'credits')
+        if(type === 'credits' || pointType === -1)
         {
             return <LayoutCurrencyIcon type={ -1 } />;
         }
-        if(type === 'pixels')
+        if(type === 'pixels' || (type === 'points' && pointType === 0))
         {
             return <LayoutCurrencyIcon type={ 0 } />;
         }
+        if(type === 'points' || pointType === 5)
+        {
+            return <LayoutCurrencyIcon type={ 5 } />;
+        }
         if(imgUrl && imgUrl.length > 0)
         {
-            return <img src={ imgUrl } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />;
+            return <img src={ imgUrl } alt="" style={ { maxWidth: '30px', maxHeight: '30px', objectFit: 'contain' } } />;
         }
         return <LayoutCurrencyIcon type={ isVip ? 5 : -1 } />;
     };
@@ -270,27 +307,27 @@ export const BattlePassView: FC<{}> = () =>
         <NitroCardView uniqueKey="battle-pass" className="nitro-battle-pass" theme="primary-slim">
             <NitroCardHeaderView headerText="PASE DE BATALLA - Llegar al máximo nivel" onCloseClick={ () => setIsVisible(false) } />
             
-            <NitroCardContentView className="p-2 bp-container d-flex flex-column gap-2">
+            <NitroCardContentView className="p-2.5 bp-container d-flex flex-column gap-2">
                 
                 { /* Top Season Notice Bar */ }
                 <div className="bp-season-banner d-flex align-items-center justify-content-between">
-                    <span className="text-secondary fw-semibold" style={ { fontSize: '11px' } }>
-                        Actualmente nos encontramos en <strong>Capítulo 1, Temporada 1</strong> la experiencia y los premios serán reiniciados en:
+                    <span className="text-secondary fw-semibold" style={ { fontSize: '11.5px' } }>
+                        Actualmente nos encontramos en <strong>Capítulo { bpData.chapter }</strong>, <strong>Temporada { bpData.season }</strong>. La experiencia y los premios serán reiniciados en:
                     </span>
                     <div className="d-flex align-items-center gap-1.5 flex-shrink-0">
                         <div className="d-flex flex-column align-items-center">
                             <span className="bp-countdown-digit">{ timeRemaining.days }</span>
-                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Días</span>
+                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 700 } }>Días</span>
                         </div>
                         <span className="fw-bold text-muted" style={ { marginTop: '-8px' } }>:</span>
                         <div className="d-flex flex-column align-items-center">
                             <span className="bp-countdown-digit">{ timeRemaining.hours }</span>
-                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Horas</span>
+                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 700 } }>Horas</span>
                         </div>
                         <span className="fw-bold text-muted" style={ { marginTop: '-8px' } }>:</span>
                         <div className="d-flex flex-column align-items-center">
                             <span className="bp-countdown-digit">{ timeRemaining.minutes }</span>
-                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 600 } }>Minutos</span>
+                            <span style={ { fontSize: '8px', color: '#64748b', fontWeight: 700 } }>Minutos</span>
                         </div>
                     </div>
                 </div>
@@ -307,29 +344,29 @@ export const BattlePassView: FC<{}> = () =>
                             <div className="d-flex align-items-center justify-content-between gap-2">
                                 
                                 { /* Avatar + Username + XP Progress */ }
-                                <div className="d-flex flex-column gap-1" style={ { minWidth: '155px' } }>
+                                <div className="d-flex flex-column gap-1.5" style={ { minWidth: '165px' } }>
                                     <div className="d-flex align-items-center gap-2">
                                         <div className="bp-avatar-circle">
-                                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } scale={ 0.9 } />
+                                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } scale={ 1.0 } />
                                         </div>
                                         <div className="min-w-0">
-                                            <div className="fw-bold text-dark text-truncate" style={ { fontSize: '13px', maxWidth: '95px' } }>
+                                            <div className="fw-bold text-dark text-truncate" style={ { fontSize: '13.5px', maxWidth: '100px' } }>
                                                 { userInfo?.username || 'Habbten' }
                                             </div>
-                                            <span className="badge bg-light text-dark border fw-bold px-2 py-0.5 rounded-pill" style={ { fontSize: '9px' } }>
+                                            <span className="badge bg-light text-dark border fw-bold px-2 py-0.5 rounded-pill" style={ { fontSize: '9.5px' } }>
                                                 NIVEL { bpData.user.level }
                                             </span>
                                         </div>
                                     </div>
                                     { /* XP Progress bar */ }
-                                    <div className="d-flex align-items-center gap-1 mt-0.5">
+                                    <div className="d-flex align-items-center gap-1">
                                         <div className="bp-xp-bar flex-grow-1">
                                             <div className="bp-xp-fill" style={ { width: `${ xpPercent }%` } } />
-                                            <span className="position-absolute w-100 top-0 text-center text-white fw-bold" style={ { fontSize: '9px', lineHeight: '14px', textShadow: '0 1px 2px rgba(0,0,0,0.8)' } }>
+                                            <span className="position-absolute w-100 top-0 text-center text-white fw-bold" style={ { fontSize: '9.5px', lineHeight: '16px', textShadow: '0 1px 2px rgba(0,0,0,0.8)' } }>
                                                 { bpData.user.xp } / { bpData.user.xpNext || 100 }
                                             </span>
                                         </div>
-                                        <span className="badge bg-dark text-white fw-bold px-1.5 py-0.5 rounded-1" style={ { fontSize: '9px' } }>
+                                        <span className="badge bg-dark text-white fw-bold px-1.5 py-0.5 rounded-1" style={ { fontSize: '9.5px' } }>
                                             { bpData.user.level + 1 }
                                         </span>
                                     </div>
@@ -338,27 +375,32 @@ export const BattlePassView: FC<{}> = () =>
                                 { /* Next Reward Box */ }
                                 { nextReward && (
                                     <div className="d-flex flex-column align-items-center text-center">
-                                        <span className="text-secondary fw-semibold mb-0.5" style={ { fontSize: '9px' } }>Tu próximo premio es:</span>
-                                        <div className="bp-mini-reward">
-                                            <div className="position-relative d-flex align-items-center justify-content-center" style={ { width: 28, height: 28 } }>
+                                        <span className="text-secondary fw-semibold mb-1" style={ { fontSize: '9.5px' } }>Tu próximo premio es:</span>
+                                        <div className="bp-mini-reward" title={ `${ nextReward.name } (Desbloquea en Nivel ${ nextReward.level_required })` }>
+                                            <div className="position-relative d-flex align-items-center justify-content-center" style={ { width: 30, height: 30 } }>
                                                 { renderRewardIcon(nextReward.type, nextReward.image, nextReward.badge, nextReward.point_type, false) }
-                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7px', lineHeight: 1 } }>x1</span>
+                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7.5px', lineHeight: 1 } }>
+                                                    x{ nextReward.amount || 1 }
+                                                </span>
                                             </div>
-                                            <span className="fw-bold text-dark text-truncate" style={ { fontSize: '10px', maxWidth: '85px' } }>{ nextReward.name }</span>
-                                        </div>
-                                        <div className="d-flex align-items-center gap-1 mt-1 text-success fw-bold" style={ { fontSize: '10px' } }>
-                                            <span>▲▲▲▲▲</span>
+                                            <span className="fw-bold text-dark text-truncate" style={ { fontSize: '10.5px', maxWidth: '90px' } }>{ nextReward.name }</span>
                                         </div>
                                     </div>
                                 ) }
 
                                 { /* Ranking Star */ }
                                 <div className="d-flex flex-column align-items-center text-center">
-                                    <span className="text-secondary fw-semibold mb-0.5" style={ { fontSize: '9px' } }>Vas en el puesto</span>
-                                    <div className="bp-ranking-star my-0.5">
-                                        { bpData.user.rankPosition || 1 }°
-                                    </div>
-                                    <span className="text-muted" style={ { fontSize: '8px' } }>del ranking</span>
+                                    <span className="text-secondary fw-semibold mb-1" style={ { fontSize: '9.5px' } }>Vas en el puesto</span>
+                                    <button 
+                                        type="button" 
+                                        className="bp-ranking-star-btn"
+                                        onClick={ () => setShowRankingModal(true) }
+                                        title="Clic para ver la tabla de clasificación">
+                                        <div className="bp-ranking-star">
+                                            { bpData.user.rankPosition || 1 }°
+                                        </div>
+                                    </button>
+                                    <span className="text-muted" style={ { fontSize: '8.5px' } }>del ranking</span>
                                 </div>
 
                             </div>
@@ -370,23 +412,23 @@ export const BattlePassView: FC<{}> = () =>
                         <div className="bp-card-box h-100 d-flex flex-column justify-content-between">
                             <div className="d-flex align-items-center justify-content-between mb-1">
                                 <span className="bp-box-header-title">RETOS POR COMPLETAR ({ pendingMissions.length })</span>
-                                <span className="badge bg-primary text-white" style={ { fontSize: '9px' } }>{ completedMissions.length }/{ bpData.missions.length }</span>
+                                <span className="badge bg-primary text-white" style={ { fontSize: '9.5px' } }>{ completedMissions.length }/{ bpData.missions.length }</span>
                             </div>
                             <div className="d-flex flex-column gap-1 flex-grow-1 justify-content-center">
                                 { quickPending.length > 0 ? quickPending.map(m => (
                                     <div key={ m.id } className="bp-quick-mission">
                                         <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                            <div className="p-0.5 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 28, height: 28 } }>
+                                            <div className="p-0.5 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 30, height: 30 } }>
                                                 { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <span>🎯</span> }
                                             </div>
-                                            <span className="badge bg-danger text-white mt-0.5" style={ { fontSize: '7px', padding: '1px 3px' } }>{ m.progress }/{ m.task }</span>
+                                            <span className="badge bg-danger text-white mt-0.5" style={ { fontSize: '7.5px', padding: '1px 3px' } }>{ m.progress }/{ m.task }</span>
                                         </div>
                                         <div className="flex-grow-1 min-w-0">
                                             <div className="d-flex align-items-center justify-content-between">
-                                                <span className="fw-bold text-dark text-truncate" style={ { fontSize: '10px' } }>{ m.name }</span>
-                                                <span className="badge bg-danger text-white fw-bold px-1 py-0.5 rounded-1" style={ { fontSize: '8px' } }>+{ m.reward_xp } XP</span>
+                                                <span className="fw-bold text-dark text-truncate" style={ { fontSize: '10.5px' } }>{ m.name }</span>
+                                                <span className="badge bg-danger text-white fw-bold px-1.5 py-0.5 rounded-1" style={ { fontSize: '8.5px' } }>+{ m.reward_xp } XP</span>
                                             </div>
-                                            <div className="text-muted text-truncate" style={ { fontSize: '9px' } }>{ m.description }</div>
+                                            <div className="text-muted text-truncate" style={ { fontSize: '9.5px' } }>{ m.description }</div>
                                         </div>
                                     </div>
                                 )) : (
@@ -411,12 +453,9 @@ export const BattlePassView: FC<{}> = () =>
                     
                     { /* Left Column: Premios Track */ }
                     <div className="bp-rewards-column bp-card-box">
-                        <div className="d-flex align-items-center justify-content-between pb-1 border-bottom mb-1">
-                            <span className="bp-box-header-title">PREMIOS</span>
-                            <div className="d-flex gap-3">
-                                <span className="text-primary fw-bold" style={ { fontSize: '9px' } }>GRATIS</span>
-                                <span className="text-warning fw-bold" style={ { fontSize: '9px' } }>VIP</span>
-                            </div>
+                        <div className="d-flex align-items-center justify-content-between pb-1.5 border-bottom mb-1 px-2">
+                            <span className="fw-bold text-primary" style={ { fontSize: '11px', letterSpacing: '0.5px' } }>GRATIS</span>
+                            <span className="fw-bold text-warning" style={ { fontSize: '11px', letterSpacing: '0.5px' } }>VIP</span>
                         </div>
                         
                         <div className="bp-rewards-scroll-track flex-grow-1">
@@ -444,7 +483,7 @@ export const BattlePassView: FC<{}> = () =>
                                                 } }
                                                 title={ `${ r.name } ${ isFreeClaimable ? '(¡Clic para reclamar!)' : '' }` }>
                                                 { renderRewardIcon(r.type, r.image, r.badge, r.point_type, false) }
-                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7px', lineHeight: 1 } }>
+                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7.5px', lineHeight: 1 } }>
                                                     x{ r.amount || 1 }
                                                 </span>
                                                 { isFreeClaimed && (
@@ -455,7 +494,7 @@ export const BattlePassView: FC<{}> = () =>
                                             { /* Level Node in Center */ }
                                             { isCurrentLevel ? (
                                                 <div className="bp-level-node current-node" title={ `Nivel Actual: ${ r.level_required }` }>
-                                                    <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } scale={ 0.65 } />
+                                                    <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } scale={ 0.7 } />
                                                 </div>
                                             ) : (
                                                 <div className={ `bp-level-node ${ isUnlocked ? 'reached' : '' }` }>
@@ -472,8 +511,8 @@ export const BattlePassView: FC<{}> = () =>
                                                 } }
                                                 title={ `${ r.name_vip || r.name } ${ isVipClaimable ? '(¡Clic para reclamar VIP!)' : '' }` }>
                                                 { renderRewardIcon(r.type_vip || r.type, r.image_vip, r.badge_vip, r.point_type_vip, true) }
-                                                <span className="badge bg-warning text-dark position-absolute top-0 end-0 p-0.5 fw-bold" style={ { fontSize: '6px', lineHeight: 1 } }>VIP</span>
-                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7px', lineHeight: 1 } }>
+                                                <span className="badge bg-warning text-dark position-absolute top-0 end-0 p-0.5 fw-bold" style={ { fontSize: '6.5px', lineHeight: 1 } }>VIP</span>
+                                                <span className="badge bg-danger text-white position-absolute bottom-0 end-0 p-0.5" style={ { fontSize: '7.5px', lineHeight: 1 } }>
                                                     x{ r.amount_vip || 1 }
                                                 </span>
                                                 { !isUnlocked && (
@@ -498,9 +537,9 @@ export const BattlePassView: FC<{}> = () =>
                             <>
                                 { /* Header: Retos Info */ }
                                 <div className="d-flex align-items-center gap-2 pb-1.5 mb-1.5 border-bottom">
-                                    <span style={ { fontSize: '20px' } }>🏆</span>
+                                    <img src="https://images.habbo.com/c_images/album1584/ACH_BattlePass1.gif" alt="" style={ { width: 28, height: 28 } } />
                                     <div>
-                                        <div className="fw-bold text-dark" style={ { fontSize: '12px' } }>Retos</div>
+                                        <div className="fw-bold text-dark" style={ { fontSize: '12.5px' } }>Retos</div>
                                         <div className="text-muted" style={ { fontSize: '10px' } }>Aquí encontrarás todo tipo de retos ¡cuantos más te pases más rápido subirás de nivel!</div>
                                     </div>
                                 </div>
@@ -513,7 +552,9 @@ export const BattlePassView: FC<{}> = () =>
                                         <div onClick={ () => setSelectedCategory(1) } className="bp-category-card h-100">
                                             <div className="d-flex gap-2">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">📋</div>
+                                                    <div className="bp-category-icon-box">
+                                                        <img src={ categoryIcons[1] } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />
+                                                    </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(1) }/{ getCategoryMissions(1).length || 6 }</span>
                                                 </div>
                                                 <div className="min-w-0">
@@ -531,7 +572,9 @@ export const BattlePassView: FC<{}> = () =>
                                         <div onClick={ () => setSelectedCategory(6) } className="bp-category-card h-100">
                                             <div className="d-flex gap-2">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">🏅</div>
+                                                    <div className="bp-category-icon-box">
+                                                        <img src={ categoryIcons[6] } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />
+                                                    </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(6) }/{ getCategoryMissions(6).length || 10 }</span>
                                                 </div>
                                                 <div className="min-w-0">
@@ -549,7 +592,9 @@ export const BattlePassView: FC<{}> = () =>
                                         <div onClick={ () => setSelectedCategory(2) } className="bp-category-card h-100">
                                             <div className="d-flex gap-2">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">📅</div>
+                                                    <div className="bp-category-icon-box">
+                                                        <img src={ categoryIcons[2] } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />
+                                                    </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length || 10 }</span>
                                                 </div>
                                                 <div className="min-w-0">
@@ -567,12 +612,14 @@ export const BattlePassView: FC<{}> = () =>
                                         </div>
                                     </div>
 
-                                    { /* Card 4: Retos Comunidad / Rol */ }
+                                    { /* Card 4: Retos Comunidad */ }
                                     <div className="col-6">
                                         <div onClick={ () => setSelectedCategory(5) } className="bp-category-card h-100">
                                             <div className="d-flex gap-2">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">🛡️</div>
+                                                    <div className="bp-category-icon-box">
+                                                        <img src={ categoryIcons[5] } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />
+                                                    </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(5) }/{ getCategoryMissions(5).length || 8 }</span>
                                                 </div>
                                                 <div className="min-w-0">
@@ -590,7 +637,9 @@ export const BattlePassView: FC<{}> = () =>
                                         <div onClick={ () => setSelectedCategory(3) } className="bp-category-card h-100">
                                             <div className="d-flex gap-2">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">⭐</div>
+                                                    <div className="bp-category-icon-box">
+                                                        <img src={ categoryIcons[3] } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />
+                                                    </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length || 7 }</span>
                                                 </div>
                                                 <div className="min-w-0">
@@ -613,7 +662,9 @@ export const BattlePassView: FC<{}> = () =>
                                         <div onClick={ () => setSelectedCategory(4) } className="bp-category-card h-100">
                                             <div className="d-flex gap-2">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">🎮</div>
+                                                    <div className="bp-category-icon-box">
+                                                        <img src={ categoryIcons[4] } alt="" style={ { maxWidth: '28px', maxHeight: '28px', objectFit: 'contain' } } />
+                                                    </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '8px' } }>{ getCategoryCompleted(4) }/{ getCategoryMissions(4).length || 6 }</span>
                                                 </div>
                                                 <div className="min-w-0">
@@ -678,10 +729,74 @@ export const BattlePassView: FC<{}> = () =>
 
                 </div>
 
+                { /* Ranking Leaderboard Modal */ }
+                { showRankingModal && (
+                    <div className="bp-modal-backdrop" onClick={ () => setShowRankingModal(false) }>
+                        <div className="bp-dialog" style={ { width: '420px', maxWidth: '92%' } } onClick={ (e) => e.stopPropagation() }>
+                            <div className="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
+                                <div className="d-flex align-items-center gap-2">
+                                    <span style={ { fontSize: '18px' } }>🏆</span>
+                                    <div>
+                                        <div className="fw-bold text-dark" style={ { fontSize: '13px' } }>Tabla de Clasificación</div>
+                                        <div className="text-muted" style={ { fontSize: '10px' } }>Top 10 usuarios con mayor nivel en el Pase de Batalla</div>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn-close" style={ { fontSize: '10px' } } onClick={ () => setShowRankingModal(false) } />
+                            </div>
+
+                            <div className="overflow-auto" style={ { maxHeight: '280px' } }>
+                                <table className="bp-ranking-table">
+                                    <thead>
+                                        <tr>
+                                            <th style={ { width: '60px' } }>Puesto</th>
+                                            <th>Usuario</th>
+                                            <th style={ { width: '90px' } }>Nivel</th>
+                                            <th style={ { width: '80px' } }>XP</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        { bpData.ranking && bpData.ranking.length > 0 ? bpData.ranking.map((user, idx) => {
+                                            const isMe = userInfo?.username === user.username;
+                                            return (
+                                                <tr key={ user.id } className={ isMe ? 'current-user-row' : '' }>
+                                                    <td>
+                                                        <span className={ `badge ${ idx === 0 ? 'bg-warning text-dark' : (idx === 1 ? 'bg-secondary text-white' : (idx === 2 ? 'bg-danger text-white' : 'bg-light text-dark border')) } fw-bold px-2 py-0.5` }>
+                                                            { idx + 1 }°
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <div className="bp-avatar-circle" style={ { width: 28, height: 28 } }>
+                                                                <LayoutAvatarImageView figure={ user.look || '' } direction={ 2 } headOnly={ true } scale={ 0.65 } />
+                                                            </div>
+                                                            <span className="fw-bold text-dark">{ user.username }</span>
+                                                            { isMe && <span className="badge bg-primary text-white" style={ { fontSize: '8px' } }>Tú</span> }
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span className="badge bg-primary text-white fw-bold">Nivel { user.level }</span>
+                                                    </td>
+                                                    <td>
+                                                        <span className="fw-bold text-secondary">{ user.xp } XP</span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        }) : (
+                                            <tr>
+                                                <td colSpan={ 4 } className="text-center text-muted py-3">No hay datos de clasificación aún.</td>
+                                            </tr>
+                                        ) }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                ) }
+
                 { /* Reward Preview Detail Modal */ }
                 { previewReward && (
                     <div className="bp-modal-backdrop" onClick={ () => setPreviewReward(null) }>
-                        <div className="bp-preview-dialog" onClick={ (e) => e.stopPropagation() }>
+                        <div className="bp-dialog" style={ { width: '300px', maxWidth: '92%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' } } onClick={ (e) => e.stopPropagation() }>
                             <div className="d-flex align-items-center justify-content-between w-100 mb-2">
                                 <span className={ `badge ${ previewReward.isVip ? 'bg-warning text-dark' : 'bg-primary text-white' } fw-bold` }>
                                     { previewReward.isVip ? 'Pase VIP' : 'Pase Gratuito' } • Nivel { previewReward.reward.level_required }
@@ -699,14 +814,14 @@ export const BattlePassView: FC<{}> = () =>
                                 ) }
                             </div>
 
-                            <span className="fw-bold text-dark mb-1" style={ { fontSize: '13px' } }>
+                            <span className="fw-bold text-dark mb-1" style={ { fontSize: '13.5px' } }>
                                 { previewReward.isVip ? (previewReward.reward.name_vip || previewReward.reward.name) : previewReward.reward.name }
                             </span>
 
                             <span className="text-muted mb-3" style={ { fontSize: '11px' } }>
                                 { previewReward.isVip 
                                     ? 'Recompensa exclusiva del Pase VIP de Habbten.' 
-                                    : 'Recompensa desbloqueable para todos los usuarios.' }
+                                    : 'Recompensa desbloqueable para todos los usuarios de Habbten.' }
                             </span>
 
                             { /* Claim button */ }
