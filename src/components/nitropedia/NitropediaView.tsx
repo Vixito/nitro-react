@@ -64,9 +64,28 @@ export const NitropediaView: FC<{}> = props =>
             eventUrlPrefix: 'habbopages/'
         };
 
-        AddEventLinkTracker(linkTracker);
+        const habbtenLinkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) =>
+            {
+                const value = url.split('/');
 
-        return () => RemoveLinkEventTracker(linkTracker);
+                if(value.length < 2) return;
+
+                value.shift();
+
+                openPage(GetConfiguration<string>('habbopages.url') + value.join('/'));
+            },
+            eventUrlPrefix: 'habbtenpages/'
+        };
+
+        AddEventLinkTracker(linkTracker);
+        AddEventLinkTracker(habbtenLinkTracker);
+
+        return () =>
+        {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(habbtenLinkTracker);
+        }
     }, []);
 
     useEffect(() =>
