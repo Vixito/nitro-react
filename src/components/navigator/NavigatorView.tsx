@@ -66,9 +66,13 @@ export const NavigatorView: FC<{}> = props =>
             return;
         }
 
-        if(!topLevelContext) return;
+        if(topLevelContext)
+        {
+            sendSearch('', topLevelContext.code);
+            return;
+        }
 
-        sendSearch('', topLevelContext.code);
+        sendSearch('', 'official_view');
     }, [ isReady, searchResult, topLevelContext, sendSearch ]);
 
     useEffect(() =>
@@ -84,6 +88,14 @@ export const NavigatorView: FC<{}> = props =>
                 {
                     case 'show': {
                         setIsVisible(true);
+                        if(parts.length > 2)
+                        {
+                            pendingSearch.current = { value: parts[3] || '', code: parts[2] };
+                        }
+                        else
+                        {
+                            pendingSearch.current = { value: '', code: 'official_view' };
+                        }
                         setNeedsSearch(true);
                         return;
                     }
@@ -99,6 +111,7 @@ export const NavigatorView: FC<{}> = props =>
                         }
         
                         setIsVisible(true);
+                        pendingSearch.current = { value: '', code: 'official_view' };
                         setNeedsSearch(true);
                         return;
                     }

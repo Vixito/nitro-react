@@ -50,10 +50,19 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = pro
     {
         if(!searchResult) return;
 
-        setIsExtended(!searchResult.closed);
+        if (topLevelContext?.code === 'official_view')
+        {
+            const title = LocalizeText(getResultTitle());
+            const isPublicRooms = (title === 'Salas Públicas' || searchResult.code === 'official_root' || searchResult.data === 'Salas Públicas' || searchResult.code === 'official-root');
+            setIsExtended(isPublicRooms);
+        }
+        else
+        {
+            setIsExtended(!searchResult.closed);
+        }
         
         setDisplayMode(searchResult.mode);
-    }, [ searchResult ]);
+    }, [ searchResult, topLevelContext ]);
 
     const isEventsView = (topLevelContext?.code === 'events_view') || (searchResult?.code === 'events_view') || (searchResult?.data === 'events_view');
     const displayRooms = (isEventsView && searchResult?.rooms)
