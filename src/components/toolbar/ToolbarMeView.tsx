@@ -42,6 +42,7 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
                 { (unseenAchievementCount > 0) &&
                     <LayoutItemCountView count={ unseenAchievementCount } /> }
             </Base>
+            <Base pointer title="Pase de Batalla" className="navigation-item icon icon-me-profile" onClick={ event => CreateLinkEvent('battlepass/toggle') } />
             <Base pointer className="navigation-item icon icon-me-profile" onClick={ event => GetUserProfile(GetSessionDataManager().userId) } />
             <Base pointer className="navigation-item icon icon-me-rooms" onClick={ event => CreateLinkEvent('navigator/search/myworld_view') } />
             <Base pointer className="navigation-item icon icon-me-clothing" onClick={ event => CreateLinkEvent('avatar-editor/toggle') } />

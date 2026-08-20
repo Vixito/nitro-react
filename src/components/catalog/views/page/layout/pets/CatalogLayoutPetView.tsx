@@ -121,7 +121,17 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
         const offer = page.offers[0];
 
         setCurrentOffer(offer);
-        setPetIndex(GetPetIndexFromLocalization(offer.localizationId));
+        let idx = GetPetIndexFromLocalization(offer.localizationId);
+        if(idx === -1 && offer.product?.furnitureData?.className)
+        {
+            idx = GetPetIndexFromLocalization(offer.product.furnitureData.className);
+        }
+        if(idx === -1 && offer.product?.extraParam)
+        {
+            const parsed = parseInt(offer.product.extraParam);
+            if(!isNaN(parsed)) idx = parsed;
+        }
+        setPetIndex(idx);
         setColorsShowing(false);
     }, [ page, setCurrentOffer ]);
 
@@ -129,15 +139,30 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
     {
         if(!currentOffer) return;
 
-        const productData = currentOffer.product.productData;
+        let petType = petIndex;
+        if(petType === -1)
+        {
+            petType = GetPetIndexFromLocalization(currentOffer.localizationId);
+            if(petType === -1 && currentOffer.product?.furnitureData?.className)
+            {
+                petType = GetPetIndexFromLocalization(currentOffer.product.furnitureData.className);
+            }
+            if(petType === -1 && currentOffer.product?.extraParam)
+            {
+                const parsed = parseInt(currentOffer.product.extraParam);
+                if(!isNaN(parsed)) petType = parsed;
+            }
+        }
 
-        if(!productData) return;
+        if(petType === -1) return;
+
+        const petProductCode = 'a0 pet' + petType;
 
         if(petPalettes)
         {
             for(const paletteData of petPalettes)
             {
-                if(paletteData.breed !== productData.type) continue;
+                if(paletteData.breed !== petProductCode && paletteData.breed !== petType.toString() && paletteData.breed !== ('a0 pet' + petType)) continue;
     
                 const palettes: SellablePetPaletteData[] = [];
     
@@ -155,11 +180,8 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
             }
         }
 
-        setSelectedPaletteIndex(-1);
-        setSellablePalettes([]);
-
-        SendMessageComposer(new GetSellablePetPalettesComposer(productData.type));
-    }, [ currentOffer, petPalettes ]);
+        SendMessageComposer(new GetSellablePetPalettesComposer(petProductCode));
+    }, [ currentOffer, petIndex, petPalettes ]);
 
     useEffect(() =>
     {
@@ -177,14 +199,31 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
         
         roomPreviewer.reset(false);
 
-        if((petIndex === -1) || !sellablePalettes.length || (selectedPaletteIndex === -1)) return;
+        let petType = petIndex;
+        if(petType === -1 && currentOffer)
+        {
+            petType = GetPetIndexFromLocalization(currentOffer.localizationId);
+            if(petType === -1 && currentOffer.product?.furnitureData?.className)
+            {
+                petType = GetPetIndexFromLocalization(currentOffer.product.furnitureData.className);
+            }
+            if(petType === -1 && currentOffer.product?.extraParam)
+            {
+                const parsed = parseInt(currentOffer.product.extraParam);
+                if(!isNaN(parsed)) petType = parsed;
+            }
+        }
 
-        let petFigureString = `${ petIndex } ${ sellablePalettes[selectedPaletteIndex].paletteId }`;
+        if(petType === -1) return;
 
-        if(petIndex <= 7) petFigureString += ` ${ getColor.toString(16) }`;
+        const paletteId = (sellablePalettes.length && (selectedPaletteIndex > -1) && sellablePalettes[selectedPaletteIndex]?.paletteId !== undefined) ? sellablePalettes[selectedPaletteIndex].paletteId : 0;
+
+        let petFigureString = `${ petType } ${ paletteId }`;
+
+        if(petType <= 7) petFigureString += ` ${ getColor.toString(16) }`;
 
         roomPreviewer.addPetIntoRoom(petFigureString);
-    }, [ roomPreviewer, petIndex, sellablePalettes, selectedPaletteIndex, getColor ]);
+    }, [ roomPreviewer, petIndex, currentOffer, sellablePalettes, selectedPaletteIndex, getColor ]);
 
     useEffect(() =>
     {

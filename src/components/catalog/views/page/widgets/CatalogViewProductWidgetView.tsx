@@ -1,6 +1,6 @@
 import { Vector3d } from '@nitrots/nitro-renderer';
 import { FC, useEffect } from 'react';
-import { FurniCategory, GetAvatarRenderManager, GetSessionDataManager, Offer, ProductTypeEnum } from '../../../../../api';
+import { FurniCategory, GetAvatarRenderManager, GetPetIndexFromLocalization, GetSessionDataManager, Offer, ProductTypeEnum } from '../../../../../api';
 import { AutoGrid, Column, LayoutGridItem, LayoutRoomPreviewerView } from '../../../../../common';
 import { useCatalog } from '../../../../../hooks';
 
@@ -76,6 +76,18 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
             case ProductTypeEnum.EFFECT:
                 roomPreviewer.addAvatarIntoRoom(GetSessionDataManager().figure, product.productClassId);
                 return;
+            case ProductTypeEnum.PET: {
+                let petType = 0;
+                if(product.extraParam) {
+                    const parsed = parseInt(product.extraParam);
+                    if(!isNaN(parsed)) petType = parsed;
+                } else if(currentOffer?.localizationId) {
+                    const parsed = GetPetIndexFromLocalization(currentOffer.localizationId);
+                    if(parsed > -1) petType = parsed;
+                }
+                roomPreviewer.addPetIntoRoom(`${ petType } 0`);
+                return;
+            }
         }
     }, [ currentOffer, previewStuffData, roomPreviewer ]);
 

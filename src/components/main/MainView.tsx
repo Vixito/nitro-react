@@ -5,6 +5,7 @@ import { Base, TransitionAnimation, TransitionAnimationTypes } from '../../commo
 import { useRoomSessionManagerEvent } from '../../hooks';
 import { AchievementsView } from '../achievements/AchievementsView';
 import { AvatarEditorView } from '../avatar-editor/AvatarEditorView';
+import { BattlePassView } from '../battle-pass/BattlePassView';
 import { CameraWidgetView } from '../camera/CameraWidgetView';
 import { CampaignView } from '../campaign/CampaignView';
 import { CatalogView } from '../catalog/CatalogView';
@@ -107,6 +108,7 @@ export const MainView: FC<{}> = props =>
             <CampaignView />
             <GameCenterView />
             <FloorplanEditorView />
+            <BattlePassView />
         </Base>
     );
 }
