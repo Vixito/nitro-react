@@ -74,7 +74,7 @@ export const CatalogLayoutFrontpage4View: FC<CatalogLayoutProps> = props =>
                         style={ { height: '82px', minHeight: '82px' } }
                         onClick={ event => selectItem(frontPageItems[3]) } 
                     /> }
-                <Flex className="mt-1">
+                <Flex className="mt-1 w-100">
                     <CatalogRedeemVoucherView text={ page?.localization?.getText(1) } />
                 </Flex>
             </Column>
