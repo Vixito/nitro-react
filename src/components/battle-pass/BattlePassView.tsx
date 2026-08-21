@@ -430,7 +430,7 @@ export const BattlePassView: FC<{}> = () =>
                                 <div className="d-flex flex-column gap-2" style={ { minWidth: '190px' } }>
                                     <div className="d-flex align-items-center gap-3">
                                         <div className="bp-avatar-circle">
-                                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ false } gesture={ AvatarAction.GESTURE_SMILE } />
+                                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ false } gesture={ AvatarAction.GESTURE_SMILE } scale={ 1.25 } />
                                         </div>
                                         <div className="min-w-0 d-flex flex-column gap-2">
                                             <div className="fw-bold text-dark text-truncate" style={ { fontSize: '17px', maxWidth: '120px' } }>

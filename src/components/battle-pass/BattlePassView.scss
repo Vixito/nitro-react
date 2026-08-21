@@ -51,25 +51,25 @@
         text-transform: uppercase;
     }
 
-    /* Avatar Frame — shows upper body/torso inside circle */
+    /* Avatar Frame — shows close-up portrait inside neutral clean circle */
     .bp-avatar-circle {
         width: 68px;
         height: 68px;
         border-radius: 50%;
-        border: 2.5px solid #1e293b;
-        background: #dbeafe;
+        border: 2px solid #cbd5e1;
+        background: radial-gradient(circle, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%);
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
         position: relative;
 
         .avatar-image {
             position: relative;
             left: 0;
-            top: 15px;
+            top: 22px;
         }
     }
 
