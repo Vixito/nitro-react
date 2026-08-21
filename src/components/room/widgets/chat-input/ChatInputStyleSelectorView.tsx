@@ -1,4 +1,4 @@
-import { FC, MouseEvent, useEffect, useState } from 'react';
+import { FC, useRef, useState } from 'react';
 import { Overlay, Popover } from 'react-bootstrap';
 import { Base, Flex, Grid, NitroCardContentView } from '../../../../common';
 
@@ -12,8 +12,8 @@ interface ChatInputStyleSelectorViewProps
 export const ChatInputStyleSelectorView: FC<ChatInputStyleSelectorViewProps> = props =>
 {
     const { chatStyleId = 0, chatStyleIds = null, selectChatStyleId = null } = props;
-    const [ target, setTarget ] = useState<(EventTarget & HTMLElement)>(null);
     const [ selectorVisible, setSelectorVisible ] = useState(false);
+    const elementRef = useRef<HTMLDivElement>(null);
 
     const selectStyle = (styleId: number) =>
     {
@@ -21,39 +21,30 @@ export const ChatInputStyleSelectorView: FC<ChatInputStyleSelectorViewProps> = p
         setSelectorVisible(false);
     }
 
-    const toggleSelector = (event: MouseEvent<HTMLElement>) =>
+    const toggleSelector = () =>
     {
-        let visible = false;
-
-        setSelectorVisible(prevValue =>
-        {
-            visible = !prevValue;
-
-            return visible;
-        });
-
-        if(visible) setTarget((event.target as (EventTarget & HTMLElement)));
+        setSelectorVisible(prevValue => !prevValue);
     }
-
-    useEffect(() =>
-    {
-        if(selectorVisible) return;
-
-        setTarget(null);
-    }, [ selectorVisible ]);
 
     return (
         <>
-            <Base pointer className="icon chatstyles-icon" onClick={ toggleSelector } />
-            <Overlay show={ selectorVisible } target={ target } placement="top">
+            <Base innerRef={ elementRef } pointer className="icon chatstyles-icon" onClick={ toggleSelector } />
+            <Overlay
+                show={ selectorVisible }
+                target={ elementRef.current }
+                placement="top"
+                rootClose={ true }
+                onHide={ () => setSelectorVisible(false) }
+                transition={ false }
+            >
                 <Popover className="nitro-chat-style-selector-container image-rendering-pixelated">
                     <NitroCardContentView overflow="hidden" className="bg-transparent">
                         <Grid columnCount={ 3 } overflow="auto">
                             { chatStyleIds && (chatStyleIds.length > 0) && chatStyleIds.map((styleId) =>
                             {
                                 return (
-                                    <Flex center pointer key={ styleId } className="bubble-parent-container" onClick={ event => selectStyle(styleId) }>
-                                        <Base key={ styleId } className="bubble-container">
+                                    <Flex center pointer key={ styleId } className="bubble-parent-container" onClick={ () => selectStyle(styleId) }>
+                                        <Base className="bubble-container">
                                             <Base className={ `chat-bubble bubble-${ styleId }` }>&nbsp;</Base>
                                         </Base>
                                     </Flex>
