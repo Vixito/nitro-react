@@ -168,6 +168,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         { !isInRoom &&
                             <Base pointer title="Mi Sala" className="navigation-item icon icon-house" onClick={ event => CreateLinkEvent('navigator/goto/home') } /> }
                         <Base pointer title="Navegador de Salas" className="navigation-item icon icon-rooms" onClick={ event => CreateLinkEvent('navigator/toggle') } />
+                        <Base pointer title="Pase de Batalla" className="navigation-item icon icon-battlepass" onClick={ event => CreateLinkEvent('battlepass/toggle') } />
                         { isGameCenterEnabled && <Base pointer title="Centro de Juegos" className="navigation-item icon icon-game" onClick={ event => CreateLinkEvent('games/toggle') } /> }
                         <Base pointer title="Tienda de Habbten" className="navigation-item icon icon-catalog" onClick={ event => CreateLinkEvent('catalog/toggle') } />
                         <Base pointer title="Inventario" className="navigation-item icon icon-inventory" onClick={ event => CreateLinkEvent('inventory/toggle') }>
@@ -176,7 +177,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         </Base>
                         { isInRoom &&
                             <Base pointer title="Cámara" className="navigation-item icon icon-camera" onClick={ event => CreateLinkEvent('camera/toggle') } /> }
-                        <Base pointer title="Pase de Batalla" className="navigation-item icon icon-battlepass" onClick={ event => CreateLinkEvent('battlepass/toggle') } />
                         { isMod &&
                             <Base pointer title="Herramientas de Moderación" className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
                         { radioUrl && (
