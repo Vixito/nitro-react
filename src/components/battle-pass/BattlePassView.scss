@@ -1,11 +1,11 @@
 .nitro-battle-pass {
-    width: 930px;
+    width: 935px;
     max-width: 98vw;
-    height: 640px;
+    height: 645px;
     min-height: 600px;
 
     .bp-container {
-        background-color: #f1f5f9;
+        background-color: #f1f4f8;
         color: #1e293b;
         font-family: inherit;
         overflow: hidden;
@@ -16,20 +16,20 @@
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
-        padding: 8px 16px;
+        padding: 7px 16px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     .bp-countdown-digit {
-        min-width: 32px;
+        min-width: 30px;
         text-align: center;
         background: #0f172a;
         color: #ffffff;
         font-weight: 800;
-        font-size: 14px;
+        font-size: 13.5px;
         border-radius: 4px;
         border: 1px solid #000000;
-        padding: 2px 5px;
+        padding: 2px 4px;
         font-family: monospace;
         line-height: 1.2;
     }
@@ -56,8 +56,8 @@
         width: 58px;
         height: 58px;
         border-radius: 50%;
-        border: 2px solid #0f172a;
-        background: #e2e8f0;
+        border: 2.5px solid #1e293b;
+        background: #dbeafe;
         overflow: hidden;
         display: flex;
         align-items: center;
@@ -72,11 +72,24 @@
             height: 130px;
             left: 50%;
             top: 50%;
-            transform: translate(-50%, -35%);
+            transform: translate(-50%, -36%);
             background-position: center top;
             background-repeat: no-repeat;
             pointer-events: none;
         }
+    }
+
+    /* Level Tag */
+    .bp-level-tag {
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 4px;
+        font-weight: 800;
+        font-size: 10.5px;
+        padding: 2px 8px;
+        color: #334155;
+        display: inline-block;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     /* XP Bar */
@@ -99,16 +112,24 @@
     /* Mini Next Reward Box */
     .bp-mini-reward {
         background: #f8fafc;
-        border: 1px solid #cbd5e1;
+        border: 1.5px solid #cbd5e1;
         border-radius: 6px;
         padding: 5px 10px;
         display: flex;
         align-items: center;
         gap: 10px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
-    /* Star Ranking Badge */
+    /* Green Chevron Arrow */
+    .bp-green-chevron {
+        color: #22c55e;
+        font-size: 11px;
+        letter-spacing: 2px;
+        font-weight: 900;
+    }
+
+    /* Star Ranking Badge - 8-pointed star */
     .bp-ranking-star-btn {
         background: transparent;
         border: none;
@@ -117,40 +138,65 @@
         transition: transform 0.15s ease;
 
         &:hover {
-            transform: scale(1.08);
+            transform: scale(1.1);
         }
     }
 
-    .bp-ranking-star {
-        width: 48px;
-        height: 48px;
-        background: radial-gradient(circle, #fde047 0%, #eab308 70%, #ca8a04 100%);
-        border: 2px solid #a16207;
-        border-radius: 50%;
-        color: #713f12;
-        font-weight: 900;
-        font-size: 14px;
+    .bp-starburst-badge {
+        width: 46px;
+        height: 46px;
+        background: radial-gradient(circle, #fde047 0%, #eab308 80%, #ca8a04 100%);
+        clip-path: polygon(50% 0%, 65% 15%, 85% 15%, 85% 35%, 100% 50%, 85% 65%, 85% 85%, 65% 85%, 50% 100%, 35% 85%, 15% 85%, 15% 65%, 0% 50%, 15% 35%, 15% 15%, 35% 15%);
         display: flex;
         align-items: center;
         justify-content: center;
+        color: #000000;
+        font-weight: 900;
+        font-size: 13px;
         box-shadow: 0 2px 6px rgba(202, 138, 4, 0.4);
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
     }
 
-    /* Quick Mission Item */
-    .bp-quick-mission {
+    /* Quick Mission Horizontal Scroll Item */
+    .bp-quick-mission-card {
+        min-width: 240px;
+        max-width: 240px;
         background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        border: 1.5px solid #e2e8f0;
         border-radius: 6px;
-        padding: 6px 12px;
+        padding: 7px 10px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
+        flex-shrink: 0;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .bp-missions-horizontal-track {
+        overflow-x: auto;
+        overflow-y: hidden;
+        display: flex;
+        gap: 8px;
+        padding-bottom: 4px;
+
+        &::-webkit-scrollbar {
+            height: 5px;
+        }
+        &::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+            &:hover {
+                background: #64748b;
+            }
+        }
     }
 
     /* Bottom Section Layout */
     .bp-bottom-section {
-        min-height: 350px;
+        min-height: 355px;
     }
 
     /* Vertical Rewards Track */
@@ -165,7 +211,7 @@
     .bp-rewards-scroll-track {
         overflow-y: auto;
         overflow-x: hidden;
-        padding: 10px 10px 16px 10px;
+        padding: 10px 8px 16px 8px;
         position: relative;
 
         &::-webkit-scrollbar {
@@ -190,7 +236,7 @@
         top: 26px;
         bottom: 26px;
         left: 50%;
-        width: 4px;
+        width: 3px;
         transform: translateX(-50%);
         background: #cbd5e1;
         z-index: 1;
@@ -202,7 +248,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
 
     /* Square Reward Box */
@@ -210,20 +256,20 @@
         width: 52px;
         height: 52px;
         background: #ffffff;
-        border: 2px solid #cbd5e1;
-        border-radius: 8px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         cursor: pointer;
         transition: all 0.15s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 
         &:hover {
             transform: scale(1.06);
             border-color: #3b82f6;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.14);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
         }
 
         &.unlocked {
@@ -244,20 +290,37 @@
         }
 
         &.vip-square {
-            background: #fffdf5;
-            border-color: #fde047;
+            background: #ffffff;
+            border-color: #cbd5e1;
 
             &.unlocked {
-                border-color: #eab308;
-                background: #fefce8;
+                border-color: #22c55e;
+                background: #f0fdf4;
             }
 
             &.claimable {
-                border-color: #f59e0b;
-                background: #fef3c7;
-                animation: bp-pulse-gold 1.8s infinite;
+                border-color: #16a34a;
+                background: #dcfce7;
+                animation: bp-pulse-green 1.8s infinite;
             }
         }
+    }
+
+    /* Dark VIP Tag */
+    .bp-vip-tag {
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1e293b;
+        color: #ffffff;
+        font-size: 7.5px;
+        font-weight: 800;
+        padding: 1px 5px;
+        border-radius: 3px;
+        letter-spacing: 0.5px;
+        line-height: 1;
+        z-index: 5;
     }
 
     .bp-level-node {
@@ -296,7 +359,7 @@
                 height: 130px;
                 left: 50%;
                 top: 50%;
-                transform: translate(-50%, -35%);
+                transform: translate(-50%, -36%);
                 background-position: center top;
                 background-repeat: no-repeat;
                 pointer-events: none;
@@ -332,8 +395,8 @@
     }
 
     .bp-category-icon-box {
-        width: 42px;
-        height: 42px;
+        width: 44px;
+        height: 44px;
         background: #ffffff;
         border: 1px solid #cbd5e1;
         border-radius: 6px;
@@ -341,6 +404,18 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+    }
+
+    /* Digital timer box inside category card */
+    .bp-category-timer-pill {
+        background: #0f172a;
+        color: #ffffff;
+        border-radius: 4px;
+        padding: 2px 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1;
     }
 
     /* Challenge List Item */
@@ -421,17 +496,5 @@
     }
     100% {
         box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-    }
-}
-
-@keyframes bp-pulse-gold {
-    0% {
-        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
-    }
-    70% {
-        box-shadow: 0 0 0 6px rgba(245, 158, 11, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
     }
 }
