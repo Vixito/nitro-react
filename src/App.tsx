@@ -66,14 +66,20 @@ export const App: FC<{}> = props =>
                             let dynamicCss = '';
                             
                             data.bubbles.forEach((b: any) => {
-                                // Add to configuration
-                                existingStyles.push({
+                                const bubbleObj = {
                                     styleId: b.bubble_id,
                                     minRank: b.min_rank || 0,
                                     isSystemStyle: false,
                                     isHcOnly: !!b.is_vip,
                                     isAmbassadorOnly: false
-                                });
+                                };
+                                
+                                const existingIndex = existingStyles.findIndex((s: any) => s && s.styleId === b.bubble_id);
+                                if (existingIndex >= 0) {
+                                    existingStyles[existingIndex] = { ...existingStyles[existingIndex], ...bubbleObj };
+                                } else {
+                                    existingStyles.push(bubbleObj);
+                                }
                                 
                                 // Generate CSS for the bubble
                                 dynamicCss += `
@@ -91,9 +97,14 @@ export const App: FC<{}> = props =>
                             
                             // Inject CSS
                             if (dynamicCss.length > 0) {
-                                const styleEl = document.createElement('style');
+                                const styleId = 'dynamic-chat-bubbles-style';
+                                let styleEl = document.getElementById(styleId);
+                                if (!styleEl) {
+                                    styleEl = document.createElement('style');
+                                    styleEl.id = styleId;
+                                    document.head.appendChild(styleEl);
+                                }
                                 styleEl.innerHTML = dynamicCss;
-                                document.head.appendChild(styleEl);
                             }
                         }
                     })

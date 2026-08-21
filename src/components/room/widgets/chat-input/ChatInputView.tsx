@@ -171,47 +171,51 @@ export const ChatInputView: FC<{}> = props =>
 
         const styles = GetConfiguration<{ styleId: number, minRank: number, isSystemStyle: boolean, isHcOnly: boolean, isAmbassadorOnly: boolean }[]>('chat.styles');
 
-        for(const style of styles)
+        if(styles && styles.length)
         {
-            if(!style) continue;
-
-            if(style.minRank > 0)
+            for(const style of styles)
             {
-                if(GetSessionDataManager().hasSecurity(style.minRank)) styleIds.push(style.styleId);
+                if(!style) continue;
+                if(styleIds.indexOf(style.styleId) >= 0) continue;
 
-                continue;
-            }
+                if(style.minRank > 0)
+                {
+                    if(GetSessionDataManager().hasSecurity(style.minRank)) styleIds.push(style.styleId);
 
-            if(style.isSystemStyle)
-            {
-                if(GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR))
+                    continue;
+                }
+
+                if(style.isSystemStyle)
+                {
+                    if(GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR))
+                    {
+                        styleIds.push(style.styleId);
+
+                        continue;
+                    }
+                }
+
+                if(GetConfiguration<number[]>('chat.styles.disabled').indexOf(style.styleId) >= 0) continue;
+
+                if(style.isHcOnly && (GetClubMemberLevel() >= HabboClubLevelEnum.CLUB))
                 {
                     styleIds.push(style.styleId);
 
                     continue;
                 }
+
+                if(style.isAmbassadorOnly && GetSessionDataManager().isAmbassador)
+                {
+                    styleIds.push(style.styleId);
+
+                    continue;
+                }
+
+                if(!style.isHcOnly && !style.isAmbassadorOnly) styleIds.push(style.styleId);
             }
-
-            if(GetConfiguration<number[]>('chat.styles.disabled').indexOf(style.styleId) >= 0) continue;
-
-            if(style.isHcOnly && (GetClubMemberLevel() >= HabboClubLevelEnum.CLUB))
-            {
-                styleIds.push(style.styleId);
-
-                continue;
-            }
-
-            if(style.isAmbassadorOnly && GetSessionDataManager().isAmbassador)
-            {
-                styleIds.push(style.styleId);
-
-                continue;
-            }
-
-            if(!style.isHcOnly && !style.isAmbassadorOnly) styleIds.push(style.styleId);
         }
 
-        return styleIds;
+        return Array.from(new Set(styleIds));
     }, []);
 
     useEffect(() =>
