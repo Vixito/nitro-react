@@ -317,6 +317,7 @@ const useCatalogState = () =>
     const activateNode = useCallback((targetNode: ICatalogNode, offerId: number = -1) =>
     {
         cancelObjectMover();
+        setNavigationHidden(false);
 
         if(targetNode.parent.pageName === 'root')
         {
@@ -374,11 +375,12 @@ const useCatalogState = () =>
         });
 
         if(targetNode.pageId > -1) loadCatalogPage(targetNode.pageId, offerId);
-    }, [ setActiveNodes, loadCatalogPage, cancelObjectMover ]);
+    }, [ setActiveNodes, loadCatalogPage, cancelObjectMover, setNavigationHidden ]);
 
     const openPageById = useCallback((id: number) =>
     {
         if(id !== -1) setSearchResult(null);
+        setNavigationHidden(false);
 
         if(!isVisible)
         {
@@ -392,11 +394,12 @@ const useCatalogState = () =>
 
             if(node) activateNode(node);
         }
-    }, [ isVisible, rootNode, getNodeById, activateNode ]);
+    }, [ isVisible, rootNode, getNodeById, activateNode, setNavigationHidden ]);
 
     const openPageByName = useCallback((name: string) =>
     {
         setSearchResult(null);
+        setNavigationHidden(false);
 
         if(!isVisible)
         {
@@ -410,7 +413,7 @@ const useCatalogState = () =>
 
             if(node) activateNode(node);
         }
-    }, [ isVisible, rootNode, getNodeByName, activateNode ]);
+    }, [ isVisible, rootNode, getNodeByName, activateNode, setNavigationHidden ]);
 
     const openSearchByName = useCallback((query: string) =>
     {
@@ -483,6 +486,7 @@ const useCatalogState = () =>
     const openPageByOfferId = useCallback((offerId: number) =>
     {
         setSearchResult(null);
+        setNavigationHidden(false);
 
         if(!isVisible)
         {
@@ -534,7 +538,7 @@ const useCatalogState = () =>
                 }
             }
         }
-    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, openSearchByName ]);
+    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, openSearchByName, setNavigationHidden ]);
 
     const refreshBuilderStatus = useCallback(() =>
     {
