@@ -1,4 +1,4 @@
-import { ILinkEventTracker } from '@nitrots/nitro-renderer';
+import { AvatarAction, ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
 import { Button, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
@@ -430,7 +430,7 @@ export const BattlePassView: FC<{}> = () =>
                                 <div className="d-flex flex-column gap-2" style={ { minWidth: '190px' } }>
                                     <div className="d-flex align-items-center gap-3">
                                         <div className="bp-avatar-circle">
-                                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ false } />
+                                            <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ false } gesture={ AvatarAction.GESTURE_SMILE } />
                                         </div>
                                         <div className="min-w-0 d-flex flex-column gap-2">
                                             <div className="fw-bold text-dark text-truncate" style={ { fontSize: '17px', maxWidth: '120px' } }>
@@ -577,7 +577,7 @@ export const BattlePassView: FC<{}> = () =>
                                             { /* Level Node in Center — NO circle when reached, JUST avatar head over green line */ }
                                             { isUnlocked ? (
                                                 <div className="bp-level-avatar-node" title={ `Nivel ${ r.level_required }` }>
-                                                    <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } />
+                                                    <LayoutAvatarImageView figure={ userFigure || '' } direction={ 2 } headOnly={ true } gesture={ AvatarAction.GESTURE_SMILE } />
                                                 </div>
                                             ) : (
                                                 <div className="bp-level-node">
@@ -849,7 +849,7 @@ export const BattlePassView: FC<{}> = () =>
                                                 { idx + 1 }°
                                             </span>
                                             <div className="bp-rank-avatar">
-                                                <LayoutAvatarImageView figure={ user.look || '' } direction={ 2 } headOnly={ true } />
+                                                <LayoutAvatarImageView figure={ user.look || '' } direction={ 2 } headOnly={ true } gesture={ AvatarAction.GESTURE_SMILE } />
                                             </div>
                                             <div className="bp-rank-info">
                                                 <span className="bp-rank-name">

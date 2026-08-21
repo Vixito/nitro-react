@@ -1,4 +1,4 @@
-import { AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
+import { AvatarAction, AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
 import { GetAvatarRenderManager } from '../../api';
 import { Base, BaseProps } from '../Base';
@@ -10,11 +10,13 @@ export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement>
     headOnly?: boolean;
     direction?: number;
     scale?: number;
+    posture?: string;
+    gesture?: string;
 }
 
 export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
 {
-    const { figure = '', gender = 'M', headOnly = false, direction = 0, scale = 1, classNames = [], style = {}, ...rest } = props;
+    const { figure = '', gender = 'M', headOnly = false, direction = 0, scale = 1, posture = null, gesture = null, classNames = [], style = {}, ...rest } = props;
     const [ avatarUrl, setAvatarUrl ] = useState<string>(null);
     const [ randomValue, setRandomValue ] = useState(-1);
     const isDisposed = useRef(false);
@@ -68,12 +70,15 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
 
         avatarImage.setDirection(setType, direction);
 
+        if(posture) avatarImage.appendAction(AvatarAction.POSTURE, posture);
+        if(gesture) avatarImage.appendAction(AvatarAction.GESTURE, gesture);
+
         const image = avatarImage.getCroppedImage(setType);
 
         if(image) setAvatarUrl(image.src);
 
         avatarImage.dispose();
-    }, [ figure, gender, direction, headOnly, randomValue ]);
+    }, [ figure, gender, direction, headOnly, posture, gesture, randomValue ]);
 
     useEffect(() =>
     {
