@@ -19,10 +19,7 @@ export const CatalogGridOfferView: FC<CatalogGridOfferViewProps> = props =>
 
     const iconUrl = useMemo(() =>
     {
-        if(offer.pricingModel === Offer.PRICING_MODEL_BUNDLE)
-        {
-            return null;
-        }
+        if(!offer.product) return null;
 
         return offer.product.getIconUrl(offer);
     }, [ offer ]);
