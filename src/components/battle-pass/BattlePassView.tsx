@@ -642,14 +642,14 @@ export const BattlePassView: FC<{}> = () =>
                                     { /* Card 1: Primeros Retos */ }
                                     <div className="col-6">
                                         <div onClick={ () => setSelectedCategory(1) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3 align-items-start">
+                                            <div className="d-flex gap-3">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[1] } />
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(1) }/{ getCategoryMissions(1).length }</span>
                                                 </div>
-                                                <div className="flex-grow-1 min-w-0">
+                                                <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>PRIMEROS RETOS</span>
                                                     <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
                                                         Estas recompensas son para aquellos usuarios nuevos, te ayudarán a familiarizarte con este juego.
@@ -662,14 +662,14 @@ export const BattlePassView: FC<{}> = () =>
                                     { /* Card 2: Retos Legendarios */ }
                                     <div className="col-6">
                                         <div onClick={ () => setSelectedCategory(6) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3 align-items-start">
+                                            <div className="d-flex gap-3">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[6] } />
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(6) }/{ getCategoryMissions(6).length }</span>
                                                 </div>
-                                                <div className="flex-grow-1 min-w-0">
+                                                <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS LEGENDARIOS</span>
                                                     <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
                                                         Estos retos son una verdadera leyenda en Habbten, subirás de nivel muy rápido si los desbloqueas todos.
@@ -682,23 +682,23 @@ export const BattlePassView: FC<{}> = () =>
                                     { /* Card 3: Retos Diarios */ }
                                     <div className="col-6">
                                         <div onClick={ () => setSelectedCategory(2) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3 align-items-start">
+                                            <div className="d-flex gap-3">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[2] } />
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length }</span>
                                                 </div>
-                                                <div className="flex-grow-1 min-w-0">
-                                                    <div className="d-flex align-items-center justify-content-between gap-1 mb-0.5">
-                                                        <span className="fw-bold text-dark text-truncate" style={ { fontSize: '13.5px' } }>RETOS DIARIOS</span>
+                                                <div className="min-w-0">
+                                                    <div className="d-flex align-items-center justify-content-between gap-2">
+                                                        <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS DIARIOS</span>
                                                         <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
-                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10px' } }>
+                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
                                                                 { dailyTimeRemaining.days } : { dailyTimeRemaining.hours } : { dailyTimeRemaining.minutes } : { dailyTimeRemaining.seconds }
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <span className="text-muted d-block" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
                                                         Estos retos aparecerán cada 24h en el hotel ¡cúmplelos cada día! Son muy sencillos.
                                                     </span>
                                                 </div>
@@ -709,14 +709,14 @@ export const BattlePassView: FC<{}> = () =>
                                     { /* Card 4: Retos Comunidad */ }
                                     <div className="col-6">
                                         <div onClick={ () => setSelectedCategory(5) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3 align-items-start">
+                                            <div className="d-flex gap-3">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[5] } />
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(5) }/{ getCategoryMissions(5).length }</span>
                                                 </div>
-                                                <div className="flex-grow-1 min-w-0">
+                                                <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS COMUNIDAD</span>
                                                     <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
                                                         Estos retos son únicos y exclusivos para miembros activos de la comunidad de Habbten.
@@ -729,23 +729,23 @@ export const BattlePassView: FC<{}> = () =>
                                     { /* Card 5: Retos Semanales */ }
                                     <div className="col-6">
                                         <div onClick={ () => setSelectedCategory(3) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3 align-items-start">
+                                            <div className="d-flex gap-3">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[3] } />
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length }</span>
                                                 </div>
-                                                <div className="flex-grow-1 min-w-0">
-                                                    <div className="d-flex align-items-center justify-content-between gap-1 mb-0.5">
-                                                        <span className="fw-bold text-dark text-truncate" style={ { fontSize: '13.5px' } }>RETOS SEMANALES</span>
+                                                <div className="min-w-0">
+                                                    <div className="d-flex align-items-center justify-content-between gap-2">
+                                                        <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS SEMANALES</span>
                                                         <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
-                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10px' } }>
+                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
                                                                 { weeklyTimeRemaining.days } : { weeklyTimeRemaining.hours } : { weeklyTimeRemaining.minutes } : { weeklyTimeRemaining.seconds }
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <span className="text-muted d-block" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
                                                         Estos retos aparecerán cada 7 días en el hotel ¡requieren más dedicación!
                                                     </span>
                                                 </div>
@@ -756,14 +756,14 @@ export const BattlePassView: FC<{}> = () =>
                                     { /* Card 6: Retos Especiales */ }
                                     <div className="col-6">
                                         <div onClick={ () => setSelectedCategory(4) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3 align-items-start">
+                                            <div className="d-flex gap-3">
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[4] } />
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(4) }/{ getCategoryMissions(4).length }</span>
                                                 </div>
-                                                <div className="flex-grow-1 min-w-0">
+                                                <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS ESPECIALES</span>
                                                     <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
                                                         Estos retos aparecen y desaparecen de la nada ¡son temporales y raros! ¡Estate muy atento!
