@@ -1,5 +1,5 @@
 import { FC, ReactNode, useMemo } from 'react';
-import { NotificationBubbleType } from '../../api';
+import { NotificationAlertType, NotificationBubbleType } from '../../api';
 import { Column } from '../../common';
 import { useNotification } from '../../hooks';
 import { GetAlertLayout } from './views/alert-layouts/GetAlertLayout';
