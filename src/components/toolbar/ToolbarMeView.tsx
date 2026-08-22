@@ -1,4 +1,4 @@
-import { MouseEventType, RoomObjectCategory } from '@nitrots/nitro-renderer';
+import { MouseEventType, RoomObjectCategory, RoomObjectType } from '@nitrots/nitro-renderer';
 import { Dispatch, FC, PropsWithChildren, SetStateAction, useEffect, useRef } from 'react';
 import { CreateLinkEvent, DispatchUiEvent, GetConfiguration, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile } from '../../api';
 import { Base, Flex, LayoutItemCountView } from '../../common';
@@ -22,7 +22,13 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
 
         if(!roomSession) return;
 
-        GetRoomEngine().selectRoomObject(roomSession.roomId, roomSession.ownRoomIndex, RoomObjectCategory.UNIT);
+        const ownUser = roomSession.userDataManager?.getDataByType(GetSessionDataManager().userId, RoomObjectType.USER);
+        const userIndex = ownUser ? ownUser.roomIndex : roomSession.ownRoomIndex;
+
+        if(userIndex >= 0)
+        {
+            GetRoomEngine().selectRoomObject(roomSession.roomId, userIndex, RoomObjectCategory.UNIT);
+        }
     }, []);
 
     useEffect(() =>

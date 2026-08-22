@@ -138,11 +138,11 @@ export const BattlePassView: FC<{}> = () =>
         setWeeklyTimeRemaining(msToCountdown(nextMonday.getTime() - now.getTime()));
     };
 
-    const fetchData = async () =>
+    const fetchData = async (silent: boolean = false) =>
     {
         try
         {
-            setLoading(true);
+            if(!silent) setLoading(true);
             const userId = GetSessionDataManager().userId;
             const res = await fetch(`/api/battlepass/data?user_id=${ userId }`);
             const data = await res.json();
@@ -167,7 +167,7 @@ export const BattlePassView: FC<{}> = () =>
         }
         finally
         {
-            setLoading(false);
+            if(!silent) setLoading(false);
         }
     };
 
@@ -252,7 +252,16 @@ export const BattlePassView: FC<{}> = () =>
     {
         if(!isVisible) return;
         updateAllCountdowns();
-        const timer = setInterval(updateAllCountdowns, 1000);
+        let tick = 0;
+        const timer = setInterval(() =>
+        {
+            updateAllCountdowns();
+            tick++;
+            if(tick % 3 === 0)
+            {
+                fetchData(true);
+            }
+        }, 1000);
         return () => clearInterval(timer);
     }, [ isVisible, bpData.seasonEnd ]);
 
