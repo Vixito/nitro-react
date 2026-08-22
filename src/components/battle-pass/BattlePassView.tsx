@@ -1,5 +1,6 @@
 import { AvatarAction, ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
+import { FaSearch, FaTimes } from 'react-icons/fa';
 import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
 import { Button, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
 import { useSessionInfo } from '../../hooks';
@@ -66,6 +67,7 @@ export const BattlePassView: FC<{}> = () =>
     const [ claiming, setClaiming ] = useState<string | null>(null);
     const [ statusMessage, setStatusMessage ] = useState<{ text: string; type: 'success' | 'danger' } | null>(null);
     const [ previewReward, setPreviewReward ] = useState<{ reward: Reward; isVip: boolean } | null>(null);
+    const [ searchQuery, setSearchQuery ] = useState<string>('');
 
     const { userInfo = null, userFigure = null } = useSessionInfo();
 
@@ -265,6 +267,14 @@ export const BattlePassView: FC<{}> = () =>
         return () => clearInterval(timer);
     }, [ isVisible, bpData.seasonEnd ]);
 
+    // Auto-dismiss status alert after 4 seconds
+    useEffect(() =>
+    {
+        if(!statusMessage) return;
+        const timer = setTimeout(() => setStatusMessage(null), 4000);
+        return () => clearTimeout(timer);
+    }, [ statusMessage ]);
+
     // Claimed set lookup
     const claimedSet = useMemo(() =>
     {
@@ -324,6 +334,27 @@ export const BattlePassView: FC<{}> = () =>
     const nextReward = bpData.rewards.find(r => r.level_required > bpData.user.level) || bpData.rewards[0];
     const currentCategoryMissions = selectedCategory !== null ? getCategoryMissions(selectedCategory) : [];
     const xpPercent = Math.min(100, Math.round((bpData.user.xp / (bpData.user.xpNext || 100)) * 100));
+
+    const filteredAllMissions = useMemo(() =>
+    {
+        if(!searchQuery.trim()) return [];
+        const q = searchQuery.toLowerCase().trim();
+        return bpData.missions.filter(m => 
+            (m.name && m.name.toLowerCase().includes(q)) || 
+            (m.description && m.description.toLowerCase().includes(q)) ||
+            (categoryTitles[m.category] && categoryTitles[m.category].toLowerCase().includes(q))
+        );
+    }, [ bpData.missions, searchQuery ]);
+
+    const displayedCategoryMissions = useMemo(() =>
+    {
+        if(!searchQuery.trim()) return currentCategoryMissions;
+        const q = searchQuery.toLowerCase().trim();
+        return currentCategoryMissions.filter(m => 
+            (m.name && m.name.toLowerCase().includes(q)) || 
+            (m.description && m.description.toLowerCase().includes(q))
+        );
+    }, [ currentCategoryMissions, searchQuery ]);
 
     // Determine currency type accurately: -1 = Credits (Coins), 0 = Pixels (Duckets), 5 = Points (Diamonds)
     const getCurrencyType = (type: string, pointType: number = 0): number | null =>
@@ -627,202 +658,303 @@ export const BattlePassView: FC<{}> = () =>
                         
                         { selectedCategory === null ? (
                             <>
-                                { /* Header: Retos Info */ }
-                                <div className="d-flex align-items-center gap-3 pb-2 mb-2 border-bottom">
-                                    <LayoutBadgeImageView badgeCode="ACH_Graduate1" />
-                                    <div>
-                                        <div className="fw-bold text-dark" style={ { fontSize: '16px' } }>Retos</div>
-                                        <div className="text-muted" style={ { fontSize: '12px' } }>Aquí encontrarás todo tipo de retos ¡cuantos más te pases más rápido subirás de nivel!</div>
+                                { /* Header: Retos Info + Search Input */ }
+                                <div className="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom gap-2">
+                                    <div className="d-flex align-items-center gap-2.5 min-w-0">
+                                        <LayoutBadgeImageView badgeCode="ACH_Graduate1" />
+                                        <div className="min-w-0">
+                                            <div className="fw-bold text-dark" style={ { fontSize: '15px' } }>Retos</div>
+                                            <div className="text-muted text-truncate" style={ { fontSize: '11px' } }>Pasa retos para subir más rápido de nivel</div>
+                                        </div>
+                                    </div>
+                                    <div className="position-relative flex-shrink-0" style={ { width: '180px' } }>
+                                        <input 
+                                            type="text" 
+                                            className="form-control form-control-sm ps-4 pe-4" 
+                                            placeholder="Buscar reto..." 
+                                            value={ searchQuery } 
+                                            onChange={ e => setSearchQuery(e.target.value) } 
+                                            style={ { fontSize: '12px', borderRadius: '6px', height: '30px' } }
+                                        />
+                                        <FaSearch className="position-absolute text-muted" style={ { left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '11px', pointerEvents: 'none' } } />
+                                        { searchQuery.length > 0 && (
+                                            <button 
+                                                type="button" 
+                                                className="btn btn-link btn-sm position-absolute p-0 text-muted" 
+                                                style={ { right: '8px', top: '50%', transform: 'translateY(-50%)', textDecoration: 'none', lineHeight: 1 } } 
+                                                onClick={ () => setSearchQuery('') }>
+                                                <FaTimes style={ { fontSize: '10px' } } />
+                                            </button>
+                                        ) }
                                     </div>
                                 </div>
 
-                                { /* 2x3 Grid of Category Cards */ }
-                                <div className="row g-2.5 flex-grow-1">
-                                    
-                                    { /* Card 1: Primeros Retos */ }
-                                    <div className="col-6">
-                                        <div onClick={ () => setSelectedCategory(1) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3">
-                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">
-                                                        <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[1] } />
-                                                    </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(1) }/{ getCategoryMissions(1).length }</span>
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>PRIMEROS RETOS</span>
-                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
-                                                        Estas recompensas son para aquellos usuarios nuevos, te ayudarán a familiarizarte con este juego.
-                                                    </span>
-                                                </div>
-                                            </div>
+                                { searchQuery.trim().length > 0 ? (
+                                    <div className="overflow-auto pe-2 flex-grow-1 d-flex flex-column gap-2" style={ { maxHeight: '340px' } }>
+                                        <div className="d-flex align-items-center justify-content-between text-muted px-1" style={ { fontSize: '12px' } }>
+                                            <span>Resultados para "<strong>{ searchQuery }</strong>"</span>
+                                            <span className="badge bg-secondary">{ filteredAllMissions.length } reto(s) ({ filteredAllMissions.filter(m => m.completed).length } completados)</span>
                                         </div>
-                                    </div>
-
-                                    { /* Card 2: Retos Legendarios */ }
-                                    <div className="col-6">
-                                        <div onClick={ () => setSelectedCategory(6) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3">
-                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">
-                                                        <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[6] } />
-                                                    </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(6) }/{ getCategoryMissions(6).length }</span>
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS LEGENDARIOS</span>
-                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
-                                                        Estos retos son una verdadera leyenda en Habbten, subirás de nivel muy rápido si los desbloqueas todos.
-                                                    </span>
-                                                </div>
+                                        { filteredAllMissions.length === 0 ? (
+                                            <div className="d-flex flex-column align-items-center justify-content-center py-5 text-center text-muted">
+                                                <FaSearch className="fs-4 mb-2 text-secondary opacity-50" />
+                                                <div className="fw-bold fs-6 text-dark">No se encontraron retos</div>
+                                                <div className="small">No hay retos que coincidan con la búsqueda "{ searchQuery }".</div>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    { /* Card 3: Retos Diarios */ }
-                                    <div className="col-6">
-                                        <div onClick={ () => setSelectedCategory(2) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3">
-                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">
-                                                        <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[2] } />
+                                        ) : (
+                                            filteredAllMissions.map(m => (
+                                                <div key={ m.id } className={ `bp-mission-row ${ m.completed ? 'completed' : '' }` }>
+                                                    <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                        <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
+                                                            { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[m.category] || 'ACH_Graduate1' } /> }
+                                                        </div>
+                                                        <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ m.progress }/{ m.task }</span>
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length }</span>
-                                                </div>
-                                                <div className="min-w-0 flex-grow-1">
-                                                    <div className="d-flex align-items-center justify-content-between gap-2">
-                                                        <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS DIARIOS</span>
-                                                        <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
-                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
-                                                                { dailyTimeRemaining.days } : { dailyTimeRemaining.hours } : { dailyTimeRemaining.minutes } : { dailyTimeRemaining.seconds }
+                                                    <div className="flex-grow-1 min-w-0">
+                                                        <div className="d-flex align-items-center justify-content-between gap-1">
+                                                            <div className="d-flex align-items-center gap-1.5 min-w-0">
+                                                                <span className="badge bg-dark text-white flex-shrink-0" style={ { fontSize: '9px', textTransform: 'uppercase' } }>
+                                                                    { categoryTitles[m.category] || 'Reto' }
+                                                                </span>
+                                                                <span className="fw-bold text-dark text-truncate" style={ { fontSize: '13px' } }>{ m.name }</span>
+                                                            </div>
+                                                            <span className="badge bg-danger text-white fw-bold px-2 py-1 rounded-1 flex-shrink-0" style={ { fontSize: '11px' } }>
+                                                                +{ m.reward_xp } XP
                                                             </span>
                                                         </div>
-                                                    </div>
-                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
-                                                        Estos retos aparecerán cada 24h en el hotel ¡cúmplelos cada día! Son muy sencillos.
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    { /* Card 4: Retos Comunidad */ }
-                                    <div className="col-6">
-                                        <div onClick={ () => setSelectedCategory(5) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3">
-                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">
-                                                        <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[5] } />
-                                                    </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(5) }/{ getCategoryMissions(5).length }</span>
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS COMUNIDAD</span>
-                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
-                                                        Estos retos son únicos y exclusivos para miembros activos de la comunidad de Habbten.
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    { /* Card 5: Retos Semanales */ }
-                                    <div className="col-6">
-                                        <div onClick={ () => setSelectedCategory(3) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3">
-                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">
-                                                        <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[3] } />
-                                                    </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length }</span>
-                                                </div>
-                                                <div className="min-w-0 flex-grow-1">
-                                                    <div className="d-flex align-items-center justify-content-between gap-2">
-                                                        <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS SEMANALES</span>
-                                                        <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
-                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
-                                                                { weeklyTimeRemaining.days } : { weeklyTimeRemaining.hours } : { weeklyTimeRemaining.minutes } : { weeklyTimeRemaining.seconds }
-                                                            </span>
+                                                        <div className="text-muted text-truncate mt-0.5" style={ { fontSize: '11.5px' } }>{ m.description }</div>
+                                                        <div className="progress mt-1.5" style={ { height: '8px', backgroundColor: '#e2e8f0' } }>
+                                                            <div 
+                                                                className={ `progress-bar ${ m.completed ? 'bg-success' : 'bg-primary' }` } 
+                                                                style={ { width: `${ Math.min(100, Math.round((m.progress / m.task) * 100)) }%` } }
+                                                            />
                                                         </div>
                                                     </div>
-                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
-                                                        Estos retos aparecerán cada 7 días en el hotel ¡requieren más dedicación!
-                                                    </span>
+                                                    { m.completed ? (
+                                                        <span className="badge bg-success text-white flex-shrink-0" style={ { fontSize: '11px' } }>✓ Hecho</span>
+                                                    ) : (
+                                                        <span className="badge bg-light text-secondary border flex-shrink-0" style={ { fontSize: '11px' } }>En progreso</span>
+                                                    ) }
                                                 </div>
-                                            </div>
-                                        </div>
+                                            ))
+                                        ) }
                                     </div>
-
-                                    { /* Card 6: Retos Especiales */ }
-                                    <div className="col-6">
-                                        <div onClick={ () => setSelectedCategory(4) } className="bp-category-card h-100">
-                                            <div className="d-flex gap-3">
-                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                    <div className="bp-category-icon-box">
-                                                        <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[4] } />
+                                ) : (
+                                    /* 2x3 Grid of Category Cards */
+                                    <div className="row g-2.5 flex-grow-1">
+                                        
+                                        { /* Card 1: Primeros Retos */ }
+                                        <div className="col-6">
+                                            <div onClick={ () => { setSelectedCategory(1); setSearchQuery(''); } } className="bp-category-card h-100">
+                                                <div className="d-flex gap-3">
+                                                    <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                        <div className="bp-category-icon-box">
+                                                            <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[1] } />
+                                                        </div>
+                                                        <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(1) }/{ getCategoryMissions(1).length }</span>
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(4) }/{ getCategoryMissions(4).length }</span>
-                                                </div>
-                                                <div className="min-w-0">
-                                                    <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS ESPECIALES</span>
-                                                    <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
-                                                        Estos retos aparecen y desaparecen de la nada ¡son temporales y raros! ¡Estate muy atento!
-                                                    </span>
+                                                    <div className="min-w-0">
+                                                        <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>PRIMEROS RETOS</span>
+                                                        <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                            Estas recompensas son para aquellos usuarios nuevos, te ayudarán a familiarizarte con este juego.
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                </div>
+                                        { /* Card 2: Retos Legendarios */ }
+                                        <div className="col-6">
+                                            <div onClick={ () => { setSelectedCategory(6); setSearchQuery(''); } } className="bp-category-card h-100">
+                                                <div className="d-flex gap-3">
+                                                    <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                        <div className="bp-category-icon-box">
+                                                            <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[6] } />
+                                                        </div>
+                                                        <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(6) }/{ getCategoryMissions(6).length }</span>
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS LEGENDARIOS</span>
+                                                        <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                            Estos retos son una verdadera leyenda en Habbten, subirás de nivel muy rápido si los desbloqueas todos.
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        { /* Card 3: Retos Diarios */ }
+                                        <div className="col-6">
+                                            <div onClick={ () => { setSelectedCategory(2); setSearchQuery(''); } } className="bp-category-card h-100">
+                                                <div className="d-flex gap-3">
+                                                    <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                        <div className="bp-category-icon-box">
+                                                            <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[2] } />
+                                                        </div>
+                                                        <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length }</span>
+                                                    </div>
+                                                    <div className="min-w-0 flex-grow-1">
+                                                        <div className="d-flex align-items-center justify-content-between gap-2">
+                                                            <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS DIARIOS</span>
+                                                            <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
+                                                                <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
+                                                                    { dailyTimeRemaining.days } : { dailyTimeRemaining.hours } : { dailyTimeRemaining.minutes } : { dailyTimeRemaining.seconds }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                            Estos retos aparecerán cada 24h en el hotel ¡cúmplelos cada día! Son muy sencillos.
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        { /* Card 4: Retos Comunidad */ }
+                                        <div className="col-6">
+                                            <div onClick={ () => { setSelectedCategory(5); setSearchQuery(''); } } className="bp-category-card h-100">
+                                                <div className="d-flex gap-3">
+                                                    <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                        <div className="bp-category-icon-box">
+                                                            <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[5] } />
+                                                        </div>
+                                                        <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(5) }/{ getCategoryMissions(5).length }</span>
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS COMUNIDAD</span>
+                                                        <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                            Estos retos son únicos y exclusivos para miembros activos de la comunidad de Habbten.
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        { /* Card 5: Retos Semanales */ }
+                                        <div className="col-6">
+                                            <div onClick={ () => { setSelectedCategory(3); setSearchQuery(''); } } className="bp-category-card h-100">
+                                                <div className="d-flex gap-3">
+                                                    <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                        <div className="bp-category-icon-box">
+                                                            <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[3] } />
+                                                        </div>
+                                                        <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length }</span>
+                                                    </div>
+                                                    <div className="min-w-0 flex-grow-1">
+                                                        <div className="d-flex align-items-center justify-content-between gap-2">
+                                                            <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS SEMANALES</span>
+                                                            <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
+                                                                <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
+                                                                    { weeklyTimeRemaining.days } : { weeklyTimeRemaining.hours } : { weeklyTimeRemaining.minutes } : { weeklyTimeRemaining.seconds }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                            Estos retos aparecerán cada 7 días en el hotel ¡requieren más dedicación!
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        { /* Card 6: Retos Especiales */ }
+                                        <div className="col-6">
+                                            <div onClick={ () => { setSelectedCategory(4); setSearchQuery(''); } } className="bp-category-card h-100">
+                                                <div className="d-flex gap-3">
+                                                    <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                        <div className="bp-category-icon-box">
+                                                            <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[4] } />
+                                                        </div>
+                                                        <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(4) }/{ getCategoryMissions(4).length }</span>
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS ESPECIALES</span>
+                                                        <span className="text-muted" style={ { fontSize: '12px', lineHeight: 1.3 } }>
+                                                            Estos retos aparecen y desaparecen de la nada ¡son temporales y raros! ¡Estate muy atento!
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                ) }
                             </>
                         ) : (
                             <>
-                                { /* Header with Back Button */ }
-                                <div className="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom">
-                                    <div className="d-flex align-items-center gap-3">
-                                        <Button size="sm" variant="secondary" onClick={ () => setSelectedCategory(null) } className="py-1 px-3" style={ { fontSize: '13px' } }>
+                                { /* Header with Back Button + Category Search */ }
+                                <div className="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom gap-2">
+                                    <div className="d-flex align-items-center gap-2.5 min-w-0">
+                                        <Button size="sm" variant="secondary" onClick={ () => { setSelectedCategory(null); setSearchQuery(''); } } className="py-1 px-2.5" style={ { fontSize: '12px' } }>
                                             « Volver
                                         </Button>
                                         <div className="bp-back-separator" />
-                                        <span className="fw-bold text-dark" style={ { fontSize: '16px' } }>{ categoryTitles[selectedCategory] || 'Retos' }</span>
+                                        <span className="fw-bold text-dark text-truncate" style={ { fontSize: '15px' } }>{ categoryTitles[selectedCategory] || 'Retos' }</span>
                                     </div>
-                                    <span className="badge bg-primary text-white" style={ { fontSize: '12px' } }>
-                                        { getCategoryCompleted(selectedCategory) } / { currentCategoryMissions.length } Completados
-                                    </span>
+                                    <div className="d-flex align-items-center gap-2 flex-shrink-0">
+                                        <div className="position-relative" style={ { width: '150px' } }>
+                                            <input 
+                                                type="text" 
+                                                className="form-control form-control-sm ps-4 pe-4" 
+                                                placeholder="Buscar..." 
+                                                value={ searchQuery } 
+                                                onChange={ e => setSearchQuery(e.target.value) } 
+                                                style={ { fontSize: '12px', borderRadius: '6px', height: '28px' } }
+                                            />
+                                            <FaSearch className="position-absolute text-muted" style={ { left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px', pointerEvents: 'none' } } />
+                                            { searchQuery.length > 0 && (
+                                                <button 
+                                                    type="button" 
+                                                    className="btn btn-link btn-sm position-absolute p-0 text-muted" 
+                                                    style={ { right: '8px', top: '50%', transform: 'translateY(-50%)', textDecoration: 'none', lineHeight: 1 } } 
+                                                    onClick={ () => setSearchQuery('') }>
+                                                    <FaTimes style={ { fontSize: '10px' } } />
+                                                </button>
+                                            ) }
+                                        </div>
+                                        <span className="badge bg-primary text-white" style={ { fontSize: '11px' } }>
+                                            { getCategoryCompleted(selectedCategory) } / { currentCategoryMissions.length }
+                                        </span>
+                                    </div>
                                 </div>
 
                                 { /* Challenges List */ }
                                 <div className="overflow-auto pe-2 flex-grow-1 d-flex flex-column gap-2" style={ { maxHeight: '340px' } }>
-                                    { currentCategoryMissions.length === 0 ? (
+                                    { displayedCategoryMissions.length === 0 ? (
                                         <div className="d-flex flex-column align-items-center justify-content-center py-5 text-center text-muted">
-                                            <div className="fw-bold fs-6 text-dark mt-2">No hay retos disponibles</div>
-                                            <div className="small">Próximamente se añadirán más retos en esta categoría. ¡Sigue atento!</div>
+                                            <FaSearch className="fs-4 mb-2 text-secondary opacity-50" />
+                                            <div className="fw-bold fs-6 text-dark mt-1">No hay retos disponibles</div>
+                                            <div className="small">{ searchQuery ? `No hay retos que coincidan con "${searchQuery}".` : 'Próximamente se añadirán más retos en esta categoría. ¡Sigue atento!' }</div>
                                         </div>
                                     ) : (
-                                        currentCategoryMissions.map(m => (
+                                        displayedCategoryMissions.map(m => (
                                             <div key={ m.id } className={ `bp-mission-row ${ m.completed ? 'completed' : '' }` }>
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
-                                                        { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode="ACH_SafetyQuizPassed1" /> }
+                                                        { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[selectedCategory] || 'ACH_SafetyQuizPassed1' } /> }
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ m.progress }/{ m.task }</span>
                                                 </div>
                                                 <div className="flex-grow-1 min-w-0">
-                                                    <div className="d-flex align-items-center justify-content-between">
-                                                        <span className="fw-bold text-dark text-truncate" style={ { fontSize: '14px' } }>{ m.name }</span>
-                                                        <span className="badge bg-danger text-white fw-bold px-2 py-1 rounded-1" style={ { fontSize: '12px' } }>
+                                                    <div className="d-flex align-items-center justify-content-between gap-1">
+                                                        <span className="fw-bold text-dark text-truncate" style={ { fontSize: '13.5px' } }>{ m.name }</span>
+                                                        <span className="badge bg-danger text-white fw-bold px-2 py-1 rounded-1 flex-shrink-0" style={ { fontSize: '11px' } }>
                                                             +{ m.reward_xp } XP
                                                         </span>
                                                     </div>
-                                                    <div className="text-muted text-truncate" style={ { fontSize: '12px' } }>{ m.description }</div>
-                                                    <div className="progress mt-2" style={ { height: '10px', backgroundColor: '#e2e8f0' } }>
+                                                    <div className="text-muted text-truncate mt-0.5" style={ { fontSize: '11.5px' } }>{ m.description }</div>
+                                                    <div className="progress mt-1.5" style={ { height: '8px', backgroundColor: '#e2e8f0' } }>
                                                         <div 
                                                             className={ `progress-bar ${ m.completed ? 'bg-success' : 'bg-primary' }` } 
                                                             style={ { width: `${ Math.min(100, Math.round((m.progress / m.task) * 100)) }%` } }
                                                         />
                                                     </div>
                                                 </div>
-                                                { m.completed && <span className="badge bg-success text-white flex-shrink-0" style={ { fontSize: '12px' } }>✓ Hecho</span> }
+                                                { m.completed ? (
+                                                    <span className="badge bg-success text-white flex-shrink-0" style={ { fontSize: '11px' } }>✓ Hecho</span>
+                                                ) : (
+                                                    <span className="badge bg-light text-secondary border flex-shrink-0" style={ { fontSize: '11px' } }>En progreso</span>
+                                                ) }
                                             </div>
                                         ))
                                     ) }
