@@ -65,8 +65,14 @@ export const NotificationCenterView: FC<{}> = props =>
         return elements;
     }, [ confirms, closeConfirm ]);
 
+    const hasModal = useMemo(() =>
+    {
+        return ((alerts && alerts.length > 0) || (confirms && confirms.length > 0));
+    }, [ alerts, confirms ]);
+
     return (
         <>
+            { hasModal && <div className="nitro-alert-backdrop" /> }
             <Column gap={ 1 }>
                 { getBubbleAlerts }
             </Column>
