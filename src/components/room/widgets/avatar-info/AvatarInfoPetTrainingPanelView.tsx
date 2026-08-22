@@ -35,25 +35,42 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = props =>
     if(!petData || !petTrainInformation) return null;
 
     return (
-        <NitroCardView uniqueKey="user-settings" className="user-settings-window no-resize" theme="primary-slim">
-            <NitroCardHeaderView headerText={ LocalizeText('widgets.pet.commands.title') } onCloseClick={ () => setPetTrainInformation(null) } />
+        <NitroCardView uniqueKey="pet-training" className="pet-training-window no-resize" theme="primary-slim">
+            <NitroCardHeaderView headerText={ LocalizeText('widgets.pet.commands.title', 'Comandos de Mascota') } onCloseClick={ () => setPetTrainInformation(null) } />
             <NitroCardContentView className="text-black">
-                <Flex alignItems="center" justifyContent="center" gap={ 2 }>
-                    <Grid columnCount={ 2 }>
-                        <Column fullWidth overflow="hidden" className="body-image pet p-1">
-                            <LayoutPetImageView figure={ petData.figure } posture={ 'std' } direction={ 2 } />
-                        </Column>
-                        <Text variant="black" small wrap>{ petData.name }</Text>
-                    </Grid>
+                <Flex alignItems="center" gap={ 2 } className="pet-training-header mb-2">
+                    <div className="pet-training-preview">
+                        <LayoutPetImageView figure={ petData.figure } posture={ 'std' } direction={ 2 } />
+                    </div>
+                    <Column gap={ 0 } className="flex-1 min-w-0">
+                        <Text bold className="text-truncate">{ petData.name }</Text>
+                        <Text small variant="muted" style={{ fontSize: '11px' }}>Haz clic en un comando para entrenar:</Text>
+                    </Column>
                 </Flex>
-                <Grid columnCount={ 2 }>
-                    {
-                        (petTrainInformation.commands && petTrainInformation.commands.length > 0) && petTrainInformation.commands.map((command, index) =>
-                            <Button key={ index } disabled={ !petTrainInformation.enabledCommands.includes(command) } onClick={ () => processPetAction(petData.name, LocalizeText(`pet.command.${ command }`)) }>{ LocalizeText(`pet.command.${ command }`) }</Button>
-                        )
-                    }
-                </Grid>
+                <div className="pet-commands-container">
+                    <Grid columnCount={ 2 } gap={ 1 }>
+                        {
+                            (petTrainInformation.commands && petTrainInformation.commands.length > 0) && petTrainInformation.commands.map((command, index) => {
+                                const isEnabled = petTrainInformation.enabledCommands && petTrainInformation.enabledCommands.includes(command);
+                                const commandText = LocalizeText(`pet.command.${ command }`);
+                                return (
+                                    <Button
+                                        key={ index }
+                                        variant={ isEnabled ? 'primary' : 'secondary' }
+                                        disabled={ !isEnabled }
+                                        onClick={ () => processPetAction(petData.name, commandText) }
+                                        className="text-truncate"
+                                        style={{ fontSize: '11px', padding: '4px 6px' }}
+                                    >
+                                        { commandText }
+                                    </Button>
+                                );
+                            })
+                        }
+                    </Grid>
+                </div>
             </NitroCardContentView>
         </NitroCardView>
     );
 };
+

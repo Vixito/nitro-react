@@ -132,3 +132,40 @@
         height: 18px;
     }
 }
+
+.pet-training-window {
+    width: 320px !important;
+    min-width: 320px !important;
+
+    .pet-training-header {
+        background: rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        padding: 6px 10px;
+    }
+
+    .pet-training-preview {
+        width: 54px;
+        height: 54px;
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .pet-commands-container {
+        max-height: 220px;
+        overflow-y: auto;
+        padding-right: 2px;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+    }
+}
