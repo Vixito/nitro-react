@@ -126,7 +126,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
             <Flex fullHeight overflow="hidden" className="w-100" gap={ hasFrank || (item.imageUrl && !imageFailed) ? 2 : 0 }>
                 { hasFrank && !item.imageUrl && <Base className="notification-frank flex-shrink-0" /> }
                 { item.imageUrl && !imageFailed && <img src={ item.imageUrl } alt={ item.title } onError={ () => setImageFailed(true) } className="align-self-baseline" /> }
-                <Base classNames={ [ 'notification-text d-flex flex-column w-100 flex-grow-1 overflow-hidden', (item.clickUrl && !hasFrank) ? 'justify-content-center' : '' ] }>
+                <Base classNames={ [ 'notification-text d-flex flex-column w-100 flex-grow-1 overflow-hidden', (item.clickUrl && !hasFrank && !item.imageUrl) ? 'justify-content-center' : 'justify-content-between' ] }>
                     { isCommandsList && (
                         <div className="d-flex flex-column gap-2 mb-2 flex-shrink-0">
                             <Flex fullWidth alignItems="center" gap={ 1 } className="bg-white rounded border" style={{ padding: '5px 10px' }}>
@@ -167,11 +167,12 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                             const htmlText = message.replace(/\r\n|\r|\n/g, '<br />');
                             return <Base key={ index } dangerouslySetInnerHTML={ { __html: htmlText } } />;
                         }) }
-                        { item.clickUrl && (item.clickUrl.length > 0) && (item.imageUrl && !imageFailed) && <>
-                            <hr className="my-2 w-100" />
-                            <Button onClick={ visitUrl } className="align-self-center px-3">{ LocalizeText(item.clickUrlText) }</Button>
-                        </> }
                     </div>
+                    { item.clickUrl && (item.clickUrl.length > 0) && (item.imageUrl && !imageFailed) && (
+                        <div className="d-flex flex-column w-100 mt-auto pt-2 flex-shrink-0">
+                            <Button onClick={ visitUrl } className="w-100 py-1">{ LocalizeText(item.clickUrlText) }</Button>
+                        </div>
+                    ) }
                 </Base>
             </Flex>
             { (!item.imageUrl || (item.imageUrl && imageFailed)) && <>

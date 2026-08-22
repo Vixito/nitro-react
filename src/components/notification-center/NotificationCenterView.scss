@@ -87,14 +87,19 @@
 
     &.nitro-alert-hotel\.event,
     &.nitro-alert-hotel_event {
-        width: 480px;
-        min-height: 220px;
-        max-height: 440px;
+        width: 510px;
+        min-height: 210px;
 
-        img {
-            max-width: 190px;
-            height: auto;
+        img,
+        .notification-image {
+            width: 220px;
+            height: 177px;
+            min-width: 220px;
+            min-height: 177px;
             object-fit: contain;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
         }
     }
 
