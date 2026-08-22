@@ -67,7 +67,15 @@ export const NotificationCenterView: FC<{}> = props =>
 
     const hasModal = useMemo(() =>
     {
-        return ((alerts && alerts.length > 0) || (confirms && confirms.length > 0));
+        if (confirms && confirms.length > 0) return true;
+        if (!alerts || !alerts.length) return false;
+
+        return alerts.some(alert =>
+        {
+            if (alert.alertType === NotificationAlertType.MOTD || alert.alertType === NotificationAlertType.SEARCH) return false;
+            if (alert.messages && alert.messages.some(msg => msg.includes('is-commands-list') || msg.includes('cmd-category-block') || msg.includes('cmd-row'))) return false;
+            return true;
+        });
     }, [ alerts, confirms ]);
 
     return (
