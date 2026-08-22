@@ -689,7 +689,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length }</span>
                                                 </div>
-                                                <div className="min-w-0">
+                                                <div className="min-w-0 flex-grow-1">
                                                     <div className="d-flex align-items-center justify-content-between gap-2">
                                                         <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS DIARIOS</span>
                                                         <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
@@ -736,7 +736,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length }</span>
                                                 </div>
-                                                <div className="min-w-0">
+                                                <div className="min-w-0 flex-grow-1">
                                                     <div className="d-flex align-items-center justify-content-between gap-2">
                                                         <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS SEMANALES</span>
                                                         <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
