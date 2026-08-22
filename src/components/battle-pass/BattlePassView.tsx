@@ -300,8 +300,6 @@ export const BattlePassView: FC<{}> = () =>
         return reachedCount * 76;
     }, [ bpData.rewards, bpData.user.level ]);
 
-    if(!isVisible) return null;
-
     const completedMissions = bpData.missions.filter(m => m.completed);
     const pendingMissions = bpData.missions.filter(m => !m.completed);
 
@@ -424,6 +422,8 @@ export const BattlePassView: FC<{}> = () =>
             </>
         );
     };
+
+    if(!isVisible) return null;
 
     return (
         <NitroCardView uniqueKey="battle-pass" className="nitro-battle-pass" theme="primary-slim">
