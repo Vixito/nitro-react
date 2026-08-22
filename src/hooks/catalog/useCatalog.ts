@@ -234,7 +234,7 @@ const useCatalogState = () =>
 
     const getNodeByName = useCallback((name: string, node: ICatalogNode) =>
     {
-        if((node.pageName === name) && (node !== rootNode)) return node;
+        if(((node.pageName === name) || (name === 'guild_custom_furni' && node.pageName === 'group_furni') || (name === 'group_furni' && node.pageName === 'guild_custom_furni')) && (node !== rootNode)) return node;
 
         for(const child of node.children)
         {

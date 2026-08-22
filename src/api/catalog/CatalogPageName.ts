@@ -1,4 +1,4 @@
-﻿export class CatalogPageName 
+export class CatalogPageName 
 {
     public static DUCKET_INFO: string = 'ducket_info';
     public static CREDITS: string = 'credits';
@@ -12,7 +12,7 @@
     public static QUEST_SHELL: string = 'quest_shell';
     public static QUEST_SNOWFLAKES: string = 'quest_snowflakes';
     public static VAL_QUESTS: string = 'val_quests';
-    public static GUILD_CUSTOM_FURNI: string = 'guild_custom_furni';
+    public static GUILD_CUSTOM_FURNI: string = 'group_furni';
     public static GIFT_SHOP: string = 'gift_shop';
     public static HORSE_STYLES: string = 'horse_styles';
     public static HORSE_SHOE: string = 'horse_shoe';

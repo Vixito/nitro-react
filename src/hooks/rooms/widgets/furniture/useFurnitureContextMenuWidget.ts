@@ -1,7 +1,8 @@
 import { ContextMenuEnum, GroupFurniContextMenuInfoMessageEvent, GroupFurniContextMenuInfoMessageParser, RoomEngineTriggerWidgetEvent, RoomObjectCategory, RoomObjectVariable } from '@nitrots/nitro-renderer';
 import { useState } from 'react';
-import { GetRoomEngine, IsOwnerOfFurniture, TryJoinGroup, TryVisitRoom } from '../../../../api';
+import { GetRoomEngine, IsOwnerOfFurniture, LocalizeText, TryJoinGroup, TryVisitRoom } from '../../../../api';
 import { useMessageEvent, useRoomEngineEvent } from '../../../events';
+import { useNotification } from '../../../notification/useNotification';
 import { useRoom } from '../../useRoom';
 
 export const MONSTERPLANT_SEED_CONFIRMATION: string = 'MONSTERPLANT_SEED_CONFIRMATION';
@@ -20,6 +21,7 @@ const useFurnitureContextMenuWidgetState = () =>
     const [ isGroupMember, setIsGroupMember ] = useState(false);
     const [ objectOwnerId, setObjectOwnerId ] = useState(-1);
     const { roomSession = null } = useRoom();
+    const { simpleAlert = null } = useNotification();
 
     const onClose = () =>
     {
@@ -68,6 +70,12 @@ const useFurnitureContextMenuWidgetState = () =>
                     return;
                 case 'go_to_group_homeroom':
                     if(groupData) TryVisitRoom(groupData.guildHomeRoomId);
+                    break;
+                case 'open_forum':
+                    if(groupData)
+                    {
+                        simpleAlert(LocalizeText('groupforum.view.error.forums_disabled'), null, null, null, LocalizeText('groupforum.view.window_title'));
+                    }
                     break;
             }
         }
