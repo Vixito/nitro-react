@@ -75,21 +75,22 @@ const useChatWidgetState = () =>
         return existing;
     }
 
-    const getPetImage = (figure: string, direction: number, _arg_3: boolean, scale: number = 64, posture: string = null) =>
+    const getPetImage = (figure: string, direction: number = 3, _arg_3: boolean = true, scale: number = 64, posture: string = null, headOnly: boolean = true) =>
     {
-        let existing = petImageCache.get((figure + posture));
+        let existing = petImageCache.get((figure + posture + headOnly));
 
         if(existing) return existing;
 
         const figureData = new PetFigureData(figure);
         const typeId = figureData.typeId;
-        const image = GetRoomEngine().getRoomObjectPetImage(typeId, figureData.paletteId, figureData.color, new Vector3d((direction * 45)), scale, null, false, 0, figureData.customParts, posture);
+        const petHeadOnly = (typeId === 16) ? false : headOnly;
+        const image = GetRoomEngine().getRoomObjectPetImage(typeId, figureData.paletteId, figureData.color, new Vector3d((direction * 45)), scale, null, petHeadOnly, 0, figureData.customParts, posture);
 
         if(image)
         {
             existing = TextureUtils.generateImageUrl(image.data);
 
-            petImageCache.set((figure + posture), existing);
+            petImageCache.set((figure + posture + headOnly), existing);
         }
 
         return existing;
@@ -119,7 +120,7 @@ const useChatWidgetState = () =>
             switch(userType)
             {
                 case RoomObjectType.PET:
-                    imageUrl = getPetImage(figure, 2, true, 64, roomObject.model.getValue<string>(RoomObjectVariable.FIGURE_POSTURE));
+                    imageUrl = getPetImage(figure, 3, true, 64, null, true);
                     petType = new PetFigureData(figure).typeId;
                     break;
                 case RoomObjectType.USER:

@@ -660,11 +660,13 @@ export const BattlePassView: FC<{}> = () =>
                             <>
                                 { /* Header: Retos Info + Search Input */ }
                                 <div className="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom gap-2">
-                                    <div className="d-flex align-items-center gap-2.5 min-w-0">
-                                        <LayoutBadgeImageView badgeCode="ACH_Graduate1" />
+                                    <div className="d-flex align-items-center min-w-0" style={ { gap: '12px' } }>
+                                        <div className="d-flex align-items-center justify-content-center flex-shrink-0" style={ { width: 40, height: 40 } }>
+                                            <LayoutBadgeImageView badgeCode="ACH_Graduate1" />
+                                        </div>
                                         <div className="min-w-0">
-                                            <div className="fw-bold text-dark" style={ { fontSize: '15px' } }>Retos</div>
-                                            <div className="text-muted text-truncate" style={ { fontSize: '11px' } }>Pasa retos para subir más rápido de nivel</div>
+                                            <div className="fw-bold text-dark" style={ { fontSize: '15px', lineHeight: 1.2 } }>Retos</div>
+                                            <div className="text-muted text-truncate mt-0.5" style={ { fontSize: '11.5px' } }>Pasa retos para subir más rápido de nivel</div>
                                         </div>
                                     </div>
                                     <div className="position-relative flex-shrink-0" style={ { width: '180px' } }>
@@ -691,9 +693,16 @@ export const BattlePassView: FC<{}> = () =>
 
                                 { searchQuery.trim().length > 0 ? (
                                     <div className="overflow-auto pe-2 flex-grow-1 d-flex flex-column gap-2" style={ { maxHeight: '340px' } }>
-                                        <div className="d-flex align-items-center justify-content-between text-muted px-1" style={ { fontSize: '12px' } }>
-                                            <span>Resultados para "<strong>{ searchQuery }</strong>"</span>
-                                            <span className="badge bg-secondary">{ filteredAllMissions.length } reto(s) ({ filteredAllMissions.filter(m => m.completed).length } completados)</span>
+                                        <div className="d-flex align-items-center justify-content-between px-1 py-1 text-secondary" style={ { fontSize: '12px' } }>
+                                            <span>Resultados para "<strong>{ searchQuery }</strong>":</span>
+                                            <div className="d-flex align-items-center" style={ { gap: '6px' } }>
+                                                <span className="badge bg-primary text-white" style={ { fontSize: '11px', padding: '4px 8px', fontWeight: 600 } }>
+                                                    { filteredAllMissions.length } { filteredAllMissions.length === 1 ? 'reto' : 'retos' }
+                                                </span>
+                                                <span className="badge bg-success text-white" style={ { fontSize: '11px', padding: '4px 8px', fontWeight: 600 } }>
+                                                    ✓ { filteredAllMissions.filter(m => m.completed).length } completados
+                                                </span>
+                                            </div>
                                         </div>
                                         { filteredAllMissions.length === 0 ? (
                                             <div className="d-flex flex-column align-items-center justify-content-center py-5 text-center text-muted">
@@ -712,8 +721,8 @@ export const BattlePassView: FC<{}> = () =>
                                                     </div>
                                                     <div className="flex-grow-1 min-w-0">
                                                         <div className="d-flex align-items-center justify-content-between gap-1">
-                                                            <div className="d-flex align-items-center gap-1.5 min-w-0">
-                                                                <span className="badge bg-dark text-white flex-shrink-0" style={ { fontSize: '9px', textTransform: 'uppercase' } }>
+                                                            <div className="d-flex align-items-center min-w-0" style={ { gap: '8px' } }>
+                                                                <span className="badge bg-dark text-white flex-shrink-0" style={ { fontSize: '9.5px', textTransform: 'uppercase', letterSpacing: '0.3px', padding: '3px 6px' } }>
                                                                     { categoryTitles[m.category] || 'Reto' }
                                                                 </span>
                                                                 <span className="fw-bold text-dark text-truncate" style={ { fontSize: '13px' } }>{ m.name }</span>
@@ -884,8 +893,8 @@ export const BattlePassView: FC<{}> = () =>
                             <>
                                 { /* Header with Back Button + Category Search */ }
                                 <div className="d-flex align-items-center justify-content-between pb-2 mb-2 border-bottom gap-2">
-                                    <div className="d-flex align-items-center gap-2.5 min-w-0">
-                                        <Button size="sm" variant="secondary" onClick={ () => { setSelectedCategory(null); setSearchQuery(''); } } className="py-1 px-2.5" style={ { fontSize: '12px' } }>
+                                    <div className="d-flex align-items-center min-w-0" style={ { gap: '10px' } }>
+                                        <Button size="sm" variant="secondary" onClick={ () => { setSelectedCategory(null); setSearchQuery(''); } } className="py-1 px-3" style={ { fontSize: '12px', fontWeight: 600 } }>
                                             « Volver
                                         </Button>
                                         <div className="bp-back-separator" />
