@@ -7,7 +7,7 @@ export class CatalogPageName
     public static CLUB_GIFTS: string = 'club_gifts';
     public static LIMITED_SOLD: string = 'limited_sold';
     public static PET_ACCESSORIES: string = 'pet_accessories';
-    public static TRAX_SONGS: string = 'trax_songs';
+    public static TRAX_SONGS: string = 'habbo_hotel_hits';
     public static NEW_ADDITIONS: string = 'new_additions';
     public static QUEST_SHELL: string = 'quest_shell';
     public static QUEST_SNOWFLAKES: string = 'quest_snowflakes';
