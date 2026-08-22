@@ -305,7 +305,6 @@ export const BattlePassView: FC<{}> = () =>
     };
 
     const getCategoryMissions = (cat: number) => {
-        if(cat === 4) return bpData.missions.filter(m => m.category === 4 || m.category === 5);
         return bpData.missions.filter(m => m.category === cat);
     };
 
@@ -634,7 +633,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[1] } />
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(1) }/{ getCategoryMissions(1).length || 6 }</span>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(1) }/{ getCategoryMissions(1).length }</span>
                                                 </div>
                                                 <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>PRIMEROS RETOS</span>
@@ -654,7 +653,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[6] } />
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(6) }/{ getCategoryMissions(6).length || 10 }</span>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(6) }/{ getCategoryMissions(6).length }</span>
                                                 </div>
                                                 <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS LEGENDARIOS</span>
@@ -674,7 +673,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[2] } />
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length || 10 }</span>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(2) }/{ getCategoryMissions(2).length }</span>
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className="d-flex align-items-center justify-content-between gap-2">
@@ -701,7 +700,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[5] } />
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(5) }/{ getCategoryMissions(5).length || 8 }</span>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(5) }/{ getCategoryMissions(5).length }</span>
                                                 </div>
                                                 <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS COMUNIDAD</span>
@@ -721,7 +720,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[3] } />
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length || 7 }</span>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(3) }/{ getCategoryMissions(3).length }</span>
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className="d-flex align-items-center justify-content-between gap-2">
@@ -748,7 +747,7 @@ export const BattlePassView: FC<{}> = () =>
                                                     <div className="bp-category-icon-box">
                                                         <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[4] } />
                                                     </div>
-                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(4) }/{ getCategoryMissions(4).length || 6 }</span>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ getCategoryCompleted(4) }/{ getCategoryMissions(4).length }</span>
                                                 </div>
                                                 <div className="min-w-0">
                                                     <span className="fw-bold text-dark d-block" style={ { fontSize: '14px' } }>RETOS ESPECIALES</span>
@@ -780,32 +779,39 @@ export const BattlePassView: FC<{}> = () =>
 
                                 { /* Challenges List */ }
                                 <div className="overflow-auto pe-2 flex-grow-1 d-flex flex-column gap-2" style={ { maxHeight: '340px' } }>
-                                    { currentCategoryMissions.map(m => (
-                                        <div key={ m.id } className={ `bp-mission-row ${ m.completed ? 'completed' : '' }` }>
-                                            <div className="d-flex flex-column align-items-center flex-shrink-0">
-                                                <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
-                                                    { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode="ACH_SafetyQuizPassed1" /> }
-                                                </div>
-                                                <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ m.progress }/{ m.task }</span>
-                                            </div>
-                                            <div className="flex-grow-1 min-w-0">
-                                                <div className="d-flex align-items-center justify-content-between">
-                                                    <span className="fw-bold text-dark text-truncate" style={ { fontSize: '14px' } }>{ m.name }</span>
-                                                    <span className="badge bg-danger text-white fw-bold px-2 py-1 rounded-1" style={ { fontSize: '12px' } }>
-                                                        +{ m.reward_xp } XP
-                                                    </span>
-                                                </div>
-                                                <div className="text-muted text-truncate" style={ { fontSize: '12px' } }>{ m.description }</div>
-                                                <div className="progress mt-2" style={ { height: '10px', backgroundColor: '#e2e8f0' } }>
-                                                    <div 
-                                                        className={ `progress-bar ${ m.completed ? 'bg-success' : 'bg-primary' }` } 
-                                                        style={ { width: `${ Math.min(100, Math.round((m.progress / m.task) * 100)) }%` } }
-                                                    />
-                                                </div>
-                                            </div>
-                                            { m.completed && <span className="badge bg-success text-white flex-shrink-0" style={ { fontSize: '12px' } }>✓ Hecho</span> }
+                                    { currentCategoryMissions.length === 0 ? (
+                                        <div className="d-flex flex-column align-items-center justify-content-center py-5 text-center text-muted">
+                                            <div className="fw-bold fs-6 text-dark mt-2">No hay retos disponibles</div>
+                                            <div className="small">Próximamente se añadirán más retos en esta categoría. ¡Sigue atento!</div>
                                         </div>
-                                    )) }
+                                    ) : (
+                                        currentCategoryMissions.map(m => (
+                                            <div key={ m.id } className={ `bp-mission-row ${ m.completed ? 'completed' : '' }` }>
+                                                <div className="d-flex flex-column align-items-center flex-shrink-0">
+                                                    <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
+                                                        { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode="ACH_SafetyQuizPassed1" /> }
+                                                    </div>
+                                                    <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ m.progress }/{ m.task }</span>
+                                                </div>
+                                                <div className="flex-grow-1 min-w-0">
+                                                    <div className="d-flex align-items-center justify-content-between">
+                                                        <span className="fw-bold text-dark text-truncate" style={ { fontSize: '14px' } }>{ m.name }</span>
+                                                        <span className="badge bg-danger text-white fw-bold px-2 py-1 rounded-1" style={ { fontSize: '12px' } }>
+                                                            +{ m.reward_xp } XP
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-muted text-truncate" style={ { fontSize: '12px' } }>{ m.description }</div>
+                                                    <div className="progress mt-2" style={ { height: '10px', backgroundColor: '#e2e8f0' } }>
+                                                        <div 
+                                                            className={ `progress-bar ${ m.completed ? 'bg-success' : 'bg-primary' }` } 
+                                                            style={ { width: `${ Math.min(100, Math.round((m.progress / m.task) * 100)) }%` } }
+                                                        />
+                                                    </div>
+                                                </div>
+                                                { m.completed && <span className="badge bg-success text-white flex-shrink-0" style={ { fontSize: '12px' } }>✓ Hecho</span> }
+                                            </div>
+                                        ))
+                                    ) }
                                 </div>
                             </>
                         ) }
