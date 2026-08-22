@@ -112,7 +112,7 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = props =>
         switch(purchaseState)
         {
             case CatalogPurchaseState.CONFIRM:
-                return <Button fullWidth variant="warning" onClick={ purchaseSubscription }>{ LocalizeText('catalog.marketplace.confirm_title') }</Button>;
+                return <Button fullWidth variant="warning" onClick={ purchaseSubscription }>{ LocalizeText('catalog.purchase_confirmation.title') }</Button>;
             case CatalogPurchaseState.PURCHASE:
                 return <Button fullWidth variant="primary" disabled><LayoutLoadingSpinnerView /></Button>;
             case CatalogPurchaseState.FAILED:

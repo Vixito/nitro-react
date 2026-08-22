@@ -139,7 +139,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = pro
         switch(purchaseState)
         {
             case CatalogPurchaseState.CONFIRM:
-                return <Button variant="warning" onClick={ event => purchase() }>{ LocalizeText('catalog.marketplace.confirm_title') }</Button>;
+                return <Button variant="warning" onClick={ event => purchase() }>{ LocalizeText('catalog.purchase_confirmation.title') }</Button>;
             case CatalogPurchaseState.PURCHASE:
                 return <Button disabled><LayoutLoadingSpinnerView /></Button>;
             case CatalogPurchaseState.FAILED:
