@@ -80,7 +80,7 @@ export const GroupTabIdentityView: FC<GroupTabIdentityViewProps> = props =>
     if(!groupData) return null;
 
     return (
-        <Column justifyContent="between" overflow="auto">
+        <Column grow justifyContent="between" overflow="auto">
             <Column gap={ 1 }>
                 <Flex alignItems="center" gap={ 1 }>
                     <Text center className="col-3">{ LocalizeText('group.edit.name') }</Text>
