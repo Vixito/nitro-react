@@ -428,14 +428,18 @@
         background: #0f172a;
         color: #ffffff;
         border-radius: 4px;
-        padding: 3px 7px;
-        display: flex;
+        padding: 3px 5px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         white-space: nowrap;
         flex-shrink: 0;
-        min-width: 102px;
+        width: 104px;
+        min-width: 104px;
+        max-width: 104px;
+        box-sizing: border-box;
         line-height: 1;
+        text-align: center;
     }
 
     /* Challenge List Item */
