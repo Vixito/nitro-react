@@ -420,6 +420,11 @@ export const BattlePassView: FC<{}> = () =>
                             <span className="bp-countdown-digit">{ seasonTimeRemaining.minutes }</span>
                             <span style={ { fontSize: '9px', color: '#64748b', fontWeight: 800, marginTop: '2px' } }>Minutos</span>
                         </div>
+                        <span className="fw-bold text-muted" style={ { fontSize: '16px', marginTop: '-12px' } }>:</span>
+                        <div className="d-flex flex-column align-items-center">
+                            <span className="bp-countdown-digit">{ seasonTimeRemaining.seconds }</span>
+                            <span style={ { fontSize: '9px', color: '#64748b', fontWeight: 800, marginTop: '2px' } }>Segundos</span>
+                        </div>
                     </div>
                 </div>
 
@@ -687,9 +692,9 @@ export const BattlePassView: FC<{}> = () =>
                                                 <div className="min-w-0">
                                                     <div className="d-flex align-items-center justify-content-between gap-2">
                                                         <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS DIARIOS</span>
-                                                        <div className="bp-category-timer-pill">
-                                                            <span className="font-monospace fw-bold" style={ { fontSize: '11px' } }>
-                                                                { dailyTimeRemaining.hours } : { dailyTimeRemaining.minutes } : { dailyTimeRemaining.seconds }
+                                                        <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
+                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
+                                                                { dailyTimeRemaining.days } : { dailyTimeRemaining.hours } : { dailyTimeRemaining.minutes } : { dailyTimeRemaining.seconds }
                                                             </span>
                                                         </div>
                                                     </div>
@@ -734,9 +739,9 @@ export const BattlePassView: FC<{}> = () =>
                                                 <div className="min-w-0">
                                                     <div className="d-flex align-items-center justify-content-between gap-2">
                                                         <span className="fw-bold text-dark" style={ { fontSize: '14px' } }>RETOS SEMANALES</span>
-                                                        <div className="bp-category-timer-pill">
-                                                            <span className="font-monospace fw-bold" style={ { fontSize: '11px' } }>
-                                                                { weeklyTimeRemaining.days } : { weeklyTimeRemaining.hours } : { weeklyTimeRemaining.minutes }
+                                                        <div className="bp-category-timer-pill" title="Días : Horas : Minutos : Segundos">
+                                                            <span className="font-monospace fw-bold" style={ { fontSize: '10.5px' } }>
+                                                                { weeklyTimeRemaining.days } : { weeklyTimeRemaining.hours } : { weeklyTimeRemaining.minutes } : { weeklyTimeRemaining.seconds }
                                                             </span>
                                                         </div>
                                                     </div>
