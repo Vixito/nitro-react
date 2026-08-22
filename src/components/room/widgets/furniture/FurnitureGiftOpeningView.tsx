@@ -46,7 +46,7 @@ export const FurnitureGiftOpeningView: FC<{}> = props =>
                         </Column>
                         <Column grow>
                             <Column center gap={ 1 }>
-                                <Text wrap small>{ LocalizeText('widget.furni.present.message_opened') }</Text>
+                                <Text wrap small>{ LocalizeText('widget.furni.present.message_opened', [ 'product' ], [ text ]) }</Text>
                                 <Text bold fontSize={ 5 }>{ text }</Text>
                             </Column>
                             <Column grow gap={ 1 }>
