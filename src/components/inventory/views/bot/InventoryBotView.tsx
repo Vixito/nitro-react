@@ -39,6 +39,9 @@ export const InventoryBotView: FC<InventoryBotViewProps> = props =>
         roomPreviewer.updateRoomWallsAndFloorVisibility(true, true);
         roomPreviewer.updateObjectRoom(floorType, wallType, landscapeType);
         roomPreviewer.addAvatarIntoRoom(botData.figure, 0);
+        roomPreviewer.updateObjectUserFigure(botData.figure, botData.gender);
+        roomPreviewer.updateUserPosture('std');
+        roomPreviewer.updatePreviewRoomView();
     }, [ roomPreviewer, selectedBot ]);
 
     useEffect(() =>
