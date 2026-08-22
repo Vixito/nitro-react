@@ -117,7 +117,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = props =>
                                 <hr className="m-0" />
                             </Column>
                             <Column gap={ 1 }>
-                                <Text variant="white" small wrap>{ LocalizeText('pet.age', [ 'age' ], [ avatarInfo.age.toString() ]) }</Text>
+                                <Text variant="white" small wrap>{ (avatarInfo.age === 1) ? LocalizeText('pet.age.single', [ 'age' ], [ '1' ]) : LocalizeText('pet.age', [ 'age' ], [ avatarInfo.age.toString() ]) }</Text>
                                 <hr className="m-0" />
                             </Column>
                         </> }
@@ -164,7 +164,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = props =>
                             <Column gap={ 1 }>
                                 { (avatarInfo.petType !== PetType.MONSTERPLANT) &&
                                     <Text variant="white" small wrap>{ LocalizeText('infostand.text.petrespect', [ 'count' ], [ avatarInfo.respect.toString() ]) }</Text> }
-                                <Text variant="white" small wrap>{ LocalizeText('pet.age', [ 'age' ], [ avatarInfo.age.toString() ]) }</Text>
+                                <Text variant="white" small wrap>{ (avatarInfo.age === 1) ? LocalizeText('pet.age.single', [ 'age' ], [ '1' ]) : LocalizeText('pet.age', [ 'age' ], [ avatarInfo.age.toString() ]) }</Text>
                                 <hr className="m-0" />
                             </Column>
                         </> }
