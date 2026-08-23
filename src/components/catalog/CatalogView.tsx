@@ -11,7 +11,7 @@ import { MarketplacePostOfferView } from './views/page/layout/marketplace/Market
 
 export const CatalogView: FC<{}> = props =>
 {
-    const { isVisible = false, setIsVisible = null, rootNode = null, currentPage = null, navigationHidden = false, setNavigationHidden = null, activeNodes = [], searchResult = null, setSearchResult = null, openPageByName = null, openPageByOfferId = null, openSearchByName = null, activateNode = null, getNodeById } = useCatalog();
+    const { isVisible = false, setIsVisible = null, rootNode = null, currentPage = null, navigationHidden = false, setNavigationHidden = null, activeNodes = [], searchResult = null, setSearchResult = null, openPageByName = null, openPageByOfferId = null, openPageByFurniName = null, openSearchByName = null, activateNode = null, getNodeById } = useCatalog();
 
     useEffect(() =>
     {
@@ -44,6 +44,8 @@ export const CatalogView: FC<{}> = props =>
                                         openPageByOfferId(parseInt(parts[3]));
                                         return;
                                     case 'furni':
+                                        openPageByFurniName(parts[3]);
+                                        return;
                                     case 'search':
                                         openSearchByName(parts[3]);
                                         return;
@@ -68,7 +70,7 @@ export const CatalogView: FC<{}> = props =>
         AddEventLinkTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, [ setIsVisible, openPageByOfferId, openPageByName, openSearchByName ]);
+    }, [ setIsVisible, openPageByOfferId, openPageByName, openPageByFurniName, openSearchByName ]);
 
     return (
         <>
