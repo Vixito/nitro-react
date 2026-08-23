@@ -504,18 +504,21 @@ const useCatalogState = () =>
 
             if(!nodes || !nodes.length)
             {
-                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
-
-                if(furni)
+                if(offerId > 0)
                 {
-                    const foundNodes = [
-                        ...GetOfferNodes(offersToNodes, furni.purchaseOfferId),
-                        ...GetOfferNodes(offersToNodes, furni.rentOfferId),
-                        ...GetOfferNodes(offersToNodes, furni.id)
-                    ];
+                    const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+                    const furni = furnitureDatas?.find(f => (offerId > 0 && ((f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId))));
 
-                    if(foundNodes && foundNodes.length) nodes = foundNodes;
+                    if(furni)
+                    {
+                        const foundNodes = [
+                            ...(furni.purchaseOfferId > 0 ? GetOfferNodes(offersToNodes, furni.purchaseOfferId) : []),
+                            ...(furni.rentOfferId > 0 ? GetOfferNodes(offersToNodes, furni.rentOfferId) : []),
+                            ...(furni.id > 0 ? GetOfferNodes(offersToNodes, furni.id) : [])
+                        ];
+
+                        if(foundNodes && foundNodes.length) nodes = foundNodes;
+                    }
                 }
             }
 
@@ -525,20 +528,22 @@ const useCatalogState = () =>
             }
             else
             {
-                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-                const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
+                if(offerId > 0)
+                {
+                    const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+                    const furni = furnitureDatas?.find(f => (offerId > 0 && ((f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId))));
 
-                if(furni)
-                {
-                    openSearchByName(furni.className);
-                }
-                else
-                {
-                    if(rootNode && rootNode.children && rootNode.children.length)
+                    if(furni)
                     {
-                        const first = rootNode.children.find(c => c.isVisible) || rootNode.children[0];
-                        if(first) activateNode(first);
+                        openSearchByName(furni.className);
+                        return;
                     }
+                }
+
+                if(rootNode && rootNode.children && rootNode.children.length)
+                {
+                    const first = rootNode.children.find(c => c.isVisible) || rootNode.children[0];
+                    if(first) activateNode(first);
                 }
             }
         }

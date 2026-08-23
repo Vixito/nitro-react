@@ -1,7 +1,7 @@
 import { CrackableDataType, GroupInformationComposer, GroupInformationEvent, NowPlayingEvent, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, SetObjectDataMessageComposer, SongInfoReceivedEvent, StringDataType } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { AvatarInfoFurni, CreateLinkEvent, GetGroupInformation, GetNitroInstance, GetRoomEngine, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { AvatarInfoFurni, CreateLinkEvent, GetFurnitureDataForRoomObject, GetGroupInformation, GetNitroInstance, GetRoomEngine, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Base, Button, Column, Flex, LayoutBadgeImageView, LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { useMessageEvent, useRoom, useSoundEvent } from '../../../../../hooks';
 
@@ -257,11 +257,24 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
 
         let objectData: string = null;
 
-        switch(action)
-        {
             case 'buy_one':
-                CreateLinkEvent(`catalog/open/offerId/${ avatarInfo.purchaseOfferId }`);
-                return;
+                {
+                    const furniData = roomSession ? GetFurnitureDataForRoomObject(roomSession.roomId, avatarInfo.id, avatarInfo.category) : null;
+                    const targetOfferId = (avatarInfo.purchaseOfferId > 0) ? avatarInfo.purchaseOfferId : (furniData ? furniData.id : -1);
+                    if(targetOfferId > 0)
+                    {
+                        CreateLinkEvent(`catalog/open/offerId/${ targetOfferId }`);
+                    }
+                    else if(furniData)
+                    {
+                        CreateLinkEvent(`catalog/open/search/${ furniData.className }`);
+                    }
+                    else
+                    {
+                        CreateLinkEvent('catalog/open');
+                    }
+                    return;
+                }
             case 'move':
                 GetRoomEngine().processRoomObjectOperation(avatarInfo.id, avatarInfo.category, RoomObjectOperationType.OBJECT_MOVE);
                 break;
