@@ -28,7 +28,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
     const { avatarInfo = null, isDancing = false, setIsDecorating = null, onClose = null } = props;
     const habbtenConfig = (window as any).HabbtenConfig || (window.parent as any).HabbtenConfig;
     const canDanceAll = habbtenConfig?.client?.dances_enabled ?? (habbtenConfig?.dances_enabled ?? true);
-    const [ mode, setMode ] = useState((isDancing && canDanceAll) ? MODE_CLUB_DANCES : MODE_NORMAL);
+    const [ mode, setMode ] = useState(MODE_NORMAL);
     const { roomSession = null } = useRoom();
 
     const processAction = (name: string) =>
@@ -135,6 +135,10 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                     <ContextMenuListItemView onClick={ event => processAction('change_looks') }>
                         { LocalizeText('widget.memenu.myclothes') }
                     </ContextMenuListItemView>
+                    { (isDancing && !isRidingHorse) &&
+                        <ContextMenuListItemView onClick={ event => processAction('dance_stop') }>
+                            { LocalizeText('widget.memenu.dance.stop') }
+                        </ContextMenuListItemView> }
                     { (canDanceAll && !isRidingHorse) &&
                         <ContextMenuListItemView onClick={ event => processAction('dance_menu') }>
                             <FaChevronRight className="right fa-icon" />
