@@ -524,7 +524,8 @@ const useCatalogState = () =>
 
             if(nodes && nodes.length)
             {
-                activateNode(nodes[0], offerId);
+                const targetNode = nodes.find(n => n.pageId !== 5 && !n.isBuildersClub) || nodes[0];
+                activateNode(targetNode, offerId);
             }
             else
             {
