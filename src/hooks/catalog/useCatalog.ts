@@ -524,7 +524,7 @@ const useCatalogState = () =>
 
             if(nodes && nodes.length)
             {
-                const targetNode = nodes.find(n => n.pageId !== 5 && !n.isBuildersClub) || nodes[0];
+                const targetNode = nodes.find(n => n.isVisible && (!n.minRank || n.minRank <= GetSessionDataManager().rank)) || nodes[0];
                 activateNode(targetNode, offerId);
             }
             else
