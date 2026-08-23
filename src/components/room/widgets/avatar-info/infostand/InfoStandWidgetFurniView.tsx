@@ -262,14 +262,13 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
             case 'buy_one':
                 {
                     const furniData = roomSession ? GetFurnitureDataForRoomObject(roomSession.roomId, avatarInfo.id, avatarInfo.category) : null;
-                    const targetOfferId = (avatarInfo.purchaseOfferId > 0) ? avatarInfo.purchaseOfferId : (furniData ? furniData.id : -1);
-                    if(targetOfferId > 0)
-                    {
-                        CreateLinkEvent(`catalog/open/offerId/${ targetOfferId }`);
-                    }
-                    else if(furniData)
+                    if(furniData)
                     {
                         CreateLinkEvent(`catalog/open/search/${ furniData.className }`);
+                    }
+                    else if(avatarInfo.purchaseOfferId > 0)
+                    {
+                        CreateLinkEvent(`catalog/open/offerId/${ avatarInfo.purchaseOfferId }`);
                     }
                     else
                     {

@@ -1,7 +1,7 @@
-import { AvatarAction, AvatarExpressionEnum, RoomControllerLevel, RoomObjectCategory, RoomUnitDropHandItemComposer } from '@nitrots/nitro-renderer';
+import { AvatarAction, AvatarExpressionEnum, RoomControllerLevel, RoomObjectCategory, RoomObjectVariable, RoomUnitDropHandItemComposer } from '@nitrots/nitro-renderer';
 import { Dispatch, FC, SetStateAction, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import { AvatarInfoUser, CreateLinkEvent, DispatchUiEvent, GetCanStandUp, GetCanUseExpression, GetOwnPosture, GetUserProfile, HasHabboClub, HasHabboVip, IsRidingHorse, LocalizeText, PostureTypeEnum, SendMessageComposer } from '../../../../../api';
+import { AvatarInfoUser, CreateLinkEvent, DispatchUiEvent, GetCanStandUp, GetCanUseExpression, GetOwnPosture, GetRoomEngine, GetUserProfile, HasHabboClub, HasHabboVip, IsRidingHorse, LocalizeText, PostureTypeEnum, SendMessageComposer } from '../../../../../api';
 import { Flex, LayoutCurrencyIcon } from '../../../../../common';
 import { HelpNameChangeEvent } from '../../../../../events';
 import { useRoom } from '../../../../../hooks';
@@ -30,6 +30,10 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
     const canDanceAll = habbtenConfig?.client?.dances_enabled ?? (habbtenConfig?.dances_enabled ?? true);
     const [ mode, setMode ] = useState(MODE_NORMAL);
     const { roomSession = null } = useRoom();
+
+    const roomObject = roomSession ? GetRoomEngine().getRoomObject(roomSession.roomId, avatarInfo.roomIndex, RoomObjectCategory.UNIT) : null;
+    const isObjectDancing = (roomObject?.model?.getValue<number>(RoomObjectVariable.FIGURE_DANCE) || 0) !== 0;
+    const userDancing = isDancing || isObjectDancing;
 
     const processAction = (name: string) =>
     {
@@ -135,7 +139,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                     <ContextMenuListItemView onClick={ event => processAction('change_looks') }>
                         { LocalizeText('widget.memenu.myclothes') }
                     </ContextMenuListItemView>
-                    { (isDancing && !isRidingHorse) &&
+                    { (userDancing && !isRidingHorse) &&
                         <ContextMenuListItemView onClick={ event => processAction('dance_stop') }>
                             { LocalizeText('widget.memenu.dance.stop') }
                         </ContextMenuListItemView> }
@@ -144,13 +148,9 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                             <FaChevronRight className="right fa-icon" />
                             { LocalizeText('widget.memenu.dance') }
                         </ContextMenuListItemView> }
-                    { (!isDancing && !canDanceAll && !isRidingHorse) &&
+                    { (!userDancing && !canDanceAll && !isRidingHorse) &&
                         <ContextMenuListItemView onClick={ event => processAction('dance') }>
                             { LocalizeText('widget.memenu.dance') }
-                        </ContextMenuListItemView> }
-                    { (isDancing && !canDanceAll && !isRidingHorse) &&
-                        <ContextMenuListItemView onClick={ event => processAction('dance_stop') }>
-                            { LocalizeText('widget.memenu.dance.stop') }
                         </ContextMenuListItemView> }
                     <ContextMenuListItemView onClick={ event => processAction('expressions') }>
                         <FaChevronRight className="right fa-icon" />
@@ -167,7 +167,7 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
                 </> }
             { (mode === MODE_CLUB_DANCES) &&
                 <>
-                    { isDancing &&
+                    { userDancing &&
                         <ContextMenuListItemView onClick={ event => processAction('dance_stop') }>
                             { LocalizeText('widget.memenu.dance.stop') }
                         </ContextMenuListItemView> }
