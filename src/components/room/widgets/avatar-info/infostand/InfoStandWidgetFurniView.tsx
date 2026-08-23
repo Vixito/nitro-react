@@ -257,6 +257,8 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
 
         let objectData: string = null;
 
+        switch(action)
+        {
             case 'buy_one':
                 {
                     const furniData = roomSession ? GetFurnitureDataForRoomObject(roomSession.roomId, avatarInfo.id, avatarInfo.category) : null;
