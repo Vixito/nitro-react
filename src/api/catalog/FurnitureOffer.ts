@@ -20,12 +20,15 @@ export class FurnitureOffer implements IPurchasableOffer
 
     public activate(): void
     {
-        SendMessageComposer(new GetProductOfferComposer((this._furniData.rentOfferId > -1) ? this._furniData.rentOfferId : this._furniData.purchaseOfferId));
+        let offerId = (this._furniData.rentOfferId > -1) ? this._furniData.rentOfferId : this._furniData.purchaseOfferId;
+        if(!offerId || (offerId <= 0)) offerId = this._furniData.id;
+        SendMessageComposer(new GetProductOfferComposer(offerId));
     }
 
     public get offerId(): number
     {
-        return (this.isRentOffer) ? this._furniData.rentOfferId : this._furniData.purchaseOfferId;
+        const id = (this.isRentOffer) ? this._furniData.rentOfferId : this._furniData.purchaseOfferId;
+        return (id > 0) ? id : this._furniData.id;
     }
 
     public get priceInActivityPoints(): number

@@ -57,6 +57,11 @@ export const CatalogSearchView: FC<{}> = props =>
 
         setSearchResult(new SearchResult(search, offers, nodes.filter(node => (node.isVisible))));
         setCurrentPage((new CatalogPage(-1, 'default_3x3', new PageLocalization([], []), offers, false, 1) as ICatalogPage));
+
+        if(offers.length > 0)
+        {
+            offers[0].activate();
+        }
     };
 
     useEffect(() =>
