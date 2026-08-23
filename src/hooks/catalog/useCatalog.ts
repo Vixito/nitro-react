@@ -972,7 +972,8 @@ const useCatalogState = () =>
         switch(requestedPage.current.requestType)
         {
             case RequestedPage.REQUEST_TYPE_NONE:
-                if(currentPage && (currentPage.pageId !== -1)) return;
+                if(searchResult || (currentPage && (currentPage.pageId === -1))) return;
+                if(currentPage) return;
 
                 if(activeNodes && (activeNodes.length > 0))
                 {
@@ -1022,7 +1023,7 @@ const useCatalogState = () =>
                 break;
             }
         }
-    }, [ isVisible, rootNode, offersToNodes, currentPage, activeNodes, activateNode, openPageById, openPageByOfferId, openPageByName, openSearchByName ]);
+    }, [ isVisible, rootNode, offersToNodes, currentPage, searchResult, activeNodes, activateNode, openPageById, openPageByOfferId, openPageByName, openSearchByName, loadCatalogPage ]);
 
     useEffect(() =>
     {
