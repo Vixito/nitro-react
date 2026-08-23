@@ -24,19 +24,8 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = pro
 
     const selectOffer = (offer: IPurchasableOffer) =>
     {
-        if(currentPage && (currentPage.pageId === -1))
-        {
-            if(openPageByOfferId)
-            {
-                openPageByOfferId(offer.offerId);
-                return;
-            }
-        }
-
         offer.activate();
 
-        if(offer.isLazy) return;
-        
         setCurrentOffer(offer);
 
         if(offer.product && (offer.product.productType === ProductTypeEnum.WALL))
