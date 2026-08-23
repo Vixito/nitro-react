@@ -461,6 +461,17 @@ const useCatalogState = () =>
             }
         }
 
+        const exactMatch = furnitureDatas.find(f => f.className.toLowerCase() === query.toLowerCase());
+        if(exactMatch && (foundFurniture.indexOf(exactMatch) < 0))
+        {
+            foundFurniture.unshift(exactMatch);
+        }
+        else if(exactMatch && (foundFurniture.indexOf(exactMatch) > 0))
+        {
+            foundFurniture.splice(foundFurniture.indexOf(exactMatch), 1);
+            foundFurniture.unshift(exactMatch);
+        }
+
         const offers: IPurchasableOffer[] = [];
         for(const furniture of foundFurniture) offers.push(new FurnitureOffer(furniture));
 
