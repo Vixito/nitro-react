@@ -314,7 +314,11 @@ const useCatalogState = () =>
 
             if(!matchedOffer) matchedOffer = catalogPage.offers[0];
 
-            setCurrentOffer(matchedOffer);
+            if(matchedOffer)
+            {
+                matchedOffer.activate();
+                setCurrentOffer(matchedOffer);
+            }
         }
     }, []);
 
@@ -512,45 +516,54 @@ const useCatalogState = () =>
         else
         {
             let nodes = getNodesByOfferId(offerId);
+            const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
+            const furni = furnitureDatas?.find(f => (offerId > 0 && ((f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId))));
 
             if(!nodes || !nodes.length)
             {
-                if(offerId > 0)
+                if(furni)
                 {
-                    const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-                    const furni = furnitureDatas?.find(f => (offerId > 0 && ((f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId))));
+                    const foundNodes = [
+                        ...(furni.purchaseOfferId > 0 ? GetOfferNodes(offersToNodes, furni.purchaseOfferId) : []),
+                        ...(furni.rentOfferId > 0 ? GetOfferNodes(offersToNodes, furni.rentOfferId) : []),
+                        ...(furni.id > 0 ? GetOfferNodes(offersToNodes, furni.id) : [])
+                    ];
 
-                    if(furni)
+                    if(foundNodes && foundNodes.length) nodes = foundNodes;
+                }
+            }
+
+            if(!nodes || !nodes.length)
+            {
+                if(rootNode)
+                {
+                    const checkIds = [ offerId, ...(furni ? [ furni.purchaseOfferId, furni.rentOfferId, furni.id ] : []) ].filter(id => id > 0);
+                    const treeNodes: ICatalogNode[] = [];
+                    const traverseTree = (node: ICatalogNode) =>
                     {
-                        const foundNodes = [
-                            ...(furni.purchaseOfferId > 0 ? GetOfferNodes(offersToNodes, furni.purchaseOfferId) : []),
-                            ...(furni.rentOfferId > 0 ? GetOfferNodes(offersToNodes, furni.rentOfferId) : []),
-                            ...(furni.id > 0 ? GetOfferNodes(offersToNodes, furni.id) : [])
-                        ];
-
-                        if(foundNodes && foundNodes.length) nodes = foundNodes;
-                    }
+                        if(!node) return;
+                        if(node.offerIds && node.offerIds.some(id => checkIds.includes(id))) treeNodes.push(node);
+                        if(node.children) for(const child of node.children) traverseTree(child);
+                    };
+                    traverseTree(rootNode);
+                    if(treeNodes.length) nodes = treeNodes;
                 }
             }
 
             if(nodes && nodes.length)
             {
+                const userRank = GetSessionDataManager().rank;
                 const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
-                const targetNode = nodes.find(n => n.isVisible && !isNodeInBc(n) && (!n.minRank || n.minRank <= GetSessionDataManager().rank)) || nodes.find(n => n.isVisible && (!n.minRank || n.minRank <= GetSessionDataManager().rank)) || nodes[0];
+                const accessibleNodes = nodes.filter(n => n.isVisible && (!n.minRank || n.minRank <= userRank));
+                const targetNode = accessibleNodes.find(n => !isNodeInBc(n)) || accessibleNodes[0] || nodes.find(n => n.isVisible) || nodes[0];
                 activateNode(targetNode, offerId);
             }
             else
             {
-                if(offerId > 0)
+                if(furni)
                 {
-                    const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-                    const furni = furnitureDatas?.find(f => (offerId > 0 && ((f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId))));
-
-                    if(furni)
-                    {
-                        openSearchByName(furni.className);
-                        return;
-                    }
+                    openSearchByName(furni.className);
+                    return;
                 }
 
                 if(rootNode && rootNode.children && rootNode.children.length)
