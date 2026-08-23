@@ -12,7 +12,7 @@ interface CatalogItemGridWidgetViewProps extends AutoGridProps
 export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = props =>
 {
     const { columnCount = 5, children = null, ...rest } = props;
-    const { currentOffer = null, setCurrentOffer = null, currentPage = null, setPurchaseOptions = null } = useCatalog();
+    const { currentOffer = null, setCurrentOffer = null, currentPage = null, setPurchaseOptions = null, openPageByOfferId = null } = useCatalog();
     const elementRef = useRef<HTMLDivElement>();
 
     useEffect(() =>
@@ -24,6 +24,15 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = pro
 
     const selectOffer = (offer: IPurchasableOffer) =>
     {
+        if(currentPage && (currentPage.pageId === -1))
+        {
+            if(openPageByOfferId)
+            {
+                openPageByOfferId(offer.offerId);
+                return;
+            }
+        }
+
         offer.activate();
 
         if(offer.isLazy) return;
