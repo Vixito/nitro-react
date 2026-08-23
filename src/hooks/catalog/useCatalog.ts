@@ -535,7 +535,8 @@ const useCatalogState = () =>
 
             if(nodes && nodes.length)
             {
-                const targetNode = nodes.find(n => n.isVisible && (!n.minRank || n.minRank <= GetSessionDataManager().rank)) || nodes[0];
+                const isNodeInBc = (n: ICatalogNode) => (n.pageId === 5 || n.pageId === 140 || n.isBuildersClub || n.parent?.pageId === 5 || n.parent?.parent?.pageId === 5 || n.parent?.parent?.parent?.pageId === 5);
+                const targetNode = nodes.find(n => n.isVisible && !isNodeInBc(n) && (!n.minRank || n.minRank <= GetSessionDataManager().rank)) || nodes.find(n => n.isVisible && (!n.minRank || n.minRank <= GetSessionDataManager().rank)) || nodes[0];
                 activateNode(targetNode, offerId);
             }
             else
