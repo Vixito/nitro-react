@@ -1,5 +1,5 @@
 import { Vector3d } from '@nitrots/nitro-renderer';
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { FurniCategory, GetAvatarRenderManager, GetPetIndexFromLocalization, GetSessionDataManager, Offer, ProductTypeEnum } from '../../../../../api';
 import { AutoGrid, Column, LayoutGridItem, LayoutRoomPreviewerView } from '../../../../../common';
 import { useCatalog } from '../../../../../hooks';
@@ -8,6 +8,7 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
 {
     const { currentOffer = null, roomPreviewer = null, purchaseOptions = null } = useCatalog();
     const { previewStuffData = null } = purchaseOptions;
+    const prevPreviewIsAvatar = useRef<boolean>(false);
 
     useEffect(() =>
     {
@@ -16,8 +17,6 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
         const product = currentOffer.product;
 
         if(!product) return;
-
-        roomPreviewer.reset(false);
 
         switch(product.productType)
         {
@@ -37,16 +36,30 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
 
                     const figureString = GetAvatarRenderManager().getFigureStringWithFigureIds(GetSessionDataManager().figure, GetSessionDataManager().gender, figureSets);
 
-                    roomPreviewer.addAvatarIntoRoom(figureString, product.productClassId)
+                    if(prevPreviewIsAvatar.current)
+                    {
+                        roomPreviewer.updateObjectUserFigure(figureString, GetSessionDataManager().gender);
+                    }
+                    else
+                    {
+                        roomPreviewer.reset(false);
+                        roomPreviewer.addAvatarIntoRoom(figureString, product.productClassId);
+                    }
+
+                    prevPreviewIsAvatar.current = true;
                 }
                 else
                 {
+                    prevPreviewIsAvatar.current = false;
+                    roomPreviewer.reset(false);
                     roomPreviewer.addFurnitureIntoRoom(product.productClassId, new Vector3d(90), previewStuffData, product.extraParam);
                 }
                 return;
             }
             case ProductTypeEnum.WALL: {
                 if(!product.furnitureData) return;
+
+                prevPreviewIsAvatar.current = false;
 
                 switch(product.furnitureData.specialType)
                 {
@@ -71,12 +84,15 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
                 }
             }
             case ProductTypeEnum.ROBOT:
+                prevPreviewIsAvatar.current = true;
                 roomPreviewer.addAvatarIntoRoom(product.extraParam, 0);
                 return;
             case ProductTypeEnum.EFFECT:
+                prevPreviewIsAvatar.current = true;
                 roomPreviewer.addAvatarIntoRoom(GetSessionDataManager().figure, product.productClassId);
                 return;
             case ProductTypeEnum.PET: {
+                prevPreviewIsAvatar.current = false;
                 let petType = 0;
                 if(product.extraParam) {
                     const parsed = parseInt(product.extraParam);
