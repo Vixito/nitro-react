@@ -49,6 +49,7 @@ export const GetCatalogLayout = (page: ICatalogPage, hideNavigation: () => void)
             return <CatalogLayouGuildForumView { ...layoutProps } />;
         case 'guild_custom_furni':
             return <CatalogLayouGuildCustomFurniView { ...layoutProps } />;
+        case 'club_gift':
         case 'club_gifts':
             return <CatalogLayoutVipGiftsView { ...layoutProps } />;
         case 'marketplace_own_items':
