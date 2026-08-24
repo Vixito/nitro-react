@@ -497,6 +497,23 @@ const useCatalogState = () =>
                 }
             }
         }
+        else if(pendingFurniCandidates.current)
+        {
+            const target = pendingFurniCandidates.current;
+            if(target.nodes.length > 0)
+            {
+                const nextNode = target.nodes.shift();
+                activateNode(nextNode, target.targetFurni ? target.targetFurni.id : -1);
+                return;
+            }
+            else
+            {
+                const searchName = target.className;
+                pendingFurniCandidates.current = null;
+                openSearchByName(searchName);
+                return;
+            }
+        }
     }, [ activateNode, openSearchByName ]);
 
     const openPageById = useCallback((id: number) =>
@@ -685,7 +702,9 @@ const useCatalogState = () =>
             const parentName = n.parent?.pageName?.toLowerCase() || '';
             const parentLoc = n.parent?.localization?.toLowerCase() || '';
 
-            if(n.isLeaf) score += 200;
+            if(n.isLeaf || !n.children || n.children.length === 0) score += 350;
+            else score -= 350;
+
             if(!isRootTabNode(n)) score += 150;
             if(!isNodeInBc(n)) score += 100;
 

@@ -228,6 +228,17 @@ export const BattlePassView: FC<{}> = () =>
                     case 'show':
                     case 'open':
                         setIsVisible(true);
+                        if(parts.length >= 4 && parts[2] === 'mission')
+                        {
+                            const missionQuery = decodeURIComponent(parts.slice(3).join('/'));
+                            setSearchQuery(missionQuery);
+                            setSelectedCategory(null);
+                        }
+                        else if(parts.length >= 4 && parts[2] === 'category')
+                        {
+                            setSelectedCategory(parseInt(parts[3]));
+                            setSearchQuery('');
+                        }
                         fetchData();
                         return;
                     case 'hide':
