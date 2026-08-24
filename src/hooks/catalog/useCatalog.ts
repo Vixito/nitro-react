@@ -595,38 +595,48 @@ const useCatalogState = () =>
         const furni = furnitureDatas?.find(f => f.className.toLowerCase() === className.toLowerCase());
         const checkIds = [ ...(furni ? [ furni.id, furni.purchaseOfferId, furni.rentOfferId ] : []) ].filter(id => id > 0);
 
+        console.log('[BUY] openPageByFurniName:', className, '| furni:', furni ? `id=${furni.id} purchaseOffer=${furni.purchaseOfferId}` : 'NOT FOUND', '| checkIds:', checkIds, '| offersToNodes size:', offersToNodes?.size ?? 'null');
+
+        const userRank = GetSessionDataManager().rank;
+        const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
+
         let nodes: ICatalogNode[] = [];
 
-        for(const id of checkIds)
+        if(checkIds.length)
         {
-            const found = offersToNodes?.get(id);
-            if(found && found.length) nodes.push(...found);
-        }
-
-        if(!nodes.length && rootNode)
-        {
-            const treeNodes: ICatalogNode[] = [];
-            const traverseTree = (node: ICatalogNode) =>
+            for(const id of checkIds)
             {
-                if(!node) return;
-                if(node.offerIds && node.offerIds.some(id => checkIds.includes(id))) treeNodes.push(node);
-                if(node.children) for(const child of node.children) traverseTree(child);
-            };
-            traverseTree(rootNode);
-            if(treeNodes.length) nodes = treeNodes;
+                const found = offersToNodes?.get(id);
+                console.log('[BUY]   offersToNodes.get(' + id + '):', found ? found.map(n => `${n.pageName}(${n.pageId})`).join(',') : 'null');
+                if(found && found.length) nodes.push(...found);
+            }
+
+            if(!nodes.length && rootNode)
+            {
+                const treeNodes: ICatalogNode[] = [];
+                const traverseTree = (node: ICatalogNode) =>
+                {
+                    if(!node) return;
+                    if(node.offerIds && node.offerIds.some(id => checkIds.includes(id))) treeNodes.push(node);
+                    if(node.children) for(const child of node.children) traverseTree(child);
+                };
+                traverseTree(rootNode);
+                if(treeNodes.length) nodes = treeNodes;
+                console.log('[BUY] traverseTree found:', treeNodes.map(n => `${n.pageName}(${n.pageId})`).join(','));
+            }
         }
 
         if(nodes.length)
         {
-            const userRank = GetSessionDataManager().rank;
-            const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
             const accessibleNodes = nodes.filter(n => n.isVisible && (!n.minRank || n.minRank <= userRank));
             const targetNode = accessibleNodes.find(n => !isNodeInBc(n)) || accessibleNodes[0] || nodes.find(n => n.isVisible) || nodes[0];
 
+            console.log('[BUY] targetNode:', targetNode?.pageName, targetNode?.pageId, '| accessible:', accessibleNodes.length);
             activateNode(targetNode, furni ? furni.id : -1);
         }
         else
         {
+            console.log('[BUY] FALLBACK to openSearchByName:', className);
             openSearchByName(className);
         }
     }, [ isVisible, offersToNodes, rootNode, activateNode, openSearchByName, setNavigationHidden, setSearchResult, setIsVisible ]);
