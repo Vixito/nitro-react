@@ -1153,7 +1153,7 @@ const useCatalogState = () =>
         {
             case RequestedPage.REQUEST_TYPE_NONE:
                 if(searchResult || (currentPage && (currentPage.pageId === -1))) return;
-                if(currentPage) return;
+                if(currentPage || pendingFurniCandidates.current || (pendingPageId.current > -1)) return;
 
                 if(activeNodes && (activeNodes.length > 0))
                 {

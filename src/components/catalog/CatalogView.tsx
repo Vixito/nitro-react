@@ -83,7 +83,7 @@ export const CatalogView: FC<{}> = props =>
                             if(!child.isVisible) return null;
 
                             return (
-                                <NitroCardTabsItemView key={ child.pageId } isActive={ child.isActive } onClick={ event =>
+                                <NitroCardTabsItemView key={ child.pageId } isActive={ (activeNodes && activeNodes.length > 0 && activeNodes[0] === child) || child.isActive } onClick={ event =>
                                 {
                                     if(searchResult) setSearchResult(null);
                                     if(setNavigationHidden) setNavigationHidden(false);

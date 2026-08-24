@@ -15,11 +15,13 @@ export interface CatalogNavigationItemViewProps
 export const CatalogNavigationItemView: FC<CatalogNavigationItemViewProps> = props =>
 {
     const { node = null, child = false } = props;
-    const { activateNode = null } = useCatalog();
+    const { activateNode = null, activeNodes = [] } = useCatalog();
     
+    const isNodeActive = (activeNodes && activeNodes.length > 0 && activeNodes[activeNodes.length - 1] === node) || node.isActive;
+
     return (
         <Base className="nitro-catalog-navigation-section">
-            <LayoutGridItem gap={ 1 } column={ false } itemActive={ node.isActive } onClick={ event => activateNode(node) } className={ child ? 'inset' : '' }>
+            <LayoutGridItem gap={ 1 } column={ false } itemActive={ isNodeActive } onClick={ event => activateNode(node) } className={ child ? 'inset' : '' }>
                 <CatalogIconView icon={ node.iconId } />
                 <Text grow truncate>{ node.localization }</Text>
                 { node.isBranch &&
