@@ -43,9 +43,11 @@ const useCatalogState = () =>
     const [ secondsLeftWithGrace, setSecondsLeftWithGrace ] = useState(0);
     const { simpleAlert = null } = useNotification();
     const requestedPage = useRef(new RequestedPage());
+    const pendingFurniCandidates = useRef<{ nodes: ICatalogNode[], targetFurni: IFurnitureData, className: string, checkIds: number[] }>(null);
 
     const resetState = useCallback(() =>
     {
+        pendingFurniCandidates.current = null;
         setPageId(-1);
         setPreviousPageId(-1);
         setRootNode(null);
@@ -277,152 +279,6 @@ const useCatalogState = () =>
         if(pageId > -1) SendMessageComposer(new GetCatalogPageComposer(pageId, offerId, currentType));
     }, [ currentType ]);
 
-    const showCatalogPage = useCallback((pageId: number, layoutCode: string, localization: IPageLocalization, offers: IPurchasableOffer[], offerId: number, acceptSeasonCurrencyAsCredits: boolean) =>
-    {
-        const catalogPage = (new CatalogPage(pageId, layoutCode, localization, offers, acceptSeasonCurrencyAsCredits) as ICatalogPage);
-
-        setCurrentPage(catalogPage);
-        setPreviousPageId(prevValue => ((pageId !== -1) ? pageId : prevValue));
-        setNavigationHidden(false);
-
-        if((offerId > -1) && catalogPage.offers.length)
-        {
-            let matchedOffer: IPurchasableOffer = null;
-
-            for(const offer of catalogPage.offers)
-            {
-                if((offer.offerId === offerId) || offer.products?.some(p => (p.productClassId === offerId) || (p.furnitureData?.purchaseOfferId === offerId) || (p.furnitureData?.id === offerId)))
-                {
-                    matchedOffer = offer;
-                    break;
-                }
-            }
-
-            if(!matchedOffer && catalogPage.offers.length)
-            {
-                const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-                const targetFurni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
-
-                if(targetFurni)
-                {
-                    matchedOffer = catalogPage.offers.find(offer => 
-                        offer.localizationId?.toLowerCase() === targetFurni.className?.toLowerCase() ||
-                        offer.products?.some(p => p.furnitureData?.className?.toLowerCase() === targetFurni.className?.toLowerCase() || p.furnitureData?.name?.toLowerCase() === targetFurni.name?.toLowerCase())
-                    );
-                }
-            }
-
-            if(!matchedOffer) matchedOffer = catalogPage.offers[0];
-
-            if(matchedOffer)
-            {
-                matchedOffer.activate();
-                setCurrentOffer(matchedOffer);
-            }
-        }
-    }, []);
-
-    const activateNode = useCallback((targetNode: ICatalogNode, offerId: number = -1) =>
-    {
-        cancelObjectMover();
-        setNavigationHidden(false);
-
-        if(targetNode.parent.pageName === 'root')
-        {
-            if(targetNode.children.length)
-            {
-                for(const child of targetNode.children)
-                {
-                    if(!child.isVisible) continue;
-
-                    targetNode = child;
-
-                    break;
-                }
-            }
-        }
-
-        const nodes: ICatalogNode[] = [];
-
-        let node = targetNode;
-
-        while(node && (node.pageName !== 'root'))
-        {
-            nodes.push(node);
-
-            node = node.parent;
-        }
-
-        nodes.reverse();
-
-        setActiveNodes(prevValue =>
-        {
-            const isActive = (prevValue.indexOf(targetNode) >= 0);
-            const isOpen = targetNode.isOpen;
-
-            for(const existing of prevValue)
-            {
-                existing.deactivate();
-
-                if(nodes.indexOf(existing) === -1) existing.close();
-            }
-
-            for(const n of nodes)
-            {
-                n.activate();
-
-                if(n.parent) n.open();
-
-                if((n === targetNode.parent) && n.children.length) n.open();
-            }
-
-            if(isActive && isOpen && (targetNode.children.length > 0)) targetNode.close();
-            else targetNode.open();
-
-            return nodes;
-        });
-
-        if(targetNode.pageId > -1) loadCatalogPage(targetNode.pageId, offerId);
-    }, [ setActiveNodes, loadCatalogPage, cancelObjectMover, setNavigationHidden ]);
-
-    const openPageById = useCallback((id: number) =>
-    {
-        if(id !== -1) setSearchResult(null);
-        setNavigationHidden(false);
-
-        if(!isVisible)
-        {
-            requestedPage.current.requestById = id;
-
-            setIsVisible(true);
-        }
-        else
-        {
-            const node = getNodeById(id, rootNode);
-
-            if(node) activateNode(node);
-        }
-    }, [ isVisible, rootNode, getNodeById, activateNode, setNavigationHidden ]);
-
-    const openPageByName = useCallback((name: string) =>
-    {
-        setSearchResult(null);
-        setNavigationHidden(false);
-
-        if(!isVisible)
-        {
-            requestedPage.current.requestByName = name;
-
-            setIsVisible(true);
-        }
-        else
-        {
-            const node = getNodeByName(name, rootNode);
-
-            if(node) activateNode(node);
-        }
-    }, [ isVisible, rootNode, getNodeByName, activateNode, setNavigationHidden ]);
-
     const openSearchByName = useCallback((query: string) =>
     {
         if(!query || !query.length) return;
@@ -497,10 +353,189 @@ const useCatalogState = () =>
 
         if(offers.length > 0)
         {
-            const exactOffer = offers.find(o => o.localizationId?.toLowerCase() === query.toLowerCase() || (o as any)._furniData?.className?.toLowerCase() === query.toLowerCase()) || offers[0];
-            setCurrentOffer(exactOffer);
+            offers[0].activate();
+            setCurrentOffer(offers[0]);
         }
-    }, [ currentType, rootNode, isVisible, setIsVisible, setSearchResult, setCurrentPage, setCurrentOffer, activeNodes, setActiveNodes ]);
+    }, [ isVisible, currentType, rootNode, activeNodes ]);
+
+    const activateNode = useCallback((targetNode: ICatalogNode, offerId: number = -1) =>
+    {
+        cancelObjectMover();
+        setNavigationHidden(false);
+
+        if(targetNode.parent && (targetNode.parent.pageName === 'root'))
+        {
+            if(targetNode.children.length)
+            {
+                for(const child of targetNode.children)
+                {
+                    if(!child.isVisible) continue;
+
+                    targetNode = child;
+
+                    break;
+                }
+            }
+        }
+
+        const nodes: ICatalogNode[] = [];
+
+        let node = targetNode;
+
+        while(node && (node.pageName !== 'root'))
+        {
+            nodes.push(node);
+
+            node = node.parent;
+        }
+
+        nodes.reverse();
+
+        setActiveNodes(prevValue =>
+        {
+            const isActive = (prevValue.indexOf(targetNode) >= 0);
+            const isOpen = targetNode.isOpen;
+
+            for(const existing of prevValue)
+            {
+                existing.deactivate();
+
+                if(nodes.indexOf(existing) === -1) existing.close();
+            }
+
+            for(const n of nodes)
+            {
+                if((n === nodes[0]) || (n === targetNode))
+                {
+                    n.activate();
+                }
+                else
+                {
+                    n.deactivate();
+                }
+
+                if(n.parent) n.open();
+
+                if((n === targetNode.parent) && n.children.length) n.open();
+            }
+
+            if(isActive && isOpen && (targetNode.children.length > 0)) targetNode.close();
+            else targetNode.open();
+
+            return nodes;
+        });
+
+        if(targetNode.pageId > -1) loadCatalogPage(targetNode.pageId, offerId);
+    }, [ setActiveNodes, loadCatalogPage, cancelObjectMover, setNavigationHidden ]);
+
+    const showCatalogPage = useCallback((pageId: number, layoutCode: string, localization: IPageLocalization, offers: IPurchasableOffer[], offerId: number, acceptSeasonCurrencyAsCredits: boolean) =>
+    {
+        const catalogPage = (new CatalogPage(pageId, layoutCode, localization, offers, acceptSeasonCurrencyAsCredits) as ICatalogPage);
+
+        setCurrentPage(catalogPage);
+        setPreviousPageId(prevValue => ((pageId !== -1) ? pageId : prevValue));
+        setNavigationHidden(false);
+
+        if(catalogPage.offers.length)
+        {
+            let matchedOffer: IPurchasableOffer = null;
+            const target = pendingFurniCandidates.current;
+            const searchIds = target ? target.checkIds : (offerId > -1 ? [ offerId ] : []);
+
+            if(searchIds.length)
+            {
+                const idsSet = new Set(searchIds);
+                matchedOffer = catalogPage.offers.find(offer =>
+                {
+                    if(idsSet.has(offer.offerId)) return true;
+                    if(offer.products?.some(p => idsSet.has(p.productClassId) || (p.furnitureData && (idsSet.has(p.furnitureData.id) || idsSet.has(p.furnitureData.purchaseOfferId) || idsSet.has(p.furnitureData.rentOfferId))))) return true;
+                    return false;
+                });
+
+                if(!matchedOffer && target)
+                {
+                    const targetClass = target.className.toLowerCase();
+                    const targetBase = targetClass.split('*')[0];
+                    matchedOffer = catalogPage.offers.find(offer =>
+                    {
+                        if(offer.localizationId?.toLowerCase() === targetClass || offer.localizationId?.toLowerCase() === targetBase) return true;
+                        if(offer.products?.some(p => {
+                            const cName = p.furnitureData?.className?.toLowerCase();
+                            return cName === targetClass || cName === targetBase || (target.targetFurni?.name && p.furnitureData?.name?.toLowerCase() === target.targetFurni.name.toLowerCase());
+                        })) return true;
+                        return false;
+                    });
+                }
+            }
+
+            if(matchedOffer)
+            {
+                pendingFurniCandidates.current = null;
+                matchedOffer.activate();
+                setCurrentOffer(matchedOffer);
+            }
+            else if(target && (target.nodes.length > 0))
+            {
+                const nextNode = target.nodes.shift();
+                activateNode(nextNode, target.targetFurni ? target.targetFurni.id : -1);
+                return;
+            }
+            else if(target && (target.nodes.length === 0))
+            {
+                const searchName = target.className;
+                pendingFurniCandidates.current = null;
+                openSearchByName(searchName);
+                return;
+            }
+            else if(offerId > -1)
+            {
+                matchedOffer = catalogPage.offers[0];
+                if(matchedOffer)
+                {
+                    matchedOffer.activate();
+                    setCurrentOffer(matchedOffer);
+                }
+            }
+        }
+    }, [ activateNode, openSearchByName ]);
+
+    const openPageById = useCallback((id: number) =>
+    {
+        if(id !== -1) setSearchResult(null);
+        setNavigationHidden(false);
+
+        if(!isVisible)
+        {
+            requestedPage.current.requestById = id;
+
+            setIsVisible(true);
+        }
+        else
+        {
+            const node = getNodeById(id, rootNode);
+
+            if(node) activateNode(node);
+        }
+    }, [ isVisible, rootNode, getNodeById, activateNode, setNavigationHidden ]);
+
+    const openPageByName = useCallback((name: string) =>
+    {
+        setSearchResult(null);
+        setNavigationHidden(false);
+
+        if(!isVisible)
+        {
+            requestedPage.current.requestByName = name;
+
+            setIsVisible(true);
+        }
+        else
+        {
+            const node = getNodeByName(name, rootNode);
+
+            if(node) activateNode(node);
+        }
+    }, [ isVisible, rootNode, getNodeByName, activateNode, setNavigationHidden ]);
 
     const openPageByOfferId = useCallback((offerId: number) =>
     {
@@ -512,60 +547,27 @@ const useCatalogState = () =>
             requestedPage.current.requestedByOfferId = offerId;
 
             setIsVisible(true);
+
+            return;
+        }
+
+        const nodes = getNodesByOfferId(offerId);
+
+        if(nodes && nodes.length)
+        {
+            activateNode(nodes[0], offerId);
         }
         else
         {
-            let nodes = getNodesByOfferId(offerId);
             const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-            const furni = furnitureDatas?.find(f => (offerId > 0 && ((f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId))));
-
-            if(!nodes || !nodes.length)
+            const furni = furnitureDatas?.find(f => (f.purchaseOfferId === offerId) || (f.rentOfferId === offerId) || (f.id === offerId));
+            
+            if(furni && furni.className)
             {
-                if(furni)
-                {
-                    const foundNodes = [
-                        ...(furni.purchaseOfferId > 0 ? GetOfferNodes(offersToNodes, furni.purchaseOfferId) : []),
-                        ...(furni.rentOfferId > 0 ? GetOfferNodes(offersToNodes, furni.rentOfferId) : []),
-                        ...(furni.id > 0 ? GetOfferNodes(offersToNodes, furni.id) : [])
-                    ];
-
-                    if(foundNodes && foundNodes.length) nodes = foundNodes;
-                }
-            }
-
-            if(!nodes || !nodes.length)
-            {
-                if(rootNode)
-                {
-                    const checkIds = [ offerId, ...(furni ? [ furni.purchaseOfferId, furni.rentOfferId, furni.id ] : []) ].filter(id => id > 0);
-                    const treeNodes: ICatalogNode[] = [];
-                    const traverseTree = (node: ICatalogNode) =>
-                    {
-                        if(!node) return;
-                        if(node.offerIds && node.offerIds.some(id => checkIds.includes(id))) treeNodes.push(node);
-                        if(node.children) for(const child of node.children) traverseTree(child);
-                    };
-                    traverseTree(rootNode);
-                    if(treeNodes.length) nodes = treeNodes;
-                }
-            }
-
-            if(nodes && nodes.length)
-            {
-                const userRank = GetSessionDataManager().rank;
-                const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
-                const accessibleNodes = nodes.filter(n => n.isVisible && (!n.minRank || n.minRank <= userRank));
-                const targetNode = accessibleNodes.find(n => !isNodeInBc(n)) || accessibleNodes[0] || nodes.find(n => n.isVisible) || nodes[0];
-                activateNode(targetNode, offerId);
+                openPageByFurniName(furni.className);
             }
             else
             {
-                if(furni)
-                {
-                    openSearchByName(furni.className);
-                    return;
-                }
-
                 if(rootNode && rootNode.children && rootNode.children.length)
                 {
                     const first = rootNode.children.find(c => c.isVisible) || rootNode.children[0];
@@ -573,7 +575,7 @@ const useCatalogState = () =>
                 }
             }
         }
-    }, [ isVisible, getNodesByOfferId, activateNode, offersToNodes, rootNode, openSearchByName, setNavigationHidden ]);
+    }, [ isVisible, getNodesByOfferId, activateNode, rootNode, setNavigationHidden ]);
 
     const openPageByFurniName = useCallback((className: string) =>
     {
@@ -591,55 +593,134 @@ const useCatalogState = () =>
             return;
         }
 
+        const cleanClass = className.trim();
+        const baseClass = cleanClass.split('*')[0].toLowerCase();
+
         const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-        const furni = furnitureDatas?.find(f => f.className.toLowerCase() === className.toLowerCase());
-        const checkIds = [ ...(furni ? [ furni.id, furni.purchaseOfferId, furni.rentOfferId ] : []) ].filter(id => id > 0);
+        const matchingFurnis = furnitureDatas?.filter(f =>
+        {
+            const fClass = f.className?.toLowerCase();
+            return (fClass === cleanClass.toLowerCase()) ||
+                   (fClass === baseClass) ||
+                   (fClass && fClass.startsWith(baseClass + '*')) ||
+                   (baseClass && baseClass.startsWith(fClass + '*')) ||
+                   (f.name?.toLowerCase() === cleanClass.toLowerCase());
+        }) || [];
 
+        const checkIdsSet = new Set<number>();
+        for(const f of matchingFurnis)
+        {
+            if(f.id > 0) checkIdsSet.add(f.id);
+            if(f.purchaseOfferId > 0) checkIdsSet.add(f.purchaseOfferId);
+            if(f.rentOfferId > 0) checkIdsSet.add(f.rentOfferId);
+        }
+        const checkIds = Array.from(checkIdsSet);
 
-        const userRank = GetSessionDataManager().rank;
-        const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
+        const candidateNodesMap = new Map<number, ICatalogNode>();
 
-        let nodes: ICatalogNode[] = [];
-
-        if(checkIds.length)
+        if(checkIds.length && offersToNodes)
         {
             for(const id of checkIds)
             {
-                const found = offersToNodes?.get(id);
-                if(found && found.length) nodes.push(...found);
-            }
-
-            if(!nodes.length && rootNode)
-            {
-                const treeNodes: ICatalogNode[] = [];
-                const traverseTree = (node: ICatalogNode) =>
+                const found = offersToNodes.get(id);
+                if(found)
                 {
-                    if(!node) return;
-                    if(node.offerIds && node.offerIds.some(id => checkIds.includes(id))) treeNodes.push(node);
-                    if(node.children) for(const child of node.children) traverseTree(child);
-                };
-                traverseTree(rootNode);
-                if(treeNodes.length) nodes = treeNodes;
+                    for(const node of found)
+                    {
+                        if(node.pageId > -1) candidateNodesMap.set(node.pageId, node);
+                    }
+                }
             }
         }
 
-        if(nodes.length)
+        if(rootNode)
         {
-            const accessibleNodes = nodes.filter(n => n.isVisible && (!n.minRank || n.minRank <= userRank));
+            const traverseTree = (node: ICatalogNode) =>
+            {
+                if(!node) return;
+                if(node.offerIds && node.offerIds.some(id => checkIdsSet.has(id)))
+                {
+                    if(node.pageId > -1) candidateNodesMap.set(node.pageId, node);
+                }
+                if(node.children) for(const child of node.children) traverseTree(child);
+            };
+            traverseTree(rootNode);
+        }
 
-            // Prefer leaf nodes (not direct tab children of root) so activateNode doesn't
-            // redirect to the first child and lose the offerId context.
-            const isRootTabNode = (n: ICatalogNode) => n.parent?.pageName === 'root';
-            const leafNodes = accessibleNodes.filter(n => !isNodeInBc(n) && !isRootTabNode(n));
-            const fallbackNodes = accessibleNodes.filter(n => !isNodeInBc(n));
+        if((candidateNodesMap.size === 0) && rootNode)
+        {
+            const primaryFurni = matchingFurnis[0] || null;
+            const fLine = primaryFurni?.furniLine?.toLowerCase() || '';
+            const fName = primaryFurni?.name?.toLowerCase() || '';
+            const keywords = [ baseClass, fLine, ...fName.split(' ') ].filter(k => k && k.length >= 3);
 
-            const targetNode = leafNodes[0] || fallbackNodes[0] || accessibleNodes[0] || nodes.find(n => n.isVisible) || nodes[0];
+            const traverseByName = (node: ICatalogNode) =>
+            {
+                if(!node) return;
+                const pName = node.pageName?.toLowerCase() || '';
+                const pLoc = node.localization?.toLowerCase() || '';
+                if(keywords.some(k => pName.includes(k) || pLoc.includes(k)))
+                {
+                    if(node.isLeaf || (node.pageId > -1)) candidateNodesMap.set(node.pageId, node);
+                }
+                if(node.children) for(const c of node.children) traverseByName(c);
+            };
+            traverseByName(rootNode);
+        }
 
-            activateNode(targetNode, furni ? furni.id : -1);
+        const userRank = GetSessionDataManager().rank;
+        const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
+        const isRootTabNode = (n: ICatalogNode) => n.parent?.pageName === 'root';
+
+        const accessibleNodes = Array.from(candidateNodesMap.values()).filter(n => n.isVisible && (!n.minRank || n.minRank <= userRank));
+
+        const primaryFurni = matchingFurnis[0] || null;
+        const fLine = primaryFurni?.furniLine?.toLowerCase() || '';
+
+        const scoreNode = (n: ICatalogNode): number =>
+        {
+            let score = 0;
+            const pName = n.pageName?.toLowerCase() || '';
+            const pLoc = n.localization?.toLowerCase() || '';
+            const parentName = n.parent?.pageName?.toLowerCase() || '';
+            const parentLoc = n.parent?.localization?.toLowerCase() || '';
+
+            if(n.isLeaf) score += 200;
+            if(!isRootTabNode(n)) score += 150;
+            if(!isNodeInBc(n)) score += 100;
+
+            if(fLine && ((pName === fLine) || (pName === fLine.replace(/_/g, '')))) score += 500;
+            if(fLine && (pName.includes(fLine) || pLoc.includes(fLine))) score += 300;
+            if(fLine && (parentName.includes(fLine) || parentLoc.includes(fLine))) score += 150;
+
+            if(baseClass && (pName.includes(baseClass) || pLoc.includes(baseClass))) score += 250;
+
+            const yearMatch = (baseClass + '_' + fLine).match(/\d{2,4}/);
+            if(yearMatch && (pName.includes(yearMatch[0]) || pLoc.includes(yearMatch[0]))) score += 400;
+
+            return score;
+        };
+
+        accessibleNodes.sort((a, b) => scoreNode(b) - scoreNode(a));
+
+        if(accessibleNodes.length > 0)
+        {
+            const targetNode = accessibleNodes[0];
+            const remaining = accessibleNodes.slice(1);
+
+            pendingFurniCandidates.current = {
+                nodes: remaining,
+                targetFurni: primaryFurni,
+                className: cleanClass,
+                checkIds
+            };
+
+            activateNode(targetNode, primaryFurni ? primaryFurni.id : -1);
         }
         else
         {
-            openSearchByName(className);
+            pendingFurniCandidates.current = null;
+            openSearchByName(cleanClass);
         }
     }, [ isVisible, offersToNodes, rootNode, activateNode, openSearchByName, setNavigationHidden, setSearchResult, setIsVisible ]);
 

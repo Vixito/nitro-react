@@ -20,6 +20,22 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = pro
         if(elementRef && elementRef.current) elementRef.current.scrollTop = 0;
     }, [ currentPage ]);
 
+    useEffect(() =>
+    {
+        if(!currentOffer || !elementRef.current) return;
+
+        const timer = setTimeout(() =>
+        {
+            const activeElement = elementRef.current?.querySelector('.item-active, .active') as HTMLElement;
+            if(activeElement)
+            {
+                activeElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            }
+        }, 50);
+
+        return () => clearTimeout(timer);
+    }, [ currentOffer ]);
+
     if(!currentPage) return null;
 
     const selectOffer = (offer: IPurchasableOffer) =>

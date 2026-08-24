@@ -266,6 +266,10 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                     {
                         CreateLinkEvent(`catalog/open/furni/${ furniData.className }`);
                     }
+                    else if(avatarInfo.name)
+                    {
+                        CreateLinkEvent(`catalog/open/furni/${ avatarInfo.name }`);
+                    }
                     else if(avatarInfo.purchaseOfferId > 0)
                     {
                         CreateLinkEvent(`catalog/open/offerId/${ avatarInfo.purchaseOfferId }`);

@@ -36,7 +36,7 @@ export const CatalogView: FC<{}> = props =>
                     case 'open':
                         if(parts.length > 2)
                         {
-                            if(parts.length === 4)
+                            if(parts.length >= 4)
                             {
                                 switch(parts[2])
                                 {
@@ -44,10 +44,10 @@ export const CatalogView: FC<{}> = props =>
                                         openPageByOfferId(parseInt(parts[3]));
                                         return;
                                     case 'furni':
-                                        openPageByFurniName(parts[3]);
+                                        openPageByFurniName(parts.slice(3).join('/'));
                                         return;
                                     case 'search':
-                                        openSearchByName(parts[3]);
+                                        openSearchByName(parts.slice(3).join('/'));
                                         return;
                                 }
                             }
