@@ -595,7 +595,6 @@ const useCatalogState = () =>
         const furni = furnitureDatas?.find(f => f.className.toLowerCase() === className.toLowerCase());
         const checkIds = [ ...(furni ? [ furni.id, furni.purchaseOfferId, furni.rentOfferId ] : []) ].filter(id => id > 0);
 
-        console.log('[BUY] openPageByFurniName:', className, '| furni:', furni ? `id=${furni.id} purchaseOffer=${furni.purchaseOfferId}` : 'NOT FOUND', '| checkIds:', checkIds, '| offersToNodes size:', offersToNodes?.size ?? 'null');
 
         const userRank = GetSessionDataManager().rank;
         const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
@@ -607,7 +606,6 @@ const useCatalogState = () =>
             for(const id of checkIds)
             {
                 const found = offersToNodes?.get(id);
-                console.log('[BUY]   offersToNodes.get(' + id + '):', found ? found.map(n => `${n.pageName}(${n.pageId})`).join(',') : 'null');
                 if(found && found.length) nodes.push(...found);
             }
 
@@ -622,21 +620,25 @@ const useCatalogState = () =>
                 };
                 traverseTree(rootNode);
                 if(treeNodes.length) nodes = treeNodes;
-                console.log('[BUY] traverseTree found:', treeNodes.map(n => `${n.pageName}(${n.pageId})`).join(','));
             }
         }
 
         if(nodes.length)
         {
             const accessibleNodes = nodes.filter(n => n.isVisible && (!n.minRank || n.minRank <= userRank));
-            const targetNode = accessibleNodes.find(n => !isNodeInBc(n)) || accessibleNodes[0] || nodes.find(n => n.isVisible) || nodes[0];
 
-            console.log('[BUY] targetNode:', targetNode?.pageName, targetNode?.pageId, '| accessible:', accessibleNodes.length);
+            // Prefer leaf nodes (not direct tab children of root) so activateNode doesn't
+            // redirect to the first child and lose the offerId context.
+            const isRootTabNode = (n: ICatalogNode) => n.parent?.pageName === 'root';
+            const leafNodes = accessibleNodes.filter(n => !isNodeInBc(n) && !isRootTabNode(n));
+            const fallbackNodes = accessibleNodes.filter(n => !isNodeInBc(n));
+
+            const targetNode = leafNodes[0] || fallbackNodes[0] || accessibleNodes[0] || nodes.find(n => n.isVisible) || nodes[0];
+
             activateNode(targetNode, furni ? furni.id : -1);
         }
         else
         {
-            console.log('[BUY] FALLBACK to openSearchByName:', className);
             openSearchByName(className);
         }
     }, [ isVisible, offersToNodes, rootNode, activateNode, openSearchByName, setNavigationHidden, setSearchResult, setIsVisible ]);
