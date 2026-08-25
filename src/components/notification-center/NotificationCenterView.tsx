@@ -79,23 +79,23 @@ export const NotificationCenterView: FC<{}> = props =>
         });
     }, [ alerts, confirms ]);
 
+    const hasActiveModals = Boolean((getConfirms && getConfirms.length > 0) || (getAlerts && getAlerts.length > 0));
+
     return (
         <>
             <Column gap={ 1 }>
                 { getBubbleAlerts }
             </Column>
-            { createPortal(
-                (getConfirms || getAlerts) ? (
-                    <div className="nitro-dialog-container">
-                        { hasModal && <div className="nitro-alert-backdrop" /> }
-                        <div className="nitro-dialog-wrapper">
-                            { getConfirms }
-                            { getAlerts }
-                        </div>
+            { hasActiveModals ? createPortal(
+                <div className="nitro-dialog-container">
+                    { hasModal && <div className="nitro-alert-backdrop" /> }
+                    <div className="nitro-dialog-wrapper">
+                        { getConfirms }
+                        { getAlerts }
                     </div>
-                ) : null,
+                </div>,
                 document.body
-            ) }
+            ) : null }
         </>
     );
 }

@@ -1,4 +1,5 @@
 import { IObjectData, IRoomEngine } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '../nitro';
 import { LocalizeText } from '../utils';
 import { FurniCategory } from './FurniCategory';
 import { FurnitureItem } from './FurnitureItem';
@@ -335,12 +336,62 @@ export class GroupItem
                 }
         }
 
-        this._name = LocalizeText(key);
+        let val = LocalizeText(key);
+        if(!val || val === key || val === ('${' + key + '}'))
+        {
+            const furniData = this.isWallItem ? GetSessionDataManager().getWallItemData(k.type) : GetSessionDataManager().getFloorItemData(k.type);
+            if(furniData && furniData.name && furniData.name.length)
+            {
+                val = furniData.name;
+            }
+        }
+
+        this._name = val || '';
     }
 
     private setDescription(): void
     {
-        this._description = '';
+        const k = this.getLastItem();
+
+        if(!k)
+        {
+            this._description = '';
+
+            return;
+        }
+
+        let key = '';
+
+        switch(this._category)
+        {
+            case FurniCategory.POSTER:
+                key = (('poster_' + k.stuffData.getLegacyString()) + '_desc');
+                break;
+            case FurniCategory.TRAX_SONG:
+                this._description = '';
+                return;
+            default:
+                if(this.isWallItem)
+                {
+                    key = ('wallItem.desc.' + k.type);
+                }
+                else
+                {
+                    key = ('roomItem.desc.' + k.type);
+                }
+        }
+
+        let val = LocalizeText(key);
+        if(!val || val === key || val === ('${' + key + '}'))
+        {
+            const furniData = this.isWallItem ? GetSessionDataManager().getWallItemData(k.type) : GetSessionDataManager().getFloorItemData(k.type);
+            if(furniData && furniData.description && furniData.description.length)
+            {
+                val = furniData.description;
+            }
+        }
+
+        this._description = val || '';
     }
 
     private setIcon(): void

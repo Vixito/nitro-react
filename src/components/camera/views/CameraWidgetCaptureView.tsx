@@ -40,7 +40,7 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = props =
             return;
         }
 
-        const texture = GetRoomEngine().createTextureFromRoom(GetRoomSession().roomId, 2, getCameraBounds());
+        const texture = GetRoomEngine().createTextureFromRoom(GetRoomSession().roomId, 1, getCameraBounds());
 
         const clone = [ ...cameraRoll ];
 

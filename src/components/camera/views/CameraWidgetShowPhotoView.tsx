@@ -51,7 +51,7 @@ export const CameraWidgetShowPhotoView: FC<CameraWidgetShowPhotoViewProps> = pro
 
     return (
         <Grid style={ { display: 'flex', flexDirection: 'column' } }>
-            <Flex center className="picture-preview border border-black" style={ imageUrl ? { backgroundImage: 'url(' + imageUrl + ')', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', imageRendering: 'pixelated' } : {} }>
+            <Flex center className="picture-preview border border-black" style={ imageUrl ? { backgroundImage: 'url(' + imageUrl + ')', backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', imageRendering: 'auto' } : {} }>
                 { !imageUrl &&
                     <Text bold>{ LocalizeText('camera.loading') }</Text> }
             </Flex>

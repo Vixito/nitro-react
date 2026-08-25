@@ -1,6 +1,6 @@
 import { MouseEventType } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useRef, useState } from 'react';
-import { GetUserProfile, LocalizeText, MessengerFriend, OpenMessengerChat } from '../../../../api';
+import { CreateLinkEvent, GetUserProfile, LocalizeText, MessengerFriend, OpenMessengerChat } from '../../../../api';
 import { Base, LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
 import { useFriends } from '../../../../hooks';
 
@@ -33,9 +33,13 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
     if(!friend)
     {
         return (
-            <div ref={ elementRef } className="btn btn-primary friend-bar-item friend-bar-search d-flex align-items-center">
+            <div 
+                ref={ elementRef } 
+                className="btn btn-primary friend-bar-item friend-bar-search d-flex align-items-center cursor-pointer"
+                onClick={ () => CreateLinkEvent('friends/toggle') }
+            >
                 <div className="friend-bar-item-head position-absolute"/>
-                <div className="text-nowrap text-white">{ LocalizeText('friend.bar.find.title') || 'Encuentra amigos' }</div>
+                <div className="text-nowrap text-white">{ LocalizeText('friend.bar.find.title') || 'Encuentra amig@s' }</div>
             </div>
         );
     }
