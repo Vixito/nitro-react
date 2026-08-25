@@ -20,10 +20,33 @@ export const FloorplanImportExportView: FC<FloorplanImportExportViewProps> = pro
 
     const saveFloorChanges = () =>
     {
+        const mapRows = map.replace(/\r\n|\n/g, '\r').split('\r');
+        let doorX = originalFloorplanSettings.entryPoint[0];
+        let doorY = originalFloorplanSettings.entryPoint[1];
+
+        if(doorY < 0 || doorY >= mapRows.length || doorX < 0 || doorX >= mapRows[doorY].length || mapRows[doorY].charAt(doorX).toLowerCase() === 'x')
+        {
+            let found = false;
+            for(let y = 0; y < mapRows.length; y++)
+            {
+                for(let x = 0; x < mapRows[y].length; x++)
+                {
+                    if(mapRows[y].charAt(x).toLowerCase() !== 'x')
+                    {
+                        doorX = x;
+                        doorY = y;
+                        found = true;
+                        break;
+                    }
+                }
+                if(found) break;
+            }
+        }
+
         SendMessageComposer(new UpdateFloorPropertiesMessageComposer(
-            map.split('\n').join('\r'),
-            originalFloorplanSettings.entryPoint[0],
-            originalFloorplanSettings.entryPoint[1],
+            mapRows.join('\r'),
+            doorX,
+            doorY,
             originalFloorplanSettings.entryPointDir,
             convertNumbersForSaving(originalFloorplanSettings.thicknessWall),
             convertNumbersForSaving(originalFloorplanSettings.thicknessFloor),

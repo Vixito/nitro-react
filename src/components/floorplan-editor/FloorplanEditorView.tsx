@@ -34,10 +34,34 @@ export const FloorplanEditorView: FC<{}> = props =>
 
     const saveFloorChanges = () =>
     {
+        const tilemap = FloorplanEditor.instance.getCurrentTilemapString();
+        const mapRows = tilemap.split('\r');
+        let doorX = FloorplanEditor.instance.doorLocation.x;
+        let doorY = FloorplanEditor.instance.doorLocation.y;
+
+        if(doorY < 0 || doorY >= mapRows.length || doorX < 0 || doorX >= mapRows[doorY].length || mapRows[doorY].charAt(doorX).toLowerCase() === 'x')
+        {
+            let found = false;
+            for(let y = 0; y < mapRows.length; y++)
+            {
+                for(let x = 0; x < mapRows[y].length; x++)
+                {
+                    if(mapRows[y].charAt(x).toLowerCase() !== 'x')
+                    {
+                        doorX = x;
+                        doorY = y;
+                        found = true;
+                        break;
+                    }
+                }
+                if(found) break;
+            }
+        }
+
         SendMessageComposer(new UpdateFloorPropertiesMessageComposer(
-            FloorplanEditor.instance.getCurrentTilemapString(),
-            FloorplanEditor.instance.doorLocation.x,
-            FloorplanEditor.instance.doorLocation.y,
+            tilemap,
+            doorX,
+            doorY,
             visualizationSettings.entryPointDir,
             convertNumbersForSaving(visualizationSettings.thicknessWall),
             convertNumbersForSaving(visualizationSettings.thicknessFloor),
