@@ -31,6 +31,29 @@ const DEFAULT_CONTROLS: { action: string; keys: string }[] = [
     { action: 'Mover personaje / vehículo', keys: 'W A S D / Flechas' }
 ];
 
+const GAME_DESCRIPTIONS: { [ gameNameId: string ]: { title: string; desc: string } } = {
+    snowwar: {
+        title: '¡Guerra de nieve en el hotel!',
+        desc: 'Lanza bolas de nieve, crea muros protectores y derrota al equipo contrario en épicas batallas multijugador.'
+    },
+    basejump: {
+        title: '¡Caída libre en paracaídas!',
+        desc: 'Planea por los aires, esquiva todos los obstáculos y sé el primero en aterrizar a salvo en el objetivo.'
+    },
+    wobblesquabble: {
+        title: '¡Duelo acuático en la piscina Lido!',
+        desc: 'Mantén el equilibrio sobre el flotador, esquiva los ataques de tu oponente y empújalo al agua para ganar.'
+    },
+    slotcar: {
+        title: '¡Carreras Speedway a máxima velocidad!',
+        desc: 'Controla la aceleración en las rectas y frena en las curvas para no descarrilar y llegar en primera posición.'
+    },
+    battleball: {
+        title: '¡Batalla clásica de BattleBall!',
+        desc: 'Rebota por la pista coloreando las baldosas y bloquea las áreas para conseguir la mayor puntuación de tu equipo.'
+    }
+};
+
 export const GameView = () => {
     const { selectedGame, accountStatus, gameOffline, setGameURL } = useGameCenter();
 
@@ -61,6 +84,10 @@ export const GameView = () => {
     const freeGamesLeft = accountStatus ? accountStatus.freeGamesLeft : 5;
 
     const controls = useMemo(() => GAME_CONTROLS[ selectedGame.gameNameId ] || DEFAULT_CONTROLS, [ selectedGame ]);
+    const gameDesc = GAME_DESCRIPTIONS[ selectedGame.gameNameId ] || {
+        title: '¡Prepárate para la acción!',
+        desc: 'Disfruta de este clásico minijuego multijugador con tus amigos en Habbten.'
+    };
 
     return (
         <Flex 
@@ -84,15 +111,16 @@ export const GameView = () => {
                             src={ `${ selectedGame.assetUrl }${ selectedGame.gameNameId }_logo.png?v=6` } 
                             alt={ selectedGame.gameNameId }
                             className="game-hero-logo" 
+                            style={{ maxHeight: '110px', maxWidth: '340px', objectFit: 'contain', borderRadius: '8px' }}
                         />
                     </Base>
 
                     <Base className="game-info-box p-3">
                         <div className="game-tagline mb-2">
-                            { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_title`) || '¡Prepárate para la acción!' }
+                            { gameDesc.title }
                         </div>
                         <div className="game-description-text">
-                            { LocalizeText(`gamecenter.${ selectedGame.gameNameId }.description_content`) || 'Disfruta de este clásico minijuego multijugador con tus amigos en Habbten.' }
+                            { gameDesc.desc }
                         </div>
                     </Base>
                 </Flex>

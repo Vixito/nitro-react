@@ -85,11 +85,15 @@ export const NotificationCenterView: FC<{}> = props =>
                 { getBubbleAlerts }
             </Column>
             { createPortal(
-                <>
-                    { hasModal && <div className="nitro-alert-backdrop" /> }
-                    { getConfirms }
-                    { getAlerts }
-                </>,
+                (getConfirms || getAlerts) ? (
+                    <div className="nitro-dialog-container">
+                        { hasModal && <div className="nitro-alert-backdrop" /> }
+                        <div className="nitro-dialog-wrapper">
+                            { getConfirms }
+                            { getAlerts }
+                        </div>
+                    </div>
+                ) : null,
                 document.body
             ) }
         </>

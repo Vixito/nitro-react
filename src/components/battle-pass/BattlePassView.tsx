@@ -58,6 +58,33 @@ interface CountdownTime {
     seconds: string;
 }
 
+const MissionImage: FC<{ image?: string; category: number; alt?: string }> = ({ image, category, alt = '' }) =>
+{
+    const [ hasError, setHasError ] = useState(false);
+    const fallbackBadge = {
+        1: 'ACH_SafetyQuizGraduate1',
+        2: 'ACH_Login1',
+        3: 'ACH_AllTimeHotelPresence1',
+        4: 'ACH_GamePlayed1',
+        5: 'ACH_RespectGiven1',
+        6: 'ACH_Graduate1'
+    }[category] || 'ACH_SafetyQuizGraduate1';
+
+    if(!image || hasError)
+    {
+        return <LayoutBadgeImageView badgeCode={ fallbackBadge } />;
+    }
+
+    return (
+        <img 
+            src={ image } 
+            alt={ alt } 
+            onError={ () => setHasError(true) }
+            style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } 
+        />
+    );
+};
+
 export const BattlePassView: FC<{}> = () =>
 {
     const [ isVisible, setIsVisible ] = useState(false);
@@ -324,7 +351,7 @@ export const BattlePassView: FC<{}> = () =>
     };
 
     const categoryBadgeCodes: { [key: number]: string } = {
-        1: 'ACH_SafetyQuizPassed1',
+        1: 'ACH_SafetyQuizGraduate1',
         2: 'ACH_Login1',
         3: 'ACH_AllTimeHotelPresence1',
         4: 'ACH_GamePlayed1',
@@ -368,10 +395,15 @@ export const BattlePassView: FC<{}> = () =>
     // Determine currency type accurately: -1 = Credits (Coins), 0 = Pixels (Duckets), 5 = Points (Diamonds)
     const getCurrencyType = (type: string, pointType: number = 0): number | null =>
     {
-        if(type === 'credits') return -1;
-        if(type === 'pixels') return 0;
-        if(type === 'points')
+        if(!type) return null;
+        const lowerType = type.toLowerCase();
+        if(lowerType === 'credits') return -1;
+        if(lowerType === 'duckets' || lowerType === 'pixels') return 0;
+        if(lowerType === 'diamonds') return 5;
+        if(lowerType === 'points')
         {
+            if(pointType === -1) return -1;
+            if(pointType === 0) return 0;
             return (pointType !== undefined && pointType !== null && pointType > 0) ? pointType : 5;
         }
         return null;
@@ -401,11 +433,19 @@ export const BattlePassView: FC<{}> = () =>
         {
             return <img src={ imgUrl } alt="" style={ { maxWidth: '46px', maxHeight: '46px', objectFit: 'contain', imageRendering: 'auto' } } />;
         }
-        // 4. Single Currency Reward: render exact currency icon (Coins for credits, Duckets for pixels, Diamonds for points=5)
+        // 4. Currency Reward: render exact currency icon (Coins for credits, Duckets for pixels, Diamonds for points=5)
         const currType = getCurrencyType(type, pointType);
         if(currType !== null)
         {
             return <LayoutCurrencyIcon type={ currType } />;
+        }
+        // 5. Fallback based on name if type wasn't recognized
+        if(name)
+        {
+            const lowerName = name.toLowerCase();
+            if(lowerName.includes('crédito') || lowerName.includes('credito')) return <LayoutCurrencyIcon type={ -1 } />;
+            if(lowerName.includes('ducket') || lowerName.includes('pixel')) return <LayoutCurrencyIcon type={ 0 } />;
+            if(lowerName.includes('diamante')) return <LayoutCurrencyIcon type={ 5 } />;
         }
         return <LayoutBadgeImageView badgeCode="ACH_BattlePass1" isGroup={ false } />;
     };
@@ -560,7 +600,7 @@ export const BattlePassView: FC<{}> = () =>
                                     <div key={ m.id } className="bp-quick-mission-card">
                                         <div className="d-flex flex-column align-items-center flex-shrink-0">
                                             <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
-                                                { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode="ACH_SafetyQuizPassed1" /> }
+                                                <MissionImage image={ m.image } category={ m.category } alt={ m.name } />
                                             </div>
                                             <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px', padding: '2px 5px' } }>{ m.progress }/{ m.task }</span>
                                         </div>
@@ -726,7 +766,7 @@ export const BattlePassView: FC<{}> = () =>
                                                 <div key={ m.id } className={ `bp-mission-row ${ m.completed ? 'completed' : '' }` }>
                                                     <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                         <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
-                                                            { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[m.category] || 'ACH_Graduate1' } /> }
+                                                            <MissionImage image={ m.image } category={ m.category } alt={ m.name } />
                                                         </div>
                                                         <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ m.progress }/{ m.task }</span>
                                                     </div>
@@ -951,7 +991,7 @@ export const BattlePassView: FC<{}> = () =>
                                             <div key={ m.id } className={ `bp-mission-row ${ m.completed ? 'completed' : '' }` }>
                                                 <div className="d-flex flex-column align-items-center flex-shrink-0">
                                                     <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
-                                                        { m.image ? <img src={ m.image } alt="" style={ { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' } } /> : <LayoutBadgeImageView badgeCode={ categoryBadgeCodes[selectedCategory] || 'ACH_SafetyQuizPassed1' } /> }
+                                                        <MissionImage image={ m.image } category={ m.category } alt={ m.name } />
                                                     </div>
                                                     <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px' } }>{ m.progress }/{ m.task }</span>
                                                 </div>
