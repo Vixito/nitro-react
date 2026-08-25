@@ -59,7 +59,7 @@ export const CameraWidgetShowPhotoView: FC<CameraWidgetShowPhotoViewProps> = pro
                 <Text center>{ currentImage.m }</Text> }
             <Flex alignItems="center" justifyContent="between">
                 <Text>{ (currentImage.n || '') }</Text>
-                <Text>{ new Date(currentImage.t * 1000).toLocaleDateString() }</Text>
+                <Text>{ new Date(currentImage.t * 1000).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' }) }</Text>
             </Flex>
             { (currentPhotos.length > 1) &&
                 <Flex className="picture-preview-buttons">
