@@ -1,4 +1,5 @@
 import { FC, ReactNode, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { NotificationAlertType, NotificationBubbleType } from '../../api';
 import { Column } from '../../common';
 import { useNotification } from '../../hooks';
@@ -80,12 +81,17 @@ export const NotificationCenterView: FC<{}> = props =>
 
     return (
         <>
-            { hasModal && <div className="nitro-alert-backdrop" /> }
             <Column gap={ 1 }>
                 { getBubbleAlerts }
             </Column>
-            { getConfirms }
-            { getAlerts }
+            { createPortal(
+                <>
+                    { hasModal && <div className="nitro-alert-backdrop" /> }
+                    { getConfirms }
+                    { getAlerts }
+                </>,
+                document.body
+            ) }
         </>
     );
 }

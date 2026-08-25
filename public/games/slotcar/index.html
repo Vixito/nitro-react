@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedway</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Ubuntu', sans-serif;
+            color: #fff;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1e293b;
+        }
+
+        canvas {
+            background: #0284c7;
+            border: 3px solid #38bdf8;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .timer-box {
+            font-size: 16px;
+            font-weight: bold;
+            color: #facc15;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .btn-hud {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-hud:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-hud-danger {
+            background: #be123c;
+            border-color: #9f1239;
+        }
+
+        .btn-hud-danger:hover {
+            background: #e11d48;
+        }
+
+        .modal-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            border: 2px solid rgba(56, 189, 248, 0.4);
+            border-radius: 16px;
+            padding: 28px 36px;
+            max-width: 520px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn-habbo-play {
+            background: #15803d;
+            color: #ffffff;
+            border: 1px solid #166534;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            padding: 12px 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-play:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-habbo-play:active {
+            background: #14532d;
+            transform: translateY(1px);
+        }
+
+        .btn-habbo-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-back:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .results-score-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0 24px 0;
+            gap: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="860" height="500"></canvas>
+
+        <div class="hud-overlay">
+            <div class="hud-panel">
+                <span style="color: #cbd5e1; font-weight: 800; font-size: 13px;">VUELTAS: <span id="lapDisplay"
+                        style="color: #facc15; font-size: 16px; font-weight: 900;">1 / 3</span></span>
+            </div>
+
+            <div class="hud-panel">
+                <div id="timerDisplay" class="timer-box">00:00.0</div>
+            </div>
+
+            <div class="hud-panel">
+                <button id="btnExit" class="btn-hud btn-hud-danger">✕ Salir</button>
+            </div>
+        </div>
+
+        <div id="startModal" class="modal-screen">
+            <div class="modal-card">
+                <img src="./assets/slotcar_logo.png" alt="Speedway"
+                    style="max-width: 240px; margin-bottom: 16px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+                
+                <p>¡Acelera en la pista con <b>Espacio / Flecha Arriba / W</b>! Suelta el acelerador en las curvas cerradas para no
+                    derrapar fuera de la ranura.</p>
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnStartGame" class="btn-habbo-play">¡ARRANCAR MOTOR!</button>
+                    <button id="btnExitModal" class="btn-habbo-back">Volver</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- In-game Results Modal -->
+        <div id="resultsModal" class="modal-screen" style="display: none;">
+            <div class="modal-card">
+                <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 4px; color: #38bdf8;">¡CARRERA TERMINADA!</h2>
+                <div style="font-size: 14px; color: #cbd5e1; margin-bottom: 12px;">Tiempo de vuelta y récord</div>
+
+                <div class="results-score-row">
+                    <span style="font-size: 14px; font-weight: 800; color: #94a3b8;">TIEMPO TOTAL:</span>
+                    <span id="finalTimeDisplay" style="font-size: 26px; font-weight: 900; color: #facc15; font-family: 'Press Start 2P', monospace;">0.0s</span>
+                </div>
+
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnPlayAgain" class="btn-habbo-play">JUGAR OTRA VEZ</button>
+                    <button id="btnExitResults" class="btn-habbo-back">Volver al Game Center</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let isPlaying = false;
+        let laps = 1;
+        let progress = 0;
+        let botProgress = 0;
+        let speed = 0;
+        let startTime = 0;
+
+        const keys = {};
+        window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+        function getTrackPoint(t, radiusOffset = 0) {
+            const rx = 320 + radiusOffset;
+            const ry = 160 + radiusOffset;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const angle = t * Math.PI * 2;
+            return {
+                x: cx + Math.cos(angle) * rx,
+                y: cy + Math.sin(angle) * ry
+            };
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            // Player acceleration
+            if (keys[' '] || keys['arrowup'] || keys['w']) {
+                speed = Math.min(0.008, speed + 0.0003);
+            } else {
+                speed = Math.max(0, speed - 0.0002);
+            }
+
+            progress += speed;
+            if (progress >= 1) {
+                progress -= 1;
+                laps++;
+                if (laps > 3) {
+                    isPlaying = false;
+                    const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+                    document.getElementById('finalTimeDisplay').innerText = `${elapsed}s`;
+                    document.getElementById('resultsModal').style.display = 'flex';
+                    return;
+                }
+                document.getElementById('lapDisplay').innerText = `${laps} / 3`;
+            }
+
+            // Bot speed
+            botProgress += 0.0045;
+            if (botProgress >= 1) botProgress -= 1;
+
+            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+            document.getElementById('timerDisplay').innerText = elapsed + 's';
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Track Outer / Inner
+            ctx.beginPath();
+            ctx.ellipse(canvas.width / 2, canvas.height / 2, 340, 180, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#334155';
+            ctx.fill();
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = '#f8fafc';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.ellipse(canvas.width / 2, canvas.height / 2, 280, 120, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#0f172a';
+            ctx.fill();
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = '#f8fafc';
+            ctx.stroke();
+
+            // Slots (Grooves)
+            ctx.beginPath();
+            ctx.ellipse(canvas.width / 2, canvas.height / 2, 320, 160, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.ellipse(canvas.width / 2, canvas.height / 2, 300, 140, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Player Car
+            const p = getTrackPoint(progress, 0);
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(-14, -8, 28, 16);
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(-6, -5, 12, 10);
+            ctx.restore();
+
+            // Bot Car
+            const bp = getTrackPoint(botProgress, -20);
+            ctx.save();
+            ctx.translate(bp.x, bp.y);
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(-14, -8, 28, 16);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(-6, -5, 12, 10);
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            document.getElementById('startModal').style.display = 'none';
+            document.getElementById('resultsModal').style.display = 'none';
+            isPlaying = true;
+            laps = 1;
+            progress = 0;
+            botProgress = 0;
+            speed = 0;
+            startTime = Date.now();
+            document.getElementById('lapDisplay').innerText = `1 / 3`;
+        }
+
+        function exitToClient() {
+            window.parent.postMessage('EXIT_GAME', '*');
+        }
+
+        document.getElementById('btnStartGame').addEventListener('click', startGame);
+        document.getElementById('btnPlayAgain').addEventListener('click', startGame);
+        document.getElementById('btnExit').addEventListener('click', exitToClient);
+        document.getElementById('btnExitModal').addEventListener('click', exitToClient);
+        document.getElementById('btnExitResults').addEventListener('click', exitToClient);
+
+        gameLoop();
+    </script>
+</body>
+
+</html>

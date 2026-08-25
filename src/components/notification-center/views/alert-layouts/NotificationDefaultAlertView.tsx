@@ -121,7 +121,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
             { ...rest } 
             type={ isCommandsList ? 'custom-commands' : (hasFrank ? NotificationAlertType.DEFAULT : item.alertType) } 
             classNames={ isCommandsList ? ['commands-alert'] : [] }
-            style={ isCommandsList ? { width: `${customSize.width}px`, height: `${customSize.height}px`, maxWidth: '96vw', maxHeight: '94vh', position: 'relative' } : {} }
+            style={ isCommandsList ? { width: `${customSize.width}px`, height: `${customSize.height}px`, maxWidth: '96vw', maxHeight: '94vh' } : {} }
         >
             <Flex fullHeight overflow="hidden" className="w-100" gap={ hasFrank || (item.imageUrl && !imageFailed) ? 2 : 0 }>
                 { hasFrank && !item.imageUrl && <Base className="notification-frank flex-shrink-0" /> }

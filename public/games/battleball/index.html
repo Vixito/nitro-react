@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Ball</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Ubuntu', sans-serif;
+            color: #fff;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+        }
+
+        canvas {
+            background: #111827;
+            border: 3px solid #6366f1;
+            border-radius: 12px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .team-score {
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .timer-box {
+            font-size: 16px;
+            font-weight: bold;
+            color: #facc15;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .btn-hud {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-hud:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-hud-danger {
+            background: #be123c;
+            border-color: #9f1239;
+        }
+
+        .btn-hud-danger:hover {
+            background: #e11d48;
+        }
+
+        .modal-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1e1b4b;
+            border: 2px solid rgba(99, 102, 241, 0.4);
+            border-radius: 16px;
+            padding: 28px 36px;
+            max-width: 520px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+
+        .btn-habbo-play {
+            background: #15803d;
+            color: #ffffff;
+            border: 1px solid #166534;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            padding: 12px 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-play:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-habbo-play:active {
+            background: #14532d;
+            transform: translateY(1px);
+        }
+
+        .btn-habbo-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-back:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .results-score-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0 24px 0;
+        }
+
+        .results-team-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .results-team-title {
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .results-team-score {
+            font-size: 28px;
+            font-weight: 900;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="500"></canvas>
+
+        <div class="hud-overlay">
+            <div class="hud-panel">
+                <span style="color: #38bdf8; font-weight: 800; font-size: 13px;">AZUL (TÚ): <span id="scoreBlue"
+                        class="team-score">0</span></span>
+                <span style="color: #f87171; font-weight: 800; font-size: 13px; margin-left: 12px;">ROJO: <span id="scoreRed"
+                        class="team-score">0</span></span>
+            </div>
+
+            <div class="hud-panel">
+                <div id="timerDisplay" class="timer-box">01:30</div>
+            </div>
+
+            <div class="hud-panel">
+                <span id="powerupBadge" style="font-size: 12px; font-weight: 800; color: #facc15;">PODER:
+                    NINGUNO</span>
+                <button id="btnExit" class="btn-hud btn-hud-danger" style="margin-left: 8px;">✕ Salir</button>
+            </div>
+        </div>
+
+        <div id="startModal" class="modal-screen">
+            <div class="modal-card">
+                <img src="./assets/battleball_logo.png" alt="Battle Ball"
+                    style="max-width: 240px; margin-bottom: 16px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+                
+                <p>¡Salta en tu bola y pinta tantas baldosas como puedas para tu equipo! Recoge los clásicos poderes
+                    para superar a los rivales.</p>
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnStartGame" class="btn-habbo-play">¡INICIAR BATALLA!</button>
+                    <button id="btnExitModal" class="btn-habbo-back">Volver</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- In-game Results Modal -->
+        <div id="resultsModal" class="modal-screen" style="display: none;">
+            <div class="modal-card">
+                <h2 id="winnerTitle" style="font-size: 24px; font-weight: 900; margin-bottom: 4px; color: #38bdf8;">¡FIN DE LA BATALLA!</h2>
+                <div id="winnerSubtitle" style="font-size: 14px; color: #cbd5e1; margin-bottom: 12px;">Resultados de baldosas pintadas</div>
+
+                <div class="results-score-row">
+                    <div class="results-team-box" style="color: #38bdf8;">
+                        <span class="results-team-title">EQUIPO AZUL</span>
+                        <span id="finalScoreBlue" class="results-team-score">0</span>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 900; color: #64748b;">VS</div>
+                    <div class="results-team-box" style="color: #f87171;">
+                        <span class="results-team-title">EQUIPO ROJO</span>
+                        <span id="finalScoreRed" class="results-team-score">0</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnPlayAgain" class="btn-habbo-play">JUGAR OTRA VEZ</button>
+                    <button id="btnExitResults" class="btn-habbo-back">Volver al Game Center</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Audio
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'bounce') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'powerup') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.linearRampToValueAtTime(1000, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            }
+        }
+
+        // Grid (Tiles)
+        const COLS = 16;
+        const ROWS = 10;
+        const TILE_W = canvas.width / COLS;
+        const TILE_H = canvas.height / ROWS;
+
+        let tiles = [];
+        function initTiles() {
+            tiles = [];
+            for (let r = 0; r < ROWS; r++) {
+                tiles[r] = [];
+                for (let c = 0; c < COLS; c++) {
+                    tiles[r][c] = 0; // 0 = empty, 1 = blue, 2 = red
+                }
+            }
+        }
+
+        let isPlaying = false;
+        let timeLeft = 90;
+        let timerInterval = null;
+
+        const player = {
+            x: 100,
+            y: 250,
+            radius: 18,
+            speed: 5,
+            team: 1, // Blue
+            bounceTimer: 0,
+            powerup: null
+        };
+
+        const bot = {
+            x: 700,
+            y: 250,
+            radius: 18,
+            speed: 3.5,
+            team: 2, // Red
+            bounceTimer: 0,
+            targetC: 8,
+            targetR: 5
+        };
+
+        let powerups = [];
+
+        const keys = {};
+        window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+
+        function spawnPowerup() {
+            if (powerups.length < 3 && Math.random() < 0.02) {
+                const c = Math.floor(Math.random() * (COLS - 2)) + 1;
+                const r = Math.floor(Math.random() * (ROWS - 2)) + 1;
+                powerups.push({
+                    x: c * TILE_W + TILE_W / 2,
+                    y: r * TILE_H + TILE_H / 2,
+                    type: Math.random() < 0.5 ? 'speed' : 'bomb'
+                });
+            }
+        }
+
+        function countScore() {
+            let blue = 0;
+            let red = 0;
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    if (tiles[r][c] === 1) blue++;
+                    if (tiles[r][c] === 2) red++;
+                }
+            }
+            document.getElementById('scoreBlue').innerText = blue * 10;
+            document.getElementById('scoreRed').innerText = red * 10;
+            return { blue: blue * 10, red: red * 10 };
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            // Player movement
+            let spd = player.powerup === 'speed' ? player.speed * 1.5 : player.speed;
+            if ((keys['w'] || keys['arrowup']) && player.y > player.radius) player.y -= spd;
+            if ((keys['s'] || keys['arrowdown']) && player.y < canvas.height - player.radius) player.y += spd;
+            if ((keys['a'] || keys['arrowleft']) && player.x > player.radius) player.x -= spd;
+            if ((keys['d'] || keys['arrowright']) && player.x < canvas.width - player.radius) player.x += spd;
+
+            // Tile coloring for player
+            const pC = Math.floor(player.x / TILE_W);
+            const pR = Math.floor(player.y / TILE_H);
+            if (pC >= 0 && pC < COLS && pR >= 0 && pR < ROWS) {
+                if (tiles[pR][pC] !== player.team) {
+                    tiles[pR][pC] = player.team;
+                    playSound('bounce');
+                    countScore();
+                }
+            }
+
+            // Bot movement AI
+            const bC = Math.floor(bot.x / TILE_W);
+            const bR = Math.floor(bot.y / TILE_H);
+            if (bC >= 0 && bC < COLS && bR >= 0 && bR < ROWS) {
+                if (tiles[bR][bC] !== bot.team) {
+                    tiles[bR][bC] = bot.team;
+                    countScore();
+                }
+            }
+
+            const targetX = bot.targetC * TILE_W + TILE_W / 2;
+            const targetY = bot.targetR * TILE_H + TILE_H / 2;
+            const dx = targetX - bot.x;
+            const dy = targetY - bot.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist > 10) {
+                bot.x += (dx / dist) * bot.speed;
+                bot.y += (dy / dist) * bot.speed;
+            } else {
+                bot.targetC = Math.floor(Math.random() * COLS);
+                bot.targetR = Math.floor(Math.random() * ROWS);
+            }
+
+            // Powerup collisions
+            spawnPowerup();
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                const pu = powerups[i];
+                if (Math.hypot(pu.x - player.x, pu.y - player.y) < player.radius + 14) {
+                    player.powerup = pu.type;
+                    document.getElementById('powerupBadge').innerText = `PODER: ${pu.type.toUpperCase()}`;
+                    playSound('powerup');
+                    powerups.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Tiles Grid
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const val = tiles[r][c];
+                    ctx.fillStyle = val === 1 ? '#0284c7' : (val === 2 ? '#dc2626' : '#1e293b');
+                    ctx.fillRect(c * TILE_W + 1, r * TILE_H + 1, TILE_W - 2, TILE_H - 2);
+
+                    // Inner border for banzai tile look
+                    ctx.strokeStyle = val === 1 ? '#38bdf8' : (val === 2 ? '#f87171' : '#334155');
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(c * TILE_W + 3, r * TILE_H + 3, TILE_W - 6, TILE_H - 6);
+                }
+            }
+
+            // Draw Powerups
+            powerups.forEach(pu => {
+                ctx.beginPath();
+                ctx.arc(pu.x, pu.y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = pu.type === 'speed' ? '#facc15' : '#a855f7';
+                ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(pu.type === 'speed' ? '⚡' : '💣', pu.x, pu.y + 4);
+            });
+
+            // Draw Bot (Red Ball)
+            ctx.beginPath();
+            ctx.arc(bot.x, bot.y, bot.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#ef4444';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+
+            // Draw Player (Blue Ball)
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#facc15';
+            ctx.stroke();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            document.getElementById('startModal').style.display = 'none';
+            document.getElementById('resultsModal').style.display = 'none';
+            initTiles();
+            isPlaying = true;
+            timeLeft = 90;
+            countScore();
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    const secs = String(timeLeft % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+                } else {
+                    clearInterval(timerInterval);
+                    isPlaying = false;
+                    const final = countScore();
+                    document.getElementById('finalScoreBlue').innerText = final.blue;
+                    document.getElementById('finalScoreRed').innerText = final.red;
+
+                    const title = document.getElementById('winnerTitle');
+                    if (final.blue > final.red) {
+                        title.innerText = '¡VICTORIA DEL EQUIPO AZUL!';
+                        title.style.color = '#38bdf8';
+                    } else if (final.red > final.blue) {
+                        title.innerText = '¡VICTORIA DEL EQUIPO ROJO!';
+                        title.style.color = '#f87171';
+                    } else {
+                        title.innerText = '¡EMPATE TÉCNICO!';
+                        title.style.color = '#facc15';
+                    }
+                    document.getElementById('resultsModal').style.display = 'flex';
+                }
+            }, 1000);
+        }
+
+        function exitToClient() {
+            window.parent.postMessage('EXIT_GAME', '*');
+        }
+
+        document.getElementById('btnStartGame').addEventListener('click', startGame);
+        document.getElementById('btnPlayAgain').addEventListener('click', startGame);
+        document.getElementById('btnExit').addEventListener('click', exitToClient);
+        document.getElementById('btnExitModal').addEventListener('click', exitToClient);
+        document.getElementById('btnExitResults').addEventListener('click', exitToClient);
+
+        gameLoop();
+    </script>
+</body>
+
+</html>

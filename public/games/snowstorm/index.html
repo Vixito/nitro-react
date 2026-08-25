@@ -1,286 +1,864 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Habbten - SnowStorm</title>
-    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>SnowStorm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Ubuntu', sans-serif;
+            color: #fff;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+
+        canvas {
+            background: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            cursor: crosshair;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .team-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue {
+            color: #38bdf8;
+        }
+
+        .badge-red {
+            color: #f87171;
+        }
+
+        .score-box {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .timer-box {
+            font-size: 16px;
+            font-weight: bold;
+            color: #facc15;
+            font-family: 'Press Start 2P', monospace;
+            letter-spacing: 1px;
+        }
+
+        .ammo-bar {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .snowball-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+            transition: all 0.15s ease;
+        }
+
+        .snowball-dot.empty {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+
+        .btn-hud {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-hud:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-hud-danger {
+            background: #be123c;
+            border-color: #9f1239;
+        }
+
+        .btn-hud-danger:hover {
+            background: #e11d48;
+        }
+
+        .modal-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            border: 2px solid rgba(56, 189, 248, 0.4);
+            border-radius: 16px;
+            padding: 28px 36px;
+            max-width: 520px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .arena-select {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .arena-btn {
+            background: #334155;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 6px;
+            cursor: pointer;
+            color: #cbd5e1;
+            font-size: 11.5px;
+            font-weight: 700;
+            transition: all 0.15s ease;
+        }
+
+        .arena-btn.active,
+        .arena-btn:hover {
+            border-color: #38bdf8;
+            background: #0284c7;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .arena-btn img {
+            width: 100%;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .btn-habbo-play {
+            background: #15803d;
+            color: #ffffff;
+            border: 1px solid #166534;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            padding: 12px 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-play:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-habbo-play:active {
+            background: #14532d;
+            transform: translateY(1px);
+        }
+
+        .btn-habbo-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-back:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        /* Results Modal */
+        .results-score-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0 24px 0;
+        }
+
+        .results-team-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .results-team-title {
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .results-team-score {
+            font-size: 28px;
+            font-weight: 900;
+        }
+    </style>
 </head>
+
 <body>
-    <div id="game-app">
-        <!-- ============================================================
-             1. PANTALLA PRINCIPAL: VENTANA "GAMES!" (Screenshot 1)
-        ============================================================ -->
-        <div id="screen-lobby" class="habbo-screen">
-            <div class="lobby-backdrop"></div>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
 
-            <div class="habbo-window">
-                <div class="window-titlebar">
-                    <span class="window-title">Games!</span>
-                    <button id="btn-close-window" class="window-close-btn" title="Cerrar">✕</button>
+        <div class="hud-overlay">
+            <div class="hud-panel">
+                <div class="team-badge badge-blue">
+                    <span>AZUL</span>
+                    <span id="scoreBlue" class="score-box">0</span>
                 </div>
+                <div style="width: 2px; height: 22px; background: rgba(255,255,255,0.15);"></div>
+                <div class="team-badge badge-red">
+                    <span id="scoreRed" class="score-box">0</span>
+                    <span>ROJO</span>
+                </div>
+            </div>
 
-                <div class="window-content">
-                    <div class="snowstorm-banner">
-                        <div class="snow-mountains-bg"></div>
-                        <div class="official-logo">
-                            <span class="logo-snow">SNOW</span>
-                            <div class="logo-gloves-crossing">
-                                <div class="glove-mini blue"></div>
-                                <div class="glove-mini red"></div>
-                            </div>
-                            <span class="logo-storm">STORM</span>
-                        </div>
-                    </div>
+            <div class="hud-panel">
+                <div id="timerDisplay" class="timer-box">02:00</div>
+            </div>
 
-                    <div class="lobby-body">
-                        <h2 class="lobby-headline">Hit or get hit!</h2>
-                        <p class="lobby-subtext">Play against other Habbos in epic snowball battles!</p>
+            <div class="hud-panel">
+                <div style="font-size: 12px; font-weight: bold; color: #94a3b8; margin-right: 2px;">BOLAS:</div>
+                <div id="ammoContainer" class="ammo-bar">
+                    <div class="snowball-dot"></div>
+                    <div class="snowball-dot"></div>
+                    <div class="snowball-dot"></div>
+                    <div class="snowball-dot"></div>
+                    <div class="snowball-dot"></div>
+                </div>
+                <button id="btnReload" class="btn-hud" style="margin-left: 6px;">[Espacio] Recargar</button>
+                <button id="btnExit" class="btn-hud btn-hud-danger" style="margin-left: 6px;">✕ Salir</button>
+            </div>
+        </div>
 
-                        <div class="battle-preview">
-                            <div class="mini-habbo habbo-left"></div>
-                            <div class="mini-habbo habbo-center-left"></div>
-                            <div class="snowball-flying-preview"></div>
-                            <div class="mini-habbo habbo-center-right"></div>
-                            <div class="mini-habbo habbo-right"></div>
-                        </div>
-
-                        <div class="lobby-links">
-                            <a href="#" id="link-how-to-play">How To Play</a>
-                            <span class="link-divider">|</span>
-                            <a href="#" id="link-leaderboard">Leaderboard</a>
-                        </div>
-                    </div>
-
-                    <div class="window-footer">
-                        <div class="games-left-info">
-                            <span class="games-count">Total Games Left: <strong>38</strong></span>
-                            <a href="#" class="buy-games-link">Buy 10 games</a>
-                        </div>
-                        <button id="btn-play-now" class="btn-habbo-green">Play now!</button>
-                    </div>
+        <!-- Pantalla de Selección de Arena -->
+        <div id="startModal" class="modal-screen">
+            <div class="modal-card">
+                <img src="./assets/thumbnails_Snowstorm_Logo.png" alt="SnowStorm"
+                    style="max-width: 240px; margin-bottom: 16px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+                
+                <p>Lanza bolas de nieve con el <b>Clic del Ratón</b>, muévete con <b>W A S D / Flechas</b> o <b>Clic en el suelo</b> y recarga bolas pulsando <b>Espacio</b>.</p>
+                
+                <div style="font-size: 12px; font-weight: 800; margin-bottom: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">SELECCIONA LA ARENA DE BATALLA:</div>
+                <div class="arena-select">
+                    <div class="arena-btn active" data-map="1"><img src="./assets/Room_snowstorm_1.png">Arena 1</div>
+                    <div class="arena-btn" data-map="2"><img src="./assets/Room_snowstorm_2.png">Arena 2</div>
+                    <div class="arena-btn" data-map="3"><img src="./assets/Room_snowstorm_3.png">Arena 3</div>
+                    <div class="arena-btn" data-map="4"><img src="./assets/Room_snowstorm_4.png">Arena 4</div>
+                    <div class="arena-btn" data-map="5"><img src="./assets/Room_snowstorm_5.png">Arena 5</div>
+                </div>
+                
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnStartGame" class="btn-habbo-play">¡COMENZAR PARTIDA!</button>
+                    <button id="btnExitModal" class="btn-habbo-back">Volver</button>
                 </div>
             </div>
         </div>
 
-        <!-- ============================================================
-             2. PANTALLA: BUSCANDO JUGADORES (Screenshot 2)
-        ============================================================ -->
-        <div id="screen-queue" class="habbo-screen hidden">
-            <div class="habbo-window matchmaking-window">
-                <div class="window-titlebar">
-                    <span class="window-title">Games!</span>
-                    <button id="btn-cancel-queue-x" class="window-close-btn">✕</button>
-                </div>
+        <!-- Modal de Resultados / Fin de Partida (Sin Browser Alert) -->
+        <div id="resultsModal" class="modal-screen" style="display: none;">
+            <div class="modal-card">
+                <h2 id="winnerTitle" style="font-size: 24px; font-weight: 900; margin-bottom: 4px; color: #38bdf8;">¡FIN DE LA PARTIDA!</h2>
+                <div id="winnerSubtitle" style="font-size: 14px; color: #94a3b8; margin-bottom: 12px;">Resultados de la batalla</div>
 
-                <div class="window-content">
-                    <div class="snowstorm-banner compact">
-                        <div class="snow-mountains-bg"></div>
-                        <div class="official-logo small">
-                            <span class="logo-snow">SNOW</span>
-                            <div class="logo-gloves-crossing">
-                                <div class="glove-mini blue"></div>
-                                <div class="glove-mini red"></div>
-                            </div>
-                            <span class="logo-storm">STORM</span>
-                        </div>
+                <div class="results-score-row">
+                    <div class="results-team-box badge-blue">
+                        <span class="results-team-title">EQUIPO AZUL</span>
+                        <span id="finalScoreBlue" class="results-team-score">0</span>
                     </div>
-
-                    <div class="queue-body">
-                        <h2 class="queue-headline">Waiting for more players...</h2>
-
-                        <div class="player-slots-grid" id="queue-slots">
-                            <!-- 10 slots -->
-                        </div>
-
-                        <div class="queue-footer">
-                            <button id="btn-cancel-queue" class="link-btn-cancel">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============================================================
-             3. PANTALLA: GET READY / ROSTER DE EQUIPOS (Screenshot 3)
-        ============================================================ -->
-        <div id="screen-roster" class="habbo-screen hidden">
-            <div class="roster-container">
-                <div class="roster-header">
-                    <div class="team-glove-big blue-glove"></div>
-                    <div class="official-logo medium">
-                        <span class="logo-snow">SNOW</span>
-                        <div class="logo-gloves-crossing">
-                            <div class="glove-mini blue"></div>
-                            <div class="glove-mini red"></div>
-                        </div>
-                        <span class="logo-storm">STORM</span>
-                    </div>
-                    <div class="team-glove-big red-glove"></div>
-                </div>
-
-                <h1 class="roster-title">Get ready!</h1>
-                <p class="roster-subtitle" id="roster-countdown-text">Waiting for players...</p>
-
-                <div class="roster-teams-layout">
-                    <div class="team-column blue-team" id="blue-roster-list"></div>
-
-                    <div class="map-preview-card">
-                        <div class="map-thumbnail">
-                            <div class="spotlight-glow"></div>
-                            <span class="map-name-label">Fight Night</span>
-                        </div>
-                    </div>
-
-                    <div class="team-column red-team" id="red-roster-list"></div>
-                </div>
-
-                <div class="roster-footer">
-                    <button id="btn-leave-roster" class="link-btn-leave">◄ Leave game?</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============================================================
-             4. PANTALLA: ARENA DE JUEGO (Screenshot 4)
-        ============================================================ -->
-        <div id="screen-arena" class="habbo-screen hidden">
-            <canvas id="arena-canvas"></canvas>
-
-            <div id="arena-hud">
-                <button id="btn-flag-exit" class="hud-flag-box" title="Abandonar partida">
-                    <div class="orange-flag-icon">🏳️</div>
-                </button>
-
-                <div class="hud-scoreboard-container">
-                    <div class="scoreboard-teams">
-                        <div class="score-team blue">
-                            <div class="hud-glove-icon blue"></div>
-                            <span class="team-score-num" id="blue-score-num">0</span>
-                        </div>
-                        <div class="score-team red">
-                            <span class="team-score-num" id="red-score-num">0</span>
-                            <div class="hud-glove-icon red"></div>
-                        </div>
-                    </div>
-                    <div class="scoreboard-timer" id="match-timer-box">
-                        02:00
+                    <div style="font-size: 16px; font-weight: 900; color: #64748b;">VS</div>
+                    <div class="results-team-box badge-red">
+                        <span class="results-team-title">EQUIPO ROJO</span>
+                        <span id="finalScoreRed" class="results-team-score">0</span>
                     </div>
                 </div>
 
-                <div class="hud-left-controls">
-                    <div class="vertical-ammo-rack" id="ammo-rack-vertical">
-                        <div class="ammo-circle active"></div>
-                        <div class="ammo-circle active"></div>
-                        <div class="ammo-circle active"></div>
-                        <div class="ammo-circle active"></div>
-                        <div class="ammo-circle active"></div>
-                    </div>
-                    <button id="btn-make-snowballs" class="btn-make-snow" title="Hacer bolas de nieve (ESPACIO)">
-                        <div class="hand-icon">🖐️</div>
-                    </button>
-                </div>
-
-                <div class="hud-player-status">
-                    <div class="player-avatar-box">
-                        <img id="player-avatar-img" src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-115-42.hd-195-19.ch-215-66.lg-270-110.sh-305-62&headonly=1&direction=2&head_direction=2" alt="Avatar">
-                    </div>
-                    <div class="player-health-gauge">
-                        <div class="health-bar-fill" id="player-health-fill"></div>
-                    </div>
-                    <div class="player-score-badge" id="player-personal-score">
-                        0
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============================================================
-             5. PANTALLA: RESULTADOS / FINAL DE PARTIDA (Screenshot 5)
-        ============================================================ -->
-        <div id="screen-postmatch" class="habbo-screen hidden">
-            <div class="postmatch-container">
-                <!-- Burbujas de Chat Retro de Habbo arriba -->
-                <div class="postmatch-chat-bubbles">
-                    <div class="chat-bubble left bubble-1"><strong>Rc-Marco:</strong> ahahahha</div>
-                    <div class="chat-bubble left bubble-2"><strong>Rc-Marco:</strong> ruuun</div>
-                    <div class="chat-bubble right bubble-3"><strong>diavo:</strong> vi uccido</div>
-                    <div class="chat-bubble right bubble-4"><strong>okki-blu96:</strong> combatti!</div>
-                </div>
-
-                <!-- Cabecera con Logo y Guantes con Puntuaciones Totales -->
-                <div class="postmatch-header">
-                    <div class="team-glove-scored blue-glove-scored">
-                        <span id="postmatch-blue-total">106</span>
-                    </div>
-
-                    <div class="official-logo medium">
-                        <span class="logo-snow">SNOW</span>
-                        <div class="logo-gloves-crossing">
-                            <div class="glove-mini blue"></div>
-                            <div class="glove-mini red"></div>
-                        </div>
-                        <span class="logo-storm">STORM</span>
-                    </div>
-
-                    <div class="team-glove-scored red-glove-scored">
-                        <span id="postmatch-red-total">96</span>
-                    </div>
-                </div>
-
-                <!-- Layout Principal: Columna Azul, Centro (Ganador + MVP) y Columna Roja -->
-                <div class="postmatch-body-layout">
-                    <!-- Equipo Azul (Izquierda) -->
-                    <div class="postmatch-team-col blue" id="postmatch-blue-list">
-                        <!-- Generado por JS: 4 tarjetas de jugadores azules -->
-                    </div>
-
-                    <!-- Centro: Ganador, MVPs y Pases -->
-                    <div class="postmatch-center-panel">
-                        <h1 class="winner-headline" id="postmatch-winner-text">Blue Team wins!</h1>
-
-                        <!-- Tarjetas de MVP (Most K.O.'s & Most Hits) -->
-                        <div class="mvp-cards-row">
-                            <div class="mvp-card blue">
-                                <span class="mvp-badge-title">Most K.O.'s</span>
-                                <div class="mvp-avatar-box">
-                                    <img id="mvp-ko-avatar" src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-893-45.hd-180-1.ch-804-82.lg-280-92.sh-300-64&size=m&action=wav&direction=2&head_direction=2" alt="MVP KO">
-                                </div>
-                                <span class="mvp-username" id="mvp-ko-name">Savel</span>
-                            </div>
-
-                            <div class="mvp-card red">
-                                <span class="mvp-badge-title">Most Hits</span>
-                                <div class="mvp-avatar-box">
-                                    <img id="mvp-hits-avatar" src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-100-45.hd-209-1.ch-255-66.lg-280-110.sh-305-62&size=m&action=wav&direction=4&head_direction=4" alt="MVP Hits">
-                                </div>
-                                <span class="mvp-username" id="mvp-hits-name">Arci</span>
-                            </div>
-                        </div>
-
-                        <!-- Info de Partidas Restantes y HC -->
-                        <div class="postmatch-games-info">
-                            <span class="games-left-label">Total Games Left: <strong>37</strong></span>
-                            <span class="hc-bonus-text">Get additional 3 free daily games with HC!</span>
-                        </div>
-                    </div>
-
-                    <!-- Equipo Rojo (Derecha) -->
-                    <div class="postmatch-team-col red" id="postmatch-red-list">
-                        <!-- Generado por JS: 4 tarjetas de jugadores rojos -->
-                    </div>
-                </div>
-
-                <!-- Footer: Leave game & Rematch Button con cuenta regresiva -->
-                <div class="postmatch-footer">
-                    <button id="btn-leave-postmatch" class="link-btn-leave">◄ Leave game?</button>
-                    <button id="btn-rematch" class="btn-habbo-green btn-rematch">Rematch (30)</button>
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnPlayAgain" class="btn-habbo-play">JUGAR OTRA VEZ</button>
+                    <button id="btnExitResults" class="btn-habbo-back">Volver al Game Center</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="engine.js"></script>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Audio synthesizer
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'throw') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'hit') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.12);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'reload') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+        }
+
+        // Map Image Loader
+        let currentMapIndex = 1;
+        const mapImages = {};
+        for (let i = 1; i <= 5; i++) {
+            const img = new Image();
+            img.src = `./assets/Room_snowstorm_${i}.png`;
+            mapImages[i] = img;
+        }
+
+        // Game State
+        let isPlaying = false;
+        let scoreBlue = 0;
+        let scoreRed = 0;
+        let timeLeft = 120;
+        let timerInterval = null;
+
+        // Isometric Player (Snaps / Moves along isometric plane)
+        const player = {
+            x: 240,
+            y: 280,
+            targetX: 240,
+            targetY: 280,
+            radius: 18,
+            speed: 3.6,
+            ammo: 5,
+            maxAmmo: 5,
+            hp: 3,
+            team: 'blue',
+            isReloading: false
+        };
+
+        const bots = [
+            { x: 720, y: 200, targetX: 720, targetY: 200, radius: 18, speed: 2.2, hp: 3, team: 'red', lastThrow: 0 },
+            { x: 740, y: 350, targetX: 740, targetY: 350, radius: 18, speed: 2.4, hp: 3, team: 'red', lastThrow: 0 },
+            { x: 260, y: 160, targetX: 260, targetY: 160, radius: 18, speed: 2.3, hp: 3, team: 'blue', lastThrow: 0 }
+        ];
+
+        let snowballs = [];
+        let particles = [];
+        let moveMarker = null;
+
+        // Controls
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.code === 'Space') {
+                e.preventDefault();
+                reloadSnowball();
+            }
+        });
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // Click Controls: Left click on canvas to throw or click-to-move
+        canvas.addEventListener('click', e => {
+            if (!isPlaying) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            // If player clicked within walking reach or holding Alt/Shift, set movement target
+            if (e.shiftKey) {
+                player.targetX = Math.max(80, Math.min(canvas.width - 80, mouseX));
+                player.targetY = Math.max(80, Math.min(canvas.height - 80, mouseY));
+                moveMarker = { x: player.targetX, y: player.targetY, time: 30 };
+            } else {
+                throwSnowball(player, mouseX, mouseY);
+            }
+        });
+
+        canvas.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            if (!isPlaying) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+            player.targetX = Math.max(80, Math.min(canvas.width - 80, mouseX));
+            player.targetY = Math.max(80, Math.min(canvas.height - 80, mouseY));
+            moveMarker = { x: player.targetX, y: player.targetY, time: 30 };
+        });
+
+        function throwSnowball(shooter, targetX, targetY) {
+            if (shooter.ammo <= 0) return;
+            shooter.ammo--;
+            updateAmmoUI();
+            playSound('throw');
+
+            const dx = targetX - shooter.x;
+            const dy = targetY - shooter.y;
+            const dist = Math.hypot(dx, dy);
+            const duration = Math.max(20, Math.min(50, dist / 12));
+
+            snowballs.push({
+                startX: shooter.x,
+                startY: shooter.y,
+                targetX: targetX,
+                targetY: targetY,
+                x: shooter.x,
+                y: shooter.y,
+                team: shooter.team,
+                progress: 0,
+                duration: duration,
+                arcHeight: Math.min(60, dist * 0.25)
+            });
+        }
+
+        function reloadSnowball() {
+            if (player.ammo < player.maxAmmo && !player.isReloading) {
+                player.isReloading = true;
+                playSound('reload');
+                setTimeout(() => {
+                    if (player.ammo < player.maxAmmo) player.ammo++;
+                    player.isReloading = false;
+                    updateAmmoUI();
+                }, 280);
+            }
+        }
+
+        function updateAmmoUI() {
+            const container = document.getElementById('ammoContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < player.maxAmmo; i++) {
+                const dot = document.createElement('div');
+                dot.className = `snowball-dot ${i < player.ammo ? '' : 'empty'}`;
+                container.appendChild(dot);
+            }
+        }
+
+        function spawnSplash(x, y) {
+            for (let i = 0; i < 14; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 22,
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            // Isometric Diagonal Movement (WASD / Arrows)
+            let moveX = 0;
+            let moveY = 0;
+
+            if (keys['w'] || keys['arrowup']) { moveY -= 1; }
+            if (keys['s'] || keys['arrowdown']) { moveY += 1; }
+            if (keys['a'] || keys['arrowleft']) { moveX -= 1; }
+            if (keys['d'] || keys['arrowright']) { moveX += 1; }
+
+            if (moveX !== 0 || moveY !== 0) {
+                // Diagonal isometric speed scaling (2:1 aspect ratio)
+                const isDiagonal = moveX !== 0 && moveY !== 0;
+                const factor = isDiagonal ? 0.707 : 1;
+                
+                player.x += moveX * player.speed * factor * 1.2;
+                player.y += moveY * player.speed * factor * 0.7;
+
+                // Restrict within playable arena
+                player.x = Math.max(80, Math.min(canvas.width - 80, player.x));
+                player.y = Math.max(60, Math.min(canvas.height - 60, player.y));
+                player.targetX = player.x;
+                player.targetY = player.y;
+            } else {
+                // Click-to-move interpolation
+                const tdx = player.targetX - player.x;
+                const tdy = player.targetY - player.y;
+                const tdist = Math.hypot(tdx, tdy);
+                if (tdist > 4) {
+                    player.x += (tdx / tdist) * player.speed;
+                    player.y += (tdy / tdist) * player.speed;
+                }
+            }
+
+            if (moveMarker) {
+                moveMarker.time--;
+                if (moveMarker.time <= 0) moveMarker = null;
+            }
+
+            // Bots AI Movement & Action
+            bots.forEach(bot => {
+                const dx = bot.targetX - bot.x;
+                const dy = bot.targetY - bot.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist > 10) {
+                    bot.x += (dx / dist) * bot.speed * 1.1;
+                    bot.y += (dy / dist) * bot.speed * 0.7;
+                } else {
+                    bot.targetX = bot.team === 'red' ? Math.random() * 320 + 560 : Math.random() * 300 + 100;
+                    bot.targetY = Math.random() * 340 + 80;
+                }
+
+                const now = Date.now();
+                if (now - bot.lastThrow > 1700 + Math.random() * 1200) {
+                    bot.lastThrow = now;
+                    let target = bot.team === 'red' ? player : bots.find(b => b.team === 'red');
+                    if (target) {
+                        const bdist = Math.hypot(target.x - bot.x, target.y - bot.y);
+                        const bduration = Math.max(20, Math.min(50, bdist / 11));
+                        snowballs.push({
+                            startX: bot.x,
+                            startY: bot.y,
+                            targetX: target.x,
+                            targetY: target.y,
+                            x: bot.x,
+                            y: bot.y,
+                            team: bot.team,
+                            progress: 0,
+                            duration: bduration,
+                            arcHeight: Math.min(50, bdist * 0.25)
+                        });
+                        playSound('throw');
+                    }
+                }
+            });
+
+            // Snowballs movement with Isometric parabolic arc & collision
+            for (let i = snowballs.length - 1; i >= 0; i--) {
+                const sb = snowballs[i];
+                sb.progress += 1;
+                const t = sb.progress / sb.duration;
+
+                // Linear interpolation on ground plane
+                const currentGroundX = sb.startX + (sb.targetX - sb.startX) * t;
+                const currentGroundY = sb.startY + (sb.targetY - sb.startY) * t;
+
+                // Parabolic arc height
+                const arc = Math.sin(Math.PI * Math.min(1, t)) * sb.arcHeight;
+
+                sb.x = currentGroundX;
+                sb.y = currentGroundY - arc;
+
+                // Check hit against player
+                if (sb.team !== player.team && Math.hypot(currentGroundX - player.x, currentGroundY - player.y) < player.radius + 8 && t >= 0.7) {
+                    spawnSplash(player.x, player.y);
+                    playSound('hit');
+                    scoreRed += 10;
+                    document.getElementById('scoreRed').innerText = scoreRed;
+                    snowballs.splice(i, 1);
+                    continue;
+                }
+
+                // Check hit against bots
+                let hitBot = false;
+                for (let b of bots) {
+                    if (sb.team !== b.team && Math.hypot(currentGroundX - b.x, currentGroundY - b.y) < b.radius + 8 && t >= 0.7) {
+                        spawnSplash(b.x, b.y);
+                        playSound('hit');
+                        if (sb.team === 'blue') {
+                            scoreBlue += 10;
+                            document.getElementById('scoreBlue').innerText = scoreBlue;
+                        } else {
+                            scoreRed += 10;
+                            document.getElementById('scoreRed').innerText = scoreRed;
+                        }
+                        snowballs.splice(i, 1);
+                        hitBot = true;
+                        break;
+                    }
+                }
+                if (hitBot) continue;
+
+                // Reached destination or out of bounds
+                if (t >= 1) {
+                    spawnSplash(sb.targetX, sb.targetY);
+                    snowballs.splice(i, 1);
+                }
+            }
+
+            // Particles update
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+        }
+
+        function drawIsometricShadow(x, y, radius) {
+            ctx.beginPath();
+            ctx.ellipse(x, y + 6, radius, radius * 0.5, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.4)';
+            ctx.fill();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Arena Map Background
+            const currentBg = mapImages[currentMapIndex];
+            if (currentBg && currentBg.complete) {
+                ctx.drawImage(currentBg, 0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Click-to-move tile highlight
+            if (moveMarker) {
+                ctx.beginPath();
+                ctx.ellipse(moveMarker.x, moveMarker.y, 22, 11, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(56, 189, 248, ${moveMarker.time / 30})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            // Draw Particles
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.life / 22})`;
+                ctx.fill();
+            });
+
+            // Draw Bots Shadows & Avatars
+            bots.forEach(bot => {
+                drawIsometricShadow(bot.x, bot.y, bot.radius);
+
+                ctx.beginPath();
+                ctx.arc(bot.x, bot.y, bot.radius, 0, Math.PI * 2);
+                ctx.fillStyle = bot.team === 'red' ? '#ef4444' : '#0284c7';
+                ctx.fill();
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = '#ffffff';
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.fillText(bot.team === 'red' ? 'Bot Rojo' : 'Bot Azul', bot.x, bot.y - 24);
+            });
+
+            // Draw Player Shadow & Avatar
+            drawIsometricShadow(player.x, player.y, player.radius);
+
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fill();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#facc15';
+            ctx.stroke();
+
+            ctx.fillStyle = '#facc15';
+            ctx.font = 'bold 12px Ubuntu';
+            ctx.textAlign = 'center';
+            ctx.fillText('¡TÚ!', player.x, player.y - 26);
+
+            // Draw Snowballs with Parabolic Shadow & Ball
+            snowballs.forEach(sb => {
+                // Ball
+                ctx.beginPath();
+                ctx.arc(sb.x, sb.y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(200, 230, 255, 0.8)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            document.getElementById('startModal').style.display = 'none';
+            document.getElementById('resultsModal').style.display = 'none';
+            isPlaying = true;
+            scoreBlue = 0;
+            scoreRed = 0;
+            timeLeft = 120;
+            document.getElementById('scoreBlue').innerText = '0';
+            document.getElementById('scoreRed').innerText = '0';
+            updateAmmoUI();
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                    const secs = String(timeLeft % 60).padStart(2, '0');
+                    document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+                } else {
+                    clearInterval(timerInterval);
+                    isPlaying = false;
+                    showResults();
+                }
+            }, 1000);
+        }
+
+        function showResults() {
+            document.getElementById('finalScoreBlue').innerText = scoreBlue;
+            document.getElementById('finalScoreRed').innerText = scoreRed;
+
+            const title = document.getElementById('winnerTitle');
+            const subtitle = document.getElementById('winnerSubtitle');
+
+            if (scoreBlue > scoreRed) {
+                title.innerText = '¡VICTORIA DEL EQUIPO AZUL!';
+                title.style.color = '#38bdf8';
+                subtitle.innerText = '¡Gran trabajo en la arena nevada!';
+            } else if (scoreRed > scoreBlue) {
+                title.innerText = '¡VICTORIA DEL EQUIPO ROJO!';
+                title.style.color = '#f87171';
+                subtitle.innerText = '¡El equipo rival se llevó la victoria esta vez!';
+            } else {
+                title.innerText = '¡EMPATE TÉCNICO!';
+                title.style.color = '#facc15';
+                subtitle.innerText = '¡Una batalla muy reñida!';
+            }
+
+            document.getElementById('resultsModal').style.display = 'flex';
+        }
+
+        // Arena Selection
+        document.querySelectorAll('.arena-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.arena-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMapIndex = parseInt(btn.dataset.map);
+            });
+        });
+
+        document.getElementById('btnStartGame').addEventListener('click', startGame);
+        document.getElementById('btnPlayAgain').addEventListener('click', startGame);
+        document.getElementById('btnReload').addEventListener('click', reloadSnowball);
+
+        function exitToClient() {
+            window.parent.postMessage('EXIT_GAME', '*');
+        }
+
+        document.getElementById('btnExit').addEventListener('click', exitToClient);
+        document.getElementById('btnExitModal').addEventListener('click', exitToClient);
+        document.getElementById('btnExitResults').addEventListener('click', exitToClient);
+
+        gameLoop();
+    </script>
 </body>
+
 </html>

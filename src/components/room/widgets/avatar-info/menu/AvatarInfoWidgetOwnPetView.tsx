@@ -145,10 +145,6 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = p
                         <ContextMenuListItemView onClick={ event => processAction('buy_saddle') }>
                             { LocalizeText('infostand.button.buy_saddle') }
                         </ContextMenuListItemView> }
-                    { ([ PetType.BEAR, PetType.TERRIER, PetType.CAT, PetType.DOG, PetType.PIG ].indexOf(avatarInfo.petType) > -1) &&
-                        <ContextMenuListItemView onClick={ event => processAction('breed') }>
-                            { LocalizeText('infostand.button.breed') }
-                        </ContextMenuListItemView> }
                 </> }
             { (mode === MODE_SADDLED_UP) &&
                 <>

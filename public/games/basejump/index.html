@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Food</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0f172a;
+            font-family: 'Ubuntu', sans-serif;
+            color: #fff;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top, #38bdf8 0%, #0369a1 60%, #0c4a6e 100%);
+        }
+
+        canvas {
+            background: transparent;
+            border-radius: 12px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .score-box {
+            font-size: 18px;
+            font-weight: 900;
+            color: #facc15;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .btn-hud {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-hud:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-hud-danger {
+            background: #be123c;
+            border-color: #9f1239;
+        }
+
+        .btn-hud-danger:hover {
+            background: #e11d48;
+        }
+
+        .modal-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            border: 2px solid rgba(245, 158, 11, 0.4);
+            border-radius: 16px;
+            padding: 28px 36px;
+            max-width: 520px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn-habbo-play {
+            background: #15803d;
+            color: #ffffff;
+            border: 1px solid #166534;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            padding: 12px 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-play:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-habbo-play:active {
+            background: #14532d;
+            transform: translateY(1px);
+        }
+
+        .btn-habbo-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbo-back:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .results-score-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0 24px 0;
+            gap: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+        <div class="hud-overlay">
+            <div class="hud-panel">
+                <span style="color: #cbd5e1; font-weight: 800; font-size: 13px;">PUNTOS:</span>
+                <span id="scoreDisplay" class="score-box">0</span>
+            </div>
+
+            <div class="hud-panel">
+                <span style="color: #cbd5e1; font-weight: 800; font-size: 13px;">ALTITUD:</span>
+                <span id="altitudeDisplay"
+                    style="color: #38bdf8; font-weight: bold; font-family: 'Press Start 2P', monospace; font-size: 14px;">1000m</span>
+            </div>
+
+            <div class="hud-panel">
+                <button id="btnParachute" class="btn-hud">[Espacio] Paracaídas</button>
+                <button id="btnExit" class="btn-hud btn-hud-danger">✕ Salir</button>
+            </div>
+        </div>
+
+        <div id="startModal" class="modal-screen">
+            <div class="modal-card">
+                <img src="./assets/basejump_logo.png" alt="Fast Food"
+                    style="max-width: 240px; margin-bottom: 16px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+                
+                <p>¡Entrega la comida rápida a salvo! Usa <b>A / D o Flechas Izq/Der</b> para esquivar obstáculos,
+                    <b>Espacio</b> para abrir o cerrar el paracaídas y recoge todas las hamburguesas y bebidas.
+                </p>
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnStartGame" class="btn-habbo-play">¡LANZARSE AL VACÍO!</button>
+                    <button id="btnExitModal" class="btn-habbo-back">Volver</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- In-game Results Modal -->
+        <div id="resultsModal" class="modal-screen" style="display: none;">
+            <div class="modal-card">
+                <h2 style="font-size: 24px; font-weight: 900; margin-bottom: 4px; color: #facc15;">¡ENTREGA COMPLETADA!</h2>
+                <div style="font-size: 14px; color: #cbd5e1; margin-bottom: 12px;">Puntuación de la misión</div>
+
+                <div class="results-score-row">
+                    <span style="font-size: 14px; font-weight: 800; color: #94a3b8;">PUNTOS TOTALES:</span>
+                    <span id="finalScoreDisplay" style="font-size: 28px; font-weight: 900; color: #facc15; font-family: 'Press Start 2P', monospace;">0</span>
+                </div>
+
+                <div style="display: flex; gap: 14px; justify-content: center;">
+                    <button id="btnPlayAgain" class="btn-habbo-play">JUGAR OTRA VEZ</button>
+                    <button id="btnExitResults" class="btn-habbo-back">Volver al Game Center</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Audio
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'coin') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.setValueAtTime(1200, now + 0.08);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
+                osc.start(now);
+                osc.stop(now + 0.16);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+        }
+
+        let isPlaying = false;
+        let score = 0;
+        let altitude = 1000;
+        let speed = 4;
+
+        const player = {
+            x: 480,
+            y: 200,
+            vx: 0,
+            width: 40,
+            height: 48,
+            parachute: false
+        };
+
+        const clouds = [];
+        for (let i = 0; i < 8; i++) {
+            clouds.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 60 + 40, speed: Math.random() * 2 + 1 });
+        }
+
+        const items = [];
+        const obstacles = [];
+
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.code === 'Space') {
+                e.preventDefault();
+                player.parachute = !player.parachute;
+            }
+        });
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        function spawnEntity() {
+            if (Math.random() < 0.05) {
+                items.push({
+                    x: Math.random() * (canvas.width - 60) + 30,
+                    y: canvas.height + 20,
+                    type: Math.random() < 0.5 ? 'burger' : 'drink',
+                    size: 26
+                });
+            }
+            if (Math.random() < 0.04) {
+                obstacles.push({
+                    x: Math.random() * (canvas.width - 60) + 30,
+                    y: canvas.height + 20,
+                    type: 'bird',
+                    vx: (Math.random() - 0.5) * 3,
+                    size: 28
+                });
+            }
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            // Speed control by parachute
+            speed = player.parachute ? 3 : 7;
+            altitude -= speed * 0.15;
+            document.getElementById('altitudeDisplay').innerText = Math.max(0, Math.floor(altitude)) + 'm';
+
+            if (altitude <= 0) {
+                isPlaying = false;
+                document.getElementById('finalScoreDisplay').innerText = score;
+                document.getElementById('resultsModal').style.display = 'flex';
+                return;
+            }
+
+            // Movement
+            if (keys['a'] || keys['arrowleft']) player.vx = -6;
+            else if (keys['d'] || keys['arrowright']) player.vx = 6;
+            else player.vx *= 0.85;
+
+            player.x += player.vx;
+            if (player.x < 30) player.x = 30;
+            if (player.x > canvas.width - 30) player.x = canvas.width - 30;
+
+            // Clouds update
+            clouds.forEach(c => {
+                c.y -= speed * 0.8;
+                if (c.y < -100) {
+                    c.y = canvas.height + 100;
+                    c.x = Math.random() * canvas.width;
+                }
+            });
+
+            // Spawn items/obstacles
+            spawnEntity();
+
+            // Update Items
+            for (let i = items.length - 1; i >= 0; i--) {
+                const item = items[i];
+                item.y -= speed;
+                if (Math.hypot(item.x - player.x, item.y - player.y) < player.width / 2 + item.size / 2) {
+                    score += 50;
+                    document.getElementById('scoreDisplay').innerText = score;
+                    playSound('coin');
+                    items.splice(i, 1);
+                    continue;
+                }
+                if (item.y < -50) items.splice(i, 1);
+            }
+
+            // Update Obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                obs.y -= speed;
+                obs.x += obs.vx;
+                if (Math.hypot(obs.x - player.x, obs.y - player.y) < player.width / 2 + obs.size / 2) {
+                    score = Math.max(0, score - 30);
+                    document.getElementById('scoreDisplay').innerText = score;
+                    playSound('hit');
+                    obstacles.splice(i, 1);
+                    continue;
+                }
+                if (obs.y < -50) obstacles.splice(i, 1);
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Clouds
+            clouds.forEach(c => {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw Items (Burgers / Drinks)
+            items.forEach(it => {
+                ctx.beginPath();
+                ctx.arc(it.x, it.y, it.size / 2, 0, Math.PI * 2);
+                ctx.fillStyle = it.type === 'burger' ? '#f59e0b' : '#ec4899';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(it.type === 'burger' ? '🍔' : '🥤', it.x, it.y + 6);
+            });
+
+            // Draw Obstacles (Birds)
+            obstacles.forEach(ob => {
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '22px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('🦅', ob.x, ob.y + 8);
+            });
+
+            // Draw Player & Parachute
+            if (player.parachute) {
+                // Parachute canopy
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(player.x, player.y - 45, 38, Math.PI, 0);
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Parachute strings
+                ctx.beginPath();
+                ctx.moveTo(player.x - 35, player.y - 45);
+                ctx.lineTo(player.x, player.y - 15);
+                ctx.moveTo(player.x + 35, player.y - 45);
+                ctx.lineTo(player.x, player.y - 15);
+                ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+                ctx.stroke();
+            }
+
+            // Player Avatar Body
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, 18, 0, Math.PI * 2);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+
+            // Habbo face indicator
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y - 3, 11, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function startGame() {
+            document.getElementById('startModal').style.display = 'none';
+            document.getElementById('resultsModal').style.display = 'none';
+            isPlaying = true;
+            score = 0;
+            altitude = 1000;
+            document.getElementById('scoreDisplay').innerText = score;
+        }
+
+        function exitToClient() {
+            window.parent.postMessage('EXIT_GAME', '*');
+        }
+
+        document.getElementById('btnStartGame').addEventListener('click', startGame);
+        document.getElementById('btnPlayAgain').addEventListener('click', startGame);
+        document.getElementById('btnParachute').addEventListener('click', () => { player.parachute = !player.parachute; });
+        document.getElementById('btnExit').addEventListener('click', exitToClient);
+        document.getElementById('btnExitModal').addEventListener('click', exitToClient);
+        document.getElementById('btnExitResults').addEventListener('click', exitToClient);
+
+        gameLoop();
+    </script>
+</body>
+
+</html>

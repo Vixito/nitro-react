@@ -32,7 +32,7 @@ const DEFAULT_CONTROLS: { action: string; keys: string }[] = [
 ];
 
 export const GameView = () => {
-    const { selectedGame, accountStatus, gameOffline } = useGameCenter();
+    const { selectedGame, accountStatus, gameOffline, setGameURL } = useGameCenter();
 
     useEffect(() => {
         if (selectedGame) {
@@ -53,6 +53,7 @@ export const GameView = () => {
 
     const onPlay = () => {
         if (gameOffline) return;
+        
         SendMessageComposer(new JoinQueueMessageComposer(selectedGame.gameId));
     };
 

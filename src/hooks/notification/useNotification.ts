@@ -92,7 +92,7 @@ const useNotificationState = () =>
         const linkUrl = getNotificationPart(options, type, 'linkUrl', false);
         const image = getNotificationImageUrl(options, type);
 
-        if(options.get('display') === 'BUBBLE')
+        if(options.get('display') === 'BUBBLE' || type.toLowerCase().includes('battlepass') || type.toLowerCase().includes('quest') || type.toLowerCase().includes('reto'))
         {
             showSingleBubble(LocalizeText(message), NotificationBubbleType.INFO, image, linkUrl);
         }
@@ -392,6 +392,11 @@ const useNotificationState = () =>
     useMessageEvent<SimpleAlertMessageEvent>(SimpleAlertMessageEvent, event =>
     {
         const parser = event.getParser();
+
+        if (parser.titleMessage && (parser.titleMessage.toLowerCase().includes('pase de batalla') || parser.titleMessage.toLowerCase().includes('reto'))) {
+            showSingleBubble(LocalizeText(parser.alertMessage), NotificationBubbleType.INFO);
+            return;
+        }
 
         simpleAlert(LocalizeText(parser.alertMessage), NotificationAlertType.DEFAULT, null, null, LocalizeText(parser.titleMessage ? parser.titleMessage : 'notifications.broadcast.title'));
     });
