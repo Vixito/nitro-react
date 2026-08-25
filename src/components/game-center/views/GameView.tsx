@@ -14,6 +14,11 @@ const GAME_CONTROLS: { [ gameNameId: string ]: { action: string; keys: string }[
         { action: 'Esquivar obstáculos', keys: 'A / D o Flechas Izq/Der' },
         { action: 'Abrir / cerrar paracaídas', keys: 'Espacio' }
     ],
+    wobblesquabble: [
+        { action: 'Mantener equilibrio', keys: 'A / D o Flechas Izq/Der' },
+        { action: 'Empujar oponente', keys: 'Espacio / Clic' },
+        { action: 'Agacharse / Esquivar', keys: 'S / Flecha Abajo' }
+    ],
     slotcar: [
         { action: 'Acelerar', keys: 'Espacio / Flecha Arriba / W' }
     ],

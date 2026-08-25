@@ -15,8 +15,9 @@ export const GameListView = () =>
         {
             case 'snowwar': return 'SnowStorm';
             case 'basejump': return 'Fast Food';
-            case 'slotcar': return 'Speedway';
+            case 'wobblesquabble': return 'Wobble Squabble';
             case 'battleball': return 'Battle Ball';
+            case 'slotcar': return 'Speedway';
             default: return LocalizeText(`gamecenter.${ game.gameNameId }.name`) || game.gameNameId;
         }
     };
