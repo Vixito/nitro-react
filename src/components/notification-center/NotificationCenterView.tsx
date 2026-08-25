@@ -1,6 +1,5 @@
 import { FC, ReactNode, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import { NotificationAlertType, NotificationBubbleType } from '../../api';
+import { NotificationBubbleType } from '../../api';
 import { Column } from '../../common';
 import { useNotification } from '../../hooks';
 import { GetAlertLayout } from './views/alert-layouts/GetAlertLayout';
@@ -66,36 +65,13 @@ export const NotificationCenterView: FC<{}> = props =>
         return elements;
     }, [ confirms, closeConfirm ]);
 
-    const hasModal = useMemo(() =>
-    {
-        if (confirms && confirms.length > 0) return true;
-        if (!alerts || !alerts.length) return false;
-
-        return alerts.some(alert =>
-        {
-            if (alert.alertType === NotificationAlertType.MOTD || alert.alertType === NotificationAlertType.SEARCH) return false;
-            if (alert.messages && alert.messages.some(msg => msg.includes('is-commands-list') || msg.includes('cmd-category-block') || msg.includes('cmd-row'))) return false;
-            return true;
-        });
-    }, [ alerts, confirms ]);
-
-    const hasActiveModals = Boolean((getConfirms && getConfirms.length > 0) || (getAlerts && getAlerts.length > 0));
-
     return (
         <>
             <Column gap={ 1 }>
                 { getBubbleAlerts }
             </Column>
-            { hasActiveModals ? createPortal(
-                <div className="nitro-dialog-container">
-                    { hasModal && <div className="nitro-alert-backdrop" /> }
-                    <div className="nitro-dialog-wrapper">
-                        { getConfirms }
-                        { getAlerts }
-                    </div>
-                </div>,
-                document.body
-            ) : null }
+            { getConfirms }
+            { getAlerts }
         </>
     );
 }
