@@ -80,13 +80,7 @@ export const NotificationCenterView: FC<{}> = props =>
 
     return (
         <>
-            { hasModal && <div className="nitro-alert-backdrop" onClick={ () => {
-                if (confirms && confirms.length > 0) closeConfirm(confirms[confirms.length - 1]);
-                else if (alerts && alerts.length > 0) {
-                    const modalAlert = [ ...alerts ].reverse().find(a => a.alertType !== NotificationAlertType.MOTD && a.alertType !== NotificationAlertType.SEARCH && !a.messages?.some(m => m.includes('cmd-category-block') || m.includes('cmd-row')));
-                    if (modalAlert) closeAlert(modalAlert);
-                }
-            } } /> }
+            { hasModal && <div className="nitro-alert-backdrop" /> }
             <Column gap={ 1 }>
                 { getBubbleAlerts }
             </Column>
