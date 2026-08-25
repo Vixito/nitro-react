@@ -14,17 +14,71 @@
     }
 }
 
+.nitro-dialog-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .nitro-alert-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(3.5px);
+        -webkit-backdrop-filter: blur(3.5px);
+        z-index: 10000;
+        pointer-events: auto;
+        cursor: pointer;
+        animation: alertBackdropFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .nitro-dialog-wrapper {
+        position: relative;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        z-index: 10001;
+
+        .nitro-dialog-item {
+            position: absolute;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+}
+
+@keyframes alertBackdropFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 .nitro-alert {
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4) !important;
+    position: relative;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
     min-height: 150px;
-    max-height: 350px;
+    max-height: 85vh;
+    animation: alertPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 
     &.commands-alert {
         min-width: 380px !important;
         min-height: 280px !important;
         max-width: 96vw !important;
         max-height: 94vh !important;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
 
         .card-content {
             height: 100% !important;
@@ -58,7 +112,7 @@
 
     &.nitro-alert-default,
     &.nitro-alert-motd {
-        width: 350px;
+        width: 380px;
         .notification-text {
             min-width: auto;
         }
@@ -103,3 +157,15 @@
         height: 50px;
     }
 }
+
+@keyframes alertPopIn {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+

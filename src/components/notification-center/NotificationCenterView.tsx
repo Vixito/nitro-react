@@ -1,4 +1,5 @@
-import { FC, ReactNode, useMemo } from 'react';
+import { FC, ReactNode, useCallback, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { NotificationBubbleType } from '../../api';
 import { Column } from '../../common';
 import { useNotification } from '../../hooks';
@@ -16,9 +17,14 @@ export const NotificationCenterView: FC<{}> = props =>
 
         const elements: ReactNode[] = [];
 
-        for(const alert of alerts)
+        for(let i = 0; i < alerts.length; i++)
         {
-            const element = GetAlertLayout(alert, () => closeAlert(alert));
+            const alert = alerts[i];
+            const element = (
+                <div key={ `alert-${i}` } className="nitro-dialog-item" style={{ zIndex: 10002 + i }}>
+                    { GetAlertLayout(alert, () => closeAlert(alert)) }
+                </div>
+            );
 
             elements.push(element);
         }
@@ -55,9 +61,14 @@ export const NotificationCenterView: FC<{}> = props =>
 
         const elements: ReactNode[] = [];
 
-        for(const confirm of confirms)
+        for(let i = 0; i < confirms.length; i++)
         {
-            const element = GetConfirmLayout(confirm, () => closeConfirm(confirm));
+            const confirm = confirms[i];
+            const element = (
+                <div key={ `confirm-${i}` } className="nitro-dialog-item" style={{ zIndex: 10010 + i }}>
+                    { GetConfirmLayout(confirm, () => closeConfirm(confirm)) }
+                </div>
+            );
 
             elements.push(element);
         }
@@ -65,13 +76,69 @@ export const NotificationCenterView: FC<{}> = props =>
         return elements;
     }, [ confirms, closeConfirm ]);
 
+    const hasModal = useMemo(() =>
+    {
+        return Boolean((confirms && confirms.length > 0) || (alerts && alerts.length > 0));
+    }, [ alerts, confirms ]);
+
+    // Dismiss topmost modal when clicking on the backdrop
+    const handleBackdropClick = useCallback((e: React.MouseEvent) =>
+    {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (confirms && confirms.length > 0)
+        {
+            closeConfirm(confirms[confirms.length - 1]);
+            return;
+        }
+        
+        if (alerts && alerts.length > 0)
+        {
+            closeAlert(alerts[alerts.length - 1]);
+            return;
+        }
+    }, [ alerts, confirms, closeAlert, closeConfirm ]);
+
+    // Dismiss on Escape key
+    useEffect(() =>
+    {
+        if (!hasModal) return;
+
+        const handleKeyDown = (e: KeyboardEvent) =>
+        {
+            if (e.key === 'Escape')
+            {
+                if (confirms && confirms.length > 0)
+                {
+                    closeConfirm(confirms[confirms.length - 1]);
+                }
+                else if (alerts && alerts.length > 0)
+                {
+                    closeAlert(alerts[alerts.length - 1]);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [ hasModal, alerts, confirms, closeAlert, closeConfirm ]);
+
     return (
         <>
             <Column gap={ 1 }>
                 { getBubbleAlerts }
             </Column>
-            { getConfirms }
-            { getAlerts }
+            { hasModal ? createPortal(
+                <div className="nitro-dialog-container">
+                    <div className="nitro-alert-backdrop" onClick={ handleBackdropClick } title="Haz clic para cerrar" />
+                    <div className="nitro-dialog-wrapper">
+                        { getAlerts }
+                        { getConfirms }
+                    </div>
+                </div>,
+                document.body
+            ) : null }
         </>
     );
 }
