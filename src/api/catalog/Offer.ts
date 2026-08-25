@@ -1,4 +1,4 @@
-import { GetFurnitureData, GetProductDataForLocalization, LocalizeText, ProductTypeEnum } from '..';
+import { GetFurnitureData, GetProductDataForLocalization, GetSessionDataManager, LocalizeText, ProductTypeEnum } from '..';
 import { ICatalogPage } from './ICatalogPage';
 import { IProduct } from './IProduct';
 import { IPurchasableOffer } from './IPurchasableOffer';
@@ -150,18 +150,64 @@ export class Offer implements IPurchasableOffer
     {
         const productData = GetProductDataForLocalization(this._localizationId);
 
-        if(productData) return productData.name;
+        if(productData && productData.name && productData.name.length && productData.name !== this._localizationId) return productData.name;
 
-        return LocalizeText(this._localizationId);
+        let val = LocalizeText(this._localizationId);
+        if(!val || val === this._localizationId || val === ('${' + this._localizationId + '}'))
+        {
+            // 1. Try from first product's class ID
+            const product = (this._products && this._products.length > 0) ? this._products[0] : null;
+            if(product)
+            {
+                const isWall = product.isWallItem || (product.productType && product.productType.toLowerCase() === 'i');
+                const furniData = isWall ? GetSessionDataManager().getWallItemData(product.productClassId) : GetSessionDataManager().getFloorItemData(product.productClassId);
+                if(furniData && furniData.name && furniData.name.length) return furniData.name;
+
+                const localizedKey = LocalizeText((isWall ? 'wallItem.name.' : 'roomItem.name.') + product.productClassId);
+                if(localizedKey && !localizedKey.startsWith('roomItem.') && !localizedKey.startsWith('wallItem.') && !localizedKey.startsWith('${')) return localizedKey;
+            }
+
+            // 2. Try by localizationId matching furni classname
+            const furniFloorByName = GetSessionDataManager().getFloorItemDataByName(this._localizationId);
+            if(furniFloorByName && furniFloorByName.name && furniFloorByName.name.length) return furniFloorByName.name;
+
+            const furniWallByName = GetSessionDataManager().getWallItemDataByName(this._localizationId);
+            if(furniWallByName && furniWallByName.name && furniWallByName.name.length) return furniWallByName.name;
+        }
+
+        return val || this._localizationId;
     }
 
     public get localizationDescription(): string
     {
         const productData = GetProductDataForLocalization(this._localizationId);
 
-        if(productData) return productData.description;
+        if(productData && productData.description && productData.description.length && productData.description !== this._localizationId) return productData.description;
 
-        return LocalizeText(this._localizationId);
+        let val = LocalizeText(this._localizationId);
+        if(!val || val === this._localizationId || val === ('${' + this._localizationId + '}'))
+        {
+            // 1. Try from first product's class ID
+            const product = (this._products && this._products.length > 0) ? this._products[0] : null;
+            if(product)
+            {
+                const isWall = product.isWallItem || (product.productType && product.productType.toLowerCase() === 'i');
+                const furniData = isWall ? GetSessionDataManager().getWallItemData(product.productClassId) : GetSessionDataManager().getFloorItemData(product.productClassId);
+                if(furniData && furniData.description && furniData.description.length) return furniData.description;
+
+                const localizedKey = LocalizeText((isWall ? 'wallItem.desc.' : 'roomItem.desc.') + product.productClassId);
+                if(localizedKey && !localizedKey.startsWith('roomItem.') && !localizedKey.startsWith('wallItem.') && !localizedKey.startsWith('${')) return localizedKey;
+            }
+
+            // 2. Try by localizationId matching furni classname
+            const furniFloorByName = GetSessionDataManager().getFloorItemDataByName(this._localizationId);
+            if(furniFloorByName && furniFloorByName.description && furniFloorByName.description.length) return furniFloorByName.description;
+
+            const furniWallByName = GetSessionDataManager().getWallItemDataByName(this._localizationId);
+            if(furniWallByName && furniWallByName.description && furniWallByName.description.length) return furniWallByName.description;
+        }
+
+        return val || '';
     }
 
     public get isLazy(): boolean
