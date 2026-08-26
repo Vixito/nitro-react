@@ -122,33 +122,25 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
     return (
         <Grid>
             <Column fullHeight size={ 7 } overflow="hidden" justifyContent="between">
-                <AutoGrid columnCount={ 2 } className="p-1">
+                <AutoGrid columnCount={ 5 } className="p-1">
                     { bubbles.map(b => (
                         <LayoutGridItem
                             key={ b.bubble_id }
-                            column={ false }
-                            center={ false }
+                            center
                             alignItems="center"
-                            justifyContent="between"
+                            justifyContent="center"
                             itemActive={ selectedBubble?.bubble_id === b.bubble_id }
-                            className="p-2 cursor-pointer"
+                            className="cursor-pointer"
                             onClick={ () => { setSelectedBubble(b); setMessage(''); } }
                         >
-                            <Flex alignItems="center" gap={ 2 }>
-                                { b.image_url && (
-                                    <img
-                                        src={ b.image_url }
-                                        alt={ b.name }
-                                        style={ { height: 24, objectFit: 'contain', imageRendering: 'pixelated' } }
-                                        onError={ e => { (e.target as HTMLElement).style.display = 'none'; } }
-                                    />
-                                ) }
-                                <Text fontWeight="bold" fontSize={ 6 }>{ b.name }</Text>
-                            </Flex>
-                            <Flex alignItems="center" gap={ 1 }>
-                                <Text fontSize={ 6 } fontWeight="bold">50</Text>
-                                <LayoutCurrencyIcon type={ 5 } />
-                            </Flex>
+                            { b.image_url ? (
+                                <img
+                                    src={ b.image_url }
+                                    alt={ b.name }
+                                    style={ { maxWidth: 36, maxHeight: 24, objectFit: 'contain', imageRendering: 'pixelated' } }
+                                    onError={ e => { (e.target as HTMLElement).style.display = 'none'; } }
+                                />
+                            ) : null }
                         </LayoutGridItem>
                     )) }
                 </AutoGrid>
@@ -157,15 +149,17 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
             <Column size={ 5 } overflow="hidden" justifyContent="between">
                 { selectedBubble && (
                     <Column fullHeight center justifyContent="between" className="text-center p-3 bg-gray-50 rounded-lg">
-                        <Column center gap={ 2 }>
+                        <Column center gap={ 2 } fullWidth>
                             <Text fontWeight="bold" fontSize={ 4 }>{ selectedBubble.name }</Text>
-                            { selectedBubble.image_url && (
-                                <img
-                                    src={ selectedBubble.image_url }
-                                    alt={ selectedBubble.name }
-                                    style={ { maxHeight: 48, objectFit: 'contain', imageRendering: 'pixelated' } }
-                                />
-                            ) }
+                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex flex-col items-center justify-center min-h-[60px]">
+                                { selectedBubble.image_url && (
+                                    <img
+                                        src={ selectedBubble.image_url }
+                                        alt={ selectedBubble.name }
+                                        style={ { maxHeight: 36, objectFit: 'contain', imageRendering: 'pixelated' } }
+                                    />
+                                ) }
+                            </div>
                             <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
                                 <Text fontWeight="bold" fontSize={ 5 }>Precio: 50</Text>
                                 <LayoutCurrencyIcon type={ 5 } />

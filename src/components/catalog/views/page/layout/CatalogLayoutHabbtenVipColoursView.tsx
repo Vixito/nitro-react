@@ -83,7 +83,7 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
             <Column fullHeight center justifyContent="center" className="p-4 text-center bg-gray-50 rounded-lg">
                 <div className="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-3 mx-auto shadow-sm">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                 </div>
                 <Text fontWeight="bold" fontSize={ 4 } className="text-gray-900 mb-1">
@@ -102,34 +102,27 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
     return (
         <Grid>
             <Column fullHeight size={ 7 } overflow="hidden" justifyContent="between">
-                <AutoGrid columnCount={ 2 } className="p-1">
+                <AutoGrid columnCount={ 5 } className="p-1">
                     { VIP_COLOURS.map(c => (
                         <LayoutGridItem
                             key={ c.id }
-                            column={ false }
-                            center={ false }
+                            center
                             alignItems="center"
-                            justifyContent="between"
+                            justifyContent="center"
                             itemActive={ selectedColour?.id === c.id }
-                            className="p-2 cursor-pointer"
+                            className="cursor-pointer"
                             onClick={ () => { setSelectedColour(c); setMessage(''); } }
                         >
-                            <Flex alignItems="center" gap={ 2 }>
-                                <div
-                                    style={ {
-                                        width: 18,
-                                        height: 18,
-                                        borderRadius: '50%',
-                                        background: c.isRainbow ? 'linear-gradient(135deg, #ef4444, #eab308, #10b981, #06b6d4, #8b5cf6)' : c.hex,
-                                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-                                    } }
-                                />
-                                <Text fontWeight="bold" fontSize={ 6 }>{ c.name }</Text>
-                            </Flex>
-                            <Flex alignItems="center" gap={ 1 }>
-                                <Text fontSize={ 6 } fontWeight="bold">30</Text>
-                                <LayoutCurrencyIcon type={ 5 } />
-                            </Flex>
+                            <div
+                                style={ {
+                                    width: 26,
+                                    height: 26,
+                                    borderRadius: '50%',
+                                    background: c.isRainbow ? 'linear-gradient(135deg, #ef4444, #eab308, #10b981, #06b6d4, #8b5cf6)' : c.hex,
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.25)',
+                                    border: '1px solid rgba(0,0,0,0.1)'
+                                } }
+                            />
                         </LayoutGridItem>
                     )) }
                 </AutoGrid>
@@ -138,27 +131,29 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
             <Column size={ 5 } overflow="hidden" justifyContent="between">
                 { selectedColour && (
                     <Column fullHeight center justifyContent="between" className="text-center p-3 bg-gray-50 rounded-lg">
-                        <Column center gap={ 2 }>
+                        <Column center gap={ 2 } fullWidth>
                             <Text fontWeight="bold" fontSize={ 4 }>{ selectedColour.name }</Text>
-                            <div className="p-3 bg-white rounded-lg border border-gray-200 w-full shadow-inner my-2">
-                                <Text className="text-xs text-gray-400 mb-1">Vista Previa:</Text>
-                                <span
-                                    style={ {
-                                        fontWeight: 'bold',
-                                        fontSize: 16,
-                                        color: selectedColour.isRainbow ? '#ec4899' : selectedColour.hex,
-                                        textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                                    } }
-                                >
-                                    { selectedColour.isRainbow ? (
-                                        username.split('').map((char, i) => {
-                                            const rainbowPalette = ['#ef4444', '#f97316', '#eab308', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6'];
-                                            return <span key={ i } style={ { color: rainbowPalette[i % rainbowPalette.length] } }>{ char }</span>;
-                                        })
-                                    ) : (
-                                        username
-                                    ) }
-                                </span>
+                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex items-center justify-center">
+                                <Text fontSize={ 5 } className="text-gray-800 font-medium">
+                                    Vista Previa: { ' ' }
+                                    <span
+                                        style={ {
+                                            fontWeight: 'bold',
+                                            fontSize: 16,
+                                            color: selectedColour.isRainbow ? '#ec4899' : selectedColour.hex,
+                                            textShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                                        } }
+                                    >
+                                        { selectedColour.isRainbow ? (
+                                            username.split('').map((char, i) => {
+                                                const rainbowPalette = ['#ef4444', '#f97316', '#eab308', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6'];
+                                                return <span key={ i } style={ { color: rainbowPalette[i % rainbowPalette.length] } }>{ char }</span>;
+                                            })
+                                        ) : (
+                                            username
+                                        ) }
+                                    </span>
+                                </Text>
                             </div>
                             <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
                                 <Text fontWeight="bold" fontSize={ 5 }>Precio: 30</Text>

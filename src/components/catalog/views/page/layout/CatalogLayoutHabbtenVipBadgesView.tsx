@@ -101,33 +101,25 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
     return (
         <Grid>
             <Column fullHeight size={ 7 } overflow="hidden" justifyContent="between">
-                <AutoGrid columnCount={ 2 } className="p-1">
+                <AutoGrid columnCount={ 5 } className="p-1">
                     { VIP_BADGES.map(b => (
                         <LayoutGridItem
                             key={ b.code }
-                            column={ false }
-                            center={ false }
+                            center
                             alignItems="center"
-                            justifyContent="between"
+                            justifyContent="center"
                             itemActive={ selectedBadge?.code === b.code }
-                            className="p-2 cursor-pointer"
+                            className="cursor-pointer"
                             onClick={ () => { setSelectedBadge(b); setMessage(''); } }
                         >
-                            <Flex alignItems="center" gap={ 2 }>
-                                <img
-                                    src={ `${ badgeBaseUrl }${ b.code }.gif` }
-                                    alt={ b.name }
-                                    style={ { width: 36, height: 36, objectFit: 'contain', imageRendering: 'pixelated' } }
-                                    onError={ e => {
-                                        (e.target as HTMLImageElement).src = `${ badgeBaseUrl }${ b.code }.png`;
-                                    } }
-                                />
-                                <Text fontWeight="bold" fontSize={ 6 }>{ b.name }</Text>
-                            </Flex>
-                            <Flex alignItems="center" gap={ 1 }>
-                                <Text fontSize={ 6 } fontWeight="bold">{ b.priceDiamonds }</Text>
-                                <LayoutCurrencyIcon type={ 5 } />
-                            </Flex>
+                            <img
+                                src={ `${ badgeBaseUrl }${ b.code }.gif` }
+                                alt={ b.name }
+                                style={ { width: 36, height: 36, objectFit: 'contain', imageRendering: 'pixelated' } }
+                                onError={ e => {
+                                    (e.target as HTMLImageElement).src = `${ badgeBaseUrl }${ b.code }.png`;
+                                } }
+                            />
                         </LayoutGridItem>
                     )) }
                 </AutoGrid>
@@ -136,16 +128,18 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
             <Column size={ 5 } overflow="hidden" justifyContent="between">
                 { selectedBadge && (
                     <Column fullHeight center justifyContent="between" className="text-center p-3 bg-gray-50 rounded-lg">
-                        <Column center gap={ 2 }>
+                        <Column center gap={ 2 } fullWidth>
                             <Text fontWeight="bold" fontSize={ 4 }>{ selectedBadge.name }</Text>
-                            <img
-                                src={ `${ badgeBaseUrl }${ selectedBadge.code }.gif` }
-                                alt={ selectedBadge.name }
-                                style={ { width: 48, height: 48, objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' } }
-                                onError={ e => {
-                                    (e.target as HTMLImageElement).src = `${ badgeBaseUrl }${ selectedBadge.code }.png`;
-                                } }
-                            />
+                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex items-center justify-center min-h-[60px]">
+                                <img
+                                    src={ `${ badgeBaseUrl }${ selectedBadge.code }.gif` }
+                                    alt={ selectedBadge.name }
+                                    style={ { width: 48, height: 48, objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' } }
+                                    onError={ e => {
+                                        (e.target as HTMLImageElement).src = `${ badgeBaseUrl }${ selectedBadge.code }.png`;
+                                    } }
+                                />
+                            </div>
                             <Text className="text-xs text-gray-600 px-2">
                                 { selectedBadge.description }
                             </Text>
