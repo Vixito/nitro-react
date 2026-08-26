@@ -208,25 +208,22 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                         <Column center gap={ 2 } fullWidth>
                             <Text fontWeight="bold" fontSize={ 4 }>{ selectedBubble.name }</Text>
                             
-                            { /* HD Live Bubble Preview Box */ }
-                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex flex-col items-center justify-center min-h-[75px] overflow-hidden">
-                                { selectedBubble.image_url && (
-                                    <div style={ { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 } }>
-                                        <img
-                                            src={ selectedBubble.image_url }
-                                            alt={ selectedBubble.name }
-                                            style={ {
-                                                maxWidth: '100%',
-                                                height: 30,
-                                                objectFit: 'contain',
-                                                imageRendering: 'pixelated'
-                                            } }
-                                        />
-                                        <Text className="text-xs text-gray-700 font-medium">
-                                            { username }: ¡Hola Habbten!
-                                        </Text>
+                            { /* HD Live 9-slice Chat Bubble Preview with Text INSIDE */ }
+                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex items-center justify-center min-h-[75px] overflow-hidden">
+                                <div
+                                    className={ `chat-bubble bubble-${ selectedBubble.bubble_id }` }
+                                    style={ {
+                                        position: 'relative',
+                                        margin: '0 auto',
+                                        display: 'inline-block',
+                                        minHeight: 20
+                                    } }
+                                >
+                                    <div className="chat-content" style={ { padding: '2px 8px', display: 'flex', alignItems: 'center' } }>
+                                        <b className="username mr-1">{ username }: </b>
+                                        <span className="message">¡Hola Habbten!</span>
                                     </div>
-                                ) }
+                                </div>
                             </div>
 
                             <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
