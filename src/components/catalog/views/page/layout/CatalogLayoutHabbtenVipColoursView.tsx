@@ -30,6 +30,9 @@ const VIP_COLOURS: ColourOption[] = [
 export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props =>
 {
     const [ selectedColour, setSelectedColour ] = useState<ColourOption>(VIP_COLOURS[0]);
+    const [ activeColourId, setActiveColourId ] = useState<string>('');
+    const [ isBuying, setIsBuying ] = useState<boolean>(false);
+    const [ message, setMessage ] = useState<string>('');
     const { purse = null, getClubMemberLevel = null } = usePurse();
     const { badgeCodes = [] } = useInventoryBadges();
     const { userInfo = null } = useSessionInfo();
@@ -45,6 +48,34 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
 
     const openStore = () => {
         window.open('/tienda', '_blank');
+    };
+
+    const buyColourInGame = async () => {
+        if(!selectedColour || isBuying) return;
+        setIsBuying(true);
+        setMessage('');
+        try {
+            const res = await fetch('/api/catalog/buy-vip-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'name_colour',
+                    item_id: selectedColour.id,
+                    cost_diamonds: 30
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setActiveColourId(selectedColour.id);
+                setMessage('¡Color activado con éxito!');
+            } else {
+                setMessage(data.error || 'Error al activar');
+            }
+        } catch (e) {
+            setMessage('Error de conexión.');
+        } finally {
+            setIsBuying(false);
+        }
     };
 
     if(!isVip) {
@@ -81,7 +112,7 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
                             justifyContent="between"
                             itemActive={ selectedColour?.id === c.id }
                             className="p-2 cursor-pointer"
-                            onClick={ () => setSelectedColour(c) }
+                            onClick={ () => { setSelectedColour(c); setMessage(''); } }
                         >
                             <Flex alignItems="center" gap={ 2 }>
                                 <div
@@ -130,22 +161,30 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
                                 </span>
                             </div>
                             <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
-                                <Text fontWeight="bold" fontSize={ 5 }>Valor individual: 30</Text>
+                                <Text fontWeight="bold" fontSize={ 5 }>Precio: 30</Text>
                                 <LayoutCurrencyIcon type={ 5 } />
                             </Flex>
-                            <Text className="text-xs text-gray-600">
-                                Para activar este color en cualquier momento, escribe en el chat:
-                            </Text>
-                            <code className="text-xs bg-gray-200 px-2 py-1 rounded font-mono text-gray-800">
-                                :namecolour { selectedColour.id }
-                            </code>
-                            <Text className="text-xs text-gray-500 mt-1">
-                                Nota: El comando y los colores permanecen activos mientras tu membresía VIP esté vigente.
-                            </Text>
+                            { message ? (
+                                <Text className="text-xs font-semibold text-emerald-600">
+                                    { message }
+                                </Text>
+                            ) : (
+                                <Text className="text-xs text-gray-500">
+                                    Haz clic en comprar para equiparlo inmediatamente.
+                                </Text>
+                            ) }
                         </Column>
-                        <Text className="text-xs text-green-700 font-semibold">
-                            ✓ Membresía VIP activa
-                        </Text>
+                        <Column fullWidth gap={ 1 }>
+                            { activeColourId === selectedColour.id ? (
+                                <Button fullWidth variant="secondary" disabled>
+                                    Color Equipado ✓
+                                </Button>
+                            ) : (
+                                <Button fullWidth variant="success" disabled={ isBuying } onClick={ buyColourInGame }>
+                                    { isBuying ? 'Comprando...' : 'Comprar y Activar' }
+                                </Button>
+                            ) }
+                        </Column>
                     </Column>
                 ) }
             </Column>

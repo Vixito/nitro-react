@@ -16,10 +16,26 @@ interface ChatBubbleData {
     visible: number;
 }
 
+const DEFAULT_VIP_BUBBLES: ChatBubbleData[] = [
+    { bubble_id: 24, name: 'Murciélagos', image_url: '/img/chatbubbles/bubble_24.png', text_color: 'ffffff', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 25, name: 'Mensajero', image_url: '/img/chatbubbles/bubble_25.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 26, name: 'Steampunk', image_url: '/img/chatbubbles/bubble_26.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 27, name: 'Tormenta / Rayo', image_url: '/img/chatbubbles/bubble_27.png', text_color: 'ffffff', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 28, name: 'Loro', image_url: '/img/chatbubbles/bubble_28.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 29, name: 'Pirata', image_url: '/img/chatbubbles/bubble_29.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 32, name: 'Terror / Pesadilla', image_url: '/img/chatbubbles/bubble_32.png', text_color: 'ffffff', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 35, name: 'Cabra', image_url: '/img/chatbubbles/bubble_35.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 36, name: 'Santa', image_url: '/img/chatbubbles/bubble_36.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 },
+    { bubble_id: 38, name: 'Radio Habbten', image_url: '/img/chatbubbles/bubble_38.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 }
+];
+
 export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props =>
 {
-    const [ bubbles, setBubbles ] = useState<ChatBubbleData[]>([]);
-    const [ selectedBubble, setSelectedBubble ] = useState<ChatBubbleData>(null);
+    const [ bubbles, setBubbles ] = useState<ChatBubbleData[]>(DEFAULT_VIP_BUBBLES);
+    const [ selectedBubble, setSelectedBubble ] = useState<ChatBubbleData>(DEFAULT_VIP_BUBBLES[0]);
+    const [ activeBubbleId, setActiveBubbleId ] = useState<number>(0);
+    const [ isBuying, setIsBuying ] = useState<boolean>(false);
+    const [ message, setMessage ] = useState<string>('');
     const { purse = null, getClubMemberLevel = null } = usePurse();
     const { badgeCodes = [] } = useInventoryBadges();
 
@@ -32,12 +48,19 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
 
     useEffect(() => {
         fetch('/api/chat-bubbles')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) return null;
+                const ct = res.headers.get('content-type');
+                if (ct && ct.includes('application/json')) return res.json();
+                return null;
+            })
             .then(data => {
                 if (data && data.success && data.bubbles) {
                     const vipOnly = data.bubbles.filter((b: ChatBubbleData) => b.is_vip && b.visible);
-                    setBubbles(vipOnly);
-                    if (vipOnly.length > 0) setSelectedBubble(vipOnly[0]);
+                    if (vipOnly.length > 0) {
+                        setBubbles(vipOnly);
+                        setSelectedBubble(vipOnly[0]);
+                    }
                 }
             })
             .catch(() => {});
@@ -45,6 +68,34 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
 
     const openStore = () => {
         window.open('/tienda', '_blank');
+    };
+
+    const buyBubbleInGame = async () => {
+        if(!selectedBubble || isBuying) return;
+        setIsBuying(true);
+        setMessage('');
+        try {
+            const res = await fetch('/api/catalog/buy-vip-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'bubble',
+                    item_id: selectedBubble.bubble_id,
+                    cost_diamonds: 50
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setActiveBubbleId(selectedBubble.bubble_id);
+                setMessage('¡Burbuja VIP activada con éxito!');
+            } else {
+                setMessage(data.error || 'Error al comprar');
+            }
+        } catch (e) {
+            setMessage('Error de conexión.');
+        } finally {
+            setIsBuying(false);
+        }
     };
 
     if(!isVip) {
@@ -81,7 +132,7 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                             justifyContent="between"
                             itemActive={ selectedBubble?.bubble_id === b.bubble_id }
                             className="p-2 cursor-pointer"
-                            onClick={ () => setSelectedBubble(b) }
+                            onClick={ () => { setSelectedBubble(b); setMessage(''); } }
                         >
                             <Flex alignItems="center" gap={ 2 }>
                                 { b.image_url && (
@@ -116,16 +167,30 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                                 />
                             ) }
                             <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
-                                <Text fontWeight="bold" fontSize={ 5 }>Precio individual: 50</Text>
+                                <Text fontWeight="bold" fontSize={ 5 }>Precio: 50</Text>
                                 <LayoutCurrencyIcon type={ 5 } />
                             </Flex>
-                            <Text className="text-xs text-gray-600">
-                                Incluida de forma ilimitada mientras tu suscripción a Habbten VIP esté activa. Al finalizar la membresía, las burbujas VIP se bloquean automáticamente.
-                            </Text>
+                            { message ? (
+                                <Text className="text-xs font-semibold text-emerald-600">
+                                    { message }
+                                </Text>
+                            ) : (
+                                <Text className="text-xs text-gray-500">
+                                    Haz clic en comprar para equipar esta burbuja en tus mensajes.
+                                </Text>
+                            ) }
                         </Column>
-                        <Text className="text-xs text-green-700 font-semibold">
-                            ✓ Desbloqueada por membresía VIP
-                        </Text>
+                        <Column fullWidth gap={ 1 }>
+                            { activeBubbleId === selectedBubble.bubble_id ? (
+                                <Button fullWidth variant="secondary" disabled>
+                                    Burbuja Equipada ✓
+                                </Button>
+                            ) : (
+                                <Button fullWidth variant="success" disabled={ isBuying } onClick={ buyBubbleInGame }>
+                                    { isBuying ? 'Comprando...' : 'Comprar y Activar' }
+                                </Button>
+                            ) }
+                        </Column>
                     </Column>
                 ) }
             </Column>

@@ -24,6 +24,9 @@ const VIP_BADGES: VipBadgeItem[] = [
 export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =>
 {
     const [ selectedBadge, setSelectedBadge ] = useState<VipBadgeItem>(VIP_BADGES[0]);
+    const [ purchasedBadges, setPurchasedBadges ] = useState<string[]>([]);
+    const [ isBuying, setIsBuying ] = useState<boolean>(false);
+    const [ message, setMessage ] = useState<string>('');
     const { purse = null, getClubMemberLevel = null } = usePurse();
     const { badgeCodes = [] } = useInventoryBadges();
 
@@ -36,8 +39,8 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
 
     const isOwned = useMemo(() => {
         if(!selectedBadge) return false;
-        return badgeCodes.includes(selectedBadge.code);
-    }, [ selectedBadge, badgeCodes ]);
+        return badgeCodes.includes(selectedBadge.code) || purchasedBadges.includes(selectedBadge.code);
+    }, [ selectedBadge, badgeCodes, purchasedBadges ]);
 
     const imgLib = GetConfiguration<string>('image.library.url', 'http://127.0.0.1:1080/game/swf/c_images/');
     const badgeBaseUrl = imgLib.endsWith('/') ? `${ imgLib }album1584/` : `${ imgLib }/album1584/`;
@@ -46,9 +49,32 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
         window.open('/tienda', '_blank');
     };
 
-    const buyBadge = () => {
-        if(!selectedBadge) return;
-        window.open('/tienda', '_blank');
+    const buyBadgeInGame = async () => {
+        if(!selectedBadge || isBuying || isOwned) return;
+        setIsBuying(true);
+        setMessage('');
+        try {
+            const res = await fetch('/api/catalog/buy-vip-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'badge',
+                    item_id: selectedBadge.code,
+                    cost_diamonds: selectedBadge.priceDiamonds
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setPurchasedBadges(prev => [ ...prev, selectedBadge.code ]);
+                setMessage('¡Placa comprada con éxito!');
+            } else {
+                setMessage(data.error || 'Error en la compra');
+            }
+        } catch (e) {
+            setMessage('Error de conexión.');
+        } finally {
+            setIsBuying(false);
+        }
     };
 
     if(!isVip) {
@@ -85,7 +111,7 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
                             justifyContent="between"
                             itemActive={ selectedBadge?.code === b.code }
                             className="p-2 cursor-pointer"
-                            onClick={ () => setSelectedBadge(b) }
+                            onClick={ () => { setSelectedBadge(b); setMessage(''); } }
                         >
                             <Flex alignItems="center" gap={ 2 }>
                                 <img
@@ -127,6 +153,11 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
                                 <Text fontWeight="bold" fontSize={ 5 }>Precio: { selectedBadge.priceDiamonds }</Text>
                                 <LayoutCurrencyIcon type={ 5 } />
                             </Flex>
+                            { message && (
+                                <Text className="text-xs font-semibold text-emerald-600">
+                                    { message }
+                                </Text>
+                            ) }
                         </Column>
                         <Column fullWidth gap={ 1 }>
                             { isOwned ? (
@@ -134,8 +165,8 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
                                     Ya Adquirida ✓
                                 </Button>
                             ) : (
-                                <Button fullWidth variant="success" onClick={ buyBadge }>
-                                    Comprar en la Tienda
+                                <Button fullWidth variant="success" disabled={ isBuying } onClick={ buyBadgeInGame }>
+                                    { isBuying ? 'Comprando...' : 'Comprar' }
                                 </Button>
                             ) }
                         </Column>
