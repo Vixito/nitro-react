@@ -1,5 +1,6 @@
+import { HabboClubLevelEnum } from '@nitrots/nitro-renderer';
 import { FC, useMemo, useState } from 'react';
-import { GetConfiguration, HabboClubLevelEnum } from '../../../../../api';
+import { GetConfiguration } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
 import { usePurse } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
