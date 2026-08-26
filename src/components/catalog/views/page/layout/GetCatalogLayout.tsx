@@ -6,6 +6,9 @@ import { CatalogLayoutDefaultView } from './CatalogLayoutDefaultView';
 import { CatalogLayouGuildCustomFurniView } from './CatalogLayoutGuildCustomFurniView';
 import { CatalogLayouGuildForumView } from './CatalogLayoutGuildForumView';
 import { CatalogLayouGuildFrontpageView } from './CatalogLayoutGuildFrontpageView';
+import { CatalogLayoutHabbtenVipBubblesView } from './CatalogLayoutHabbtenVipBubblesView';
+import { CatalogLayoutHabbtenVipBuyView } from './CatalogLayoutHabbtenVipBuyView';
+import { CatalogLayoutHabbtenVipColoursView } from './CatalogLayoutHabbtenVipColoursView';
 import { CatalogLayoutInfoLoyaltyView } from './CatalogLayoutInfoLoyaltyView';
 import { CatalogLayoutPets2View } from './CatalogLayoutPets2View';
 import { CatalogLayoutPets3View } from './CatalogLayoutPets3View';
@@ -43,6 +46,12 @@ export const GetCatalogLayout = (page: ICatalogPage, hideNavigation: () => void)
             return <CatalogLayoutPets3View { ...layoutProps } />;
         case 'vip_buy':
             return <CatalogLayoutVipBuyView { ...layoutProps } />;
+        case 'habbten_vip_buy':
+            return <CatalogLayoutHabbtenVipBuyView { ...layoutProps } />;
+        case 'habbten_vip_bubbles':
+            return <CatalogLayoutHabbtenVipBubblesView { ...layoutProps } />;
+        case 'habbten_vip_colours':
+            return <CatalogLayoutHabbtenVipColoursView { ...layoutProps } />;
         case 'guild_frontpage':
             return <CatalogLayouGuildFrontpageView { ...layoutProps } />;
         case 'guild_forum':

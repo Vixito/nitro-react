@@ -70,7 +70,8 @@ export const App: FC<{}> = props =>
                                     styleId: b.bubble_id,
                                     minRank: b.min_rank || 0,
                                     isSystemStyle: false,
-                                    isHcOnly: !!b.is_vip,
+                                    isHcOnly: !!b.is_hc,
+                                    isVipOnly: !!b.is_vip,
                                     isAmbassadorOnly: false
                                 };
                                 
