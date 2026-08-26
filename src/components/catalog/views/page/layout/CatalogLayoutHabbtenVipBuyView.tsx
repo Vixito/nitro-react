@@ -1,6 +1,6 @@
-import { HabboClubLevelEnum } from '@nitrots/nitro-renderer';
+import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
 import { FC, useMemo, useState } from 'react';
-import { GetConfiguration } from '../../../../../api';
+import { GetConfiguration, GetSessionDataManager } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
 import { usePurse } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
@@ -42,14 +42,15 @@ export const CatalogLayoutHabbtenVipBuyView: FC<CatalogLayoutProps> = props =>
     const { purse = null, getClubMemberLevel = null } = usePurse();
 
     const isVip = useMemo(() => {
-        if(!getClubMemberLevel) return false;
-        return getClubMemberLevel() >= HabboClubLevelEnum.VIP;
-    }, [ getClubMemberLevel ]);
+        const hasClub = (getClubMemberLevel ? getClubMemberLevel() >= HabboClubLevelEnum.CLUB : false) || (purse && (purse.clubDays > 0 || purse.clubPeriods > 0));
+        const hasBadgeVip = GetSessionDataManager().hasBadge('VIP') || GetSessionDataManager().hasBadge('ACH_VipClub1') || GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
+        return hasClub || hasBadgeVip;
+    }, [ purse, getClubMemberLevel ]);
 
     const vipDays = useMemo(() => {
         if(!purse) return 0;
-        return isVip ? ((purse.clubPeriods * 31) + purse.clubDays) : 0;
-    }, [ purse, isVip ]);
+        return (purse.clubPeriods * 31) + purse.clubDays;
+    }, [ purse ]);
 
     const validUntilDate = useMemo(() => {
         const date = new Date();
@@ -58,11 +59,8 @@ export const CatalogLayoutHabbtenVipBuyView: FC<CatalogLayoutProps> = props =>
         return `${ date.getDate() }/${ date.getMonth() + 1 }/${ date.getFullYear() }`;
     }, [ vipDays, selectedOffer ]);
 
-    const badgeUrl = useMemo(() => {
-        const badgeName = selectedOffer ? selectedOffer.badge : 'ACH_VipClub1';
-        const imgLib = GetConfiguration<string>('image.library.url', 'http://127.0.0.1:1080/game/swf/c_images/');
-        return `${ imgLib.endsWith('/') ? imgLib : imgLib + '/' }album1584/${ badgeName }.png`;
-    }, [ selectedOffer ]);
+    const imgLib = GetConfiguration<string>('image.library.url', 'http://127.0.0.1:1080/game/swf/c_images/');
+    const badgeBaseUrl = imgLib.endsWith('/') ? `${ imgLib }album1584/` : `${ imgLib }/album1584/`;
 
     const openStore = () => {
         window.open('/tienda', '_blank');
@@ -85,10 +83,12 @@ export const CatalogLayoutHabbtenVipBuyView: FC<CatalogLayoutProps> = props =>
                         >
                             <Flex alignItems="center" gap={ 2 }>
                                 <img
-                                    src={ `${ GetConfiguration<string>('image.library.url', 'http://127.0.0.1:1080/game/swf/c_images/') }album1584/${ offer.badge }.png` }
+                                    src={ `${ badgeBaseUrl }${ offer.badge }.gif` }
                                     alt={ offer.title }
                                     style={ { width: 36, height: 36, objectFit: 'contain', imageRendering: 'pixelated' } }
-                                    onError={ e => { (e.target as HTMLElement).style.display = 'none'; } }
+                                    onError={ e => {
+                                        (e.target as HTMLImageElement).src = `${ badgeBaseUrl }${ offer.badge }.png`;
+                                    } }
                                 />
                                 <Text fontWeight="bold" fontSize={ 5 }>{ offer.title }</Text>
                             </Flex>
@@ -110,9 +110,12 @@ export const CatalogLayoutHabbtenVipBuyView: FC<CatalogLayoutProps> = props =>
             <Column size={ 5 } overflow="hidden" justifyContent="between">
                 <Column fullHeight center overflow="hidden" gap={ 2 } className="text-center pt-2">
                     <img
-                        src={ badgeUrl }
+                        src={ `${ badgeBaseUrl }${ selectedOffer ? selectedOffer.badge : 'ACH_VipClub1' }.gif` }
                         alt="VIP Badge"
                         style={ { width: 64, height: 64, objectFit: 'contain', imageRendering: 'pixelated', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' } }
+                        onError={ e => {
+                            (e.target as HTMLImageElement).src = `${ badgeBaseUrl }${ selectedOffer ? selectedOffer.badge : 'ACH_VipClub1' }.png`;
+                        } }
                     />
                     { vipDays > 0 ? (
                         <Text center overflow="auto" className="text-xs text-gray-700">

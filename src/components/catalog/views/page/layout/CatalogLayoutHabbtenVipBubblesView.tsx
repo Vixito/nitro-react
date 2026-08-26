@@ -1,5 +1,6 @@
-import { HabboClubLevelEnum } from '@nitrots/nitro-renderer';
+import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
+import { GetSessionDataManager } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
 import { usePurse } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
@@ -19,12 +20,13 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
 {
     const [ bubbles, setBubbles ] = useState<ChatBubbleData[]>([]);
     const [ selectedBubble, setSelectedBubble ] = useState<ChatBubbleData>(null);
-    const { getClubMemberLevel = null } = usePurse();
+    const { purse = null, getClubMemberLevel = null } = usePurse();
 
     const isVip = useMemo(() => {
-        if(!getClubMemberLevel) return false;
-        return getClubMemberLevel() >= HabboClubLevelEnum.VIP;
-    }, [ getClubMemberLevel ]);
+        const hasClub = (getClubMemberLevel ? getClubMemberLevel() >= HabboClubLevelEnum.CLUB : false) || (purse && (purse.clubDays > 0 || purse.clubPeriods > 0));
+        const hasBadgeVip = GetSessionDataManager().hasBadge('VIP') || GetSessionDataManager().hasBadge('ACH_VipClub1') || GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
+        return hasClub || hasBadgeVip;
+    }, [ purse, getClubMemberLevel ]);
 
     useEffect(() => {
         fetch('/api/chat-bubbles')
