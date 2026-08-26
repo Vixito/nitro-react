@@ -1,5 +1,5 @@
 import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { GetConfiguration, GetSessionDataManager } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
 import { useInventoryBadges, usePurse } from '../../../../../hooks';
@@ -36,6 +36,20 @@ export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =
         const isStaff = GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
         return hasClub || hasBadgeVip || isStaff;
     }, [ purse, getClubMemberLevel, badgeCodes ]);
+
+    useEffect(() => {
+        fetch('/api/catalog/user-vip-status')
+            .then(res => {
+                if (!res.ok) return null;
+                return res.json();
+            })
+            .then(data => {
+                if (data && data.success && data.owned_badges) {
+                    setPurchasedBadges(data.owned_badges);
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     const isOwned = useMemo(() => {
         if(!selectedBadge) return false;

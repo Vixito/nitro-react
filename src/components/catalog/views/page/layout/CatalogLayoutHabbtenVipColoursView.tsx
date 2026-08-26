@@ -1,5 +1,5 @@
 import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
-import { FC, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { GetSessionDataManager } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
 import { useInventoryBadges, usePurse, useSessionInfo } from '../../../../../hooks';
@@ -31,7 +31,8 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
 {
     const [ selectedColour, setSelectedColour ] = useState<ColourOption>(VIP_COLOURS[0]);
     const [ activeColourId, setActiveColourId ] = useState<string>('');
-    const [ isBuying, setIsBuying ] = useState<boolean>(false);
+    const [ unlockedColours, setUnlockedColours ] = useState<string[]>([]);
+    const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
     const [ message, setMessage ] = useState<string>('');
     const { purse = null, getClubMemberLevel = null } = usePurse();
     const { badgeCodes = [] } = useInventoryBadges();
@@ -46,35 +47,85 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
 
     const username = userInfo?.username || 'Usuario';
 
+    const fetchStatus = () => {
+        fetch('/api/catalog/user-vip-status')
+            .then(res => {
+                if (!res.ok) return null;
+                return res.json();
+            })
+            .then(data => {
+                if (data && data.success) {
+                    if (data.active_colour) setActiveColourId(data.active_colour);
+                    if (data.unlocked_colours) setUnlockedColours(data.unlocked_colours);
+                }
+            })
+            .catch(() => {});
+    };
+
+    useEffect(() => {
+        fetchStatus();
+    }, []);
+
     const openStore = () => {
         window.open('/tienda', '_blank');
     };
 
-    const buyColourInGame = async () => {
-        if(!selectedColour || isBuying) return;
-        setIsBuying(true);
+    const isOwned = useMemo(() => {
+        if (!selectedColour) return false;
+        return unlockedColours.includes(selectedColour.id) || isVip;
+    }, [ selectedColour, unlockedColours, isVip ]);
+
+    const isCurrentlyEquipped = useMemo(() => {
+        return activeColourId === selectedColour?.id;
+    }, [ activeColourId, selectedColour ]);
+
+    const handleAction = async () => {
+        if (!selectedColour || isSubmitting || isCurrentlyEquipped) return;
+        setIsSubmitting(true);
         setMessage('');
+
         try {
-            const res = await fetch('/api/catalog/buy-vip-item', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'name_colour',
-                    item_id: selectedColour.id,
-                    cost_diamonds: 30
-                })
-            });
-            const data = await res.json();
-            if (data.success) {
-                setActiveColourId(selectedColour.id);
-                setMessage('¡Color activado con éxito!');
+            if (isOwned) {
+                // Activate without charging
+                const res = await fetch('/api/catalog/activate-vip-item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'name_colour',
+                        item_id: selectedColour.id
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setActiveColourId(selectedColour.id);
+                    setMessage('¡Color equipado con éxito!');
+                } else {
+                    setMessage(data.error || 'Error al equipar');
+                }
             } else {
-                setMessage(data.error || 'Error al activar');
+                // Buy and activate
+                const res = await fetch('/api/catalog/buy-vip-item', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'name_colour',
+                        item_id: selectedColour.id,
+                        cost_diamonds: 30
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setActiveColourId(selectedColour.id);
+                    setUnlockedColours(prev => [ ...prev, selectedColour.id ]);
+                    setMessage('¡Color comprado y activado!');
+                } else {
+                    setMessage(data.error || 'Error en la compra');
+                }
             }
         } catch (e) {
             setMessage('Error de conexión.');
         } finally {
-            setIsBuying(false);
+            setIsSubmitting(false);
         }
     };
 
@@ -83,7 +134,7 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
             <Column fullHeight center justifyContent="center" className="p-4 text-center bg-gray-50 rounded-lg">
                 <div className="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-3 mx-auto shadow-sm">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                     </svg>
                 </div>
                 <Text fontWeight="bold" fontSize={ 4 } className="text-gray-900 mb-1">
@@ -165,18 +216,18 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
                                 </Text>
                             ) : (
                                 <Text className="text-xs text-gray-500">
-                                    Haz clic en comprar para equiparlo inmediatamente.
+                                    { isCurrentlyEquipped ? 'Este color está actualmente activo en tu usuario.' : (isOwned ? 'Color disponible en tu membresía VIP.' : 'Haz clic en comprar para adquirirlo.') }
                                 </Text>
                             ) }
                         </Column>
                         <Column fullWidth gap={ 1 }>
-                            { activeColourId === selectedColour.id ? (
+                            { isCurrentlyEquipped ? (
                                 <Button fullWidth variant="secondary" disabled>
                                     Color Equipado ✓
                                 </Button>
                             ) : (
-                                <Button fullWidth variant="success" disabled={ isBuying } onClick={ buyColourInGame }>
-                                    { isBuying ? 'Comprando...' : 'Comprar y Activar' }
+                                <Button fullWidth variant="success" disabled={ isSubmitting } onClick={ handleAction }>
+                                    { isSubmitting ? 'Procesando...' : (isOwned ? 'Equipar Color' : 'Comprar y Activar') }
                                 </Button>
                             ) }
                         </Column>
