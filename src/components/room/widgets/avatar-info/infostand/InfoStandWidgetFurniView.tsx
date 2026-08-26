@@ -381,7 +381,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                                 { LocalizeText('furni.owner', [ 'name' ], [ avatarInfo.ownerName ]) }
                             </Text>
                         </Flex>
-                        { (avatarInfo.purchaseOfferId > 0) &&
+                        { (avatarInfo.purchaseOfferId > 0 || !!avatarInfo.name?.length) &&
                             <Flex>
                                 <Text variant="white" small underline pointer onClick={ event => processButtonAction('buy_one') }>
                                     { LocalizeText('infostand.button.buy') }
