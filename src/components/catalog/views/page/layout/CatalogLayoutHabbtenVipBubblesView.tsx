@@ -1,6 +1,6 @@
 import { FC, useEffect, useMemo, useState } from 'react';
 import { HabboClubLevelEnum } from '../../../../../api';
-import { AutoGrid, Button, Column, Flex, Grid, LayoutGridItem, Text } from '../../../../../common';
+import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
 import { usePurse } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
@@ -90,6 +90,10 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                                 ) }
                                 <Text fontWeight="bold" fontSize={ 6 }>{ b.name }</Text>
                             </Flex>
+                            <Flex alignItems="center" gap={ 1 }>
+                                <Text fontSize={ 6 } fontWeight="bold">50</Text>
+                                <LayoutCurrencyIcon type={ 5 } />
+                            </Flex>
                         </LayoutGridItem>
                     )) }
                 </AutoGrid>
@@ -107,12 +111,16 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                                     style={ { maxHeight: 48, objectFit: 'contain', imageRendering: 'pixelated' } }
                                 />
                             ) }
+                            <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
+                                <Text fontWeight="bold" fontSize={ 5 }>Precio individual: 50</Text>
+                                <LayoutCurrencyIcon type={ 5 } />
+                            </Flex>
                             <Text className="text-xs text-gray-600">
-                                Burbuja exclusiva para miembros VIP de Habbten.
+                                Incluida de forma ilimitada mientras tu suscripción a Habbten VIP esté activa. Al finalizar la membresía, las burbujas VIP se bloquean automáticamente.
                             </Text>
                         </Column>
                         <Text className="text-xs text-green-700 font-semibold">
-                            ✓ Membresía VIP activa
+                            ✓ Desbloqueada por membresía VIP
                         </Text>
                     </Column>
                 ) }

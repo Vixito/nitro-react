@@ -1,6 +1,6 @@
 import { FC, useMemo, useState } from 'react';
 import { HabboClubLevelEnum } from '../../../../../api';
-import { AutoGrid, Button, Column, Flex, Grid, LayoutGridItem, Text } from '../../../../../common';
+import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
 import { usePurse, useSessionInfo } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
@@ -91,6 +91,10 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
                                 />
                                 <Text fontWeight="bold" fontSize={ 6 }>{ c.name }</Text>
                             </Flex>
+                            <Flex alignItems="center" gap={ 1 }>
+                                <Text fontSize={ 6 } fontWeight="bold">30</Text>
+                                <LayoutCurrencyIcon type={ 5 } />
+                            </Flex>
                         </LayoutGridItem>
                     )) }
                 </AutoGrid>
@@ -121,12 +125,19 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
                                     ) }
                                 </span>
                             </div>
+                            <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
+                                <Text fontWeight="bold" fontSize={ 5 }>Valor individual: 30</Text>
+                                <LayoutCurrencyIcon type={ 5 } />
+                            </Flex>
                             <Text className="text-xs text-gray-600">
                                 Para activar este color en cualquier momento, escribe en el chat:
                             </Text>
                             <code className="text-xs bg-gray-200 px-2 py-1 rounded font-mono text-gray-800">
                                 :namecolour { selectedColour.id }
                             </code>
+                            <Text className="text-xs text-gray-500 mt-1">
+                                Nota: El comando y los colores permanecen activos mientras tu membresía VIP esté vigente.
+                            </Text>
                         </Column>
                         <Text className="text-xs text-green-700 font-semibold">
                             ✓ Membresía VIP activa
