@@ -29,14 +29,13 @@ const DEFAULT_VIP_BUBBLES: ChatBubbleData[] = [
     { bubble_id: 38, name: 'Radio Habbten', image_url: '/img/chatbubbles/bubble_38.png', text_color: '000000', min_rank: 1, is_hc: 0, is_vip: 1, visible: 1 }
 ];
 
-export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props =>
-{
-    const [ bubbles, setBubbles ] = useState<ChatBubbleData[]>(DEFAULT_VIP_BUBBLES);
-    const [ selectedBubble, setSelectedBubble ] = useState<ChatBubbleData>(DEFAULT_VIP_BUBBLES[0]);
-    const [ activeBubbleId, setActiveBubbleId ] = useState<number>(0);
-    const [ unlockedBubbles, setUnlockedBubbles ] = useState<number[]>([]);
-    const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
-    const [ message, setMessage ] = useState<string>('');
+export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props => {
+    const [bubbles, setBubbles] = useState<ChatBubbleData[]>(DEFAULT_VIP_BUBBLES);
+    const [selectedBubble, setSelectedBubble] = useState<ChatBubbleData>(DEFAULT_VIP_BUBBLES[0]);
+    const [activeBubbleId, setActiveBubbleId] = useState<number>(0);
+    const [unlockedBubbles, setUnlockedBubbles] = useState<number[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>('');
     const { purse = null, getClubMemberLevel = null } = usePurse();
     const { badgeCodes = [] } = useInventoryBadges();
     const { userInfo = null } = useSessionInfo();
@@ -46,7 +45,7 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
         const hasBadgeVip = badgeCodes.includes('VIP') || badgeCodes.includes('ACH_VipClub1');
         const isStaff = GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
         return hasClub || hasBadgeVip || isStaff;
-    }, [ purse, getClubMemberLevel, badgeCodes ]);
+    }, [purse, getClubMemberLevel, badgeCodes]);
 
     const username = userInfo?.username || 'Usuario';
 
@@ -62,7 +61,7 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                     if (data.unlocked_bubbles) setUnlockedBubbles(data.unlocked_bubbles.map((b: any) => Number(b)));
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     };
 
     useEffect(() => {
@@ -83,7 +82,7 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                     }
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     }, []);
 
     const openStore = () => {
@@ -93,11 +92,11 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
     const isOwned = useMemo(() => {
         if (!selectedBubble) return false;
         return unlockedBubbles.includes(selectedBubble.bubble_id);
-    }, [ selectedBubble, unlockedBubbles ]);
+    }, [selectedBubble, unlockedBubbles]);
 
     const isCurrentlyEquipped = useMemo(() => {
         return activeBubbleId === selectedBubble?.bubble_id;
-    }, [ activeBubbleId, selectedBubble ]);
+    }, [activeBubbleId, selectedBubble]);
 
     const handleAction = async () => {
         if (!selectedBubble || isSubmitting || isCurrentlyEquipped) return;
@@ -136,7 +135,7 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                 const data = await res.json();
                 if (data.success) {
                     setActiveBubbleId(selectedBubble.bubble_id);
-                    setUnlockedBubbles(prev => [ ...prev, selectedBubble.bubble_id ]);
+                    setUnlockedBubbles(prev => [...prev, selectedBubble.bubble_id]);
                     setMessage('¡Burbuja VIP comprada y equipada!');
                 } else {
                     setMessage(data.error || 'Error al comprar');
@@ -149,7 +148,7 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
         }
     };
 
-    if(!isVip) {
+    if (!isVip) {
         return (
             <Column fullHeight center justifyContent="center" className="p-4 text-center bg-gray-50 rounded-lg">
                 <div className="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-3 mx-auto shadow-sm">
@@ -157,13 +156,13 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                 </div>
-                <Text fontWeight="bold" fontSize={ 4 } className="text-gray-900 mb-1">
+                <Text fontWeight="bold" fontSize={4} className="text-gray-900 mb-1">
                     Zona Exclusiva para Miembros Habbten VIP
                 </Text>
                 <Text className="text-xs text-gray-600 max-w-md mx-auto mb-4">
                     Esta subsección requiere una suscripción activa a <b>Habbten VIP</b> para adquirir y equipar estilos de burbujas de conversación prémium en todo el hotel.
                 </Text>
-                <Button variant="success" onClick={ openStore } className="px-6 py-2">
+                <Button variant="success" onClick={openStore} className="px-6 py-2">
                     Adquirir Habbten VIP
                 </Button>
             </Column>
@@ -172,87 +171,88 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
 
     return (
         <Grid>
-            <Column fullHeight size={ 7 } overflow="hidden" justifyContent="between">
-                <AutoGrid columnCount={ 5 } className="p-1">
-                    { bubbles.map(b => (
+            <Column fullHeight size={7} overflow="hidden" justifyContent="between">
+                <AutoGrid columnCount={5} className="p-1">
+                    {bubbles.map(b => (
                         <LayoutGridItem
-                            key={ b.bubble_id }
+                            key={b.bubble_id}
                             center
                             alignItems="center"
                             justifyContent="center"
-                            itemActive={ selectedBubble?.bubble_id === b.bubble_id }
+                            itemActive={selectedBubble?.bubble_id === b.bubble_id}
                             className="cursor-pointer"
-                            onClick={ () => { setSelectedBubble(b); setMessage(''); } }
+                            onClick={() => { setSelectedBubble(b); setMessage(''); }}
                         >
-                            { b.image_url ? (
+                            {b.image_url ? (
                                 <img
-                                    src={ b.image_url }
-                                    alt={ b.name }
-                                    style={ {
+                                    src={b.image_url}
+                                    alt={b.name}
+                                    style={{
                                         width: 50,
                                         height: 25,
                                         objectFit: 'contain',
                                         imageRendering: 'pixelated'
-                                    } }
-                                    onError={ e => { (e.target as HTMLElement).style.display = 'none'; } }
+                                    }}
+                                    onError={e => { (e.target as HTMLElement).style.display = 'none'; }}
                                 />
-                            ) : null }
+                            ) : null}
                         </LayoutGridItem>
-                    )) }
+                    ))}
                 </AutoGrid>
             </Column>
 
-            <Column size={ 5 } overflow="hidden" justifyContent="between">
-                { selectedBubble && (
+            <Column size={5} overflow="hidden" justifyContent="between">
+                {selectedBubble && (
                     <Column fullHeight center justifyContent="between" className="text-center p-3 bg-gray-50 rounded-lg">
-                        <Column center gap={ 2 } fullWidth>
-                            <Text fontWeight="bold" fontSize={ 4 }>{ selectedBubble.name }</Text>
-                            
-                            { /* HD Live 9-slice Chat Bubble Preview with Text INSIDE */ }
-                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex items-center justify-center min-h-[75px] overflow-hidden">
-                                <div
-                                    className={ `chat-bubble bubble-${ selectedBubble.bubble_id }` }
-                                    style={ {
-                                        position: 'relative',
-                                        margin: '0 auto',
-                                        display: 'inline-block',
-                                        minHeight: 20
-                                    } }
-                                >
-                                    <div className="chat-content" style={ { padding: '2px 8px', display: 'flex', alignItems: 'center' } }>
-                                        <b className="username mr-1">{ username }: </b>
-                                        <span className="message">¡Hola Habbten!</span>
+                        <Column center gap={2} fullWidth>
+                            <Text fontWeight="bold" fontSize={4}>{selectedBubble.name}</Text>
+
+                            { /* HD Live 9-slice Chat Bubble Preview with Container */}
+                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex items-center justify-center min-h-[75px] overflow-visible">
+                                <div className="bubble-container" style={{ position: 'relative', display: 'inline-block' }}>
+                                    <div
+                                        className={`chat-bubble bubble-${selectedBubble.bubble_id} type-0`}
+                                        style={{
+                                            borderImageSource: selectedBubble.image_url ? `url('${selectedBubble.image_url}')` : undefined,
+                                            color: selectedBubble.text_color ? `#${selectedBubble.text_color}` : undefined
+                                        }}
+                                    >
+                                        <div className="chat-content" style={{ padding: '2px 8px', display: 'flex', alignItems: 'center' }}>
+                                            <b className="username mr-1" style={{ color: selectedBubble.text_color ? `#${selectedBubble.text_color}` : undefined }}>{username}: </b>
+                                            <span className="message" style={{ color: selectedBubble.text_color ? `#${selectedBubble.text_color}` : undefined }}>¡Hola Habbten!</span>
+                                        </div>
+                                        <div className="pointer" />
                                     </div>
                                 </div>
                             </div>
 
-                            <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
-                                <Text fontWeight="bold" fontSize={ 5 }>Precio: 50</Text>
-                                <LayoutCurrencyIcon type={ 5 } />
+                            <Flex alignItems="center" justifyContent="center" gap={1} className="my-1">
+                                <Text fontWeight="bold" fontSize={5}>Precio: 50</Text>
+                                <LayoutCurrencyIcon type={5} />
                             </Flex>
-                            { message ? (
+                            {message ? (
                                 <Text className="text-xs font-semibold text-emerald-600">
-                                    { message }
+                                    {message}
                                 </Text>
                             ) : (
                                 <Text className="text-xs text-gray-500">
-                                    { isCurrentlyEquipped ? 'Esta burbuja está actualmente activa en tu chat.' : (isOwned ? 'Burbuja ya adquirida.' : 'Haz clic en comprar para adquirir esta burbuja.') }
+                                    {isCurrentlyEquipped ? 'Esta burbuja está actualmente activa en tu chat.' : (isOwned ? 'Burbuja ya adquirida.' : 'Haz clic en comprar para adquirir esta burbuja.')}
                                 </Text>
-                            ) }
+                            )}
                         </Column>
-                        <Column fullWidth gap={ 1 }>
-                            { isCurrentlyEquipped ? (
+                        <Column fullWidth gap={1}>
+                            {isCurrentlyEquipped ? (
                                 <Button fullWidth variant="secondary" disabled>
                                     Burbuja Equipada ✓
                                 </Button>
                             ) : (
-                                <Button fullWidth variant="success" disabled={ isSubmitting } onClick={ handleAction }>
-                                    { isSubmitting ? 'Procesando...' : (isOwned ? 'Equipar Burbuja' : 'Comprar y Activar') }
+                                <Button fullWidth variant="success" disabled={isSubmitting} onClick={handleAction}>
+                                    {isSubmitting ? 'Procesando...' : (isOwned ? 'Equipar Burbuja' : 'Comprar y Activar')}
                                 </Button>
-                            ) }
+                            )}
                         </Column>
                     </Column>
-                ) }
+                )}
             </Column>
         </Grid>
     );
