@@ -2,7 +2,7 @@ import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer
 import { FC, useMemo, useState } from 'react';
 import { GetConfiguration, GetSessionDataManager } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
-import { usePurse } from '../../../../../hooks';
+import { useInventoryBadges, usePurse } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 interface VipBadgeItem {
@@ -18,24 +18,26 @@ const VIP_BADGES: VipBadgeItem[] = [
     { code: 'ACH_VipClub3', name: 'Insignia VIP - Nivel III', description: 'Insignia coleccionable oficial para miembros Habbten VIP de nivel 3.', priceDiamonds: 20 },
     { code: 'ACH_VipClub4', name: 'Insignia VIP - Nivel IV', description: 'Insignia coleccionable oficial para miembros Habbten VIP de nivel 4.', priceDiamonds: 20 },
     { code: 'ACH_VipClub5', name: 'Insignia VIP - Nivel V', description: 'Insignia coleccionable oficial para miembros Habbten VIP de nivel 5.', priceDiamonds: 20 },
-    { code: 'VIP', name: 'Insignia Oficial Habbten VIP', description: 'Insignia insignia dorada oficial de membresía Habbten VIP.', priceDiamonds: 20 }
+    { code: 'VIP', name: 'Insignia Oficial Habbten VIP', description: 'Insignia dorada oficial de membresía Habbten VIP.', priceDiamonds: 20 }
 ];
 
 export const CatalogLayoutHabbtenVipBadgesView: FC<CatalogLayoutProps> = props =>
 {
     const [ selectedBadge, setSelectedBadge ] = useState<VipBadgeItem>(VIP_BADGES[0]);
     const { purse = null, getClubMemberLevel = null } = usePurse();
+    const { badgeCodes = [] } = useInventoryBadges();
 
     const isVip = useMemo(() => {
-        const hasClub = (getClubMemberLevel ? getClubMemberLevel() >= HabboClubLevelEnum.CLUB : false) || (purse && (purse.clubDays > 0 || purse.clubPeriods > 0));
-        const hasBadgeVip = GetSessionDataManager().hasBadge('VIP') || GetSessionDataManager().hasBadge('ACH_VipClub1') || GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
-        return hasClub || hasBadgeVip;
-    }, [ purse, getClubMemberLevel ]);
+        const hasClub = (getClubMemberLevel ? getClubMemberLevel() >= HabboClubLevelEnum.CLUB : false) || (purse && (purse.clubDays > 0 || purse.clubPeriods > 0 || purse.isVip));
+        const hasBadgeVip = badgeCodes.includes('VIP') || badgeCodes.includes('ACH_VipClub1');
+        const isStaff = GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
+        return hasClub || hasBadgeVip || isStaff;
+    }, [ purse, getClubMemberLevel, badgeCodes ]);
 
     const isOwned = useMemo(() => {
         if(!selectedBadge) return false;
-        return GetSessionDataManager().hasBadge(selectedBadge.code);
-    }, [ selectedBadge ]);
+        return badgeCodes.includes(selectedBadge.code);
+    }, [ selectedBadge, badgeCodes ]);
 
     const imgLib = GetConfiguration<string>('image.library.url', 'http://127.0.0.1:1080/game/swf/c_images/');
     const badgeBaseUrl = imgLib.endsWith('/') ? `${ imgLib }album1584/` : `${ imgLib }/album1584/`;

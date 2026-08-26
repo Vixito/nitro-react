@@ -2,7 +2,7 @@ import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer
 import { FC, useMemo, useState } from 'react';
 import { GetSessionDataManager } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
-import { usePurse, useSessionInfo } from '../../../../../hooks';
+import { useInventoryBadges, usePurse, useSessionInfo } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
 interface ColourOption {
@@ -31,13 +31,15 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
 {
     const [ selectedColour, setSelectedColour ] = useState<ColourOption>(VIP_COLOURS[0]);
     const { purse = null, getClubMemberLevel = null } = usePurse();
+    const { badgeCodes = [] } = useInventoryBadges();
     const { userInfo = null } = useSessionInfo();
 
     const isVip = useMemo(() => {
-        const hasClub = (getClubMemberLevel ? getClubMemberLevel() >= HabboClubLevelEnum.CLUB : false) || (purse && (purse.clubDays > 0 || purse.clubPeriods > 0));
-        const hasBadgeVip = GetSessionDataManager().hasBadge('VIP') || GetSessionDataManager().hasBadge('ACH_VipClub1') || GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
-        return hasClub || hasBadgeVip;
-    }, [ purse, getClubMemberLevel ]);
+        const hasClub = (getClubMemberLevel ? getClubMemberLevel() >= HabboClubLevelEnum.CLUB : false) || (purse && (purse.clubDays > 0 || purse.clubPeriods > 0 || purse.isVip));
+        const hasBadgeVip = badgeCodes.includes('VIP') || badgeCodes.includes('ACH_VipClub1');
+        const isStaff = GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR);
+        return hasClub || hasBadgeVip || isStaff;
+    }, [ purse, getClubMemberLevel, badgeCodes ]);
 
     const username = userInfo?.username || 'Usuario';
 
