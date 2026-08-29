@@ -11,8 +11,8 @@ interface CatalogEmptyPageViewProps
     message?: string;
 }
 
-// Authentic Habbo Frank Concierge figure: classic side-part hair, mature face, burgundy concierge uniform vest & tie, black dress trousers, dress shoes
-const FRANK_FIGURE = 'hr-115-42.hd-195-1.ch-215-66.lg-285-64.sh-300-64';
+// Iconic Official Habbo Frank / Butler: Gentleman hair (hr-893-45), friendly face (hd-180-1), formal tuxedo & tie (ch-804-82), suit pants (lg-280-92), dress shoes (sh-300-64)
+const FRANK_FIGURE = 'hr-893-45.hd-180-1.ch-804-82.lg-280-92.sh-300-64';
 
 export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 {
@@ -23,41 +23,40 @@ export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 
     return (
         <Column fullHeight fullWidth justifyContent="center" alignItems="center" className="p-4 select-none">
-            <div className="w-full max-w-lg bg-gradient-to-b from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95 border border-slate-300 dark:border-slate-700 rounded-2xl p-5 shadow-lg backdrop-blur-md">
+            <div className="w-full max-w-lg bg-white/95 dark:bg-slate-900/95 border border-slate-300/90 dark:border-slate-700/90 rounded-2xl p-6 shadow-xl backdrop-blur-md">
                 <Flex alignItems="center" gap={ 3 } className="relative">
                     {/* Official Frank Character */}
-                    <div className="relative flex-shrink-0 flex items-end justify-center" style={{ width: '80px', height: '120px' }}>
-                        {/* Floor shadow */}
-                        <div className="absolute bottom-1 w-14 h-3 bg-black/15 dark:bg-black/40 rounded-full blur-[1px] pointer-events-none" />
+                    <div className="relative flex-shrink-0 flex items-end justify-center" style={{ width: '85px', height: '125px' }}>
+                        <div className="absolute bottom-1 w-16 h-3 bg-black/20 dark:bg-black/50 rounded-full blur-[1.5px] pointer-events-none" />
                         <LayoutAvatarImageView 
                             figure={ FRANK_FIGURE } 
                             direction={ 2 } 
-                            scale={ 1.2 } 
+                            scale={ 1.25 } 
                             className="relative z-10"
                         />
                     </div>
 
-                    {/* Speech / Dialog Box */}
-                    <Column grow gap={ 1 } className="bg-white/80 dark:bg-slate-950/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
-                        <Flex alignItems="center" gap={ 1.5 }>
-                            <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 font-bold text-[11px] uppercase tracking-wider border border-amber-500/30">
+                    {/* Speech / Dialog Box with Habbo Speech Bubble styling */}
+                    <div className="relative flex-1 bg-slate-50/90 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 font-bold text-[10px] uppercase tracking-wider border border-amber-500/30">
                                 Frank · Conserje
                             </span>
-                        </Flex>
-                        <Text bold className="text-sm text-slate-900 dark:text-white mt-1 leading-tight">
+                        </div>
+                        <Text bold className="text-xs text-slate-900 dark:text-white leading-snug">
                             { props.title || 'Sección vacía o en preparación' }
                         </Text>
-                        <Text className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-1">
+                        <Text className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed mt-1">
                             { props.message || 'Actualmente no hay artículos disponibles en esta sección del catálogo. Puedes explorar las demás categorías en el menú de la izquierda.' }
                         </Text>
-                    </Column>
+                    </div>
                 </Flex>
 
                 {/* Subcategories Shortcuts (Rendered ONLY if there are child subcategories) */}
                 { (visibleChildren && visibleChildren.length > 0) && (
-                    <Column gap={ 2 } className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                        <Text bold small className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                            Subcategorías disponibles en esta sección:
+                    <Column gap={ 2 } className="mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-800">
+                        <Text bold className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Subcategorías disponibles:
                         </Text>
                         <Grid columnCount={ visibleChildren.length > 1 ? 2 : 1 } gap={ 1.5 }>
                             { visibleChildren.map(child => (
@@ -66,7 +65,7 @@ export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
                                     variant="secondary"
                                     onClick={ () => activateNode(child) }
                                     className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-left truncate transition-all hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300"
-                                    style={{ height: '36px' }}
+                                    style={{ height: '34px' }}
                                 >
                                     <CatalogIconView icon={ child.iconId } />
                                     <span className="truncate">{ child.localization }</span>
