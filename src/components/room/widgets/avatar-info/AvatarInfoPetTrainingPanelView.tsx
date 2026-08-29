@@ -43,8 +43,8 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = props =>
                         <LayoutPetImageView figure={ petData.figure } posture={ 'std' } direction={ 2 } />
                     </div>
                     <Column gap={ 0 } className="flex-1 min-w-0">
-                        <Text bold className="text-truncate">{ petData.name }</Text>
-                        <Text small variant="muted" style={{ fontSize: '11px' }}>Haz clic en un comando para entrenar:</Text>
+                        <Text bold style={{ fontSize: '15px' }} className="text-truncate">{ petData.name }</Text>
+                        <Text small variant="muted" style={{ fontSize: '13px' }}>Haz clic en un comando para entrenar:</Text>
                     </Column>
                 </Flex>
                 <div className="pet-commands-container">
@@ -59,8 +59,8 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = props =>
                                         variant={ isEnabled ? 'primary' : 'secondary' }
                                         disabled={ !isEnabled }
                                         onClick={ () => processPetAction(petData.name, commandText) }
-                                        className="text-truncate"
-                                        style={{ fontSize: '11px', padding: '4px 6px' }}
+                                        className="text-truncate font-bold"
+                                        style={{ fontSize: '13px', fontWeight: 700, padding: '6px 8px' }}
                                     >
                                         { commandText }
                                     </Button>

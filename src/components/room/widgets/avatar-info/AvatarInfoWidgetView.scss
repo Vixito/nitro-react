@@ -134,9 +134,9 @@
 }
 
 .pet-training-window {
-    min-width: 280px;
-    min-height: 240px;
-    width: 330px;
+    min-width: 320px;
+    min-height: 260px;
+    width: 360px;
     resize: both !important;
     overflow: hidden;
 
@@ -149,8 +149,8 @@
     }
 
     .pet-training-preview {
-        width: 54px;
-        height: 54px;
+        width: 58px;
+        height: 58px;
         background: rgba(0, 0, 0, 0.08);
         border-radius: 6px;
         display: flex;
@@ -164,7 +164,7 @@
         flex: 1;
         overflow-y: auto;
         padding-right: 2px;
-        min-height: 120px;
+        min-height: 140px;
 
         .grid {
             align-content: start !important;
@@ -172,9 +172,11 @@
         }
 
         .btn {
-            height: 26px !important;
-            min-height: 26px !important;
-            max-height: 26px !important;
+            height: 32px !important;
+            min-height: 32px !important;
+            max-height: 32px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
             display: flex;
             align-items: center;
             justify-content: center;
