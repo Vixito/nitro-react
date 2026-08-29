@@ -10,6 +10,7 @@ import { CatalogLayoutHabbtenVipBadgesView } from './CatalogLayoutHabbtenVipBadg
 import { CatalogLayoutHabbtenVipBubblesView } from './CatalogLayoutHabbtenVipBubblesView';
 import { CatalogLayoutHabbtenVipBuyView } from './CatalogLayoutHabbtenVipBuyView';
 import { CatalogLayoutHabbtenVipColoursView } from './CatalogLayoutHabbtenVipColoursView';
+import { CatalogLayoutHabbtenVipPrefixView } from './CatalogLayoutHabbtenVipPrefixView';
 import { CatalogLayoutInfoLoyaltyView } from './CatalogLayoutInfoLoyaltyView';
 import { CatalogLayoutPets2View } from './CatalogLayoutPets2View';
 import { CatalogLayoutPets3View } from './CatalogLayoutPets3View';
@@ -53,6 +54,8 @@ export const GetCatalogLayout = (page: ICatalogPage, hideNavigation: () => void)
             return <CatalogLayoutHabbtenVipBubblesView { ...layoutProps } />;
         case 'habbten_vip_colours':
             return <CatalogLayoutHabbtenVipColoursView { ...layoutProps } />;
+        case 'habbten_vip_prefix':
+            return <CatalogLayoutHabbtenVipPrefixView { ...layoutProps } />;
         case 'habbten_vip_badges':
             return <CatalogLayoutHabbtenVipBadgesView { ...layoutProps } />;
         case 'guild_frontpage':

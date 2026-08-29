@@ -20,8 +20,8 @@ const VIP_OFFERS: VipOffer[] = [
         id: 1,
         months: 1,
         days: 30,
-        priceCredits: 250,
-        priceDiamonds: 75,
+        priceCredits: 500,
+        priceDiamonds: 150,
         badge: 'ACH_VipClub1',
         title: '1 mes'
     },
@@ -29,8 +29,8 @@ const VIP_OFFERS: VipOffer[] = [
         id: 2,
         months: 3,
         days: 90,
-        priceCredits: 600,
-        priceDiamonds: 180,
+        priceCredits: 1200,
+        priceDiamonds: 350,
         badge: 'ACH_VipClub3',
         title: '3 meses'
     }
@@ -125,7 +125,7 @@ export const CatalogLayoutHabbtenVipBuyView: FC<CatalogLayoutProps> = props =>
                         </Text>
                     ) : (
                         <Text center overflow="auto" className="text-xs text-gray-700">
-                            ¡Desbloquea el Pase de Batalla VIP, colores de nombre, burbujas de chat prémium y ventajas exclusivas en todo el hotel!
+                            ¡Desbloquea el Sistema de Prefijos y Tags (:prefix y :prefixcolor), Pase de Batalla VIP, colores de nombre, burbujas de chat prémium y ventajas exclusivas en todo el hotel!
                         </Text>
                     ) }
                 </Column>
