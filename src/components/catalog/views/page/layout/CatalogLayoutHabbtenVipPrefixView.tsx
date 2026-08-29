@@ -134,10 +134,10 @@ export const CatalogLayoutHabbtenVipPrefixView: FC<CatalogLayoutProps> = props =
                     <Flex gap={ 1 }>
                         <input
                             type="text"
-                            maxLength={ 11 }
+                            maxLength={ 10 }
                             placeholder="Ej: [VIP], [Rey], [Pro]"
                             value={ prefixText }
-                            onChange={ e => setPrefixText(e.target.value) }
+                            onChange={ e => setPrefixText(e.target.value.replace(/[<>{}\\/'"`;=]/g, '').slice(0, 10)) }
                             className="nitro-form-control p-2 text-sm flex-1 rounded border border-gray-300"
                             style={ { background: '#f8fafc', color: '#0f172a', fontWeight: 'bold' } }
                         />

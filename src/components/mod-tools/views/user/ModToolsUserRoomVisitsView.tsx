@@ -47,7 +47,7 @@ export const ModToolsUserRoomVisitsView: FC<ModToolsUserRoomVisitsViewProps> = p
                     {
                         return (
                             <Grid fullHeight={ false } gap={ 1 } alignItems="center" className="text-black py-1 border-bottom">
-                                <Text className="g-col-2">{ row.enterHour.toString().padStart(2, '0') }: { row.enterMinute.toString().padStart(2, '0') }</Text>
+                                <Text className="g-col-2">{ row.enterHour.toString().padStart(2, '0') }:{ row.enterMinute.toString().padStart(2, '0') }</Text>
                                 <Text className="g-col-7">{ row.roomName }</Text>
                                 <Text bold underline pointer variant="primary" className="g-col-3" onClick={ event => TryVisitRoom(row.roomId) }>Entrar</Text>
                             </Grid>
