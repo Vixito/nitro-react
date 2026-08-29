@@ -134,14 +134,18 @@
 }
 
 .pet-training-window {
-    width: 320px !important;
-    min-width: 320px !important;
+    min-width: 280px;
+    min-height: 240px;
+    width: 330px;
+    resize: both !important;
+    overflow: hidden;
 
     .pet-training-header {
         background: rgba(0, 0, 0, 0.05);
         border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 6px;
         padding: 6px 10px;
+        flex-shrink: 0;
     }
 
     .pet-training-preview {
@@ -153,18 +157,20 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        flex-shrink: 0;
     }
 
     .pet-commands-container {
-        max-height: 220px;
+        flex: 1;
         overflow-y: auto;
         padding-right: 2px;
+        min-height: 120px;
 
         &::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
         &::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.25);
             border-radius: 4px;
         }
     }
