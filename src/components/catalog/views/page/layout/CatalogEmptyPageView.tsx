@@ -11,8 +11,8 @@ interface CatalogEmptyPageViewProps
     message?: string;
 }
 
-// Official Habbo Frank Concierge Look: Classic side-part hair (hr-115-42), mature face (hd-195-1), concierge coat (ch-3030-82), trousers (lg-275-1408), black shoes (sh-300-64), waist sash (wa-2007)
-const FRANK_FIGURE = 'hr-115-42.hd-195-1.ch-3030-82.lg-275-1408.sh-300-64.wa-2007';
+// Official Habbo Frank Concierge Look: Classic side-combed hair (hr-100-33), classic face (hd-180-1), staff shirt & tie (ch-210-66), formal long trousers (lg-280-64), black dress shoes (sh-300-64)
+const FRANK_FIGURE = 'hr-100-33.hd-180-1.ch-210-66.lg-280-64.sh-300-64';
 
 export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 {
