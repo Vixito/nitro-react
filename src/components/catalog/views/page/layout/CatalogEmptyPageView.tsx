@@ -11,8 +11,16 @@ interface CatalogEmptyPageViewProps
     message?: string;
 }
 
-// Official Habbo Frank Concierge Look: Classic side-combed hair (hr-100-33), classic face (hd-180-1), staff shirt & tie (ch-210-66), formal long trousers (lg-280-64), black dress shoes (sh-300-64)
-const FRANK_FIGURE = 'hr-100-33.hd-180-1.ch-210-66.lg-280-64.sh-300-64';
+// Official Habbo Mascot: Frank the Concierge
+// - ha-3236-1072-1077: Red concierge pillbox hat with gold star/trim
+// - hr-893-90: Brown wavy hair
+// - hd-180-1: Classic smiling face
+// - fa-1202-90: Iconic brown mustache
+// - cc-3039-1072: Red hotel uniform jacket with gold epaulettes & buttons
+// - ch-210-92: White collared shirt
+// - lg-280-1072: Matching red uniform trousers
+// - sh-300-64: Black dress shoes
+const FRANK_FIGURE = 'ha-3236-1072-1077.hr-893-90.hd-180-1.fa-1202-90.cc-3039-1072.ch-210-92.lg-280-1072.sh-300-64';
 
 export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 {
@@ -26,158 +34,162 @@ export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
             <div 
                 style={{
                     width: '100%',
-                    maxWidth: '500px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.96)',
-                    borderRadius: '16px',
-                    border: '1px solid rgba(0, 0, 0, 0.12)',
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
-                    padding: '24px',
+                    maxWidth: '480px',
                     display: 'flex',
-                    flexDirection: 'column',
+                    alignItems: 'center',
                     gap: '16px'
                 }}
             >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    {/* Official Frank Character */}
+                {/* Frank Avatar - Standing free */}
+                <div 
+                    style={{ 
+                        width: '80px', 
+                        height: '130px', 
+                        flexShrink: 0, 
+                        position: 'relative', 
+                        display: 'flex', 
+                        alignItems: 'flex-end', 
+                        justifyContent: 'center' 
+                    }}
+                >
+                    {/* Floor shadow */}
                     <div 
                         style={{ 
-                            width: '74px', 
-                            height: '110px', 
-                            flexShrink: 0, 
-                            position: 'relative', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center' 
-                        }}
-                    >
-                        <div 
-                            style={{ 
-                                position: 'absolute', 
-                                bottom: '4px', 
-                                width: '56px', 
-                                height: '10px', 
-                                backgroundColor: 'rgba(0, 0, 0, 0.18)', 
-                                borderRadius: '50%', 
-                                filter: 'blur(1px)' 
-                            }} 
-                        />
-                        <LayoutAvatarImageView 
-                            figure={ FRANK_FIGURE } 
-                            direction={ 2 } 
-                            scale={ 1.2 } 
-                        />
-                    </div>
-
-                    {/* Speech / Dialog Box */}
-                    <div 
-                        style={{ 
-                            flex: 1, 
-                            backgroundColor: '#F8FAFC', 
-                            border: '1px solid #E2E8F0', 
-                            borderRadius: '12px', 
-                            padding: '14px 18px', 
-                            position: 'relative', 
-                            boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)' 
-                        }}
-                    >
-                        <div 
-                            style={{ 
-                                display: 'inline-block', 
-                                padding: '3px 8px', 
-                                backgroundColor: '#FEF3C7', 
-                                color: '#92400E', 
-                                border: '1px solid #FCD34D', 
-                                borderRadius: '6px', 
-                                fontSize: '10px', 
-                                fontWeight: 800, 
-                                letterSpacing: '0.5px', 
-                                textTransform: 'uppercase', 
-                                marginBottom: '6px' 
-                            }}
-                        >
-                            Frank · Conserje
-                        </div>
-                        <div 
-                            style={{ 
-                                fontSize: '13px', 
-                                fontWeight: 800, 
-                                color: '#0F172A', 
-                                lineHeight: 1.3, 
-                                marginBottom: '4px' 
-                            }}
-                        >
-                            { props.title || 'Sección vacía o en preparación' }
-                        </div>
-                        <div 
-                            style={{ 
-                                fontSize: '11px', 
-                                color: '#475569', 
-                                lineHeight: 1.5 
-                            }}
-                        >
-                            { props.message || 'Actualmente no hay artículos disponibles en esta sección del catálogo. Puedes explorar las demás categorías en el menú de la izquierda.' }
-                        </div>
-                    </div>
+                            position: 'absolute', 
+                            bottom: '2px', 
+                            width: '58px', 
+                            height: '10px', 
+                            backgroundColor: 'rgba(0, 0, 0, 0.22)', 
+                            borderRadius: '50%', 
+                            filter: 'blur(1px)' 
+                        }} 
+                    />
+                    <LayoutAvatarImageView 
+                        figure={ FRANK_FIGURE } 
+                        direction={ 2 } 
+                        scale={ 1.25 } 
+                        style={{ position: 'relative', zIndex: 2 }}
+                    />
                 </div>
 
-                {/* Subcategories Shortcuts (Rendered ONLY if there are child subcategories) */}
-                { (visibleChildren && visibleChildren.length > 0) && (
+                {/* Cartel / Signboard */}
+                <div 
+                    style={{ 
+                        flex: 1, 
+                        backgroundColor: '#FFFFFF', 
+                        border: '2px solid #CBD5E1', 
+                        borderRadius: '14px', 
+                        padding: '16px 20px', 
+                        position: 'relative', 
+                        boxShadow: '0 6px 18px rgba(0, 0, 0, 0.08)' 
+                    }}
+                >
+                    {/* Cartel Header Badge */}
                     <div 
                         style={{ 
-                            borderTop: '1px solid #E2E8F0', 
-                            paddingTop: '14px', 
-                            display: 'flex', 
-                            flexDirection: 'column', 
-                            gap: '8px' 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            padding: '3px 10px', 
+                            backgroundColor: '#FEF3C7', 
+                            color: '#92400E', 
+                            border: '1px solid #FCD34D', 
+                            borderRadius: '6px', 
+                            fontSize: '10px', 
+                            fontWeight: 800, 
+                            letterSpacing: '0.6px', 
+                            textTransform: 'uppercase', 
+                            marginBottom: '8px' 
                         }}
                     >
+                        <span>🏨</span>
+                        <span>Frank · Conserje</span>
+                    </div>
+
+                    {/* Title */}
+                    <div 
+                        style={{ 
+                            fontSize: '13px', 
+                            fontWeight: 800, 
+                            color: '#0F172A', 
+                            lineHeight: 1.3, 
+                            marginBottom: '6px' 
+                        }}
+                    >
+                        { props.title || 'Sección vacía o en preparación' }
+                    </div>
+
+                    {/* Message */}
+                    <div 
+                        style={{ 
+                            fontSize: '11px', 
+                            color: '#475569', 
+                            lineHeight: 1.5 
+                        }}
+                    >
+                        { props.message || 'Actualmente no hay artículos disponibles en esta sección del catálogo. Puedes explorar las demás categorías en el menú de la izquierda.' }
+                    </div>
+
+                    {/* Subcategories Shortcuts (if any) */}
+                    { (visibleChildren && visibleChildren.length > 0) && (
                         <div 
                             style={{ 
-                                fontSize: '10px', 
-                                fontWeight: 700, 
-                                color: '#64748B', 
-                                textTransform: 'uppercase', 
-                                letterSpacing: '0.5px' 
-                            }}
-                        >
-                            Subcategorías disponibles:
-                        </div>
-                        <div 
-                            style={{ 
-                                display: 'grid', 
-                                gridTemplateColumns: visibleChildren.length > 1 ? '1fr 1fr' : '1fr', 
+                                borderTop: '1px solid #E2E8F0', 
+                                marginTop: '12px',
+                                paddingTop: '12px', 
+                                display: 'flex', 
+                                flexDirection: 'column', 
                                 gap: '8px' 
                             }}
                         >
-                            { visibleChildren.map(child => (
-                                <Button
-                                    key={ child.pageId }
-                                    variant="secondary"
-                                    onClick={ () => activateNode(child) }
-                                    style={{
-                                        height: '36px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px',
-                                        padding: '0 12px',
-                                        fontSize: '11px',
-                                        fontWeight: 600,
-                                        borderRadius: '8px',
-                                        textAlign: 'left',
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    <CatalogIconView icon={ child.iconId } />
-                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                        { child.localization }
-                                    </span>
-                                </Button>
-                            )) }
+                            <div 
+                                style={{ 
+                                    fontSize: '10px', 
+                                    fontWeight: 700, 
+                                    color: '#64748B', 
+                                    textTransform: 'uppercase', 
+                                    letterSpacing: '0.5px' 
+                                }}
+                            >
+                                Subcategorías disponibles:
+                            </div>
+                            <div 
+                                style={{ 
+                                    display: 'grid', 
+                                    gridTemplateColumns: visibleChildren.length > 1 ? '1fr 1fr' : '1fr', 
+                                    gap: '6px' 
+                                }}
+                            >
+                                { visibleChildren.map(child => (
+                                    <Button
+                                        key={ child.pageId }
+                                        variant="secondary"
+                                        onClick={ () => activateNode(child) }
+                                        style={{
+                                            height: '32px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '0 10px',
+                                            fontSize: '11px',
+                                            fontWeight: 600,
+                                            borderRadius: '8px',
+                                            textAlign: 'left',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+                                        <CatalogIconView icon={ child.iconId } />
+                                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            { child.localization }
+                                        </span>
+                                    </Button>
+                                )) }
+                            </div>
                         </div>
-                    </div>
-                ) }
+                    ) }
+                </div>
             </div>
         </Column>
     );
