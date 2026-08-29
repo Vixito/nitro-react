@@ -166,6 +166,20 @@
         padding-right: 2px;
         min-height: 120px;
 
+        .grid {
+            align-content: start !important;
+            grid-auto-rows: min-content !important;
+        }
+
+        .btn {
+            height: 26px !important;
+            min-height: 26px !important;
+            max-height: 26px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         &::-webkit-scrollbar {
             width: 5px;
         }

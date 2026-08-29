@@ -48,7 +48,7 @@ export const AvatarInfoPetTrainingPanelView: FC<{}> = props =>
                     </Column>
                 </Flex>
                 <div className="pet-commands-container">
-                    <Grid columnCount={ 2 } gap={ 1 }>
+                    <Grid columnCount={ 2 } gap={ 1 } fullHeight={ false }>
                         {
                             (petTrainInformation.commands && petTrainInformation.commands.length > 0) && petTrainInformation.commands.map((command, index) => {
                                 const isEnabled = petTrainInformation.enabledCommands && petTrainInformation.enabledCommands.includes(command);
