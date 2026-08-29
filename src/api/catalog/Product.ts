@@ -43,8 +43,15 @@ export class Product implements IProduct
     {
         switch(this._productType)
         {
-            case ProductTypeEnum.FLOOR:
-                return GetRoomEngine().getFurnitureFloorIconUrl(this.productClassId);
+            case ProductTypeEnum.FLOOR: {
+                let url = GetRoomEngine() ? GetRoomEngine().getFurnitureFloorIconUrl(this.productClassId) : null;
+                if(!url && this._furnitureData)
+                {
+                    const base = GetConfiguration<string>('hof.furni.url');
+                    if(base) url = `${base}/icons/${this._furnitureData.className}_icon.png`;
+                }
+                return url;
+            }
             case ProductTypeEnum.WALL: {
                 if(offer && this._furnitureData)
                 {
@@ -71,7 +78,13 @@ export class Product implements IProduct
                     }
                 }
 
-                return GetRoomEngine().getFurnitureWallIconUrl(this.productClassId, this._extraParam);
+                let url = GetRoomEngine() ? GetRoomEngine().getFurnitureWallIconUrl(this.productClassId, this._extraParam) : null;
+                if(!url && this._furnitureData)
+                {
+                    const base = GetConfiguration<string>('hof.furni.url');
+                    if(base) url = `${base}/icons/${this._furnitureData.className}_icon.png`;
+                }
+                return url;
             }
             case ProductTypeEnum.EFFECT:
                 return GetPixelEffectIcon(this.productClassId);

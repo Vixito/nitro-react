@@ -52,7 +52,18 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
                 {
                     prevPreviewIsAvatar.current = false;
                     roomPreviewer.reset(false);
-                    roomPreviewer.addFurnitureIntoRoom(product.productClassId, new Vector3d(90), previewStuffData, product.extraParam);
+                    const res = roomPreviewer.addFurnitureIntoRoom(product.productClassId, new Vector3d(90), previewStuffData, product.extraParam);
+                    if(res === -1 && product.furnitureData && (roomPreviewer as any)._roomEngine)
+                    {
+                        const rp = roomPreviewer as any;
+                        rp._currentPreviewObjectType = product.productClassId;
+                        rp._currentPreviewObjectCategory = 10;
+                        rp._currentPreviewObjectData = '';
+                        rp._roomEngine.addFurnitureFloorByTypeName(rp._previewRoomId, 1, product.furnitureData.className, new Vector3d(0, 0, 0), new Vector3d(90), 0, previewStuffData || null, NaN, -1, 0, -1, '', true, false);
+                        rp._previousAutomaticStateChangeTime = Date.now();
+                        rp._automaticStateChange = true;
+                        roomPreviewer.updatePreviewRoomView();
+                    }
                 }
                 return;
             }
@@ -77,10 +88,22 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
                         if(furniData) roomPreviewer.addWallItemIntoRoom(furniData.id, new Vector3d(90), furniData.customParams);
                         return;
                     }
-                    default:
+                    default: {
                         roomPreviewer.updateObjectRoom('default', 'default', 'default');
-                        roomPreviewer.addWallItemIntoRoom(product.productClassId, new Vector3d(90), product.extraParam);
+                        const res = roomPreviewer.addWallItemIntoRoom(product.productClassId, new Vector3d(90), product.extraParam);
+                        if(res === -1 && product.furnitureData && (roomPreviewer as any)._roomEngine)
+                        {
+                            const rp = roomPreviewer as any;
+                            rp._currentPreviewObjectType = product.productClassId;
+                            rp._currentPreviewObjectCategory = 20;
+                            rp._currentPreviewObjectData = product.extraParam || '';
+                            rp._roomEngine.addFurnitureWall(rp._previewRoomId, 1, product.productClassId, new Vector3d(0.5, 2.3, 1.8), new Vector3d(90), 0, product.extraParam || '', 0, 0, -1, '', false);
+                            rp._previousAutomaticStateChangeTime = Date.now();
+                            rp._automaticStateChange = true;
+                            roomPreviewer.updatePreviewRoomView();
+                        }
                         return;
+                    }
                 }
             }
             case ProductTypeEnum.ROBOT:
