@@ -47,6 +47,8 @@ const useCatalogState = () =>
 
     const resetState = useCallback(() =>
     {
+        pendingPageId.current = -1;
+        if(requestedPage.current) requestedPage.current.resetRequest();
         pendingFurniCandidates.current = null;
         setPageId(-1);
         setPreviousPageId(-1);
@@ -1234,6 +1236,7 @@ const useCatalogState = () =>
     {
         if(!isVisible)
         {
+            pendingPageId.current = -1;
             setSearchResult(null);
             setCurrentOffer(null);
             setNavigationHidden(false);

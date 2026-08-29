@@ -106,9 +106,10 @@
 
     &.nitro-alert-moderation,
     &.nitro-alert-alert {
-        width: 250px;
+        width: 330px;
+        min-width: 300px;
         .notification-text {
-            min-width: 225px;
+            min-width: 270px;
         }
     }
 }
