@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { ICatalogNode } from '../../../../../api';
-import { Button, Column, Flex, Grid, Text } from '../../../../../common';
+import { Button, Column, Flex, Grid, LayoutAvatarImageView, Text } from '../../../../../common';
 import { useCatalog } from '../../../../../hooks';
 import { CatalogIconView } from '../../catalog-icon/CatalogIconView';
 
@@ -11,6 +11,9 @@ interface CatalogEmptyPageViewProps
     message?: string;
 }
 
+// Authentic Habbo Frank Concierge figure: classic side-part hair, mature face, burgundy concierge uniform vest & tie, black dress trousers, dress shoes
+const FRANK_FIGURE = 'hr-115-42.hd-195-1.ch-215-66.lg-285-64.sh-300-64';
+
 export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 {
     const { activeNodes = [], activateNode = null } = useCatalog();
@@ -20,40 +23,50 @@ export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 
     return (
         <Column fullHeight fullWidth justifyContent="center" alignItems="center" className="p-4 select-none">
-            <div className="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 max-w-md w-full text-center shadow-sm backdrop-blur-sm">
-                {/* Frank Avatar & Speech Bubble */}
-                <Flex justifyContent="center" alignItems="center" gap={ 3 } className="mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner">
-                        <img 
-                            src="https://www.habbo.com/habbo-imaging/avatarimage?figure=hr-115-42.hd-195-19.ch-3030-82.lg-275-1408.fa-1201.ca-1804-64&size=m&direction=2&head_direction=2&gesture=sml&action=std" 
-                            alt="Frank" 
-                            className="scale-[1.3] [image-rendering:pixelated] pointer-events-none"
+            <div className="w-full max-w-lg bg-gradient-to-b from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95 border border-slate-300 dark:border-slate-700 rounded-2xl p-5 shadow-lg backdrop-blur-md">
+                <Flex alignItems="center" gap={ 3 } className="relative">
+                    {/* Official Frank Character */}
+                    <div className="relative flex-shrink-0 flex items-end justify-center" style={{ width: '80px', height: '120px' }}>
+                        {/* Floor shadow */}
+                        <div className="absolute bottom-1 w-14 h-3 bg-black/15 dark:bg-black/40 rounded-full blur-[1px] pointer-events-none" />
+                        <LayoutAvatarImageView 
+                            figure={ FRANK_FIGURE } 
+                            direction={ 2 } 
+                            scale={ 1.2 } 
+                            className="relative z-10"
                         />
                     </div>
-                    <Column alignItems="start" className="text-left min-w-0 flex-1">
-                        <Text bold className="text-sm text-slate-800 dark:text-white m-0">
+
+                    {/* Speech / Dialog Box */}
+                    <Column grow gap={ 1 } className="bg-white/80 dark:bg-slate-950/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
+                        <Flex alignItems="center" gap={ 1.5 }>
+                            <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 font-bold text-[11px] uppercase tracking-wider border border-amber-500/30">
+                                Frank · Conserje
+                            </span>
+                        </Flex>
+                        <Text bold className="text-sm text-slate-900 dark:text-white mt-1 leading-tight">
                             { props.title || 'Sección vacía o en preparación' }
                         </Text>
-                        <Text variant="muted" className="text-xs mt-0.5 leading-relaxed">
-                            { props.message || 'Frank te informa que esta sección no tiene artículos en este momento. Explora el menú para descubrir más colecciones.' }
+                        <Text className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-1">
+                            { props.message || 'Actualmente no hay artículos disponibles en esta sección del catálogo. Puedes explorar las demás categorías en el menú de la izquierda.' }
                         </Text>
                     </Column>
                 </Flex>
 
                 {/* Subcategories Shortcuts (Rendered ONLY if there are child subcategories) */}
                 { (visibleChildren && visibleChildren.length > 0) && (
-                    <Column gap={ 2 } className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-left">
-                        <Text bold small variant="muted" className="text-[11px] uppercase tracking-wider">
-                            Subcategorías disponibles:
+                    <Column gap={ 2 } className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <Text bold small className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            Subcategorías disponibles en esta sección:
                         </Text>
-                        <Grid columnCount={ visibleChildren.length > 1 ? 2 : 1 } gap={ 1 }>
+                        <Grid columnCount={ visibleChildren.length > 1 ? 2 : 1 } gap={ 1.5 }>
                             { visibleChildren.map(child => (
                                 <Button
                                     key={ child.pageId }
                                     variant="secondary"
                                     onClick={ () => activateNode(child) }
-                                    className="flex items-center gap-2 p-2 text-xs font-semibold rounded-xl text-left truncate"
-                                    style={{ height: '34px' }}
+                                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-left truncate transition-all hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300"
+                                    style={{ height: '36px' }}
                                 >
                                     <CatalogIconView icon={ child.iconId } />
                                     <span className="truncate">{ child.localization }</span>
