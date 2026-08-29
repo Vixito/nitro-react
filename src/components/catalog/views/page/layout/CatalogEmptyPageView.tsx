@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { ICatalogNode } from '../../../../../api';
-import { Button, Column, Flex, Grid, LayoutAvatarImageView, Text } from '../../../../../common';
+import { Button, Column, LayoutAvatarImageView } from '../../../../../common';
 import { useCatalog } from '../../../../../hooks';
 import { CatalogIconView } from '../../catalog-icon/CatalogIconView';
 
@@ -11,8 +11,8 @@ interface CatalogEmptyPageViewProps
     message?: string;
 }
 
-// Iconic Official Habbo Frank / Butler: Gentleman hair (hr-893-45), friendly face (hd-180-1), formal tuxedo & tie (ch-804-82), suit pants (lg-280-92), dress shoes (sh-300-64)
-const FRANK_FIGURE = 'hr-893-45.hd-180-1.ch-804-82.lg-280-92.sh-300-64';
+// Official Habbo Frank Concierge Look: Classic side-part hair (hr-115-42), mature face (hd-195-1), concierge coat (ch-3030-82), trousers (lg-275-1408), black shoes (sh-300-64), waist sash (wa-2007)
+const FRANK_FIGURE = 'hr-115-42.hd-195-1.ch-3030-82.lg-275-1408.sh-300-64.wa-2007';
 
 export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 {
@@ -23,56 +23,160 @@ export const CatalogEmptyPageView: FC<CatalogEmptyPageViewProps> = props =>
 
     return (
         <Column fullHeight fullWidth justifyContent="center" alignItems="center" className="p-4 select-none">
-            <div className="w-full max-w-lg bg-white/95 dark:bg-slate-900/95 border border-slate-300/90 dark:border-slate-700/90 rounded-2xl p-6 shadow-xl backdrop-blur-md">
-                <Flex alignItems="center" gap={ 3 } className="relative">
+            <div 
+                style={{
+                    width: '100%',
+                    maxWidth: '500px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.96)',
+                    borderRadius: '16px',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                }}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     {/* Official Frank Character */}
-                    <div className="relative flex-shrink-0 flex items-end justify-center" style={{ width: '85px', height: '125px' }}>
-                        <div className="absolute bottom-1 w-16 h-3 bg-black/20 dark:bg-black/50 rounded-full blur-[1.5px] pointer-events-none" />
+                    <div 
+                        style={{ 
+                            width: '74px', 
+                            height: '110px', 
+                            flexShrink: 0, 
+                            position: 'relative', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center' 
+                        }}
+                    >
+                        <div 
+                            style={{ 
+                                position: 'absolute', 
+                                bottom: '4px', 
+                                width: '56px', 
+                                height: '10px', 
+                                backgroundColor: 'rgba(0, 0, 0, 0.18)', 
+                                borderRadius: '50%', 
+                                filter: 'blur(1px)' 
+                            }} 
+                        />
                         <LayoutAvatarImageView 
                             figure={ FRANK_FIGURE } 
                             direction={ 2 } 
-                            scale={ 1.25 } 
-                            className="relative z-10"
+                            scale={ 1.2 } 
                         />
                     </div>
 
-                    {/* Speech / Dialog Box with Habbo Speech Bubble styling */}
-                    <div className="relative flex-1 bg-slate-50/90 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
-                        <div className="flex items-center gap-1.5 mb-1.5">
-                            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-900 dark:text-amber-300 font-bold text-[10px] uppercase tracking-wider border border-amber-500/30">
-                                Frank · Conserje
-                            </span>
+                    {/* Speech / Dialog Box */}
+                    <div 
+                        style={{ 
+                            flex: 1, 
+                            backgroundColor: '#F8FAFC', 
+                            border: '1px solid #E2E8F0', 
+                            borderRadius: '12px', 
+                            padding: '14px 18px', 
+                            position: 'relative', 
+                            boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)' 
+                        }}
+                    >
+                        <div 
+                            style={{ 
+                                display: 'inline-block', 
+                                padding: '3px 8px', 
+                                backgroundColor: '#FEF3C7', 
+                                color: '#92400E', 
+                                border: '1px solid #FCD34D', 
+                                borderRadius: '6px', 
+                                fontSize: '10px', 
+                                fontWeight: 800, 
+                                letterSpacing: '0.5px', 
+                                textTransform: 'uppercase', 
+                                marginBottom: '6px' 
+                            }}
+                        >
+                            Frank · Conserje
                         </div>
-                        <Text bold className="text-xs text-slate-900 dark:text-white leading-snug">
+                        <div 
+                            style={{ 
+                                fontSize: '13px', 
+                                fontWeight: 800, 
+                                color: '#0F172A', 
+                                lineHeight: 1.3, 
+                                marginBottom: '4px' 
+                            }}
+                        >
                             { props.title || 'Sección vacía o en preparación' }
-                        </Text>
-                        <Text className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed mt-1">
+                        </div>
+                        <div 
+                            style={{ 
+                                fontSize: '11px', 
+                                color: '#475569', 
+                                lineHeight: 1.5 
+                            }}
+                        >
                             { props.message || 'Actualmente no hay artículos disponibles en esta sección del catálogo. Puedes explorar las demás categorías en el menú de la izquierda.' }
-                        </Text>
+                        </div>
                     </div>
-                </Flex>
+                </div>
 
                 {/* Subcategories Shortcuts (Rendered ONLY if there are child subcategories) */}
                 { (visibleChildren && visibleChildren.length > 0) && (
-                    <Column gap={ 2 } className="mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-800">
-                        <Text bold className="text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    <div 
+                        style={{ 
+                            borderTop: '1px solid #E2E8F0', 
+                            paddingTop: '14px', 
+                            display: 'flex', 
+                            flexDirection: 'column', 
+                            gap: '8px' 
+                        }}
+                    >
+                        <div 
+                            style={{ 
+                                fontSize: '10px', 
+                                fontWeight: 700, 
+                                color: '#64748B', 
+                                textTransform: 'uppercase', 
+                                letterSpacing: '0.5px' 
+                            }}
+                        >
                             Subcategorías disponibles:
-                        </Text>
-                        <Grid columnCount={ visibleChildren.length > 1 ? 2 : 1 } gap={ 1.5 }>
+                        </div>
+                        <div 
+                            style={{ 
+                                display: 'grid', 
+                                gridTemplateColumns: visibleChildren.length > 1 ? '1fr 1fr' : '1fr', 
+                                gap: '8px' 
+                            }}
+                        >
                             { visibleChildren.map(child => (
                                 <Button
                                     key={ child.pageId }
                                     variant="secondary"
                                     onClick={ () => activateNode(child) }
-                                    className="flex items-center gap-2.5 px-3 py-1.5 text-xs font-semibold rounded-xl text-left truncate transition-all hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300"
-                                    style={{ height: '34px' }}
+                                    style={{
+                                        height: '36px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        padding: '0 12px',
+                                        fontSize: '11px',
+                                        fontWeight: 600,
+                                        borderRadius: '8px',
+                                        textAlign: 'left',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap'
+                                    }}
                                 >
                                     <CatalogIconView icon={ child.iconId } />
-                                    <span className="truncate">{ child.localization }</span>
+                                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        { child.localization }
+                                    </span>
                                 </Button>
                             )) }
-                        </Grid>
-                    </Column>
+                        </div>
+                    </div>
                 ) }
             </div>
         </Column>
