@@ -991,6 +991,16 @@ const useCatalogState = () =>
 
         resetState();
 
+        try
+        {
+            const sdm = GetSessionDataManager() as any;
+            if(sdm && (typeof sdm.loadFurnitureData === 'function'))
+            {
+                sdm.loadFurnitureData();
+            }
+        }
+        catch (e) {}
+
         if(wasVisible) simpleAlert(LocalizeText('catalog.alert.published.description'), NotificationAlertType.ALERT, null, null, LocalizeText('catalog.alert.published.title'));
     });
 
