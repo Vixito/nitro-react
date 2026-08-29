@@ -11,11 +11,17 @@ import { CatalogSpinnerWidgetView } from '../widgets/CatalogSpinnerWidgetView';
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import { CatalogEmptyPageView } from './CatalogEmptyPageView';
 
 export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
 {
     const { page = null } = props;
     const { currentOffer = null, currentPage = null } = useCatalog();
+
+    if(!page || (!page.offers || page.offers.length === 0) && (!page.localization || !page.localization.getText(0)))
+    {
+        return <CatalogEmptyPageView />;
+    }
 
     return (
         <>
