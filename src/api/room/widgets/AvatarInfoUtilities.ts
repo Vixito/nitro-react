@@ -113,11 +113,13 @@ export class AvatarInfoUtilities
             if(category === RoomObjectCategory.FLOOR)
             {
                 furnitureData = GetSessionDataManager().getFloorItemData(typeId);
+                if(!furnitureData) furnitureData = GetSessionDataManager().getFloorItemDataByName(objectType);
             }
 
             else if(category === RoomObjectCategory.WALL)
             {
                 furnitureData = GetSessionDataManager().getWallItemData(typeId);
+                if(!furnitureData) furnitureData = GetSessionDataManager().getWallItemDataByName(objectType);
             }
 
             if(furnitureData)
@@ -131,6 +133,20 @@ export class AvatarInfoUtilities
                 furniInfo.availableForBuildersClub = furnitureData.availableForBuildersClub;
                 furniInfo.tileSizeX = furnitureData.tileSizeX;
                 furniInfo.tileSizeY = furnitureData.tileSizeY;
+            }
+
+            if(!furniInfo.name || furniInfo.name === objectType || furniInfo.name.includes('_'))
+            {
+                const localizedName = LocalizeText(objectType);
+                if(localizedName && localizedName !== objectType && !localizedName.startsWith('${'))
+                {
+                    furniInfo.name = localizedName;
+                }
+                else
+                {
+                    const pretty = objectType.replace(/^nft_/i, '').replace(/_/g, ' ');
+                    furniInfo.name = pretty.replace(/\b\w/g, l => l.toUpperCase());
+                }
             }
         }
 
