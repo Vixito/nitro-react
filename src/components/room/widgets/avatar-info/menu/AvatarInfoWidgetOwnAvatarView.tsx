@@ -28,12 +28,12 @@ export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProp
     const { avatarInfo = null, isDancing = false, setIsDecorating = null, onClose = null } = props;
     const habbtenConfig = (window as any).HabbtenConfig || (window.parent as any).HabbtenConfig;
     const canDanceAll = habbtenConfig?.client?.dances_enabled ?? (habbtenConfig?.dances_enabled ?? true);
-    const [ mode, setMode ] = useState(MODE_NORMAL);
     const { roomSession = null } = useRoom();
 
     const roomObject = roomSession ? GetRoomEngine().getRoomObject(roomSession.roomId, avatarInfo.roomIndex, RoomObjectCategory.UNIT) : null;
     const isObjectDancing = (roomObject?.model?.getValue<number>(RoomObjectVariable.FIGURE_DANCE) || 0) !== 0;
     const userDancing = isDancing || isObjectDancing;
+    const [ mode, setMode ] = useState(userDancing ? MODE_CLUB_DANCES : MODE_NORMAL);
 
     const processAction = (name: string) =>
     {
