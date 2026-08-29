@@ -91,6 +91,7 @@ export const ChatWidgetView: FC<{}> = props =>
             if(!elementRef || !elementRef.current) return;
 
             const heightPercent = GetConfiguration<number>('chat.viewer.height.percentage', 0.4) || 0.4;
+            const currentHeight = elementRef.current.offsetHeight;
             const newHeight = Math.round(document.body.offsetHeight * heightPercent);
 
             elementRef.current.style.height = `${ newHeight }px`;
