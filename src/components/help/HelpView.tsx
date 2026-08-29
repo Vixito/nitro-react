@@ -103,7 +103,7 @@ export const HelpView: FC<{}> = props =>
                             <Column center size={ 5 } overflow="hidden">
                                 <Base className="index-image" />
                             </Column>
-                            <Column justifyContent="between" size={ 7 } overflow="hidden">
+                            <Column justifyContent="between" size={ 7 } overflow="auto">
                                 <CurrentStepView />
                             </Column>
                         </Grid>

@@ -62,7 +62,7 @@ export const SelectReportedChatsView: FC<{}> = props =>
                 <Text fontSize={ 4 }>{ LocalizeText('help.emergency.chat_report.subtitle') }</Text>
                 <Text>{ LocalizeText('help.emergency.chat_report.description') }</Text>
             </Column>
-            <Column gap={ 1 } overflow="hidden">
+            <Column gap={ 1 } overflow="auto">
                 { !userChats || !userChats.length &&
                     <Text>{ LocalizeText('help.cfh.error.no_user_data') }</Text> }
                 { (userChats.length > 0) &&

@@ -141,17 +141,23 @@ export const FriendsMessengerView: FC<{}> = props =>
                                 <Text bold center>{ LocalizeText('messenger.window.separator', [ 'FRIEND_NAME' ], [ activeThread.participant.name ]) }</Text>
                                 <Flex alignItems="center" justifyContent="between" gap={ 1 }>
                                     <Flex gap={ 1 }>
-                                        <ButtonGroup>
-                                            <Button onClick={ followFriend }>
-                                                <Base className="nitro-friends-spritesheet icon-follow" />
-                                            </Button>
-                                            <Button onClick={ openProfile }>
-                                                <Base className="nitro-friends-spritesheet icon-profile-sm" />
-                                            </Button>
-                                        </ButtonGroup>
-                                        <Button variant="danger" onClick={ () => report(ReportType.IM, { reportedUserId: activeThread.participant.id }) }>
-                                            { LocalizeText('messenger.window.button.report') }
-                                        </Button>
+                                        { activeThread.participant.id > 0 ? (
+                                            <>
+                                                <ButtonGroup>
+                                                    <Button onClick={ followFriend }>
+                                                        <Base className="nitro-friends-spritesheet icon-follow" />
+                                                    </Button>
+                                                    <Button onClick={ openProfile }>
+                                                        <Base className="nitro-friends-spritesheet icon-profile-sm" />
+                                                    </Button>
+                                                </ButtonGroup>
+                                                <Button variant="danger" onClick={ () => report(ReportType.IM, { reportedUserId: activeThread.participant.id }) }>
+                                                    { LocalizeText('messenger.window.button.report') }
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <span className="badge bg-primary text-white text-xs px-2 py-1">Canal Oficial Staff</span>
+                                        ) }
                                     </Flex>
                                     <Button onClick={ event => closeThread(activeThread.threadId) }>
                                         <FaTimes className="fa-icon" />
@@ -165,7 +171,7 @@ export const FriendsMessengerView: FC<{}> = props =>
                                 <Flex gap={ 1 }>
                                     <input type="text" className="form-control form-control-sm" maxLength={ 255 } placeholder={ LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ activeThread.participant.name ]) } value={ messageText } onChange={ event => setMessageText(event.target.value) } onKeyDown={ onKeyDown } />
                                     <Button variant="success" onClick={ send }>
-                                        { LocalizeText('widgets.chatinput.say') }
+                                        { LocalizeText('generic.send') }
                                     </Button>
                                 </Flex>
                             </> }
