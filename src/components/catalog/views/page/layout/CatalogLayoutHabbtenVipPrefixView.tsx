@@ -1,7 +1,7 @@
 import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { GetSessionDataManager } from '../../../../../api';
-import { Button, Column, Flex, Grid, LayoutAvatarImageView, Text } from '../../../../../common';
+import { Button, Column, Flex, Grid, LayoutAvatarImageView, LayoutCurrencyIcon, Text } from '../../../../../common';
 import { useInventoryBadges, usePurse, useSessionInfo } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
@@ -95,7 +95,8 @@ export const CatalogLayoutHabbtenVipPrefixView: FC<CatalogLayoutProps> = props =
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     prefix: prefixToSave,
-                    prefix_color: colorToSave
+                    prefix_color: colorToSave,
+                    cost_diamonds: 20
                 })
             });
 
@@ -245,8 +246,12 @@ export const CatalogLayoutHabbtenVipPrefixView: FC<CatalogLayoutProps> = props =
 
                     { isVip ? (
                         <Column gap={ 1 }>
+                            <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
+                                <Text fontWeight="bold" fontSize={ 5 }>Precio: 20</Text>
+                                <LayoutCurrencyIcon type={ 5 } />
+                            </Flex>
                             <Button fullWidth variant="success" onClick={ () => savePrefix() } disabled={ isSubmitting }>
-                                { isSubmitting ? 'Guardando...' : 'Aplicar Prefijo VIP' }
+                                { isSubmitting ? 'Guardando...' : 'Comprar y Aplicar Prefijo' }
                             </Button>
                             { message && (
                                 <Text center className={ `text-xs ${ messageType === 'success' ? 'text-success fw-bold' : 'text-danger fw-bold' }` }>
