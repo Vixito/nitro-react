@@ -1,7 +1,7 @@
 import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { GetSessionDataManager } from '../../../../../api';
-import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Text } from '../../../../../common';
+import { Button, Column, Flex, Grid, LayoutAvatarImageView, LayoutCurrencyIcon, Text } from '../../../../../common';
 import { useInventoryBadges, usePurse, useSessionInfo } from '../../../../../hooks';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 
@@ -13,7 +13,8 @@ interface ColourOption {
 }
 
 const VIP_COLOURS: ColourOption[] = [
-    { id: 'rainbow', name: 'Rainbow', hex: '#ec4899', isRainbow: true },
+    { id: '', name: 'Predeterminado', hex: '#0f172a' },
+    { id: 'rainbow', name: 'Rainbow (Arcoíris)', hex: '#ec4899', isRainbow: true },
     { id: 'gold', name: 'Oro Imperial', hex: '#eab308' },
     { id: 'cyan', name: 'Cian Eléctrico', hex: '#06b6d4' },
     { id: 'red', name: 'Rojo Pasión', hex: '#ef4444' },
@@ -34,6 +35,8 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
     const [ unlockedColours, setUnlockedColours ] = useState<string[]>([]);
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
     const [ message, setMessage ] = useState<string>('');
+    const [ messageType, setMessageType ] = useState<'success' | 'danger'>('success');
+    
     const { purse = null, getClubMemberLevel = null } = usePurse();
     const { badgeCodes = [] } = useInventoryBadges();
     const { userInfo = null } = useSessionInfo();
@@ -46,6 +49,7 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
     }, [ purse, getClubMemberLevel, badgeCodes ]);
 
     const username = userInfo?.username || 'Usuario';
+    const userFigure = userInfo?.figure || '';
 
     const fetchStatus = () => {
         fetch('/api/catalog/user-vip-status')
@@ -55,7 +59,11 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
             })
             .then(data => {
                 if (data && data.success) {
-                    if (data.active_colour) setActiveColourId(data.active_colour);
+                    if (data.active_colour !== undefined) {
+                        setActiveColourId(data.active_colour || '');
+                        const found = VIP_COLOURS.find(c => c.id === (data.active_colour || ''));
+                        if (found) setSelectedColour(found);
+                    }
                     if (data.unlocked_colours) setUnlockedColours(data.unlocked_colours);
                 }
             })
@@ -66,13 +74,9 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
         fetchStatus();
     }, []);
 
-    const openStore = () => {
-        window.open('/tienda', '_blank');
-    };
-
     const isOwned = useMemo(() => {
         if (!selectedColour) return false;
-        return unlockedColours.includes(selectedColour.id) || isVip;
+        return selectedColour.id === '' || unlockedColours.includes(selectedColour.id) || isVip;
     }, [ selectedColour, unlockedColours, isVip ]);
 
     const isCurrentlyEquipped = useMemo(() => {
@@ -86,7 +90,6 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
 
         try {
             if (isOwned) {
-                // Activate without charging
                 const res = await fetch('/api/catalog/activate-vip-item', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -98,12 +101,13 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
                 const data = await res.json();
                 if (data.success) {
                     setActiveColourId(selectedColour.id);
-                    setMessage('¡Color equipado con éxito!');
+                    setMessage('¡Color de nombre equipado con éxito!');
+                    setMessageType('success');
                 } else {
-                    setMessage(data.error || 'Error al equipar');
+                    setMessage(data.error || 'Error al equipar el color.');
+                    setMessageType('danger');
                 }
             } else {
-                // Buy and activate
                 const res = await fetch('/api/catalog/buy-vip-item', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -118,121 +122,157 @@ export const CatalogLayoutHabbtenVipColoursView: FC<CatalogLayoutProps> = props 
                     setActiveColourId(selectedColour.id);
                     setUnlockedColours(prev => [ ...prev, selectedColour.id ]);
                     setMessage('¡Color comprado y activado!');
+                    setMessageType('success');
                 } else {
                     setMessage(data.error || 'Error en la compra');
+                    setMessageType('danger');
                 }
             }
         } catch (e) {
-            setMessage('Error de conexión.');
+            setMessage('Error de conexión con el servidor.');
+            setMessageType('danger');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    if(!isVip) {
-        return (
-            <Column fullHeight center justifyContent="center" className="p-4 text-center bg-gray-50 rounded-lg">
-                <div className="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mb-3 mx-auto shadow-sm">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                    </svg>
-                </div>
-                <Text fontWeight="bold" fontSize={ 4 } className="text-gray-900 mb-1">
-                    Zona Exclusiva para Miembros Habbten VIP
-                </Text>
-                <Text className="text-xs text-gray-600 max-w-md mx-auto mb-4">
-                    Esta subsección requiere una suscripción activa a <b>Habbten VIP</b> para personalizar el color de tu nombre de usuario con tonos prémium y efectos como Rainbow.
-                </Text>
-                <Button variant="success" onClick={ openStore } className="px-6 py-2">
-                    Adquirir Habbten VIP
-                </Button>
-            </Column>
-        );
-    }
-
     return (
-        <Grid>
-            <Column fullHeight size={ 7 } overflow="hidden" justifyContent="between">
-                <AutoGrid columnCount={ 5 } className="p-1">
-                    { VIP_COLOURS.map(c => (
-                        <LayoutGridItem
-                            key={ c.id }
-                            center
-                            alignItems="center"
-                            justifyContent="center"
-                            itemActive={ selectedColour?.id === c.id }
-                            className="cursor-pointer"
-                            onClick={ () => { setSelectedColour(c); setMessage(''); } }
-                        >
-                            <div
-                                style={ {
-                                    width: 26,
-                                    height: 26,
-                                    borderRadius: '50%',
-                                    background: c.isRainbow ? 'linear-gradient(135deg, #ef4444, #eab308, #10b981, #06b6d4, #8b5cf6)' : c.hex,
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.25)',
-                                    border: '1px solid rgba(0,0,0,0.1)'
-                                } }
-                            />
-                        </LayoutGridItem>
-                    )) }
-                </AutoGrid>
+        <Grid className="p-1">
+            <Column fullHeight size={ 6 } gap={ 2 } overflow="hidden">
+                <Column gap={ 1 }>
+                    <Text fontWeight="bold" fontSize={ 5 }>Personaliza el Color de tu Nombre</Text>
+                    <Text className="text-xs text-muted">
+                        Elige un color exclusivo para destacar tu nombre de usuario en el chat y salas del hotel.
+                    </Text>
+                </Column>
+
+                <Column gap={ 1 }>
+                    <Flex justifyContent="between" alignItems="center">
+                        <Text fontWeight="bold" fontSize={ 6 }>Paleta de Colores VIP:</Text>
+                        <span className="badge bg-secondary text-xs">{ selectedColour.name }</span>
+                    </Flex>
+                    <div className="d-flex flex-wrap gap-2 p-2 rounded" style={ { background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)' } }>
+                        { VIP_COLOURS.map(color => {
+                            const isSelected = selectedColour.id === color.id;
+                            const isEquipped = activeColourId === color.id;
+                            return (
+                                <button
+                                    key={ color.id }
+                                    type="button"
+                                    title={ color.name }
+                                    onClick={ () => { setSelectedColour(color); setMessage(''); } }
+                                    className="p-0 border-0 cursor-pointer position-relative"
+                                    style={ {
+                                        width: 26,
+                                        height: 26,
+                                        borderRadius: '50%',
+                                        background: color.isRainbow 
+                                            ? 'linear-gradient(135deg, #ef4444, #eab308, #10b981, #3b82f6, #a855f7)'
+                                            : color.hex,
+                                        outline: isSelected ? '2px solid #0284c7' : '1px solid rgba(0,0,0,0.2)',
+                                        outlineOffset: 2,
+                                        transition: 'transform 0.15s ease'
+                                    } }
+                                >
+                                    { isEquipped && (
+                                        <span
+                                            style={ {
+                                                position: 'absolute',
+                                                bottom: -2,
+                                                right: -2,
+                                                width: 10,
+                                                height: 10,
+                                                borderRadius: '50%',
+                                                background: '#10b981',
+                                                border: '1px solid #ffffff'
+                                            } }
+                                        />
+                                    ) }
+                                </button>
+                            );
+                        }) }
+                    </div>
+                </Column>
+
+                <Column gap={ 1 }>
+                    <Text className="text-xs text-muted">
+                        El color se aplicará inmediatamente a tu nombre en los mensajes del chat y perfil.
+                    </Text>
+                </Column>
             </Column>
 
-            <Column size={ 5 } overflow="hidden" justifyContent="between">
-                { selectedColour && (
-                    <Column fullHeight center justifyContent="between" className="text-center p-3 bg-gray-50 rounded-lg">
-                        <Column center gap={ 2 } fullWidth>
-                            <Text fontWeight="bold" fontSize={ 4 }>{ selectedColour.name }</Text>
-                            <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex items-center justify-center">
-                                <Text fontSize={ 5 } className="text-gray-800 font-medium">
-                                    Vista Previa: { ' ' }
-                                    <span
-                                        style={ {
-                                            fontWeight: 'bold',
-                                            fontSize: 16,
-                                            color: selectedColour.isRainbow ? '#ec4899' : selectedColour.hex,
-                                            textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                                        } }
-                                    >
-                                        { selectedColour.isRainbow ? (
-                                            username.split('').map((char, i) => {
-                                                const rainbowPalette = ['#ef4444', '#f97316', '#eab308', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6'];
-                                                return <span key={ i } style={ { color: rainbowPalette[i % rainbowPalette.length] } }>{ char }</span>;
-                                            })
-                                        ) : (
-                                            username
-                                        ) }
-                                    </span>
-                                </Text>
+            <Column size={ 6 } overflow="hidden" justifyContent="between" gap={ 2 }>
+                <Column gap={ 2 } className="pt-1">
+                    <Text fontWeight="bold" fontSize={ 5 } center>Vista Previa en Chat</Text>
+                    
+                    <div
+                        className="p-2 rounded shadow-sm"
+                        style={ {
+                            background: '#ffffff',
+                            border: '1px solid #cbd5e1',
+                            minHeight: 70,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6
+                        } }
+                    >
+                        { userFigure && (
+                            <div style={ { width: 32, height: 32, overflow: 'hidden', flexShrink: 0 } }>
+                                <LayoutAvatarImageView figure={ userFigure } headOnly={ true } direction={ 2 } />
                             </div>
-                            <Flex alignItems="center" justifyContent="center" gap={ 1 } className="my-1">
-                                <Text fontWeight="bold" fontSize={ 5 }>Precio: 30</Text>
-                                <LayoutCurrencyIcon type={ 5 } />
-                            </Flex>
-                            { message ? (
-                                <Text className="text-xs font-semibold text-emerald-600">
-                                    { message }
-                                </Text>
-                            ) : (
-                                <Text className="text-xs text-gray-500">
-                                    { isCurrentlyEquipped ? 'Este color está actualmente activo en tu usuario.' : (isOwned ? 'Color disponible en tu membresía VIP.' : 'Haz clic en comprar para adquirirlo.') }
-                                </Text>
-                            ) }
-                        </Column>
-                        <Column fullWidth gap={ 1 }>
+                        ) }
+                        <div className="d-flex flex-wrap align-items-center gap-1 text-sm">
+                            <span
+                                style={ {
+                                    fontWeight: 'bold',
+                                    color: selectedColour.isRainbow ? '#ec4899' : (selectedColour.id ? selectedColour.hex : '#0f172a'),
+                                    background: selectedColour.isRainbow 
+                                        ? 'linear-gradient(90deg, #ef4444, #eab308, #10b981, #3b82f6, #a855f7)'
+                                        : 'transparent',
+                                    WebkitBackgroundClip: selectedColour.isRainbow ? 'text' : undefined,
+                                    WebkitTextFillColor: selectedColour.isRainbow ? 'transparent' : undefined
+                                } }
+                            >
+                                { username }:
+                            </span>
+                            <span style={ { color: '#334155' } }>¡Así lucirá mi nombre en Habbten!</span>
+                        </div>
+                    </div>
+
+                    { isVip ? (
+                        <Column gap={ 1 }>
                             { isCurrentlyEquipped ? (
                                 <Button fullWidth variant="secondary" disabled>
-                                    Color Equipado ✓
+                                    Color Actualmente Activo ✓
                                 </Button>
                             ) : (
-                                <Button fullWidth variant="success" disabled={ isSubmitting } onClick={ handleAction }>
-                                    { isSubmitting ? 'Procesando...' : (isOwned ? 'Equipar Color' : 'Comprar y Activar') }
+                                <Button fullWidth variant="success" onClick={ handleAction } disabled={ isSubmitting }>
+                                    { isSubmitting ? 'Guardando...' : (isOwned ? 'Equipar Color' : 'Comprar y Activar') }
                                 </Button>
                             ) }
+                            { message && (
+                                <Text center className={ `text-xs ${ messageType === 'success' ? 'text-success fw-bold' : 'text-danger fw-bold' }` }>
+                                    { message }
+                                </Text>
+                            ) }
+                            <Text center className="text-xs text-muted mt-1">
+                                Comandos rápidos: <b>:namecolor [color]</b> o <b>:color [color]</b>
+                            </Text>
                         </Column>
-                    </Column>
-                ) }
+                    ) : (
+                        <Column gap={ 1 } center className="p-2 bg-warning-subtle rounded border border-warning text-center">
+                            <Text fontWeight="bold" className="text-warning-emphasis text-xs">
+                                ⭐ Exclusivo para Habbten VIP
+                            </Text>
+                            <Text className="text-xs text-secondary">
+                                Activa tu membresía VIP para personalizar el color de tu nombre con paletas y efectos únicos.
+                            </Text>
+                            <Button fullWidth variant="primary" className="btn-sm" onClick={ () => window.open('/tienda', '_blank') }>
+                                Obtener Habbten VIP
+                            </Button>
+                        </Column>
+                    ) }
+                </Column>
             </Column>
         </Grid>
     );

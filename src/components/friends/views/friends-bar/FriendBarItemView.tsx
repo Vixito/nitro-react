@@ -44,7 +44,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
         );
     }
 
-    const isAvatar = (friend.id > 0 || friend.figure?.includes('hd-') || friend.figure?.includes('hr-'));
+    const isAvatar = (friend.id > 0);
 
     return (
         <div 
@@ -60,7 +60,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
         >
             <div className={ `friend-bar-item-head position-absolute ${ isAvatar ? 'avatar': 'group' }` }>
                 { isAvatar && <LayoutAvatarImageView headOnly={ true } figure={ friend.figure } direction={ 2 } /> }
-                { !isAvatar && <LayoutBadgeImageView isGroup={ true } badgeCode={ friend.figure } /> } 
+                { !isAvatar && <LayoutBadgeImageView isGroup={ false } badgeCode={ friend.figure || 'ADM' } /> } 
             </div>
             <div className="text-truncate">{ friend.name }</div>
             { isVisible && friend.id > 0 &&
