@@ -15,7 +15,8 @@ export const CatalogIconView: FC<CatalogIconViewProps> = props =>
     {
         const iconTemplate = GetConfiguration<string>('catalog.asset.icon.url', 'http://127.0.0.1:1080/game/swf/c_images/catalogue/icon_%name%.png');
         if(!iconTemplate) return null;
-        return iconTemplate.replace('%name%', icon.toString());
+        const url = iconTemplate.replace('%name%', icon.toString());
+        return `${url}?v=2`;
     }, [ icon ]);
 
     if(!getIconUrl) return null;
