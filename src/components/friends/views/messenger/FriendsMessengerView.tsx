@@ -122,9 +122,8 @@ export const FriendsMessengerView: FC<{}> = props =>
                                             <LayoutItemCountView count={ thread.unreadCount } /> }
                                             <Flex fullWidth alignItems="center" gap={ 1 }>
                                                 <Flex alignItems="center" className="friend-head px-1">
-                                                    { (thread.participant.id > 0) &&
-                                                    <LayoutAvatarImageView figure={ thread.participant.figure } headOnly={ true } direction={ 3 } /> }
-                                                    { (thread.participant.id <= 0) &&
+                                                    { (thread.participant.id > 0 || thread.participant.figure?.includes('hd-') || thread.participant.figure?.includes('hr-')) ?
+                                                    <LayoutAvatarImageView figure={ thread.participant.figure } headOnly={ true } direction={ 3 } /> :
                                                     <LayoutBadgeImageView isGroup={ true } badgeCode={ thread.participant.figure } /> }
                                                 </Flex>
                                                 <Text truncate grow>{ thread.participant.name }</Text>

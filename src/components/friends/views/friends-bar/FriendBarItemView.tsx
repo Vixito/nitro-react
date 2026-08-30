@@ -44,14 +44,26 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
         );
     }
 
+    const isAvatar = (friend.id > 0 || friend.figure?.includes('hd-') || friend.figure?.includes('hr-'));
+
     return (
-        <div ref={ elementRef } className={ 'btn btn-success friend-bar-item ' + (isVisible ? 'friend-bar-item-active' : '') } onClick={ event => setVisible(prevValue => !prevValue) }>
-            <div className={ `friend-bar-item-head position-absolute ${ friend.id > 0 ? 'avatar': 'group' }` }>
-                { (friend.id > 0) && <LayoutAvatarImageView headOnly={ true } figure={ friend.figure } direction={ 2 } /> }
-                { (friend.id <= 0) && <LayoutBadgeImageView isGroup={ true } badgeCode={ friend.figure } /> } 
+        <div 
+            ref={ elementRef } 
+            className={ 'btn btn-success friend-bar-item ' + (isVisible ? 'friend-bar-item-active' : '') } 
+            onClick={ event => {
+                if(friend.id <= 0) {
+                    OpenMessengerChat(friend.id);
+                } else {
+                    setVisible(prevValue => !prevValue);
+                }
+            } }
+        >
+            <div className={ `friend-bar-item-head position-absolute ${ isAvatar ? 'avatar': 'group' }` }>
+                { isAvatar && <LayoutAvatarImageView headOnly={ true } figure={ friend.figure } direction={ 2 } /> }
+                { !isAvatar && <LayoutBadgeImageView isGroup={ true } badgeCode={ friend.figure } /> } 
             </div>
             <div className="text-truncate">{ friend.name }</div>
-            { isVisible &&
+            { isVisible && friend.id > 0 &&
             <div className="d-flex justify-content-between">
                 <Base className="nitro-friends-spritesheet icon-friendbar-chat cursor-pointer" onClick={ event => OpenMessengerChat(friend.id) } />
                 { friend.followingAllowed &&
