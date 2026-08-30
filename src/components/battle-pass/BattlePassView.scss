@@ -144,12 +144,15 @@
 
     /* Quick Mission Horizontal Scroll Item */
     .bp-quick-mission-card {
-        min-width: 260px;
-        max-width: 260px;
+        width: 275px;
+        min-width: 275px;
+        max-width: 275px;
+        box-sizing: border-box;
+        overflow: hidden;
         background: #f8fafc;
         border: 1.5px solid #e2e8f0;
         border-radius: 6px;
-        padding: 8px 12px;
+        padding: 8px 10px;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -162,7 +165,8 @@
         overflow-y: hidden;
         display: flex;
         gap: 8px;
-        padding-bottom: 4px;
+        padding: 4px 6px 8px 4px;
+        box-sizing: border-box;
 
         &::-webkit-scrollbar {
             height: 5px;

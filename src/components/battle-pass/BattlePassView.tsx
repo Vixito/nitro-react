@@ -605,11 +605,11 @@ export const BattlePassView: FC<{}> = () =>
                                             <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px', padding: '2px 5px' } }>{ m.progress }/{ m.task }</span>
                                         </div>
                                         <div className="flex-grow-1 min-w-0">
-                                            <div className="d-flex align-items-center justify-content-between">
-                                                <span className="fw-bold text-dark text-truncate" style={ { fontSize: '13px' } }>{ m.name.toUpperCase() }</span>
-                                                <span className="badge bg-danger text-white fw-bold px-2 py-0.5 rounded-1" style={ { fontSize: '10px' } }>+{ m.reward_xp } XP</span>
+                                            <div className="d-flex align-items-center justify-content-between gap-1 mb-0.5">
+                                                <span className="fw-bold text-dark text-truncate" style={ { fontSize: '12px' } } title={ m.name.toUpperCase() }>{ m.name.toUpperCase() }</span>
+                                                <span className="badge bg-danger text-white fw-bold px-1.5 py-0.5 rounded-1 flex-shrink-0" style={ { fontSize: '10px', whiteSpace: 'nowrap' } }>+{ m.reward_xp } XP</span>
                                             </div>
-                                            <div className="text-muted text-truncate" style={ { fontSize: '12px' } }>{ m.description }</div>
+                                            <div className="text-muted text-truncate" style={ { fontSize: '11px' } } title={ m.description }>{ m.description }</div>
                                         </div>
                                     </div>
                                 )) : (
