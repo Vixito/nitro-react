@@ -1,6 +1,6 @@
 import { GetGuestRoomResultEvent, NavigatorSearchComposer, RateFlatMessageComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
-import { CreateLinkEvent, GetRoomEngine, LocalizeText, SendMessageComposer } from '../../../../api';
+import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Base, classNames, Column, Flex, Text, TransitionAnimation, TransitionAnimationTypes } from '../../../../common';
 import { useMessageEvent, useNavigator, useRoom } from '../../../../hooks';
 
@@ -13,6 +13,8 @@ export const RoomToolsWidgetView: FC<{}> = props =>
     const [ isOpen, setIsOpen ] = useState<boolean>(false);
     const { navigatorData = null } = useNavigator();
     const { roomSession = null } = useRoom();
+
+    const isOwner = (roomOwner && GetSessionDataManager().userName && roomOwner.toLowerCase() === GetSessionDataManager().userName.toLowerCase()) || (roomSession && roomSession.isRoomOwner);
 
     const handleToolClick = (action: string, value?: string) =>
     {
@@ -38,6 +40,7 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                 CreateLinkEvent('chat-history/toggle');
                 return;
             case 'like_room':
+                if(isOwner) return;
                 SendMessageComposer(new RateFlatMessageComposer(1));
                 return;
             case 'toggle_room_link':
@@ -76,8 +79,9 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                 <Base pointer title={ LocalizeText('room.settings.button.text') } className="icon icon-cog" onClick={ () => handleToolClick('settings') } />
                 <Base pointer title={ LocalizeText('room.zoom.button.text') } onClick={ () => handleToolClick('zoom') } className={ classNames('icon', (!isZoomedIn && 'icon-zoom-less'), (isZoomedIn && 'icon-zoom-more')) } />
                 <Base pointer title={ LocalizeText('room.chathistory.button.text') } onClick={ () => handleToolClick('chat_history') } className="icon icon-chat-history" />
-                { navigatorData.canRate &&
+                { (navigatorData.canRate && !isOwner) &&
                     <Base pointer title={ LocalizeText('room.like.button.text') } onClick={ () => handleToolClick('like_room') } className="icon icon-like-room" /> }
+                <Base pointer title={ LocalizeText('navigator.embed.src') } onClick={ () => handleToolClick('toggle_room_link') } className="icon icon-link-room" />
             </Column>
             <Column justifyContent="center">
                 <TransitionAnimation type={ TransitionAnimationTypes.SLIDE_LEFT } inProp={ isOpen } timeout={ 300 }>

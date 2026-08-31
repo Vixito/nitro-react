@@ -117,6 +117,9 @@ export const FriendsListView: FC<{}> = props =>
         return () => RemoveLinkEventTracker(linkTracker);
     }, [ requestFriend ]);
 
+    const onlineFriendsCount = useMemo(() => onlineFriends.filter(f => f.id > 0 && f.name !== 'Staff Chat').length, [ onlineFriends ]);
+    const offlineFriendsCount = useMemo(() => offlineFriends.filter(f => f.id > 0 && f.name !== 'Staff Chat').length, [ offlineFriends ]);
+
     if(!isVisible) return null;
 
     return (
@@ -125,10 +128,10 @@ export const FriendsListView: FC<{}> = props =>
                 <NitroCardHeaderView headerText={ LocalizeText('friendlist.friends') } onCloseClick={ event => setIsVisible(false) } />
                 <NitroCardContentView overflow="hidden" gap={ 1 } className="text-black p-0">
                     <NitroCardAccordionView fullHeight overflow="hidden">
-                        <NitroCardAccordionSetView headerText={ LocalizeText('friendlist.friends') + ` (${ onlineFriends.length })` } isExpanded={ true }>
+                        <NitroCardAccordionSetView headerText={ LocalizeText('friendlist.friends') + ` (${ onlineFriendsCount })` } isExpanded={ true }>
                             <FriendsListGroupView list={ onlineFriends } selectedFriendsIds={ selectedFriendsIds } selectFriend={ selectFriend } />
                         </NitroCardAccordionSetView>
-                        <NitroCardAccordionSetView headerText={ LocalizeText('friendlist.friends.offlinecaption') + ` (${ offlineFriends.length })` }>
+                        <NitroCardAccordionSetView headerText={ LocalizeText('friendlist.friends.offlinecaption') + ` (${ offlineFriendsCount })` }>
                             <FriendsListGroupView list={ offlineFriends } selectedFriendsIds={ selectedFriendsIds } selectFriend={ selectFriend } />
                         </NitroCardAccordionSetView>
                         <FriendsListRequestView headerText={ LocalizeText('friendlist.tab.friendrequests') + ` (${ requests.length })` } isExpanded={ true } />

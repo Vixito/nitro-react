@@ -338,8 +338,16 @@ export const BattlePassView: FC<{}> = () =>
         return reachedCount * 76;
     }, [ bpData.rewards, bpData.user.level ]);
 
-    const completedMissions = bpData.missions.filter(m => m.completed);
-    const pendingMissions = bpData.missions.filter(m => !m.completed);
+    const [ missionFilter, setMissionFilter ] = useState<'all' | 'in_progress' | 'completed'>('in_progress');
+
+    const pendingMissions = useMemo(() => bpData.missions.filter(m => (m.progress || 0) < m.task), [ bpData.missions ]);
+    const completedMissions = useMemo(() => bpData.missions.filter(m => (m.progress || 0) >= m.task), [ bpData.missions ]);
+
+    const displayedMissions = useMemo(() => {
+        if (missionFilter === 'all') return bpData.missions;
+        if (missionFilter === 'completed') return completedMissions;
+        return pendingMissions;
+    }, [ missionFilter, bpData.missions, completedMissions, pendingMissions ]);
 
     const categoryTitles: { [key: number]: string } = {
         1: 'PRIMEROS RETOS',
@@ -592,17 +600,24 @@ export const BattlePassView: FC<{}> = () =>
                     <div className="col-12 col-md-6">
                         <div className="bp-card-box h-100 d-flex flex-column justify-content-between">
                             <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="bp-box-header-title">RETOS POR COMPLETAR ({ pendingMissions.length })</span>
+                                <div className="d-flex align-items-center gap-1.5">
+                                    <span className="bp-box-header-title">RETOS ({ displayedMissions.length })</span>
+                                    <div className="btn-group btn-group-sm">
+                                        <button type="button" className={ `btn btn-xs ${ missionFilter === 'all' ? 'btn-primary' : 'btn-outline-secondary' }` } style={ { fontSize: '10px', padding: '1px 6px' } } onClick={ () => setMissionFilter('all') }>Todas</button>
+                                        <button type="button" className={ `btn btn-xs ${ missionFilter === 'in_progress' ? 'btn-primary' : 'btn-outline-secondary' }` } style={ { fontSize: '10px', padding: '1px 6px' } } onClick={ () => setMissionFilter('in_progress') }>En progreso</button>
+                                        <button type="button" className={ `btn btn-xs ${ missionFilter === 'completed' ? 'btn-primary' : 'btn-outline-secondary' }` } style={ { fontSize: '10px', padding: '1px 6px' } } onClick={ () => setMissionFilter('completed') }>Completado</button>
+                                    </div>
+                                </div>
                                 <span className="badge bg-primary text-white" style={ { fontSize: '12px' } }>{ completedMissions.length }/{ bpData.missions.length }</span>
                             </div>
                             <div className="bp-missions-horizontal-track flex-grow-1 align-items-center">
-                                { pendingMissions.length > 0 ? pendingMissions.map(m => (
+                                { displayedMissions.length > 0 ? displayedMissions.map(m => (
                                     <div key={ m.id } className="bp-quick-mission-card">
                                         <div className="d-flex flex-column align-items-center flex-shrink-0">
                                             <div className="p-1 rounded bg-white border d-flex align-items-center justify-content-center" style={ { width: 44, height: 44 } }>
                                                 <MissionImage image={ m.image } category={ m.category } alt={ m.name } />
                                             </div>
-                                            <span className="badge bg-danger text-white mt-1" style={ { fontSize: '10px', padding: '2px 5px' } }>{ m.progress }/{ m.task }</span>
+                                            <span className={ `badge ${ (m.progress || 0) >= m.task ? 'bg-success' : 'bg-danger' } text-white mt-1` } style={ { fontSize: '10px', padding: '2px 5px' } }>{ Math.min(m.progress || 0, m.task) }/{ m.task }</span>
                                         </div>
                                         <div className="flex-grow-1 min-w-0">
                                             <div className="d-flex align-items-center justify-content-between gap-1 mb-0.5">
@@ -613,7 +628,7 @@ export const BattlePassView: FC<{}> = () =>
                                         </div>
                                     </div>
                                 )) : (
-                                    <div className="text-center text-muted py-2 w-100" style={ { fontSize: '13px' } }>¡Has completado todos los retos activos!</div>
+                                    <div className="text-center text-muted py-2 w-100" style={ { fontSize: '13px' } }>No hay retos en esta categoría.</div>
                                 ) }
                             </div>
                         </div>

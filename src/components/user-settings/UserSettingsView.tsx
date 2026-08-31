@@ -12,6 +12,10 @@ export const UserSettingsView: FC<{}> = props =>
     const [ catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects ] = useCatalogPlaceMultipleItems();
     const [ catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation ] = useCatalogSkipPurchaseConfirmation();
     const [ infinitePermissions, setInfinitePermissions ] = useState<{ credits: { rankHas: boolean, enabled: boolean }, pixels: { rankHas: boolean, enabled: boolean }, points: { rankHas: boolean, enabled: boolean } }>(null);
+    const [ showDiscordModal, setShowDiscordModal ] = useState(false);
+    const [ discordTag, setDiscordTag ] = useState(localStorage.getItem('habbten_discord_tag') || '');
+    const [ isDiscordConnected, setIsDiscordConnected ] = useState(!!localStorage.getItem('habbten_discord_tag'));
+    const [ discordStatusMsg, setDiscordStatusMsg ] = useState('');
 
     const loadInfinitePermissions = async () =>
     {
@@ -198,6 +202,11 @@ export const UserSettingsView: FC<{}> = props =>
                         <input className="form-check-input" type="checkbox" checked={ catalogSkipPurchaseConfirmation } onChange={ event => setCatalogSkipPurchaseConfirmation(event.target.checked) } />
                         <Text>{ LocalizeText('memenu.settings.other.skip.purchase.confirmation') }</Text>
                     </Flex>
+                    <HorizontalRule />
+                    <Button variant="primary" className="d-flex align-items-center justify-content-center gap-2 py-1.5" onClick={ () => setShowDiscordModal(true) }>
+                        <span style={ { fontSize: '14px' } }>🎮</span>
+                        <Text bold variant="white">Conectar a Discord</Text>
+                    </Button>
                     { infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) &&
                         <>
                             <HorizontalRule />
@@ -251,5 +260,68 @@ export const UserSettingsView: FC<{}> = props =>
                 </Column>
             </NitroCardContentView>
         </NitroCardView>
+        { showDiscordModal && (
+            <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={ { zIndex: 1050, width: 380 } }>
+                <NitroCardHeaderView headerText="Conecta Habbten a Discord" onCloseClick={ () => setShowDiscordModal(false) } />
+                <NitroCardContentView className="p-3">
+                    <div className="d-flex align-items-center gap-2 mb-2 p-2 rounded bg-primary text-white">
+                        <div style={ { fontSize: '28px' } }>🎮</div>
+                        <div>
+                            <div className="fw-bold" style={ { fontSize: '13px' } }>Comunidad Gamer de Habbten</div>
+                            <div className="small opacity-75">¡Conecta tu cuenta para compartir tu actividad y recibir novedades!</div>
+                        </div>
+                    </div>
+
+                    <div className="mb-3 p-2 border rounded bg-light">
+                        <div className="fw-bold text-dark mb-1" style={ { fontSize: '12px' } }>Paso 1: Únete a nuestro Servidor</div>
+                        <div className="small text-muted mb-2">Entra al servidor oficial de Discord de Habbten para formar parte de la comunidad.</div>
+                        <a href="https://discord.gg/habbten" target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-1">
+                            <span>🚀</span> Unirse al Discord de Habbten
+                        </a>
+                    </div>
+
+                    <div className="p-2 border rounded bg-light mb-2">
+                        <div className="fw-bold text-dark mb-1" style={ { fontSize: '12px' } }>Paso 2: Escribe tu Nickname de Discord</div>
+                        <div className="small text-muted mb-2">Ingresa tu usuario de Discord para vincular tu cuenta con tu perfil de Habbten.</div>
+                        <div className="input-group input-group-sm mb-2">
+                            <span className="input-group-text">@</span>
+                            <input 
+                                type="text" 
+                                className="form-control" 
+                                placeholder="tu_usuario_discord" 
+                                value={ discordTag } 
+                                onChange={ e => setDiscordTag(e.target.value) } 
+                            />
+                        </div>
+                        <button 
+                            type="button" 
+                            className={ `btn btn-sm ${ isDiscordConnected ? 'btn-success' : 'btn-primary' } w-100 fw-bold` }
+                            onClick={ () => {
+                                if (discordTag.trim()) {
+                                    localStorage.setItem('habbten_discord_tag', discordTag.trim());
+                                    setIsDiscordConnected(true);
+                                    setDiscordStatusMsg('¡Cuenta de Discord vinculada correctamente!');
+                                    setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                } else {
+                                    localStorage.removeItem('habbten_discord_tag');
+                                    setIsDiscordConnected(false);
+                                    setDiscordStatusMsg('Se ha desvinculado la cuenta.');
+                                    setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                }
+                            } }
+                        >
+                            { isDiscordConnected ? '✓ Cuenta Vinculada (Actualizar)' : 'Vincular Cuenta' }
+                        </button>
+                    </div>
+
+                    { discordStatusMsg && (
+                        <div className="alert alert-success py-1 px-2 small text-center mb-0 rounded">
+                            { discordStatusMsg }
+                        </div>
+                    ) }
+                </NitroCardContentView>
+            </NitroCardView>
+        ) }
+        </>
     );
 }

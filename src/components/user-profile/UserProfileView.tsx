@@ -109,10 +109,14 @@ export const UserProfileView: FC<{}> = props =>
                             <FriendsContainerView relationships={ userRelationships } friendsCount={ userProfile.friendsCount } /> }
                     </Column>
                 </Grid>
-                <Flex alignItems="center" className="rooms-button-container px-2 py-1">
+                <Flex alignItems="center" justifyContent="between" className="rooms-button-container px-2 py-1 bg-light border rounded">
                     <Flex alignItems="center" gap={ 1 } onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
                         <i className="icon icon-rooms" />
                         <Text bold underline pointer>{ LocalizeText('extendedprofile.rooms') }</Text>
+                    </Flex>
+                    <Flex alignItems="center" gap={ 1 } onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                        <span style={ { fontSize: '13px' } }>⭐</span>
+                        <Text bold pointer className="text-primary">Nivel Pase: { userProfile.achievementScore ? Math.floor(userProfile.achievementScore / 100) + 1 : 1 }</Text>
                     </Flex>
                 </Flex>
                 <GroupsContainerView fullWidth itsMe={ userProfile.id === GetSessionDataManager().userId } groups={ userProfile.groups } onLeaveGroup={ onLeaveGroup } />
