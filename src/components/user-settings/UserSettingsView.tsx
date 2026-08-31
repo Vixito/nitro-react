@@ -5,65 +5,55 @@ import { AddEventLinkTracker, DispatchMainEvent, DispatchUiEvent, LocalizeText, 
 import { Button, classNames, Column, Flex, HorizontalRule, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
 import { useCatalogPlaceMultipleItems, useCatalogSkipPurchaseConfirmation, useMessageEvent } from '../../hooks';
 
-export const UserSettingsView: FC<{}> = props =>
-{
-    const [ isVisible, setIsVisible ] = useState(false);
-    const [ userSettings, setUserSettings ] = useState<NitroSettingsEvent>(null);
-    const [ catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects ] = useCatalogPlaceMultipleItems();
-    const [ catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation ] = useCatalogSkipPurchaseConfirmation();
-    const [ infinitePermissions, setInfinitePermissions ] = useState<{ credits: { rankHas: boolean, enabled: boolean }, pixels: { rankHas: boolean, enabled: boolean }, points: { rankHas: boolean, enabled: boolean } }>(null);
-    const [ showDiscordModal, setShowDiscordModal ] = useState(false);
-    const [ discordTag, setDiscordTag ] = useState(localStorage.getItem('habbten_discord_tag') || '');
-    const [ isDiscordConnected, setIsDiscordConnected ] = useState(!!localStorage.getItem('habbten_discord_tag'));
-    const [ discordStatusMsg, setDiscordStatusMsg ] = useState('');
+export const UserSettingsView: FC<{}> = props => {
+    const [isVisible, setIsVisible] = useState(false);
+    const [userSettings, setUserSettings] = useState<NitroSettingsEvent>(null);
+    const [catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects] = useCatalogPlaceMultipleItems();
+    const [catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
+    const [infinitePermissions, setInfinitePermissions] = useState<{ credits: { rankHas: boolean, enabled: boolean }, pixels: { rankHas: boolean, enabled: boolean }, points: { rankHas: boolean, enabled: boolean } }>(null);
+    const [showDiscordModal, setShowDiscordModal] = useState(false);
+    const [discordTag, setDiscordTag] = useState(localStorage.getItem('habbten_discord_tag') || '');
+    const [isDiscordConnected, setIsDiscordConnected] = useState(!!localStorage.getItem('habbten_discord_tag'));
+    const [discordStatusMsg, setDiscordStatusMsg] = useState('');
 
-    const loadInfinitePermissions = async () =>
-    {
-        try
-        {
+    const loadInfinitePermissions = async () => {
+        try {
             const response = await fetch('/api/user/permissions');
 
-            if(response.ok)
-            {
+            if (response.ok) {
                 const data = await response.json();
 
-                if(data.success) setInfinitePermissions(data.permissions);
+                if (data.success) setInfinitePermissions(data.permissions);
             }
         }
-        catch(e)
-        {
+        catch (e) {
             // ignore
         }
     };
 
-    const toggleInfinitePermission = async (name: string, enabled: boolean) =>
-    {
-        if(!infinitePermissions || !infinitePermissions[name]) return;
+    const toggleInfinitePermission = async (name: string, enabled: boolean) => {
+        if (!infinitePermissions || !infinitePermissions[name]) return;
 
-        setInfinitePermissions(prevValue => ({ ...prevValue, [ name ]: { ...prevValue[ name ], enabled } }));
+        setInfinitePermissions(prevValue => ({ ...prevValue, [name]: { ...prevValue[name], enabled } }));
 
-        try
-        {
+        try {
             await fetch('/api/user/permissions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ [ name ]: enabled })
+                body: JSON.stringify({ [name]: enabled })
             });
         }
-        catch(e)
-        {
-            setInfinitePermissions(prevValue => ({ ...prevValue, [ name ]: { ...prevValue[ name ], enabled: !enabled } }));
+        catch (e) {
+            setInfinitePermissions(prevValue => ({ ...prevValue, [name]: { ...prevValue[name], enabled: !enabled } }));
         }
     };
 
-    const processAction = (type: string, value?: boolean | number | string) =>
-    {
+    const processAction = (type: string, value?: boolean | number | string) => {
         let doUpdate = true;
 
         const clone = userSettings.clone();
 
-        switch(type)
-        {
+        switch (type) {
             case 'close_view':
                 setIsVisible(false);
                 doUpdate = false;
@@ -97,23 +87,20 @@ export const UserSettingsView: FC<{}> = props =>
                 break;
         }
 
-        if(doUpdate) setUserSettings(clone);
-        
+        if (doUpdate) setUserSettings(clone);
+
         DispatchMainEvent(clone)
     }
 
-    const saveRangeSlider = (type: string) =>
-    {
-        switch(type)
-        {
+    const saveRangeSlider = (type: string) => {
+        switch (type) {
             case 'volume':
                 SendMessageComposer(new UserSettingsSoundComposer(Math.round(userSettings.volumeSystem), Math.round(userSettings.volumeFurni), Math.round(userSettings.volumeTrax)));
                 break;
         }
     }
 
-    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, event =>
-    {
+    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, event => {
         const parser = event.getParser();
         const settingsEvent = new NitroSettingsEvent();
 
@@ -130,17 +117,14 @@ export const UserSettingsView: FC<{}> = props =>
         DispatchMainEvent(settingsEvent);
     });
 
-    useEffect(() =>
-    {
+    useEffect(() => {
         const linkTracker: ILinkEventTracker = {
-            linkReceived: (url: string) =>
-            {
+            linkReceived: (url: string) => {
                 const parts = url.split('/');
 
-                if(parts.length < 2) return;
-        
-                switch(parts[1])
-                {
+                if (parts.length < 2) return;
+
+                switch (parts[1]) {
                     case 'show':
                         setIsVisible(true);
                         loadInfinitePermissions();
@@ -149,11 +133,10 @@ export const UserSettingsView: FC<{}> = props =>
                         setIsVisible(false);
                         return;
                     case 'toggle':
-                        setIsVisible(prevValue =>
-                        {
+                        setIsVisible(prevValue => {
                             const newValue = !prevValue;
 
-                            if(newValue) loadInfinitePermissions();
+                            if (newValue) loadInfinitePermissions();
 
                             return newValue;
                         });
@@ -168,190 +151,213 @@ export const UserSettingsView: FC<{}> = props =>
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
-    useEffect(() =>
-    {
-        if(!userSettings) return;
+    useEffect(() => {
+        if (!userSettings) return;
 
         DispatchUiEvent(userSettings);
-    }, [ userSettings ]);
+    }, [userSettings]);
 
-    if(!isVisible || !userSettings) return null;
+    if (!isVisible || !userSettings) return null;
 
     return (
         <>
-        <NitroCardView uniqueKey="user-settings" className="user-settings-window" theme="primary-slim">
-            <NitroCardHeaderView headerText={ LocalizeText('widget.memenu.settings.title') } onCloseClick={ event => processAction('close_view') } />
-            <NitroCardContentView className="text-black">
-                <Column gap={ 1 }>
-                    <Flex alignItems="center" gap={ 1 }>
-                        <input className="form-check-input" type="checkbox" checked={ userSettings.oldChat } onChange={ event => processAction('oldchat', event.target.checked) } />
-                        <Text>{ LocalizeText('memenu.settings.chat.prefer.old.chat') }</Text>
-                    </Flex>
-                    <Flex alignItems="center" gap={ 1 }>
-                        <input className="form-check-input" type="checkbox" checked={ userSettings.roomInvites } onChange={ event => processAction('room_invites', event.target.checked) } />
-                        <Text>{ LocalizeText('memenu.settings.other.ignore.room.invites') }</Text>
-                    </Flex>
-                    <Flex alignItems="center" gap={ 1 }>
-                        <input className="form-check-input" type="checkbox" checked={ userSettings.cameraFollow } onChange={ event => processAction('camera_follow', event.target.checked) } />
-                        <Text>{ LocalizeText('memenu.settings.other.disable.room.camera.follow') }</Text>
-                    </Flex>
-                    <Flex alignItems="center" gap={ 1 }>
-                        <input className="form-check-input" type="checkbox" checked={ catalogPlaceMultipleObjects } onChange={ event => setCatalogPlaceMultipleObjects(event.target.checked) } />
-                        <Text>{ LocalizeText('memenu.settings.other.place.multiple.objects') }</Text>
-                    </Flex>
-                    <Flex alignItems="center" gap={ 1 }>
-                        <input className="form-check-input" type="checkbox" checked={ catalogSkipPurchaseConfirmation } onChange={ event => setCatalogSkipPurchaseConfirmation(event.target.checked) } />
-                        <Text>{ LocalizeText('memenu.settings.other.skip.purchase.confirmation') }</Text>
-                    </Flex>
-                    <HorizontalRule />
-                    <Button variant="primary" className="d-flex align-items-center justify-content-center gap-2 py-1.5" onClick={ () => setShowDiscordModal(true) }>
-                        <span style={ { fontSize: '14px' } }>🎮</span>
-                        <Text bold variant="white">Conectar a Discord</Text>
-                    </Button>
-                    { infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) &&
-                        <>
-                            <HorizontalRule />
-                            <Text bold>{ LocalizeText('memenu.settings.other.infinite.permissions.title') }</Text>
-                            { infinitePermissions.credits.rankHas &&
-                                <Flex alignItems="center" gap={ 1 }>
-                                    <input className="form-check-input" type="checkbox" checked={ infinitePermissions.credits.enabled } onChange={ event => toggleInfinitePermission('credits', event.target.checked) } />
-                                    <Text>{ LocalizeText('memenu.settings.other.infinite.credits') }</Text>
-                                </Flex> }
-                            { infinitePermissions.pixels.rankHas &&
-                                <Flex alignItems="center" gap={ 1 }>
-                                    <input className="form-check-input" type="checkbox" checked={ infinitePermissions.pixels.enabled } onChange={ event => toggleInfinitePermission('pixels', event.target.checked) } />
-                                    <Text>{ LocalizeText('memenu.settings.other.infinite.pixels') }</Text>
-                                </Flex> }
-                            { infinitePermissions.points.rankHas &&
-                                <Flex alignItems="center" gap={ 1 }>
-                                    <input className="form-check-input" type="checkbox" checked={ infinitePermissions.points.enabled } onChange={ event => toggleInfinitePermission('points', event.target.checked) } />
-                                    <Text>{ LocalizeText('memenu.settings.other.infinite.points') }</Text>
-                                </Flex> }
-                        </> }
-                </Column>
-                <Column>
-                    <Text bold>{ LocalizeText('widget.memenu.settings.volume') }</Text>
-                    <Column gap={ 1 }>
-                        <Text>{ LocalizeText('widget.memenu.settings.volume.ui') }</Text>
-                        <Flex alignItems="center" gap={ 1 }>
-                            { (userSettings.volumeSystem === 0) && <FaVolumeMute className={ classNames((userSettings.volumeSystem >= 50) && 'text-muted', 'fa-icon') } /> }
-                            { (userSettings.volumeSystem > 0) && <FaVolumeDown className={ classNames((userSettings.volumeSystem >= 50) && 'text-muted', 'fa-icon') } /> }
-                            <input type="range" className="custom-range w-100" min="0" max="100" step="1" id="volumeSystem" value={ userSettings.volumeSystem } onChange={ event => processAction('system_volume', event.target.value) } onMouseUp={ () => saveRangeSlider('volume') }/>
-                            <FaVolumeUp className={ classNames((userSettings.volumeSystem < 50) && 'text-muted', 'fa-icon') } />
+            <NitroCardView uniqueKey="user-settings" className="user-settings-window" theme="primary-slim">
+                <NitroCardHeaderView headerText={LocalizeText('widget.memenu.settings.title')} onCloseClick={event => processAction('close_view')} />
+                <NitroCardContentView className="text-black">
+                    <Column gap={1}>
+                        <Flex alignItems="center" gap={1}>
+                            <input className="form-check-input" type="checkbox" checked={userSettings.oldChat} onChange={event => processAction('oldchat', event.target.checked)} />
+                            <Text>{LocalizeText('memenu.settings.chat.prefer.old.chat')}</Text>
                         </Flex>
-                    </Column>
-                    <Column gap={ 1 }>
-                        <Text>{ LocalizeText('widget.memenu.settings.volume.furni') }</Text>
-                        <Flex alignItems="center" gap={ 1 }>
-                            { (userSettings.volumeFurni === 0) && <FaVolumeMute className={ classNames((userSettings.volumeFurni >= 50) && 'text-muted', 'fa-icon') } /> }
-                            { (userSettings.volumeFurni > 0) && <FaVolumeDown className={ classNames((userSettings.volumeFurni >= 50) && 'text-muted', 'fa-icon') } /> }
-                            <input type="range" className="custom-range w-100" min="0" max="100" step="1" id="volumeFurni" value={ userSettings.volumeFurni } onChange={ event => processAction('furni_volume', event.target.value) } onMouseUp={ () => saveRangeSlider('volume') }/>
-                            <FaVolumeUp className={ classNames((userSettings.volumeFurni < 50) && 'text-muted', 'fa-icon') } />
+                        <Flex alignItems="center" gap={1}>
+                            <input className="form-check-input" type="checkbox" checked={userSettings.roomInvites} onChange={event => processAction('room_invites', event.target.checked)} />
+                            <Text>{LocalizeText('memenu.settings.other.ignore.room.invites')}</Text>
                         </Flex>
-                    </Column>
-                    <Column gap={ 1 }>
-                        <Text>{ LocalizeText('widget.memenu.settings.volume.trax') }</Text>
-                        <Flex alignItems="center" gap={ 1 }>
-                            { (userSettings.volumeTrax === 0) && <FaVolumeMute className={ classNames((userSettings.volumeTrax >= 50) && 'text-muted', 'fa-icon') } /> }
-                            { (userSettings.volumeTrax > 0) && <FaVolumeDown className={ classNames((userSettings.volumeTrax >= 50) && 'text-muted', 'fa-icon') } /> }
-                            <input type="range" className="custom-range w-100" min="0" max="100" step="1" id="volumeTrax" value={ userSettings.volumeTrax } onChange={ event => processAction('trax_volume', event.target.value) } onMouseUp={ () => saveRangeSlider('volume') }/>
-                            <FaVolumeUp className={ classNames((userSettings.volumeTrax < 50) && 'text-muted', 'fa-icon') } />
+                        <Flex alignItems="center" gap={1}>
+                            <input className="form-check-input" type="checkbox" checked={userSettings.cameraFollow} onChange={event => processAction('camera_follow', event.target.checked)} />
+                            <Text>{LocalizeText('memenu.settings.other.disable.room.camera.follow')}</Text>
                         </Flex>
+                        <Flex alignItems="center" gap={1}>
+                            <input className="form-check-input" type="checkbox" checked={catalogPlaceMultipleObjects} onChange={event => setCatalogPlaceMultipleObjects(event.target.checked)} />
+                            <Text>{LocalizeText('memenu.settings.other.place.multiple.objects')}</Text>
+                        </Flex>
+                        <Flex alignItems="center" gap={1}>
+                            <input className="form-check-input" type="checkbox" checked={catalogSkipPurchaseConfirmation} onChange={event => setCatalogSkipPurchaseConfirmation(event.target.checked)} />
+                            <Text>{LocalizeText('memenu.settings.other.skip.purchase.confirmation')}</Text>
+                        </Flex>
+                        <HorizontalRule />
+                        <Button variant="primary" className="d-flex align-items-center justify-content-center gap-2 py-1.5" onClick={() => setShowDiscordModal(true)}>
+                            <span style={{ fontSize: '14px' }}>🎮</span>
+                            <Text bold variant="white">Conectar a Discord</Text>
+                        </Button>
+                        {infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) &&
+                            <>
+                                <HorizontalRule />
+                                <Text bold>{LocalizeText('memenu.settings.other.infinite.permissions.title')}</Text>
+                                {infinitePermissions.credits.rankHas &&
+                                    <Flex alignItems="center" gap={1}>
+                                        <input className="form-check-input" type="checkbox" checked={infinitePermissions.credits.enabled} onChange={event => toggleInfinitePermission('credits', event.target.checked)} />
+                                        <Text>{LocalizeText('memenu.settings.other.infinite.credits')}</Text>
+                                    </Flex>}
+                                {infinitePermissions.pixels.rankHas &&
+                                    <Flex alignItems="center" gap={1}>
+                                        <input className="form-check-input" type="checkbox" checked={infinitePermissions.pixels.enabled} onChange={event => toggleInfinitePermission('pixels', event.target.checked)} />
+                                        <Text>{LocalizeText('memenu.settings.other.infinite.pixels')}</Text>
+                                    </Flex>}
+                                {infinitePermissions.points.rankHas &&
+                                    <Flex alignItems="center" gap={1}>
+                                        <input className="form-check-input" type="checkbox" checked={infinitePermissions.points.enabled} onChange={event => toggleInfinitePermission('points', event.target.checked)} />
+                                        <Text>{LocalizeText('memenu.settings.other.infinite.points')}</Text>
+                                    </Flex>}
+                            </>}
                     </Column>
-                </Column>
-            </NitroCardContentView>
-        </NitroCardView>
-        { showDiscordModal && (
-            <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={ { zIndex: 1050, width: 380, backgroundColor: '#2d2847', color: '#ffffff' } }>
-                <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={ () => setShowDiscordModal(false) } />
-                <NitroCardContentView className="p-3" style={ { backgroundColor: '#2d2847', color: '#ffffff' } }>
-                    <div className="d-flex align-items-start gap-3 mb-3">
-                        <div style={ { width: 56, height: 56, minWidth: 56, background: '#5865F2', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', boxShadow: '0 4px 10px rgba(88, 101, 242, 0.4)' } }>
-                            🎮
-                        </div>
-                        <div>
-                            <div className="fw-bold mb-1" style={ { fontSize: '14px', color: '#ffffff' } }>Conecta Habbten a Discord</div>
-                            <div style={ { fontSize: '11px', color: '#cbd5e1', lineHeight: '1.4' } }>
-                                ¡Hemos detectado que tienes un auténtico espíritu gamer! *Choca esos cinco*<br/>
-                                ¿Quieres que tus amigos/as sepan lo que estás haciendo en este loco hotel?
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mb-3 p-2 rounded" style={ { background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' } }>
-                        <div className="fw-bold mb-1.5" style={ { fontSize: '12px', color: '#e2e8f0' } }>Ajustes:</div>
-                        <div className="d-flex flex-column gap-1" style={ { fontSize: '11px' } }>
-                            <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
-                                <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                <span>Mostrar Habbten en mi estado de Discord</span>
-                            </label>
-                            <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
-                                <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                <span>Compartir mi actividad dentro del juego</span>
-                            </label>
-                            <div className="ps-4 d-flex flex-column gap-1">
-                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
-                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                    <span>Esconder actividad en salas ocultas</span>
-                                </label>
-                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
-                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                    <span>Permitir que los/as usuarios/as se unan a mí</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="mb-3 p-2 rounded" style={ { background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' } }>
-                        <div className="fw-bold mb-1" style={ { fontSize: '12px', color: '#e2e8f0' } }>Servidor Oficial de Discord:</div>
-                        <div className="d-flex gap-2 mb-2">
-                            <a href="https://discord.gg/habbten" target="_blank" rel="noopener noreferrer" className="btn btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-1.5" style={ { background: '#5865F2', color: '#ffffff', border: 'none' } }>
-                                <span>🚀</span> Unirse al Servidor Oficial
-                            </a>
-                        </div>
-                        <div className="input-group input-group-sm mb-1.5">
-                            <span className="input-group-text bg-dark text-white border-secondary">@</span>
-                            <input 
-                                type="text" 
-                                className="form-control bg-dark text-white border-secondary" 
-                                placeholder="tu_usuario_discord" 
-                                value={ discordTag } 
-                                onChange={ e => setDiscordTag(e.target.value) } 
-                            />
-                            <button 
-                                type="button" 
-                                className={ `btn btn-sm ${ isDiscordConnected ? 'btn-success' : 'btn-primary' } fw-bold` }
-                                onClick={ () => {
-                                    if (discordTag.trim()) {
-                                        localStorage.setItem('habbten_discord_tag', discordTag.trim());
-                                        setIsDiscordConnected(true);
-                                        setDiscordStatusMsg('¡Cuenta vinculada correctamente!');
-                                        setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                    } else {
-                                        localStorage.removeItem('habbten_discord_tag');
-                                        setIsDiscordConnected(false);
-                                        setDiscordStatusMsg('Cuenta desvinculada.');
-                                        setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                    }
-                                } }
-                            >
-                                { isDiscordConnected ? '✓ Vinculado' : 'Vincular' }
-                            </button>
-                        </div>
-                        { discordStatusMsg && <div className="text-success small text-center mt-1">{ discordStatusMsg }</div> }
-                    </div>
-
-                    <button 
-                        type="button" 
-                        className="btn btn-sm w-100 py-1.5 fw-bold" 
-                        style={ { background: '#1e1b4b', color: '#a5b4fc', border: '1px solid #4338ca', fontSize: '11px' } }
-                        onClick={ () => setShowDiscordModal(false) }
-                    >
-                        ¿Habbten en Discord? ¿Con esta economía...? ¡Sácame de aquí!
-                    </button>
+                    <Column>
+                        <Text bold>{LocalizeText('widget.memenu.settings.volume')}</Text>
+                        <Column gap={1}>
+                            <Text>{LocalizeText('widget.memenu.settings.volume.ui')}</Text>
+                            <Flex alignItems="center" gap={1}>
+                                {(userSettings.volumeSystem === 0) && <FaVolumeMute className={classNames((userSettings.volumeSystem >= 50) && 'text-muted', 'fa-icon')} />}
+                                {(userSettings.volumeSystem > 0) && <FaVolumeDown className={classNames((userSettings.volumeSystem >= 50) && 'text-muted', 'fa-icon')} />}
+                                <input type="range" className="custom-range w-100" min="0" max="100" step="1" id="volumeSystem" value={userSettings.volumeSystem} onChange={event => processAction('system_volume', event.target.value)} onMouseUp={() => saveRangeSlider('volume')} />
+                                <FaVolumeUp className={classNames((userSettings.volumeSystem < 50) && 'text-muted', 'fa-icon')} />
+                            </Flex>
+                        </Column>
+                        <Column gap={1}>
+                            <Text>{LocalizeText('widget.memenu.settings.volume.furni')}</Text>
+                            <Flex alignItems="center" gap={1}>
+                                {(userSettings.volumeFurni === 0) && <FaVolumeMute className={classNames((userSettings.volumeFurni >= 50) && 'text-muted', 'fa-icon')} />}
+                                {(userSettings.volumeFurni > 0) && <FaVolumeDown className={classNames((userSettings.volumeFurni >= 50) && 'text-muted', 'fa-icon')} />}
+                                <input type="range" className="custom-range w-100" min="0" max="100" step="1" id="volumeFurni" value={userSettings.volumeFurni} onChange={event => processAction('furni_volume', event.target.value)} onMouseUp={() => saveRangeSlider('volume')} />
+                                <FaVolumeUp className={classNames((userSettings.volumeFurni < 50) && 'text-muted', 'fa-icon')} />
+                            </Flex>
+                        </Column>
+                        <Column gap={1}>
+                            <Text>{LocalizeText('widget.memenu.settings.volume.trax')}</Text>
+                            <Flex alignItems="center" gap={1}>
+                                {(userSettings.volumeTrax === 0) && <FaVolumeMute className={classNames((userSettings.volumeTrax >= 50) && 'text-muted', 'fa-icon')} />}
+                                {(userSettings.volumeTrax > 0) && <FaVolumeDown className={classNames((userSettings.volumeTrax >= 50) && 'text-muted', 'fa-icon')} />}
+                                <input type="range" className="custom-range w-100" min="0" max="100" step="1" id="volumeTrax" value={userSettings.volumeTrax} onChange={event => processAction('trax_volume', event.target.value)} onMouseUp={() => saveRangeSlider('volume')} />
+                                <FaVolumeUp className={classNames((userSettings.volumeTrax < 50) && 'text-muted', 'fa-icon')} />
+                            </Flex>
+                        </Column>
+                    </Column>
                 </NitroCardContentView>
             </NitroCardView>
-        ) }
+            {showDiscordModal && (
+                <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={{ zIndex: 1050, width: 380, backgroundColor: '#2d2847', color: '#ffffff' }}>
+                    <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
+                    <NitroCardContentView className="p-3" style={{ backgroundColor: '#2d2847', color: '#ffffff' }}>
+                        <div className="d-flex align-items-start gap-3 mb-3">
+                            <div style={{ width: 56, height: 56, minWidth: 56, background: '#5865F2', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', boxShadow: '0 4px 10px rgba(88, 101, 242, 0.4)' }}>
+                                🎮
+                            </div>
+                            <div>
+                                <div className="fw-bold mb-1" style={{ fontSize: '14px', color: '#ffffff' }}>Conecta Habbten a Discord</div>
+                                <div style={{ fontSize: '11px', color: '#cbd5e1', lineHeight: '1.4' }}>
+                                    ¡Hemos detectado que tienes un auténtico espíritu gamer! *Choca esos cinco*<br />
+                                    ¿Quieres que tus amigos/as sepan lo que estás haciendo en este loco hotel?
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mb-3 p-2 rounded" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="fw-bold mb-1.5" style={{ fontSize: '12px', color: '#e2e8f0' }}>Ajustes:</div>
+                            <div className="d-flex flex-column gap-1" style={{ fontSize: '11px' }}>
+                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                    <span>Mostrar Habbten en mi estado de Discord</span>
+                                </label>
+                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                    <span>Compartir mi actividad dentro del juego</span>
+                                </label>
+                                <div className="ps-4 d-flex flex-column gap-1">
+                                    <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                        <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                        <span>Esconder actividad en salas ocultas</span>
+                                    </label>
+                                    <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                        <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                        <span>Permitir que los/as usuarios/as se unan a mí</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mb-2">
+                                <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '12px' }}>Our servers:</div>
+                                <div className="row g-2 mb-2">
+                                    <div className="col-6">
+                                        <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center gap-2 p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
+                                            <div style={{ width: 32, height: 32, minWidth: 32, background: '#e67e22', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#000000', fontSize: '18px' }}>
+                                                Ω
+                                            </div>
+                                            <div className="fw-bold text-truncate" style={{ fontSize: '11px' }}>Habbten Oficial</div>
+                                        </a>
+                                    </div>
+                                    <div className="col-6">
+                                        <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center gap-2 p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
+                                            <div style={{ width: 32, height: 32, minWidth: 32, background: '#22c55e', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                                                🔌
+                                            </div>
+                                            <div className="fw-bold text-truncate" style={{ fontSize: '11px' }}>The Wired Faculty</div>
+                                        </a>
+                                    </div>
+                                    <div className="col-6">
+                                        <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center gap-2 p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
+                                            <div style={{ width: 32, height: 32, minWidth: 32, background: '#3b82f6', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                                                🏨
+                                            </div>
+                                            <div className="fw-bold text-truncate" style={{ fontSize: '11px' }}>Habbten: Origins</div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-2 rounded mb-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <div className="fw-bold mb-1" style={{ fontSize: '11px', color: '#e2e8f0' }}>Escribe tu Usuario de Discord:</div>
+                                <div className="input-group input-group-sm">
+                                    <span className="input-group-text bg-dark text-white border-secondary">@</span>
+                                    <input
+                                        type="text"
+                                        className="form-control bg-dark text-white border-secondary"
+                                        placeholder="tu_usuario_discord"
+                                        value={discordTag}
+                                        onChange={e => setDiscordTag(e.target.value)}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={`btn btn-sm ${isDiscordConnected ? 'btn-success' : 'btn-primary'} fw-bold`}
+                                        onClick={() => {
+                                            if (discordTag.trim()) {
+                                                localStorage.setItem('habbten_discord_tag', discordTag.trim());
+                                                setIsDiscordConnected(true);
+                                                setDiscordStatusMsg('¡Cuenta vinculada correctamente!');
+                                                setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                            } else {
+                                                localStorage.removeItem('habbten_discord_tag');
+                                                setIsDiscordConnected(false);
+                                                setDiscordStatusMsg('Cuenta desvinculada.');
+                                                setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                            }
+                                        }}
+                                    >
+                                        {isDiscordConnected ? '✓ Vinculado' : 'Vincular'}
+                                    </button>
+                                </div>
+                                {discordStatusMsg && <div className="text-success small text-center mt-1">{discordStatusMsg}</div>}
+                            </div>
+
+                            <button
+                                type="button"
+                                className="btn btn-sm w-100 py-1.5 fw-bold"
+                                style={{ background: '#1e1b4b', color: '#a5b4fc', border: '1px solid #4338ca', fontSize: '11px' }}
+                                onClick={() => setShowDiscordModal(false)}
+                            >
+                                ¿Habbten en Discord? ¿Con esta economía..? ¡Sácame de aquí!
+                            </button>
+                    </NitroCardContentView>
+                </NitroCardView>
+            )}
         </>
     );
 }

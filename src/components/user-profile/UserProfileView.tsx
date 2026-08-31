@@ -100,25 +100,35 @@ export const UserProfileView: FC<{}> = props =>
                 <Grid fullHeight={ false } gap={ 2 }>
                     <Column size={ 7 } gap={ 1 } className="user-container pe-2">
                         <UserContainerView userProfile={ userProfile } />
+                        { (userProfile.id === GetSessionDataManager().userId) && (
+                            <Flex justifyContent="between" className="px-1 mt-1" style={ { fontSize: '11px' } }>
+                                <Text underline pointer onClick={ () => CreateLinkEvent('avatar-editor/toggle') }>Cambiar look</Text>
+                                <Text underline pointer onClick={ () => CreateLinkEvent('inventory/badges') }>Cambiar placas</Text>
+                            </Flex>
+                        ) }
                         <Grid columnCount={ 5 } fullHeight className="bg-muted rounded px-2 py-1">
                             <BadgesContainerView fullWidth center badges={ userBadges } />
                         </Grid>
                     </Column>
                     <Column size={ 5 }>
                         { userRelationships &&
-                            <FriendsContainerView relationships={ userRelationships } friendsCount={ userProfile.friendsCount } /> }
+                            <FriendsContainerView relationships={ userRelationships } friendsCount={ Math.max(0, userProfile.friendsCount - 1) } /> }
                     </Column>
                 </Grid>
-                <Flex alignItems="center" justifyContent="between" className="rooms-button-container px-2 py-1 bg-light border rounded">
-                    <Flex alignItems="center" gap={ 1 } onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
+                <Grid columnCount={ 3 } className="rooms-button-container px-1 py-1 bg-light border rounded text-center my-1">
+                    <Flex center alignItems="center" gap={ 1 } pointer onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
                         <i className="icon icon-rooms" />
-                        <Text bold underline pointer>{ LocalizeText('extendedprofile.rooms') }</Text>
+                        <Text small bold underline>{ LocalizeText('extendedprofile.rooms') }</Text>
                     </Flex>
-                    <Flex alignItems="center" gap={ 1 } onClick={ () => CreateLinkEvent('battlepass/toggle') }>
-                        <span style={ { fontSize: '13px' } }>⭐</span>
-                        <Text bold pointer className="text-primary">Nivel Pase: { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }</Text>
+                    <Flex center alignItems="center" gap={ 1 } className="border-start border-end" pointer onClick={ () => CreateLinkEvent('achievements/toggle') }>
+                        <span style={ { fontSize: '12px' } }>⭐</span>
+                        <Text small bold underline>Placas { userBadges?.length || 0 }</Text>
                     </Flex>
-                </Flex>
+                    <Flex center alignItems="center" gap={ 1 } pointer onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                        <span style={ { color: '#16a34a', fontSize: '10px', letterSpacing: '-2px', fontWeight: 900 } }>▶▶▶</span>
+                        <Text small bold>Nivel { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }</Text>
+                    </Flex>
+                </Grid>
                 <GroupsContainerView fullWidth itsMe={ userProfile.id === GetSessionDataManager().userId } groups={ userProfile.groups } onLeaveGroup={ onLeaveGroup } />
             </NitroCardContentView>
         </NitroCardView>
