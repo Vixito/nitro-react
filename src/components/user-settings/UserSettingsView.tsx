@@ -265,25 +265,25 @@ export const UserSettingsView: FC<{}> = props => {
                             </div>
                         </div>
 
-                        <div className="mb-3 p-2.5 rounded" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="fw-bold mb-2" style={{ fontSize: '13px', color: '#f1f5f9' }}>Ajustes:</div>
+                        <div className="mb-3 p-3 rounded" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="fw-bold mb-2 text-white" style={{ fontSize: '13px' }}>Ajustes:</div>
                             <div className="d-flex flex-column gap-2" style={{ fontSize: '12px' }}>
-                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0 ps-1">
                                     <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                    <span>Mostrar Habbten en mi estado de Discord</span>
+                                    <span className="text-white">Mostrar Habbten en mi estado de Discord</span>
                                 </label>
-                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0 ps-1">
                                     <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                    <span>Compartir mi actividad dentro del juego</span>
+                                    <span className="text-white">Compartir mi actividad dentro del juego</span>
                                 </label>
-                                <div className="ps-4 d-flex flex-column gap-1.5">
+                                <div className="ps-4 d-flex flex-column gap-2">
                                     <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
                                         <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                        <span>Esconder actividad en salas ocultas</span>
+                                        <span style={{ color: '#cbd5e1' }}>Esconder actividad en salas ocultas</span>
                                     </label>
                                     <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
                                         <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                        <span>Permitir que los/as usuarios/as se unan a mí</span>
+                                        <span style={{ color: '#cbd5e1' }}>Permitir que los/as usuarios/as se unan a mí</span>
                                     </label>
                                 </div>
                             </div>
@@ -292,21 +292,23 @@ export const UserSettingsView: FC<{}> = props => {
                         <div className="mb-3">
                             <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '13px' }}>Paso 1: Servidor Oficial de Habbten</div>
                             <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between p-2.5 rounded text-decoration-none" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
-                                <div className="d-flex align-items-center gap-2.5">
-                                    <img src="favicon-32x32.png" onError={({ currentTarget }) => { currentTarget.src = '/game/favicon-32x32.png'; }} width="36" height="36" className="rounded flex-shrink-0" alt="" style={{ objectFit: 'contain', background: '#261f38' }} />
+                                <div className="d-flex align-items-center gap-3">
+                                    <div style={{ width: 40, height: 40, minWidth: 40, background: '#261f38', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #5a4f7e' }}>
+                                        <img src="hotel-icon.png" onError={({ currentTarget }) => { currentTarget.src = '/game/hotel-icon.png'; }} width="32" height="32" style={{ objectFit: 'contain' }} alt="" />
+                                    </div>
                                     <div>
-                                        <div className="fw-bold" style={{ fontSize: '13px' }}>Servidor Oficial de Habbten</div>
+                                        <div className="fw-bold text-white" style={{ fontSize: '13px' }}>Servidor Oficial de Habbten</div>
                                         <div style={{ fontSize: '11px', color: '#cbd5e1' }}>Únete a nuestra comunidad oficial</div>
                                     </div>
                                 </div>
-                                <span className="btn btn-sm py-1 px-3 fw-bold" style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '12px', borderRadius: '6px' }}>
+                                <span className="btn btn-sm py-1.5 px-3 fw-bold" style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '12px', borderRadius: '6px' }}>
                                     Unirse
                                 </span>
                             </a>
                         </div>
 
-                        <div className="p-2.5 rounded mb-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="fw-bold mb-1.5" style={{ fontSize: '12px', color: '#f1f5f9' }}>Paso 2: Escribe tu Usuario de Discord:</div>
+                        <div className="p-3 rounded mb-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="fw-bold mb-2 text-white" style={{ fontSize: '12px' }}>Paso 2: Escribe tu Usuario de Discord:</div>
                             <div className="input-group">
                                 <span className="input-group-text bg-dark text-white border-secondary">@</span>
                                 <input

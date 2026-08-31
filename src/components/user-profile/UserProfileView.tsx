@@ -115,19 +115,31 @@ export const UserProfileView: FC<{}> = props =>
                             <FriendsContainerView relationships={ userRelationships } friendsCount={ Math.max(0, userProfile.friendsCount - 1) } /> }
                     </Column>
                 </Grid>
-                <Grid columnCount={ 3 } className="rooms-button-container px-1 py-1 bg-light border rounded text-center my-1">
-                    <Flex center alignItems="center" gap={ 1 } pointer onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
+                <div className="d-flex align-items-center justify-content-between my-2 rounded text-center" style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', height: '42px' }}>
+                    <div className="d-flex align-items-center justify-content-center gap-1.5 flex-fill h-100 cursor-pointer" onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
                         <i className="icon icon-rooms" />
-                        <Text small bold underline>{ LocalizeText('extendedprofile.rooms') }</Text>
-                    </Flex>
-                    <Flex center alignItems="center" gap={ 1 } className="border-start border-end" pointer onClick={ () => CreateLinkEvent('achievements/toggle') }>
-                        <i className="icon icon-star" />
-                        <Text small bold underline>Placas { userBadges?.length || 0 }</Text>
-                    </Flex>
-                    <Flex center alignItems="center" gap={ 1 } pointer onClick={ () => CreateLinkEvent('battlepass/toggle') }>
-                        <Text small bold className="text-success">Nivel { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }</Text>
-                    </Flex>
-                </Grid>
+                        <span className="fw-bold text-dark text-decoration-underline" style={{ fontSize: '12px' }}>{ LocalizeText('extendedprofile.rooms') }</span>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center gap-1.5 flex-fill h-100 border-start border-end cursor-pointer" style={{ borderColor: '#cbd5e1' }} onClick={ () => CreateLinkEvent('achievements/toggle') }>
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 1.5L11.2 6.5L16.5 7.2L12.5 11L13.5 16.5L9 13.8L4.5 16.5L5.5 11L1.5 7.2L6.8 6.5L9 1.5Z" fill="#FFD837" stroke="#1E1E1E" strokeWidth="1.2" strokeLinejoin="round"/>
+                        </svg>
+                        <span className="fw-bold text-dark" style={{ fontSize: '12px' }}>
+                            <span className="text-decoration-underline">Placas</span> { userBadges?.length || 0 }
+                        </span>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center gap-1.5 flex-fill h-100 cursor-pointer" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                        <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2 1.5L6 7L2 12.5" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M7 1.5L11 7L7 12.5" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M12 1.5L16 7L12 12.5" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M17 1.5L21 7L17 12.5" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span className="fw-bold text-dark" style={{ fontSize: '12px' }}>
+                            Nivel { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }
+                        </span>
+                    </div>
+                </div>
                 <GroupsContainerView fullWidth itsMe={ userProfile.id === GetSessionDataManager().userId } groups={ userProfile.groups } onLeaveGroup={ onLeaveGroup } />
             </NitroCardContentView>
         </NitroCardView>
