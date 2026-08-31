@@ -21,7 +21,24 @@ export const CatalogGridOfferView: FC<CatalogGridOfferViewProps> = props =>
     {
         if(!offer.product) return null;
 
+        if(offer.products && offer.products.length > 1)
+        {
+            return '/game/swf/c_images/catalogue/icon_84.png';
+        }
+
         return offer.product.getIconUrl(offer);
+    }, [ offer ]);
+
+    const totalCount = useMemo(() =>
+    {
+        if(!offer) return 1;
+
+        if(offer.products && offer.products.length > 1)
+        {
+            return offer.products.reduce((acc, p) => acc + (p.productCount || 1), 0);
+        }
+
+        return ((offer.pricingModel === Offer.PRICING_MODEL_MULTI) ? offer.product.productCount : 1);
     }, [ offer ]);
 
     const onMouseEvent = (event: MouseEvent) =>
@@ -48,7 +65,7 @@ export const CatalogGridOfferView: FC<CatalogGridOfferViewProps> = props =>
     if(!product) return null;
 
     return (
-        <LayoutGridItem itemImage={ iconUrl } itemCount={ ((offer.pricingModel === Offer.PRICING_MODEL_MULTI) ? product.productCount : 1) } itemUniqueSoldout={ (product.uniqueLimitedItemSeriesSize && !product.uniqueLimitedItemsLeft) } itemUniqueNumber={ product.uniqueLimitedItemSeriesSize } itemActive={ itemActive } onMouseDown={ onMouseEvent } onMouseUp={ onMouseEvent } onMouseOut={ onMouseEvent } { ...rest }>
+        <LayoutGridItem itemImage={ iconUrl } itemCount={ totalCount } itemUniqueSoldout={ (product.uniqueLimitedItemSeriesSize && !product.uniqueLimitedItemsLeft) } itemUniqueNumber={ product.uniqueLimitedItemSeriesSize } itemActive={ itemActive } onMouseDown={ onMouseEvent } onMouseUp={ onMouseEvent } onMouseOut={ onMouseEvent } { ...rest }>
             { (offer.product.productType === ProductTypeEnum.ROBOT) &&
                 <LayoutAvatarImageView figure={ offer.product.extraParam } headOnly={ true } direction={ 3 } /> }
         </LayoutGridItem>

@@ -186,8 +186,7 @@ export const UserSettingsView: FC<{}> = props => {
                             <Text>{LocalizeText('memenu.settings.other.skip.purchase.confirmation')}</Text>
                         </Flex>
                         <HorizontalRule />
-                        <Button variant="primary" className="d-flex align-items-center justify-content-center gap-2 py-1.5" onClick={() => setShowDiscordModal(true)}>
-                            <span style={{ fontSize: '14px' }}>🎮</span>
+                        <Button variant="primary" className="d-flex align-items-center justify-content-center py-1.5" onClick={() => setShowDiscordModal(true)}>
                             <Text bold variant="white">Conectar a Discord</Text>
                         </Button>
                         {infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) &&
@@ -248,8 +247,8 @@ export const UserSettingsView: FC<{}> = props => {
                     <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
                     <NitroCardContentView className="p-3" style={{ backgroundColor: '#2d2847', color: '#ffffff' }}>
                         <div className="d-flex align-items-start gap-3 mb-3">
-                            <div style={{ width: 56, height: 56, minWidth: 56, background: '#5865F2', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', boxShadow: '0 4px 10px rgba(88, 101, 242, 0.4)' }}>
-                                🎮
+                            <div style={{ width: 50, height: 50, minWidth: 50, background: '#5865F2', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#ffffff', fontSize: '22px', boxShadow: '0 4px 10px rgba(88, 101, 242, 0.4)' }}>
+                                D
                             </div>
                             <div>
                                 <div className="fw-bold mb-1" style={{ fontSize: '14px', color: '#ffffff' }}>Conecta Habbten a Discord</div>
@@ -287,8 +286,8 @@ export const UserSettingsView: FC<{}> = props => {
                             <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '12px' }}>Paso 1: Servidor Oficial de Habbten</div>
                             <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
                                 <div className="d-flex align-items-center gap-2">
-                                    <div style={{ width: 36, height: 36, minWidth: 36, background: '#5865F2', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#ffffff', fontSize: '20px' }}>
-                                        🎮
+                                    <div style={{ width: 32, height: 32, minWidth: 32, background: '#5865F2', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#ffffff', fontSize: '14px' }}>
+                                        H
                                     </div>
                                     <div>
                                         <div className="fw-bold" style={{ fontSize: '12px' }}>Servidor Oficial de Habbten</div>
@@ -296,7 +295,7 @@ export const UserSettingsView: FC<{}> = props => {
                                     </div>
                                 </div>
                                 <span className="btn btn-sm py-1 px-2 fw-bold" style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '11px', borderRadius: '6px' }}>
-                                    🚀 Unirse
+                                    Unirse
                                 </span>
                             </a>
                         </div>

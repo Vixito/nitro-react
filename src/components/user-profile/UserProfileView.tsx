@@ -121,12 +121,11 @@ export const UserProfileView: FC<{}> = props =>
                         <Text small bold underline>{ LocalizeText('extendedprofile.rooms') }</Text>
                     </Flex>
                     <Flex center alignItems="center" gap={ 1 } className="border-start border-end" pointer onClick={ () => CreateLinkEvent('achievements/toggle') }>
-                        <span style={ { fontSize: '12px' } }>⭐</span>
+                        <i className="icon icon-star" />
                         <Text small bold underline>Placas { userBadges?.length || 0 }</Text>
                     </Flex>
                     <Flex center alignItems="center" gap={ 1 } pointer onClick={ () => CreateLinkEvent('battlepass/toggle') }>
-                        <span style={ { color: '#16a34a', fontSize: '10px', letterSpacing: '-2px', fontWeight: 900 } }>▶▶▶</span>
-                        <Text small bold>Nivel { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }</Text>
+                        <Text small bold className="text-success">Nivel { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }</Text>
                     </Flex>
                 </Grid>
                 <GroupsContainerView fullWidth itsMe={ userProfile.id === GetSessionDataManager().userId } groups={ userProfile.groups } onLeaveGroup={ onLeaveGroup } />
