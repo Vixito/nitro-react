@@ -262,64 +262,93 @@ export const UserSettingsView: FC<{}> = props =>
             </NitroCardContentView>
         </NitroCardView>
         { showDiscordModal && (
-            <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={ { zIndex: 1050, width: 380 } }>
-                <NitroCardHeaderView headerText="Conecta Habbten a Discord" onCloseClick={ () => setShowDiscordModal(false) } />
-                <NitroCardContentView className="p-3">
-                    <div className="d-flex align-items-center gap-2 mb-2 p-2 rounded bg-primary text-white">
-                        <div style={ { fontSize: '28px' } }>🎮</div>
+            <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={ { zIndex: 1050, width: 380, backgroundColor: '#2d2847', color: '#ffffff' } }>
+                <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={ () => setShowDiscordModal(false) } />
+                <NitroCardContentView className="p-3" style={ { backgroundColor: '#2d2847', color: '#ffffff' } }>
+                    <div className="d-flex align-items-start gap-3 mb-3">
+                        <div style={ { width: 56, height: 56, minWidth: 56, background: '#5865F2', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', boxShadow: '0 4px 10px rgba(88, 101, 242, 0.4)' } }>
+                            🎮
+                        </div>
                         <div>
-                            <div className="fw-bold" style={ { fontSize: '13px' } }>Comunidad Gamer de Habbten</div>
-                            <div className="small opacity-75">¡Conecta tu cuenta para compartir tu actividad y recibir novedades!</div>
+                            <div className="fw-bold mb-1" style={ { fontSize: '14px', color: '#ffffff' } }>Conecta Habbten a Discord</div>
+                            <div style={ { fontSize: '11px', color: '#cbd5e1', lineHeight: '1.4' } }>
+                                ¡Hemos detectado que tienes un auténtico espíritu gamer! *Choca esos cinco*<br/>
+                                ¿Quieres que tus amigos/as sepan lo que estás haciendo en este loco hotel?
+                            </div>
                         </div>
                     </div>
 
-                    <div className="mb-3 p-2 border rounded bg-light">
-                        <div className="fw-bold text-dark mb-1" style={ { fontSize: '12px' } }>Paso 1: Únete a nuestro Servidor</div>
-                        <div className="small text-muted mb-2">Entra al servidor oficial de Discord de Habbten para formar parte de la comunidad.</div>
-                        <a href="https://discord.gg/habbten" target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary w-100 fw-bold d-flex align-items-center justify-content-center gap-1">
-                            <span>🚀</span> Unirse al Discord de Habbten
-                        </a>
+                    <div className="mb-3 p-2 rounded" style={ { background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' } }>
+                        <div className="fw-bold mb-1.5" style={ { fontSize: '12px', color: '#e2e8f0' } }>Ajustes:</div>
+                        <div className="d-flex flex-column gap-1" style={ { fontSize: '11px' } }>
+                            <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                <span>Mostrar Habbten en mi estado de Discord</span>
+                            </label>
+                            <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                <span>Compartir mi actividad dentro del juego</span>
+                            </label>
+                            <div className="ps-4 d-flex flex-column gap-1">
+                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                    <span>Esconder actividad en salas ocultas</span>
+                                </label>
+                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
+                                    <span>Permitir que los/as usuarios/as se unan a mí</span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="p-2 border rounded bg-light mb-2">
-                        <div className="fw-bold text-dark mb-1" style={ { fontSize: '12px' } }>Paso 2: Escribe tu Nickname de Discord</div>
-                        <div className="small text-muted mb-2">Ingresa tu usuario de Discord para vincular tu cuenta con tu perfil de Habbten.</div>
-                        <div className="input-group input-group-sm mb-2">
-                            <span className="input-group-text">@</span>
+                    <div className="mb-3 p-2 rounded" style={ { background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' } }>
+                        <div className="fw-bold mb-1" style={ { fontSize: '12px', color: '#e2e8f0' } }>Servidor Oficial de Discord:</div>
+                        <div className="d-flex gap-2 mb-2">
+                            <a href="https://discord.gg/habbten" target="_blank" rel="noopener noreferrer" className="btn btn-sm w-100 fw-bold d-flex align-items-center justify-content-center gap-1.5" style={ { background: '#5865F2', color: '#ffffff', border: 'none' } }>
+                                <span>🚀</span> Unirse al Servidor Oficial
+                            </a>
+                        </div>
+                        <div className="input-group input-group-sm mb-1.5">
+                            <span className="input-group-text bg-dark text-white border-secondary">@</span>
                             <input 
                                 type="text" 
-                                className="form-control" 
+                                className="form-control bg-dark text-white border-secondary" 
                                 placeholder="tu_usuario_discord" 
                                 value={ discordTag } 
                                 onChange={ e => setDiscordTag(e.target.value) } 
                             />
+                            <button 
+                                type="button" 
+                                className={ `btn btn-sm ${ isDiscordConnected ? 'btn-success' : 'btn-primary' } fw-bold` }
+                                onClick={ () => {
+                                    if (discordTag.trim()) {
+                                        localStorage.setItem('habbten_discord_tag', discordTag.trim());
+                                        setIsDiscordConnected(true);
+                                        setDiscordStatusMsg('¡Cuenta vinculada correctamente!');
+                                        setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                    } else {
+                                        localStorage.removeItem('habbten_discord_tag');
+                                        setIsDiscordConnected(false);
+                                        setDiscordStatusMsg('Cuenta desvinculada.');
+                                        setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                    }
+                                } }
+                            >
+                                { isDiscordConnected ? '✓ Vinculado' : 'Vincular' }
+                            </button>
                         </div>
-                        <button 
-                            type="button" 
-                            className={ `btn btn-sm ${ isDiscordConnected ? 'btn-success' : 'btn-primary' } w-100 fw-bold` }
-                            onClick={ () => {
-                                if (discordTag.trim()) {
-                                    localStorage.setItem('habbten_discord_tag', discordTag.trim());
-                                    setIsDiscordConnected(true);
-                                    setDiscordStatusMsg('¡Cuenta de Discord vinculada correctamente!');
-                                    setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                } else {
-                                    localStorage.removeItem('habbten_discord_tag');
-                                    setIsDiscordConnected(false);
-                                    setDiscordStatusMsg('Se ha desvinculado la cuenta.');
-                                    setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                }
-                            } }
-                        >
-                            { isDiscordConnected ? '✓ Cuenta Vinculada (Actualizar)' : 'Vincular Cuenta' }
-                        </button>
+                        { discordStatusMsg && <div className="text-success small text-center mt-1">{ discordStatusMsg }</div> }
                     </div>
 
-                    { discordStatusMsg && (
-                        <div className="alert alert-success py-1 px-2 small text-center mb-0 rounded">
-                            { discordStatusMsg }
-                        </div>
-                    ) }
+                    <button 
+                        type="button" 
+                        className="btn btn-sm w-100 py-1.5 fw-bold" 
+                        style={ { background: '#1e1b4b', color: '#a5b4fc', border: '1px solid #4338ca', fontSize: '11px' } }
+                        onClick={ () => setShowDiscordModal(false) }
+                    >
+                        ¿Habbten en Discord? ¿Con esta economía...? ¡Sácame de aquí!
+                    </button>
                 </NitroCardContentView>
             </NitroCardView>
         ) }

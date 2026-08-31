@@ -601,11 +601,50 @@ export const BattlePassView: FC<{}> = () =>
                         <div className="bp-card-box h-100 d-flex flex-column justify-content-between">
                             <div className="d-flex align-items-center justify-content-between mb-2">
                                 <div className="d-flex align-items-center gap-1.5">
-                                    <span className="bp-box-header-title">RETOS ({ displayedMissions.length })</span>
-                                    <div className="btn-group btn-group-sm">
-                                        <button type="button" className={ `btn btn-xs ${ missionFilter === 'all' ? 'btn-primary' : 'btn-outline-secondary' }` } style={ { fontSize: '10px', padding: '1px 6px' } } onClick={ () => setMissionFilter('all') }>Todas</button>
-                                        <button type="button" className={ `btn btn-xs ${ missionFilter === 'in_progress' ? 'btn-primary' : 'btn-outline-secondary' }` } style={ { fontSize: '10px', padding: '1px 6px' } } onClick={ () => setMissionFilter('in_progress') }>En progreso</button>
-                                        <button type="button" className={ `btn btn-xs ${ missionFilter === 'completed' ? 'btn-primary' : 'btn-outline-secondary' }` } style={ { fontSize: '10px', padding: '1px 6px' } } onClick={ () => setMissionFilter('completed') }>Completado</button>
+                                    <span className="bp-box-header-title me-1">RETOS ({ displayedMissions.length })</span>
+                                    <div className="d-flex align-items-center gap-1">
+                                        <button 
+                                            type="button" 
+                                            className="btn py-0.5 px-2 fw-bold" 
+                                            style={ { 
+                                                fontSize: '11px', 
+                                                borderRadius: '4px',
+                                                backgroundColor: missionFilter === 'all' ? '#0284c7' : '#f1f5f9', 
+                                                color: missionFilter === 'all' ? '#ffffff' : '#475569',
+                                                border: missionFilter === 'all' ? '1px solid #0284c7' : '1px solid #cbd5e1'
+                                            } } 
+                                            onClick={ () => setMissionFilter('all') }
+                                        >
+                                            Tareas (todas)
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            className="btn py-0.5 px-2 fw-bold" 
+                                            style={ { 
+                                                fontSize: '11px', 
+                                                borderRadius: '4px',
+                                                backgroundColor: missionFilter === 'in_progress' ? '#0284c7' : '#f1f5f9', 
+                                                color: missionFilter === 'in_progress' ? '#ffffff' : '#475569',
+                                                border: missionFilter === 'in_progress' ? '1px solid #0284c7' : '1px solid #cbd5e1'
+                                            } } 
+                                            onClick={ () => setMissionFilter('in_progress') }
+                                        >
+                                            En progreso
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            className="btn py-0.5 px-2 fw-bold" 
+                                            style={ { 
+                                                fontSize: '11px', 
+                                                borderRadius: '4px',
+                                                backgroundColor: missionFilter === 'completed' ? '#0284c7' : '#f1f5f9', 
+                                                color: missionFilter === 'completed' ? '#ffffff' : '#475569',
+                                                border: missionFilter === 'completed' ? '1px solid #0284c7' : '1px solid #cbd5e1'
+                                            } } 
+                                            onClick={ () => setMissionFilter('completed') }
+                                        >
+                                            Completado
+                                        </button>
                                     </div>
                                 </div>
                                 <span className="badge bg-primary text-white" style={ { fontSize: '12px' } }>{ completedMissions.length }/{ bpData.missions.length }</span>
