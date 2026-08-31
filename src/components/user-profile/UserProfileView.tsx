@@ -106,7 +106,7 @@ export const UserProfileView: FC<{}> = props =>
                                 <Text underline pointer onClick={ () => CreateLinkEvent('inventory/badges') }>Cambiar placas</Text>
                             </Flex>
                         ) }
-                        <Grid columnCount={ 5 } fullHeight className="bg-muted rounded px-2 py-1">
+                        <Grid columnCount={ 5 } className="bg-muted rounded px-2 py-1 d-flex align-items-center" style={{ minHeight: '52px' }}>
                             <BadgesContainerView fullWidth center badges={ userBadges } />
                         </Grid>
                     </Column>
@@ -116,20 +116,20 @@ export const UserProfileView: FC<{}> = props =>
                     </Column>
                 </Grid>
                 <div className="d-flex align-items-center justify-content-between my-2 rounded text-center" style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', height: '42px' }}>
-                    <div className="d-flex align-items-center justify-content-center gap-1.5 flex-fill h-100 cursor-pointer" onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
-                        <i className="icon icon-rooms" />
+                    <div className="d-flex align-items-center justify-content-center gap-2.5 flex-fill h-100 cursor-pointer" onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
+                        <i className="icon icon-rooms me-1" />
                         <span className="fw-bold text-dark text-decoration-underline" style={{ fontSize: '12px' }}>{ LocalizeText('extendedprofile.rooms') }</span>
                     </div>
-                    <div className="d-flex align-items-center justify-content-center gap-1.5 flex-fill h-100 border-start border-end cursor-pointer" style={{ borderColor: '#cbd5e1' }} onClick={ () => CreateLinkEvent('achievements/toggle') }>
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <div className="d-flex align-items-center justify-content-center gap-2.5 flex-fill h-100 border-start border-end cursor-pointer" style={{ borderColor: '#cbd5e1' }} onClick={ () => CreateLinkEvent('achievements/toggle') }>
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="me-1">
                             <path d="M9 1.5L11.2 6.5L16.5 7.2L12.5 11L13.5 16.5L9 13.8L4.5 16.5L5.5 11L1.5 7.2L6.8 6.5L9 1.5Z" fill="#FFD837" stroke="#1E1E1E" strokeWidth="1.2" strokeLinejoin="round"/>
                         </svg>
                         <span className="fw-bold text-dark" style={{ fontSize: '12px' }}>
                             <span className="text-decoration-underline">Placas</span> { userBadges?.length || 0 }
                         </span>
                     </div>
-                    <div className="d-flex align-items-center justify-content-center gap-1.5 flex-fill h-100 cursor-pointer" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
-                        <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <div className="d-flex align-items-center justify-content-center gap-2.5 flex-fill h-100 cursor-pointer" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                        <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="me-1">
                             <path d="M2 1.5L6 7L2 12.5" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M7 1.5L11 7L7 12.5" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M12 1.5L16 7L12 12.5" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>

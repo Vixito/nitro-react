@@ -293,8 +293,8 @@ export const UserSettingsView: FC<{}> = props => {
                             <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '13px' }}>Paso 1: Servidor Oficial de Habbten</div>
                             <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between p-2.5 rounded text-decoration-none" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
                                 <div className="d-flex align-items-center gap-3">
-                                    <div style={{ width: 40, height: 40, minWidth: 40, background: '#261f38', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #5a4f7e' }}>
-                                        <img src="hotel-icon.png" onError={({ currentTarget }) => { currentTarget.src = '/game/hotel-icon.png'; }} width="32" height="32" style={{ objectFit: 'contain' }} alt="" />
+                                    <div style={{ width: 44, height: 44, minWidth: 44, background: '#261f38', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #5a4f7e', padding: '3px' }}>
+                                        <img src="habbten_logo.png" onError={({ currentTarget }) => { currentTarget.src = '/game/habbten_logo.png'; }} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="" />
                                     </div>
                                     <div>
                                         <div className="fw-bold text-white" style={{ fontSize: '13px' }}>Servidor Oficial de Habbten</div>
