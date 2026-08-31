@@ -283,38 +283,26 @@ export const UserSettingsView: FC<{}> = props => {
                                 </div>
                             </div>
                         </div>
-                        <div className="mb-2">
-                                <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '12px' }}>Our servers:</div>
-                                <div className="row g-2 mb-2">
-                                    <div className="col-6">
-                                        <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center gap-2 p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
-                                            <div style={{ width: 32, height: 32, minWidth: 32, background: '#e67e22', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#000000', fontSize: '18px' }}>
-                                                Ω
-                                            </div>
-                                            <div className="fw-bold text-truncate" style={{ fontSize: '11px' }}>Habbten Oficial</div>
-                                        </a>
+                        <div className="mb-3">
+                            <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '12px' }}>Paso 1: Servidor Oficial de Habbten</div>
+                            <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
+                                <div className="d-flex align-items-center gap-2">
+                                    <div style={{ width: 36, height: 36, minWidth: 36, background: '#5865F2', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#ffffff', fontSize: '20px' }}>
+                                        🎮
                                     </div>
-                                    <div className="col-6">
-                                        <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center gap-2 p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
-                                            <div style={{ width: 32, height: 32, minWidth: 32, background: '#22c55e', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
-                                                🔌
-                                            </div>
-                                            <div className="fw-bold text-truncate" style={{ fontSize: '11px' }}>The Wired Faculty</div>
-                                        </a>
-                                    </div>
-                                    <div className="col-6">
-                                        <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center gap-2 p-2 rounded text-decoration-none" style={{ background: '#453c63', border: '1px solid #5a4f7e', color: '#ffffff' }}>
-                                            <div style={{ width: 32, height: 32, minWidth: 32, background: '#3b82f6', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
-                                                🏨
-                                            </div>
-                                            <div className="fw-bold text-truncate" style={{ fontSize: '11px' }}>Habbten: Origins</div>
-                                        </a>
+                                    <div>
+                                        <div className="fw-bold" style={{ fontSize: '12px' }}>Servidor Oficial de Habbten</div>
+                                        <div style={{ fontSize: '10px', color: '#cbd5e1' }}>Únete a nuestra comunidad oficial</div>
                                     </div>
                                 </div>
-                            </div>
+                                <span className="btn btn-sm py-1 px-2 fw-bold" style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '11px', borderRadius: '6px' }}>
+                                    🚀 Unirse
+                                </span>
+                            </a>
+                        </div>
 
-                            <div className="p-2 rounded mb-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                <div className="fw-bold mb-1" style={{ fontSize: '11px', color: '#e2e8f0' }}>Escribe tu Usuario de Discord:</div>
+                        <div className="p-2 rounded mb-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div className="fw-bold mb-1" style={{ fontSize: '11px', color: '#e2e8f0' }}>Paso 2: Escribe tu Usuario de Discord:</div>
                                 <div className="input-group input-group-sm">
                                     <span className="input-group-text bg-dark text-white border-secondary">@</span>
                                     <input
