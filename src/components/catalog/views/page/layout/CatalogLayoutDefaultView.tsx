@@ -21,8 +21,6 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
         <>
             <Grid>
                 <Column size={ 7 } overflow="hidden">
-                    { GetConfiguration('catalog.headers') && currentPage?.localization &&
-                        <CatalogHeaderView imageUrl={ currentPage.localization.getImage(0) }/> }
                     <CatalogItemGridWidgetView />
                 </Column>
                 <Column center={ !currentOffer } size={ 5 } overflow="hidden">
