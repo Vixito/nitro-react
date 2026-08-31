@@ -244,7 +244,7 @@ export const UserSettingsView: FC<{}> = props => {
             </NitroCardView>
             {showDiscordModal && (
                 <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={{ zIndex: 1050, width: 430, backgroundColor: '#2d2847', color: '#ffffff', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}>
-                    <NitroCardHeaderView headerText="Habbo Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
+                    <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
                     <NitroCardContentView className="p-3" style={{ backgroundColor: '#2d2847', color: '#ffffff' }}>
                         <div className="d-flex align-items-center gap-3 mb-3">
                             <div style={{ width: 64, height: 64, minWidth: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -293,9 +293,7 @@ export const UserSettingsView: FC<{}> = props => {
                             <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '13px' }}>Paso 1: Servidor Oficial de Habbten</div>
                             <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between p-2.5 rounded text-decoration-none" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
                                 <div className="d-flex align-items-center gap-2.5">
-                                    <div style={{ width: 36, height: 36, minWidth: 36, background: '#5865F2', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: '#ffffff', fontSize: '16px' }}>
-                                        H
-                                    </div>
+                                    <img src="/favicon-32x32.png" width="36" height="36" alt="Habbten" style={{ borderRadius: '6px', objectFit: 'contain' }} />
                                     <div>
                                         <div className="fw-bold" style={{ fontSize: '13px' }}>Servidor Oficial de Habbten</div>
                                         <div style={{ fontSize: '11px', color: '#cbd5e1' }}>Únete a nuestra comunidad oficial</div>
