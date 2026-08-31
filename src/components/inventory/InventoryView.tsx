@@ -85,6 +85,26 @@ export const InventoryView: FC<{}> = props =>
                     case 'toggle':
                         setIsVisible(prevValue => !prevValue);
                         return;
+                    case 'badges':
+                    case 'badge':
+                        setCurrentTab(TAB_BADGES);
+                        setIsVisible(true);
+                        return;
+                    case 'furni':
+                    case 'furniture':
+                        setCurrentTab(TAB_FURNITURE);
+                        setIsVisible(true);
+                        return;
+                    case 'bots':
+                    case 'bot':
+                        setCurrentTab(TAB_BOTS);
+                        setIsVisible(true);
+                        return;
+                    case 'pets':
+                    case 'pet':
+                        setCurrentTab(TAB_PETS);
+                        setIsVisible(true);
+                        return;
                 }
             },
             eventUrlPrefix: 'inventory/'

@@ -249,11 +249,11 @@ export const UserSettingsView: FC<{}> = props => {
                         <div className="d-flex align-items-center gap-3 mb-3">
                             <div style={{ width: 64, height: 64, minWidth: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M32 6L56 18V44L32 58L8 44V18L32 6Z" fill="#5865F2" stroke="#4752C4" strokeWidth="2"/>
-                                    <path d="M32 6L56 18L32 30L8 18L32 6Z" fill="#7983F5"/>
-                                    <path d="M32 30V58L8 44V18L32 30Z" fill="#4752C4"/>
-                                    <path d="M32 30V58L56 44V18L32 30Z" fill="#5865F2"/>
-                                    <path d="M24 24C22.5 24.5 21 25.5 20 27.5C20 33.5 23 39 27 41C28 40 29 38.5 30 37.5C27.5 36.8 26.5 35 26.5 35C26.5 35 27 35.3 28 35.8C30.5 37 33 37.5 35.5 37.5C38 37.5 40.5 37 43 35.8C44 35.3 44.5 35 44.5 35C44.5 35 43.5 36.8 41 37.5C42 38.5 43 40 44 41C48 39 51 33.5 51 27.5C50 25.5 48.5 24.5 47 24C45.5 26 44.5 28 44 30C41.5 29.5 39 29.5 35.5 29.5C32 29.5 29.5 29.5 27 30C26.5 28 25.5 26 24 24Z" fill="white"/>
+                                    <path d="M32 6L56 18V44L32 58L8 44V18L32 6Z" fill="#5865F2" stroke="#4752C4" strokeWidth="2" />
+                                    <path d="M32 6L56 18L32 30L8 18L32 6Z" fill="#7983F5" />
+                                    <path d="M32 30V58L8 44V18L32 30Z" fill="#4752C4" />
+                                    <path d="M32 30V58L56 44V18L32 30Z" fill="#5865F2" />
+                                    <path d="M24 24C22.5 24.5 21 25.5 20 27.5C20 33.5 23 39 27 41C28 40 29 38.5 30 37.5C27.5 36.8 26.5 35 26.5 35C26.5 35 27 35.3 28 35.8C30.5 37 33 37.5 35.5 37.5C38 37.5 40.5 37 43 35.8C44 35.3 44.5 35 44.5 35C44.5 35 43.5 36.8 41 37.5C42 38.5 43 40 44 41C48 39 51 33.5 51 27.5C50 25.5 48.5 24.5 47 24C45.5 26 44.5 28 44 30C41.5 29.5 39 29.5 35.5 29.5C32 29.5 29.5 29.5 27 30C26.5 28 25.5 26 24 24Z" fill="white" />
                                 </svg>
                             </div>
                             <div>
@@ -291,7 +291,7 @@ export const UserSettingsView: FC<{}> = props => {
 
                         <div className="mb-3">
                             <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '13px' }}>Paso 1: Servidor Oficial de Habbten</div>
-                            <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between px-3.5 py-3 rounded text-decoration-none" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
+                            <div className="d-flex align-items-center justify-content-between p-1 rounded mt-2" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
                                 <div className="d-flex align-items-center gap-3">
                                     <div style={{ width: 44, height: 44, minWidth: 44, background: '#261f38', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #5a4f7e', padding: '3px' }}>
                                         <img src="habbten_logo.png" onError={({ currentTarget }) => { currentTarget.src = '/game/habbten_logo.png'; }} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="" />
@@ -301,10 +301,16 @@ export const UserSettingsView: FC<{}> = props => {
                                         <div style={{ fontSize: '11px', color: '#cbd5e1' }}>Únete a nuestra comunidad oficial</div>
                                     </div>
                                 </div>
-                                <span className="btn btn-sm py-1.5 px-3 fw-bold me-1" style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '12px', borderRadius: '6px' }}>
+                                <a
+                                    href="https://discord.com/invite/EVafmrDh"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-sm py-1.5 px-3 fw-bold text-decoration-none"
+                                    style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '12px', borderRadius: '6px', marginRight: '4px' }}
+                                >
                                     Unirse
-                                </span>
-                            </a>
+                                </a>
+                            </div>
                         </div>
 
                         <div className="p-3 rounded mb-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
@@ -346,7 +352,7 @@ export const UserSettingsView: FC<{}> = props => {
                         <button
                             type="button"
                             className="btn w-100 py-2 fw-bold"
-                            style={{ background: '#1e1b4b', color: '#c7d2fe', border: '1px solid #4338ca', fontSize: '12px' }}
+                            style={{ background: '#4a406b', color: '#ffffff', border: '2px solid #2b2344', borderRadius: '6px', fontSize: '12px' }}
                             onClick={() => setShowDiscordModal(false)}
                         >
                             ¿Habbten en Discord? ¿Con esta economía..? ¡Sácame de aquí!
