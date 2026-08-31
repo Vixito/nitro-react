@@ -186,7 +186,7 @@ export const UserSettingsView: FC<{}> = props => {
                             <Text>{LocalizeText('memenu.settings.other.skip.purchase.confirmation')}</Text>
                         </Flex>
                         <HorizontalRule />
-                        <Button variant="primary" className="d-flex align-items-center justify-content-center py-1.5" onClick={() => setShowDiscordModal(true)}>
+                        <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => setShowDiscordModal(true)}>
                             <Text bold variant="white">Conectar a Discord</Text>
                         </Button>
                         {infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) &&
@@ -291,7 +291,7 @@ export const UserSettingsView: FC<{}> = props => {
 
                         <div className="mb-3">
                             <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '13px' }}>Paso 1: Servidor Oficial de Habbten</div>
-                            <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between p-2.5 rounded text-decoration-none" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
+                            <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between px-3.5 py-3 rounded text-decoration-none" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
                                 <div className="d-flex align-items-center gap-3">
                                     <div style={{ width: 44, height: 44, minWidth: 44, background: '#261f38', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #5a4f7e', padding: '3px' }}>
                                         <img src="habbten_logo.png" onError={({ currentTarget }) => { currentTarget.src = '/game/habbten_logo.png'; }} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="" />
@@ -301,7 +301,7 @@ export const UserSettingsView: FC<{}> = props => {
                                         <div style={{ fontSize: '11px', color: '#cbd5e1' }}>Únete a nuestra comunidad oficial</div>
                                     </div>
                                 </div>
-                                <span className="btn btn-sm py-1.5 px-3 fw-bold" style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '12px', borderRadius: '6px' }}>
+                                <span className="btn btn-sm py-1.5 px-3 fw-bold me-1" style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '12px', borderRadius: '6px' }}>
                                     Unirse
                                 </span>
                             </a>

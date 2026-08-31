@@ -1,5 +1,5 @@
 import { ExtendedProfileChangedMessageEvent, RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomEngineObjectEvent, RoomObjectCategory, RoomObjectType, UserCurrentBadgesComposer, UserCurrentBadgesEvent, UserProfileEvent, UserProfileParser, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { CreateLinkEvent, GetRoomSession, GetSessionDataManager, GetUserProfile, LocalizeText, SendMessageComposer } from '../../api';
 import { Column, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
 import { useMessageEvent, useRoomEngineEvent } from '../../hooks';
@@ -13,6 +13,7 @@ export const UserProfileView: FC<{}> = props =>
     const [ userProfile, setUserProfile ] = useState<UserProfileParser>(null);
     const [ userBadges, setUserBadges ] = useState<string[]>([]);
     const [ userRelationships, setUserRelationships ] = useState<RelationshipStatusInfoMessageParser>(null);
+    const [ battlePassLevel, setBattlePassLevel ] = useState<number>(1);
 
     const onClose = () =>
     {
@@ -91,6 +92,32 @@ export const UserProfileView: FC<{}> = props =>
         GetUserProfile(userData.webID);
     });
 
+    useEffect(() =>
+    {
+        if(!userProfile || !userProfile.id) return;
+
+        fetch(`/api/battlepass/data?user_id=${ userProfile.id }`)
+            .then(r => r.json())
+            .then(data =>
+            {
+                if(data && data.success && data.user && data.user.level)
+                {
+                    setBattlePassLevel(data.user.level);
+                }
+                else if(userProfile.achievementPoints)
+                {
+                    setBattlePassLevel(Math.floor(userProfile.achievementPoints / 100) + 1);
+                }
+            })
+            .catch(() =>
+            {
+                if(userProfile.achievementPoints)
+                {
+                    setBattlePassLevel(Math.floor(userProfile.achievementPoints / 100) + 1);
+                }
+            });
+    }, [ userProfile?.id ]);
+
     if(!userProfile) return null;
 
     return (
@@ -136,7 +163,7 @@ export const UserProfileView: FC<{}> = props =>
                             <path d="M17 1.5L21 7L17 12.5" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                         <span className="fw-bold text-dark" style={{ fontSize: '12px' }}>
-                            Nivel { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }
+                            Nivel { battlePassLevel }
                         </span>
                     </div>
                 </div>
