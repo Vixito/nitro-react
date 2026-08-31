@@ -31,22 +31,27 @@ img {
     border-radius: 8px !important;
     box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important;
 
+    .nitro-card-header,
     .drag-handler {
+        background: #372e50 !important;
         background-color: #372e50 !important;
         border-bottom: 1px solid rgba(255,255,255,0.08) !important;
         color: #ffffff !important;
         
+        .nitro-card-header-text,
         .header-text {
             color: #ffffff !important;
-            font-weight: 700;
+            font-weight: 700 !important;
         }
 
-        .btn-close, .close-button {
+        .nitro-card-header-close,
+        .btn-close, 
+        .close-button {
             background-color: #261f38 !important;
             border: 1px solid #181324 !important;
-            border-radius: 4px;
+            border-radius: 4px !important;
             color: #ffffff !important;
-            opacity: 0.9;
+            opacity: 0.9 !important;
         }
     }
 

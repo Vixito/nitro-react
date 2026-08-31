@@ -293,7 +293,7 @@ export const UserSettingsView: FC<{}> = props => {
                             <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '13px' }}>Paso 1: Servidor Oficial de Habbten</div>
                             <a href="https://discord.com/invite/EVafmrDh" target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-between p-2.5 rounded text-decoration-none" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
                                 <div className="d-flex align-items-center gap-2.5">
-                                    <img src="/favicon-32x32.png" width="36" height="36" alt="Habbten" style={{ borderRadius: '6px', objectFit: 'contain' }} />
+                                    <img src="favicon-32x32.png" onError={({ currentTarget }) => { currentTarget.src = '/game/favicon-32x32.png'; }} width="36" height="36" className="rounded flex-shrink-0" alt="" style={{ objectFit: 'contain', background: '#261f38' }} />
                                     <div>
                                         <div className="fw-bold" style={{ fontSize: '13px' }}>Servidor Oficial de Habbten</div>
                                         <div style={{ fontSize: '11px', color: '#cbd5e1' }}>Únete a nuestra comunidad oficial</div>
