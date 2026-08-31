@@ -116,7 +116,7 @@ export const UserProfileView: FC<{}> = props =>
                     </Flex>
                     <Flex alignItems="center" gap={ 1 } onClick={ () => CreateLinkEvent('battlepass/toggle') }>
                         <span style={ { fontSize: '13px' } }>⭐</span>
-                        <Text bold pointer className="text-primary">Nivel Pase: { userProfile.achievementScore ? Math.floor(userProfile.achievementScore / 100) + 1 : 1 }</Text>
+                        <Text bold pointer className="text-primary">Nivel Pase: { userProfile.achievementPoints ? Math.floor(userProfile.achievementPoints / 100) + 1 : 1 }</Text>
                     </Flex>
                 </Flex>
                 <GroupsContainerView fullWidth itsMe={ userProfile.id === GetSessionDataManager().userId } groups={ userProfile.groups } onLeaveGroup={ onLeaveGroup } />
