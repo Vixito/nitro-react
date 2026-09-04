@@ -4,7 +4,7 @@ import { GetRoomEngine } from '../../../../api';
 import { useRoomEngineEvent } from '../../../events';
 import { useRoom } from '../../useRoom';
 
-const SCORE_TYPES = [ 'perteam', 'mostwins', 'classic' ];
+const SCORE_TYPES = [ 'perteam', 'mostwins', 'classic', 'fastesttime', 'longesttime' ];
 const CLEAR_TYPES = [ 'alltime', 'daily', 'weekly', 'monthly' ];
 
 const useFurnitureHighScoreWidgetState = () =>
