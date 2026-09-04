@@ -13,6 +13,8 @@ import { WiredTriggerGameEndsView } from './WiredTriggerGameEndsView';
 import { WiredTriggerGameStartsView } from './WiredTriggerGameStartsView';
 import { WiredTriggeScoreAchievedView } from './WiredTriggerScoreAchievedView';
 import { WiredTriggerToggleFurniView } from './WiredTriggerToggleFurniView';
+import { WiredTriggerUserPerformsActionView } from './WiredTriggerUserPerformsActionView';
+import { WiredTriggerVariableChangedView } from './WiredTriggerVariableChangedView';
 
 export const WiredTriggerLayoutView = (code: number) =>
 {
@@ -46,6 +48,10 @@ export const WiredTriggerLayoutView = (code: number) =>
             return <WiredTriggeScoreAchievedView />;
         case WiredTriggerLayout.TOGGLE_FURNI:
             return <WiredTriggerToggleFurniView />;
+        case WiredTriggerLayout.VARIABLE_CHANGED:
+            return <WiredTriggerVariableChangedView />;
+        case WiredTriggerLayout.USER_PERFORMS_ACTION:
+            return <WiredTriggerUserPerformsActionView />;
     }
 
     return null;
