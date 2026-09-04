@@ -27,4 +27,7 @@ export class WiredConditionlayout
     public static DATE_RANGE_ACTIVE: number = 24;
     public static ACTOR_HAS_HANDITEM: number = 25;
     public static VARIABLE_VALUE_MATCH: number = 26;
+    public static USER_PERFORMS_ACTION: number = 27;
+    public static NOT_USER_PERFORMS_ACTION: number = 28;
+    public static SLC_QUANTITY: number = 29;
 }

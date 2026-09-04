@@ -2,9 +2,9 @@ import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
 import { Column, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { WiredConditionBaseView } from './WiredConditionBaseView';
 
-export const WiredTriggerUserPerformsActionView: FC<{}> = props =>
+export const WiredConditionUserPerformsActionView: FC<{}> = props =>
 {
     const [ action, setAction ] = useState(1);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
@@ -21,7 +21,7 @@ export const WiredTriggerUserPerformsActionView: FC<{}> = props =>
     }, [ trigger ]);
 
     return (
-        <WiredTriggerBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
+        <WiredConditionBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
             <Column gap={ 1 }>
                 <Text bold>Acción del usuario:</Text>
                 <select
@@ -38,6 +38,6 @@ export const WiredTriggerUserPerformsActionView: FC<{}> = props =>
                     <option value={ 7 }>Respetar</option>
                 </select>
             </Column>
-        </WiredTriggerBaseView>
+        </WiredConditionBaseView>
     );
-}
+};

@@ -15,6 +15,8 @@ import { WiredConditionFurniMatchesSnapshotView } from './WiredConditionFurniMat
 import { WiredConditionTimeElapsedLessView } from './WiredConditionTimeElapsedLessView';
 import { WiredConditionTimeElapsedMoreView } from './WiredConditionTimeElapsedMoreView';
 import { WiredConditionUserCountInRoomView } from './WiredConditionUserCountInRoomView';
+import { WiredConditionUserPerformsActionView } from './WiredConditionUserPerformsActionView';
+import { WiredConditionSlcQuantityView } from './WiredConditionSlcQuantityView';
 
 export const WiredConditionLayoutView = (code: number) =>
 {
@@ -61,6 +63,11 @@ export const WiredConditionLayoutView = (code: number) =>
             return <WiredConditionUserCountInRoomView />;
         case WiredConditionlayout.VARIABLE_VALUE_MATCH:
             return <WiredConditionVariableValueMatchView />;
+        case WiredConditionlayout.USER_PERFORMS_ACTION:
+        case WiredConditionlayout.NOT_USER_PERFORMS_ACTION:
+            return <WiredConditionUserPerformsActionView />;
+        case WiredConditionlayout.SLC_QUANTITY:
+            return <WiredConditionSlcQuantityView />;
     }
 
     return null;
