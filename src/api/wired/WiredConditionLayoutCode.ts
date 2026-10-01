@@ -30,4 +30,26 @@ export class WiredConditionlayout
     public static USER_PERFORMS_ACTION: number = 27;
     public static NOT_USER_PERFORMS_ACTION: number = 28;
     public static SLC_QUANTITY: number = 29;
+    public static HAS_VARIABLE: number = 30;
+    public static VARIABLE_AGE_MATCH: number = 31;
+    public static SELECTOR_VARIABLE: number = 32;
+    public static SELECTOR_REMOTE: number = 33;
+    public static FILTER_VARIABLE: number = 34;
+    public static TEXT_CONNECTOR: number = 35;
+    public static SELECTOR_USERS_TEAM: number = 36;
+    public static SELECTOR_USERS_HANDITEM: number = 37;
+    public static SELECTOR_USERS_BYACTION: number = 38;
+    public static SELECTOR_USERS_GROUP: number = 39;
+    public static SELECTOR_USERS_BYNAME: number = 40;
+    public static SELECTOR_USERS_BYTYPE: number = 41;
+    public static SELECTOR_USERS_ONFURNI: number = 42;
+    public static SELECTOR_FURNI_ONFURNI: number = 43;
+    public static SELECTOR_FURNI_PICKS: number = 44;
+    public static SELECTOR_FURNI_BYTYPE: number = 45;
+    public static SELECTOR_FURNI_ALTITUDE: number = 46;
+    public static SELECTOR_NEIGHBORHOOD: number = 47;
+    public static SELECTOR_SIGNAL: number = 48;
+    public static FILTER_COUNT: number = 49;
+    public static SELECTOR_AREA: number = 50;
 }
+

@@ -29,4 +29,8 @@ export class WiredActionLayoutCode
     public static CHANGE_VARIABLE_VALUE: number = 28;
     public static TELEPORT_TO_ROOM: number = 29;
     public static CLICK_CONF: number = 30;
+    public static GIVE_VARIABLE: number = 31;
+    public static REMOVE_VARIABLE: number = 32;
+    public static MOVE_ROTATE_USER: number = 33;
+    public static USER_TO_FURNI: number = 34;
 }

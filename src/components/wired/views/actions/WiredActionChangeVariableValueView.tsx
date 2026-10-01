@@ -64,6 +64,9 @@ export const WiredActionChangeVariableValueView: FC<{}> = props =>
                 >
                     <option value={ 0 }>Variable de Sala (Global en toda la sala)</option>
                     <option value={ 1 }>Variable de Usuario (Individual por cada jugador)</option>
+                    <option value={ 2 }>Variable de Furni (Asociada a objetos)</option>
+                    <option value={ 3 }>Variable de Contexto (Temporal de ejecución)</option>
+                    <option value={ 4 }>Variable Global / Otra Sala (Persistente entre salas)</option>
                 </select>
             </Column>
             <Column gap={ 1 }>
@@ -79,6 +82,8 @@ export const WiredActionChangeVariableValueView: FC<{}> = props =>
                     <option value={ 3 }>Multiplicar por (*)</option>
                     <option value={ 4 }>Dividir entre (/)</option>
                     <option value={ 5 }>Número Aleatorio (1 a N)</option>
+                    <option value={ 6 }>Módulo / Residuo (%)</option>
+                    <option value={ 7 }>Potencia (^)</option>
                 </select>
             </Column>
             <Column gap={ 1 }>

@@ -64,6 +64,9 @@ export const WiredConditionVariableValueMatchView: FC<{}> = props =>
                 >
                     <option value={ 0 }>Variable de Sala (Global en toda la sala)</option>
                     <option value={ 1 }>Variable de Usuario (Individual por jugador)</option>
+                    <option value={ 2 }>Variable de Furni (Asociada a objetos)</option>
+                    <option value={ 3 }>Variable de Contexto (Temporal de ejecución)</option>
+                    <option value={ 4 }>Variable Global / Otra Sala (Persistente entre salas)</option>
                 </select>
             </Column>
             <Column gap={ 1 }>

@@ -53,7 +53,7 @@ export const WiredActionClickConfView: FC<{}> = props =>
                     <option value={ 0 }>Todos los usuarios</option>
                     <option value={ 1 }>Solo usuarios con derechos o dueño</option>
                 </select>
-                <Text small muted>Configura el comportamiento y permisos de interacción por clic sobre los furnis seleccionados.</Text>
+                <Text small variant="muted">Configura el comportamiento y permisos de interacción por clic sobre los furnis seleccionados.</Text>
             </Column>
         </WiredActionBaseView>
     );

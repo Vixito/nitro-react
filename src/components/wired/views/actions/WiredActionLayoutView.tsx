@@ -27,6 +27,10 @@ import { WiredActionTeleportView } from './WiredActionTeleportView';
 import { WiredActionToggleFurniStateView } from './WiredActionToggleFurniStateView';
 import { WiredActionTeleportToRoomView } from './WiredActionTeleportToRoomView';
 import { WiredActionClickConfView } from './WiredActionClickConfView';
+import { WiredActionGiveVariableView } from './WiredActionGiveVariableView';
+import { WiredActionRemoveVariableView } from './WiredActionRemoveVariableView';
+import { WiredActionMoveRotateUserView } from './WiredActionMoveRotateUserView';
+import { WiredActionMoveUserToFurniView } from './WiredActionMoveUserToFurniView';
 
 export const WiredActionLayoutView = (code: number) =>
 {
@@ -88,6 +92,14 @@ export const WiredActionLayoutView = (code: number) =>
             return <WiredActionTeleportToRoomView />;
         case WiredActionLayoutCode.CLICK_CONF:
             return <WiredActionClickConfView />;
+        case WiredActionLayoutCode.GIVE_VARIABLE:
+            return <WiredActionGiveVariableView />;
+        case WiredActionLayoutCode.REMOVE_VARIABLE:
+            return <WiredActionRemoveVariableView />;
+        case WiredActionLayoutCode.MOVE_ROTATE_USER:
+            return <WiredActionMoveRotateUserView />;
+        case WiredActionLayoutCode.USER_TO_FURNI:
+            return <WiredActionMoveUserToFurniView />;
     }
 
     return null;

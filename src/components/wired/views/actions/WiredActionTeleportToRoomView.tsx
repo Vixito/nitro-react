@@ -43,7 +43,7 @@ export const WiredActionTeleportToRoomView: FC<{}> = props =>
                     value={ roomId || '' }
                     onChange={ event => setRoomId(parseInt(event.target.value) || 0) }
                     placeholder="Ej: 123" />
-                <Text small muted>Introduce el ID de la sala de destino a la que se teletransportará al usuario cuando se active el efecto.</Text>
+                <Text small variant="muted">Introduce el ID de la sala de destino a la que se teletransportará al usuario cuando se active el efecto.</Text>
             </Column>
         </WiredActionBaseView>
     );

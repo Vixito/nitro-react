@@ -45,11 +45,13 @@ export class WiredSelectionVisualizer
 
         const visualization = (roomObject.visualization as IRoomObjectSpriteVisualization);
 
-        if(!visualization) return;
+        if(!visualization || !visualization.sprites) return;
 
         for(const sprite of visualization.sprites)
         {
-            if(sprite.blendMode === 1) continue; // BLEND_MODE: ADD
+            if(!sprite || sprite.blendMode === 1) continue; // BLEND_MODE: ADD
+
+            if(sprite.filters && sprite.filters.includes(WiredSelectionVisualizer._selectionShader)) continue;
 
             sprite.filters = [ WiredSelectionVisualizer._selectionShader ];
         }
@@ -61,8 +63,16 @@ export class WiredSelectionVisualizer
 
         const visualization = (roomObject.visualization as IRoomObjectSpriteVisualization);
 
-        if(!visualization) return;
+        if(!visualization || !visualization.sprites) return;
 
-        for(const sprite of visualization.sprites) sprite.filters = [];
+        for(const sprite of visualization.sprites)
+        {
+            if(!sprite) continue;
+
+            if(!sprite.filters || sprite.filters.length === 0) continue;
+
+            sprite.filters = [];
+        }
     }
 }
+
