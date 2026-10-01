@@ -57,7 +57,20 @@ export const NitroCardView: FC<NitroCardViewProps> = props =>
     return (
         <NitroCardContextProvider value={ { theme } }>
             <DraggableWindow uniqueKey={ uniqueKey } handleSelector={ handleSelector } windowPosition={ windowPosition } disableDrag={ disableDrag }>
-                <Column innerRef={ elementRef } overflow={ overflow } position={ position } gap={ gap } classNames={ getClassNames } { ...rest } />
+                <Column 
+                    innerRef={ elementRef } 
+                    overflow={ overflow } 
+                    position={ position } 
+                    gap={ gap } 
+                    classNames={ getClassNames } 
+                    onMouseEnter={ event => {
+                        if(document.body.style.cursor === 'pointer') {
+                            document.body.style.cursor = 'default';
+                        }
+                        if((rest as any).onMouseEnter) (rest as any).onMouseEnter(event);
+                    } }
+                    { ...rest } 
+                />
             </DraggableWindow>
         </NitroCardContextProvider>
     );

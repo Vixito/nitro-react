@@ -3,6 +3,56 @@ $nitro-card-tabs-height: 33px;
 
 .nitro-card {
     resize: both;
+    cursor: default;
+
+    *, *::before, *::after {
+        cursor: inherit;
+    }
+
+    button,
+    .btn,
+    .btn-close,
+    .cursor-pointer,
+    [role="button"],
+    .nitro-card-header-close,
+    .nitro-card-header-report-camera,
+    a,
+    select,
+    option,
+    input[type="checkbox"],
+    input[type="radio"],
+    .form-check-input,
+    .form-check-label {
+        cursor: pointer;
+
+        *, *::before, *::after {
+            cursor: pointer;
+        }
+    }
+
+    input,
+    textarea {
+        cursor: text;
+    }
+
+    button:disabled,
+    .btn:disabled,
+    .cursor-not-allowed,
+    [disabled] {
+        cursor: not-allowed;
+
+        *, *::before, *::after {
+            cursor: not-allowed;
+        }
+    }
+
+    .cursor-default {
+        cursor: default !important;
+
+        *, *::before, *::after {
+            cursor: default !important;
+        }
+    }
 
     @include media-breakpoint-down(lg) {
         max-width: 100vw !important;
