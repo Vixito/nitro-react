@@ -104,7 +104,7 @@ export const BattlePassView: FC<{}> = () => {
         chapter: number;
         season: number;
         seasonEnd: number;
-        theme?: { id: string; primary: string; secondary: string; xpStart: string; xpEnd: string; bg: string; cardBg: string; textColor: string; banner: string };
+        theme?: { id: string; primary: string; secondary: string; xpStart: string; xpEnd: string; bg: string; cardBg: string; textColor: string; subtextColor?: string; isDark?: boolean; banner: string };
         user: { level: number; xp: number; xpNext: number; rankPosition?: number };
         isVip: boolean;
         minVipRank?: number;
@@ -361,7 +361,9 @@ export const BattlePassView: FC<{}> = () => {
             '--bp-xp-gradient': `linear-gradient(90deg, ${t.xpStart} 0%, ${t.xpEnd} 100%)`,
             '--bp-bg': t.bg,
             '--bp-card-bg': t.cardBg,
-            '--bp-text': t.textColor
+            '--bp-text': t.textColor,
+            '--bp-subtext': t.subtextColor || (t.isDark ? '#94a3b8' : '#64748b'),
+            '--bp-border': t.isDark ? 'rgba(255, 255, 255, 0.12)' : '#cbd5e1'
         };
         if (t.banner) {
             styles['--bp-banner-bg'] = `url("${t.banner}") center/cover no-repeat`;
@@ -479,32 +481,32 @@ export const BattlePassView: FC<{}> = () => {
                 }}
             />
 
-            <NitroCardContentView className="p-3 bp-container d-flex flex-column gap-2.5" style={themeStyles as React.CSSProperties}>
+            <NitroCardContentView className={`p-3 bp-container d-flex flex-column gap-2.5 ${bpData.theme?.isDark ? 'bp-theme-dark' : ''}`} style={themeStyles as React.CSSProperties}>
 
                 { /* Top Season Notice Bar */}
-                <div className="bp-season-banner d-flex align-items-center justify-content-between">
-                    <span className="text-secondary fw-semibold" style={{ fontSize: '13px' }}>
+                <div className={`bp-season-banner d-flex align-items-center justify-content-between ${bpData.theme?.banner ? 'has-custom-banner' : ''}`}>
+                    <span className="bp-banner-title fw-semibold" style={{ fontSize: '13px' }}>
                         Actualmente nos encontramos en <strong>Capítulo {bpData.chapter}, Temporada {bpData.season}</strong> la experiencia y los premios serán reiniciados en:
                     </span>
                     <div className="d-flex align-items-center gap-2 flex-shrink-0">
                         <div className="d-flex flex-column align-items-center">
                             <span className="bp-countdown-digit">{seasonTimeRemaining.days}</span>
-                            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 800, marginTop: '2px' }}>Días</span>
+                            <span className="bp-countdown-label">Días</span>
                         </div>
-                        <span className="fw-bold text-muted" style={{ fontSize: '16px', marginTop: '-12px' }}>:</span>
+                        <span className="bp-countdown-sep">:</span>
                         <div className="d-flex flex-column align-items-center">
                             <span className="bp-countdown-digit">{seasonTimeRemaining.hours}</span>
-                            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 800, marginTop: '2px' }}>Horas</span>
+                            <span className="bp-countdown-label">Horas</span>
                         </div>
-                        <span className="fw-bold text-muted" style={{ fontSize: '16px', marginTop: '-12px' }}>:</span>
+                        <span className="bp-countdown-sep">:</span>
                         <div className="d-flex flex-column align-items-center">
                             <span className="bp-countdown-digit">{seasonTimeRemaining.minutes}</span>
-                            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 800, marginTop: '2px' }}>Minutos</span>
+                            <span className="bp-countdown-label">Minutos</span>
                         </div>
-                        <span className="fw-bold text-muted" style={{ fontSize: '16px', marginTop: '-12px' }}>:</span>
+                        <span className="bp-countdown-sep">:</span>
                         <div className="d-flex flex-column align-items-center">
                             <span className="bp-countdown-digit">{seasonTimeRemaining.seconds}</span>
-                            <span style={{ fontSize: '9px', color: '#64748b', fontWeight: 800, marginTop: '2px' }}>Segundos</span>
+                            <span className="bp-countdown-label">Segundos</span>
                         </div>
                     </div>
                 </div>
@@ -600,9 +602,9 @@ export const BattlePassView: FC<{}> = () => {
                                             style={{
                                                 fontSize: '11px',
                                                 borderRadius: '4px',
-                                                backgroundColor: missionFilter === 'all' ? '#0284c7' : '#f1f5f9',
-                                                color: missionFilter === 'all' ? '#ffffff' : '#475569',
-                                                border: missionFilter === 'all' ? '1px solid #0284c7' : '1px solid #cbd5e1'
+                                                backgroundColor: missionFilter === 'all' ? 'var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '#0f172a' : '#f1f5f9'),
+                                                color: missionFilter === 'all' ? '#ffffff' : (bpData.theme?.isDark ? '#94a3b8' : '#475569'),
+                                                border: missionFilter === 'all' ? '1px solid var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1')
                                             }}
                                             onClick={() => setMissionFilter('all')}
                                         >
@@ -614,9 +616,9 @@ export const BattlePassView: FC<{}> = () => {
                                             style={{
                                                 fontSize: '11px',
                                                 borderRadius: '4px',
-                                                backgroundColor: missionFilter === 'in_progress' ? '#0284c7' : '#f1f5f9',
-                                                color: missionFilter === 'in_progress' ? '#ffffff' : '#475569',
-                                                border: missionFilter === 'in_progress' ? '1px solid #0284c7' : '1px solid #cbd5e1'
+                                                backgroundColor: missionFilter === 'in_progress' ? 'var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '#0f172a' : '#f1f5f9'),
+                                                color: missionFilter === 'in_progress' ? '#ffffff' : (bpData.theme?.isDark ? '#94a3b8' : '#475569'),
+                                                border: missionFilter === 'in_progress' ? '1px solid var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1')
                                             }}
                                             onClick={() => setMissionFilter('in_progress')}
                                         >
@@ -628,9 +630,9 @@ export const BattlePassView: FC<{}> = () => {
                                             style={{
                                                 fontSize: '11px',
                                                 borderRadius: '4px',
-                                                backgroundColor: missionFilter === 'completed' ? '#0284c7' : '#f1f5f9',
-                                                color: missionFilter === 'completed' ? '#ffffff' : '#475569',
-                                                border: missionFilter === 'completed' ? '1px solid #0284c7' : '1px solid #cbd5e1'
+                                                backgroundColor: missionFilter === 'completed' ? 'var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '#0f172a' : '#f1f5f9'),
+                                                color: missionFilter === 'completed' ? '#ffffff' : (bpData.theme?.isDark ? '#94a3b8' : '#475569'),
+                                                border: missionFilter === 'completed' ? '1px solid var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1')
                                             }}
                                             onClick={() => setMissionFilter('completed')}
                                         >
