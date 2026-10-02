@@ -7,6 +7,7 @@ import { useMessageEvent } from '../events';
 const useGameCenterState = () => 
 {
     const [ isVisible, setIsVisible ] = useState<boolean>(false);
+    const [ isSnowStormLobbyVisible, setIsSnowStormLobbyVisible ] = useState<boolean>(false);
     const [ games, setGames ] = useState<GameConfigurationData[]>(null);
     const [ selectedGame, setSelectedGame ] = useState<GameConfigurationData>(null);
     const [ accountStatus, setAccountStatus ] = useState<Game2AccountGameStatusMessageParser>(null);
@@ -74,6 +75,7 @@ const useGameCenterState = () =>
 
     return {
         isVisible, setIsVisible,
+        isSnowStormLobbyVisible, setIsSnowStormLobbyVisible,
         games,
         accountStatus,
         selectedGame, setSelectedGame: selectGame,

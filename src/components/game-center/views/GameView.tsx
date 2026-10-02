@@ -55,7 +55,7 @@ const GAME_DESCRIPTIONS: { [ gameNameId: string ]: { title: string; desc: string
 };
 
 export const GameView = () => {
-    const { selectedGame, accountStatus, gameOffline, setGameURL } = useGameCenter();
+    const { selectedGame, accountStatus, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible } = useGameCenter();
 
     useEffect(() => {
         if (selectedGame) {
@@ -77,6 +77,12 @@ export const GameView = () => {
     const onPlay = () => {
         if (gameOffline) return;
         
+        if (selectedGame && (selectedGame.gameNameId === 'snowwar' || selectedGame.gameNameId === 'snowstorm')) {
+            setIsVisible(false);
+            setIsSnowStormLobbyVisible(true);
+            return;
+        }
+
         SendMessageComposer(new JoinQueueMessageComposer(selectedGame.gameId));
     };
 
