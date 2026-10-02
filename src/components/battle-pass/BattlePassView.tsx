@@ -485,7 +485,7 @@ export const BattlePassView: FC<{}> = () => {
 
                 { /* Top Season Notice Bar */}
                 <div className={`bp-season-banner d-flex align-items-center justify-content-between ${bpData.theme?.banner ? 'has-custom-banner' : ''}`}>
-                    <span className="bp-banner-title fw-semibold" style={{ fontSize: '13px' }}>
+                    <span className="bp-banner-title text-secondary fw-semibold" style={{ fontSize: '13px' }}>
                         Actualmente nos encontramos en <strong>Capítulo {bpData.chapter}, Temporada {bpData.season}</strong> la experiencia y los premios serán reiniciados en:
                     </span>
                     <div className="d-flex align-items-center gap-2 flex-shrink-0">

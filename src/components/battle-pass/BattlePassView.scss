@@ -49,12 +49,31 @@
 
     /* Top Season Banner */
     .bp-season-banner {
+        background: var(--bp-banner-bg, var(--bp-card-bg, #ffffff));
         border: 1px solid var(--bp-border, #cbd5e1);
         border-radius: 6px;
-        padding: 8px 18px;
+        padding: 10px 18px;
+        min-height: 52px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        position: relative;
-        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+
+        .bp-countdown-label {
+            font-size: 9px;
+            font-weight: 800;
+            margin-top: 3px;
+            line-height: 1;
+            color: var(--bp-subtext, #64748b);
+            transition: color 0.2s ease;
+        }
+
+        .bp-countdown-sep {
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: -10px;
+            color: var(--bp-subtext, #94a3b8);
+            transition: color 0.2s ease;
+        }
 
         &.has-custom-banner {
             background: linear-gradient(90deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.55) 55%, rgba(15, 23, 42, 0.85) 100%), var(--bp-banner-bg);
@@ -65,11 +84,6 @@
             .bp-banner-title {
                 color: #ffffff !important;
                 text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
-
-                strong {
-                    color: #fde047 !important;
-                    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-                }
             }
 
             .bp-countdown-label {
@@ -81,41 +95,6 @@
                 color: rgba(255, 255, 255, 0.75) !important;
                 text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
             }
-        }
-
-        &:not(.has-custom-banner) {
-            background: var(--bp-card-bg, #ffffff);
-            color: var(--bp-text, #1e293b);
-
-            .bp-banner-title {
-                color: var(--bp-text, #1e293b) !important;
-
-                strong {
-                    color: var(--bp-primary, #0284c7) !important;
-                }
-            }
-
-            .bp-countdown-label {
-                color: var(--bp-subtext, #64748b) !important;
-            }
-
-            .bp-countdown-sep {
-                color: var(--bp-subtext, #94a3b8) !important;
-            }
-        }
-
-        .bp-countdown-label {
-            font-size: 9px;
-            font-weight: 800;
-            margin-top: 2px;
-            transition: color 0.2s ease;
-        }
-
-        .bp-countdown-sep {
-            font-weight: bold;
-            font-size: 16px;
-            margin-top: -12px;
-            transition: color 0.2s ease;
         }
     }
 
