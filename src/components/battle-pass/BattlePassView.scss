@@ -698,22 +698,57 @@
     }
 
     /* Adaptive Dark Mode overrides */
-    &.bp-theme-dark {
+    &.bp-theme-dark,
+    .bp-theme-dark {
+        /* General Typography */
         .text-dark {
             color: #f8fafc !important;
         }
         .text-secondary {
-            color: #94a3b8 !important;
+            color: #cbd5e1 !important;
         }
         .text-muted {
-            color: #64748b !important;
+            color: #94a3b8 !important;
         }
+        .border-bottom {
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        /* Top Season Notice Banner (without custom image) */
+        .bp-season-banner:not(.has-custom-banner) {
+            background: var(--bp-card-bg, #1e293b);
+            border-color: rgba(255, 255, 255, 0.12);
+
+            .bp-banner-title {
+                color: #e2e8f0 !important;
+
+                strong {
+                    color: var(--bp-primary, #ea580c) !important;
+                }
+            }
+
+            .bp-countdown-label {
+                color: #94a3b8 !important;
+            }
+
+            .bp-countdown-sep {
+                color: #cbd5e1 !important;
+            }
+
+            .bp-countdown-digit {
+                background: #0f172a;
+                border-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        /* Main Info Cards */
         .bp-card-box {
             background: var(--bp-card-bg, #1e293b);
             border-color: var(--bp-border, rgba(255, 255, 255, 0.12));
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         .bp-box-header-title {
-            color: #94a3b8;
+            color: #cbd5e1;
         }
         .bp-level-tag {
             background: #0f172a;
@@ -724,28 +759,162 @@
             background: #0f172a;
             border-color: rgba(255, 255, 255, 0.15);
         }
+
+        /* Quick Missions Horizontal Track */
         .bp-quick-mission-card {
             background: #0f172a;
             border-color: rgba(255, 255, 255, 0.15);
+
+            &:hover {
+                background: #141d2e;
+                border-color: rgba(255, 255, 255, 0.25);
+            }
         }
-        .bp-track-card {
+        .bp-missions-horizontal-track {
+            &::-webkit-scrollbar-track {
+                background: #0f172a;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: #334155;
+            }
+        }
+
+        /* Rewards Track (Left Column) */
+        .bp-rewards-scroll-track {
+            &::-webkit-scrollbar-track {
+                background: #0f172a;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: #334155;
+            }
+        }
+        .bp-vertical-line {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .bp-level-node {
+            background: #0f172a;
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #f8fafc;
+        }
+        .bp-square-box {
             background: #0f172a;
             border-color: rgba(255, 255, 255, 0.15);
+
+            &:hover {
+                border-color: var(--bp-primary, #ea580c);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            }
+
+            &.unlocked {
+                background: #064e3b;
+                border-color: #10b981;
+            }
+
+            &.claimable {
+                background: #065f46;
+                border-color: #22c55e;
+            }
+
+            &.claimed {
+                background: #090d16;
+                border-color: rgba(255, 255, 255, 0.08);
+                opacity: 0.6;
+            }
+
+            &.vip-square {
+                background: #0f172a;
+                border-color: rgba(255, 255, 255, 0.15);
+
+                &.vip-locked {
+                    background: linear-gradient(135deg, #1f1402 0%, #2e1a04 100%);
+                    border-color: rgba(245, 158, 11, 0.35);
+                }
+
+                &.unlocked {
+                    background: #064e3b;
+                    border-color: #10b981;
+                }
+
+                &.claimable {
+                    background: #065f46;
+                    border-color: #22c55e;
+                }
+            }
         }
-        .bp-missions-sidebar {
+
+        /* Challenges Area (Right Column) */
+        .bp-category-card {
             background: #0f172a;
-            border-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+
+            &:hover {
+                background: #141d2e;
+                border-color: rgba(255, 255, 255, 0.25);
+            }
+
+            .bp-category-icon-box {
+                background: #1e293b;
+                border-color: rgba(255, 255, 255, 0.15);
+            }
         }
+
+        .form-control {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border-color: rgba(255, 255, 255, 0.15);
+
+            &:focus {
+                background-color: #0f172a;
+                color: #f8fafc;
+                border-color: var(--bp-primary, #ea580c);
+                box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.25);
+            }
+
+            &::placeholder {
+                color: #64748b;
+            }
+        }
+
         .bp-mission-row {
             background: #0f172a;
-            border-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.12);
+
+            &.completed {
+                background: #064e3b;
+                border-color: rgba(34, 197, 94, 0.4);
+            }
+
+            .progress {
+                background-color: #1e293b !important;
+            }
+
+            .badge.bg-light {
+                background-color: #1e293b !important;
+                color: #cbd5e1 !important;
+                border-color: rgba(255, 255, 255, 0.15) !important;
+            }
         }
+
+        .bp-dialog {
+            background: #1e293b;
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #f8fafc;
+        }
+
+        .bp-ranking-item {
+            background: #0f172a;
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
         .bp-rank-name {
             color: #f8fafc;
         }
+
         .bp-rank-xp {
             color: #94a3b8;
         }
+
         .bp-back-separator {
             background: rgba(255, 255, 255, 0.15);
         }

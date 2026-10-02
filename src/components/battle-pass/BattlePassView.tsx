@@ -467,7 +467,7 @@ export const BattlePassView: FC<{}> = () => {
     return (
         <NitroCardView
             uniqueKey="battle-pass"
-            className="nitro-battle-pass"
+            className={`nitro-battle-pass ${bpData.theme?.isDark ? 'bp-theme-dark' : ''}`}
             theme="primary-slim"
             onMouseEnter={() => {
                 if (document.body.style.cursor === 'pointer') document.body.style.cursor = 'default';
