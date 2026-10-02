@@ -153,6 +153,10 @@ const useChatInputWidgetState = () =>
                     if(roomSession.controllerLevel >= RoomControllerLevel.ROOM_OWNER) CreateLinkEvent('floor-editor/show');
                     
                     return null;
+                case ':wired':
+                case ':wf':
+                    CreateLinkEvent('wired/creator-tools');
+                    return null;
                 case ':togglefps': {
                     if(GetTicker().maxFPS > 0) GetTicker().maxFPS = 0;
                     else GetTicker().maxFPS = GetConfiguration('system.animation.fps');

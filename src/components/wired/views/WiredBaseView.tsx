@@ -1,6 +1,6 @@
 import { FC, PropsWithChildren, useEffect, useRef, useState } from 'react';
-import { FaBars, FaCheck, FaCopy, FaPaintBrush, FaPaste, FaRedo, FaSave, FaTimes, FaTrashAlt } from 'react-icons/fa';
-import { GetSessionDataManager, LocalizeText, WiredFurniType, WiredSelectionVisualizer } from '../../../api';
+import { FaCheck, FaPaintBrush, FaSave } from 'react-icons/fa';
+import { GetRoomSession, GetSessionDataManager, LocalizeText, WiredFurniType, WiredSelectionVisualizer } from '../../../api';
 import { Button, Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
 import { useWired } from '../../../hooks';
 import { WiredFurniSelectorView } from './WiredFurniSelectorView';
@@ -34,7 +34,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
     const [ isMenuOpen, setIsMenuOpen ] = useState<boolean>(false);
     const [ toastMessage, setToastMessage ] = useState<string>(null);
     const [ continuousBrush, setContinuousBrush ] = useState<boolean>(() => sessionStorage.getItem('wired_continuous_brush') === 'true');
-    const { trigger = null, setTrigger = null, setIntParams = null, setStringParam = null, setFurniIds = null, setAllowsFurni = null, saveWired = null, intParams = [], stringParam = '', furniIds = [], actionDelay = 0, setActionDelay = null } = useWired();
+    const { trigger = null, setTrigger = null, setIntParams = null, setStringParam = null, setFurniIds = null, setAllowsFurni = null, saveWired = null, intParams = [], stringParam = '', furniIds = [], actionDelay = 0, setActionDelay = null, setIsWiredCreatorToolsVisible } = useWired();
     const initializedTriggerIdRef = useRef<number>(-1);
     const menuRef = useRef<HTMLDivElement>(null);
     const menuButtonRef = useRef<HTMLDivElement>(null);
@@ -102,7 +102,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
 
         (window as any).__WIRED_CLIPBOARD__ = clipboardData;
         sessionStorage.setItem('wired_clipboard', JSON.stringify(clipboardData));
-        showToast('📋 Ajustes copiados');
+        showToast('✓ Configuración copiada');
         setIsMenuOpen(false);
     };
 
@@ -111,7 +111,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
         const raw = (window as any).__WIRED_CLIPBOARD__ || (sessionStorage.getItem('wired_clipboard') ? JSON.parse(sessionStorage.getItem('wired_clipboard')) : null);
         if(!raw)
         {
-            showToast('⚠️ No hay ajustes en el portapapeles');
+            showToast('⚠️ No hay configuración en el portapapeles');
             return;
         }
 
@@ -129,7 +129,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
             });
         }
 
-        showToast('📥 Ajustes pegados');
+        showToast('✓ Configuración pegada');
         setIsMenuOpen(false);
     };
 
@@ -143,7 +143,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
                 return [];
             });
         }
-        showToast('🧹 Selección de furnis borrada');
+        showToast('✓ Selección de furnis borrada');
         setIsMenuOpen(false);
     };
 
@@ -160,7 +160,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
                 return [];
             });
         }
-        showToast('🔄 Restablecido a valores predeterminados');
+        showToast('✓ Restablecido a los valores predeterminados');
         setIsMenuOpen(false);
     };
 
@@ -171,18 +171,34 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
         sessionStorage.setItem('wired_continuous_brush', nextState ? 'true' : 'false');
         if(nextState)
         {
-            // Auto copy current if clipboard empty
             if(!(window as any).__WIRED_CLIPBOARD__)
             {
                 handleCopySettings();
             }
-            showToast('🖌️ Modo brocha continua ACTIVO');
+            showToast('✓ Copiar en otro Wired activado');
         }
         else
         {
-            showToast('Modo brocha desactivado');
+            showToast('Copiar en otro Wired desactivado');
         }
         setIsMenuOpen(false);
+    };
+
+    const handleOpenCreatorTools = () =>
+    {
+        setIsMenuOpen(false);
+        setIsWiredCreatorToolsVisible(true);
+        const session = GetRoomSession();
+        if(session)
+        {
+            session.sendChatMessage(':wired', 0);
+        }
+    };
+
+    const handleSaveMenu = () =>
+    {
+        setIsMenuOpen(false);
+        onApplyWithoutClosing();
     };
 
     const saveWiredRef = useRef(saveWired);
@@ -205,7 +221,6 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
             return;
         }
 
-        // Prevent wiping out user selections or re-running shaders if already initialized for this wired
         if(initializedTriggerIdRef.current === trigger.id) return;
         initializedTriggerIdRef.current = trigger.id;
 
@@ -248,7 +263,6 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
 
         setAllowsFurni(requiresFurni);
 
-        // Continuous Brush execution
         if(continuousBrush)
         {
             const raw = (window as any).__WIRED_CLIPBOARD__ || (sessionStorage.getItem('wired_clipboard') ? JSON.parse(sessionStorage.getItem('wired_clipboard')) : null);
@@ -267,48 +281,44 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
                     });
                 }
                 if(saveWiredRef.current) saveWiredRef.current();
-                showToast('🖌️ Brocha: Ajustes aplicados y guardados');
+                showToast('✓ Brocha: Ajustes aplicados y guardados');
             }
         }
     }, [ trigger, hasSpecialInput, requiresFurni, setIntParams, setStringParam, setFurniIds, setAllowsFurni, continuousBrush, setActionDelay ]);
 
     const hasClipboard = !!((window as any).__WIRED_CLIPBOARD__ || sessionStorage.getItem('wired_clipboard'));
 
-
     return (
         <NitroCardView uniqueKey="nitro-wired" className="nitro-wired" theme="primary-slim" overflow="visible">
             <NitroCardHeaderView headerText={ LocalizeText('wiredfurni.title') } onCloseClick={ onClose }>
-                <Flex
-                    innerRef={ menuButtonRef }
-                    center
+                <div
+                    ref={ menuButtonRef }
                     className={ `nitro-card-header-wired-menu ${ isMenuOpen ? 'active' : '' }` }
                     title="Menú de ajustes Wired"
                     onMouseDownCapture={ event => { event.stopPropagation(); event.nativeEvent.stopImmediatePropagation(); } }
                     onClick={ () => setIsMenuOpen(prev => !prev) }
                 >
-                    <FaBars className="menu-btn-icon" />
-                </Flex>
+                    <div className="hamburger-line" />
+                    <div className="hamburger-line" />
+                </div>
             </NitroCardHeaderView>
 
-            { /* Toast notification */ }
             { toastMessage && (
                 <div className="nitro-wired-toast">
                     { toastMessage }
                 </div>
             ) }
 
-            { /* Continuous brush active banner */ }
             { continuousBrush && (
                 <Flex alignItems="center" justifyContent="between" className="px-2 py-1 bg-info text-dark small fw-bold">
                     <Flex alignItems="center" gap={ 1 }>
                         <FaPaintBrush />
-                        <span>Modo brocha continua activo</span>
+                        <span>Modo copiar en otro Wired activo</span>
                     </Flex>
                     <span style={{ cursor: 'pointer' }} onClick={ toggleContinuousBrush }>Desactivar</span>
                 </Flex>
             ) }
 
-            { /* Backdrop to close dropdown when clicking outside */ }
             { isMenuOpen && (
                 <div
                     className="nitro-wired-backdrop"
@@ -317,36 +327,46 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
                 />
             ) }
 
-            { /* Dropdown menu */ }
             { isMenuOpen && (
                 <div ref={ menuRef } className="nitro-wired-dropdown" onMouseDown={ e => e.stopPropagation() }>
                     <div className="nitro-wired-menu-item" onClick={ handleCopySettings }>
-                        <FaCopy className="menu-item-icon" />
-                        <span>Copiar ajustes wired</span>
+                        <span>Copiar configuración</span>
                     </div>
                     <div
                         className={ `nitro-wired-menu-item ${ !hasClipboard ? 'disabled' : '' }` }
                         onClick={ hasClipboard ? handlePasteSettings : undefined }
                     >
-                        <FaPaste className="menu-item-icon" />
-                        <span>Pegar ajustes wired</span>
+                        <span>Pegar configuración</span>
                     </div>
                     <div
-                        className={ `nitro-wired-menu-item ${ continuousBrush ? 'brush-active' : '' }` }
+                        className="nitro-wired-menu-item"
                         onClick={ toggleContinuousBrush }
                     >
-                        <FaPaintBrush className="menu-item-icon" />
-                        <span>Copiar en otro wired (brocha)</span>
-                        { continuousBrush && <FaCheck className="ms-auto" /> }
+                        <span className={ `wired-menu-checkbox ${ continuousBrush ? 'checked' : '' }` }>
+                            { continuousBrush && <FaCheck /> }
+                        </span>
+                        <span>Copiar en otro Wired</span>
                     </div>
                     <div className="nitro-wired-menu-divider" />
-                    <div className="nitro-wired-menu-item" onClick={ handleClearFurniSelection }>
-                        <FaTrashAlt className="menu-item-icon" />
+                    <div 
+                        className={ `nitro-wired-menu-item ${ (!furniIds || !furniIds.length) ? 'disabled' : '' }` }
+                        onClick={ (furniIds && furniIds.length) ? handleClearFurniSelection : undefined }
+                    >
                         <span>Borrar selección de furnis</span>
                     </div>
                     <div className="nitro-wired-menu-item" onClick={ handleResetDefaults }>
-                        <FaRedo className="menu-item-icon" />
-                        <span>Restablecer valores predeterminados</span>
+                        <span>Restablecer a los valores predeterminados</span>
+                    </div>
+                    <div className="nitro-wired-menu-divider" />
+                    <div className="nitro-wired-menu-item" onClick={ handleOpenCreatorTools }>
+                        <span>Abrir herramientas de creación Wired</span>
+                    </div>
+                    <div className="nitro-wired-menu-divider" />
+                    <div className="nitro-wired-menu-item" onClick={ handleSaveMenu }>
+                        <span>Guardar</span>
+                    </div>
+                    <div className="nitro-wired-menu-item" onClick={ onClose }>
+                        <span>Cerrar</span>
                     </div>
                 </div>
             ) }

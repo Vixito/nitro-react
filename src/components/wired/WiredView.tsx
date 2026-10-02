@@ -4,18 +4,29 @@ import { useWired } from '../../hooks';
 import { WiredActionLayoutView } from './views/actions/WiredActionLayoutView';
 import { WiredConditionLayoutView } from './views/conditions/WiredConditionLayoutView';
 import { WiredTriggerLayoutView } from './views/triggers/WiredTriggerLayoutView';
+import { WiredCreatorToolsView } from './views/creator-tools/WiredCreatorToolsView';
 
 export const WiredView: FC<{}> = props =>
 {
     const { trigger = null } = useWired();
 
-    if(!trigger) return null;
+    const renderWiredContent = () =>
+    {
+        if(!trigger) return null;
 
-    if(trigger instanceof WiredActionDefinition) return WiredActionLayoutView(trigger.code);
+        if(trigger instanceof WiredActionDefinition) return WiredActionLayoutView(trigger.code);
 
-    if(trigger instanceof TriggerDefinition) return WiredTriggerLayoutView(trigger.code);
-    
-    if(trigger instanceof ConditionDefinition) return WiredConditionLayoutView(trigger.code);
-    
-    return null;
+        if(trigger instanceof TriggerDefinition) return WiredTriggerLayoutView(trigger.code);
+        
+        if(trigger instanceof ConditionDefinition) return WiredConditionLayoutView(trigger.code);
+        
+        return null;
+    };
+
+    return (
+        <>
+            { renderWiredContent() }
+            <WiredCreatorToolsView />
+        </>
+    );
 };

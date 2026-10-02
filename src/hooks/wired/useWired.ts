@@ -1,7 +1,7 @@
-import { ConditionDefinition, Triggerable, TriggerDefinition, UpdateActionMessageComposer, UpdateConditionMessageComposer, UpdateTriggerMessageComposer, WiredActionDefinition, WiredFurniActionEvent, WiredFurniConditionEvent, WiredFurniTriggerEvent, WiredSaveSuccessEvent } from '@nitrots/nitro-renderer';
+import { ConditionDefinition, ILinkEventTracker, Triggerable, TriggerDefinition, UpdateActionMessageComposer, UpdateConditionMessageComposer, UpdateTriggerMessageComposer, WiredActionDefinition, WiredFurniActionEvent, WiredFurniConditionEvent, WiredFurniTriggerEvent, WiredSaveSuccessEvent } from '@nitrots/nitro-renderer';
 import { useCallback, useEffect, useState } from 'react';
 import { useBetween } from 'use-between';
-import { IsOwnerOfFloorFurniture, LocalizeText, SendMessageComposer, WiredFurniType, WiredSelectionVisualizer } from '../../api';
+import { AddEventLinkTracker, IsOwnerOfFloorFurniture, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, WiredFurniType, WiredSelectionVisualizer } from '../../api';
 import { useMessageEvent } from '../events';
 import { useNotification } from '../notification';
 
@@ -13,6 +13,7 @@ const useWiredState = () =>
     const [ furniIds, setFurniIds ] = useState<number[]>([]);
     const [ actionDelay, setActionDelay ] = useState<number>(0);
     const [ allowsFurni, setAllowsFurni ] = useState<number>(WiredFurniType.STUFF_SELECTION_OPTION_NONE);
+    const [ isWiredCreatorToolsVisible, setIsWiredCreatorToolsVisible ] = useState<boolean>(false);
     const { showConfirm = null } = useNotification();
 
     const saveWired = useCallback(() =>
@@ -128,7 +129,38 @@ const useWiredState = () =>
         }
     }, [ trigger ]);
 
-    return { trigger, setTrigger, intParams, setIntParams, stringParam, setStringParam, furniIds, setFurniIds, actionDelay, setActionDelay, setAllowsFurni, saveWired, selectObjectForWired };
+    useEffect(() =>
+    {
+        const linkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) =>
+            {
+                const parts = url.split('/');
+                if(parts.length < 2) return;
+
+                if(parts[1] === 'creator-tools' || parts[1] === 'tools')
+                {
+                    setIsWiredCreatorToolsVisible(prev => !prev);
+                }
+            },
+            eventUrlPrefix: 'wired/'
+        };
+
+        AddEventLinkTracker(linkTracker);
+
+        return () => RemoveLinkEventTracker(linkTracker);
+    }, []);
+
+    return { 
+        trigger, setTrigger, 
+        intParams, setIntParams, 
+        stringParam, setStringParam, 
+        furniIds, setFurniIds, 
+        actionDelay, setActionDelay, 
+        setAllowsFurni, 
+        saveWired, 
+        selectObjectForWired,
+        isWiredCreatorToolsVisible, setIsWiredCreatorToolsVisible
+    };
 }
 
 export const useWired = () => useBetween(useWiredState);

@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
-import { JoinQueueMessageComposer } from '@nitrots/nitro-renderer';
+import { FC, useEffect, useState } from 'react';
+import { Game2GetAccountGameStatusMessageComposer, JoinQueueMessageComposer } from '@nitrots/nitro-renderer';
 import { CreateLinkEvent, SendMessageComposer } from '../../../api';
 import { DraggableWindow, DraggableWindowPosition } from '../../../common';
 import { useGameCenter } from '../../../hooks';
@@ -7,8 +7,33 @@ import SnowStormLobbyImg from '../../../assets/images/gamecenter/snowstorm_lobby
 
 export const SnowStormLobbyView: FC<{}> = () =>
 {
-    const { isSnowStormLobbyVisible, setIsSnowStormLobbyVisible, selectedGame } = useGameCenter();
+    const { isSnowStormLobbyVisible, setIsSnowStormLobbyVisible, selectedGame, accountStatus } = useGameCenter();
     const [ isQueueing, setIsQueueing ] = useState(false);
+    const [ remainingGames, setRemainingGames ] = useState<number>(() =>
+    {
+        const saved = sessionStorage.getItem('snowstorm_games_left');
+        return saved !== null ? parseInt(saved, 10) : 30;
+    });
+
+    useEffect(() =>
+    {
+        if(isSnowStormLobbyVisible)
+        {
+            const gameId = selectedGame ? selectedGame.gameId : 0;
+            SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(gameId));
+        }
+    }, [ isSnowStormLobbyVisible, selectedGame ]);
+
+    useEffect(() =>
+    {
+        if(!accountStatus) return;
+
+        if(!accountStatus.hasUnlimitedGames && accountStatus.freeGamesLeft !== undefined && accountStatus.freeGamesLeft !== null && accountStatus.freeGamesLeft >= 0)
+        {
+            setRemainingGames(accountStatus.freeGamesLeft);
+            sessionStorage.setItem('snowstorm_games_left', accountStatus.freeGamesLeft.toString());
+        }
+    }, [ accountStatus ]);
 
     if(!isSnowStormLobbyVisible) return null;
 
@@ -20,6 +45,12 @@ export const SnowStormLobbyView: FC<{}> = () =>
     const onPlayNow = () =>
     {
         setIsQueueing(true);
+        setRemainingGames(prev =>
+        {
+            const next = Math.max(0, prev - 1);
+            sessionStorage.setItem('snowstorm_games_left', next.toString());
+            return next;
+        });
         const gameId = selectedGame ? selectedGame.gameId : 0;
         SendMessageComposer(new JoinQueueMessageComposer(gameId));
     };
@@ -43,6 +74,8 @@ export const SnowStormLobbyView: FC<{}> = () =>
     {
         CreateLinkEvent('catalog/toggle');
     };
+
+    const displayGames = (accountStatus && accountStatus.hasUnlimitedGames) ? '∞' : remainingGames;
 
     return (
         <DraggableWindow 
@@ -79,13 +112,33 @@ export const SnowStormLobbyView: FC<{}> = () =>
                         width: '22px',
                         height: '22px',
                         cursor: 'pointer',
-                        borderRadius: '4px',
-                        backgroundColor: 'transparent',
-                        transition: 'background-color 0.15s ease'
+                        transition: 'filter 0.1s ease, transform 0.05s ease'
                     }}
-                    onMouseEnter={ e => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)') }
-                    onMouseLeave={ e => (e.currentTarget.style.backgroundColor = 'transparent') }
+                    onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.2)') }
+                    onMouseLeave={ e => (e.currentTarget.style.filter = 'none') }
+                    onMouseDown={ e => (e.currentTarget.style.transform = 'scale(0.92)') }
+                    onMouseUp={ e => (e.currentTarget.style.transform = 'none') }
                 />
+
+                {/* Subtítulo dinámico con 'Habbtens' */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '175px',
+                        left: '0px',
+                        width: '410px',
+                        textAlign: 'center',
+                        fontFamily: 'Ubuntu, "Segoe UI", sans-serif',
+                        fontSize: '12px',
+                        color: '#14729f',
+                        lineHeight: '1.28',
+                        pointerEvents: 'none',
+                        userSelect: 'none'
+                    }}
+                >
+                    ¡Enfréntate a otros Habbtens en unas<br />
+                    épicas batallas de bolas de nieve!
+                </div>
 
                 {/* Enlace Cómo jugar */}
                 <div 
@@ -93,15 +146,14 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     title="Cómo jugar a SnowStorm"
                     style={{
                         position: 'absolute',
-                        top: '298px',
-                        left: '160px',
-                        width: '90px',
-                        height: '20px',
-                        cursor: 'pointer',
-                        borderRadius: '3px'
+                        top: '304px',
+                        left: '166px',
+                        width: '78px',
+                        height: '22px',
+                        cursor: 'pointer'
                     }}
-                    onMouseEnter={ e => (e.currentTarget.style.backgroundColor = 'rgba(15, 123, 189, 0.12)') }
-                    onMouseLeave={ e => (e.currentTarget.style.backgroundColor = 'transparent') }
+                    onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.15)') }
+                    onMouseLeave={ e => (e.currentTarget.style.filter = 'none') }
                 />
 
                 {/* Enlace Clasificación */}
@@ -110,16 +162,34 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     title="Ver Clasificación de SnowStorm"
                     style={{
                         position: 'absolute',
-                        top: '328px',
-                        left: '155px',
-                        width: '100px',
-                        height: '20px',
-                        cursor: 'pointer',
-                        borderRadius: '3px'
+                        top: '333px',
+                        left: '164px',
+                        width: '82px',
+                        height: '24px',
+                        cursor: 'pointer'
                     }}
-                    onMouseEnter={ e => (e.currentTarget.style.backgroundColor = 'rgba(15, 123, 189, 0.12)') }
-                    onMouseLeave={ e => (e.currentTarget.style.backgroundColor = 'transparent') }
+                    onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.15)') }
+                    onMouseLeave={ e => (e.currentTarget.style.filter = 'none') }
                 />
+
+                {/* Contador dinámico de partidas restantes */}
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: '400px',
+                        left: '148px',
+                        fontFamily: 'Ubuntu, "Segoe UI", sans-serif',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
+                        color: '#0b689e',
+                        textShadow: '-1.5px -1.5px 0 #fff, 1.5px -1.5px 0 #fff, -1.5px 1.5px 0 #fff, 1.5px 1.5px 0 #fff',
+                        letterSpacing: '-0.5px',
+                        pointerEvents: 'none',
+                        userSelect: 'none'
+                    }}
+                >
+                    { displayGames }
+                </div>
 
                 {/* Enlace Logra juegos extras con HC */}
                 <div 
@@ -127,15 +197,14 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     title="Obtener más partidas con el Club HC"
                     style={{
                         position: 'absolute',
-                        top: '378px',
-                        left: '230px',
-                        width: '165px',
-                        height: '24px',
-                        cursor: 'pointer',
-                        borderRadius: '3px'
+                        top: '400px',
+                        left: '204px',
+                        width: '186px',
+                        height: '28px',
+                        cursor: 'pointer'
                     }}
-                    onMouseEnter={ e => (e.currentTarget.style.backgroundColor = 'rgba(27, 80, 102, 0.12)') }
-                    onMouseLeave={ e => (e.currentTarget.style.backgroundColor = 'transparent') }
+                    onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.12)') }
+                    onMouseLeave={ e => (e.currentTarget.style.filter = 'none') }
                 />
 
                 {/* Botón comprar +10 */}
@@ -144,17 +213,16 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     title="Comprar +10 partidas"
                     style={{
                         position: 'absolute',
-                        top: '444px',
+                        top: '446px',
                         left: '13px',
-                        width: '50px',
-                        height: '52px',
+                        width: '52px',
+                        height: '62px',
                         cursor: 'pointer',
-                        borderRadius: '4px',
-                        transition: 'filter 0.15s ease, transform 0.05s ease'
+                        transition: 'filter 0.12s ease, transform 0.05s ease'
                     }}
-                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.15)'; } }
+                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.12)'; } }
                     onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                    onMouseDown={ e => { e.currentTarget.style.transform = 'scale(0.96)'; } }
+                    onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; } }
                     onMouseUp={ e => { e.currentTarget.style.transform = 'none'; } }
                 />
 
@@ -164,17 +232,16 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     title="Comprar +100 partidas"
                     style={{
                         position: 'absolute',
-                        top: '444px',
-                        left: '70px',
-                        width: '50px',
-                        height: '52px',
+                        top: '446px',
+                        left: '73px',
+                        width: '52px',
+                        height: '62px',
                         cursor: 'pointer',
-                        borderRadius: '4px',
-                        transition: 'filter 0.15s ease, transform 0.05s ease'
+                        transition: 'filter 0.12s ease, transform 0.05s ease'
                     }}
-                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.15)'; } }
+                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.12)'; } }
                     onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                    onMouseDown={ e => { e.currentTarget.style.transform = 'scale(0.96)'; } }
+                    onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; } }
                     onMouseUp={ e => { e.currentTarget.style.transform = 'none'; } }
                 />
 
@@ -184,17 +251,16 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     title="Comprar +300 partidas"
                     style={{
                         position: 'absolute',
-                        top: '444px',
-                        left: '128px',
-                        width: '50px',
-                        height: '52px',
+                        top: '446px',
+                        left: '133px',
+                        width: '52px',
+                        height: '62px',
                         cursor: 'pointer',
-                        borderRadius: '4px',
-                        transition: 'filter 0.15s ease, transform 0.05s ease'
+                        transition: 'filter 0.12s ease, transform 0.05s ease'
                     }}
-                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.15)'; } }
+                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.12)'; } }
                     onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                    onMouseDown={ e => { e.currentTarget.style.transform = 'scale(0.96)'; } }
+                    onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; } }
                     onMouseUp={ e => { e.currentTarget.style.transform = 'none'; } }
                 />
 
@@ -205,17 +271,16 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     style={{
                         position: 'absolute',
                         top: '446px',
-                        left: '200px',
-                        width: '188px',
-                        height: '48px',
+                        left: '206px',
+                        width: '189px',
+                        height: '62px',
                         cursor: 'pointer',
-                        borderRadius: '6px',
                         transition: 'filter 0.12s ease, transform 0.05s ease'
                     }}
-                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.12)'; } }
+                    onMouseEnter={ e => { e.currentTarget.style.filter = 'brightness(1.08)'; } }
                     onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                    onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.95)'; } }
-                    onMouseUp={ e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.filter = 'brightness(1.12)'; } }
+                    onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.92)'; } }
+                    onMouseUp={ e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.filter = 'brightness(1.08)'; } }
                 />
             </div>
         </DraggableWindow>

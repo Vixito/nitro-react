@@ -177,50 +177,36 @@
 
 .nitro-card-header-wired-menu {
     cursor: pointer;
-    padding: 0px 2px;
-    margin-right: 6px;
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
     height: 18px;
-    width: 18px;
-    min-width: 18px;
-    max-width: 18px;
-    min-height: 18px;
-    max-height: 18px;
-    flex-shrink: 0;
-    box-sizing: border-box;
-    line-height: 1;
-    border-radius: 4px;
-    box-shadow: 0 0 0 1.6px #ffffff;
-    border: 2px solid #1a3c5a;
-    background: repeating-linear-gradient(
-        #3a78a6,
-        #3a78a6 50%,
-        #275a80 50%,
-        #275a80 100%
-    );
-    color: #ffffff;
-    display: inline-flex;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
+    gap: 3px;
+    padding: 2px 3px;
+    border-radius: 3px;
+    background: transparent;
+    z-index: 10;
 
-    &:hover {
-        filter: brightness(1.25);
+    .hamburger-line {
+        height: 3px;
+        width: 14px;
+        background-color: #d1d5db;
+        border-radius: 2px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+        transition: background-color 0.15s;
     }
 
-    &.active {
-        box-shadow: 0 0 0 1.6px #00d9cb;
-        border-color: #005f58;
-        background: repeating-linear-gradient(
-            #00bfa5,
-            #00bfa5 50%,
-            #00897b 50%,
-            #00897b 100%
-        );
+    &:hover .hamburger-line {
+        background-color: #ffffff;
     }
 
-    .menu-btn-icon {
-        width: 10px;
-        height: 10px;
-        flex-shrink: 0;
+    &.active .hamburger-line {
+        background-color: #00d9cb;
     }
 }
 
@@ -236,60 +222,66 @@
 
 .nitro-wired-dropdown {
     position: absolute;
-    top: 32px;
-    right: 6px;
+    top: 30px;
+    left: 6px;
     z-index: 1000;
-    min-width: 240px;
-    background: #1c1829;
-    border: 2px solid #322847;
-    border-radius: 6px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.12);
-    padding: 6px;
+    min-width: 260px;
+    background: #383838;
+    border: 1px solid #222222;
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+    padding: 6px 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    color: #e4e4e7;
+    color: #ffffff;
+    font-family: 'Ubuntu', 'Segoe UI', sans-serif;
     font-size: 12px;
     animation: fadeInWiredMenu 0.12s ease-out;
 
     .nitro-wired-menu-item {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 7px 10px;
-        border-radius: 4px;
+        padding: 5px 14px;
         cursor: pointer;
         user-select: none;
-        transition: background 0.12s;
+        transition: background 0.1s;
         font-weight: 500;
+        color: #ffffff;
 
         &:hover:not(.disabled) {
-            background: #2e2444;
-            color: #ffffff;
+            background: #4a4a4a;
         }
 
         &.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+            color: #7a7a7a;
+            cursor: default;
         }
 
-        &.brush-active {
-            background: rgba(0, 217, 203, 0.2);
-            border: 1px solid #00d9cb;
+        .wired-menu-checkbox {
+            width: 13px;
+            height: 13px;
+            border: 1.5px solid #d4d4d8;
+            background: #262626;
+            margin-right: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            font-size: 10px;
             color: #00d9cb;
-            font-weight: bold;
-        }
-
-        .menu-item-icon {
-            font-size: 13px;
             flex-shrink: 0;
+
+            &.checked {
+                border-color: #00d9cb;
+                background: #172554;
+            }
         }
     }
 
     .nitro-wired-menu-divider {
         height: 1px;
-        background: #322847;
-        margin: 3px 0;
+        background: #4a4a4a;
+        margin: 4px 10px;
     }
 }
 
