@@ -101,6 +101,7 @@ export const BattlePassView: FC<{}> = () => {
     const [weeklyTimeRemaining, setWeeklyTimeRemaining] = useState<CountdownTime>({ days: '00', hours: '00', minutes: '00', seconds: '00' });
 
     const [bpData, setBpData] = useState<{
+        title?: string;
         chapter: number;
         season: number;
         seasonEnd: number;
@@ -113,6 +114,7 @@ export const BattlePassView: FC<{}> = () => {
         rewards: Reward[];
         ranking: RankingUser[];
     }>({
+        title: 'Llegar al máximo nivel',
         chapter: 1,
         season: 1,
         seasonEnd: 0,
@@ -171,6 +173,7 @@ export const BattlePassView: FC<{}> = () => {
             const data = await res.json();
             if (data.success) {
                 setBpData({
+                    title: data.title || 'Llegar al máximo nivel',
                     chapter: data.chapter || 1,
                     season: data.season || 1,
                     seasonEnd: data.seasonEnd || 0,
@@ -474,7 +477,7 @@ export const BattlePassView: FC<{}> = () => {
             }}
         >
             <NitroCardHeaderView
-                headerText="PASE DE BATALLA - Llegar al máximo nivel"
+                headerText={bpData.title ? (bpData.title.toUpperCase().startsWith('PASE DE BATALLA') ? bpData.title : `PASE DE BATALLA - ${bpData.title}`) : 'PASE DE BATALLA - Llegar al máximo nivel'}
                 onCloseClick={() => {
                     setIsVisible(false);
                     if (document.body.style.cursor === 'pointer') document.body.style.cursor = 'auto';
@@ -1095,7 +1098,7 @@ export const BattlePassView: FC<{}> = () => {
                             </div>
 
                             { /* Column headers */}
-                            <div className="d-flex align-items-center px-3 pb-2 mb-1" style={{ fontSize: '11px', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            <div className="d-flex align-items-center px-3 pb-2 mb-1 bp-ranking-header-row" style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                                 <span style={{ minWidth: '36px', flexShrink: 0, textAlign: 'center' }}>PUESTO</span>
                                 <span style={{ width: '12px', flexShrink: 0 }} />
                                 <span style={{ minWidth: '40px', flexShrink: 0 }} />
@@ -1171,7 +1174,7 @@ export const BattlePassView: FC<{}> = () => {
 
                             { /* VIP notice if viewing VIP item without VIP status */}
                             {previewReward.isVip && !bpData.isVip && (
-                                <div className="p-2.5 rounded mb-3 w-100" style={{ background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)', border: '1.5px solid #f59e0b', color: '#92400e', textAlign: 'left' }}>
+                                <div className="p-2.5 rounded mb-3 w-100 bp-vip-locked-alert" style={{ textAlign: 'left' }}>
                                     <div className="d-flex align-items-center gap-1.5 fw-bold mb-1" style={{ fontSize: '12.5px' }}>
                                         <i className="icon icon-navigator-room-locked me-1" /> Pista VIP Bloqueada
                                     </div>
