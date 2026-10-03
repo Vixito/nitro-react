@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { Base, Button, Flex, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
@@ -15,6 +15,17 @@ export const GameStageView: FC<{}> = () =>
     {
         setGameURL(null);
     };
+
+    useEffect(() =>
+    {
+        const handleMessage = (event: MessageEvent) =>
+        {
+            if(event.data === 'EXIT_GAME') handleExitGame();
+        };
+
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, []);
 
     return (
         <Flex 
