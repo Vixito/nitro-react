@@ -333,89 +333,133 @@
 }
 
 .nitro-wired-creator-tools {
-    width: 480px;
-    min-width: 480px;
-    max-width: 480px;
+    width: 375px;
+    min-width: 375px;
+    max-width: 375px;
+
+    .creator-custom-tabs {
+        display: flex;
+        align-items: flex-end;
+        padding: 4px 6px 0 6px;
+        background: #ecebe7;
+        margin: 0;
+        border-bottom: 1px solid #1f3742;
+
+        .creator-custom-tab {
+            flex: 1;
+            text-align: center;
+            height: 22px;
+            line-height: 21px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #111827;
+            background: #c2c7ce;
+            border: 1px solid #2d3844;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 2px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.1s;
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            &:hover:not(.active) {
+                background: #d1d5db;
+            }
+
+            &.active {
+                background: #ecebe7;
+                font-weight: bold;
+                height: 24px;
+                line-height: 23px;
+                margin-bottom: -1px;
+                z-index: 2;
+                border-bottom: 1px solid #ecebe7;
+            }
+        }
+    }
 
     .creator-banner-strip {
-        height: 32px;
-        min-height: 32px;
-        background: linear-gradient(180deg, #2b6173 0%, #1c4755 100%);
+        height: 26px;
+        min-height: 26px;
+        background: #2b5b6c url('@/assets/images/wired/wired_banner_pattern.png') repeat-x center;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         border-top: 1px solid #163641;
         border-bottom: 1px solid #163641;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 
         .creator-banner-title {
             color: #ffffff;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
-            font-family: 'Ubuntu', 'Segoe UI', sans-serif;
+            font-family: 'Ubuntu', 'Segoe UI', Arial, sans-serif;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-            letter-spacing: 0.3px;
-        }
-
-        .creator-banner-discord {
-            position: absolute;
-            right: 8px;
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            background: #5865F2;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-            transition: filter 0.1s;
-
-            &:hover {
-                filter: brightness(1.15);
-            }
+            letter-spacing: 0.2px;
         }
     }
 
     .nitro-wired-creator-body {
         background-color: #ecebe7 !important;
-        color: #1f2937;
-        padding: 10px 12px;
-        min-height: 340px;
+        color: #111827;
+        padding: 8px 10px;
         font-family: 'Ubuntu', 'Segoe UI', Arial, sans-serif;
         font-size: 11px;
+        min-height: 280px;
+    }
+
+    .creator-stats-box {
+        width: 145px;
+        min-width: 145px;
+        height: 100px;
+        background: #dfe3e8;
+        border: 1px solid #94a3b8;
+        border-radius: 4px;
+        padding: 5px 6px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-size: 10px;
+
+        .creator-stat-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #111827;
+
+            .stat-val-green {
+                color: #22c55e;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .creator-desk-illustration {
+        flex: 1;
+        height: 100px;
+        background: url('@/assets/images/wired/wired_monitor_illustration.png') no-repeat center;
+        background-size: contain;
     }
 
     .creator-panel-card {
         background: #dfe3e8;
         border: 1px solid #c7d2d9;
-        border-radius: 5px;
-        padding: 8px 10px;
+        border-radius: 4px;
+        padding: 6px 8px;
         box-shadow: inset 0 1px 0 #ffffff;
-    }
-
-    .creator-metric-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 4px 0;
-        border-bottom: 1px solid #d0d7de;
-        font-size: 11px;
-
-        &:last-child {
-            border-bottom: none;
-        }
     }
 
     .creator-retro-table-container {
         overflow-y: auto;
-        border: 1px solid #9ca3af;
+        border: 1px solid #94a3b8;
         border-radius: 3px;
         background: #ffffff;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 
         &::-webkit-scrollbar {
             width: 8px;
@@ -433,24 +477,24 @@
     .wired-retro-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 11px;
+        font-size: 10.5px;
 
         thead th {
             position: sticky;
             top: 0;
-            background: #e2e8f0;
+            background: #f1f5f9;
             border-bottom: 1px solid #cbd5e1;
-            padding: 4px 6px;
+            padding: 3px 5px;
             text-align: left;
             font-weight: bold;
-            color: #334155;
+            color: #475569;
             z-index: 1;
         }
 
         tbody td {
-            padding: 3px 6px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #1f2937;
+            padding: 2.5px 5px;
+            border-bottom: 1px solid #f8fafc;
+            color: #111827;
         }
 
         tbody tr:last-child td {
@@ -468,12 +512,23 @@
         }
     }
 
+    .creator-log-type-link {
+        color: #2563eb;
+        text-decoration: underline;
+        cursor: pointer;
+        font-weight: 500;
+
+        &:hover {
+            color: #1d4ed8;
+        }
+    }
+
     .creator-retro-listbox {
         overflow-y: auto;
-        border: 1px solid #9ca3af;
+        border: 1px solid #94a3b8;
         border-radius: 3px;
         background: #ffffff;
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 
         &::-webkit-scrollbar {
             width: 8px;
@@ -488,13 +543,12 @@
         }
 
         .creator-list-item {
-            padding: 3px 6px;
+            padding: 2px 6px;
             font-size: 11px;
             cursor: pointer;
             user-select: none;
-            color: #1f2937;
-            font-family: 'Ubuntu', 'Segoe UI', monospace;
-            border-bottom: 1px solid #f1f5f9;
+            color: #111827;
+            border-bottom: 1px solid #f8fafc;
 
             &:last-child {
                 border-bottom: none;
@@ -507,23 +561,24 @@
             &.selected {
                 background-color: #cbd5e1;
                 font-weight: bold;
-                color: #0f172a;
+                color: #000000;
             }
         }
     }
 
     .wired-type-icon-btn {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         background: #f1f5f9;
-        border: 1.5px solid #94a3b8;
-        border-radius: 4px;
+        border: 1px solid #94a3b8;
+        border-radius: 3px;
         cursor: pointer;
-        box-shadow: inset 0 1px 0 #ffffff, 0 1px 2px rgba(0,0,0,0.08);
-        font-size: 14px;
+        box-shadow: inset 0 1px 0 #ffffff, 0 1px 1px rgba(0,0,0,0.06);
+        font-size: 13px;
         color: #334155;
         transition: all 0.1s;
         padding: 0;
@@ -545,7 +600,6 @@
         background: #dfe3e8;
         border: 1px solid #c7d2d9;
         border-radius: 4px;
-        height: 120px;
         position: relative;
         display: flex;
         align-items: center;
@@ -556,13 +610,13 @@
             position: absolute;
             top: 4px;
             right: 4px;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: #00d9cb;
-            border: 1.5px solid #008f85;
+            border: 1px solid #008f85;
             border-radius: 3px;
             color: #ffffff;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 900;
             display: flex;
             align-items: center;
@@ -587,8 +641,8 @@
             justify-content: center;
 
             .furni-placeholder-bonsai {
-                width: 48px;
-                height: 48px;
+                width: 44px;
+                height: 44px;
                 background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='32,8 52,24 32,40 12,24' fill='%2322c55e' stroke='%2315803d' stroke-width='2'/%3E%3Cpolygon points='32,24 50,38 32,52 14,38' fill='%2316a34a' stroke='%2315803d' stroke-width='2'/%3E%3Crect x='28' y='46' width='8' height='10' fill='%23854d0e'/%3E%3Cpolygon points='20,56 44,56 40,62 24,62' fill='%2394a3b8' stroke='%2364748b' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat center;
                 background-size: contain;
                 filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
@@ -600,18 +654,18 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 3px 10px;
+        padding: 2px 10px;
         font-size: 11px;
-        font-weight: bold;
-        color: #1a1a1a;
+        font-weight: 500;
+        color: #111827;
         background: linear-gradient(to bottom, #ffffff 0%, #e2e8f0 100%);
         border: 1px solid #718096;
         border-radius: 3px;
-        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.1);
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.08);
         cursor: pointer;
         user-select: none;
         transition: filter 0.1s;
-        height: 24px;
+        height: 22px;
 
         &:hover:not(:disabled) {
             background: linear-gradient(to bottom, #ffffff 0%, #edf2f7 100%);
@@ -625,9 +679,9 @@
         }
 
         &:disabled {
-            opacity: 0.55;
+            opacity: 0.5;
             cursor: not-allowed;
-            filter: grayscale(0.5);
+            color: #64748b;
         }
 
         &.danger {
@@ -668,15 +722,15 @@
         cursor: pointer;
         user-select: none;
         font-size: 11px;
-        color: #1f2937;
+        color: #111827;
         margin: 0;
 
         .checkbox-box {
-            width: 14px;
-            height: 14px;
-            min-width: 14px;
+            width: 13px;
+            height: 13px;
+            min-width: 13px;
             background: #ffffff;
-            border: 1.5px solid #4b5563;
+            border: 1.5px solid #374151;
             border-radius: 2px;
             display: flex;
             align-items: center;
@@ -686,7 +740,7 @@
 
             &.checked {
                 border-color: #111827;
-                background: #f8fafc;
+                background: #ffffff;
             }
         }
     }
@@ -696,12 +750,12 @@
         background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%23374151'/%3E%3C/svg%3E") no-repeat right 8px center;
         border: 1px solid #718096;
         border-radius: 3px;
-        padding: 3px 22px 3px 8px;
+        padding: 2px 22px 2px 6px;
         font-size: 11px;
-        color: #1f2937;
+        color: #111827;
         box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
         outline: none;
-        height: 24px;
+        height: 22px;
 
         &:focus {
             border-color: #0284c7;
