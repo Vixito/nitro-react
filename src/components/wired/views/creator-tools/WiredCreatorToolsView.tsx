@@ -182,8 +182,8 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                 { /* TAB 1: MONITOR */ }
                 { activeTab === 'monitor' && (
                     <Column gap={ 1 }>
-                        <Text bold small className="text-dark mb-1">Statistics:</Text>
-                        <Flex gap={ 1 } className="mb-2">
+                        <div className="creator-section-title">Statistics:</div>
+                        <Flex gap={ 2 } className="mb-3">
                             <div className="creator-stats-box">
                                 <div className="creator-stat-line">
                                     <span>Wired usage:</span>
@@ -209,14 +209,14 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                             <div className="creator-desk-illustration" />
                         </Flex>
 
-                        <Text bold small className="text-dark mb-1">Logs:</Text>
-                        <div className="creator-retro-table-container" style={{ height: '130px' }}>
+                        <div className="creator-section-title">Logs:</div>
+                        <div className="creator-retro-table-container" style={{ height: '175px' }}>
                             <table className="wired-retro-table">
                                 <thead>
                                     <tr>
-                                        <th style={{ width: '42%' }}>Type</th>
+                                        <th style={{ width: '40%' }}>Type</th>
                                         <th style={{ width: '22%' }}>Category</th>
-                                        <th style={{ width: '16%' }}>Amount</th>
+                                        <th style={{ width: '15%' }}>Amount</th>
                                         <th>Latest occurrence</th>
                                     </tr>
                                 </thead>
@@ -232,7 +232,7 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                                     { log.type }
                                                 </span>
                                             </td>
-                                            <td style={{ color: log.category === 'WARNING' ? '#d97706' : '#64748b' }}>
+                                            <td style={{ color: log.category === 'WARNING' ? '#d97706' : '#64748b', fontWeight: 600 }}>
                                                 { log.category }
                                             </td>
                                             <td>{ log.amount }</td>
@@ -258,9 +258,9 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                 { /* TAB 2: VARIABLES */ }
                 { activeTab === 'variables' && (
                     <Flex gap={ 2 } fullHeight>
-                        <Column style={{ width: '135px' }} gap={ 1 }>
-                            <Text bold small className="text-dark">Variable type:</Text>
-                            <Flex gap={ 1 } className="mb-1">
+                        <Column style={{ width: '165px' }} gap={ 1 }>
+                            <div className="creator-section-title">Variable type:</div>
+                            <Flex gap={ 1 } className="mb-2">
                                 <button
                                     className={ `wired-type-icon-btn ${ varType === 'furni' ? 'active' : '' }` }
                                     onClick={ () => { setVarType('furni'); setSelectedVarIndex(0); } }
@@ -291,8 +291,8 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                 </button>
                             </Flex>
 
-                            <Text bold small className="text-dark">Variable picker:</Text>
-                            <div className="creator-retro-listbox" style={{ height: '160px' }}>
+                            <div className="creator-section-title">Variable picker:</div>
+                            <div className="creator-retro-listbox" style={{ height: '190px' }}>
                                 { currentVariables.map((v, i) => (
                                     <div
                                         key={ v.name }
@@ -301,11 +301,11 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                     >
                                         { v.name }
                                     </div>
-                                )) }
+                                ))}
                             </div>
 
                             <button
-                                className="wired-btn-retro w-100 mt-1"
+                                className="wired-btn-retro w-100 mt-2"
                                 onClick={ () => showToast(`Resaltando portadores de ${ activeVar.name }`) }
                             >
                                 Highlight holders
@@ -313,8 +313,8 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                         </Column>
 
                         <Column className="flex-grow-1" gap={ 1 }>
-                            <Text bold small className="text-dark">Properties:</Text>
-                            <div className="creator-retro-table-container" style={{ height: '125px' }}>
+                            <div className="creator-section-title">Properties:</div>
+                            <div className="creator-retro-table-container" style={{ height: '160px' }}>
                                 <table className="wired-retro-table">
                                     <thead>
                                         <tr>
@@ -359,8 +359,8 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                 </table>
                             </div>
 
-                            <Text bold small className="text-dark mt-1">Text values:</Text>
-                            <div className="creator-retro-table-container" style={{ height: '80px' }}>
+                            <div className="creator-section-title mt-2">Text values:</div>
+                            <div className="creator-retro-table-container" style={{ height: '95px' }}>
                                 <table className="wired-retro-table">
                                     <thead>
                                         <tr>
@@ -384,9 +384,9 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                 { /* TAB 3: INSPECTION */ }
                 { activeTab === 'inspect' && (
                     <Flex gap={ 2 } fullHeight>
-                        <Column style={{ width: '135px' }} gap={ 1 }>
-                            <Text bold small className="text-dark">Variable holder type:</Text>
-                            <Flex gap={ 1 } className="mb-1">
+                        <Column style={{ width: '175px' }} gap={ 1 }>
+                            <div className="creator-section-title">Variable holder type:</div>
+                            <Flex gap={ 1 } className="mb-2">
                                 <button
                                     className={ `wired-type-icon-btn ${ holderType === 'furni' ? 'active' : '' }` }
                                     onClick={ () => setHolderType('furni') }
@@ -410,8 +410,8 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                 </button>
                             </Flex>
 
-                            <Text bold small className="text-dark">Preview:</Text>
-                            <div className="creator-preview-card" style={{ height: '160px' }}>
+                            <div className="creator-section-title">Preview:</div>
+                            <div className="creator-preview-card" style={{ height: '180px' }}>
                                 <button
                                     className="creator-inspect-w-btn"
                                     onClick={ () => showToast('Resaltando pilas Wired del elemento') }
@@ -422,22 +422,22 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                 <div className="creator-preview-content">
                                     { isInspecting ? (
                                         <div className="text-center">
-                                            <div className="furni-placeholder-bonsai mb-1" />
-                                            <span style={{ fontSize: '10px', fontWeight: 'bold', color: '#1f2937' }}>
+                                            <div className="furni-placeholder-bonsai mb-2" />
+                                            <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937' }}>
                                                 Furni (#163)
                                             </span>
                                         </div>
                                     ) : (
-                                        <span className="text-muted" style={{ fontSize: '11px' }}>
+                                        <span className="text-muted" style={{ fontSize: '13px' }}>
                                             Select a furni to inspect it
                                         </span>
                                     )}
                                 </div>
                             </div>
 
-                            <label className="wired-checkbox-retro mt-1" onClick={ () => setKeepSelected(!keepSelected) }>
+                            <label className="wired-checkbox-retro mt-2" onClick={ () => setKeepSelected(!keepSelected) }>
                                 <span className={ `checkbox-box ${ keepSelected ? 'checked' : '' }` }>
-                                    { keepSelected && <FaCheck style={{ fontSize: '8px' }} /> }
+                                    { keepSelected && <FaCheck style={{ fontSize: '10px' }} /> }
                                 </span>
                                 <span>Keep furni/user selected</span>
                             </label>
@@ -452,8 +452,8 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                         </Column>
 
                         <Column className="flex-grow-1" gap={ 1 }>
-                            <Text bold small className="text-dark">Variables:</Text>
-                            <div className="creator-retro-table-container" style={{ height: '230px' }}>
+                            <div className="creator-section-title">Variables:</div>
+                            <div className="creator-retro-table-container" style={{ height: '280px' }}>
                                 <table className="wired-retro-table">
                                     <thead>
                                         <tr>
@@ -476,7 +476,7 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                             </>
                                         ) : (
                                             <tr>
-                                                <td colSpan={ 2 } className="text-center text-muted py-4">
+                                                <td colSpan={ 2 } className="text-center text-muted py-4" style={{ fontSize: '13px' }}>
                                                     Nothing to display
                                                 </td>
                                             </tr>
@@ -491,26 +491,26 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                 { /* TAB 4: SETTINGS */ }
                 { activeTab === 'settings' && (
                     <Column gap={ 1 }>
-                        <Text bold small className="text-dark mb-1">Room settings:</Text>
-                        <Flex gap={ 1 } className="mb-2">
+                        <div className="creator-section-title">Room settings:</div>
+                        <Flex gap={ 2 } className="mb-3">
                             <div className="creator-panel-card flex-grow-1">
-                                <Text bold small className="mb-1 text-dark">Who can modify Wired:</Text>
+                                <div className="creator-section-title mb-2">Who can modify Wired:</div>
                                 <Column gap={ 1 }>
                                     <label className="wired-checkbox-retro" onClick={ () => setCanModify('rights') }>
                                         <span className={ `checkbox-box ${ canModify === 'rights' ? 'checked' : '' }` }>
-                                            { canModify === 'rights' && <FaCheck style={{ fontSize: '8px' }} /> }
+                                            { canModify === 'rights' && <FaCheck style={{ fontSize: '10px' }} /> }
                                         </span>
                                         <span>Users with rights</span>
                                     </label>
                                     <label className="wired-checkbox-retro" onClick={ () => setCanModify('members') }>
                                         <span className={ `checkbox-box ${ canModify === 'members' ? 'checked' : '' }` }>
-                                            { canModify === 'members' && <FaCheck style={{ fontSize: '8px' }} /> }
+                                            { canModify === 'members' && <FaCheck style={{ fontSize: '10px' }} /> }
                                         </span>
                                         <span>Group members</span>
                                     </label>
                                     <label className="wired-checkbox-retro" onClick={ () => setCanModify('admins') }>
                                         <span className={ `checkbox-box ${ canModify === 'admins' ? 'checked' : '' }` }>
-                                            { canModify === 'admins' && <FaCheck style={{ fontSize: '8px' }} /> }
+                                            { canModify === 'admins' && <FaCheck style={{ fontSize: '10px' }} /> }
                                         </span>
                                         <span>Group admins</span>
                                     </label>
@@ -518,29 +518,29 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                             </div>
 
                             <div className="creator-panel-card flex-grow-1">
-                                <Text bold small className="mb-1 text-dark">Who can inspect Wired:</Text>
+                                <div className="creator-section-title mb-2">Who can inspect Wired:</div>
                                 <Column gap={ 1 }>
                                     <label className="wired-checkbox-retro" onClick={ () => setCanInspect('everyone') }>
                                         <span className={ `checkbox-box ${ canInspect === 'everyone' ? 'checked' : '' }` }>
-                                            { canInspect === 'everyone' && <FaCheck style={{ fontSize: '8px' }} /> }
+                                            { canInspect === 'everyone' && <FaCheck style={{ fontSize: '10px' }} /> }
                                         </span>
                                         <span>Everyone</span>
                                     </label>
                                     <label className="wired-checkbox-retro" onClick={ () => setCanInspect('rights') }>
                                         <span className={ `checkbox-box ${ canInspect === 'rights' ? 'checked' : '' }` }>
-                                            { canInspect === 'rights' && <FaCheck style={{ fontSize: '8px' }} /> }
+                                            { canInspect === 'rights' && <FaCheck style={{ fontSize: '10px' }} /> }
                                         </span>
                                         <span>Users with rights</span>
                                     </label>
                                     <label className="wired-checkbox-retro" onClick={ () => setCanInspect('members') }>
                                         <span className={ `checkbox-box ${ canInspect === 'members' ? 'checked' : '' }` }>
-                                            { canInspect === 'members' && <FaCheck style={{ fontSize: '8px' }} /> }
+                                            { canInspect === 'members' && <FaCheck style={{ fontSize: '10px' }} /> }
                                         </span>
                                         <span>Group members</span>
                                     </label>
                                     <label className="wired-checkbox-retro" onClick={ () => setCanInspect('admins') }>
                                         <span className={ `checkbox-box ${ canInspect === 'admins' ? 'checked' : '' }` }>
-                                            { canInspect === 'admins' && <FaCheck style={{ fontSize: '8px', color: '#64748b' }} /> }
+                                            { canInspect === 'admins' && <FaCheck style={{ fontSize: '10px', color: '#64748b' }} /> }
                                         </span>
                                         <span>Group admins</span>
                                     </label>
@@ -548,11 +548,11 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                             </div>
                         </Flex>
 
-                        <div className="mb-2">
-                            <Text bold small className="text-dark mb-1">Timezone:</Text>
+                        <div className="mb-3">
+                            <div className="creator-section-title">Timezone:</div>
                             <select
                                 className="wired-select-retro"
-                                style={{ width: '180px' }}
+                                style={{ width: '220px' }}
                                 value={ timezone }
                                 onChange={ e => setTimezone(e.target.value) }
                             >
@@ -564,30 +564,30 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                             </select>
                         </div>
 
-                        <Text bold small className="text-dark mb-1">Preferences:</Text>
+                        <div className="creator-section-title">Preferences:</div>
                         <div className="creator-panel-card">
                             <Column gap={ 1 }>
                                 <label className="wired-checkbox-retro" onClick={ () => setPrefShowMenuToolbar(!prefShowMenuToolbar) }>
                                     <span className={ `checkbox-box ${ prefShowMenuToolbar ? 'checked' : '' }` }>
-                                        { prefShowMenuToolbar && <FaCheck style={{ fontSize: '8px' }} /> }
+                                        { prefShowMenuToolbar && <FaCheck style={{ fontSize: '10px' }} /> }
                                     </span>
                                     <span>Show wired menu in toolbar</span>
                                 </label>
                                 <label className="wired-checkbox-retro" onClick={ () => setPrefInspectBtn(!prefInspectBtn) }>
                                     <span className={ `checkbox-box ${ prefInspectBtn ? 'checked' : '' }` }>
-                                        { prefInspectBtn && <FaCheck style={{ fontSize: '8px' }} /> }
+                                        { prefInspectBtn && <FaCheck style={{ fontSize: '10px' }} /> }
                                     </span>
                                     <span>Show "inspect" button in furni/user info view</span>
                                 </label>
                                 <label className="wired-checkbox-retro" onClick={ () => setPrefPlaytesting(!prefPlaytesting) }>
                                     <span className={ `checkbox-box ${ prefPlaytesting ? 'checked' : '' }` }>
-                                        { prefPlaytesting && <FaCheck style={{ fontSize: '8px' }} /> }
+                                        { prefPlaytesting && <FaCheck style={{ fontSize: '10px' }} /> }
                                     </span>
                                     <span>Enable playtesting mode (play without room rights)</span>
                                 </label>
                                 <label className="wired-checkbox-retro" onClick={ () => setPrefPrettifyVars(!prefPrettifyVars) }>
                                     <span className={ `checkbox-box ${ prefPrettifyVars ? 'checked' : '' }` }>
-                                        { prefPrettifyVars && <FaCheck style={{ fontSize: '8px' }} /> }
+                                        { prefPrettifyVars && <FaCheck style={{ fontSize: '10px' }} /> }
                                     </span>
                                     <span>Prettify user-created variable names</span>
                                 </label>

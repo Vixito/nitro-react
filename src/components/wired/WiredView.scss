@@ -333,14 +333,14 @@
 }
 
 .nitro-wired-creator-tools {
-    width: 375px;
-    min-width: 375px;
-    max-width: 375px;
+    width: 510px;
+    min-width: 510px;
+    max-width: 510px;
 
     .creator-custom-tabs {
         display: flex;
         align-items: flex-end;
-        padding: 4px 6px 0 6px;
+        padding: 4px 8px 0 8px;
         background: #ecebe7;
         margin: 0;
         border-bottom: 1px solid #1f3742;
@@ -348,16 +348,16 @@
         .creator-custom-tab {
             flex: 1;
             text-align: center;
-            height: 22px;
-            line-height: 21px;
-            font-size: 11px;
-            font-weight: 500;
-            color: #111827;
-            background: #c2c7ce;
+            height: 28px;
+            line-height: 27px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2937;
+            background: #b5bfc6;
             border: 1px solid #2d3844;
             border-bottom: none;
-            border-radius: 5px 5px 0 0;
-            margin-right: 2px;
+            border-radius: 6px 6px 0 0;
+            margin-right: 3px;
             cursor: pointer;
             user-select: none;
             transition: background 0.1s;
@@ -367,14 +367,15 @@
             }
 
             &:hover:not(.active) {
-                background: #d1d5db;
+                background: #cdd5dc;
             }
 
             &.active {
                 background: #ecebe7;
-                font-weight: bold;
-                height: 24px;
-                line-height: 23px;
+                font-weight: 700;
+                color: #000000;
+                height: 30px;
+                line-height: 29px;
                 margin-bottom: -1px;
                 z-index: 2;
                 border-bottom: 1px solid #ecebe7;
@@ -383,8 +384,8 @@
     }
 
     .creator-banner-strip {
-        height: 26px;
-        min-height: 26px;
+        height: 34px;
+        min-height: 34px;
         background: #2b5b6c url('@/assets/images/wired/wired_banner_pattern.png') repeat-x center;
         display: flex;
         align-items: center;
@@ -396,8 +397,8 @@
 
         .creator-banner-title {
             color: #ffffff;
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 15px;
+            font-weight: 700;
             font-family: 'Ubuntu', 'Segoe UI', Arial, sans-serif;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
             letter-spacing: 0.2px;
@@ -407,41 +408,53 @@
     .nitro-wired-creator-body {
         background-color: #ecebe7 !important;
         color: #111827;
-        padding: 8px 10px;
+        padding: 10px 14px;
         font-family: 'Ubuntu', 'Segoe UI', Arial, sans-serif;
-        font-size: 11px;
-        min-height: 280px;
+        font-size: 13px;
+        min-height: 360px;
+    }
+
+    .creator-section-title {
+        font-size: 13.5px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 6px;
+        line-height: 1.3;
+        font-family: 'Ubuntu', 'Segoe UI', Arial, sans-serif;
     }
 
     .creator-stats-box {
-        width: 145px;
-        min-width: 145px;
-        height: 100px;
+        width: 210px;
+        min-width: 210px;
+        height: 125px;
         background: #dfe3e8;
         border: 1px solid #94a3b8;
-        border-radius: 4px;
-        padding: 5px 6px;
+        border-radius: 5px;
+        padding: 8px 10px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        font-size: 10px;
+        font-size: 13px;
+        line-height: 1.4;
 
         .creator-stat-line {
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: #111827;
+            font-size: 13px;
 
             .stat-val-green {
-                color: #22c55e;
-                font-weight: bold;
+                color: #16a34a;
+                font-weight: 700;
+                font-size: 13px;
             }
         }
     }
 
     .creator-desk-illustration {
         flex: 1;
-        height: 100px;
+        height: 125px;
         background: url('@/assets/images/wired/wired_monitor_illustration.png') no-repeat center;
         background-size: contain;
     }
@@ -449,20 +462,21 @@
     .creator-panel-card {
         background: #dfe3e8;
         border: 1px solid #c7d2d9;
-        border-radius: 4px;
-        padding: 6px 8px;
+        border-radius: 5px;
+        padding: 10px 12px;
         box-shadow: inset 0 1px 0 #ffffff;
+        font-size: 13px;
     }
 
     .creator-retro-table-container {
         overflow-y: auto;
         border: 1px solid #94a3b8;
-        border-radius: 3px;
+        border-radius: 5px;
         background: #ffffff;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 
         &::-webkit-scrollbar {
-            width: 8px;
+            width: 9px;
         }
         &::-webkit-scrollbar-track {
             background: #f1f5f9;
@@ -477,24 +491,26 @@
     .wired-retro-table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 10.5px;
+        font-size: 13px;
 
         thead th {
             position: sticky;
             top: 0;
             background: #f1f5f9;
             border-bottom: 1px solid #cbd5e1;
-            padding: 3px 5px;
+            padding: 5px 8px;
             text-align: left;
-            font-weight: bold;
-            color: #475569;
+            font-weight: 700;
+            color: #111827;
+            font-size: 13px;
             z-index: 1;
         }
 
         tbody td {
-            padding: 2.5px 5px;
-            border-bottom: 1px solid #f8fafc;
+            padding: 4.5px 8px;
+            border-bottom: 1px solid #f1f5f9;
             color: #111827;
+            font-size: 13px;
         }
 
         tbody tr:last-child td {
@@ -504,7 +520,7 @@
         tbody tr.selected {
             background-color: #dbeafe;
             color: #1e3a8a;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         tbody tr:hover:not(.selected) {
@@ -513,25 +529,26 @@
     }
 
     .creator-log-type-link {
-        color: #2563eb;
+        color: #1d4ed8;
         text-decoration: underline;
         cursor: pointer;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 13px;
 
         &:hover {
-            color: #1d4ed8;
+            color: #1e40af;
         }
     }
 
     .creator-retro-listbox {
         overflow-y: auto;
         border: 1px solid #94a3b8;
-        border-radius: 3px;
+        border-radius: 5px;
         background: #ffffff;
         box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
 
         &::-webkit-scrollbar {
-            width: 8px;
+            width: 9px;
         }
         &::-webkit-scrollbar-track {
             background: #f1f5f9;
@@ -543,8 +560,8 @@
         }
 
         .creator-list-item {
-            padding: 2px 6px;
-            font-size: 11px;
+            padding: 4px 8px;
+            font-size: 13px;
             cursor: pointer;
             user-select: none;
             color: #111827;
@@ -560,25 +577,25 @@
 
             &.selected {
                 background-color: #cbd5e1;
-                font-weight: bold;
+                font-weight: 700;
                 color: #000000;
             }
         }
     }
 
     .wired-type-icon-btn {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         background: #f1f5f9;
         border: 1px solid #94a3b8;
-        border-radius: 3px;
+        border-radius: 4px;
         cursor: pointer;
         box-shadow: inset 0 1px 0 #ffffff, 0 1px 1px rgba(0,0,0,0.06);
-        font-size: 13px;
+        font-size: 16px;
         color: #334155;
         transition: all 0.1s;
         padding: 0;
@@ -599,7 +616,7 @@
     .creator-preview-card {
         background: #dfe3e8;
         border: 1px solid #c7d2d9;
-        border-radius: 4px;
+        border-radius: 5px;
         position: relative;
         display: flex;
         align-items: center;
@@ -608,15 +625,15 @@
 
         .creator-inspect-w-btn {
             position: absolute;
-            top: 4px;
-            right: 4px;
-            width: 18px;
-            height: 18px;
+            top: 6px;
+            right: 6px;
+            width: 22px;
+            height: 22px;
             background: #00d9cb;
             border: 1px solid #008f85;
             border-radius: 3px;
             color: #ffffff;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
             display: flex;
             align-items: center;
@@ -639,10 +656,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            font-size: 13px;
 
             .furni-placeholder-bonsai {
-                width: 44px;
-                height: 44px;
+                width: 48px;
+                height: 48px;
                 background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='32,8 52,24 32,40 12,24' fill='%2322c55e' stroke='%2315803d' stroke-width='2'/%3E%3Cpolygon points='32,24 50,38 32,52 14,38' fill='%2316a34a' stroke='%2315803d' stroke-width='2'/%3E%3Crect x='28' y='46' width='8' height='10' fill='%23854d0e'/%3E%3Cpolygon points='20,56 44,56 40,62 24,62' fill='%2394a3b8' stroke='%2364748b' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat center;
                 background-size: contain;
                 filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
@@ -654,18 +672,18 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 2px 10px;
-        font-size: 11px;
-        font-weight: 500;
+        padding: 3px 16px;
+        font-size: 13px;
+        font-weight: 600;
         color: #111827;
         background: linear-gradient(to bottom, #ffffff 0%, #e2e8f0 100%);
         border: 1px solid #718096;
-        border-radius: 3px;
+        border-radius: 4px;
         box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.08);
         cursor: pointer;
         user-select: none;
         transition: filter 0.1s;
-        height: 22px;
+        height: 28px;
 
         &:hover:not(:disabled) {
             background: linear-gradient(to bottom, #ffffff 0%, #edf2f7 100%);
@@ -679,7 +697,7 @@
         }
 
         &:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
             color: #64748b;
         }
@@ -718,24 +736,24 @@
     .wired-checkbox-retro {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         cursor: pointer;
         user-select: none;
-        font-size: 11px;
+        font-size: 13px;
         color: #111827;
-        margin: 0;
+        margin: 2px 0;
 
         .checkbox-box {
-            width: 13px;
-            height: 13px;
-            min-width: 13px;
+            width: 15px;
+            height: 15px;
+            min-width: 15px;
             background: #ffffff;
-            border: 1.5px solid #374151;
+            border: 1.5px solid #111827;
             border-radius: 2px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.12);
             color: #111827;
 
             &.checked {
@@ -747,15 +765,15 @@
 
     .wired-select-retro {
         appearance: none;
-        background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%23374151'/%3E%3C/svg%3E") no-repeat right 8px center;
+        background: #ffffff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%23111827'/%3E%3C/svg%3E") no-repeat right 8px center;
         border: 1px solid #718096;
-        border-radius: 3px;
-        padding: 2px 22px 2px 6px;
-        font-size: 11px;
+        border-radius: 4px;
+        padding: 2px 26px 2px 8px;
+        font-size: 13px;
         color: #111827;
         box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
         outline: none;
-        height: 22px;
+        height: 28px;
 
         &:focus {
             border-color: #0284c7;
