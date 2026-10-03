@@ -77,10 +77,10 @@ export const GameCenterView = () =>
                             </Flex>
                         )}
                     </Flex>
-                    <GameStageView />
                 </Flex>
             )}
             { isSnowStormLobbyVisible && <SnowStormLobbyView /> }
+            <GameStageView />
         </>
     );
 }

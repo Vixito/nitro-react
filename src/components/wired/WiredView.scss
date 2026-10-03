@@ -177,36 +177,57 @@
 
 .nitro-card-header-wired-menu {
     cursor: pointer;
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
+    margin-right: 3px;
+    width: 18px;
     height: 18px;
+    min-width: 18px;
+    max-width: 18px;
+    min-height: 18px;
+    max-height: 18px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
     gap: 3px;
-    padding: 2px 3px;
+    padding: 0;
     border-radius: 3px;
-    background: transparent;
-    z-index: 10;
+    border: 2px solid #1a3c5a;
+    background: repeating-linear-gradient(
+        #3a78a6,
+        #3a78a6 50%,
+        #275a80 50%,
+        #275a80 100%
+    );
+    box-shadow: 0 0 0 1.6px #ffffff;
+    transition: filter 0.1s, transform 0.05s;
+    user-select: none;
 
     .hamburger-line {
-        height: 3px;
-        width: 14px;
-        background-color: #d1d5db;
-        border-radius: 2px;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
-        transition: background-color 0.15s;
-    }
-
-    &:hover .hamburger-line {
+        height: 2px;
+        width: 10px;
         background-color: #ffffff;
+        border-radius: 1px;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
     }
 
-    &.active .hamburger-line {
-        background-color: #00d9cb;
+    &:hover {
+        filter: brightness(1.25);
+    }
+
+    &:active {
+        filter: brightness(0.85);
+        transform: translateY(1px);
+    }
+
+    &.active {
+        box-shadow: 0 0 0 1.6px #00d9cb;
+        border-color: #005f58;
+        background: repeating-linear-gradient(
+            #00bfa5,
+            #00bfa5 50%,
+            #00897b 50%,
+            #00897b 100%
+        );
     }
 }
 
@@ -222,8 +243,8 @@
 
 .nitro-wired-dropdown {
     position: absolute;
-    top: 30px;
-    left: 6px;
+    top: 28px;
+    right: 4px;
     z-index: 1000;
     min-width: 260px;
     background: #383838;
@@ -309,5 +330,54 @@
 @keyframes slideDownToast {
     from { opacity: 0; transform: translate(-50%, -10px); }
     to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.nitro-wired-creator-tools {
+    width: 430px;
+    min-width: 400px;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+
+    .nitro-card-content {
+        padding: 8px 10px;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        background-color: #2b2b2b;
+        color: #ffffff;
+    }
+
+    .creator-panel-card {
+        background: #1f1f1f;
+        border: 1px solid #141414;
+        border-radius: 4px;
+        padding: 8px 10px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .creator-metric-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px solid #2e2e2e;
+        font-size: 11px;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .creator-terminal {
+        background: #121212;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        padding: 8px;
+        font-family: monospace;
+        font-size: 11px;
+        max-height: 95px;
+        overflow-y: auto;
+    }
 }
 
