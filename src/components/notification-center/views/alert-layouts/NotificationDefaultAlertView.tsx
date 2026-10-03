@@ -21,7 +21,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
 
     const displayMessages = useMemo(() => {
         if (!isCommandsList || !item?.messages) return item?.messages || [];
-        const hasWired = item.messages.some(msg => msg.toLowerCase().includes(':wired'));
+        const hasWired = item.messages.some(msg => msg.includes(':wired, :wf') || />:wired(<\/td>|,|\b)/i.test(msg));
         if (hasWired) return item.messages;
 
         const wiredRow = '<tr class="cmd-row" style="border-bottom: 1px solid rgba(0,0,0,0.12);"><td style="width: 38%; padding: 5px 4px; vertical-align: middle; font-weight: bold; color: #0f172a;">:wired, :wf</td><td style="width: 62%; padding: 5px 4px; vertical-align: middle; font-size: 11px; color: #334155;">Abre las herramientas de creación Wired (Wired Creator Tools). Uso: :wired</td></tr>';
