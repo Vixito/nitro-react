@@ -1,8 +1,9 @@
+import { RoomEngineObjectEvent, RoomObjectCategory } from '@nitrots/nitro-renderer';
 import { FC, useState } from 'react';
-import { FaChair, FaCheck, FaGlobeAmericas, FaPlug, FaSearch, FaSyncAlt, FaTimes, FaTools, FaUser } from 'react-icons/fa';
-import { GetRoomSession, LocalizeText, WiredSelectionVisualizer } from '../../../../api';
-import { Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
-import { useWired } from '../../../../hooks';
+import { FaChair, FaCheck, FaGlobeAmericas, FaPlug, FaUser } from 'react-icons/fa';
+import { GetFurnitureDataForRoomObject, GetRoomSession, ProductTypeEnum, WiredSelectionVisualizer } from '../../../../api';
+import { Column, Flex, LayoutAvatarImageView, LayoutFurniImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { useRoomEngineEvent, useWired } from '../../../../hooks';
 
 type VariableCategory = 'furni' | 'user' | 'global' | 'context';
 type ElementCategory = 'furni' | 'user' | 'global';
@@ -71,8 +72,9 @@ export const WiredCreatorToolsView: FC<{}> = () =>
 
     // Tab 3: Inspection
     const [ holderType, setHolderType ] = useState<ElementCategory>('furni');
-    const [ isInspecting, setIsInspecting ] = useState<boolean>(false);
     const [ keepSelected, setKeepSelected ] = useState<boolean>(false);
+    const [ inspectedFurni, setInspectedFurni ] = useState<{ id: number; classId: number; name: string; isWall: boolean } | null>(null);
+    const [ inspectedUser, setInspectedUser ] = useState<{ id: number; name: string; figure: string } | null>(null);
 
     // Tab 4: Settings
     const [ canModify, setCanModify ] = useState<'rights' | 'members' | 'admins'>('admins');
@@ -82,6 +84,39 @@ export const WiredCreatorToolsView: FC<{}> = () =>
     const [ prefInspectBtn, setPrefInspectBtn ] = useState<boolean>(true);
     const [ prefPlaytesting, setPrefPlaytesting ] = useState<boolean>(false);
     const [ prefPrettifyVars, setPrefPrettifyVars ] = useState<boolean>(true);
+
+    useRoomEngineEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.SELECTED, event =>
+    {
+        if(activeTab !== 'inspect') return;
+
+        if((event.category === RoomObjectCategory.FLOOR) || (event.category === RoomObjectCategory.WALL))
+        {
+            const furniData = GetFurnitureDataForRoomObject(GetRoomSession()?.roomId, event.objectId, event.category);
+            if(furniData)
+            {
+                setInspectedFurni({
+                    id: event.objectId,
+                    classId: furniData.id,
+                    name: furniData.name || 'Furni',
+                    isWall: event.category === RoomObjectCategory.WALL
+                });
+                setHolderType('furni');
+            }
+        }
+        else if(event.category === RoomObjectCategory.UNIT)
+        {
+            const userData = GetRoomSession()?.userDataManager?.getUserDataByIndex(event.objectId);
+            if(userData)
+            {
+                setInspectedUser({
+                    id: userData.webID,
+                    name: userData.name,
+                    figure: userData.figure
+                });
+                setHolderType('user');
+            }
+        }
+    });
 
     if(!isWiredCreatorToolsVisible) return null;
 
@@ -106,21 +141,6 @@ export const WiredCreatorToolsView: FC<{}> = () =>
     {
         WiredSelectionVisualizer.clearSelectionShaderFromFurni([]);
         showToast('Resaltados de Wired eliminados');
-    };
-
-    const toggleInspectMode = () =>
-    {
-        const next = !isInspecting;
-        setIsInspecting(next);
-        if(next)
-        {
-            showToast('Modo inspección de furnis ACTIVO');
-        }
-        else
-        {
-            handleClearVisualizers();
-            showToast('Modo inspección desactivado');
-        }
     };
 
     const currentVariables = VARIABLES_CATALOG[varType] || [];
@@ -412,26 +432,53 @@ export const WiredCreatorToolsView: FC<{}> = () =>
 
                             <div className="creator-section-title">Preview:</div>
                             <div className="creator-preview-card" style={{ height: '180px' }}>
-                                <button
-                                    className="creator-inspect-w-btn"
-                                    onClick={ () => showToast('Resaltando pilas Wired del elemento') }
-                                    title="Resaltar Wired conectados"
-                                >
-                                    W
-                                </button>
                                 <div className="creator-preview-content">
-                                    { isInspecting ? (
-                                        <div className="text-center">
-                                            <div className="furni-placeholder-bonsai mb-2" />
+                                    { (holderType === 'furni') && (
+                                        inspectedFurni ? (
+                                            <div className="text-center d-flex flex-column align-items-center justify-content-center">
+                                                <LayoutFurniImageView
+                                                    productType={ inspectedFurni.isWall ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR }
+                                                    productClassId={ inspectedFurni.classId }
+                                                    className="mb-2"
+                                                />
+                                                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937' }}>
+                                                    { inspectedFurni.name } (#{ inspectedFurni.classId })
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted" style={{ fontSize: '13px' }}>
+                                                Select a furni to inspect it
+                                            </span>
+                                        )
+                                    ) }
+
+                                    { (holderType === 'user') && (
+                                        inspectedUser ? (
+                                            <div className="text-center d-flex flex-column align-items-center justify-content-center">
+                                                <LayoutAvatarImageView
+                                                    figure={ inspectedUser.figure }
+                                                    direction={ 2 }
+                                                    className="mb-1"
+                                                />
+                                                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937' }}>
+                                                    { inspectedUser.name }
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-muted" style={{ fontSize: '13px' }}>
+                                                Select a user to inspect it
+                                            </span>
+                                        )
+                                    ) }
+
+                                    { (holderType === 'global') && (
+                                        <div className="text-center d-flex flex-column align-items-center justify-content-center">
+                                            <FaGlobeAmericas style={{ fontSize: '36px', color: '#38bdf8' }} className="mb-2" />
                                             <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937' }}>
-                                                Furni (#163)
+                                                Room / Global
                                             </span>
                                         </div>
-                                    ) : (
-                                        <span className="text-muted" style={{ fontSize: '13px' }}>
-                                            Select a furni to inspect it
-                                        </span>
-                                    )}
+                                    ) }
                                 </div>
                             </div>
 
@@ -441,14 +488,6 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                 </span>
                                 <span>Keep furni/user selected</span>
                             </label>
-
-                            <button
-                                className={ `wired-btn-retro w-100 mt-2 ${ isInspecting ? 'danger' : 'primary' }` }
-                                onClick={ toggleInspectMode }
-                            >
-                                <FaTools className="me-1" />
-                                <span>{ isInspecting ? 'Desactivar' : 'Activar Modo (W)' }</span>
-                            </button>
                         </Column>
 
                         <Column className="flex-grow-1" gap={ 1 }>
@@ -462,25 +501,52 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        { isInspecting ? (
+                                        { (holderType === 'furni') && (
+                                            inspectedFurni ? (
+                                                <>
+                                                    <tr><td className="fw-semibold">@id</td><td>{ inspectedFurni.id }</td></tr>
+                                                    <tr><td className="fw-semibold">@class_id</td><td>{ inspectedFurni.classId }</td></tr>
+                                                    <tr><td className="fw-semibold">@height</td><td>100</td></tr>
+                                                    <tr><td className="fw-semibold">@state</td><td>0</td></tr>
+                                                    <tr><td className="fw-semibold">@position.x</td><td>44</td></tr>
+                                                    <tr><td className="fw-semibold">@position.y</td><td>51</td></tr>
+                                                    <tr><td className="fw-semibold">@rotation</td><td>0</td></tr>
+                                                    <tr><td className="fw-semibold">@altitude</td><td>0</td></tr>
+                                                    <tr><td className="fw-semibold">@type</td><td>0 (Normal)</td></tr>
+                                                </>
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={ 2 } className="text-center text-muted py-4" style={{ fontSize: '13px' }}>
+                                                        Nothing to display
+                                                    </td>
+                                                </tr>
+                                            )
+                                        ) }
+
+                                        { (holderType === 'user') && (
+                                            inspectedUser ? (
+                                                <>
+                                                    <tr><td className="fw-semibold">@user_id</td><td>{ inspectedUser.id }</td></tr>
+                                                    <tr><td className="fw-semibold">@user_name</td><td>{ inspectedUser.name }</td></tr>
+                                                    <tr><td className="fw-semibold">puntos_usuario</td><td>15</td></tr>
+                                                    <tr><td className="fw-semibold">vidas_restantes</td><td>3</td></tr>
+                                                </>
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={ 2 } className="text-center text-muted py-4" style={{ fontSize: '13px' }}>
+                                                        Nothing to display
+                                                    </td>
+                                                </tr>
+                                            )
+                                        ) }
+
+                                        { (holderType === 'global') && (
                                             <>
-                                                <tr><td className="fw-semibold">@id</td><td>979277312</td></tr>
-                                                <tr><td className="fw-semibold">@class_id</td><td>163</td></tr>
-                                                <tr><td className="fw-semibold">@height</td><td>100</td></tr>
-                                                <tr><td className="fw-semibold">@state</td><td>0</td></tr>
-                                                <tr><td className="fw-semibold">@position.x</td><td>44</td></tr>
-                                                <tr><td className="fw-semibold">@position.y</td><td>51</td></tr>
-                                                <tr><td className="fw-semibold">@rotation</td><td>0</td></tr>
-                                                <tr><td className="fw-semibold">@altitude</td><td>0</td></tr>
-                                                <tr><td className="fw-semibold">@type</td><td>0 (Normal)</td></tr>
+                                                <tr><td className="fw-semibold">@room_id</td><td>{ GetRoomSession()?.roomId || 0 }</td></tr>
+                                                <tr><td className="fw-semibold">ronda_actual</td><td>1</td></tr>
+                                                <tr><td className="fw-semibold">sala_bloqueada</td><td>0</td></tr>
                                             </>
-                                        ) : (
-                                            <tr>
-                                                <td colSpan={ 2 } className="text-center text-muted py-4" style={{ fontSize: '13px' }}>
-                                                    Nothing to display
-                                                </td>
-                                            </tr>
-                                        )}
+                                        ) }
                                     </tbody>
                                 </table>
                             </div>
