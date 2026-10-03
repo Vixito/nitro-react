@@ -6,58 +6,48 @@ import { Button, Column, DraggableWindow, DraggableWindowPosition, Flex, NitroCa
 import { useGameCenter } from '../../../hooks';
 import SnowStormLobbyImg from '../../../assets/images/gamecenter/snowstorm_lobby.png';
 
-export const SnowStormLobbyView: FC<{}> = () =>
-{
+export const SnowStormLobbyView: FC<{}> = () => {
     const { isSnowStormLobbyVisible, setIsSnowStormLobbyVisible, setIsVisible, selectedGame, accountStatus, setGameURL } = useGameCenter();
-    const [ remainingGames, setRemainingGames ] = useState<number>(() =>
-    {
+    const [remainingGames, setRemainingGames] = useState<number>(() => {
         const saved = sessionStorage.getItem('snowstorm_games_left');
         return saved !== null ? parseInt(saved, 10) : 30;
     });
 
-    const [ selectedPack, setSelectedPack ] = useState<10 | 100 | 300 | null>(null);
-    const [ isBuyConfirmOpen, setIsBuyConfirmOpen ] = useState<boolean>(false);
-    const [ isHowToPlayOpen, setIsHowToPlayOpen ] = useState<boolean>(false);
-    const [ isLeaderboardOpen, setIsLeaderboardOpen ] = useState<boolean>(false);
-    const [ toastMsg, setToastMsg ] = useState<string | null>(null);
+    const [selectedPack, setSelectedPack] = useState<10 | 100 | 300 | null>(null);
+    const [isBuyConfirmOpen, setIsBuyConfirmOpen] = useState<boolean>(false);
+    const [isHowToPlayOpen, setIsHowToPlayOpen] = useState<boolean>(false);
+    const [isLeaderboardOpen, setIsLeaderboardOpen] = useState<boolean>(false);
+    const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-    const showToast = (msg: string) =>
-    {
+    const showToast = (msg: string) => {
         setToastMsg(msg);
         setTimeout(() => setToastMsg(null), 2500);
     };
 
-    useEffect(() =>
-    {
-        if(isSnowStormLobbyVisible)
-        {
+    useEffect(() => {
+        if (isSnowStormLobbyVisible) {
             const gameId = selectedGame ? selectedGame.gameId : 0;
             SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(gameId));
         }
-    }, [ isSnowStormLobbyVisible, selectedGame ]);
+    }, [isSnowStormLobbyVisible, selectedGame]);
 
-    useEffect(() =>
-    {
-        if(!accountStatus) return;
+    useEffect(() => {
+        if (!accountStatus) return;
 
-        if(!accountStatus.hasUnlimitedGames && accountStatus.freeGamesLeft !== undefined && accountStatus.freeGamesLeft !== null && accountStatus.freeGamesLeft >= 0)
-        {
+        if (!accountStatus.hasUnlimitedGames && accountStatus.freeGamesLeft !== undefined && accountStatus.freeGamesLeft !== null && accountStatus.freeGamesLeft >= 0) {
             setRemainingGames(accountStatus.freeGamesLeft);
             sessionStorage.setItem('snowstorm_games_left', accountStatus.freeGamesLeft.toString());
         }
-    }, [ accountStatus ]);
+    }, [accountStatus]);
 
-    if(!isSnowStormLobbyVisible) return null;
+    if (!isSnowStormLobbyVisible) return null;
 
-    const onClose = () =>
-    {
+    const onClose = () => {
         setIsSnowStormLobbyVisible(false);
     };
 
-    const onPlayNow = () =>
-    {
-        setRemainingGames(prev =>
-        {
+    const onPlayNow = () => {
+        setRemainingGames(prev => {
             const next = Math.max(0, prev - 1);
             sessionStorage.setItem('snowstorm_games_left', next.toString());
             return next;
@@ -71,40 +61,34 @@ export const SnowStormLobbyView: FC<{}> = () =>
         setGameURL('/games/snowstorm/index.html');
     };
 
-    const onHowToPlay = () =>
-    {
+    const onHowToPlay = () => {
         setIsHowToPlayOpen(true);
     };
 
-    const onLeaderboard = () =>
-    {
+    const onLeaderboard = () => {
         setIsLeaderboardOpen(true);
     };
 
-    const onGetHc = () =>
-    {
+    const onGetHc = () => {
         CreateLinkEvent('habboUI/open/hccenter');
         CreateLinkEvent('catalog/open/habbo_club');
     };
 
-    const onSelectPack = (pack: 10 | 100 | 300) =>
-    {
+    const onSelectPack = (pack: 10 | 100 | 300) => {
         setSelectedPack(pack);
         setIsBuyConfirmOpen(true);
     };
 
-    const onConfirmBuy = () =>
-    {
-        if(!selectedPack) return;
+    const onConfirmBuy = () => {
+        if (!selectedPack) return;
 
-        setRemainingGames(prev =>
-        {
+        setRemainingGames(prev => {
             const next = prev + selectedPack;
             sessionStorage.setItem('snowstorm_games_left', next.toString());
             return next;
         });
 
-        showToast(`✓ ¡Has adquirido +${ selectedPack } partidas!`);
+        showToast(`✓ ¡Has adquirido +${selectedPack} partidas!`);
         setIsBuyConfirmOpen(false);
     };
 
@@ -118,17 +102,17 @@ export const SnowStormLobbyView: FC<{}> = () =>
 
     return (
         <>
-            <DraggableWindow 
-                uniqueKey="snowstorm-lobby" 
-                handleSelector=".drag-handler" 
-                windowPosition={ DraggableWindowPosition.CENTER }
+            <DraggableWindow
+                uniqueKey="snowstorm-lobby"
+                handleSelector=".drag-handler"
+                windowPosition={DraggableWindowPosition.CENTER}
             >
-                <div 
+                <div
                     className="snowstorm-lobby-window"
                     style={{
                         width: '410px',
                         height: '527px',
-                        backgroundImage: `url(${ SnowStormLobbyImg })`,
+                        backgroundImage: `url(${SnowStormLobbyImg})`,
                         backgroundSize: '410px 527px',
                         backgroundRepeat: 'no-repeat',
                         position: 'relative',
@@ -141,7 +125,7 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     }}
                 >
                     {/* Barra superior de arrastre exclusiva (28px de alto) */}
-                    <div 
+                    <div
                         className="drag-handler"
                         style={{
                             position: 'absolute',
@@ -155,9 +139,9 @@ export const SnowStormLobbyView: FC<{}> = () =>
                     />
 
                     {/* Botón cerrar X superior derecho: alineado con la X del fondo */}
-                    <div 
+                    <div
                         className="snowstorm-lobby-close-btn"
-                        onClick={ onClose }
+                        onClick={onClose}
                         title="Cerrar ventana"
                         style={{
                             position: 'absolute',
@@ -176,17 +160,17 @@ export const SnowStormLobbyView: FC<{}> = () =>
                             zIndex: 20,
                             transition: 'filter 0.1s ease, transform 0.05s ease'
                         }}
-                        onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.25)') }
-                        onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                        onMouseDown={ e => { e.currentTarget.style.filter = 'brightness(0.85)'; e.currentTarget.style.transform = 'translateY(1px)'; } }
-                        onMouseUp={ e => (e.currentTarget.style.transform = 'none') }
+                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.25)')}
+                        onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
+                        onMouseDown={e => { e.currentTarget.style.filter = 'brightness(0.85)'; e.currentTarget.style.transform = 'translateY(1px)'; }}
+                        onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     >
                         <FaTimes style={{ color: '#ffffff', fontSize: '10px', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))' }} />
                     </div>
 
                     {/* Toast de confirmación dentro del lobby */}
-                    { toastMsg && (
-                        <div 
+                    {toastMsg && (
+                        <div
                             style={{
                                 position: 'absolute',
                                 top: '40px',
@@ -202,9 +186,9 @@ export const SnowStormLobbyView: FC<{}> = () =>
                                 fontSize: '12px'
                             }}
                         >
-                            { toastMsg }
+                            {toastMsg}
                         </div>
-                    ) }
+                    )}
 
                     {/* Subtítulo dinámico con 'Habbtens' */}
                     <div
@@ -226,62 +210,58 @@ export const SnowStormLobbyView: FC<{}> = () =>
                         épicas batallas de bolas de nieve!
                     </div>
 
-                    {/* Enlace Cómo jugar: ubicado exactamente sobre el texto (y=316..334) con hover azul */}
-                    <div 
-                        onClick={ onHowToPlay }
+                    {/* Enlace Cómo jugar: ubicado exactamente sobre el texto (y=316..334) con hover retro sutil */}
+                    <div
+                        onClick={onHowToPlay}
                         title="Cómo jugar a SnowStorm"
                         style={{
                             position: 'absolute',
-                            top: '315px',
-                            left: '160px',
-                            width: '88px',
-                            height: '20px',
+                            top: '316px',
+                            left: '164px',
+                            width: '82px',
+                            height: '18px',
                             cursor: 'pointer',
                             zIndex: 10,
-                            borderRadius: '4px',
-                            transition: 'background-color 0.15s ease, box-shadow 0.15s ease'
+                            borderRadius: '3px',
+                            transition: 'background-color 0.12s ease'
                         }}
-                        onMouseEnter={ e => {
-                            e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.28)';
-                            e.currentTarget.style.boxShadow = '0 0 8px rgba(0, 168, 255, 0.4)';
-                        } }
-                        onMouseLeave={ e => {
+                        onMouseEnter={e => {
+                            e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.16)';
+                        }}
+                        onMouseLeave={e => {
                             e.currentTarget.style.backgroundColor = 'transparent';
-                            e.currentTarget.style.boxShadow = 'none';
-                        } }
+                        }}
                     />
 
-                    {/* Enlace Clasificación: ubicado exactamente sobre el texto (y=351..368) con hover azul */}
-                    <div 
-                        onClick={ onLeaderboard }
+                    {/* Enlace Clasificación: ubicado exactamente sobre el texto (y=351..368) con hover retro sutil */}
+                    <div
+                        onClick={onLeaderboard}
                         title="Ver Clasificación de SnowStorm"
                         style={{
                             position: 'absolute',
-                            top: '350px',
-                            left: '158px',
-                            width: '94px',
-                            height: '20px',
+                            top: '351px',
+                            left: '160px',
+                            width: '88px',
+                            height: '18px',
                             cursor: 'pointer',
                             zIndex: 10,
-                            borderRadius: '4px',
-                            transition: 'background-color 0.15s ease, box-shadow 0.15s ease'
+                            borderRadius: '3px',
+                            transition: 'background-color 0.12s ease'
                         }}
-                        onMouseEnter={ e => {
-                            e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.28)';
-                            e.currentTarget.style.boxShadow = '0 0 8px rgba(0, 168, 255, 0.4)';
-                        } }
-                        onMouseLeave={ e => {
+                        onMouseEnter={e => {
+                            e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.16)';
+                        }}
+                        onMouseLeave={e => {
                             e.currentTarget.style.backgroundColor = 'transparent';
-                            e.currentTarget.style.boxShadow = 'none';
-                        } }
+                        }}
                     />
 
-                    {/* Contador numérico de partidas restantes: exactamente a 148px para dejar 1 espacio natural tras el ':' (x=145) */}
+                    {/* Contador numérico de partidas restantes: exactamente a 153px para 1 espacio natural tras el ':' (x=145) */}
                     <div
                         style={{
                             position: 'absolute',
                             top: '404px',
-                            left: '148px',
+                            left: '153px',
                             height: '14px',
                             lineHeight: '1',
                             display: 'flex',
@@ -297,12 +277,12 @@ export const SnowStormLobbyView: FC<{}> = () =>
                             zIndex: 7
                         }}
                     >
-                        { displayGames }
+                        {displayGames}
                     </div>
 
                     {/* Enlace Logra juegos extras con HC */}
-                    <div 
-                        onClick={ onGetHc }
+                    <div
+                        onClick={onGetHc}
                         title="Obtener más partidas con el Club HC"
                         style={{
                             position: 'absolute',
@@ -315,15 +295,15 @@ export const SnowStormLobbyView: FC<{}> = () =>
                             borderRadius: '3px',
                             transition: 'filter 0.1s ease, transform 0.05s ease'
                         }}
-                        onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.18)') }
-                        onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                        onMouseDown={ e => (e.currentTarget.style.transform = 'translateY(1px)') }
-                        onMouseUp={ e => (e.currentTarget.style.transform = 'none') }
+                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.18)')}
+                        onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
+                        onMouseDown={e => (e.currentTarget.style.transform = 'translateY(1px)')}
+                        onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
                     {/* Botón comprar +10: alineación exacta al píxel (y=451..512, x=13..64) */}
-                    <div 
-                        onClick={ () => onSelectPack(10) }
+                    <div
+                        onClick={() => onSelectPack(10)}
                         title="Comprar +10 partidas (5 créditos)"
                         style={{
                             position: 'absolute',
@@ -337,15 +317,15 @@ export const SnowStormLobbyView: FC<{}> = () =>
                             boxShadow: selectedPack === 10 ? 'inset 0 0 0 2px #ffffff, 0 0 0 2px #006a9e' : 'none',
                             transition: 'filter 0.1s ease, transform 0.05s ease'
                         }}
-                        onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.15)') }
-                        onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                        onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.9)'; } }
-                        onMouseUp={ e => (e.currentTarget.style.transform = 'none') }
+                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.15)')}
+                        onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
+                        onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.9)'; }}
+                        onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
                     {/* Botón comprar +100: alineación exacta al píxel (y=451..512, x=73..124) */}
-                    <div 
-                        onClick={ () => onSelectPack(100) }
+                    <div
+                        onClick={() => onSelectPack(100)}
                         title="Comprar +100 partidas (30 créditos)"
                         style={{
                             position: 'absolute',
@@ -359,15 +339,15 @@ export const SnowStormLobbyView: FC<{}> = () =>
                             boxShadow: selectedPack === 100 ? 'inset 0 0 0 2px #ffffff, 0 0 0 2px #006a9e' : 'none',
                             transition: 'filter 0.1s ease, transform 0.05s ease'
                         }}
-                        onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.15)') }
-                        onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                        onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.9)'; } }
-                        onMouseUp={ e => (e.currentTarget.style.transform = 'none') }
+                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.15)')}
+                        onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
+                        onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.9)'; }}
+                        onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
                     {/* Botón comprar +300: alineación exacta al píxel (y=451..512, x=133..184) */}
-                    <div 
-                        onClick={ () => onSelectPack(300) }
+                    <div
+                        onClick={() => onSelectPack(300)}
                         title="Comprar +300 partidas (70 créditos)"
                         style={{
                             position: 'absolute',
@@ -381,15 +361,15 @@ export const SnowStormLobbyView: FC<{}> = () =>
                             boxShadow: selectedPack === 300 ? 'inset 0 0 0 2px #ffffff, 0 0 0 2px #006a9e' : 'none',
                             transition: 'filter 0.1s ease, transform 0.05s ease'
                         }}
-                        onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.15)') }
-                        onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                        onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.9)'; } }
-                        onMouseUp={ e => (e.currentTarget.style.transform = 'none') }
+                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.15)')}
+                        onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
+                        onMouseDown={e => { e.currentTarget.style.transform = 'translateY(1px)'; e.currentTarget.style.filter = 'brightness(0.9)'; }}
+                        onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
                     {/* Gran botón verde: ¡Jugar ahora! (y=464..512, x=206..395) */}
-                    <div 
-                        onClick={ onPlayNow }
+                    <div
+                        onClick={onPlayNow}
                         title="¡Entrar en la batalla de SnowStorm!"
                         style={{
                             position: 'absolute',
@@ -402,121 +382,151 @@ export const SnowStormLobbyView: FC<{}> = () =>
                             borderRadius: '6px',
                             transition: 'filter 0.1s ease, transform 0.05s ease'
                         }}
-                        onMouseEnter={ e => (e.currentTarget.style.filter = 'brightness(1.12)') }
-                        onMouseLeave={ e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; } }
-                        onMouseDown={ e => { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.filter = 'brightness(0.85)'; } }
-                        onMouseUp={ e => (e.currentTarget.style.transform = 'none') }
+                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.12)')}
+                        onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
+                        onMouseDown={e => { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.filter = 'brightness(0.85)'; }}
+                        onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
                 </div>
             </DraggableWindow>
 
             {/* Ventana Habbo Retro Illumina: Confirmación de compra de partidas */}
-            { isBuyConfirmOpen && selectedPack && (
-                <NitroCardView uniqueKey="snowstorm-buy-games" theme="primary-slim" windowPosition={ DraggableWindowPosition.CENTER } style={{ width: '330px', zIndex: 1100 }}>
-                    <NitroCardHeaderView headerText={ LocalizeText('snowwar.buy_more_games') || 'Compra más partidas' } onCloseClick={ () => setIsBuyConfirmOpen(false) } />
+            {isBuyConfirmOpen && selectedPack && (
+                <NitroCardView uniqueKey="snowstorm-buy-games" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '330px', zIndex: 1100 }}>
+                    <NitroCardHeaderView headerText={LocalizeText('snowwar.buy_more_games') || 'Compra más partidas'} onCloseClick={() => setIsBuyConfirmOpen(false)} />
                     <NitroCardContentView className="p-3">
-                        <Column gap={ 2 } alignItems="center">
+                        <Column gap={2} alignItems="center">
                             <Text bold center style={{ fontSize: '13px' }}>
-                                Pack de +{ selectedPack } partidas
+                                Pack de +{selectedPack} partidas
                             </Text>
                             <Text small center className="text-muted">
-                                ¿Deseas adquirir este paquete de partidas por <strong className="text-dark">{ packPrices[selectedPack] } créditos</strong>?
+                                ¿Deseas adquirir este paquete de partidas por <strong className="text-dark">{packPrices[selectedPack]} créditos</strong>?
                             </Text>
                             <hr className="w-100 my-1 bg-secondary" />
-                            <Flex gap={ 2 } fullWidth justifyContent="center">
-                                <Button fullWidth variant="success" onClick={ onConfirmBuy }>
-                                    { LocalizeText('catalog.purchase_confirmation.buy') || 'Comprar' }
+                            <Flex gap={2} fullWidth justifyContent="center">
+                                <Button fullWidth variant="success" onClick={onConfirmBuy}>
+                                    {LocalizeText('catalog.purchase_confirmation.buy') || 'Comprar'}
                                 </Button>
-                                <Button fullWidth variant="secondary" onClick={ () => setIsBuyConfirmOpen(false) }>
-                                    { LocalizeText('cancel') || 'Cancelar' }
+                                <Button fullWidth variant="secondary" onClick={() => setIsBuyConfirmOpen(false)}>
+                                    {LocalizeText('cancel') || 'Cancelar'}
                                 </Button>
                             </Flex>
                         </Column>
                     </NitroCardContentView>
                 </NitroCardView>
-            ) }
+            )}
 
             {/* Ventana Habbo Retro Illumina: Cómo jugar a SnowStorm con textos oficiales */}
-            { isHowToPlayOpen && (
-                <NitroCardView uniqueKey="snowstorm-howto" theme="primary-slim" windowPosition={ DraggableWindowPosition.CENTER } style={{ width: '390px', zIndex: 1100 }}>
-                    <NitroCardHeaderView headerText={ LocalizeText('snowwar.instructions.link') || 'Cómo jugar a SnowStorm' } onCloseClick={ () => setIsHowToPlayOpen(false) } />
+            {isHowToPlayOpen && (
+                <NitroCardView uniqueKey="snowstorm-howto" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '390px', zIndex: 1100 }}>
+                    <NitroCardHeaderView headerText={LocalizeText('snowwar.instructions.link') || 'Cómo jugar a SnowStorm'} onCloseClick={() => setIsHowToPlayOpen(false)} />
                     <NitroCardContentView className="p-3">
-                        <Column gap={ 2 }>
-                            <Text bold>{ LocalizeText('gamecenter.snowwar.description_title') || '¡Ataca o te atacarán!' }</Text>
-                            <Text small>{ LocalizeText('gamecenter.snowwar.description_content') || 'Juega rápido y mantén la cabeza fría: ataca o te atacarán. Cuando empiecen a volar las bolas de nieve, ¡solo un equipo ganará!' }</Text>
+                        <Column gap={2}>
+                            <Text bold>{LocalizeText('gamecenter.snowwar.description_title') || '¡Ataca o te atacarán!'}</Text>
+                            <Text small>{LocalizeText('gamecenter.snowwar.description_content') || 'Juega rápido y mantén la cabeza fría: ataca o te atacarán. Cuando empiecen a volar las bolas de nieve, ¡solo un equipo ganará!'}</Text>
                             <hr className="my-1 bg-secondary" />
-                            <Column gap={ 1 }>
-                                <Text small>• { LocalizeText('snowwar.instructions.1') || 'Haz clic en las casillas vacías para moverte hacia ellas.' }</Text>
-                                <Text small>• { LocalizeText('snowwar.instructions.2') || 'Haz clic sobre un rival para lanzarle una bola de nieve.' }</Text>
-                                <Text small>• { LocalizeText('snowwar.instructions.3') || "Mantén pulsado 'SHIFT' para lanzar una bola a una casilla vacía." }</Text>
-                                <Text small>• { LocalizeText('snowwar.instructions.4') || "Mantén pulsado 'ALT' para lanzar una bola por encima de obstáculos." }</Text>
-                                <Text small>• { LocalizeText('snowwar.instructions.5') || 'Cuentas con limitadas bolas de nieve. Crea nuevas con el botón verde.' }</Text>
+                            <Column gap={1}>
+                                <Text small>• {LocalizeText('snowwar.instructions.1') || 'Haz clic en las casillas vacías para moverte hacia ellas.'}</Text>
+                                <Text small>• {LocalizeText('snowwar.instructions.2') || 'Haz clic sobre un rival para lanzarle una bola de nieve.'}</Text>
+                                <Text small>• {LocalizeText('snowwar.instructions.3') || "Mantén pulsado 'SHIFT' para lanzar una bola a una casilla vacía."}</Text>
+                                <Text small>• {LocalizeText('snowwar.instructions.4') || "Mantén pulsado 'ALT' para lanzar una bola por encima de obstáculos."}</Text>
+                                <Text small>• {LocalizeText('snowwar.instructions.5') || 'Cuentas con limitadas bolas de nieve. Crea nuevas con el botón verde.'}</Text>
                             </Column>
-                            <Button fullWidth variant="primary" className="mt-2" onClick={ () => setIsHowToPlayOpen(false) }>
-                                { LocalizeText('snowwar.instructions.back') || 'Atrás' }
+                            <Button fullWidth variant="primary" className="mt-2" onClick={() => setIsHowToPlayOpen(false)}>
+                                {LocalizeText('snowwar.instructions.back') || 'Atrás'}
                             </Button>
                         </Column>
                     </NitroCardContentView>
                 </NitroCardView>
-            ) }
+            )}
 
             {/* Ventana Habbo Retro Illumina: Clasificación de SnowStorm */}
-            { isLeaderboardOpen && (
-                <NitroCardView uniqueKey="snowstorm-leaderboard" theme="primary-slim" windowPosition={ DraggableWindowPosition.CENTER } style={{ width: '400px', zIndex: 1100 }}>
-                    <NitroCardHeaderView headerText={ LocalizeText('snowwar.leaderboards.link') || 'Clasificación de SnowStorm' } onCloseClick={ () => setIsLeaderboardOpen(false) } />
+            {isLeaderboardOpen && (
+                <NitroCardView uniqueKey="snowstorm-leaderboard" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '380px', zIndex: 1100 }}>
+                    <NitroCardHeaderView headerText={LocalizeText('snowwar.leaderboards.link') || 'Clasificación de SnowStorm'} onCloseClick={() => setIsLeaderboardOpen(false)} />
                     <NitroCardContentView className="p-3">
-                        <Column gap={ 2 }>
+                        <Column gap={2}>
                             <Flex alignItems="center" justifyContent="between">
                                 <Text bold style={{ fontSize: '14px', color: '#1a567c' }}>
-                                    { LocalizeText('snowwar.leaderboard.this_week') || 'Esta semana' }
+                                    {LocalizeText('snowwar.leaderboard.this_week') || 'Esta semana'}
                                 </Text>
                                 <Text small bold className="text-secondary">Top Jugadores de Habbten</Text>
                             </Flex>
                             <div className="table-responsive" style={{ border: '1px solid #c7d2d9', borderRadius: '4px', overflow: 'hidden' }}>
-                                <table className="table table-sm table-striped m-0" style={{ fontSize: '14px', fontFamily: 'Ubuntu, "Segoe UI", sans-serif' }}>
+                                <table className="table table-sm table-striped m-0" style={{ fontSize: '13px', fontFamily: 'Ubuntu, "Segoe UI", sans-serif' }}>
                                     <thead style={{ background: '#e2ebf0', borderBottom: '2px solid #b1c6d3' }}>
                                         <tr>
-                                            <th style={{ width: '45px', padding: '6px 8px' }}>#</th>
-                                            <th style={{ padding: '6px 8px' }}>Habbten</th>
-                                            <th className="text-end" style={{ padding: '6px 8px' }}>{ LocalizeText('snowwar.stats.total_score') || 'PUNTOS' }</th>
+                                            <th style={{ width: '42px', padding: '6px 10px', textAlign: 'center' }}>#</th>
+                                            <th style={{ padding: '6px 10px' }}>Habbten</th>
+                                            <th className="text-end" style={{ padding: '6px 10px', width: '85px' }}>Puntos</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td style={{ padding: '7px 8px' }}><b style={{ color: '#d97706' }}>🥇 1.</b></td>
-                                            <td style={{ padding: '7px 8px' }}><b>Vixis</b></td>
-                                            <td className="text-end fw-bold text-success" style={{ padding: '7px 8px' }}>1.480</td>
+                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                <strong style={{ color: '#b45309' }}>1.</strong>
+                                            </td>
+                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                <strong>Vixis</strong>
+                                            </td>
+                                            <td className="text-end fw-bold text-success" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                1.480
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <td style={{ padding: '7px 8px' }}><b style={{ color: '#64748b' }}>🥈 2.</b></td>
-                                            <td style={{ padding: '7px 8px' }}><b>SnowMaster</b></td>
-                                            <td className="text-end fw-bold" style={{ padding: '7px 8px' }}>1.210</td>
+                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                <strong style={{ color: '#475569' }}>2.</strong>
+                                            </td>
+                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                <strong>SnowMaster</strong>
+                                            </td>
+                                            <td className="text-end fw-bold" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                1.210
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <td style={{ padding: '7px 8px' }}><b style={{ color: '#b45309' }}>🥉 3.</b></td>
-                                            <td style={{ padding: '7px 8px' }}><b>Frosty</b></td>
-                                            <td className="text-end fw-bold" style={{ padding: '7px 8px' }}>970</td>
+                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                <strong style={{ color: '#92400e' }}>3.</strong>
+                                            </td>
+                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                <strong>Frosty</strong>
+                                            </td>
+                                            <td className="text-end fw-bold" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                970
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <td style={{ padding: '7px 8px' }}><b>4.</b></td>
-                                            <td style={{ padding: '7px 8px' }}>Blizzard</td>
-                                            <td className="text-end" style={{ padding: '7px 8px' }}>840</td>
+                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                <span className="text-muted fw-bold">4.</span>
+                                            </td>
+                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                Blizzard
+                                            </td>
+                                            <td className="text-end text-muted" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                840
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <td style={{ padding: '7px 8px' }}><b>5.</b></td>
-                                            <td style={{ padding: '7px 8px' }}>IceKing</td>
-                                            <td className="text-end" style={{ padding: '7px 8px' }}>720</td>
+                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                <span className="text-muted fw-bold">5.</span>
+                                            </td>
+                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                IceKing
+                                            </td>
+                                            <td className="text-end text-muted" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                                720
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <Button fullWidth variant="secondary" className="mt-2" onClick={ () => setIsLeaderboardOpen(false) }>
-                                { LocalizeText('generic.close') || 'Cerrar' }
+                            <Button fullWidth variant="secondary" className="mt-2" onClick={() => setIsLeaderboardOpen(false)}>
+                                {LocalizeText('generic.close') || 'Cerrar'}
                             </Button>
                         </Column>
                     </NitroCardContentView>
                 </NitroCardView>
-            ) }
+            )}
         </>
     );
 };
