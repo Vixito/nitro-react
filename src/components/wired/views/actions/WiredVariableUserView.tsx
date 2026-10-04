@@ -1,12 +1,14 @@
 import { FC, useEffect, useState } from 'react';
+import { WiredFurniType } from '../../../../api';
+import { Column, Flex, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { WiredModernBaseView } from '../WiredModernBaseView';
+import { WiredActionBaseView } from './WiredActionBaseView';
 
 export const WiredVariableUserView: FC<{}> = props =>
 {
     const [ variableName, setVariableName ] = useState('punto_de_control');
     const [ hasValue, setHasValue ] = useState(false);
-    const [ availability, setAvailability ] = useState(1); // 0: Mientras en sala, 1: Permanente, 2: Entre salas
+    const [ availability, setAvailability ] = useState(1);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
 
     const save = () =>
@@ -39,61 +41,67 @@ export const WiredVariableUserView: FC<{}> = props =>
     }, [ trigger ]);
 
     return (
-        <WiredModernBaseView
-            headerVariant="green"
-            headerTitle="Variable Wired: Variable de usuario"
-            subtitleLinkText="Ver en el menú Wired"
-            iconType="variable"
-            hasSpecialInput={ true }
-            save={ save }
-        >
-            <div className="d-flex flex-column gap-3">
-                <div className="wired-modern-field-group">
-                    <label className="wired-modern-label">Nombre de la variable:</label>
+        <WiredActionBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
+            <Column gap={ 1 }>
+                <Text bold>Nombre de la variable:</Text>
+                <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="ej: punto_de_control"
+                    value={ variableName }
+                    onChange={ event => setVariableName(event.target.value) }
+                    maxLength={ 32 }
+                />
+            </Column>
+            <Column gap={ 1 }>
+                <Text bold>Opciones de la variable:</Text>
+                <Flex alignItems="center" gap={ 1 }>
                     <input
-                        type="text"
-                        className="wired-modern-input"
-                        placeholder="ej: punto_de_control"
-                        value={ variableName }
-                        onChange={ event => setVariableName(event.target.value) }
-                        maxLength={ 32 }
+                        className="form-check-input"
+                        type="checkbox"
+                        id="hasValueCheck"
+                        checked={ hasValue }
+                        onChange={ event => setHasValue(event.target.checked) }
                     />
-                </div>
-
-                <div className="wired-modern-field-group">
-                    <label className="wired-modern-label">Opciones de la variable:</label>
-                    <div className="wired-modern-checkbox" onClick={ () => setHasValue(!hasValue) }>
-                        <span className={ `checkbox-box ${ hasValue ? 'checked' : '' }` }>
-                            { hasValue && '✓' }
-                        </span>
-                        <span className="checkbox-label">Tiene valor</span>
-                    </div>
-                </div>
-
-                <div className="wired-modern-field-group">
-                    <label className="wired-modern-label">Opciones de disponibilidad:</label>
-                    <div className="d-flex flex-column gap-1">
-                        <div className="wired-modern-radio" onClick={ () => setAvailability(0) }>
-                            <span className={ `radio-circle ${ availability === 0 ? 'checked' : '' }` }>
-                                { availability === 0 && <span className="radio-dot" /> }
-                            </span>
-                            <span className="radio-label">Mientras el usuario esté en la sala</span>
-                        </div>
-                        <div className="wired-modern-radio" onClick={ () => setAvailability(1) }>
-                            <span className={ `radio-circle ${ availability === 1 ? 'checked' : '' }` }>
-                                { availability === 1 && <span className="radio-dot" /> }
-                            </span>
-                            <span className="radio-label">Permanente</span>
-                        </div>
-                        <div className="wired-modern-radio" onClick={ () => setAvailability(2) }>
-                            <span className={ `radio-circle ${ availability === 2 ? 'checked' : '' }` }>
-                                { availability === 2 && <span className="radio-dot" /> }
-                            </span>
-                            <span className="radio-label">Permanente, compartida entre salas</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </WiredModernBaseView>
+                    <Text small>Tiene valor</Text>
+                </Flex>
+            </Column>
+            <Column gap={ 1 }>
+                <Text bold>Opciones de disponibilidad:</Text>
+                <Flex alignItems="center" gap={ 1 }>
+                    <input
+                        className="form-check-input"
+                        type="radio"
+                        name="userVarAvailability"
+                        id="availRoom"
+                        checked={ availability === 0 }
+                        onChange={ () => setAvailability(0) }
+                    />
+                    <Text small>Mientras el usuario esté en la sala</Text>
+                </Flex>
+                <Flex alignItems="center" gap={ 1 }>
+                    <input
+                        className="form-check-input"
+                        type="radio"
+                        name="userVarAvailability"
+                        id="availPerm"
+                        checked={ availability === 1 }
+                        onChange={ () => setAvailability(1) }
+                    />
+                    <Text small>Permanente</Text>
+                </Flex>
+                <Flex alignItems="center" gap={ 1 }>
+                    <input
+                        className="form-check-input"
+                        type="radio"
+                        name="userVarAvailability"
+                        id="availCross"
+                        checked={ availability === 2 }
+                        onChange={ () => setAvailability(2) }
+                    />
+                    <Text small>Permanente, compartida entre salas</Text>
+                </Flex>
+            </Column>
+        </WiredActionBaseView>
     );
 };

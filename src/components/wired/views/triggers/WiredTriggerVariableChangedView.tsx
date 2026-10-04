@@ -1,6 +1,8 @@
 import { FC, useEffect, useState } from 'react';
+import { WiredFurniType } from '../../../../api';
+import { Column, Flex, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { WiredModernBaseView } from '../WiredModernBaseView';
+import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 
 export const WiredTriggerVariableChangedView: FC<{}> = props =>
 {
@@ -43,52 +45,51 @@ export const WiredTriggerVariableChangedView: FC<{}> = props =>
     }, [ trigger ]);
 
     return (
-        <WiredModernBaseView
-            headerVariant="dark"
-            headerTitle="Causante Wired: Variable cambiada"
-            iconType="trigger"
-            hasSpecialInput={ true }
-            save={ save }
-        >
-            <div className="d-flex flex-column gap-3">
-                <div className="wired-modern-field-group">
-                    <label className="wired-modern-label">Elegir variable:</label>
-                    <div className="d-flex gap-1 align-items-center">
-                        <input
-                            type="text"
-                            className="wired-modern-input flex-grow-1"
-                            placeholder="Monedas De Oro"
-                            value={ variableName }
-                            onChange={ event => setVariableName(event.target.value) }
-                            maxLength={ 32 }
-                        />
-                    </div>
-                </div>
-
-                <div className="wired-modern-field-group">
-                    <label className="wired-modern-label">Activar cuando la variable es:</label>
-                    <div className="d-flex flex-column gap-2 mt-1">
-                        <div className="wired-modern-checkbox" onClick={ () => setOnCreated(!onCreated) }>
-                            <span className={ `checkbox-box ${ onCreated ? 'checked' : '' }` }>
-                                { onCreated && '✓' }
-                            </span>
-                            <span className="checkbox-label">Creada</span>
-                        </div>
-                        <div className="wired-modern-checkbox" onClick={ () => setOnChanged(!onChanged) }>
-                            <span className={ `checkbox-box ${ onChanged ? 'checked' : '' }` }>
-                                { onChanged && '✓' }
-                            </span>
-                            <span className="checkbox-label">Valor cambiado</span>
-                        </div>
-                        <div className="wired-modern-checkbox" onClick={ () => setOnDeleted(!onDeleted) }>
-                            <span className={ `checkbox-box ${ onDeleted ? 'checked' : '' }` }>
-                                { onDeleted && '✓' }
-                            </span>
-                            <span className="checkbox-label">Eliminada</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </WiredModernBaseView>
+        <WiredTriggerBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
+            <Column gap={ 1 }>
+                <Text bold>Elegir variable:</Text>
+                <input
+                    type="text"
+                    className="form-control form-control-sm"
+                    placeholder="Monedas De Oro"
+                    value={ variableName }
+                    onChange={ event => setVariableName(event.target.value) }
+                    maxLength={ 32 }
+                />
+            </Column>
+            <Column gap={ 1 }>
+                <Text bold>Activar cuando la variable es:</Text>
+                <Flex alignItems="center" gap={ 1 }>
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="trgVarCreated"
+                        checked={ onCreated }
+                        onChange={ event => setOnCreated(event.target.checked) }
+                    />
+                    <Text small>Creada</Text>
+                </Flex>
+                <Flex alignItems="center" gap={ 1 }>
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="trgVarChanged"
+                        checked={ onChanged }
+                        onChange={ event => setOnChanged(event.target.checked) }
+                    />
+                    <Text small>Valor cambiado</Text>
+                </Flex>
+                <Flex alignItems="center" gap={ 1 }>
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        id="trgVarDeleted"
+                        checked={ onDeleted }
+                        onChange={ event => setOnDeleted(event.target.checked) }
+                    />
+                    <Text small>Eliminada</Text>
+                </Flex>
+            </Column>
+        </WiredTriggerBaseView>
     );
 };
