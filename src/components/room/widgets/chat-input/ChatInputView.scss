@@ -88,41 +88,20 @@
     align-items: center;
     gap: 6px;
     z-index: 2;
+    padding-left: 4px;
 
-    .chat-addon-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 26px;
-        height: 24px;
-        border-radius: 4px;
+    .icon {
         cursor: pointer;
-        background: rgba(0, 0, 0, 0.06);
-        transition: background 0.15s, transform 0.1s;
-        user-select: none;
+        opacity: 0.85;
+        transition: opacity 0.15s ease, transform 0.1s ease;
 
         &:hover {
-            background: rgba(0, 0, 0, 0.15);
-            transform: scale(1.08);
+            opacity: 1;
+            transform: scale(1.1);
         }
 
         &:active {
             transform: scale(0.95);
-        }
-
-        .chat-btn-label {
-            font-size: 15px;
-            line-height: 1;
-
-            &.gif-badge {
-                font-size: 10px;
-                font-weight: 800;
-                background: #007bff;
-                color: #ffffff;
-                padding: 1px 4px;
-                border-radius: 3px;
-                letter-spacing: 0.5px;
-            }
         }
     }
 }

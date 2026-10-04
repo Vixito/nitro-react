@@ -232,11 +232,9 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
                 innerRef={ buttonRef }
                 pointer
                 title="GIFs"
-                className="chat-addon-btn chat-gif-btn"
+                className="icon chat-gif-icon"
                 onClick={ () => setVisible(prev => !prev) }
-            >
-                <span className="chat-btn-label gif-badge">GIF</span>
-            </Base>
+            />
 
             <Overlay
                 show={ visible }

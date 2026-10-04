@@ -179,9 +179,6 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <Base pointer title="Cámara" className="navigation-item icon icon-camera" onClick={ event => CreateLinkEvent('camera/toggle') } /> }
                         { isMod &&
                             <Base pointer title="Herramientas de Moderación" className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
-                        <Base pointer title="Versiones / Eras de Habbo (2006, 2012, 2016)" className="navigation-item" style={{ background: 'rgba(0,168,255,0.2)', border: '1px solid #00a8ff', borderRadius: '4px', width: '32px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={ event => CreateLinkEvent('era-selector/toggle') }>
-                            <span style={{ fontSize: '14px', lineHeight: 1 }}>⏳</span>
-                        </Base>
                         { radioUrl && (
                             <Flex alignItems="center" gap={ 1 } title="Radio Habbten" className="navigation-item" style={{ background: 'rgba(0,0,0,0.6)', padding: '0 8px', borderRadius: '4px', height: '30px' }}>
                                 <audio ref={audioRef} preload="none" />

@@ -199,6 +199,20 @@
         height: 19px;
     }
 
+    &.chat-emoji-icon {
+        background-image: url('@/assets/images/chat/icon_emoji.png');
+        width: 14px;
+        height: 14px;
+        image-rendering: pixelated;
+    }
+
+    &.chat-gif-icon {
+        background-image: url('@/assets/images/chat/icon_gif.png');
+        width: 20px;
+        height: 13px;
+        image-rendering: pixelated;
+    }
+
     &.pencil-icon {
         background-image: url('@/assets/images/infostand/pencil-icon.png');
         width: 17px;

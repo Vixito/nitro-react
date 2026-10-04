@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { AddEventLinkTracker, RemoveLinkEventTracker } from '../../api';
+import { Button, Column, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
 import { EraType, useEraTheme } from '../../hooks/era/useEraTheme';
 import './EraSelectorModalView.scss';
 
@@ -70,27 +71,19 @@ export const EraSelectorModalView: FC<{}> = () =>
     };
 
     return (
-        <div className="era-modal-backdrop d-flex align-items-center justify-content-center">
-            <div className="era-modal-container">
-                <button
-                    type="button"
-                    className="btn-close-era"
-                    onClick={ () => setIsVisible(false) }
-                    title="Cerrar"
-                >
-                    ✕
-                </button>
-
-                <div className="era-modal-header text-center mb-4">
-                    <h2 className="era-modal-title">
-                        WHICH ERA OF <span className="highlight-habbo">HABBO</span> DO YOU LOVE MOST?
-                    </h2>
-                    <p className="era-modal-subtitle">
-                        Choose your preferred style and we'll theme your entire experience to match. You can always change this later in Settings.
+        <NitroCardView uniqueKey="era-selector" theme="primary" className="era-selector-window" style={ { width: 720, maxWidth: '95vw' } }>
+            <NitroCardHeaderView headerText="¿Qué era de Habbo te gusta más?" onCloseClick={ () => setIsVisible(false) } />
+            <NitroCardContentView className="p-3 text-white">
+                <div className="text-center mb-3">
+                    <h4 className="fw-bold mb-1 era-window-heading">
+                        WHICH ERA OF <span className="text-info">HABBO</span> DO YOU LOVE MOST?
+                    </h4>
+                    <p className="small text-muted mb-0">
+                        Elige tu era favorita y adaptaremos tu experiencia de juego. Puedes cambiarla en cualquier momento desde <strong>Ajustes → Preferencias</strong>.
                     </p>
                 </div>
 
-                <div className="era-cards-grid">
+                <div className="era-cards-grid mb-3">
                     { eras.map(era => {
                         const isSelected = selectedEra === era.id;
                         return (
@@ -108,55 +101,43 @@ export const EraSelectorModalView: FC<{}> = () =>
                                     <span className="era-year-badge">{ era.year }</span>
                                 </div>
 
-                                <div className="era-card-body">
-                                    <h4 className="era-card-name">{ era.name }</h4>
-                                    <p className="era-card-desc">{ era.description }</p>
+                                <div className="era-card-body p-2 d-flex flex-column flex-grow-1">
+                                    <h5 className="era-card-name fw-bold mb-1">{ era.name }</h5>
+                                    <p className="era-card-desc small text-muted mb-2 flex-grow-1">{ era.description }</p>
 
-                                    <div className="era-badges-row">
+                                    <div className="era-badges-row d-flex gap-1 mb-2">
                                         { era.badges.map(badge => (
                                             <span key={ badge } className="era-pill-badge">{ badge }</span>
                                         )) }
                                     </div>
 
-                                    <button
-                                        type="button"
-                                        className={ `btn btn-sm btn-era-preview ${ isSelected ? 'active' : '' }` }
+                                    <Button
+                                        variant={ isSelected ? 'success' : 'secondary' }
+                                        className="w-100 btn-sm fw-bold"
                                         onClick={ (e) => { e.stopPropagation(); setSelectedEra(era.id); } }
                                     >
-                                        👁 { isSelected ? 'SELECTED' : 'SELECT' }
-                                    </button>
+                                        { isSelected ? '✓ SELECCIONADO' : 'ELEGIR' }
+                                    </Button>
                                 </div>
                             </div>
                         );
                     }) }
                 </div>
 
-                <div className="era-footer-hint text-center my-3">
-                    You can change your era at any time from <strong>Settings → Preferences</strong>
-                </div>
-
-                <div className="era-modal-footer d-flex align-items-center justify-content-between px-4 py-3">
-                    <div className="footer-status text-white">
-                        Play as <strong>{ activeEraObj.name } { activeEraObj.year }</strong>?
+                <div className="d-flex align-items-center justify-content-between p-2 rounded era-footer-bar">
+                    <div className="text-white small">
+                        Jugar en modo: <strong className="text-success">{ activeEraObj.name } ({ activeEraObj.year })</strong>
                     </div>
-                    <div className="footer-actions d-flex gap-2">
-                        <button
-                            type="button"
-                            className="btn btn-secondary px-4 fw-bold"
-                            onClick={ () => setIsVisible(false) }
-                        >
-                            CANCEL
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-success px-4 fw-bold btn-lets-go"
-                            onClick={ handleConfirm }
-                        >
-                            YES, LET'S GO!
-                        </button>
+                    <div className="d-flex gap-2">
+                        <Button variant="secondary" className="btn-sm px-3" onClick={ () => setIsVisible(false) }>
+                            Cancelar
+                        </Button>
+                        <Button variant="success" className="btn-sm px-4 fw-bold" onClick={ handleConfirm }>
+                            ¡SÍ, VAMOS!
+                        </Button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </NitroCardContentView>
+        </NitroCardView>
     );
 };

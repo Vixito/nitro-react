@@ -122,11 +122,9 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
                 innerRef={ buttonRef }
                 pointer
                 title="Emojis"
-                className="chat-addon-btn chat-emoji-btn"
+                className="icon chat-emoji-icon"
                 onClick={ () => setVisible(prev => !prev) }
-            >
-                <span className="chat-btn-label">😊</span>
-            </Base>
+            />
 
             <Overlay
                 show={ visible }
