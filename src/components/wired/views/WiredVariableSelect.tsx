@@ -1,5 +1,8 @@
 import { FC, useMemo, useState } from 'react';
-import { FaChair, FaGlobeAmericas, FaPlug, FaUser } from 'react-icons/fa';
+import IconScopeContext from '@/assets/images/wired/icon_scope_context.png';
+import IconScopeFurni from '@/assets/images/wired/icon_scope_furni.png';
+import IconScopeGlobal from '@/assets/images/wired/icon_scope_global.png';
+import IconScopeUser from '@/assets/images/wired/icon_scope_user.png';
 import { Column, Flex, Text } from '../../../common';
 
 export type VariableScopeType = 0 | 1 | 2 | 3;
@@ -143,7 +146,7 @@ export const WiredVariableSelect: FC<WiredVariableSelectProps> = ({
                             disabled={ disabled }
                             onClick={ () => handleScopeClick(2) }
                         >
-                            <FaChair />
+                            <img src={ IconScopeFurni } alt="Furni" className="scope-icon-img" />
                         </button>
                     ) }
                     { availableScopes.includes(1) && (
@@ -154,7 +157,7 @@ export const WiredVariableSelect: FC<WiredVariableSelectProps> = ({
                             disabled={ disabled }
                             onClick={ () => handleScopeClick(1) }
                         >
-                            <FaUser />
+                            <img src={ IconScopeUser } alt="Usuario" className="scope-icon-img" />
                         </button>
                     ) }
                     { availableScopes.includes(0) && (
@@ -165,7 +168,7 @@ export const WiredVariableSelect: FC<WiredVariableSelectProps> = ({
                             disabled={ disabled }
                             onClick={ () => handleScopeClick(0) }
                         >
-                            <FaGlobeAmericas />
+                            <img src={ IconScopeGlobal } alt="Global (Sala)" className="scope-icon-img" />
                         </button>
                     ) }
                     { availableScopes.includes(3) && (
@@ -176,7 +179,7 @@ export const WiredVariableSelect: FC<WiredVariableSelectProps> = ({
                             disabled={ disabled }
                             onClick={ () => handleScopeClick(3) }
                         >
-                            <FaPlug />
+                            <img src={ IconScopeContext } alt="Contexto" className="scope-icon-img" />
                         </button>
                     ) }
                 </div>
