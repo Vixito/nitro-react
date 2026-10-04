@@ -4,6 +4,8 @@ import { createPortal } from 'react-dom';
 import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfiguration, GetSessionDataManager, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
 import { Text } from '../../../../common';
 import { useChatInputWidget, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
+import { ChatInputEmojiPickerView } from './ChatInputEmojiPickerView';
+import { ChatInputGifPickerView } from './ChatInputGifPickerView';
 import { ChatInputStyleSelectorView } from './ChatInputStyleSelectorView';
 
 export const ChatInputView: FC<{}> = props =>
@@ -246,6 +248,42 @@ export const ChatInputView: FC<{}> = props =>
         inputRef.current.parentElement.dataset.value = chatValue;
     }, [ chatValue ]);
 
+    const onSelectEmoji = useCallback((emoji: string) =>
+    {
+        setChatValue(prev =>
+        {
+            if(!inputRef.current) return prev + emoji;
+            const start = inputRef.current.selectionStart ?? prev.length;
+            const end = inputRef.current.selectionEnd ?? prev.length;
+            const next = prev.substring(0, start) + emoji + prev.substring(end);
+            setTimeout(() => {
+                if(inputRef.current)
+                {
+                    inputRef.current.focus();
+                    inputRef.current.setSelectionRange(start + emoji.length, start + emoji.length);
+                }
+            }, 50);
+            return next;
+        });
+        setIsTyping(true);
+        setIsIdle(true);
+    }, [ setIsTyping, setIsIdle ]);
+
+    const onSelectGif = useCallback((gifUrl: string) =>
+    {
+        const gifTag = `[gif]${ gifUrl }[/gif]`;
+        setChatValue(prev =>
+        {
+            const space = prev && !prev.endsWith(' ') ? ' ' : '';
+            return `${ prev }${ space }${ gifTag }`;
+        });
+        setIsTyping(true);
+        setIsIdle(true);
+        setTimeout(() => {
+            if(inputRef.current) inputRef.current.focus();
+        }, 50);
+    }, [ setIsTyping, setIsIdle ]);
+
     if(!roomSession || roomSession.isSpectator) return null;
 
     return (
@@ -257,7 +295,11 @@ export const ChatInputView: FC<{}> = props =>
                     { floodBlocked &&
                     <Text variant="danger">{ LocalizeText('chat.input.alert.flood', [ 'time' ], [ floodBlockedSeconds.toString() ]) } </Text> }
                 </div>
-                <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
+                <div className="chat-addons">
+                    <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } />
+                    <ChatInputGifPickerView onSelectGif={ onSelectGif } />
+                    <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
+                </div>
             </div>, document.getElementById('toolbar-chat-input-container'))
     );
 }

@@ -1,9 +1,9 @@
 import { ILinkEventTracker, NitroSettingsEvent, UserSettingsCameraFollowComposer, UserSettingsEvent, UserSettingsOldChatComposer, UserSettingsRoomInvitesComposer, UserSettingsSoundComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaVolumeDown, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
-import { AddEventLinkTracker, DispatchMainEvent, DispatchUiEvent, LocalizeText, RemoveLinkEventTracker, SendMessageComposer } from '../../api';
+import { AddEventLinkTracker, CreateLinkEvent, DispatchMainEvent, DispatchUiEvent, LocalizeText, RemoveLinkEventTracker, SendMessageComposer } from '../../api';
 import { Button, classNames, Column, Flex, HorizontalRule, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
-import { useCatalogPlaceMultipleItems, useCatalogSkipPurchaseConfirmation, useMessageEvent } from '../../hooks';
+import { useCatalogPlaceMultipleItems, useCatalogSkipPurchaseConfirmation, useEraTheme, useMessageEvent } from '../../hooks';
 
 export const UserSettingsView: FC<{}> = props => {
     const [isVisible, setIsVisible] = useState(false);
@@ -15,6 +15,7 @@ export const UserSettingsView: FC<{}> = props => {
     const [discordTag, setDiscordTag] = useState(localStorage.getItem('habbten_discord_tag') || '');
     const [isDiscordConnected, setIsDiscordConnected] = useState(!!localStorage.getItem('habbten_discord_tag'));
     const [discordStatusMsg, setDiscordStatusMsg] = useState('');
+    const { currentEra, setEra, eras } = useEraTheme();
 
     const loadInfinitePermissions = async () => {
         try {
@@ -185,6 +186,29 @@ export const UserSettingsView: FC<{}> = props => {
                             <input className="form-check-input" type="checkbox" checked={catalogSkipPurchaseConfirmation} onChange={event => setCatalogSkipPurchaseConfirmation(event.target.checked)} />
                             <Text>{LocalizeText('memenu.settings.other.skip.purchase.confirmation')}</Text>
                         </Flex>
+                        <HorizontalRule />
+                        <Text bold>Versión / Era del Juego</Text>
+                        <div className="d-flex flex-column gap-1 my-1">
+                            { eras.map(era => (
+                                <label key={ era.id } className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                    <input
+                                        type="radio"
+                                        name="era_theme_radio"
+                                        className="form-check-input"
+                                        checked={ currentEra === era.id }
+                                        onChange={ () => setEra(era.id) }
+                                    />
+                                    <span className="small"><strong>{ era.name } ({ era.year })</strong> - { era.subtitle }</span>
+                                </label>
+                            )) }
+                        </div>
+                        <Button
+                            variant="secondary"
+                            className="btn-sm py-1 my-1"
+                            onClick={ () => CreateLinkEvent('era-selector/open') }
+                        >
+                            Abrir Selector Visual de Eras...
+                        </Button>
                         <HorizontalRule />
                         <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => setShowDiscordModal(true)}>
                             <Text bold variant="white">Conectar a Discord</Text>

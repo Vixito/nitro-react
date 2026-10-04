@@ -75,6 +75,27 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = props =>
         setIsVisible(true);
     }, [ chat, isReady, isVisible, makeRoom ]);
 
+    useEffect(() =>
+    {
+        const element = elementRef.current;
+        if(!element) return;
+
+        const img = element.querySelector('.chat-inline-gif') as HTMLImageElement;
+        if(img && !img.complete)
+        {
+            const handleLoad = () =>
+            {
+                if(!elementRef.current) return;
+                chat.width = elementRef.current.offsetWidth;
+                chat.height = elementRef.current.offsetHeight;
+                if(makeRoom) makeRoom(chat);
+            };
+
+            img.addEventListener('load', handleLoad);
+            return () => img.removeEventListener('load', handleLoad);
+        }
+    }, [ chat, isReady, makeRoom ]);
+
     return (
         <div ref={ elementRef } className={ `bubble-container ${ isVisible ? 'visible' : 'invisible' }` } onClick={ event => GetRoomEngine().selectRoomObject(chat.roomId, chat.senderId, RoomObjectCategory.UNIT) }>
             { (chat.styleId === 0) &&

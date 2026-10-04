@@ -82,3 +82,197 @@
         }
     }
 }
+
+.chat-addons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 2;
+
+    .chat-addon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.06);
+        transition: background 0.15s, transform 0.1s;
+        user-select: none;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.15);
+            transform: scale(1.08);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        .chat-btn-label {
+            font-size: 15px;
+            line-height: 1;
+
+            &.gif-badge {
+                font-size: 10px;
+                font-weight: 800;
+                background: #007bff;
+                color: #ffffff;
+                padding: 1px 4px;
+                border-radius: 3px;
+                letter-spacing: 0.5px;
+            }
+        }
+    }
+}
+
+.nitro-chat-popover {
+    background: #1b232a !important;
+    border: 2px solid #000000 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+    color: #ffffff !important;
+    z-index: 9999 !important;
+    padding: 0 !important;
+
+    .popover-header-custom {
+        background: #141b21;
+        border-bottom: 1px solid #2d3842;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+
+        .btn-close-popover {
+            cursor: pointer;
+            color: #8899a6;
+            font-size: 13px;
+            padding: 0 4px;
+
+            &:hover {
+                color: #ff5555;
+            }
+        }
+    }
+
+    .popover-tabs {
+        background: #192127;
+
+        .tab-btn {
+            background: transparent;
+            color: #a0b0be;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            transition: all 0.15s ease;
+
+            &:hover {
+                color: #ffffff;
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            &.active {
+                color: #ffffff;
+                background: #007bff;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .popover-body-custom {
+        max-height: 270px;
+        overflow-y: auto;
+    }
+
+    &.nitro-chat-emoji-popover {
+        width: 320px;
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            font-size: 20px;
+            text-align: center;
+
+            .emoji-item {
+                cursor: pointer;
+                border-radius: 4px;
+                padding: 4px 2px;
+                transition: transform 0.1s, background 0.1s;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.15);
+                    transform: scale(1.25);
+                }
+            }
+        }
+
+        .habbo-shortcuts-grid {
+            .habbo-shortcut-item {
+                cursor: pointer;
+                background: #252f38;
+                transition: background 0.15s;
+
+                &:hover {
+                    background: #313e4a;
+                }
+            }
+        }
+    }
+
+    &.nitro-chat-gif-popover {
+        width: 340px;
+
+        .gif-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+
+            .gif-item-card {
+                position: relative;
+                height: 90px;
+                border-radius: 6px;
+                overflow: hidden;
+                cursor: pointer;
+                background: #000000;
+                border: 1px solid #333f4a;
+
+                img.gif-thumb {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.2s;
+                }
+
+                .gif-title-overlay {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    padding: 2px 4px;
+                    background: rgba(0, 0, 0, 0.75);
+                    color: #ffffff;
+                    font-size: 10px;
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                &:hover {
+                    border-color: #007bff;
+
+                    img.gif-thumb {
+                        transform: scale(1.05);
+                    }
+
+                    .gif-title-overlay {
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+    }
+}
+

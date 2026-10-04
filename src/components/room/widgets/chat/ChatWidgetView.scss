@@ -715,6 +715,24 @@
             line-height: 1.25;
             color: $black;
             min-height: 25px;
+
+            .chat-gif-wrapper {
+                display: block;
+                margin-top: 4px;
+                border-radius: 4px;
+                overflow: hidden;
+                max-width: 180px;
+
+                .chat-inline-gif {
+                    display: block;
+                    max-width: 180px;
+                    max-height: 120px;
+                    width: auto;
+                    height: auto;
+                    object-fit: contain;
+                    border-radius: 4px;
+                }
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ import { ToolbarView } from '../toolbar/ToolbarView';
 import { UserProfileView } from '../user-profile/UserProfileView';
 import { UserSettingsView } from '../user-settings/UserSettingsView';
 import { WiredView } from '../wired/WiredView';
+import { EraSelectorModalView } from '../eras/EraSelectorModalView';
 
 export const MainView: FC<{}> = props =>
 {
@@ -109,6 +110,7 @@ export const MainView: FC<{}> = props =>
             <GameCenterView />
             <FloorplanEditorView />
             <BattlePassView />
+            <EraSelectorModalView />
         </Base>
     );
 }

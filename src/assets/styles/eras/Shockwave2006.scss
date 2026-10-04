@@ -1,0 +1,32 @@
+// Shockwave Era 2006 Theme Styles
+body.era-shockwave-2006,
+body[data-era="shockwave2006"] {
+
+    // Retro Teal Window Header Accents
+    .nitro-card-header,
+    .drag-handler {
+        background-color: #008080 !important;
+        border-bottom: 2px solid #004d4d !important;
+
+        .header-text,
+        .nitro-card-header-text {
+            color: #ffffff !important;
+            font-family: 'Ubuntu', sans-serif !important;
+            letter-spacing: 0.5px !important;
+        }
+    }
+
+    // Retro Gold & Teal Toolbar
+    .nitro-toolbar {
+        background: #005050 !important;
+        border-top: 2px solid #008080 !important;
+
+        .navigation-item {
+            border-radius: 4px !important;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.2) !important;
+            }
+        }
+    }
+}
