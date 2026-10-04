@@ -99,7 +99,7 @@ export const WiredActionGiveRewardView: FC<{}> = props =>
             </Flex>
             { !limitEnabled &&
                 <Text center small className="bg-muted rounded p-1">
-                    Reward limit not set. Make sure rewards are badges or non-tradeable items.
+                    Límite de premios no establecido. Asegúrate de que las recompensas sean placas o ítems no tradeables.
                 </Text> }
             { limitEnabled &&
                 <ReactSlider
@@ -110,13 +110,13 @@ export const WiredActionGiveRewardView: FC<{}> = props =>
                     onChange={ event => setRewardsLimit(event) } /> }
             <hr className="m-0 bg-dark" />
             <Column gap={ 1 }>
-                <Text bold>How often can a user be rewarded?</Text>
+                <Text bold>¿Con qué frecuencia se puede premiar a un usuario?</Text>
                 <Flex gap={ 1 }>
                     <select className="form-select form-select-sm w-100" value={ rewardTime } onChange={ (e) => setRewardTime(Number(e.target.value)) }>
-                        <option value="0">Once</option>
-                        <option value="3">Once every { limitationInterval } minutes</option>
-                        <option value="2">Once every { limitationInterval } hours</option>
-                        <option value="1">Once every { limitationInterval } days</option>
+                        <option value="0">Una vez</option>
+                        <option value="3">Una vez cada { limitationInterval } minutos</option>
+                        <option value="2">Una vez cada { limitationInterval } horas</option>
+                        <option value="1">Una vez cada { limitationInterval } días</option>
                     </select>
                     { (rewardTime > 0) && <input type="number" className="form-control form-control-sm" value={ limitationInterval } onChange={ event => setLimitationInterval(Number(event.target.value)) } /> }
                 </Flex>
@@ -124,14 +124,14 @@ export const WiredActionGiveRewardView: FC<{}> = props =>
             <hr className="m-0 bg-dark" />
             <Flex alignItems="center" gap={ 1 }>
                 <input className="form-check-input" type="checkbox" id="uniqueRewards" checked={ uniqueRewards } onChange={ (e) => setUniqueRewards(e.target.checked) } />
-                <Text>Unique rewards</Text>
+                <Text>Recompensas únicas</Text>
             </Flex>
             <Text center small className="bg-muted rounded p-1">
-                If checked each reward will be given once to each user. This will disable the probabilities option.
+                Si está marcado, cada recompensa se entregará una sola vez a cada usuario. Esto deshabilitará la opción de probabilidades.
             </Text>
             <hr className="m-0 bg-dark" />
             <Flex justifyContent="between" alignItems="center">
-                <Text bold>Rewards</Text>
+                <Text bold>Recompensas</Text>
                 <Button variant="success" onClick={ addReward }>
                     <FaPlus className="fa-icon" />
                 </Button>
@@ -143,10 +143,10 @@ export const WiredActionGiveRewardView: FC<{}> = props =>
                         <Flex key={ index } gap={ 1 }>
                             <Flex alignItems="center" gap={ 1 }>
                                 <input className="form-check-input" type="checkbox" checked={ reward.isBadge } onChange={ (e) => updateReward(index, e.target.checked, reward.itemCode, reward.probability) } />
-                                <Text small>Badge?</Text>
+                                <Text small>¿Placa?</Text>
                             </Flex>
-                            <input type="text" className="form-control form-control-sm" value={ reward.itemCode } onChange={ e => updateReward(index, reward.isBadge, e.target.value, reward.probability) } placeholder="Item Code" />
-                            <input type="number" className="form-control form-control-sm" value={ reward.probability } onChange={ e => updateReward(index, reward.isBadge, reward.itemCode, Number(e.target.value)) } placeholder="Probability" />
+                            <input type="text" className="form-control form-control-sm" value={ reward.itemCode } onChange={ e => updateReward(index, reward.isBadge, e.target.value, reward.probability) } placeholder="Código / ID" />
+                            <input type="number" className="form-control form-control-sm" value={ reward.probability } onChange={ e => updateReward(index, reward.isBadge, reward.itemCode, Number(e.target.value)) } placeholder="Probabilidad" />
                             { (index > 0) &&
                             <Button variant="danger" onClick={ event => removeReward(index) }>
                                 <FaTrash className="fa-icon" />

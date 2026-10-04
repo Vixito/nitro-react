@@ -1,51 +1,94 @@
 import { FC, useEffect, useState } from 'react';
-import { WiredFurniType } from '../../../../api';
-import { Column, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
-import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { WiredModernBaseView } from '../WiredModernBaseView';
 
 export const WiredTriggerVariableChangedView: FC<{}> = props =>
 {
-    const [ variableName, setVariableName ] = useState('');
-    const [ scope, setScope ] = useState(0);
+    const [ variableName, setVariableName ] = useState('Monedas De Oro');
+    const [ onCreated, setOnCreated ] = useState(false);
+    const [ onChanged, setOnChanged ] = useState(true);
+    const [ onDeleted, setOnDeleted ] = useState(false);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
 
     const save = () =>
     {
         setStringParam(variableName.trim());
-        setIntParams([ scope ]);
+        setIntParams([ onCreated ? 1 : 0, onChanged ? 1 : 0, onDeleted ? 1 : 0 ]);
     };
 
     useEffect(() =>
     {
-        setVariableName(trigger.stringData || '');
-        setScope((trigger.intData && trigger.intData.length > 0) ? trigger.intData[0] : 0);
+        if(!trigger) return;
+
+        setVariableName(trigger.stringData || 'Monedas De Oro');
+
+        if(trigger.intData && trigger.intData.length >= 3)
+        {
+            setOnCreated(trigger.intData[0] === 1);
+            setOnChanged(trigger.intData[1] === 1);
+            setOnDeleted(trigger.intData[2] === 1);
+        }
+        else if(trigger.intData && trigger.intData.length >= 1)
+        {
+            setOnCreated(false);
+            setOnChanged(true);
+            setOnDeleted(false);
+        }
+        else
+        {
+            setOnCreated(false);
+            setOnChanged(true);
+            setOnDeleted(false);
+        }
     }, [ trigger ]);
 
     return (
-        <WiredTriggerBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
-            <Column gap={ 1 }>
-                <Text bold>Nombre de la Variable:</Text>
-                <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="ej: puntos (o dejar vacío para cualquiera)"
-                    value={ variableName }
-                    onChange={ event => setVariableName(event.target.value) }
-                    maxLength={ 32 }
-                />
-            </Column>
-            <Column gap={ 1 }>
-                <Text bold>Ámbito a Monitorear:</Text>
-                <select
-                    className="form-select form-select-sm"
-                    value={ scope }
-                    onChange={ event => setScope(parseInt(event.target.value)) }
-                >
-                    <option value={ 0 }>Variable de Sala (Global)</option>
-                    <option value={ 1 }>Variable de Usuario (Individual)</option>
-                </select>
-            </Column>
-        </WiredTriggerBaseView>
+        <WiredModernBaseView
+            headerVariant="dark"
+            headerTitle="Causante Wired: Variable cambiada"
+            iconType="trigger"
+            hasSpecialInput={ true }
+            save={ save }
+        >
+            <div className="d-flex flex-column gap-3">
+                <div className="wired-modern-field-group">
+                    <label className="wired-modern-label">Elegir variable:</label>
+                    <div className="d-flex gap-1 align-items-center">
+                        <input
+                            type="text"
+                            className="wired-modern-input flex-grow-1"
+                            placeholder="Monedas De Oro"
+                            value={ variableName }
+                            onChange={ event => setVariableName(event.target.value) }
+                            maxLength={ 32 }
+                        />
+                    </div>
+                </div>
+
+                <div className="wired-modern-field-group">
+                    <label className="wired-modern-label">Activar cuando la variable es:</label>
+                    <div className="d-flex flex-column gap-2 mt-1">
+                        <div className="wired-modern-checkbox" onClick={ () => setOnCreated(!onCreated) }>
+                            <span className={ `checkbox-box ${ onCreated ? 'checked' : '' }` }>
+                                { onCreated && '✓' }
+                            </span>
+                            <span className="checkbox-label">Creada</span>
+                        </div>
+                        <div className="wired-modern-checkbox" onClick={ () => setOnChanged(!onChanged) }>
+                            <span className={ `checkbox-box ${ onChanged ? 'checked' : '' }` }>
+                                { onChanged && '✓' }
+                            </span>
+                            <span className="checkbox-label">Valor cambiado</span>
+                        </div>
+                        <div className="wired-modern-checkbox" onClick={ () => setOnDeleted(!onDeleted) }>
+                            <span className={ `checkbox-box ${ onDeleted ? 'checked' : '' }` }>
+                                { onDeleted && '✓' }
+                            </span>
+                            <span className="checkbox-label">Eliminada</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </WiredModernBaseView>
     );
-}
+};
