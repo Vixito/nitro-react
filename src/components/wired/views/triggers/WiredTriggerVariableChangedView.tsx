@@ -2,11 +2,13 @@ import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
 import { Column, Flex, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
+import { WiredVariableSelect } from '../WiredVariableSelect';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
 
 export const WiredTriggerVariableChangedView: FC<{}> = props =>
 {
     const [ variableName, setVariableName ] = useState('Monedas De Oro');
+    const [ scope, setScope ] = useState<number>(1);
     const [ onCreated, setOnCreated ] = useState(false);
     const [ onChanged, setOnChanged ] = useState(true);
     const [ onDeleted, setOnDeleted ] = useState(false);
@@ -15,7 +17,7 @@ export const WiredTriggerVariableChangedView: FC<{}> = props =>
     const save = () =>
     {
         setStringParam(variableName.trim());
-        setIntParams([ onCreated ? 1 : 0, onChanged ? 1 : 0, onDeleted ? 1 : 0 ]);
+        setIntParams([ scope, onCreated ? 1 : 0, onChanged ? 1 : 0, onDeleted ? 1 : 0 ]);
     };
 
     useEffect(() =>
@@ -24,20 +26,23 @@ export const WiredTriggerVariableChangedView: FC<{}> = props =>
 
         setVariableName(trigger.stringData || 'Monedas De Oro');
 
-        if(trigger.intData && trigger.intData.length >= 3)
+        if(trigger.intData && trigger.intData.length >= 4)
         {
-            setOnCreated(trigger.intData[0] === 1);
-            setOnChanged(trigger.intData[1] === 1);
-            setOnDeleted(trigger.intData[2] === 1);
+            setScope(trigger.intData[0]);
+            setOnCreated(trigger.intData[1] === 1);
+            setOnChanged(trigger.intData[2] === 1);
+            setOnDeleted(trigger.intData[3] === 1);
         }
         else if(trigger.intData && trigger.intData.length >= 1)
         {
+            setScope(trigger.intData[0]);
             setOnCreated(false);
             setOnChanged(true);
             setOnDeleted(false);
         }
         else
         {
+            setScope(1);
             setOnCreated(false);
             setOnChanged(true);
             setOnDeleted(false);
@@ -46,17 +51,15 @@ export const WiredTriggerVariableChangedView: FC<{}> = props =>
 
     return (
         <WiredTriggerBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
-            <Column gap={ 1 }>
-                <Text bold>Elegir variable:</Text>
-                <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="Monedas De Oro"
-                    value={ variableName }
-                    onChange={ event => setVariableName(event.target.value) }
-                    maxLength={ 32 }
-                />
-            </Column>
+            <WiredVariableSelect
+                label="Elegir variable:"
+                value={ variableName }
+                scope={ scope }
+                onScopeChange={ setScope }
+                onChange={ (val, scp) => { setVariableName(val); if(scp !== undefined) setScope(scp); } }
+                activeColor="green"
+            />
+
             <Column gap={ 1 }>
                 <Text bold>Activar cuando la variable es:</Text>
                 <Flex alignItems="center" gap={ 1 }>

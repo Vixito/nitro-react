@@ -44,6 +44,17 @@ export const RoomChatFormatter = (content: string) =>
     content = encodeHTML(content);
     //content = (joypixels.shortnameToUnicode(content) as string)
 
+    content = content
+        .replace(/&#60;br\s*\/?&#62;/gi, '<br />')
+        .replace(/&lt;br\s*\/?&gt;/gi, '<br />')
+        .replace(/&#60;b&#62;/gi, '<b>')
+        .replace(/&#60;\/b&#62;/gi, '</b>')
+        .replace(/&#60;i&#62;/gi, '<i>')
+        .replace(/&#60;\/i&#62;/gi, '</i>')
+        .replace(/&#60;u&#62;/gi, '<u>')
+        .replace(/&#60;\/u&#62;/gi, '</u>')
+        .replace(/\r\n|\n/g, '<br />');
+
     if(content.startsWith('@') && content.indexOf('@', 1) > -1)
     {
         let match = null;

@@ -1,123 +1,103 @@
 import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
-import { Column, Text } from '../../../../common';
+import { Column, Flex, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
+import { WiredStepperSelect } from '../WiredStepperSelect';
+import { WiredVariableSelect } from '../WiredVariableSelect';
 import { WiredActionBaseView } from './WiredActionBaseView';
+
+const TARGET_OPTIONS = [
+    'Utilizar el usuario desencadenante',
+    'Utilizar usuarios de Selector',
+    'Utilizar el furni desencadenante',
+    'Utilizar furnis de Selector'
+];
 
 export const WiredActionGiveVariableView: FC<{}> = props =>
 {
-    const [ variableName, setVariableName ] = useState('');
-    const [ scope, setScope ] = useState(1); // 1: User, 2: Furni
-    const [ initialValue, setInitialValue ] = useState(0);
-    const [ hasValue, setHasValue ] = useState(1); // 1: Yes, 0: No
-    const [ overwrite, setOverwrite ] = useState(1); // 1: Yes, 0: No
-    const [ isPermanent, setIsPermanent ] = useState(1); // 1: Permanent, 0: Temporary
+    const [ variableName, setVariableName ] = useState('Punto De Control');
+    const [ scope, setScope ] = useState<number>(1); // 2: Furni, 1: User, 3: Context
+    const [ initialValue, setInitialValue ] = useState<number>(0);
+    const [ hasValue, setHasValue ] = useState<number>(1);
+    const [ overwrite, setOverwrite ] = useState<boolean>(true);
+    const [ isPermanent, setIsPermanent ] = useState<number>(1);
+    const [ targetIndex, setTargetIndex ] = useState<number>(0);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
 
     const save = () =>
     {
         setStringParam(variableName.trim());
-        setIntParams([ scope, initialValue, hasValue, overwrite, isPermanent ]);
+        setIntParams([ scope, initialValue, hasValue, overwrite ? 1 : 0, isPermanent, targetIndex ]);
     };
 
     useEffect(() =>
     {
-        setVariableName(trigger.stringData || '');
+        if(!trigger) return;
+
+        setVariableName(trigger.stringData || 'Punto De Control');
 
         if(trigger.intData && trigger.intData.length >= 5)
         {
             setScope(trigger.intData[0]);
             setInitialValue(trigger.intData[1]);
             setHasValue(trigger.intData[2]);
-            setOverwrite(trigger.intData[3]);
+            setOverwrite(trigger.intData[3] === 1);
             setIsPermanent(trigger.intData[4]);
-        }
-        else if(trigger.intData && trigger.intData.length >= 2)
-        {
-            setScope(trigger.intData[0]);
-            setInitialValue(trigger.intData[1]);
-            setHasValue(1);
-            setOverwrite(1);
-            setIsPermanent(1);
+            if(trigger.intData.length >= 6) setTargetIndex(trigger.intData[5] % TARGET_OPTIONS.length);
         }
         else
         {
             setScope(1);
             setInitialValue(0);
             setHasValue(1);
-            setOverwrite(1);
+            setOverwrite(true);
             setIsPermanent(1);
         }
     }, [ trigger ]);
 
     return (
         <WiredActionBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
-            <Column gap={ 1 }>
-                <Text bold>Nombre de la Variable:</Text>
+            <WiredVariableSelect
+                label="Elegir variable:"
+                value={ variableName }
+                scope={ scope }
+                onScopeChange={ setScope }
+                availableScopes={ [ 2, 1, 3 ] }
+                onChange={ (val, scp) => { setVariableName(val); if(scp !== undefined) setScope(scp); } }
+                activeColor="green"
+            />
+
+            <Flex alignItems="center" gap={ 1 }>
                 <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="ej: puntos, vidas, nivel"
-                    value={ variableName }
-                    onChange={ event => setVariableName(event.target.value) }
-                    maxLength={ 32 }
+                    className="form-check-input"
+                    type="checkbox"
+                    id="giveVarOverwrite"
+                    checked={ overwrite }
+                    onChange={ e => setOverwrite(e.target.checked) }
                 />
-            </Column>
+                <Text small>Sobreescribir la variable existente</Text>
+            </Flex>
+
             <Column gap={ 1 }>
-                <Text bold>Asignar a (Ámbito):</Text>
-                <select
-                    className="form-select form-select-sm"
-                    value={ scope }
-                    onChange={ event => setScope(parseInt(event.target.value)) }
-                >
-                    <option value={ 1 }>Usuario (Jugador actual o seleccionado)</option>
-                    <option value={ 2 }>Furni (Objeto activador o en contexto)</option>
-                </select>
-            </Column>
-            <Column gap={ 1 }>
-                <Text bold>¿Tiene valor numérico?:</Text>
-                <select
-                    className="form-select form-select-sm"
-                    value={ hasValue }
-                    onChange={ event => setHasValue(parseInt(event.target.value)) }
-                >
-                    <option value={ 1 }>Sí (asignar valor numérico)</option>
-                    <option value={ 0 }>No (usar como bandera / flag booleano)</option>
-                </select>
-            </Column>
-            { hasValue === 1 && (
-                <Column gap={ 1 }>
-                    <Text bold>Valor Inicial:</Text>
+                <Text bold>Opciones de la variable:</Text>
+                <Flex alignItems="center" gap={ 2 }>
+                    <Text small>Valor inicial:</Text>
                     <input
                         type="number"
                         className="form-control form-control-sm"
+                        style={{ width: '90px' }}
                         value={ initialValue }
                         onChange={ event => setInitialValue(parseInt(event.target.value) || 0) }
                     />
-                </Column>
-            ) }
-            <Column gap={ 1 }>
-                <Text bold>Si la variable ya existe:</Text>
-                <select
-                    className="form-select form-select-sm"
-                    value={ overwrite }
-                    onChange={ event => setOverwrite(parseInt(event.target.value)) }
-                >
-                    <option value={ 1 }>Sobrescribir con el nuevo valor</option>
-                    <option value={ 0 }>Conservar el valor existente sin modificar</option>
-                </select>
+                </Flex>
             </Column>
-            <Column gap={ 1 }>
-                <Text bold>Duración / Persistencia:</Text>
-                <select
-                    className="form-select form-select-sm"
-                    value={ isPermanent }
-                    onChange={ event => setIsPermanent(parseInt(event.target.value)) }
-                >
-                    <option value={ 1 }>Permanente (se guarda en base de datos)</option>
-                    <option value={ 0 }>Temporal (se elimina al salir de la sala)</option>
-                </select>
-            </Column>
+
+            <WiredStepperSelect
+                label="Variable de destino:"
+                options={ TARGET_OPTIONS }
+                value={ targetIndex }
+                onChange={ setTargetIndex }
+            />
         </WiredActionBaseView>
     );
-}
+};

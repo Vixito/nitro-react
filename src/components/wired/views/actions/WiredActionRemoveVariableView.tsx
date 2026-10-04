@@ -1,28 +1,40 @@
 import { FC, useEffect, useState } from 'react';
 import { WiredFurniType } from '../../../../api';
-import { Column, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
+import { WiredStepperSelect } from '../WiredStepperSelect';
+import { WiredVariableSelect } from '../WiredVariableSelect';
 import { WiredActionBaseView } from './WiredActionBaseView';
+
+const SOURCE_OPTIONS = [
+    'Utilizar el usuario desencadenante',
+    'Utilizar usuarios de Selector',
+    'Utilizar el furni desencadenante',
+    'Utilizar furnis de Selector'
+];
 
 export const WiredActionRemoveVariableView: FC<{}> = props =>
 {
-    const [ variableName, setVariableName ] = useState('');
-    const [ scope, setScope ] = useState(1); // 1: User, 2: Furni
+    const [ variableName, setVariableName ] = useState('Punto De Control');
+    const [ scope, setScope ] = useState<number>(1); // 2: Furni, 1: User, 3: Context
+    const [ sourceIndex, setSourceIndex ] = useState<number>(0);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
 
     const save = () =>
     {
         setStringParam(variableName.trim());
-        setIntParams([ scope ]);
+        setIntParams([ scope, sourceIndex ]);
     };
 
     useEffect(() =>
     {
-        setVariableName(trigger.stringData || '');
+        if(!trigger) return;
+
+        setVariableName(trigger.stringData || 'Punto De Control');
 
         if(trigger.intData && trigger.intData.length >= 1)
         {
             setScope(trigger.intData[0]);
+            if(trigger.intData.length >= 2) setSourceIndex(trigger.intData[1] % SOURCE_OPTIONS.length);
         }
         else
         {
@@ -32,28 +44,22 @@ export const WiredActionRemoveVariableView: FC<{}> = props =>
 
     return (
         <WiredActionBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_NONE } hasSpecialInput={ true } save={ save }>
-            <Column gap={ 1 }>
-                <Text bold>Nombre de la Variable a Eliminar:</Text>
-                <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="ej: puntos, vidas, nivel"
-                    value={ variableName }
-                    onChange={ event => setVariableName(event.target.value) }
-                    maxLength={ 32 }
-                />
-            </Column>
-            <Column gap={ 1 }>
-                <Text bold>Eliminar de (Ámbito):</Text>
-                <select
-                    className="form-select form-select-sm"
-                    value={ scope }
-                    onChange={ event => setScope(parseInt(event.target.value)) }
-                >
-                    <option value={ 1 }>Usuario (Jugador actual o en contexto)</option>
-                    <option value={ 2 }>Furni (Objeto activador o en contexto)</option>
-                </select>
-            </Column>
+            <WiredVariableSelect
+                label="Elegir variable:"
+                value={ variableName }
+                scope={ scope }
+                onScopeChange={ setScope }
+                availableScopes={ [ 2, 1, 3 ] }
+                onChange={ (val, scp) => { setVariableName(val); if(scp !== undefined) setScope(scp); } }
+                activeColor="green"
+            />
+
+            <WiredStepperSelect
+                label="Fuente de la variable:"
+                options={ SOURCE_OPTIONS }
+                value={ sourceIndex }
+                onChange={ setSourceIndex }
+            />
         </WiredActionBaseView>
     );
-}
+};
