@@ -63,7 +63,7 @@ export const GameStageView: FC<{}> = () =>
                     style={{ 
                         boxShadow: '0 0 0 1px #ffffff',
                         padding: '2px 10px',
-                        fontSize: '11px',
+                        fontSize: '12px',
                         fontWeight: 'bold'
                     }}
                 >

@@ -84,6 +84,18 @@ export const GameView = () => {
         }
 
         SendMessageComposer(new JoinQueueMessageComposer(selectedGame.gameId));
+
+        const gameUrls: { [name: string]: string } = {
+            basejump: '/game/games/basejump/index.html',
+            wobblesquabble: '/game/games/wobblesquabble/index.html',
+            battleball: '/game/games/battleball/index.html',
+            slotcar: '/game/games/slotcar/index.html'
+        };
+
+        if (selectedGame && gameUrls[selectedGame.gameNameId]) {
+            setIsVisible(false);
+            setGameURL(gameUrls[selectedGame.gameNameId]);
+        }
     };
 
     const hasUnlimited = accountStatus ? accountStatus.hasUnlimitedGames : true;

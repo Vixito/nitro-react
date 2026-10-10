@@ -58,6 +58,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
 
         setIsSnowStormLobbyVisible(false);
         setIsVisible(false);
+        setGameURL('/game/games/snowstorm/index.html');
     };
 
     const onHowToPlay = () => {
@@ -112,12 +113,12 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         width: '410px',
                         height: '527px',
                         backgroundImage: `url(${SnowStormLobbyImg})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
+                        backgroundSize: '410px 527px',
                         backgroundRepeat: 'no-repeat',
                         position: 'relative',
                         borderRadius: '6px',
                         boxShadow: '0 12px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.4)',
+                        imageRendering: 'pixelated',
                         userSelect: 'none',
                         overflow: 'hidden',
                         cursor: 'default'
