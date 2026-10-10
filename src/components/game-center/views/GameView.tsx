@@ -126,7 +126,7 @@ export const GameView = () => {
 
                     <Base className="game-logo-wrapper">
                         <img 
-                            src={ `${ selectedGame.assetUrl }${ selectedGame.gameNameId }_logo.png?v=6` } 
+                            src={ `${ selectedGame.assetUrl }${ selectedGame.gameNameId }_logo.png?v=7` } 
                             alt={ selectedGame.gameNameId }
                             className="game-hero-logo" 
                             style={{ maxHeight: '110px', maxWidth: '340px', objectFit: 'contain', borderRadius: '8px' }}
