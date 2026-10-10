@@ -65,7 +65,7 @@
 
     .game-view {
         flex: 1;
-        background-position: center right;
+        background-position: center center;
         background-repeat: no-repeat;
         background-size: cover;
         position: relative;
@@ -75,7 +75,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.88) 45%, rgba(15, 23, 42, 0.5) 100%);
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.4) 50%, rgba(15, 23, 42, 0.15) 100%);
             pointer-events: none;
         }
 

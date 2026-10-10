@@ -1,6 +1,7 @@
 import { FC, useMemo, useRef, useState } from 'react';
 import { Overlay, Popover } from 'react-bootstrap';
-import { Base } from '../../../../common';
+import { Base, Button } from '../../../../common';
+import { isSafeGifUrl } from '../../../../api';
 
 interface ChatInputGifPickerViewProps
 {
@@ -17,65 +18,65 @@ interface GifItem
 }
 
 const GIF_LIBRARY: GifItem[] = [
-    // 🔥 Trending / Reacciones
+    // Populares / Reacciones
     {
         id: 'cheer-leo',
         title: 'Leonardo Toast',
         url: 'https://media.giphy.com/media/g9582DNuQppxC/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'cheers', 'salud', 'toast', 'celebrate', 'leo' ]
     },
     {
         id: 'mind-blown',
         title: 'Mind Blown',
         url: 'https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'mind blown', 'explosion', 'wow', 'omg', 'shock' ]
     },
     {
         id: 'applause',
         title: 'Aplausos',
         url: 'https://media.giphy.com/media/111ebonMs90YLu/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'clap', 'applause', 'bravo', 'aplausos', 'bien' ]
     },
     {
         id: 'yes-nod',
         title: 'Asentir / Yes',
         url: 'https://media.giphy.com/media/ne3xrYlWtQFtC/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'yes', 'si', 'nod', 'claro', 'agree' ]
     },
     {
         id: 'no-finger',
         title: 'No con el dedo',
         url: 'https://media.giphy.com/media/VTxmwaCEwSlZm/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'no', 'negativo', 'nope', 'never' ]
     },
     {
         id: 'facepalm',
         title: 'Facepalm',
         url: 'https://media.giphy.com/media/3og0INyCmHlNylks9O/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'facepalm', 'desastre', 'dios mio', 'verguenza' ]
     },
     {
         id: 'cry-cat',
         title: 'Gato Llorando',
         url: 'https://media.giphy.com/media/OPU6wzx8JrHna/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'cry', 'llorar', 'triste', 'sad', 'cat' ]
     },
     {
         id: 'laugh-elvira',
         title: 'Risa / Laugh',
         url: 'https://media.giphy.com/media/10JhviFuU2gWD6/giphy.gif',
-        category: 'trending',
+        category: 'popular',
         keywords: [ 'laugh', 'risa', 'jaja', 'lol', 'funny' ]
     },
 
-    // 💃 Bailes / Dances
+    // Bailes / Dances
     {
         id: 'dance-carlton',
         title: 'Baile Carlton',
@@ -85,33 +86,47 @@ const GIF_LIBRARY: GifItem[] = [
     },
     {
         id: 'cat-vibe',
-        title: 'Cat Vibing',
-        url: 'https://media.giphy.com/media/jpbnoe3UIa8TU8LM13/giphy.gif',
+        title: 'Gato Bailando',
+        url: 'https://media.giphy.com/media/GeimqsH0TLDt4tScGw/giphy.gif',
         category: 'dance',
         keywords: [ 'cat', 'gato', 'vibe', 'musica', 'dance' ]
     },
     {
         id: 'dance-snoop',
-        title: 'Snoop Dogg Dance',
+        title: 'Snoop Dogg Baile',
         url: 'https://media.giphy.com/media/DHqth0hVQoIzS/giphy.gif',
         category: 'dance',
         keywords: [ 'snoop', 'dance', 'ritmo', 'party' ]
     },
     {
+        id: 'dance-gangnam',
+        title: 'Gangnam Style',
+        url: 'https://media.giphy.com/media/13Y6LAZJqRspI4/giphy.gif',
+        category: 'dance',
+        keywords: [ 'gangnam', 'psy', 'dance', 'baile' ]
+    },
+    {
+        id: 'dance-groove',
+        title: 'Ritmo Fiesta',
+        url: 'https://media.giphy.com/media/blSTtZehjAZ8I/giphy.gif',
+        category: 'dance',
+        keywords: [ 'ritmo', 'groove', 'dance', 'baile' ]
+    },
+    {
         id: 'party-blob',
-        title: 'Party Parrot / Rave',
+        title: 'Loro Fiesta Rave',
         url: 'https://media.giphy.com/media/l3q2wJsC23ikJg9xe/giphy.gif',
         category: 'dance',
         keywords: [ 'party', 'fiesta', 'rave', 'dance' ]
     },
 
-    // 😂 Memes
+    // Memes
     {
         id: 'popcat',
         title: 'Pop Cat',
-        url: 'https://media.giphy.com/media/S604D5NhkhPgSPpwGx/giphy.gif',
+        url: 'https://media.giphy.com/media/Lq0h93752f6J9tijrh/giphy.gif',
         category: 'memes',
-        keywords: [ 'popcat', 'cat', 'meme', 'pop' ]
+        keywords: [ 'popcat', 'cat', 'gato', 'meme', 'pop' ]
     },
     {
         id: 'travolta-confused',
@@ -122,7 +137,7 @@ const GIF_LIBRARY: GifItem[] = [
     },
     {
         id: 'this-is-fine',
-        title: 'This Is Fine',
+        title: 'Todo Esta Bien',
         url: 'https://media.giphy.com/media/NTur7XlVDUdqM/giphy.gif',
         category: 'memes',
         keywords: [ 'this is fine', 'fuego', 'tranquilo', 'dog', 'perro' ]
@@ -130,63 +145,50 @@ const GIF_LIBRARY: GifItem[] = [
     {
         id: 'doge-wow',
         title: 'Doge Wow',
-        url: 'https://media.giphy.com/media/9C1nyePmmrUAUblvJN/giphy.gif',
+        url: 'https://media.giphy.com/media/HCTfYH2XK6CTK/giphy.gif',
         category: 'memes',
         keywords: [ 'doge', 'wow', 'shiba', 'much' ]
     },
     {
-        id: 'spongebob-mock',
-        title: 'Bob Esponja Burlón',
-        url: 'https://media.giphy.com/media/QUXYcgCwvCm4cKcrnU/giphy.gif',
+        id: 'drake-yes',
+        title: 'Drake Aprobado',
+        url: 'https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif',
         category: 'memes',
-        keywords: [ 'spongebob', 'bob esponja', 'mock', 'meme' ]
+        keywords: [ 'drake', 'aprobado', 'si', 'meme' ]
     },
 
-    // 🏨 Habbo Classic / Pixel
+    // Habbten Classic / Pixel
     {
-        id: 'habbo-dance',
-        title: 'Habbo Pogo Dance',
-        url: 'https://i.imgur.com/G3p22Fq.gif',
-        category: 'habbo',
-        keywords: [ 'habbo', 'dance', 'pogo', 'retro', 'pixel' ]
+        id: 'habbten-logo',
+        title: 'Logo Habbten',
+        url: '/habbten.gif',
+        category: 'habbten',
+        keywords: [ 'habbten', 'logo', 'hotel', 'pixel' ]
     },
     {
-        id: 'habbo-duck',
-        title: 'Pato Habbo Amarillo',
-        url: 'https://i.imgur.com/gK1Nf4m.gif',
-        category: 'habbo',
-        keywords: [ 'pato', 'duck', 'habbo', 'cuak', 'pixel' ]
-    },
-    {
-        id: 'habbo-wave',
-        title: 'Habbo Saludo / Wave',
-        url: 'https://i.imgur.com/39wF4d6.gif',
-        category: 'habbo',
-        keywords: [ 'habbo', 'hola', 'saludo', 'wave', 'avatar' ]
-    },
-    {
-        id: 'habbo-hc-badge',
-        title: 'Habbo Club Badge',
-        url: 'https://i.imgur.com/wP4dI1u.gif',
-        category: 'habbo',
-        keywords: [ 'hc', 'habbo club', 'vip', 'badge' ]
+        id: 'habbten-dance',
+        title: 'Baile Animado',
+        url: 'https://media.giphy.com/media/artj92V8o75VPL7AeQ/giphy.gif',
+        category: 'habbten',
+        keywords: [ 'habbten', 'baile', 'dance', 'pixel' ]
     }
 ];
 
 const GIF_CATEGORIES = [
-    { id: 'trending', name: 'Populares', icon: '🔥' },
-    { id: 'dance', name: 'Bailes', icon: '💃' },
-    { id: 'memes', name: 'Memes', icon: '😂' },
-    { id: 'habbo', name: 'Habbo Pixel', icon: '🏨' },
-    { id: 'custom', name: 'Pegar Link', icon: '🔗' }
+    { id: 'popular', name: 'Populares' },
+    { id: 'dance', name: 'Bailes' },
+    { id: 'memes', name: 'Memes' },
+    { id: 'habbten', name: 'Habbten' },
+    { id: 'custom', name: 'Pegar enlace' }
 ];
 
 export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSelectGif }) =>
 {
     const [ visible, setVisible ] = useState(false);
-    const [ activeCategory, setActiveCategory ] = useState('trending');
+    const [ activeCategory, setActiveCategory ] = useState('popular');
     const [ searchTerm, setSearchTerm ] = useState('');
     const [ customUrl, setCustomUrl ] = useState('');
+    const [ urlError, setUrlError ] = useState<string>('');
     const buttonRef = useRef<HTMLDivElement>(null);
 
     const filteredGifs = useMemo(() =>
@@ -214,17 +216,32 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
     const handleSelect = (url: string) =>
     {
         if(!url) return;
-        onSelectGif(url);
+        const clean = url.trim();
+        if(!isSafeGifUrl(clean))
+        {
+            setUrlError('Por seguridad, solo se permiten enlaces de Giphy, Tenor, Imgur y Discord.');
+            return;
+        }
+        onSelectGif(clean);
         setVisible(false);
         setCustomUrl('');
+        setUrlError('');
     };
 
     const handleCustomSubmit = (e: React.FormEvent) =>
     {
         e.preventDefault();
-        if(!customUrl.trim()) return;
-        handleSelect(customUrl.trim());
+        const clean = customUrl.trim();
+        if(!clean) return;
+        if(!isSafeGifUrl(clean))
+        {
+            setUrlError('Enlace no permitido por seguridad. Usa URLs directas de Giphy, Tenor, Imgur o Discord.');
+            return;
+        }
+        handleSelect(clean);
     };
+
+    const isCustomUrlValid = customUrl.trim().length > 0 && isSafeGifUrl(customUrl.trim());
 
     return (
         <>
@@ -244,10 +261,10 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
                 onHide={ () => setVisible(false) }
                 transition={ false }
             >
-                <Popover className="nitro-chat-popover nitro-chat-gif-popover">
+                <Popover id="nitro-chat-gif-popover" style={ { width: '410px', maxWidth: 'none' } } className="nitro-chat-popover nitro-chat-gif-popover">
                     <div className="popover-header-custom d-flex align-items-center justify-content-between px-2 py-1">
                         <span className="fw-bold small text-white">Selector de GIFs</span>
-                        <span className="btn-close-popover" onClick={ () => setVisible(false) }>✕</span>
+                        <div className="btn-close-popover" onClick={ () => setVisible(false) }>✕</div>
                     </div>
 
                     <div className="popover-tabs d-flex px-2 py-1 gap-1 border-bottom border-secondary overflow-auto">
@@ -255,12 +272,11 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
                             <button
                                 key={ cat.id }
                                 type="button"
-                                className={ `tab-btn btn btn-sm ${ activeCategory === cat.id ? 'active' : '' }` }
-                                onClick={ () => { setActiveCategory(cat.id); setSearchTerm(''); } }
+                                className={ `tab-btn ${ activeCategory === cat.id ? 'active' : '' }` }
+                                onClick={ () => { setActiveCategory(cat.id); setSearchTerm(''); setUrlError(''); } }
                                 title={ cat.name }
                             >
-                                <span className="me-1">{ cat.icon }</span>
-                                <span className="small">{ cat.name }</span>
+                                <span style={ { fontSize: '13px' } }>{ cat.name }</span>
                             </button>
                         )) }
                     </div>
@@ -269,8 +285,8 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
                         <div className="px-2 pt-2">
                             <input
                                 type="text"
-                                className="form-control form-control-sm bg-dark text-white border-secondary"
-                                placeholder="Buscar GIF (risa, aplausos, baile, habbo...)"
+                                className="form-control form-control-sm gif-search-input"
+                                placeholder="Buscar GIF (risa, aplausos, baile, habbten...)"
                                 value={ searchTerm }
                                 onChange={ e => setSearchTerm(e.target.value) }
                             />
@@ -280,39 +296,52 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
                     <div className="popover-body-custom p-2">
                         { activeCategory === 'custom' ? (
                             <form onSubmit={ handleCustomSubmit } className="custom-gif-container">
-                                <label className="form-label small text-white mb-1">
-                                    Pega la URL de cualquier GIF (Tenor, Giphy, Discord, etc.):
-                                </label>
-                                <div className="input-group input-group-sm mb-2">
+                                <div className="mb-2" style={ { fontSize: '13px', color: '#f1f5f9' } }>
+                                    Pega un enlace directo de GIF en formato HTTPS seguro:
+                                </div>
+                                <div className="d-flex gap-2 mb-2">
                                     <input
                                         type="url"
-                                        className="form-control bg-dark text-white border-secondary"
-                                        placeholder="https://.../imagen.gif"
+                                        className="form-control form-control-sm bg-dark text-white border-secondary"
+                                        placeholder="https://media.giphy.com/.../giphy.gif"
                                         value={ customUrl }
-                                        onChange={ e => setCustomUrl(e.target.value) }
+                                        onChange={ e => { setCustomUrl(e.target.value); setUrlError(''); } }
                                         autoFocus
                                     />
-                                    <button type="submit" className="btn btn-primary" disabled={ !customUrl.trim() }>
+                                    <Button
+                                        variant="primary"
+                                        className="btn-sm px-3"
+                                        disabled={ !isCustomUrlValid }
+                                        onClick={ handleCustomSubmit }
+                                    >
                                         Enviar
-                                    </button>
+                                    </Button>
                                 </div>
-                                { customUrl.trim() && (
+                                { urlError && (
+                                    <div className="text-danger mb-2 p-1.5 rounded bg-black" style={ { fontSize: '12px' } }>
+                                        { urlError }
+                                    </div>
+                                ) }
+                                { isCustomUrlValid && (
                                     <div className="custom-preview text-center p-2 rounded bg-black">
-                                        <div className="small text-muted mb-1">Vista Previa:</div>
+                                        <div className="text-secondary mb-1" style={ { fontSize: '13px' } }>Vista previa:</div>
                                         <img
                                             src={ customUrl.trim() }
                                             alt="Preview"
                                             className="img-fluid rounded"
                                             style={ { maxHeight: '120px' } }
-                                            onError={ (e) => { (e.target as HTMLElement).style.display = 'none'; } }
+                                            onError={ () => setUrlError('No se pudo cargar la imagen desde este enlace.') }
                                         />
                                     </div>
                                 ) }
+                                <div className="mt-2 border-top border-secondary pt-2" style={ { fontSize: '12px', color: '#cbd5e1' } }>
+                                    <strong style={ { color: '#facc15' } }>Dominios permitidos:</strong> Giphy, Tenor, Imgur, Discord CDN.
+                                </div>
                             </form>
                         ) : (
                             <div className="gif-grid">
                                 { filteredGifs.length === 0 ? (
-                                    <div className="text-center text-muted small py-3">
+                                    <div className="text-center py-3" style={ { fontSize: '13px', color: '#cbd5e1' } }>
                                         No se encontraron GIFs con "{ searchTerm }"
                                     </div>
                                 ) : (

@@ -14,7 +14,7 @@ export const CatalogGridOfferView: FC<CatalogGridOfferViewProps> = props =>
 {
     const { offer = null, selectOffer = null, itemActive = false, ...rest } = props;
     const [ isMouseDown, setMouseDown ] = useState(false);
-    const { requestOfferToMover = null } = useCatalog();
+    const { requestOfferToMover = null, currentPage = null } = useCatalog();
     const { isVisible = false } = useInventoryFurni();
 
     const iconUrl = useMemo(() =>
@@ -64,8 +64,11 @@ export const CatalogGridOfferView: FC<CatalogGridOfferViewProps> = props =>
 
     if(!product) return null;
 
+    const isUniqueLimited = Boolean(product.isUniqueLimitedItem || (product.uniqueLimitedItemSeriesSize > 0));
+    const isSoldOut = Boolean((isUniqueLimited && product.uniqueLimitedItemsLeft === 0) || currentPage?.pageId === 761 || offer.page?.pageId === 761);
+
     return (
-        <LayoutGridItem itemImage={ iconUrl } itemCount={ totalCount } itemUniqueSoldout={ (product.uniqueLimitedItemSeriesSize && !product.uniqueLimitedItemsLeft) } itemUniqueNumber={ product.uniqueLimitedItemSeriesSize } itemActive={ itemActive } onMouseDown={ onMouseEvent } onMouseUp={ onMouseEvent } onMouseOut={ onMouseEvent } { ...rest }>
+        <LayoutGridItem title={ offer.localizationName } itemImage={ iconUrl } itemCount={ totalCount } itemUniqueSoldout={ isSoldOut } itemUniqueNumber={ isUniqueLimited ? product.uniqueLimitedItemSeriesSize : -2 } itemActive={ itemActive } onMouseDown={ onMouseEvent } onMouseUp={ onMouseEvent } onMouseOut={ onMouseEvent } { ...rest }>
             { (offer.product.productType === ProductTypeEnum.ROBOT) &&
                 <LayoutAvatarImageView figure={ offer.product.extraParam } headOnly={ true } direction={ 3 } /> }
         </LayoutGridItem>

@@ -188,11 +188,6 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
     {
         setIsMenuOpen(false);
         setIsWiredCreatorToolsVisible(true);
-        const session = GetRoomSession();
-        if(session)
-        {
-            session.sendChatMessage(':wired', 0);
-        }
     };
 
     const handleSaveMenu = () =>

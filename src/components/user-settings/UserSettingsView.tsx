@@ -198,16 +198,12 @@ export const UserSettingsView: FC<{}> = props => {
                                         checked={ currentEra === era.id }
                                         onChange={ () => setEra(era.id) }
                                     />
-                                    <span className="small"><strong>{ era.name } ({ era.year })</strong> - { era.subtitle }</span>
+                                    <span className="small"><strong>{ era.name }</strong> - { era.subtitle }</span>
                                 </label>
                             )) }
                         </div>
-                        <Button
-                            variant="secondary"
-                            className="btn-sm py-1 my-1"
-                            onClick={ () => CreateLinkEvent('era-selector/open') }
-                        >
-                            Abrir Selector Visual de Eras...
+                        <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => CreateLinkEvent('era-selector/open')}>
+                            <Text bold variant="white">Selector de Versión Visual</Text>
                         </Button>
                         <HorizontalRule />
                         <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => setShowDiscordModal(true)}>
@@ -322,7 +318,7 @@ export const UserSettingsView: FC<{}> = props => {
                                     </div>
                                     <div>
                                         <div className="fw-bold text-white" style={{ fontSize: '13px' }}>Servidor Oficial de Habbten</div>
-                                        <div style={{ fontSize: '11px', color: '#cbd5e1' }}>Únete a nuestra comunidad oficial</div>
+                                        <div style={{ fontSize: '12.5px', color: '#e2e8f0' }}>Únete a nuestra comunidad oficial</div>
                                     </div>
                                 </div>
                                 <a

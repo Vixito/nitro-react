@@ -71,7 +71,7 @@ export const GameView = () => {
     };
 
     const getBgImage = (): string => {
-        return `url(${selectedGame.assetUrl}${selectedGame.gameNameId}_theme.png?v=4)`;
+        return `url(${selectedGame.assetUrl}${selectedGame.gameNameId}_theme.png?v=5)`;
     };
 
     const onPlay = () => {

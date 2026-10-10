@@ -72,14 +72,11 @@ export const EraSelectorModalView: FC<{}> = () =>
 
     return (
         <NitroCardView uniqueKey="era-selector" theme="primary" className="era-selector-window" style={ { width: 720, maxWidth: '95vw' } }>
-            <NitroCardHeaderView headerText="¿Qué era de Habbo te gusta más?" onCloseClick={ () => setIsVisible(false) } />
+            <NitroCardHeaderView headerText="Selector de Versión Visual" onCloseClick={ () => setIsVisible(false) } />
             <NitroCardContentView className="p-3 text-white">
                 <div className="text-center mb-3">
-                    <h4 className="fw-bold mb-1 era-window-heading">
-                        WHICH ERA OF <span className="text-info">HABBO</span> DO YOU LOVE MOST?
-                    </h4>
-                    <p className="small text-muted mb-0">
-                        Elige tu era favorita y adaptaremos tu experiencia de juego. Puedes cambiarla en cualquier momento desde <strong>Ajustes → Preferencias</strong>.
+                    <p className="era-intro-text mb-0">
+                        Elige tu versión visual favorita de Habbten para adaptar la interfaz del juego. Puedes cambiarla en cualquier momento desde <strong>Ajustes → Preferencias</strong>.
                     </p>
                 </div>
 
@@ -103,13 +100,7 @@ export const EraSelectorModalView: FC<{}> = () =>
 
                                 <div className="era-card-body p-2 d-flex flex-column flex-grow-1">
                                     <h5 className="era-card-name fw-bold mb-1">{ era.name }</h5>
-                                    <p className="era-card-desc small text-muted mb-2 flex-grow-1">{ era.description }</p>
-
-                                    <div className="era-badges-row d-flex gap-1 mb-2">
-                                        { era.badges.map(badge => (
-                                            <span key={ badge } className="era-pill-badge">{ badge }</span>
-                                        )) }
-                                    </div>
+                                    <p className="era-card-desc mb-3 flex-grow-1">{ era.description }</p>
 
                                     <Button
                                         variant={ isSelected ? 'success' : 'secondary' }
@@ -125,8 +116,8 @@ export const EraSelectorModalView: FC<{}> = () =>
                 </div>
 
                 <div className="d-flex align-items-center justify-content-between p-2 rounded era-footer-bar">
-                    <div className="text-white small">
-                        Jugar en modo: <strong className="text-success">{ activeEraObj.name } ({ activeEraObj.year })</strong>
+                    <div className="era-footer-label">
+                        Jugar en versión: <strong className="era-active-version-text">{ activeEraObj.name }</strong>
                     </div>
                     <div className="d-flex gap-2">
                         <Button variant="secondary" className="btn-sm px-3" onClick={ () => setIsVisible(false) }>

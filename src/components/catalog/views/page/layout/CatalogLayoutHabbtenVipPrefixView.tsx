@@ -126,7 +126,7 @@ export const CatalogLayoutHabbtenVipPrefixView: FC<CatalogLayoutProps> = props =
             <Column fullHeight size={ 6 } gap={ 2 } overflow="hidden">
                 <Column gap={ 1 }>
                     <Text fontWeight="bold" fontSize={ 5 }>Personaliza tu Prefijo / Tag VIP</Text>
-                    <Text className="text-xs text-muted">
+                    <Text style={ { fontSize: '13px', color: '#cbd5e1' } }>
                         Elige un prefijo de hasta 10 caracteres para mostrar antes de tu nombre en el chat.
                     </Text>
                 </Column>
@@ -134,7 +134,7 @@ export const CatalogLayoutHabbtenVipPrefixView: FC<CatalogLayoutProps> = props =
                 <Column gap={ 1 }>
                     <Flex justifyContent="between" alignItems="center">
                         <Text fontWeight="bold" fontSize={ 6 }>Texto del Prefijo:</Text>
-                        <Text className="text-xs text-muted">{ prefixText.length }/10</Text>
+                        <Text style={ { fontSize: '13px', color: '#cbd5e1' } }>{ prefixText.length }/10</Text>
                     </Flex>
                     <Flex gap={ 1 }>
                         <input
@@ -254,20 +254,20 @@ export const CatalogLayoutHabbtenVipPrefixView: FC<CatalogLayoutProps> = props =
                                 { isSubmitting ? 'Guardando...' : 'Comprar y Aplicar Prefijo' }
                             </Button>
                             { message && (
-                                <Text center className={ `text-xs ${ messageType === 'success' ? 'text-success fw-bold' : 'text-danger fw-bold' }` }>
+                                <Text center style={ { fontSize: '13px' } } className={ `${ messageType === 'success' ? 'text-success fw-bold' : 'text-danger fw-bold' }` }>
                                     { message }
                                 </Text>
                             ) }
-                            <Text center className="text-xs text-muted mt-1">
+                            <Text center style={ { fontSize: '13px', color: '#cbd5e1' } } className="mt-1">
                                 Comandos rápidos en el chat: <b>:prefix [TAG]</b> y <b>:prefixcolor [color]</b>
                             </Text>
                         </Column>
                     ) : (
                         <Column gap={ 1 } center className="p-2 bg-warning-subtle rounded border border-warning text-center">
-                            <Text fontWeight="bold" className="text-warning-emphasis text-xs">
+                            <Text fontWeight="bold" className="text-warning-emphasis" style={ { fontSize: '13px' } }>
                                 ⭐ Exclusivo para Habbten VIP
                             </Text>
-                            <Text className="text-xs text-secondary">
+                            <Text style={ { fontSize: '13px', color: '#334155' } }>
                                 Activa tu suscripción VIP para usar prefijos, colores y tags de chat exclusivos.
                             </Text>
                             <Button fullWidth variant="primary" className="btn-sm" onClick={ () => window.open('/tienda', '_blank') }>

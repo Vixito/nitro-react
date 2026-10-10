@@ -153,13 +153,21 @@ export class Offer implements IPurchasableOffer
         if(productData && productData.name && productData.name.length && productData.name !== this._localizationId) return productData.name;
 
         let val = LocalizeText(this._localizationId);
+
+        if(this._products && this._products.length > 1)
+        {
+            if(productData && productData.name && productData.name.length) return productData.name;
+            if(val && val !== ('${' + this._localizationId + '}')) return val;
+            return this._localizationId;
+        }
+
         if(!val || val === this._localizationId || val === ('${' + this._localizationId + '}'))
         {
             // 1. Try from first product's class ID
             const product = (this._products && this._products.length > 0) ? this._products[0] : null;
             if(product)
             {
-                const isWall = product.isWallItem || (product.productType && product.productType.toLowerCase() === 'i');
+                const isWall = Boolean((product as any).isWallItem) || (product.productType && product.productType.toLowerCase() === 'i');
                 const furniData = isWall ? GetSessionDataManager().getWallItemData(product.productClassId) : GetSessionDataManager().getFloorItemData(product.productClassId);
                 if(furniData && furniData.name && furniData.name.length) return furniData.name;
 
@@ -185,13 +193,21 @@ export class Offer implements IPurchasableOffer
         if(productData && productData.description && productData.description.length && productData.description !== this._localizationId) return productData.description;
 
         let val = LocalizeText(this._localizationId);
+
+        if(this._products && this._products.length > 1)
+        {
+            if(productData && productData.description && productData.description.length) return productData.description;
+            if(val && val !== this._localizationId && val !== ('${' + this._localizationId + '}')) return val;
+            return '';
+        }
+
         if(!val || val === this._localizationId || val === ('${' + this._localizationId + '}'))
         {
             // 1. Try from first product's class ID
             const product = (this._products && this._products.length > 0) ? this._products[0] : null;
             if(product)
             {
-                const isWall = product.isWallItem || (product.productType && product.productType.toLowerCase() === 'i');
+                const isWall = Boolean((product as any).isWallItem) || (product.productType && product.productType.toLowerCase() === 'i');
                 const furniData = isWall ? GetSessionDataManager().getWallItemData(product.productClassId) : GetSessionDataManager().getFloorItemData(product.productClassId);
                 if(furniData && furniData.description && furniData.description.length) return furniData.description;
 
@@ -279,7 +295,7 @@ export class Offer implements IPurchasableOffer
         {
             const furnitureData = GetFurnitureData(product.productClassId, product.productType);
 
-            products.push(new Product(product.productType, product.productClassId, product.extraParam, product.productCount, productData, furnitureData));
+            products.push(new Product(product.productType, product.productClassId, product.extraParam, product.productCount, productData, furnitureData, product.isUniqueLimitedItem, product.uniqueLimitedItemSeriesSize, product.uniqueLimitedItemsLeft));
         }
 
         const offer = new Offer(this.offerId, this.localizationId, this.isRentOffer, this.priceInCredits, this.priceInActivityPoints, this.activityPointType, this.giftable, this.clubLevel, products, this.bundlePurchaseAllowed);

@@ -50,6 +50,8 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = pro
         
         if(purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length)) return false;
 
+        if(currentPage?.pageId === 761 || currentOffer.page?.pageId === 761) return true;
+
         if(currentOffer.pricingModel === Offer.PRICING_MODEL_SINGLE)
         {
             const product = currentOffer.product;
@@ -58,7 +60,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = pro
         }
 
         return false;
-    }, [ currentOffer, purchaseOptions ]);
+    }, [ currentOffer, currentPage, purchaseOptions ]);
 
     const purchase = (isGift: boolean = false) =>
     {
@@ -155,8 +157,8 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = pro
     return (
         <>
             <PurchaseButton />
-            { (!noGiftOption && !currentOffer.isRentOffer) &&
-                <Button disabled={ ((purchaseOptions.quantity > 1) || !currentOffer.giftable || isLimitedSoldOut || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))) } onClick={ event => purchase(true) }>
+            { (!noGiftOption && !currentOffer.isRentOffer && !isLimitedSoldOut && !currentOffer.product?.isUniqueLimitedItem && currentPage?.pageId !== 761) &&
+                <Button disabled={ ((purchaseOptions.quantity > 1) || !currentOffer.giftable || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))) } onClick={ event => purchase(true) }>
                     { LocalizeText('catalog.purchase_confirmation.gift') }
                 </Button> }
         </>

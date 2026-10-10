@@ -358,15 +358,35 @@ export const BattlePassView: FC<{}> = () => {
     const themeStyles = useMemo(() => {
         const t = bpData.theme;
         if (!t) return {};
+
+        const hexToRgb = (hex: string, fallback = '2, 132, 199') => {
+            if (!hex) return fallback;
+            let c = hex.replace('#', '').trim();
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');
+            if (c.length === 6) {
+                const r = parseInt(c.substring(0, 2), 16);
+                const g = parseInt(c.substring(2, 4), 16);
+                const b = parseInt(c.substring(4, 6), 16);
+                if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+                    return `${r}, ${g}, ${b}`;
+                }
+            }
+            return fallback;
+        };
+
         const styles: Record<string, string> = {
             '--bp-primary': t.primary,
+            '--bp-primary-rgb': hexToRgb(t.primary, '2, 132, 199'),
             '--bp-secondary': t.secondary,
+            '--bp-secondary-rgb': hexToRgb(t.secondary, '245, 158, 11'),
             '--bp-xp-gradient': `linear-gradient(90deg, ${t.xpStart} 0%, ${t.xpEnd} 100%)`,
             '--bp-bg': t.bg,
             '--bp-card-bg': t.cardBg,
             '--bp-text': t.textColor,
-            '--bp-subtext': t.subtextColor || (t.isDark ? '#94a3b8' : '#64748b'),
-            '--bp-border': t.isDark ? 'rgba(255, 255, 255, 0.12)' : '#cbd5e1'
+            '--bp-subtext': t.subtextColor || (t.isDark ? '#cbd5e1' : '#64748b'),
+            '--bp-border': t.isDark ? 'rgba(255, 255, 255, 0.12)' : '#cbd5e1',
+            '--bp-dialog-bg': t.cardBg,
+            '--bp-dialog-border': t.isDark ? 'rgba(255, 255, 255, 0.18)' : '#cbd5e1'
         };
         if (t.banner) {
             styles['--bp-banner-bg'] = `url("${t.banner}") center/cover no-repeat`;
@@ -472,6 +492,7 @@ export const BattlePassView: FC<{}> = () => {
             uniqueKey="battle-pass"
             className={`nitro-battle-pass ${bpData.theme?.isDark ? 'bp-theme-dark' : ''}`}
             theme="primary-slim"
+            style={themeStyles as React.CSSProperties}
             onMouseEnter={() => {
                 if (document.body.style.cursor === 'pointer') document.body.style.cursor = 'default';
             }}
@@ -585,7 +606,7 @@ export const BattlePassView: FC<{}> = () => {
                                             {bpData.user.rankPosition || 1}°
                                         </div>
                                     </button>
-                                    <span className="text-muted mt-1" style={{ fontSize: '11px' }}>del ranking</span>
+                                    <span style={{ fontSize: '12.5px', color: '#cbd5e1' }} className="mt-1">del ranking</span>
                                 </div>
 
                             </div>
@@ -603,10 +624,10 @@ export const BattlePassView: FC<{}> = () => {
                                             type="button"
                                             className="btn py-0.5 px-2 fw-bold"
                                             style={{
-                                                fontSize: '11px',
+                                                fontSize: '12px',
                                                 borderRadius: '4px',
                                                 backgroundColor: missionFilter === 'all' ? 'var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '#0f172a' : '#f1f5f9'),
-                                                color: missionFilter === 'all' ? '#ffffff' : (bpData.theme?.isDark ? '#94a3b8' : '#475569'),
+                                                color: missionFilter === 'all' ? '#ffffff' : (bpData.theme?.isDark ? '#cbd5e1' : '#475569'),
                                                 border: missionFilter === 'all' ? '1px solid var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1')
                                             }}
                                             onClick={() => setMissionFilter('all')}
@@ -617,10 +638,10 @@ export const BattlePassView: FC<{}> = () => {
                                             type="button"
                                             className="btn py-0.5 px-2 fw-bold"
                                             style={{
-                                                fontSize: '11px',
+                                                fontSize: '12px',
                                                 borderRadius: '4px',
                                                 backgroundColor: missionFilter === 'in_progress' ? 'var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '#0f172a' : '#f1f5f9'),
-                                                color: missionFilter === 'in_progress' ? '#ffffff' : (bpData.theme?.isDark ? '#94a3b8' : '#475569'),
+                                                color: missionFilter === 'in_progress' ? '#ffffff' : (bpData.theme?.isDark ? '#cbd5e1' : '#475569'),
                                                 border: missionFilter === 'in_progress' ? '1px solid var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1')
                                             }}
                                             onClick={() => setMissionFilter('in_progress')}
@@ -631,10 +652,10 @@ export const BattlePassView: FC<{}> = () => {
                                             type="button"
                                             className="btn py-0.5 px-2 fw-bold"
                                             style={{
-                                                fontSize: '11px',
+                                                fontSize: '12px',
                                                 borderRadius: '4px',
                                                 backgroundColor: missionFilter === 'completed' ? 'var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '#0f172a' : '#f1f5f9'),
-                                                color: missionFilter === 'completed' ? '#ffffff' : (bpData.theme?.isDark ? '#94a3b8' : '#475569'),
+                                                color: missionFilter === 'completed' ? '#ffffff' : (bpData.theme?.isDark ? '#cbd5e1' : '#475569'),
                                                 border: missionFilter === 'completed' ? '1px solid var(--bp-primary, #0284c7)' : (bpData.theme?.isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #cbd5e1')
                                             }}
                                             onClick={() => setMissionFilter('completed')}
@@ -659,7 +680,7 @@ export const BattlePassView: FC<{}> = () => {
                                                 <span className="fw-bold text-dark text-truncate" style={{ fontSize: '12px' }} title={m.name.toUpperCase()}>{m.name.toUpperCase()}</span>
                                                 <span className="badge bg-danger text-white fw-bold px-1.5 py-0.5 rounded-1 flex-shrink-0" style={{ fontSize: '10px', whiteSpace: 'nowrap' }}>+{m.reward_xp} XP</span>
                                             </div>
-                                            <div style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }} title={m.description}>{m.description}</div>
+                                            <div className="text-muted" style={{ fontSize: '12px', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }} title={m.description}>{m.description}</div>
                                         </div>
                                     </div>
                                 )) : (
@@ -774,7 +795,7 @@ export const BattlePassView: FC<{}> = () => {
                                         </div>
                                         <div className="min-w-0">
                                             <div className="fw-bold text-dark" style={{ fontSize: '15px', lineHeight: 1.2 }}>Retos</div>
-                                            <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '11.5px' }}>Pasa retos para subir más rápido de nivel</div>
+                                            <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '12.5px' }}>Pasa retos para subir más rápido de nivel</div>
                                         </div>
                                     </div>
                                     <div className="position-relative flex-shrink-0" style={{ width: '180px' }}>
@@ -839,7 +860,7 @@ export const BattlePassView: FC<{}> = () => {
                                                                 +{m.reward_xp} XP
                                                             </span>
                                                         </div>
-                                                        <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '11.5px' }}>{m.description}</div>
+                                                        <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '12.5px' }}>{m.description}</div>
                                                         <div className="progress mt-1.5" style={{ height: '8px', backgroundColor: '#e2e8f0' }}>
                                                             <div
                                                                 className={`progress-bar ${m.completed ? 'bg-success' : 'bg-primary'}`}
@@ -1059,7 +1080,7 @@ export const BattlePassView: FC<{}> = () => {
                                                             +{m.reward_xp} XP
                                                         </span>
                                                     </div>
-                                                    <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '11.5px' }}>{m.description}</div>
+                                                    <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '12.5px' }}>{m.description}</div>
                                                     <div className="progress mt-1.5" style={{ height: '8px', backgroundColor: '#e2e8f0' }}>
                                                         <div
                                                             className={`progress-bar ${m.completed ? 'bg-success' : 'bg-primary'}`}
@@ -1112,9 +1133,10 @@ export const BattlePassView: FC<{}> = () => {
                                 {bpData.ranking && bpData.ranking.length > 0 ? bpData.ranking.map((user, idx) => {
                                     const isMe = userInfo?.username === user.username;
                                     const rankClass = idx === 0 ? 'rank-1' : (idx === 1 ? 'rank-2' : (idx === 2 ? 'rank-3' : ''));
+                                    const posClass = idx === 0 ? 'bg-warning text-dark' : (idx === 1 ? 'bg-secondary text-white' : (idx === 2 ? 'bg-danger text-white' : 'bp-rank-pos-normal'));
                                     return (
                                         <div key={user.id} className={`bp-ranking-row ${rankClass} ${isMe ? 'current-user-row' : ''}`}>
-                                            <span className={`bp-rank-position badge ${idx === 0 ? 'bg-warning text-dark' : (idx === 1 ? 'bg-secondary text-white' : (idx === 2 ? 'bg-danger text-white' : 'bg-light text-dark border'))} fw-bold`}>
+                                            <span className={`bp-rank-position badge ${posClass} fw-bold`}>
                                                 {idx + 1}°
                                             </span>
                                             <div className="bp-rank-avatar">
@@ -1123,15 +1145,15 @@ export const BattlePassView: FC<{}> = () => {
                                             <div className="bp-rank-info">
                                                 <span className="bp-rank-name">
                                                     {user.username}
-                                                    {isMe && <span className="badge bg-primary text-white ms-2" style={{ fontSize: '9px', verticalAlign: 'middle' }}>Tú</span>}
+                                                    {isMe && <span className="badge text-white ms-2" style={{ fontSize: '9px', verticalAlign: 'middle', background: 'var(--bp-primary, #ea580c)' }}>Tú</span>}
                                                 </span>
                                             </div>
-                                            <span className="bp-rank-level badge bg-primary text-white fw-bold">Nivel {user.level}</span>
+                                            <span className="bp-rank-level badge text-white fw-bold" style={{ background: 'var(--bp-primary, #ea580c)' }}>Nivel {user.level}</span>
                                             <span className="bp-rank-xp">{user.xp} XP</span>
                                         </div>
                                     );
                                 }) : (
-                                    <div className="text-center text-muted py-4" style={{ fontSize: '13px' }}>No hay datos de clasificación aún.</div>
+                                    <div className="text-center py-4" style={{ fontSize: '13px', color: 'var(--bp-subtext, #64748b)' }}>No hay datos de clasificación aún.</div>
                                 )}
                             </div>
                         </div>
@@ -1141,36 +1163,53 @@ export const BattlePassView: FC<{}> = () => {
                 { /* Reward Preview Detail Modal */}
                 {previewReward && (
                     <div className="bp-modal-backdrop" onClick={() => setPreviewReward(null)}>
-                        <div className="bp-dialog" style={{ width: '340px', maxWidth: '92%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                        <div className="bp-dialog bp-preview-dialog" style={{ width: '350px', maxWidth: '92%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
                             <div className="d-flex align-items-center justify-content-between w-100 mb-2">
-                                <span className={`badge ${previewReward.isVip ? 'bg-dark text-white' : 'bg-primary text-white'} fw-bold px-3 py-1`} style={{ fontSize: '12px' }}>
-                                    {previewReward.isVip ? 'Pase VIP - Nivel ' : 'Pase Gratuito - Nivel '}{previewReward.reward.level_required}
+                                <span className="bp-preview-track-badge" style={{
+                                    background: previewReward.isVip ? 'linear-gradient(135deg, #f59e0b 0%, #b45309 100%)' : 'var(--bp-primary, #ea580c)',
+                                    color: '#ffffff',
+                                    fontSize: '11.5px',
+                                    fontWeight: 800,
+                                    padding: '4px 12px',
+                                    borderRadius: '6px',
+                                    letterSpacing: '0.4px'
+                                }}>
+                                    {previewReward.isVip ? 'PASE VIP - NIVEL ' : 'PASE GRATUITO - NIVEL '}{previewReward.reward.level_required}
                                 </span>
                                 <button type="button" className="btn-close" style={{ fontSize: '12px' }} onClick={() => setPreviewReward(null)} />
                             </div>
 
-                            <div className="bp-square-box bp-preview-box my-3" style={{ width: 72, height: 72 }}>
-                                <div className="bp-reward-icon-container" style={{ width: 56, height: 56 }}>
-                                    {(() => {
-                                        const rType = previewReward.isVip ? (previewReward.reward.type_vip || previewReward.reward.type) : previewReward.reward.type;
-                                        const rImg = previewReward.isVip ? previewReward.reward.image_vip : previewReward.reward.image;
-                                        const rBadge = previewReward.isVip ? previewReward.reward.badge_vip : previewReward.reward.badge;
-                                        const rPt = previewReward.isVip ? previewReward.reward.point_type_vip : previewReward.reward.point_type;
-                                        const rName = previewReward.isVip ? (previewReward.reward.name_vip || previewReward.reward.name) : previewReward.reward.name;
-                                        return renderRewardMainIcon(rType, rImg, rBadge, rPt, rName);
-                                    })()}
-                                </div>
-                            </div>
+                            {(() => {
+                                const rType = previewReward.isVip ? (previewReward.reward.type_vip || previewReward.reward.type) : previewReward.reward.type;
+                                const rImg = previewReward.isVip ? previewReward.reward.image_vip : previewReward.reward.image;
+                                const rBadge = previewReward.isVip ? previewReward.reward.badge_vip : previewReward.reward.badge;
+                                const rPt = previewReward.isVip ? previewReward.reward.point_type_vip : previewReward.reward.point_type;
+                                const rName = previewReward.isVip ? (previewReward.reward.name_vip || previewReward.reward.name) : previewReward.reward.name;
+                                const rAmount = previewReward.isVip ? (previewReward.reward.amount_vip || previewReward.reward.amount) : previewReward.reward.amount;
 
-                            <span className="fw-bold text-dark mb-2" style={{ fontSize: '16px' }}>
-                                {previewReward.isVip ? (previewReward.reward.name_vip || previewReward.reward.name) : previewReward.reward.name}
-                            </span>
+                                return (
+                                    <>
+                                        <div className="bp-square-box bp-preview-box my-3" style={{ width: 80, height: 80, position: 'relative' }}>
+                                            <div className="bp-reward-icon-container" style={{ width: 64, height: 64 }}>
+                                                {renderRewardMainIcon(rType, rImg, rBadge, rPt, rName)}
+                                            </div>
+                                            {(rAmount && rAmount > 1) && (
+                                                <span className="bp-preview-amount-badge">x{rAmount}</span>
+                                            )}
+                                        </div>
 
-                            <span className="text-muted mb-3" style={{ fontSize: '13px' }}>
-                                {previewReward.isVip
-                                    ? 'Recompensa exclusiva del Pase VIP de Habbten.'
-                                    : 'Recompensa desbloqueable para todos los usuarios de Habbten.'}
-                            </span>
+                                        <span className="bp-preview-title mb-2" style={{ fontSize: '16px', fontWeight: 800, color: 'var(--bp-text, #0f172a)' }}>
+                                            {rName}
+                                        </span>
+
+                                        <span className="bp-preview-desc mb-3" style={{ fontSize: '13px', color: 'var(--bp-subtext, #64748b)' }}>
+                                            {previewReward.isVip
+                                                ? 'Recompensa exclusiva del Pase VIP de Habbten.'
+                                                : 'Recompensa desbloqueable para todos los usuarios de Habbten.'}
+                                        </span>
+                                    </>
+                                );
+                            })()}
 
                             { /* VIP notice if viewing VIP item without VIP status */}
                             {previewReward.isVip && !bpData.isVip && (
@@ -1191,7 +1230,7 @@ export const BattlePassView: FC<{}> = () => {
                                 const canClaim = isUnlocked && !isClaimed && (!previewReward.isVip || bpData.isVip);
 
                                 if (isClaimed) {
-                                    return <span className="badge bg-secondary text-white py-2 px-3 w-100" style={{ fontSize: '13px' }}>Recompensa ya reclamada</span>;
+                                    return <div className="bp-preview-claimed-badge py-2 px-3 w-100" style={{ fontSize: '13px' }}>Recompensa ya reclamada</div>;
                                 }
                                 if (canClaim) {
                                     return (
@@ -1218,9 +1257,9 @@ export const BattlePassView: FC<{}> = () => {
                                     );
                                 }
                                 return (
-                                    <span className="badge bg-light text-muted border py-2 px-3 w-100" style={{ fontSize: '13px' }}>
+                                    <div className="bp-preview-locked-badge py-2 px-3 w-100" style={{ fontSize: '13px' }}>
                                         Requiere Nivel {previewReward.reward.level_required}
-                                    </span>
+                                    </div>
                                 );
                             })()}
                         </div>

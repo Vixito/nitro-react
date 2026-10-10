@@ -1,8 +1,8 @@
 import { FC, useMemo, useState } from 'react';
-import IconScopeContext from '@/assets/images/wired/icon_scope_context.png';
-import IconScopeFurni from '@/assets/images/wired/icon_scope_furni.png';
-import IconScopeGlobal from '@/assets/images/wired/icon_scope_global.png';
-import IconScopeUser from '@/assets/images/wired/icon_scope_user.png';
+import IconScopeContext from '../../../assets/images/wired/icon_scope_context.png';
+import IconScopeFurni from '../../../assets/images/wired/icon_scope_furni.png';
+import IconScopeGlobal from '../../../assets/images/wired/icon_scope_global.png';
+import IconScopeUser from '../../../assets/images/wired/icon_scope_user.png';
 import { Column, Flex, Text } from '../../../common';
 
 export type VariableScopeType = 0 | 1 | 2 | 3;
@@ -20,47 +20,72 @@ interface WiredVariableSelectProps
     placeholder?: string;
 }
 
-const SCOPE_VARIABLES: Record<number, string[]> = {
+export interface ScopeVariableItem
+{
+    id: string;
+    label: string;
+}
+
+const SCOPE_VARIABLES: Record<number, ScopeVariableItem[]> = {
     // 2: Furni
     2: [
-        '@state',
-        '@position.x',
-        '@position.y',
-        '@rotation',
-        '@altitude',
-        '@height',
-        '@id',
-        '@class_id',
-        '@is_invisible',
-        '@type'
+        { id: '@state', label: '@state (Estado del furni)' },
+        { id: '@position_x', label: '@position_x (Posición X)' },
+        { id: '@position_y', label: '@position_y (Posición Y)' },
+        { id: '@rotation', label: '@rotation (Rotación 0-7)' },
+        { id: '@altitude', label: '@altitude (Altitud Z)' },
+        { id: '@height', label: '@height (Altura del furni)' },
+        { id: '@id', label: '@id (ID único del furni)' },
+        { id: '@class_id', label: '@class_id (ID de catálogo/base)' },
+        { id: '@owner_id', label: '@owner_id (ID del dueño)' },
+        { id: '@is_stackable', label: '@is_stackable (Es apilable 1/0)' },
+        { id: '@can_stand_on', label: '@can_stand_on (Se puede pisar 1/0)' },
+        { id: '@can_sit_on', label: '@can_sit_on (Permite sentarse 1/0)' },
+        { id: '@can_lay_on', label: '@can_lay_on (Permite acostarse 1/0)' }
     ],
     // 1: User
     1: [
-        'Monedas De Oro',
-        'Galletas',
-        'Puntos',
-        'Vidas',
-        'Punto De Control',
-        'puntos_usuario',
-        'vidas_restantes',
-        '@user_id',
-        '@user_name'
+        { id: '@position_x', label: '@position_x (Posición X del usuario)' },
+        { id: '@position_y', label: '@position_y (Posición Y del usuario)' },
+        { id: '@direction', label: '@direction (Dirección de mirada 0-7)' },
+        { id: '@altitude', label: '@altitude (Altitud Z del usuario)' },
+        { id: '@handitem_id', label: '@handitem_id (Objeto/bebida en mano)' },
+        { id: '@effect_id', label: '@effect_id (ID efecto visual activo)' },
+        { id: '@dance', label: '@dance (Tipo de baile 0-4)' },
+        { id: '@sign', label: '@sign (Número de cartel levantado)' },
+        { id: '@user_id', label: '@user_id (ID del usuario)' },
+        { id: '@gender', label: '@gender (Género: 0 Hombre, 1 Mujer)' },
+        { id: '@is_hc', label: '@is_hc (Suscripción activa 1/0)' },
+        { id: '@has_rights', label: '@has_rights (Derechos en sala 1/0)' },
+        { id: '@is_owner', label: '@is_owner (Es dueño de sala 1/0)' },
+        { id: '@is_frozen', label: '@is_frozen (Congelado en juego 1/0)' },
+        { id: '@is_idle', label: '@is_idle (Ausente/Zzz 1/0)' },
+        { id: '@achievement_score', label: '@achievement_score (Puntos recompensa)' }
     ],
     // 0: Global / Sala
     0: [
-        'Monedas De Oro',
-        'Galletas',
-        'ronda_actual',
-        'sala_bloqueada',
-        'tiempo',
-        'puntos_sala',
-        '@room_id'
+        { id: '@room_id', label: '@room_id (ID de la sala actual)' },
+        { id: '@group_id', label: '@group_id (ID del grupo de sala)' },
+        { id: '@furni_count', label: '@furni_count (Total furnis en sala)' },
+        { id: '@user_count', label: '@user_count (Total usuarios en sala)' },
+        { id: '@wired_timer', label: '@wired_timer (Cronómetro Wired sala)' },
+        { id: '@team_red_score', label: '@team_red_score (Puntos equipo Rojo)' },
+        { id: '@team_green_score', label: '@team_green_score (Puntos equipo Verde)' },
+        { id: '@team_blue_score', label: '@team_blue_score (Puntos equipo Azul)' },
+        { id: '@team_yellow_score', label: '@team_yellow_score (Puntos equipo Amarillo)' },
+        { id: '@current_time.hour_of_day', label: '@current_time.hour_of_day (Hora 0-23)' },
+        { id: '@current_time.minute_of_hour', label: '@current_time.minute_of_hour (Minuto 0-59)' },
+        { id: '@current_time.seconds_of_minute', label: '@current_time.seconds_of_minute (Segundos 0-59)' },
+        { id: '@current_time.day_of_week', label: '@current_time.day_of_week (Día semana 1-7)' },
+        { id: '@current_time.day_of_month', label: '@current_time.day_of_month (Día del mes 1-31)' },
+        { id: '@current_time.month_of_year', label: '@current_time.month_of_year (Mes 1-12)' },
+        { id: '@current_time.year', label: '@current_time.year (Año actual)' }
     ],
     // 3: Context
     3: [
-        'ultimo_furni_activado',
-        'ultimo_usuario_trigger',
-        'ultimo_valor'
+        { id: '@trigger_user_id', label: '@trigger_user_id (ID usuario que activó)' },
+        { id: '@trigger_furni_id', label: '@trigger_furni_id (ID furni que originó)' },
+        { id: '@signal_value', label: '@signal_value (Valor de señal)' }
     ]
 };
 
@@ -95,11 +120,11 @@ export const WiredVariableSelect: FC<WiredVariableSelectProps> = ({
         }
 
         const presets = SCOPE_VARIABLES[newScope] || [];
-        if(!presets.includes(value))
+        const hasPreset = presets.some(p => p.id === value);
+        if(!hasPreset && !isCustom)
         {
-            const nextVal = presets[0] || '';
+            const nextVal = presets[0]?.id || '';
             onChange(nextVal, newScope);
-            setIsCustom(false);
         }
         else
         {
@@ -112,9 +137,9 @@ export const WiredVariableSelect: FC<WiredVariableSelectProps> = ({
     const options = useMemo(() =>
     {
         const list = [ ...currentPresets ];
-        if(value && !list.includes(value) && value !== '__custom__')
+        if(value && !list.some(p => p.id === value) && value !== '__custom__')
         {
-            list.unshift(value);
+            list.unshift({ id: value, label: `${ value } (Variable personalizada)` });
         }
         return list;
     }, [ currentPresets, value ]);
@@ -193,9 +218,9 @@ export const WiredVariableSelect: FC<WiredVariableSelectProps> = ({
             >
                 { !value && <option value="" disabled>{ placeholder }</option> }
                 { options.map(opt => (
-                    <option key={ opt } value={ opt }>{ opt }</option>
+                    <option key={ opt.id } value={ opt.id }>{ opt.label }</option>
                 )) }
-                <option value="__custom__">... Escribir otra variable</option>
+                <option value="__custom__">... Escribir variable personalizada</option>
             </select>
 
             { isCustom && (

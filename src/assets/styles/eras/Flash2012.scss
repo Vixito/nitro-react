@@ -238,4 +238,91 @@ body[data-era="flash2012"] {
             }
         }
     }
+
+    // === Window Frame & Cards (Authentic Flash r63b 2012 Blue Header) ===
+    .nitro-card,
+    .draggable-window {
+        border-radius: 6px !important;
+        border: 2px solid #133852 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+        background-color: #f0f0f0 !important;
+        overflow: hidden !important;
+
+        .nitro-card-header,
+        .drag-handler {
+            background: linear-gradient(180deg, #377ea6 0%, #205c84 50%, #174b6f 51%, #1f5e88 100%) !important;
+            border-bottom: 2px solid #0f324c !important;
+            border-radius: 4px 4px 0 0 !important;
+            padding: 4px 8px !important;
+            min-height: 28px !important;
+
+            .header-text,
+            .nitro-card-header-text,
+            h5, h6 {
+                color: #ffffff !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6) !important;
+            }
+
+            .nitro-card-header-close,
+            .close-button,
+            .btn-close,
+            [aria-label="Close"] {
+                background: linear-gradient(180deg, #d9534f 0%, #c9302c 100%) !important;
+                border: 1px solid #761c19 !important;
+                border-radius: 4px !important;
+                color: #ffffff !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            }
+        }
+
+        .nitro-card-content,
+        .nitro-card-body {
+            background-color: #f4f4f4 !important;
+            color: #222222 !important;
+
+            .bg-muted,
+            .card,
+            .list-group {
+                background-color: #ffffff !important;
+                border: 1px solid #d0d0d0 !important;
+                border-radius: 4px !important;
+            }
+        }
+    }
+
+    // === Authentic Flash 2012 Glossy Buttons ===
+    .btn,
+    .nitro-button {
+        border-radius: 4px !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+        transition: all 0.1s ease !important;
+
+        &.btn-success,
+        &.btn-primary {
+            background: linear-gradient(180deg, #81ca29 0%, #589f13 100%) !important;
+            border: 1px solid #376d08 !important;
+            color: #ffffff !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5) !important;
+
+            &:hover {
+                background: linear-gradient(180deg, #91da39 0%, #68af23 100%) !important;
+            }
+        }
+
+        &.btn-secondary {
+            background: linear-gradient(180deg, #6c7a89 0%, #515e6d 100%) !important;
+            border: 1px solid #3a4550 !important;
+            color: #ffffff !important;
+        }
+
+        &.btn-danger {
+            background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%) !important;
+            border: 1px solid #962d22 !important;
+            color: #ffffff !important;
+        }
+    }
 }

@@ -1,32 +1,258 @@
-// Shockwave Era 2006 Theme Styles
+// Shockwave Era 2006 Theme Styles - Authentic Habbo v9-v14 Shockwave Design
 body.era-shockwave-2006,
 body[data-era="shockwave2006"] {
 
-    // Retro Teal Window Header Accents
-    .nitro-card-header,
-    .drag-handler {
-        background-color: #008080 !important;
-        border-bottom: 2px solid #004d4d !important;
+    // === Typography & Global Feel ===
+    font-family: 'Ubuntu', 'Volter', Tahoma, sans-serif !important;
 
-        .header-text,
-        .nitro-card-header-text {
-            color: #ffffff !important;
-            font-family: 'Ubuntu', sans-serif !important;
-            letter-spacing: 0.5px !important;
+    // === Window Frame & Cards (Classic Shockwave Bevel & Colors) ===
+    .nitro-card,
+    .draggable-window {
+        border-radius: 0px !important;
+        border: 2px solid #000000 !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.45) !important;
+        background-color: #d8d4c8 !important; // Authentic Habbo v9 beige/warm grey
+        overflow: hidden !important;
+
+        .nitro-card-header,
+        .drag-handler {
+            background: linear-gradient(180deg, #008484 0%, #006666 100%) !important;
+            border-bottom: 2px solid #003d3d !important;
+            border-radius: 0px !important;
+            padding: 3px 6px !important;
+            min-height: 24px !important;
+            height: 26px !important;
+
+            .header-text,
+            .nitro-card-header-text,
+            h5, h6 {
+                color: #ffffff !important;
+                font-family: 'Ubuntu', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                letter-spacing: 0.5px !important;
+                text-shadow: 1px 1px 0px #000000 !important;
+            }
+
+            // Authentic Red Square Close Button
+            .nitro-card-header-close,
+            .close-button,
+            .btn-close,
+            button:has(svg),
+            [aria-label="Close"] {
+                background: #cc0000 !important;
+                border: 1px solid #000000 !important;
+                color: #ffffff !important;
+                border-radius: 0px !important;
+                width: 14px !important;
+                height: 14px !important;
+                min-width: 14px !important;
+                min-height: 14px !important;
+                max-width: 14px !important;
+                max-height: 14px !important;
+                padding: 0 !important;
+                font-size: 9px !important;
+                font-weight: bold !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                opacity: 1 !important;
+                box-shadow: inset 1px 1px 0px #ff6666, inset -1px -1px 0px #660000 !important;
+                cursor: pointer !important;
+
+                svg {
+                    width: 8px !important;
+                    height: 8px !important;
+                    stroke-width: 3 !important;
+                }
+
+                &:hover {
+                    background: #ee0000 !important;
+                }
+
+                &:active {
+                    background: #990000 !important;
+                    box-shadow: inset 1px 1px 0px #440000 !important;
+                }
+            }
+        }
+
+        .nitro-card-content,
+        .nitro-card-body {
+            background-color: #d8d4c8 !important;
+            color: #000000 !important;
+            border-radius: 0px !important;
+            padding: 8px !important;
+
+            // Inner content boxes with sunken 3D bevel
+            .bg-muted,
+            .card,
+            .list-group,
+            .container-fluid,
+            .table,
+            [class*="content-area"],
+            [class*="list-container"] {
+                background-color: #ffffff !important;
+                border: 2px solid !important;
+                border-color: #7b7975 #ffffff #ffffff #7b7975 !important;
+                border-radius: 0px !important;
+                color: #000000 !important;
+            }
         }
     }
 
-    // Retro Gold & Teal Toolbar
-    .nitro-toolbar {
-        background: #005050 !important;
-        border-top: 2px solid #008080 !important;
+    // === Classic Shockwave Buttons ===
+    .btn,
+    .nitro-button,
+    button:not(.drag-handler button):not(.nitro-card-header button) {
+        border-radius: 0px !important;
+        font-family: inherit !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        background: #d4d0c8 !important;
+        color: #000000 !important;
+        border: 2px solid !important;
+        border-color: #ffffff #404040 #404040 #ffffff !important;
+        box-shadow: none !important;
+        padding: 3px 10px !important;
+        cursor: pointer !important;
 
-        .navigation-item {
-            border-radius: 4px !important;
+        &:hover {
+            background: #e4e0d8 !important;
+        }
+
+        &:active,
+        &.active {
+            border-color: #404040 #ffffff #ffffff #404040 !important;
+            background: #c4c0b8 !important;
+        }
+
+        &.btn-success,
+        &.btn-primary {
+            background: #5d9e31 !important;
+            color: #ffffff !important;
+            border-color: #8ed05d #2f5415 #2f5415 #8ed05d !important;
+            text-shadow: 1px 1px 0px #244210 !important;
 
             &:hover {
-                background: rgba(255, 255, 255, 0.2) !important;
+                background: #6bb339 !important;
             }
+
+            &:active {
+                border-color: #2f5415 #8ed05d #8ed05d #2f5415 !important;
+                background: #4e8529 !important;
+            }
+        }
+
+        &.btn-danger {
+            background: #c33030 !important;
+            color: #ffffff !important;
+            border-color: #f56e6e #661010 #661010 #f56e6e !important;
+            text-shadow: 1px 1px 0px #440000 !important;
+
+            &:hover {
+                background: #d63838 !important;
+            }
+        }
+    }
+
+    // === Text Input Fields ===
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    textarea,
+    select {
+        border-radius: 0px !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 2px solid !important;
+        border-color: #7b7975 #ffffff #ffffff #7b7975 !important;
+        box-shadow: none !important;
+        font-family: inherit !important;
+        font-size: 11px !important;
+    }
+
+    // === Classic Shockwave Bottom Toolbar ===
+    .nitro-toolbar {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 42px !important;
+        background: #242424 !important;
+        border-top: 2px solid #3d3d3d !important;
+        border-bottom: none !important;
+        border-left: none !important;
+        border-right: none !important;
+        box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.6) !important;
+        z-index: 1010 !important;
+        padding: 0 8px !important;
+
+        .navigation-item {
+            border-radius: 0px !important;
+            border: 1px solid transparent !important;
+            background: transparent !important;
+            transition: none !important;
+            height: 36px !important;
+            width: 36px !important;
+
+            &:hover {
+                background: #383838 !important;
+                border: 1px solid #555555 !important;
+            }
+
+            &.active {
+                background: #191919 !important;
+                border: 1px solid #000000 !important;
+            }
+        }
+    }
+
+    // === Classic Shockwave Chat Input ===
+    #toolbar-chat-input-container {
+        .nitro-chat-input-container {
+            border-radius: 0px !important;
+            background: #ffffff !important;
+            border: 2px solid !important;
+            border-color: #7b7975 #ffffff #ffffff #7b7975 !important;
+            box-shadow: none !important;
+            height: 32px !important;
+
+            &:before {
+                display: none !important;
+            }
+
+            input {
+                font-family: inherit !important;
+                font-size: 11px !important;
+                color: #000000 !important;
+            }
+        }
+    }
+
+    // === Scrollbars Retro Style ===
+    ::-webkit-scrollbar {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #d8d4c8 !important;
+        border: 1px solid #7b7975 !important;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #d4d0c8 !important;
+        border: 2px solid !important;
+        border-color: #ffffff #404040 #404040 #ffffff !important;
+        border-radius: 0px !important;
+
+        &:hover {
+            background: #e4e0d8 !important;
+        }
+
+        &:active {
+            border-color: #404040 #ffffff #ffffff #404040 !important;
         }
     }
 }

@@ -28,12 +28,12 @@ export const LayoutLimitedEditionCompletePlateView: FC<LayoutLimitedEditionCompl
         <Base classNames={ getClassNames } { ...rest }>
             <Column className="plate-container" gap={ 0 }>
                 <Flex justifyContent="between" alignItems="center">
-                    { LocalizeText('unique.items.left') }
-                    <div><LayoutLimitedEditionStyledNumberView value={ uniqueLimitedItemsLeft } /></div>
+                    <span className="plate-label">{ LocalizeText('unique.items.left') }</span>
+                    <span className="plate-number-available"><b>{ uniqueLimitedItemsLeft }</b></span>
                 </Flex>
                 <Flex justifyContent="between" alignItems="center">
-                    { LocalizeText('unique.items.number.sold') }
-                    <div><LayoutLimitedEditionStyledNumberView value={ uniqueLimitedSeriesSize } /></div>
+                    <span className="plate-label">{ LocalizeText('unique.items.number.sold') }</span>
+                    <span className="plate-number-total">{ uniqueLimitedSeriesSize }</span>
                 </Flex>
             </Column>
         </Base>

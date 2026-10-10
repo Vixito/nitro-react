@@ -107,100 +107,180 @@
 }
 
 .nitro-chat-popover {
-    background: #1b232a !important;
-    border: 2px solid #000000 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+    max-width: none !important;
+    --bs-popover-max-width: none !important;
+    background: #1e262f !important;
+    border: 2px solid #0e141a !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
     color: #ffffff !important;
     z-index: 9999 !important;
     padding: 0 !important;
+    overflow: hidden;
 
     .popover-header-custom {
-        background: #141b21;
-        border-bottom: 1px solid #2d3842;
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
+        background: #171e25;
+        border-bottom: 2px solid #2d3e4f;
+        padding: 5px 8px;
 
         .btn-close-popover {
             cursor: pointer;
-            color: #8899a6;
-            font-size: 13px;
-            padding: 0 4px;
+            width: 18px;
+            height: 18px;
+            background: #d9534f;
+            border: 1px solid #000000;
+            border-radius: 2px;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
 
             &:hover {
-                color: #ff5555;
+                background: #c9302c;
             }
         }
     }
 
     .popover-tabs {
-        background: #192127;
+        background: #141a20;
+        border-bottom: 2px solid #2d3e4f !important;
+        padding: 6px 8px;
+        gap: 5px;
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
 
         .tab-btn {
-            background: transparent;
-            color: #a0b0be;
-            border: none;
-            padding: 3px 8px;
+            background: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
             border-radius: 4px;
-            font-size: 11px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
             transition: all 0.15s ease;
 
             &:hover {
                 color: #ffffff;
-                background: rgba(255, 255, 255, 0.08);
+                background: #334155;
+                border-color: #64748b;
             }
 
             &.active {
                 color: #ffffff;
-                background: #007bff;
-                font-weight: bold;
+                background: #0284c7;
+                border-color: #38bdf8;
+                font-weight: 700;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
             }
         }
     }
 
+    .gif-search-input {
+        background: #111827 !important;
+        border: 1px solid #475569 !important;
+        color: #ffffff !important;
+        font-size: 13px !important;
+
+        &::placeholder {
+            color: #94a3b8 !important;
+            opacity: 1 !important;
+        }
+
+        &:focus {
+            background: #0f172a !important;
+            border-color: #38bdf8 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 1px #38bdf8 !important;
+        }
+    }
+
     .popover-body-custom {
-        max-height: 270px;
+        max-height: 280px;
         overflow-y: auto;
+        color: #e2e8f0;
     }
 
     &.nitro-chat-emoji-popover {
-        width: 320px;
+        width: 440px !important;
+        min-width: 440px !important;
+        max-width: 440px !important;
 
         .emoji-grid {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             gap: 4px;
-            font-size: 20px;
+            font-size: 22px;
             text-align: center;
 
             .emoji-item {
                 cursor: pointer;
-                border-radius: 4px;
+                border-radius: 3px;
                 padding: 4px 2px;
-                transition: transform 0.1s, background 0.1s;
 
                 &:hover {
-                    background: rgba(255, 255, 255, 0.15);
-                    transform: scale(1.25);
+                    background: #2b3947;
                 }
             }
         }
 
-        .habbo-shortcuts-grid {
-            .habbo-shortcut-item {
+        .habbten-shortcuts-grid {
+            overflow-x: hidden;
+
+            .habbten-shortcut-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
                 cursor: pointer;
-                background: #252f38;
-                transition: background 0.15s;
+                background: #182027;
+                border: 1px solid #2a3846;
+                padding: 6px 12px !important;
+                border-radius: 4px;
+                box-sizing: border-box;
+                width: 100%;
 
                 &:hover {
-                    background: #313e4a;
+                    background: #222e3a;
+                    border-color: #3d5063;
+                }
+
+                .shortcut-preview {
+                    font-size: 20px;
+                    line-height: 1;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 24px;
+                    flex-shrink: 0;
+                }
+
+                .shortcut-code {
+                    font-size: 12.5px;
+                    padding: 3px 8px;
+                    letter-spacing: 0.2px;
+                    flex-shrink: 0;
+                }
+
+                .shortcut-label {
+                    font-size: 13px;
+                    color: #ffffff !important;
+                    font-weight: 600;
+                    white-space: nowrap;
+                    flex-shrink: 0;
                 }
             }
         }
     }
 
     &.nitro-chat-gif-popover {
-        width: 340px;
+        width: 410px !important;
+        min-width: 410px !important;
+        max-width: 410px !important;
 
         .gif-grid {
             display: grid;
@@ -210,17 +290,16 @@
             .gif-item-card {
                 position: relative;
                 height: 90px;
-                border-radius: 6px;
+                border-radius: 4px;
                 overflow: hidden;
                 cursor: pointer;
                 background: #000000;
-                border: 1px solid #333f4a;
+                border: 1px solid #2a3846;
 
                 img.gif-thumb {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
-                    transition: transform 0.2s;
                 }
 
                 .gif-title-overlay {
@@ -229,22 +308,17 @@
                     left: 0;
                     right: 0;
                     padding: 2px 4px;
-                    background: rgba(0, 0, 0, 0.75);
+                    background: rgba(0, 0, 0, 0.8);
                     color: #ffffff;
                     font-size: 10px;
                     opacity: 0;
-                    transition: opacity 0.2s;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
                 }
 
                 &:hover {
-                    border-color: #007bff;
-
-                    img.gif-thumb {
-                        transform: scale(1.05);
-                    }
+                    border-color: #4dd0e1;
 
                     .gif-title-overlay {
                         opacity: 1;

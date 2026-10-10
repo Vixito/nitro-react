@@ -62,12 +62,13 @@ export const LayoutGridItem: FC<LayoutGridItemProps> = props =>
         <Column center={ center } pointer position={ position } overflow={ overflow } column={ column } classNames={ getClassNames } style={ getStyle } { ...rest }>
             { (itemCount > itemCountMinimum) &&
                 <LayoutItemCountView count={ itemCount } /> }
-            { (itemUniqueNumber > 0) && 
+            { (itemUniqueNumber > 0 || itemUniqueSoldout) && 
                 <>
                     <Base fit className="unique-bg-override" style={ { backgroundImage: `url(${ itemImage })` } } />
-                    <div className="position-absolute bottom-0 unique-item-counter">
-                        <LayoutLimitedEditionStyledNumberView value={ itemUniqueNumber } />
-                    </div>
+                    { (itemUniqueNumber > 0 && !itemUniqueSoldout) &&
+                        <div className="position-absolute bottom-0 unique-item-counter">
+                            <LayoutLimitedEditionStyledNumberView value={ itemUniqueNumber } />
+                        </div> }
                 </> }
             { children }
         </Column>

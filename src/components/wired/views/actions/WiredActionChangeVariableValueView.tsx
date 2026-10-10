@@ -24,12 +24,12 @@ const REFERENCE_OPTIONS = [
 
 export const WiredActionChangeVariableValueView: FC<{}> = props =>
 {
-    const [ variableName, setVariableName ] = useState('Monedas De Oro');
-    const [ scope, setScope ] = useState<number>(1);
+    const [ variableName, setVariableName ] = useState('@state');
+    const [ scope, setScope ] = useState<number>(2);
     const [ operation, setOperation ] = useState<number>(1);
     const [ refMode, setRefMode ] = useState<number>(0); // 0: Direct value, 1: From variable
     const [ operand, setOperand ] = useState<number>(1);
-    const [ refVariableName, setRefVariableName ] = useState('Galletas');
+    const [ refVariableName, setRefVariableName ] = useState('@room_id');
     const [ refScope, setRefScope ] = useState<number>(0);
     const [ targetIndex, setTargetIndex ] = useState<number>(0);
     const [ refIndex, setRefIndex ] = useState<number>(0);
@@ -46,12 +46,12 @@ export const WiredActionChangeVariableValueView: FC<{}> = props =>
     {
         if(!trigger) return;
 
-        const rawStr = trigger.stringData || 'Monedas De Oro';
+        const rawStr = trigger.stringData || '@state';
         if(rawStr.includes('|'))
         {
             const parts = rawStr.split('|');
-            setVariableName(parts[0] || 'Monedas De Oro');
-            setRefVariableName(parts[1] || 'Galletas');
+            setVariableName(parts[0] || '@state');
+            setRefVariableName(parts[1] || '@room_id');
         }
         else
         {

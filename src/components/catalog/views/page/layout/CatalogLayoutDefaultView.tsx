@@ -32,21 +32,33 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
                         </> }
                     { currentOffer &&
                         <>
-                            <Flex center overflow="hidden" style={ { height: 140 } }>
+                            <Flex center position="relative" overflow="hidden" className="rounded" style={ { height: 140 } }>
                                 { (currentOffer.product.productType !== ProductTypeEnum.BADGE) &&
                                     <>
                                         <CatalogViewProductWidgetView />
-                                        <CatalogAddOnBadgeWidgetView className="bg-muted rounded bottom-1 end-1" />
+                                        { currentOffer.product.isUniqueLimitedItem ? (
+                                            <div className="position-absolute top-2 end-2 d-flex flex-column align-items-end" style={ { zIndex: 10 } }>
+                                                <CatalogLimitedItemWidgetView />
+                                                { currentOffer.badgeCode && (
+                                                    <div className="ltd-badge-preview mt-1">
+                                                        <CatalogAddOnBadgeWidgetView />
+                                                    </div>
+                                                ) }
+                                            </div>
+                                        ) : (
+                                            <CatalogAddOnBadgeWidgetView className="bg-muted rounded bottom-1 end-1 position-absolute" />
+                                        ) }
                                     </> }
                                 { (currentOffer.product.productType === ProductTypeEnum.BADGE) && <CatalogAddOnBadgeWidgetView className="scale-2" /> }
                             </Flex>
                             <Column grow gap={ 1 }>
-                                <CatalogLimitedItemWidgetView fullWidth />
-                                <Text grow truncate>{ currentOffer.localizationName }</Text>
+                                { !currentOffer.product.isUniqueLimitedItem && <CatalogLimitedItemWidgetView fullWidth /> }
+                                <Text grow truncate bold>{ currentOffer.localizationName }</Text>
                                 <Flex justifyContent="between">
-                                    <Column gap={ 1 }>
-                                        <CatalogSpinnerWidgetView />
-                                    </Column>
+                                    { (!currentOffer.product.isUniqueLimitedItem && currentPage?.pageId !== 761) &&
+                                        <Column gap={ 1 }>
+                                            <CatalogSpinnerWidgetView />
+                                        </Column> }
                                     <CatalogTotalPriceWidget justifyContent="end" alignItems="end" />
                                 </Flex>
                                 <CatalogPurchaseWidgetView />

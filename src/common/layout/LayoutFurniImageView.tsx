@@ -53,7 +53,11 @@ export const LayoutFurniImageView: FC<LayoutFurniImageViewProps> = props =>
                     image = TextureUtils.generateImage(texture);
                 }
 
-                image.onload = () => setImageElement(image);
+                if(image)
+                {
+                    image.onload = () => setImageElement(image);
+                    if(image.complete) setImageElement(image);
+                }
             },
             imageFailed: null
         };
@@ -72,7 +76,11 @@ export const LayoutFurniImageView: FC<LayoutFurniImageViewProps> = props =>
         {
             const image = imageResult.getImage();
 
-            image.onload = () => setImageElement(image);
+            if(image)
+            {
+                image.onload = () => setImageElement(image);
+                if(image.complete) setImageElement(image);
+            }
         }
     }, [ productType, productClassId, direction, extraData ]);
 

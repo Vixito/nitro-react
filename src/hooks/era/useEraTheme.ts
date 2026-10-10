@@ -16,29 +16,29 @@ export interface EraInfo
 export const ERAS_CONFIG: EraInfo[] = [
     {
         id: 'shockwave2006',
-        name: 'SHOCKWAVE ERA',
+        name: 'VERSIÓN SHOCKWAVE (2006)',
         year: '2006',
-        subtitle: 'The OG experience',
-        description: 'The OG experience. Bitmap fonts, teal windows, and the iconic toolbar & icons.',
-        badges: [ 'NOSTALGIC', 'ORIGINAL' ],
+        subtitle: 'Interfaz clásica de 2006',
+        description: 'Fuentes pixeladas, ventanas retro y la barra de herramientas clásica inferior.',
+        badges: [],
         thumbnail: '/src/assets/images/eras/era_shockwave_2006.png'
     },
     {
         id: 'flash2012',
-        name: 'FLASH ERA',
+        name: 'VERSIÓN FLASH (2012)',
         year: '2012',
-        subtitle: 'Refined side toolbar',
-        description: 'Refined inventory, side-fixed toolbar.. The peak flash experience.',
-        badges: [ 'NOSTALGIC', 'CLASSIC' ],
+        subtitle: 'Barra lateral de 2012',
+        description: 'Inventario refinado, barra lateral vertical fija y el estilo característico de la época dorada de Flash.',
+        badges: [],
         thumbnail: '/src/assets/images/eras/era_flash_2012.png'
     },
     {
         id: 'modern',
-        name: 'MODERN',
+        name: 'VERSIÓN MODERNA (2016)',
         year: '2016',
-        subtitle: 'The latest flash UI',
-        description: 'The latest flash user interface, before habbo moved to their latest UI.',
-        badges: [ 'NOSTALGIC', 'POPULAR' ],
+        subtitle: 'Interfaz moderna',
+        description: 'La interfaz gráfica avanzada previa a la transición completa a HTML5 y Nitro.',
+        badges: [],
         thumbnail: '/src/assets/images/eras/era_modern_2016.png'
     }
 ];

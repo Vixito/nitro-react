@@ -7,37 +7,40 @@ interface ChatInputEmojiPickerViewProps
     onSelectEmoji: (emoji: string) => void;
 }
 
-interface HabboShortcut
+interface HabbtenShortcut
 {
     code: string;
     label: string;
     emoji: string;
 }
 
-const HABBO_SHORTCUTS: HabboShortcut[] = [
-    { code: ':)', label: 'Sonrisa', emoji: '😊' },
-    { code: ':D', label: 'Risa', emoji: '😃' },
-    { code: ':(', label: 'Triste', emoji: '🙁' },
-    { code: ':p', label: 'Lengua', emoji: '😛' },
-    { code: ';)', label: 'Guiño', emoji: '😉' },
-    { code: ':o', label: 'Sorpresa', emoji: '😮' },
-    { code: '<3', label: 'Corazón', emoji: '❤️' },
-    { code: '(skull)', label: 'Calavera', emoji: '💀' },
-    { code: '(fire)', label: 'Fuego', emoji: '🔥' },
-    { code: '(star)', label: 'Estrella', emoji: '⭐' },
-    { code: '(thumbsup)', label: 'Like', emoji: '👍' },
-    { code: '(thumbsdown)', label: 'Dislike', emoji: '👎' },
-    { code: '(poop)', label: 'Caca', emoji: '💩' },
-    { code: '(crown)', label: 'Corona', emoji: '👑' },
-    { code: '(diamond)', label: 'Diamante', emoji: '💎' },
-    { code: 'bobba', label: 'Bobba', emoji: '🤐' }
+const HABBTEN_COMMAND_SHORTCUTS: HabbtenShortcut[] = [
+    { code: ':emoji 1  o  :emoji sonrisa', label: 'Sonrisa', emoji: '😀' },
+    { code: ':emoji 2  o  :emoji risa', label: 'Risa', emoji: '😂' },
+    { code: ':emoji 3  o  :emoji corazon', label: 'Corazón', emoji: '❤️' },
+    { code: ':emoji 4  o  :emoji fuego', label: 'Fuego', emoji: '🔥' },
+    { code: ':emoji 5  o  :emoji megusta', label: 'Me gusta', emoji: '👍' },
+    { code: ':emoji 6  o  :emoji nomegusta', label: 'No me gusta', emoji: '👎' },
+    { code: ':emoji 7  o  :emoji calavera', label: 'Calavera', emoji: '💀' },
+    { code: ':emoji 8  o  :emoji corona', label: 'Corona', emoji: '👑' },
+    { code: ':emoji 9  o  :emoji estrella', label: 'Estrella', emoji: '⭐' },
+    { code: ':emoji 10 o  :emoji diamante', label: 'Diamante', emoji: '💎' },
+    { code: ':emoji 11 o  :emoji caca', label: 'Caca', emoji: '💩' },
+    { code: ':emoji 12 o  :emoji fiesta', label: 'Fiesta', emoji: '🎉' },
+    { code: ':emoji 13 o  :emoji gafas', label: 'Gafas', emoji: '😎' },
+    { code: ':emoji 14 o  :emoji llanto', label: 'Triste', emoji: '😭' },
+    { code: ':emoji 15 o  :emoji enojado', label: 'Enojado', emoji: '😡' },
+    { code: ':emoji 16 o  :emoji aplausos', label: 'Aplausos', emoji: '👏' },
+    { code: ':emoji 17 o  :emoji 100', label: '100', emoji: '💯' },
+    { code: ':emoji 18 o  :emoji ojos', label: 'Ojos', emoji: '👀' },
+    { code: ':emoji 19 o  :emoji pizza', label: 'Pizza', emoji: '🍕' },
+    { code: ':emoji 20 o  :emoji cafe', label: 'Café', emoji: '☕' }
 ];
 
 const EMOJI_CATEGORIES = [
     {
         id: 'smileys',
         name: 'Caras',
-        icon: '😀',
         emojis: [
             '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇',
             '🥰', '😍', '🤩', '😘', '😗', '😚', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗',
@@ -52,7 +55,6 @@ const EMOJI_CATEGORIES = [
     {
         id: 'gestures',
         name: 'Gestos',
-        icon: '✌️',
         emojis: [
             '👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘',
             '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '🫵', '👍', '👎', '✊', '👊', '🤛',
@@ -63,7 +65,6 @@ const EMOJI_CATEGORIES = [
     {
         id: 'symbols',
         name: 'Símbolos',
-        icon: '🔥',
         emojis: [
             '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💖',
             '💗', '💓', '💞', '💕', '💌', '💘', '💝', '💟', '💯', '🔥', '✨', '🌟', '⭐',
@@ -73,9 +74,8 @@ const EMOJI_CATEGORIES = [
         ]
     },
     {
-        id: 'habbo',
-        name: 'Habbo',
-        icon: '🏨',
+        id: 'commands',
+        name: 'Comandos :emoji',
         emojis: []
     }
 ];
@@ -84,31 +84,17 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
 {
     const [ visible, setVisible ] = useState(false);
     const [ activeCategory, setActiveCategory ] = useState('smileys');
-    const [ searchTerm, setSearchTerm ] = useState('');
     const buttonRef = useRef<HTMLDivElement>(null);
 
     const filteredEmojis = useMemo(() =>
     {
-        if(activeCategory === 'habbo') return [];
+        if(activeCategory === 'commands') return [];
 
         const cat = EMOJI_CATEGORIES.find(c => c.id === activeCategory);
         if(!cat) return [];
 
         return cat.emojis;
     }, [ activeCategory ]);
-
-    const filteredHabbo = useMemo(() =>
-    {
-        if(activeCategory !== 'habbo' && !searchTerm) return [];
-
-        if(searchTerm)
-        {
-            const term = searchTerm.toLowerCase();
-            return HABBO_SHORTCUTS.filter(s => s.code.toLowerCase().includes(term) || s.label.toLowerCase().includes(term));
-        }
-
-        return HABBO_SHORTCUTS;
-    }, [ activeCategory, searchTerm ]);
 
     const handleSelect = (emoji: string) =>
     {
@@ -134,10 +120,10 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
                 onHide={ () => setVisible(false) }
                 transition={ false }
             >
-                <Popover className="nitro-chat-popover nitro-chat-emoji-popover">
+                <Popover id="nitro-chat-emoji-popover" style={ { width: '440px', maxWidth: 'none' } } className="nitro-chat-popover nitro-chat-emoji-popover">
                     <div className="popover-header-custom d-flex align-items-center justify-content-between px-2 py-1">
-                        <span className="fw-bold small text-white">Selector de Emojis</span>
-                        <span className="btn-close-popover" onClick={ () => setVisible(false) }>✕</span>
+                        <span className="fw-bold text-white" style={ { fontSize: '13px' } }>Selector de Emojis</span>
+                        <div className="btn-close-popover" onClick={ () => setVisible(false) }>✕</div>
                     </div>
 
                     <div className="popover-tabs d-flex px-2 py-1 gap-1 border-bottom border-secondary">
@@ -145,28 +131,33 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
                             <button
                                 key={ cat.id }
                                 type="button"
-                                className={ `tab-btn btn btn-sm ${ activeCategory === cat.id ? 'active' : '' }` }
-                                onClick={ () => { setActiveCategory(cat.id); setSearchTerm(''); } }
+                                className={ `tab-btn ${ activeCategory === cat.id ? 'active' : '' }` }
+                                onClick={ () => setActiveCategory(cat.id) }
                                 title={ cat.name }
                             >
-                                <span className="me-1">{ cat.icon }</span>
-                                <span className="d-none d-sm-inline small">{ cat.name }</span>
+                                <span style={ { fontSize: '13px' } }>{ cat.name }</span>
                             </button>
                         )) }
                     </div>
 
                     <div className="popover-body-custom p-2">
-                        { activeCategory === 'habbo' ? (
-                            <div className="habbo-shortcuts-grid">
-                                { filteredHabbo.map(s => (
+                        { activeCategory === 'commands' ? (
+                            <div className="habbten-shortcuts-grid">
+                                <div className="mb-2" style={ { fontSize: '13px', color: '#f1f5f9' } }>
+                                    Escribe en el chat <strong style={ { color: '#facc15' } }>:emoji &lt;número o texto&gt;</strong> o haz clic para enviar:
+                                </div>
+                                { HABBTEN_COMMAND_SHORTCUTS.map(s => (
                                     <div
                                         key={ s.code }
-                                        className="habbo-shortcut-item d-flex align-items-center justify-content-between p-1 px-2 rounded mb-1"
+                                        className="habbten-shortcut-item d-flex align-items-center justify-content-between rounded mb-1 cursor-pointer"
                                         onClick={ () => handleSelect(s.emoji) }
+                                        title={ `Haz clic para insertar ${ s.emoji }` }
                                     >
-                                        <span className="shortcut-preview fs-5 me-2">{ s.emoji }</span>
-                                        <span className="shortcut-code badge bg-dark text-warning font-monospace">{ s.code }</span>
-                                        <span className="shortcut-label small text-muted ms-auto">{ s.label }</span>
+                                        <div className="d-flex align-items-center gap-2 min-w-0">
+                                            <span className="shortcut-preview">{ s.emoji }</span>
+                                            <span className="shortcut-code badge bg-dark text-warning font-monospace">{ s.code }</span>
+                                        </div>
+                                        <span className="shortcut-label ms-2 text-nowrap flex-shrink-0">{ s.label }</span>
                                     </div>
                                 )) }
                             </div>

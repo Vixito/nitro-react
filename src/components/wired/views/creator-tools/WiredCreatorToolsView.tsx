@@ -1,9 +1,71 @@
-import { RoomEngineObjectEvent, RoomObjectCategory } from '@nitrots/nitro-renderer';
-import { FC, useState } from 'react';
-import { FaChair, FaCheck, FaGlobeAmericas, FaPlug, FaUser } from 'react-icons/fa';
-import { GetFurnitureDataForRoomObject, GetRoomSession, ProductTypeEnum, WiredSelectionVisualizer } from '../../../../api';
+import { RoomEngineObjectEvent, RoomObjectCategory, RoomObjectType, RoomObjectVariable, Vector3d } from '@nitrots/nitro-renderer';
+import { Component, ErrorInfo, FC, ReactNode, useState } from 'react';
+import { FaCheck } from 'react-icons/fa';
+import IconScopeContext from '../../../../assets/images/wired/icon_scope_context.png';
+import IconScopeFurni from '../../../../assets/images/wired/icon_scope_furni.png';
+import IconScopeGlobal from '../../../../assets/images/wired/icon_scope_global.png';
+import IconScopeUser from '../../../../assets/images/wired/icon_scope_user.png';
+import { GetFurnitureDataForRoomObject, GetRoomEngine, GetRoomSession, ProductTypeEnum, WiredSelectionVisualizer } from '../../../../api';
 import { Column, Flex, LayoutAvatarImageView, LayoutFurniImageView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
 import { useRoomEngineEvent, useWired } from '../../../../hooks';
+
+interface ErrorBoundaryProps
+{
+    children: ReactNode;
+}
+
+interface ErrorBoundaryState
+{
+    hasError: boolean;
+    error: Error | null;
+}
+
+class WiredCreatorToolsErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState>
+{
+    constructor(props: ErrorBoundaryProps)
+    {
+        super(props);
+        this.state = { hasError: false, error: null };
+    }
+
+    static getDerivedStateFromError(error: Error): ErrorBoundaryState
+    {
+        return { hasError: true, error };
+    }
+
+    componentDidCatch(error: Error, errorInfo: ErrorInfo): void
+    {
+        console.error('WiredCreatorTools Error caught by boundary:', error, errorInfo);
+    }
+
+    render(): ReactNode
+    {
+        if(this.state.hasError)
+        {
+            return (
+                <NitroCardView uniqueKey="wired-creator-tools-error" className="nitro-wired-creator-tools" theme="primary-slim">
+                    <NitroCardHeaderView headerText="Wired Creator Tools" onCloseClick={ () => this.setState({ hasError: false, error: null }) } />
+                    <NitroCardContentView className="nitro-wired-creator-body text-center p-4">
+                        <div style={{ color: '#b91c1c', fontWeight: 700, marginBottom: '8px', fontSize: '14px' }}>
+                            Ocurrió un error en esta vista
+                        </div>
+                        <p style={{ color: '#4b5563', fontSize: '12px', marginBottom: '12px' }}>
+                            Se ha recuperado el cliente sin interrupciones.
+                        </p>
+                        <button
+                            className="wired-btn-retro"
+                            onClick={ () => this.setState({ hasError: false, error: null }) }
+                        >
+                            Reiniciar herramientas
+                        </button>
+                    </NitroCardContentView>
+                </NitroCardView>
+            );
+        }
+
+        return this.props.children;
+    }
+}
 
 type VariableCategory = 'furni' | 'user' | 'global' | 'context';
 type ElementCategory = 'furni' | 'user' | 'global';
@@ -22,35 +84,64 @@ interface VariableDefinition
 
 const VARIABLES_CATALOG: Record<VariableCategory, VariableDefinition[]> = {
     furni: [
-        { name: '@id', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@class_id', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí (163)', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@height', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí (100)', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@state', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí (0)', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@position.x', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí (44)', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@position.y', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí (51)', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@rotation', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí (0)', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@altitude', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'Sí (0)', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@is_invisible', type: 'Interna', target: 'Furni', availability: '/', hasValue: 'No', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@type', type: 'Interna', target: 'Furni', availability: '/', hasValue: '0 (Normal)', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' }
+        { name: '@state', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@position_x', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@position_y', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@rotation', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@altitude', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@height', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@id', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@class_id', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@owner_id', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@is_stackable', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@can_stand_on', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@can_sit_on', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@can_lay_on', type: 'Interna', target: 'Furni', availability: 'En sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' }
     ],
     user: [
-        { name: '@user_id', type: 'Interna', target: 'Usuario', availability: '/', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: '@user_name', type: 'Interna', target: 'Usuario', availability: '/', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: 'puntos_usuario', type: 'Creada por usuario', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí (15)', canWrite: 'Sí', canCreateDelete: 'Sí', canIntercept: 'Sí' },
-        { name: 'vidas_restantes', type: 'Creada por usuario', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí (3)', canWrite: 'Sí', canCreateDelete: 'Sí', canIntercept: 'Sí' }
+        { name: '@position_x', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@position_y', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@direction', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@altitude', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@handitem_id', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@effect_id', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@dance', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@sign', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@user_id', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@gender', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@is_hc', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@has_rights', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@is_owner', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@is_frozen', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@is_idle', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@achievement_score', type: 'Interna', target: 'Usuario', availability: 'Mientras esté en sala', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' }
     ],
     global: [
-        { name: '@room_id', type: 'Interna', target: 'Sala', availability: '/', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
-        { name: 'ronda_actual', type: 'Creada por usuario', target: 'Sala', availability: 'Mientras la sala exista', hasValue: 'Sí (1)', canWrite: 'Sí', canCreateDelete: 'Sí', canIntercept: 'Sí' },
-        { name: 'sala_bloqueada', type: 'Creada por usuario', target: 'Sala', availability: 'Permanente', hasValue: 'Sí (0)', canWrite: 'Sí', canCreateDelete: 'Sí', canIntercept: 'Sí' }
+        { name: '@room_id', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@group_id', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@furni_count', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@user_count', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@wired_timer', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@team_red_score', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@team_green_score', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@team_blue_score', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@team_yellow_score', type: 'Interna', target: 'Sala', availability: 'Permanente', hasValue: 'Sí', canWrite: 'Sí', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@current_time.hour_of_day', type: 'Interna', target: 'Servidor', availability: 'Tiempo real', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@current_time.minute_of_hour', type: 'Interna', target: 'Servidor', availability: 'Tiempo real', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@current_time.seconds_of_minute', type: 'Interna', target: 'Servidor', availability: 'Tiempo real', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@current_time.day_of_week', type: 'Interna', target: 'Servidor', availability: 'Tiempo real', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@current_time.day_of_month', type: 'Interna', target: 'Servidor', availability: 'Tiempo real', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@current_time.month_of_year', type: 'Interna', target: 'Servidor', availability: 'Tiempo real', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' },
+        { name: '@current_time.year', type: 'Interna', target: 'Servidor', availability: 'Tiempo real', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'No' }
     ],
     context: [
-        { name: 'ultimo_furni_activado', type: 'Contexto de evento', target: 'Contexto', availability: 'Por evento', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'Sí' },
-        { name: 'ultimo_usuario_trigger', type: 'Contexto de evento', target: 'Contexto', availability: 'Por evento', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'Sí' }
+        { name: '@trigger_user_id', type: 'Contexto de evento', target: 'Contexto', availability: 'Por evento', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'Sí' },
+        { name: '@trigger_furni_id', type: 'Contexto de evento', target: 'Contexto', availability: 'Por evento', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'Sí' },
+        { name: '@signal_value', type: 'Contexto de evento', target: 'Contexto', availability: 'Por evento', hasValue: 'Sí', canWrite: 'No', canCreateDelete: 'No', canIntercept: 'Sí' }
     ]
 };
 
-export const WiredCreatorToolsView: FC<{}> = () =>
+const WiredCreatorToolsViewContent: FC<{}> = () =>
 {
     const { isWiredCreatorToolsVisible, setIsWiredCreatorToolsVisible } = useWired();
     const [ activeTab, setActiveTab ] = useState<'monitor' | 'variables' | 'inspect' | 'settings'>('monitor');
@@ -73,7 +164,18 @@ export const WiredCreatorToolsView: FC<{}> = () =>
     // Tab 3: Inspection
     const [ holderType, setHolderType ] = useState<ElementCategory>('furni');
     const [ keepSelected, setKeepSelected ] = useState<boolean>(false);
-    const [ inspectedFurni, setInspectedFurni ] = useState<{ id: number; classId: number; name: string; isWall: boolean } | null>(null);
+    const [ inspectedFurni, setInspectedFurni ] = useState<{
+        id: number;
+        classId: number;
+        name: string;
+        isWall: boolean;
+        posX: number;
+        posY: number;
+        posZ: number;
+        rot: number;
+        state: number;
+        imageSrc?: string;
+    } | null>(null);
     const [ inspectedUser, setInspectedUser ] = useState<{ id: number; name: string; figure: string } | null>(null);
 
     // Tab 4: Settings
@@ -87,34 +189,83 @@ export const WiredCreatorToolsView: FC<{}> = () =>
 
     useRoomEngineEvent<RoomEngineObjectEvent>(RoomEngineObjectEvent.SELECTED, event =>
     {
-        if(activeTab !== 'inspect') return;
+        if(!isWiredCreatorToolsVisible || activeTab !== 'inspect') return;
+        if(keepSelected && (inspectedFurni || inspectedUser)) return;
 
-        if((event.category === RoomObjectCategory.FLOOR) || (event.category === RoomObjectCategory.WALL))
+        try
         {
-            const furniData = GetFurnitureDataForRoomObject(GetRoomSession()?.roomId, event.objectId, event.category);
-            if(furniData)
+            const session = GetRoomSession();
+            if(!session) return;
+
+            if((event.category === RoomObjectCategory.FLOOR) || (event.category === RoomObjectCategory.WALL))
             {
+                const roomObject = GetRoomEngine().getRoomObject(session.roomId, event.objectId, event.category);
+                const furniData = GetFurnitureDataForRoomObject(session.roomId, event.objectId, event.category);
+
+                let posX = 0;
+                let posY = 0;
+                let posZ = 0;
+                let rot = 0;
+                let state = 0;
+                let imageSrc: string = null;
+
+                if(roomObject)
+                {
+                    const loc = roomObject.getLocation();
+                    if(loc)
+                    {
+                        posX = Math.round(loc.x);
+                        posY = Math.round(loc.y);
+                        posZ = Math.round(loc.z * 100) / 100;
+                    }
+                    const dir = roomObject.getDirection();
+                    if(dir) rot = Math.round(dir.x);
+
+                    const furniState = roomObject.model?.getValue<number>(RoomObjectVariable.FURNITURE_DATA);
+                    if(furniState !== undefined && furniState !== null) state = furniState;
+                }
+
+                try
+                {
+                    const roomObjectImage = GetRoomEngine().getRoomObjectImage(session.roomId, event.objectId, event.category, new Vector3d(180), 64, null);
+                    if(roomObjectImage && roomObjectImage.getImage())
+                    {
+                        imageSrc = roomObjectImage.getImage().src;
+                    }
+                }
+                catch(e) {}
+
                 setInspectedFurni({
                     id: event.objectId,
-                    classId: furniData.id,
-                    name: furniData.name || 'Furni',
-                    isWall: event.category === RoomObjectCategory.WALL
+                    classId: furniData?.id || event.objectId,
+                    name: furniData?.name || 'Furni',
+                    isWall: event.category === RoomObjectCategory.WALL,
+                    posX,
+                    posY,
+                    posZ,
+                    rot,
+                    state,
+                    imageSrc
                 });
                 setHolderType('furni');
             }
-        }
-        else if(event.category === RoomObjectCategory.UNIT)
-        {
-            const userData = GetRoomSession()?.userDataManager?.getUserDataByIndex(event.objectId);
-            if(userData)
+            else if(event.category === RoomObjectCategory.UNIT)
             {
-                setInspectedUser({
-                    id: userData.webID,
-                    name: userData.name,
-                    figure: userData.figure
-                });
-                setHolderType('user');
+                const userData = session.userDataManager?.getUserDataByIndex(event.objectId);
+                if(userData && (userData.type === RoomObjectType.USER))
+                {
+                    setInspectedUser({
+                        id: userData.webID,
+                        name: userData.name || 'Usuario',
+                        figure: userData.figure || ''
+                    });
+                    setHolderType('user');
+                }
             }
+        }
+        catch(err)
+        {
+            console.error('Error during inspect selection:', err);
         }
     });
 
@@ -286,28 +437,28 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                     onClick={ () => { setVarType('furni'); setSelectedVarIndex(0); } }
                                     title="Variables de furni"
                                 >
-                                    <FaChair />
+                                    <img src={ IconScopeFurni } alt="Furni" className="creator-scope-icon-img" />
                                 </button>
                                 <button
                                     className={ `wired-type-icon-btn ${ varType === 'user' ? 'active' : '' }` }
                                     onClick={ () => { setVarType('user'); setSelectedVarIndex(0); } }
                                     title="Variables de usuario"
                                 >
-                                    <FaUser />
+                                    <img src={ IconScopeUser } alt="Usuario" className="creator-scope-icon-img" />
                                 </button>
                                 <button
                                     className={ `wired-type-icon-btn ${ varType === 'global' ? 'active' : '' }` }
                                     onClick={ () => { setVarType('global'); setSelectedVarIndex(0); } }
                                     title="Variables globales"
                                 >
-                                    <FaGlobeAmericas />
+                                    <img src={ IconScopeGlobal } alt="Global" className="creator-scope-icon-img" />
                                 </button>
                                 <button
                                     className={ `wired-type-icon-btn ${ varType === 'context' ? 'active' : '' }` }
                                     onClick={ () => { setVarType('context'); setSelectedVarIndex(0); } }
                                     title="Variables de contexto"
                                 >
-                                    <FaPlug />
+                                    <img src={ IconScopeContext } alt="Contexto" className="creator-scope-icon-img" />
                                 </button>
                             </Flex>
 
@@ -390,7 +541,7 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td colSpan={ 2 } className="text-center text-muted py-3">
+                                            <td colSpan={ 2 } className="text-center py-3" style={{ fontSize: '13px', color: '#475569' }}>
                                                 Nada que mostrar
                                             </td>
                                         </tr>
@@ -412,21 +563,21 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                     onClick={ () => setHolderType('furni') }
                                     title="Furni"
                                 >
-                                    <FaChair />
+                                    <img src={ IconScopeFurni } alt="Furni" className="creator-scope-icon-img" />
                                 </button>
                                 <button
                                     className={ `wired-type-icon-btn ${ holderType === 'user' ? 'active' : '' }` }
                                     onClick={ () => setHolderType('user') }
                                     title="Usuario"
                                 >
-                                    <FaUser />
+                                    <img src={ IconScopeUser } alt="Usuario" className="creator-scope-icon-img" />
                                 </button>
                                 <button
                                     className={ `wired-type-icon-btn ${ holderType === 'global' ? 'active' : '' }` }
                                     onClick={ () => setHolderType('global') }
                                     title="Global"
                                 >
-                                    <FaGlobeAmericas />
+                                    <img src={ IconScopeGlobal } alt="Global" className="creator-scope-icon-img" />
                                 </button>
                             </Flex>
 
@@ -436,17 +587,21 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                     { (holderType === 'furni') && (
                                         inspectedFurni ? (
                                             <div className="text-center d-flex flex-column align-items-center justify-content-center">
-                                                <LayoutFurniImageView
-                                                    productType={ inspectedFurni.isWall ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR }
-                                                    productClassId={ inspectedFurni.classId }
-                                                    className="mb-2"
-                                                />
+                                                { inspectedFurni.imageSrc ? (
+                                                    <img src={ inspectedFurni.imageSrc } alt="" className="mb-2" style={{ maxHeight: '80px', objectFit: 'contain' }} />
+                                                ) : (
+                                                    <LayoutFurniImageView
+                                                        productType={ inspectedFurni.isWall ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR }
+                                                        productClassId={ inspectedFurni.classId }
+                                                        className="mb-2"
+                                                    />
+                                                ) }
                                                 <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937' }}>
                                                     { inspectedFurni.name } (#{ inspectedFurni.classId })
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span className="text-muted" style={{ fontSize: '13px' }}>
+                                            <span style={{ fontSize: '13px', color: '#334155', fontWeight: 500 }}>
                                                 Selecciona un furni para inspeccionarlo
                                             </span>
                                         )
@@ -465,7 +620,7 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span className="text-muted" style={{ fontSize: '13px' }}>
+                                            <span style={{ fontSize: '13px', color: '#334155', fontWeight: 500 }}>
                                                 Selecciona un usuario para inspeccionarlo
                                             </span>
                                         )
@@ -473,7 +628,7 @@ export const WiredCreatorToolsView: FC<{}> = () =>
 
                                     { (holderType === 'global') && (
                                         <div className="text-center d-flex flex-column align-items-center justify-content-center">
-                                            <FaGlobeAmericas style={{ fontSize: '36px', color: '#38bdf8' }} className="mb-2" />
+                                            <img src={ IconScopeGlobal } alt="Global" style={{ width: '36px', height: '36px', objectFit: 'contain', imageRendering: 'pixelated' }} className="mb-2" />
                                             <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937' }}>
                                                 Sala / Global
                                             </span>
@@ -507,16 +662,16 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                                     <tr><td className="fw-semibold">@id</td><td>{ inspectedFurni.id }</td></tr>
                                                     <tr><td className="fw-semibold">@class_id</td><td>{ inspectedFurni.classId }</td></tr>
                                                     <tr><td className="fw-semibold">@height</td><td>100</td></tr>
-                                                    <tr><td className="fw-semibold">@state</td><td>0</td></tr>
-                                                    <tr><td className="fw-semibold">@position.x</td><td>44</td></tr>
-                                                    <tr><td className="fw-semibold">@position.y</td><td>51</td></tr>
-                                                    <tr><td className="fw-semibold">@rotation</td><td>0</td></tr>
-                                                    <tr><td className="fw-semibold">@altitude</td><td>0</td></tr>
+                                                    <tr><td className="fw-semibold">@state</td><td>{ inspectedFurni.state ?? 0 }</td></tr>
+                                                    <tr><td className="fw-semibold">@position_x</td><td>{ inspectedFurni.posX ?? 0 }</td></tr>
+                                                    <tr><td className="fw-semibold">@position_y</td><td>{ inspectedFurni.posY ?? 0 }</td></tr>
+                                                    <tr><td className="fw-semibold">@rotation</td><td>{ inspectedFurni.rot ?? 0 }</td></tr>
+                                                    <tr><td className="fw-semibold">@altitude</td><td>{ inspectedFurni.posZ ?? 0 }</td></tr>
                                                     <tr><td className="fw-semibold">@type</td><td>0 (Normal)</td></tr>
                                                 </>
                                             ) : (
                                                 <tr>
-                                                    <td colSpan={ 2 } className="text-center text-muted py-4" style={{ fontSize: '13px' }}>
+                                                    <td colSpan={ 2 } className="text-center py-4" style={{ fontSize: '13px', color: '#475569' }}>
                                                         Nada que mostrar
                                                     </td>
                                                 </tr>
@@ -533,7 +688,7 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                                                 </>
                                             ) : (
                                                 <tr>
-                                                    <td colSpan={ 2 } className="text-center text-muted py-4" style={{ fontSize: '13px' }}>
+                                                    <td colSpan={ 2 } className="text-center py-4" style={{ fontSize: '13px', color: '#475569' }}>
                                                         Nada que mostrar
                                                     </td>
                                                 </tr>
@@ -663,5 +818,14 @@ export const WiredCreatorToolsView: FC<{}> = () =>
                 ) }
             </NitroCardContentView>
         </NitroCardView>
+    );
+};
+
+export const WiredCreatorToolsView: FC<{}> = () =>
+{
+    return (
+        <WiredCreatorToolsErrorBoundary>
+            <WiredCreatorToolsViewContent />
+        </WiredCreatorToolsErrorBoundary>
     );
 };

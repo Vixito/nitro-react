@@ -52,8 +52,10 @@ const useGameCenterState = () =>
     {
         let parser = event.getParser();
 
-        if(!parser) return;
+        if(!parser || !parser.url) return;
 
+        setIsVisible(false);
+        setIsSnowStormLobbyVisible(false);
         setGameURL(parser.url);
     });
 

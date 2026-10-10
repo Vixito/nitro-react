@@ -33,12 +33,12 @@ const COMPARISONS = [
 
 export const WiredConditionVariableValueMatchView: FC<{}> = props =>
 {
-    const [ variableName, setVariableName ] = useState('Monedas De Oro');
-    const [ scope, setScope ] = useState<number>(1);
+    const [ variableName, setVariableName ] = useState('@state');
+    const [ scope, setScope ] = useState<number>(2);
     const [ comparison, setComparison ] = useState<number>(0);
     const [ refMode, setRefMode ] = useState<number>(0); // 0: Direct value, 1: From variable
     const [ targetValue, setTargetValue ] = useState<number>(0);
-    const [ refVariableName, setRefVariableName ] = useState('Galletas');
+    const [ refVariableName, setRefVariableName ] = useState('@room_id');
     const [ refScope, setRefScope ] = useState<number>(0);
     const [ matchAll, setMatchAll ] = useState<boolean>(true);
     const [ sourceIndex, setSourceIndex ] = useState<number>(0);
@@ -56,12 +56,12 @@ export const WiredConditionVariableValueMatchView: FC<{}> = props =>
     {
         if(!trigger) return;
 
-        const rawStr = trigger.stringData || 'Monedas De Oro';
+        const rawStr = trigger.stringData || '@state';
         if(rawStr.includes('|'))
         {
             const parts = rawStr.split('|');
-            setVariableName(parts[0] || 'Monedas De Oro');
-            setRefVariableName(parts[1] || 'Galletas');
+            setVariableName(parts[0] || '@state');
+            setRefVariableName(parts[1] || '@room_id');
         }
         else
         {

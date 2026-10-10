@@ -6,6 +6,11 @@ import { defineConfig } from 'vite';
 export default defineConfig({
     base: '/game/',
     plugins: [ react() ],
+    server: {
+        host: '0.0.0.0',
+        port: 5155,
+        strictPort: true
+    },
 
     resolve: {
         alias: {

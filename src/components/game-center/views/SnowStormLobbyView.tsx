@@ -58,7 +58,6 @@ export const SnowStormLobbyView: FC<{}> = () => {
 
         setIsSnowStormLobbyVisible(false);
         setIsVisible(false);
-        setGameURL('/games/snowstorm/index.html');
     };
 
     const onHowToPlay = () => {
@@ -113,12 +112,12 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         width: '410px',
                         height: '527px',
                         backgroundImage: `url(${SnowStormLobbyImg})`,
-                        backgroundSize: '410px 527px',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
                         backgroundRepeat: 'no-repeat',
                         position: 'relative',
                         borderRadius: '6px',
                         boxShadow: '0 12px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.4)',
-                        imageRendering: 'pixelated',
                         userSelect: 'none',
                         overflow: 'hidden',
                         cursor: 'default'
@@ -399,7 +398,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                             <Text bold center style={{ fontSize: '13px' }}>
                                 Pack de +{selectedPack} partidas
                             </Text>
-                            <Text small center className="text-muted">
+                            <Text center style={{ fontSize: '13px', color: '#1e293b' }}>
                                 ¿Deseas adquirir este paquete de partidas por <strong className="text-dark">{packPrices[selectedPack]} créditos</strong>?
                             </Text>
                             <hr className="w-100 my-1 bg-secondary" />
@@ -497,23 +496,23 @@ export const SnowStormLobbyView: FC<{}> = () => {
                                         </tr>
                                         <tr>
                                             <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                <span className="text-muted fw-bold">4.</span>
+                                                <span className="fw-bold" style={{ color: '#64748b' }}>4.</span>
                                             </td>
                                             <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
                                                 Blizzard
                                             </td>
-                                            <td className="text-end text-muted" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                            <td className="text-end fw-semibold" style={{ padding: '6px 10px', verticalAlign: 'middle', color: '#64748b' }}>
                                                 840
                                             </td>
                                         </tr>
                                         <tr>
                                             <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                <span className="text-muted fw-bold">5.</span>
+                                                <span className="fw-bold" style={{ color: '#64748b' }}>5.</span>
                                             </td>
                                             <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
                                                 IceKing
                                             </td>
-                                            <td className="text-end text-muted" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
+                                            <td className="text-end fw-semibold" style={{ padding: '6px 10px', verticalAlign: 'middle', color: '#64748b' }}>
                                                 720
                                             </td>
                                         </tr>

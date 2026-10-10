@@ -162,16 +162,16 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                                 <i className="icon icon-zoom" style={{ transform: 'scale(0.85)' }}></i>
                                 <input type="text" className="w-100 border-0" style={{ outline: 'none', background: 'transparent', color: '#0f172a', fontSize: '13px' }} placeholder="Buscar comando o descripción..." value={ searchTerm } onChange={ handleSearch } />
                                 { searchTerm && (
-                                    <button onClick={ () => { setSearchTerm(''); filterCommands('', activeCategory); } } className="border-0 bg-transparent text-muted cursor-pointer px-1">✕</button>
+                                    <button onClick={ () => { setSearchTerm(''); filterCommands('', activeCategory); } } className="border-0 bg-transparent cursor-pointer px-1" style={{ color: '#475569', fontSize: '13px' }}>✕</button>
                                 ) }
                             </Flex>
                             { availableCategories.length > 1 && (
-                                <div className="d-flex flex-wrap gap-1" style={{ maxHeight: '65px', overflowY: 'auto' }}>
+                                <div className="d-flex flex-wrap gap-1" style={{ maxHeight: '75px', overflowY: 'auto' }}>
                                     <button 
                                         type="button"
                                         onClick={ () => handleCategoryClick('ALL') } 
-                                        className={`btn btn-xs px-2 py-1 rounded text-nowrap ${ activeCategory === 'ALL' ? 'btn-primary' : 'btn-outline-secondary' }`}
-                                        style={{ fontSize: '11px', fontWeight: activeCategory === 'ALL' ? 'bold' : 'normal' }}
+                                        className={`btn btn-sm px-2 py-1 rounded text-nowrap ${ activeCategory === 'ALL' ? 'btn-primary' : 'btn-outline-secondary' }`}
+                                        style={{ fontSize: '12.5px', fontWeight: activeCategory === 'ALL' ? 'bold' : 'normal' }}
                                     >
                                         Todas ({ availableCategories.length })
                                     </button>
@@ -180,8 +180,8 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                                             key={ idx } 
                                             type="button"
                                             onClick={ () => handleCategoryClick(cat) } 
-                                            className={`btn btn-xs px-2 py-1 rounded text-nowrap ${ activeCategory === cat ? 'btn-primary' : 'btn-outline-secondary' }`}
-                                            style={{ fontSize: '11px', fontWeight: activeCategory === cat ? 'bold' : 'normal' }}
+                                            className={`btn btn-sm px-2 py-1 rounded text-nowrap ${ activeCategory === cat ? 'btn-primary' : 'btn-outline-secondary' }`}
+                                            style={{ fontSize: '12.5px', fontWeight: activeCategory === cat ? 'bold' : 'normal' }}
                                         >
                                             { cat }
                                         </button>

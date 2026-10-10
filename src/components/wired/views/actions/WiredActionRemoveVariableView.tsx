@@ -14,8 +14,8 @@ const SOURCE_OPTIONS = [
 
 export const WiredActionRemoveVariableView: FC<{}> = props =>
 {
-    const [ variableName, setVariableName ] = useState('Punto De Control');
-    const [ scope, setScope ] = useState<number>(1); // 2: Furni, 1: User, 3: Context
+    const [ variableName, setVariableName ] = useState('@state');
+    const [ scope, setScope ] = useState<number>(2); // 2: Furni, 1: User, 3: Context
     const [ sourceIndex, setSourceIndex ] = useState<number>(0);
     const { trigger = null, setStringParam = null, setIntParams = null } = useWired();
 
@@ -29,7 +29,7 @@ export const WiredActionRemoveVariableView: FC<{}> = props =>
     {
         if(!trigger) return;
 
-        setVariableName(trigger.stringData || 'Punto De Control');
+        setVariableName(trigger.stringData || '@state');
 
         if(trigger.intData && trigger.intData.length >= 1)
         {

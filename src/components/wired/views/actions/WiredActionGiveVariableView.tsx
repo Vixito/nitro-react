@@ -15,8 +15,8 @@ const TARGET_OPTIONS = [
 
 export const WiredActionGiveVariableView: FC<{}> = props =>
 {
-    const [ variableName, setVariableName ] = useState('Punto De Control');
-    const [ scope, setScope ] = useState<number>(1); // 2: Furni, 1: User, 3: Context
+    const [ variableName, setVariableName ] = useState('@state');
+    const [ scope, setScope ] = useState<number>(2); // 2: Furni, 1: User, 3: Context
     const [ initialValue, setInitialValue ] = useState<number>(0);
     const [ hasValue, setHasValue ] = useState<number>(1);
     const [ overwrite, setOverwrite ] = useState<boolean>(true);
@@ -34,7 +34,7 @@ export const WiredActionGiveVariableView: FC<{}> = props =>
     {
         if(!trigger) return;
 
-        setVariableName(trigger.stringData || 'Punto De Control');
+        setVariableName(trigger.stringData || '@state');
 
         if(trigger.intData && trigger.intData.length >= 5)
         {

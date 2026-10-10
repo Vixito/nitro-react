@@ -32,30 +32,66 @@ const encodeHTML = (str: string) =>
         .replace(/'/g, '&#039;');
 }
 
-const EMOTICON_MAP: [RegExp, string][] = [
-    [/(^|\s):\)(?=\s|$)/g, '$1😊'],
-    [/(^|\s):-\)(?=\s|$)/g, '$1😊'],
-    [/(^|\s):D(?=\s|$)/g, '$1😃'],
-    [/(^|\s):-D(?=\s|$)/g, '$1😃'],
-    [/(^|\s):\((?=\s|$)/g, '$1🙁'],
-    [/(^|\s):-\((?=\s|$)/g, '$1🙁'],
-    [/(^|\s):[pP](?=\s|$)/g, '$1😛'],
-    [/(^|\s):-[pP](?=\s|$)/g, '$1😛'],
-    [/(^|\s);[)\/](?=\s|$)/g, '$1😉'],
-    [/(^|\s);-\)(?=\s|$)/g, '$1😉'],
-    [/(^|\s):[oO](?=\s|$)/g, '$1😮'],
-    [/(^|\s):-[oO](?=\s|$)/g, '$1😮'],
-    [/(^|\s)&lt;3(?=\s|$)/g, '$1❤️'],
-    [/(^|\s)\(heart\)(?=\s|$)/gi, '$1❤️'],
-    [/(^|\s)\(skull\)(?=\s|$)/gi, '$1💀'],
-    [/(^|\s)\(fire\)(?=\s|$)/gi, '$1🔥'],
-    [/(^|\s)\(star\)(?=\s|$)/gi, '$1⭐'],
-    [/(^|\s)\(thumbsup\)(?=\s|$)/gi, '$1👍'],
-    [/(^|\s)\(thumbsdown\)(?=\s|$)/gi, '$1👎'],
-    [/(^|\s)\(poop\)(?=\s|$)/gi, '$1💩'],
-    [/(^|\s)\(crown\)(?=\s|$)/gi, '$1👑'],
-    [/(^|\s)\(diamond\)(?=\s|$)/gi, '$1💎']
+// Whitelist of trusted GIF/image hosting domains to prevent XSS, SSRF, IP grabbers and malicious links
+const ALLOWED_GIF_DOMAINS = [
+    'giphy.com',
+    'media.giphy.com',
+    'i.giphy.com',
+    'tenor.com',
+    'media.tenor.com',
+    'c.tenor.com',
+    'imgur.com',
+    'i.imgur.com',
+    'cdn.discordapp.com',
+    'media.discordapp.net'
 ];
+
+export const isSafeGifUrl = (urlStr: string): boolean =>
+{
+    try
+    {
+        const parsed = new URL(urlStr);
+        if(parsed.protocol !== 'https:') return false;
+        if(parsed.username || parsed.password || parsed.port) return false;
+
+        const hostname = parsed.hostname.toLowerCase();
+        const isAllowed = ALLOWED_GIF_DOMAINS.some(domain => 
+            hostname === domain || hostname.endsWith('.' + domain)
+        );
+
+        if(!isAllowed) return false;
+        if(/["'<>\\;]/.test(parsed.pathname) || /["'<>\\;]/.test(parsed.search)) return false;
+
+        return true;
+    }
+    catch
+    {
+        return false;
+    }
+};
+
+export const EMOJI_COMMAND_MAP: Record<string, string> = {
+    '1': '😀', 'sonrisa': '😀', 'feliz': '😀',
+    '2': '😂', 'risa': '😂', 'jaja': '😂', 'lol': '😂',
+    '3': '❤️', 'corazon': '❤️', 'love': '❤️',
+    '4': '🔥', 'fuego': '🔥', 'fire': '🔥',
+    '5': '👍', 'megusta': '👍', 'like': '👍', 'pulgar': '👍',
+    '6': '👎', 'nomegusta': '👎', 'dislike': '👎',
+    '7': '💀', 'calavera': '💀', 'skull': '💀', 'rip': '💀',
+    '8': '👑', 'corona': '👑', 'crown': '👑',
+    '9': '⭐', 'estrella': '⭐', 'star': '⭐',
+    '10': '💎', 'diamante': '💎', 'diamond': '💎',
+    '11': '💩', 'caca': '💩', 'poop': '💩',
+    '12': '🎉', 'fiesta': '🎉', 'party': '🎉',
+    '13': '😎', 'gafas': '😎', 'cool': '😎',
+    '14': '😭', 'llanto': '😭', 'sad': '😭', 'triste': '😭',
+    '15': '😡', 'enojado': '😡', 'angry': '😡',
+    '16': '👏', 'aplausos': '👏', 'clap': '👏',
+    '17': '💯', '100': '💯',
+    '18': '👀', 'ojos': '👀', 'eyes': '👀',
+    '19': '🍕', 'pizza': '🍕',
+    '20': '☕', 'cafe': '☕', 'coffee': '☕'
+};
 
 export const RoomChatFormatter = (content: string) =>
 {
@@ -73,25 +109,29 @@ export const RoomChatFormatter = (content: string) =>
         .replace(/(&#60;|&lt;)\/u(&#62;|&gt;)/gi, '</u>')
         .replace(/\r\n|\n/g, '<br />');
 
-    // Parse [gif]url[/gif] BBCode
+    // Parse [gif]url[/gif] BBCode with strict domain whitelist
     content = content.replace(/\[gif\](https?:\/\/[^\s"'<]+)\[\/gif\]/gi, (match, url) =>
     {
         const cleanUrl = url.trim();
+        if(!isSafeGifUrl(cleanUrl)) return '[Enlace GIF no seguro o no permitido]';
         return `<span class="chat-gif-wrapper"><img class="chat-inline-gif" src="${ cleanUrl }" alt="GIF" loading="lazy" /></span>`;
     });
 
-    // Parse :gif url command
+    // Parse :gif url command with strict domain whitelist
     content = content.replace(/(^|\s):gif\s+(https?:\/\/[^\s"'<]+)/gi, (match, prefix, url) =>
     {
         const cleanUrl = url.trim();
+        if(!isSafeGifUrl(cleanUrl)) return `${ prefix }[Enlace GIF no seguro o no permitido]`;
         return `${ prefix }<span class="chat-gif-wrapper"><img class="chat-inline-gif" src="${ cleanUrl }" alt="GIF" loading="lazy" /></span>`;
     });
 
-    // Parse common emoticons to unicode emojis
-    for(const [ regex, emoji ] of EMOTICON_MAP)
+    // Parse explicit :emoji <numero o nombre> command only (preserves literal :) in chat)
+    content = content.replace(/(^|\s):emoji\s+([a-zA-Z0-9]+)/gi, (match, prefix, key) =>
     {
-        content = content.replace(regex, emoji);
-    }
+        const emoji = EMOJI_COMMAND_MAP[key.toLowerCase()];
+        if(emoji) return `${ prefix }${ emoji }`;
+        return match;
+    });
 
     if(content.startsWith('@') && content.indexOf('@', 1) > -1)
     {

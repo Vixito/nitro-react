@@ -31,7 +31,7 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread, group: M
                         <Flex key={ index } fullWidth gap={ 2 } justifyContent="start">
                             <Base className="w-100 text-break">
                                 { (chat.type === MessengerThreadChat.SECURITY_NOTIFICATION) &&
-                                    <Flex gap={ 2 } alignItems="center" className="bg-light rounded mb-2 px-2 py-1 small text-muted">
+                                    <Flex gap={ 2 } alignItems="center" className="bg-light rounded mb-2 px-2 py-1" style={{ fontSize: '12.5px', color: '#1e293b' }}>
                                         <Base className="nitro-friends-spritesheet icon-warning flex-shrink-0" />
                                         <Base>{ chat.message }</Base>
                                     </Flex> }

@@ -543,9 +543,17 @@
         align-items: center;
         gap: 14px;
 
+        .text-muted {
+            color: #64748b;
+        }
+
         &.completed {
             background: #f0fdf4;
             border-color: #86efac;
+
+            .text-muted {
+                color: #166534;
+            }
         }
     }
 
@@ -566,10 +574,54 @@
 
     .bp-dialog {
         background: #ffffff;
-        border: 2px solid #0f172a;
-        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
         padding: 20px 22px;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+    }
+
+    .bp-preview-dialog {
+        .bp-preview-box {
+            border: 2px solid var(--bp-primary, #ea580c) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            background: #f8fafc;
+        }
+
+        .bp-preview-amount-badge {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(15, 23, 42, 0.85);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(2px);
+        }
+
+        .bp-preview-claimed-badge {
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .bp-preview-locked-badge {
+            background: #f1f5f9;
+            color: #64748b;
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+    }
+
+    .bp-rank-pos-normal {
+        background: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
     }
 
     .bp-ranking-header-row {
@@ -718,7 +770,7 @@
             color: #cbd5e1 !important;
         }
         .text-muted {
-            color: #94a3b8 !important;
+            color: #cbd5e1 !important;
         }
         .border-bottom {
             border-color: rgba(255, 255, 255, 0.12) !important;
@@ -778,6 +830,10 @@
             &:hover {
                 background: #141d2e;
                 border-color: rgba(255, 255, 255, 0.25);
+            }
+
+            .text-muted {
+                color: #cbd5e1 !important;
             }
         }
         .bp-missions-horizontal-track {
@@ -867,6 +923,10 @@
                 background: #1e293b;
                 border-color: rgba(255, 255, 255, 0.15);
             }
+
+            .text-muted {
+                color: #cbd5e1 !important;
+            }
         }
 
         .form-control {
@@ -890,9 +950,17 @@
             background: #0f172a;
             border-color: rgba(255, 255, 255, 0.12);
 
+            .text-muted {
+                color: #cbd5e1 !important;
+            }
+
             &.completed {
                 background: #064e3b;
                 border-color: rgba(34, 197, 94, 0.4);
+
+                .text-muted {
+                    color: #bbf7d0 !important;
+                }
             }
 
             .progress {
@@ -919,6 +987,36 @@
                     opacity: 1;
                 }
             }
+        }
+
+        .bp-preview-dialog {
+            .bp-preview-box {
+                background: #0f172a;
+                border-color: var(--bp-primary, #ea580c) !important;
+            }
+
+            .bp-preview-amount-badge {
+                background: rgba(15, 23, 42, 0.9);
+                border-color: rgba(255, 255, 255, 0.25);
+            }
+
+            .bp-preview-claimed-badge {
+                background: #0f172a;
+                color: #94a3b8;
+                border-color: rgba(255, 255, 255, 0.12);
+            }
+
+            .bp-preview-locked-badge {
+                background: #0f172a;
+                color: #94a3b8;
+                border-color: rgba(255, 255, 255, 0.12);
+            }
+        }
+
+        .bp-rank-pos-normal {
+            background: #1e293b !important;
+            color: #cbd5e1 !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
         }
 
         .bp-ranking-header-row {
