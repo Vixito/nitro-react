@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habbten Fast Food</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #08111e;
+            font-family: 'Ubuntu', sans-serif;
+            color: #fff;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top, #38bdf8 0%, #0369a1 60%, #0c4a6e 100%);
+        }
+
+        canvas {
+            max-width: 100vw;
+            max-height: 100vh;
+            width: auto;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            background: transparent;
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            display: block;
+        }
+
+        /* === HUD SUPERIOR (DURANTE EL JUEGO) === */
+        .hud-overlay {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .score-box {
+            font-size: 18px;
+            font-weight: 900;
+            color: #facc15;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .altitude-box {
+            font-size: 15px;
+            font-weight: bold;
+            color: #38bdf8;
+            font-family: 'Press Start 2P', monospace;
+        }
+
+        .btn-hud {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-hud:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-hud-danger {
+            background: #be123c;
+            border-color: #9f1239;
+        }
+
+        .btn-hud-danger:hover {
+            background: #e11d48;
+        }
+
+        .btn-hud-test {
+            background: #d97706;
+            border-color: #b45309;
+        }
+
+        .btn-hud-test:hover {
+            background: #f59e0b;
+        }
+
+        /* === ETAPA 1 Y 3: MODALES (ANTES Y POST JUEGO) === */
+        .modal-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 13, 26, 0.88);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            border: 2px solid rgba(56, 189, 248, 0.4);
+            border-radius: 12px;
+            padding: 24px 32px;
+            max-width: 540px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+        }
+
+        .btn-habbten-play {
+            background: #15803d;
+            color: #ffffff;
+            border: 1px solid #166534;
+            border-radius: 6px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            padding: 10px 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbten-play:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-habbten-play:active {
+            background: #14532d;
+            transform: translateY(1px);
+        }
+
+        .btn-habbten-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbten-back:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .results-score-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0 20px 0;
+            gap: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-val {
+            font-size: 16px;
+            font-weight: 900;
+            color: #facc15;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- Canvas de Salto y Caída Libre -->
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+        <!-- HUD Durante el Juego -->
+        <div class="hud-overlay" id="hudOverlay" style="display: none;">
+            <div class="hud-panel">
+                <span style="color: #cbd5e1; font-weight: 800; font-size: 13px;">PUNTOS:</span>
+                <span id="scoreDisplay" class="score-box">0</span>
+            </div>
+
+            <div class="hud-panel">
+                <span style="color: #cbd5e1; font-weight: 800; font-size: 13px;">ALTITUD:</span>
+                <span id="altitudeDisplay" class="altitude-box">1000m</span>
+            </div>
+
+            <div class="hud-panel">
+                <button id="btnParachute" class="btn-hud">[Espacio] Paracaídas: CERRADO</button>
+                <button id="btnLandEarly" class="btn-hud btn-hud-test" title="Probar aterrizaje y post-juego de inmediato">⚡ Aterrizar</button>
+                <button id="btnExit" class="btn-hud btn-hud-danger">✕ Salir al Hotel</button>
+            </div>
+        </div>
+
+        <!-- ETAPA 1: ANTES DEL JUEGO (Briefing / Instrucciones) -->
+        <div id="startModal" class="modal-screen">
+            <div class="modal-card">
+                <img src="./assets/basejump_logo.png" alt="Habbten Fast Food"
+                    style="max-width: 240px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+                
+                <p>¡Bienvenido a <b>Habbten Fast Food</b>! Entrega los pedidos de comida rápida del hotel en caída libre. Usa <b>A / D o Flechas Izq/Der</b> para maniobrar, pulsa <b>Espacio</b> para abrir o cerrar el paracaídas y recoge todas las hamburguesas, patatas y refrescos de Habbten esquivando los obstáculos.</p>
+                
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button id="btnStartGame" class="btn-habbten-play">¡LANZARSE AL VACÍO!</button>
+                    <button id="btnExitModal" class="btn-habbten-back">Volver al Hotel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 3: POST / DESPUÉS DEL JUEGO (Resultados de Entrega) -->
+        <div id="resultsModal" class="modal-screen" style="display: none;">
+            <div class="modal-card">
+                <h2 id="resultTitle" style="font-size: 22px; font-weight: 900; margin-bottom: 4px; color: #facc15;">¡ENTREGA COMPLETADA!</h2>
+                <div id="resultSubtitle" style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">Puntuación de la misión</div>
+
+                <div class="results-score-row">
+                    <span style="font-size: 14px; font-weight: 800; color: #94a3b8;">PUNTOS TOTALES:</span>
+                    <span id="finalScoreDisplay" style="font-size: 28px; font-weight: 900; color: #facc15; font-family: 'Press Start 2P', monospace;">0</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div>Comida Recogida</div>
+                        <div id="statItems" class="stat-val">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Obstáculos Evitados</div>
+                        <div id="statDodged" class="stat-val">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Aterrizaje</div>
+                        <div id="statLanding" class="stat-val" style="color: #4ade80;">PERFECTO</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button id="btnPlayAgain" class="btn-habbten-play">JUGAR OTRA VEZ</button>
+                    <button id="btnExitResults" class="btn-habbten-back">Volver al Hotel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Sintetizador de audio retro Habbten
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'coin') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(820, now);
+                    osc.frequency.setValueAtTime(1250, now + 0.08);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.linearRampToValueAtTime(45, now + 0.2);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'chute') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(640, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'land') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(880, now + 0.15);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch(e) {}
+        }
+
+        // Estado del Juego
+        let isPlaying = false;
+        let score = 0;
+        let altitude = 1000;
+        let speed = 4;
+        let itemsCollected = 0;
+        let obstaclesDodged = 0;
+
+        const player = {
+            x: 480,
+            y: 190,
+            vx: 0,
+            width: 36,
+            height: 52,
+            parachute: false,
+            frame: 0
+        };
+
+        const clouds = [];
+        for (let i = 0; i < 10; i++) {
+            clouds.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 50 + 35,
+                speedMult: Math.random() * 0.4 + 0.8
+            });
+        }
+
+        let items = [];
+        let obstacles = [];
+        let particles = [];
+        let popups = [];
+
+        // Controles de teclado
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.code === 'Space') {
+                e.preventDefault();
+                toggleParachute();
+            }
+        });
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        function toggleParachute() {
+            if (!isPlaying) return;
+            player.parachute = !player.parachute;
+            playSound('chute');
+            const btn = document.getElementById('btnParachute');
+            btn.innerText = `[Espacio] Paracaídas: ${player.parachute ? 'ABIERTO' : 'CERRADO'}`;
+            btn.style.background = player.parachute ? '#15803d' : '#334155';
+        }
+
+        function spawnEntity() {
+            // Spawns regulares de comida de Habbten
+            if (Math.random() < 0.055) {
+                const types = ['burger', 'drink', 'fries', 'pizza'];
+                const selected = types[Math.floor(Math.random() * types.length)];
+                items.push({
+                    x: Math.random() * (canvas.width - 120) + 60,
+                    y: canvas.height + 25,
+                    type: selected,
+                    size: 26
+                });
+            }
+
+            // Spawns de obstáculos (pájaros y nubes eléctricas)
+            if (Math.random() < 0.04) {
+                obstacles.push({
+                    x: Math.random() * (canvas.width - 120) + 60,
+                    y: canvas.height + 25,
+                    type: Math.random() < 0.6 ? 'bird' : 'storm',
+                    vx: (Math.random() - 0.5) * 3.5,
+                    size: 28
+                });
+            }
+        }
+
+        function addPopup(x, y, text, color) {
+            popups.push({ x: x, y: y, text: text, color: color, life: 30 });
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            // Velocidad según paracaídas
+            speed = player.parachute ? 3.4 : 7.2;
+            altitude -= speed * 0.16;
+            document.getElementById('altitudeDisplay').innerText = Math.max(0, Math.floor(altitude)) + 'm';
+
+            // Aterrizaje al llegar a 0m
+            if (altitude <= 0) {
+                endMatch(player.parachute);
+                return;
+            }
+
+            // Movimiento lateral
+            if (keys['a'] || keys['arrowleft']) player.vx = -5.8;
+            else if (keys['d'] || keys['arrowright']) player.vx = 5.8;
+            else player.vx *= 0.85;
+
+            player.x += player.vx;
+            if (player.x < 50) player.x = 50;
+            if (player.x > canvas.width - 50) player.x = canvas.width - 50;
+
+            // Nubes en movimiento ascendente
+            clouds.forEach(c => {
+                c.y -= speed * c.speedMult;
+                if (c.y < -100) {
+                    c.y = canvas.height + 100;
+                    c.x = Math.random() * canvas.width;
+                }
+            });
+
+            spawnEntity();
+
+            // Actualización de Ítems de comida Habbten
+            for (let i = items.length - 1; i >= 0; i--) {
+                const item = items[i];
+                item.y -= speed;
+
+                if (Math.hypot(item.x - player.x, item.y - player.y) < player.width / 2 + item.size / 2 + 10) {
+                    let pts = 50;
+                    if (item.type === 'fries') pts = 75;
+                    if (item.type === 'pizza') pts = 100;
+
+                    score += pts;
+                    itemsCollected++;
+                    document.getElementById('scoreDisplay').innerText = score;
+                    playSound('coin');
+                    addPopup(item.x, item.y, `+${pts}`, '#facc15');
+                    items.splice(i, 1);
+                    continue;
+                }
+
+                if (item.y < -60) items.splice(i, 1);
+            }
+
+            // Actualización de Obstáculos
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                obs.y -= speed;
+                obs.x += obs.vx;
+
+                if (Math.hypot(obs.x - player.x, obs.y - player.y) < player.width / 2 + obs.size / 2 + 6) {
+                    score = Math.max(0, score - 35);
+                    document.getElementById('scoreDisplay').innerText = score;
+                    playSound('hit');
+                    addPopup(obs.x, obs.y, '-35', '#f87171');
+                    obstacles.splice(i, 1);
+                    continue;
+                }
+
+                if (obs.y < -60) {
+                    obstaclesDodged++;
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            // Popups
+            for (let i = popups.length - 1; i >= 0; i--) {
+                const p = popups[i];
+                p.y -= 0.7;
+                p.life--;
+                if (p.life <= 0) popups.splice(i, 1);
+            }
+        }
+
+        // Renderizado del Avatar y Elementos Estilo Habbten
+        function drawPixelBurger(x, y, size) {
+            ctx.save();
+            ctx.translate(x - size/2, y - size/2);
+            // Pan superior
+            ctx.fillStyle = '#f59e0b';
+            ctx.fillRect(4, 2, size - 8, 8);
+            // Lechuga
+            ctx.fillStyle = '#22c55e';
+            ctx.fillRect(2, 10, size - 4, 3);
+            // Carne
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(3, 13, size - 6, 5);
+            // Queso
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(5, 18, size - 10, 2);
+            // Pan inferior
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(4, 20, size - 8, 4);
+            ctx.restore();
+        }
+
+        function drawPixelDrink(x, y, size) {
+            ctx.save();
+            ctx.translate(x - size/2, y - size/2);
+            // Vaso
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(6, 6, size - 12, size - 8);
+            // Tapa
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(4, 3, size - 8, 3);
+            // Pajita
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(size/2 + 1, 0, 3, 5);
+            ctx.restore();
+        }
+
+        function drawPixelFries(x, y, size) {
+            ctx.save();
+            ctx.translate(x - size/2, y - size/2);
+            // Caja
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(5, 8, size - 10, size - 10);
+            // Patatas
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(7, 2, 3, 8);
+            ctx.fillRect(11, 0, 3, 10);
+            ctx.fillRect(15, 3, 3, 7);
+            ctx.restore();
+        }
+
+        function drawPixelPizza(x, y, size) {
+            ctx.save();
+            ctx.translate(x - size/2, y - size/2);
+            // Porción triangular
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.moveTo(size/2, 2);
+            ctx.lineTo(size - 3, size - 4);
+            ctx.lineTo(3, size - 4);
+            ctx.closePath();
+            ctx.fill();
+            // Pepperoni
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(size/2 - 2, 8, 4, 4);
+            ctx.fillRect(size/2 - 5, 14, 4, 4);
+            ctx.fillRect(size/2 + 2, 13, 4, 4);
+            ctx.restore();
+        }
+
+        function drawPixelBird(x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.arc(-8, 0, 6, 0, Math.PI, true);
+            ctx.arc(8, 0, 6, 0, Math.PI, true);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Cielo Gradiente Dinámico (se oscurece con la altitud)
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            if (altitude > 400) {
+                skyGrad.addColorStop(0, '#0284c7');
+                skyGrad.addColorStop(1, '#0369a1');
+            } else {
+                skyGrad.addColorStop(0, '#38bdf8');
+                skyGrad.addColorStop(1, '#bae6fd');
+            }
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 2. Nubes flotantes
+            clouds.forEach(c => {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+                ctx.arc(c.x + c.size * 0.6, c.y - c.size * 0.2, c.size * 0.7, 0, Math.PI * 2);
+                ctx.arc(c.x - c.size * 0.6, c.y - c.size * 0.1, c.size * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // 3. Plataforma de Aterrizaje del Hotel (Aparece a < 100m)
+            if (altitude <= 100) {
+                const landingY = canvas.height - (100 - altitude) * 4;
+                ctx.fillStyle = '#15803d';
+                ctx.fillRect(0, landingY, canvas.width, canvas.height - landingY);
+
+                // Diana diana de aterrizaje
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.ellipse(canvas.width / 2, landingY + 30, 160, 40, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.ellipse(canvas.width / 2, landingY + 30, 110, 28, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#facc15';
+                ctx.beginPath();
+                ctx.ellipse(canvas.width / 2, landingY + 30, 50, 14, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 4. Ítems de comida
+            items.forEach(it => {
+                if (it.type === 'burger') drawPixelBurger(it.x, it.y, it.size);
+                else if (it.type === 'drink') drawPixelDrink(it.x, it.y, it.size);
+                else if (it.type === 'fries') drawPixelFries(it.x, it.y, it.size);
+                else if (it.type === 'pizza') drawPixelPizza(it.x, it.y, it.size);
+            });
+
+            // 5. Obstáculos
+            obstacles.forEach(obs => {
+                if (obs.type === 'bird') {
+                    drawPixelBird(obs.x, obs.y, obs.size);
+                } else {
+                    ctx.fillStyle = '#475569';
+                    ctx.beginPath();
+                    ctx.arc(obs.x, obs.y, obs.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // 6. Personaje Habbten en Paracaídas
+            const px = player.x;
+            const py = player.y;
+
+            if (player.parachute) {
+                // Campana del paracaídas
+                ctx.save();
+                const chuteY = py - 65;
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(px, chuteY, 44, Math.PI, 0);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(px, chuteY, 24, Math.PI, 0);
+                ctx.fill();
+
+                // Cuerdas
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(px - 40, chuteY);
+                ctx.lineTo(px - 10, py - 20);
+                ctx.moveTo(px + 40, chuteY);
+                ctx.lineTo(px + 10, py - 20);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Cuerpo del personaje Habbten
+            ctx.save();
+            // Mochila de paracaídas
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(px - 14, py - 18, 28, 24);
+
+            // Cabeza Habbten
+            ctx.fillStyle = '#fed7aa';
+            ctx.fillRect(px - 10, py - 32, 20, 16);
+
+            // Pelo
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(px - 11, py - 36, 22, 8);
+
+            // Ropa Habbten
+            ctx.fillStyle = '#0284c7';
+            ctx.fillRect(px - 12, py - 16, 24, 22);
+
+            // Piernas
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(px - 10, py + 6, 8, 16);
+            ctx.fillRect(px + 2, py + 6, 8, 16);
+            ctx.restore();
+
+            // 7. Popups
+            popups.forEach(p => {
+                ctx.font = '900 13px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = p.color;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Controladores de etapas
+        document.getElementById('btnStartGame').addEventListener('click', () => {
+            document.getElementById('startModal').style.display = 'none';
+            document.getElementById('hudOverlay').style.display = 'flex';
+            startMatch();
+        });
+
+        document.getElementById('btnPlayAgain').addEventListener('click', () => {
+            document.getElementById('resultsModal').style.display = 'none';
+            document.getElementById('hudOverlay').style.display = 'flex';
+            startMatch();
+        });
+
+        function startMatch() {
+            isPlaying = true;
+            score = 0;
+            altitude = 1000;
+            itemsCollected = 0;
+            obstaclesDodged = 0;
+            items = [];
+            obstacles = [];
+            popups = [];
+            player.x = 480;
+            player.vx = 0;
+            player.parachute = false;
+
+            document.getElementById('scoreDisplay').innerText = '0';
+            document.getElementById('altitudeDisplay').innerText = '1000m';
+            const btn = document.getElementById('btnParachute');
+            btn.innerText = '[Espacio] Paracaídas: CERRADO';
+            btn.style.background = '#334155';
+        }
+
+        function endMatch(safeLanding) {
+            isPlaying = false;
+            playSound(safeLanding ? 'land' : 'hit');
+
+            if (safeLanding) {
+                score += 200; // Bonus por aterrizaje perfecto
+            }
+
+            document.getElementById('hudOverlay').style.display = 'none';
+            document.getElementById('finalScoreDisplay').innerText = score;
+            document.getElementById('statItems').innerText = itemsCollected;
+            document.getElementById('statDodged').innerText = obstaclesDodged;
+
+            const landingStat = document.getElementById('statLanding');
+            const resultTitle = document.getElementById('resultTitle');
+            if (safeLanding) {
+                landingStat.innerText = 'PERFECTO (+200)';
+                landingStat.style.color = '#4ade80';
+                resultTitle.innerText = '¡ATERRIZAJE PERFECTO!';
+                resultTitle.style.color = '#4ade80';
+            } else {
+                landingStat.innerText = 'FORZADO';
+                landingStat.style.color = '#f87171';
+                resultTitle.innerText = '¡ATERRIZAJE BRUSCO!';
+                resultTitle.style.color = '#f87171';
+            }
+
+            document.getElementById('resultsModal').style.display = 'flex';
+        }
+
+        document.getElementById('btnLandEarly').addEventListener('click', () => {
+            altitude = 1;
+            endMatch(true);
+        });
+
+        document.getElementById('btnParachute').addEventListener('click', toggleParachute);
+
+        function exitToHotel() {
+            isPlaying = false;
+            window.parent.postMessage('EXIT_GAME', '*');
+        }
+
+        document.getElementById('btnExit').addEventListener('click', exitToHotel);
+        document.getElementById('btnExitModal').addEventListener('click', exitToHotel);
+        document.getElementById('btnExitResults').addEventListener('click', exitToHotel);
+
+        gameLoop();
+    </script>
+</body>
+
+</html>

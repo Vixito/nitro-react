@@ -1,15 +1,25 @@
-import { FC, useEffect } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FC, useEffect, useState } from 'react';
+import { FaTimes, FaSpinner } from 'react-icons/fa';
 import { Base, Button, Flex, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
 
 export const GameStageView: FC<{}> = () => 
 {
     const { gameURL, setGameURL, selectedGame } = useGameCenter();
+    const [ isLoading, setIsLoading ] = useState<boolean>(true);
+    const [ hasError, setHasError ] = useState<boolean>(false);
 
     if(!gameURL) return null;
 
-    const gameTitle = selectedGame ? selectedGame.gameName : 'SnowStorm';
+    const gameTitle = selectedGame ? selectedGame.gameName : 'Habbten Game';
+
+    const normalizedUrl = (() => {
+        if (!gameURL) return '';
+        if (window.location.port === '8081' && gameURL.startsWith('/game/games/')) {
+            return gameURL.replace('/game/games/', '/games/');
+        }
+        return gameURL;
+    })();
 
     const handleExitGame = () =>
     {
@@ -18,14 +28,21 @@ export const GameStageView: FC<{}> = () =>
 
     useEffect(() =>
     {
+        setIsLoading(true);
+        setHasError(false);
+        const timer = setTimeout(() => setIsLoading(false), 250);
         const handleMessage = (event: MessageEvent) =>
         {
             if(event.data === 'EXIT_GAME') handleExitGame();
         };
 
         window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
-    }, []);
+        return () =>
+        {
+            clearTimeout(timer);
+            window.removeEventListener('message', handleMessage);
+        };
+    }, [ gameURL ]);
 
     return (
         <Flex 
@@ -72,17 +89,35 @@ export const GameStageView: FC<{}> = () =>
                 </Button>
             </Flex>
 
-            <iframe 
-                src={ gameURL } 
-                title={ gameTitle }
-                allow="autoplay; fullscreen"
-                style={{ 
-                    width: '100%', 
-                    height: 'calc(100% - 36px)', 
-                    border: 'none',
-                    display: 'block'
-                }}
-            />
+            <div style={{ position: 'relative', width: '100%', height: 'calc(100% - 36px)', backgroundColor: '#080d1a' }}>
+                { isLoading && !hasError && (
+                    <Flex center fullHeight fullWidth position="absolute" style={{ top: 0, left: 0, zIndex: 5, backgroundColor: '#080d1a', pointerEvents: 'none' }} column gap={ 2 }>
+                        <FaSpinner className="fa-spin" style={{ fontSize: '28px', color: '#38bdf8' }} />
+                        <Text bold variant="white" style={{ fontSize: '14px' }}>Cargando { gameTitle }...</Text>
+                    </Flex>
+                )}
+
+                { hasError ? (
+                    <Flex center fullHeight fullWidth column gap={ 2 }>
+                        <Text bold variant="danger">Error al cargar la partida.</Text>
+                        <Button variant="primary" size="sm" onClick={ handleExitGame }>Volver al Hotel</Button>
+                    </Flex>
+                ) : (
+                    <iframe 
+                        src={ normalizedUrl } 
+                        title={ gameTitle }
+                        allow="autoplay; fullscreen"
+                        onLoad={ () => setIsLoading(false) }
+                        onError={ () => { setIsLoading(false); setHasError(true); } }
+                        style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            border: 'none',
+                            display: 'block'
+                        }}
+                    />
+                )}
+            </div>
         </Flex>
     );
 };

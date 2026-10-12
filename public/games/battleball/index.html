@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habbten BattleBall</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #080d1a;
+            font-family: 'Ubuntu', sans-serif;
+            color: #fff;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #080d1a 100%);
+        }
+
+        canvas {
+            max-width: 100vw;
+            max-height: 100vh;
+            width: auto;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            background: #0f172a;
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            cursor: crosshair;
+            display: block;
+        }
+
+        /* === HUD SUPERIOR (DURANTE EL JUEGO) === */
+        .hud-overlay {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .team-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue {
+            color: #38bdf8;
+        }
+
+        .badge-red {
+            color: #f87171;
+        }
+
+        .score-box {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .timer-box {
+            font-size: 15px;
+            font-weight: bold;
+            color: #facc15;
+            font-family: 'Press Start 2P', monospace;
+            letter-spacing: 1px;
+        }
+
+        .btn-hud {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-hud:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-hud-danger {
+            background: #be123c;
+            border-color: #9f1239;
+        }
+
+        .btn-hud-danger:hover {
+            background: #e11d48;
+        }
+
+        .btn-hud-test {
+            background: #d97706;
+            border-color: #b45309;
+        }
+
+        .btn-hud-test:hover {
+            background: #f59e0b;
+        }
+
+        /* === ETAPA 1 Y 3: MODALES (ANTES Y POST JUEGO) === */
+        .modal-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 13, 26, 0.88);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            border: 2px solid rgba(99, 102, 241, 0.5);
+            border-radius: 12px;
+            padding: 24px 32px;
+            max-width: 560px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .btn-habbten-play {
+            background: #15803d;
+            color: #ffffff;
+            border: 1px solid #166534;
+            border-radius: 6px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            padding: 10px 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbten-play:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-habbten-play:active {
+            background: #14532d;
+            transform: translateY(1px);
+        }
+
+        .btn-habbten-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbten-back:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .results-score-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-team-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .results-team-score {
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-val {
+            font-size: 16px;
+            font-weight: 900;
+            color: #facc15;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- Canvas de Pista Isométrica de BattleBall -->
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+        <!-- HUD Durante el Juego -->
+        <div class="hud-overlay" id="hudOverlay" style="display: none;">
+            <div class="hud-panel">
+                <div class="team-badge badge-blue">
+                    <span>AZUL (TÚ)</span>
+                    <span id="scoreBlue" class="score-box">0</span>
+                </div>
+                <div style="width: 2px; height: 22px; background: rgba(255,255,255,0.15);"></div>
+                <div class="team-badge badge-red">
+                    <span id="scoreRed" class="score-box">0</span>
+                    <span>ROJO (CPU)</span>
+                </div>
+            </div>
+
+            <div class="hud-panel">
+                <div id="timerDisplay" class="timer-box">01:30</div>
+            </div>
+
+            <div class="hud-panel">
+                <span style="color: #94a3b8; font-size: 12px; font-weight: bold;">BALDOSAS:</span>
+                <span id="tilesStatus" style="color: #38bdf8; font-weight: 900; font-size: 14px;">0 Bloqueadas</span>
+                <button id="btnFinishEarly" class="btn-hud btn-hud-test" title="Probar pantalla post-juego de inmediato">⚡ Finalizar</button>
+                <button id="btnExit" class="btn-hud btn-hud-danger">✕ Salir al Hotel</button>
+            </div>
+        </div>
+
+        <!-- ETAPA 1: ANTES DEL JUEGO (Lobby / Briefing de Pista) -->
+        <div id="startModal" class="modal-screen">
+            <div class="modal-card">
+                <img src="./assets/battleball_logo.png" alt="Habbten BattleBall"
+                    style="max-width: 220px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+                
+                <p>¡Bienvenido a <b>Habbten BattleBall</b>! Rebota con tu Space Hopper sobre las baldosas para colorearlas con tu equipo:<br>
+                <b>1er bote:</b> Marca de color (+1 pt) • <b>2do bote:</b> Color intenso (+2 pts) • <b>3er bote:</b> ¡BALDOSA BLOQUEADA (+5 pts)!<br>
+                Usa <b>W A S D / Flechas o Clic</b> para moverte y recoge Bombas, Pines, Bombillas y Resortes.</p>
+                
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button id="btnStartGame" class="btn-habbten-play">¡ENTRAR A LA PISTA!</button>
+                    <button id="btnExitModal" class="btn-habbten-back">Volver al Hotel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 3: POST / DESPUÉS DEL JUEGO (Resultados de BattleBall) -->
+        <div id="resultsModal" class="modal-screen" style="display: none;">
+            <div class="modal-card">
+                <h2 id="winnerTitle" style="font-size: 22px; font-weight: 900; margin-bottom: 4px; color: #38bdf8;">¡FIN DE LA BATALLA!</h2>
+                <div id="winnerSubtitle" style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px;">Resultados de BattleBall</div>
+
+                <div class="results-score-row">
+                    <div class="results-team-box badge-blue">
+                        <span style="font-weight: 800; font-size: 13px;">EQUIPO AZUL (TÚ)</span>
+                        <span id="finalScoreBlue" class="results-team-score">0</span>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 900; color: #64748b;">VS</div>
+                    <div class="results-team-box badge-red">
+                        <span style="font-weight: 800; font-size: 13px;">EQUIPO ROJO (CPU)</span>
+                        <span id="finalScoreRed" class="results-team-score">0</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div>Baldosas Bloqueadas</div>
+                        <div id="statLocked" class="stat-val">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Botes Totales</div>
+                        <div id="statBounces" class="stat-val">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Power-ups Usados</div>
+                        <div id="statPowerups" class="stat-val">0</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button id="btnPlayAgain" class="btn-habbten-play">JUGAR OTRA VEZ</button>
+                    <button id="btnExitResults" class="btn-habbten-back">Volver al Hotel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Sintetizador de audio retro Habbten
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'bounce') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(320, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'lock') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.setValueAtTime(780, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'powerup') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'bomb') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.linearRampToValueAtTime(40, now + 0.3);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch(e) {}
+        }
+
+        // Carga de Sprites Oficiales de Habbten BattleBall
+        const assets = {
+            arena: new Image(),
+            bomb: new Image(),
+            pins: new Image(),
+            lightbulb: new Image(),
+            spring: new Image()
+        };
+
+        assets.arena.src = './assets/Battle_Ball.png';
+        assets.bomb.src = './assets/Battle_bomb.png';
+        assets.pins.src = './assets/Box_of_pins.png';
+        assets.lightbulb.src = './assets/Lightbulb.png';
+        assets.spring.src = './assets/Spring.png';
+
+        // Cuadrícula Isométrica de 8x8 baldosas
+        const GRID_ROWS = 8;
+        const GRID_COLS = 8;
+        const TILE_WIDTH = 64;
+        const TILE_HEIGHT = 32;
+        const GRID_ORIGIN_X = 480;
+        const GRID_ORIGIN_Y = 160;
+
+        let tiles = [];
+        function initTiles() {
+            tiles = [];
+            for (let r = 0; r < GRID_ROWS; r++) {
+                tiles[r] = [];
+                for (let c = 0; c < GRID_COLS; c++) {
+                    tiles[r][c] = {
+                        state: 0, // 0: neutro, 1: azul suave, 2: azul medio, 3: azul bloqueado, -1: rojo suave, -2: rojo medio, -3: rojo bloqueado
+                        locked: false
+                    };
+                }
+            }
+        }
+
+        function gridToIso(r, c) {
+            const isoX = GRID_ORIGIN_X + (c - r) * (TILE_WIDTH / 2);
+            const isoY = GRID_ORIGIN_Y + (c + r) * (TILE_HEIGHT / 2);
+            return { x: isoX, y: isoY };
+        }
+
+        function isoToGrid(x, y) {
+            const dx = x - GRID_ORIGIN_X;
+            const dy = y - GRID_ORIGIN_Y;
+            const c = Math.round((dx / (TILE_WIDTH / 2) + dy / (TILE_HEIGHT / 2)) / 2);
+            const r = Math.round((dy / (TILE_HEIGHT / 2) - dx / (TILE_WIDTH / 2)) / 2);
+            return { r: Math.max(0, Math.min(GRID_ROWS - 1, r)), c: Math.max(0, Math.min(GRID_COLS - 1, c)) };
+        }
+
+        // Estado del Juego
+        let isPlaying = false;
+        let scoreBlue = 0;
+        let scoreRed = 0;
+        let timeLeft = 90;
+        let timerInterval = null;
+        let totalBounces = 0;
+        let totalLockedBlue = 0;
+        let powerupsUsed = 0;
+
+        // Jugador Humano (Equipo Azul)
+        const player = {
+            gridR: 2,
+            gridC: 2,
+            targetR: 2,
+            targetC: 2,
+            x: 0,
+            y: 0,
+            bouncePhase: 0,
+            bounceSpeed: 0.14,
+            team: 'blue',
+            stunned: 0
+        };
+
+        // CPU Bots (Equipo Rojo)
+        const bots = [
+            { id: 1, gridR: 5, gridC: 5, targetR: 5, targetC: 5, x: 0, y: 0, bouncePhase: 0.5, bounceSpeed: 0.12, team: 'red', stunned: 0, lastMove: 0 },
+            { id: 2, gridR: 6, gridC: 2, targetR: 6, targetC: 2, x: 0, y: 0, bouncePhase: 0.8, bounceSpeed: 0.13, team: 'red', stunned: 0, lastMove: 0 }
+        ];
+
+        let activePowerups = [];
+        let popups = [];
+
+        // Controles de teclado
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            handlePlayerMoveKeys();
+        });
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        function handlePlayerMoveKeys() {
+            if (!isPlaying || player.stunned > 0) return;
+            if (keys['w'] || keys['arrowup']) movePlayer(-1, 0);
+            else if (keys['s'] || keys['arrowdown']) movePlayer(1, 0);
+            else if (keys['a'] || keys['arrowleft']) movePlayer(0, -1);
+            else if (keys['d'] || keys['arrowright']) movePlayer(0, 1);
+        }
+
+        canvas.addEventListener('click', e => {
+            if (!isPlaying || player.stunned > 0) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+            const gridPos = isoToGrid(mouseX, mouseY);
+            player.targetR = gridPos.r;
+            player.targetC = gridPos.c;
+        });
+
+        function movePlayer(dr, dc) {
+            const nextR = Math.max(0, Math.min(GRID_ROWS - 1, player.gridR + dr));
+            const nextC = Math.max(0, Math.min(GRID_COLS - 1, player.gridC + dc));
+            player.targetR = nextR;
+            player.targetC = nextC;
+        }
+
+        function bounceOnTile(entity) {
+            playSound('bounce');
+            const r = entity.gridR;
+            const c = entity.gridC;
+            const tile = tiles[r][c];
+
+            if (entity.team === 'blue') {
+                totalBounces++;
+                if (!tile.locked) {
+                    if (tile.state <= 0) {
+                        tile.state = 1;
+                        scoreBlue += 1;
+                    } else if (tile.state === 1) {
+                        tile.state = 2;
+                        scoreBlue += 2;
+                    } else if (tile.state === 2) {
+                        tile.state = 3;
+                        tile.locked = true;
+                        scoreBlue += 5;
+                        totalLockedBlue++;
+                        playSound('lock');
+                        addPopup(entity.x, entity.y, '¡BLOQUEADA! +5', '#38bdf8');
+                    }
+                    document.getElementById('scoreBlue').innerText = scoreBlue;
+                    document.getElementById('tilesStatus').innerText = `${totalLockedBlue} Bloqueadas`;
+                }
+            } else {
+                if (!tile.locked) {
+                    if (tile.state >= 0) {
+                        tile.state = -1;
+                        scoreRed += 1;
+                    } else if (tile.state === -1) {
+                        tile.state = -2;
+                        scoreRed += 2;
+                    } else if (tile.state === -2) {
+                        tile.state = -3;
+                        tile.locked = true;
+                        scoreRed += 5;
+                        playSound('lock');
+                        addPopup(entity.x, entity.y, '¡BLOQUEADA CPU! +5', '#f87171');
+                    }
+                    document.getElementById('scoreRed').innerText = scoreRed;
+                }
+            }
+
+            // Recoger powerup si hay uno en la baldosa
+            for (let i = activePowerups.length - 1; i >= 0; i--) {
+                const pu = activePowerups[i];
+                if (pu.r === r && pu.c === c) {
+                    playSound('powerup');
+                    applyPowerup(pu.type, entity);
+                    activePowerups.splice(i, 1);
+                }
+            }
+        }
+
+        function applyPowerup(type, entity) {
+            powerupsUsed++;
+            if (type === 'bomb') {
+                playSound('bomb');
+                // Colorea baldosas 3x3 adyacentes
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const tr = entity.gridR + dr;
+                        const tc = entity.gridC + dc;
+                        if (tr >= 0 && tr < GRID_ROWS && tc >= 0 && tc < GRID_COLS) {
+                            if (!tiles[tr][tc].locked) {
+                                tiles[tr][tc].state = entity.team === 'blue' ? 2 : -2;
+                            }
+                        }
+                    }
+                }
+                addPopup(entity.x, entity.y, '💥 ¡BOMBA 3x3!', '#facc15');
+            } else if (type === 'lightbulb') {
+                // Aturde oponentes
+                if (entity.team === 'blue') {
+                    bots.forEach(b => b.stunned = 35);
+                    addPopup(entity.x, entity.y, '💡 ¡BOTS ATURDIDOS!', '#facc15');
+                } else {
+                    player.stunned = 35;
+                    addPopup(player.x, player.y, '💡 ¡ATURDIDO!', '#f87171');
+                }
+            } else if (type === 'spring') {
+                entity.bounceSpeed = 0.22;
+                setTimeout(() => entity.bounceSpeed = 0.14, 4000);
+                addPopup(entity.x, entity.y, '🌀 ¡SUPER RESORTE!', '#4ade80');
+            }
+        }
+
+        function addPopup(x, y, text, color) {
+            popups.push({ x: x, y: y - 20, text: text, color: color, life: 30 });
+        }
+
+        function spawnPowerup() {
+            if (activePowerups.length < 3 && Math.random() < 0.04) {
+                const types = ['bomb', 'lightbulb', 'spring'];
+                activePowerups.push({
+                    r: Math.floor(Math.random() * GRID_ROWS),
+                    c: Math.floor(Math.random() * GRID_COLS),
+                    type: types[Math.floor(Math.random() * types.length)]
+                });
+            }
+        }
+
+        function updateEntityMovement(ent) {
+            if (ent.stunned > 0) {
+                ent.stunned--;
+                return;
+            }
+
+            ent.bouncePhase += ent.bounceSpeed;
+            if (ent.bouncePhase >= Math.PI) {
+                ent.bouncePhase = 0;
+                // Al tocar el suelo, actualiza posición de cuadrícula
+                if (ent.targetR !== ent.gridR || ent.targetC !== ent.gridC) {
+                    const dr = Math.sign(ent.targetR - ent.gridR);
+                    const dc = Math.sign(ent.targetC - ent.gridC);
+                    if (dr !== 0) ent.gridR += dr;
+                    else if (dc !== 0) ent.gridC += dc;
+                }
+                bounceOnTile(ent);
+            }
+
+            const iso = gridToIso(ent.gridR, ent.gridC);
+            ent.x = iso.x;
+            ent.y = iso.y;
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            updateEntityMovement(player);
+
+            // IA de Bots de BattleBall
+            const now = Date.now();
+            bots.forEach(bot => {
+                if (now - bot.lastMove > 800 + Math.random() * 600) {
+                    bot.lastMove = now;
+                    // Elegir baldosa no bloqueada cercana
+                    const dirs = [[-1,0], [1,0], [0,-1], [0,1]];
+                    const d = dirs[Math.floor(Math.random() * dirs.length)];
+                    bot.targetR = Math.max(0, Math.min(GRID_ROWS - 1, bot.gridR + d[0]));
+                    bot.targetC = Math.max(0, Math.min(GRID_COLS - 1, bot.gridC + d[1]));
+                }
+                updateEntityMovement(bot);
+            });
+
+            spawnPowerup();
+
+            for (let i = popups.length - 1; i >= 0; i--) {
+                const p = popups[i];
+                p.y -= 0.6;
+                p.life--;
+                if (p.life <= 0) popups.splice(i, 1);
+            }
+        }
+
+        // Renderizado Gráfico de la Pista y Space Hoppers
+        function drawTile(r, c) {
+            const iso = gridToIso(r, c);
+            const tile = tiles[r][c];
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(iso.x, iso.y - TILE_HEIGHT / 2);
+            ctx.lineTo(iso.x + TILE_WIDTH / 2, iso.y);
+            ctx.lineTo(iso.x, iso.y + TILE_HEIGHT / 2);
+            ctx.lineTo(iso.x - TILE_WIDTH / 2, iso.y);
+            ctx.closePath();
+
+            // Color de la baldosa según estado
+            if (tile.state === 3) ctx.fillStyle = '#0284c7'; // Azul Bloqueado
+            else if (tile.state === 2) ctx.fillStyle = '#38bdf8'; // Azul Medio
+            else if (tile.state === 1) ctx.fillStyle = '#bae6fd'; // Azul Suave
+            else if (tile.state === -3) ctx.fillStyle = '#dc2626'; // Rojo Bloqueado
+            else if (tile.state === -2) ctx.fillStyle = '#f87171'; // Rojo Medio
+            else if (tile.state === -1) ctx.fillStyle = '#fecaca'; // Rojo Suave
+            else ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // Neutro
+
+            ctx.fill();
+
+            // Borde de la baldosa
+            ctx.strokeStyle = tile.locked ? '#ffffff' : 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = tile.locked ? 2 : 1;
+            ctx.stroke();
+
+            // Estrella si está bloqueada
+            if (tile.locked) {
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 12px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.fillText('★', iso.x, iso.y + 4);
+            }
+
+            ctx.restore();
+        }
+
+        function drawSpaceHopper(ent) {
+            const bounceY = Math.sin(ent.bouncePhase) * 28;
+            const drawX = ent.x;
+            const drawY = ent.y - bounceY;
+
+            // Sombra sobre la baldosa
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(ent.x, ent.y, 16, 8, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            ctx.fill();
+
+            // Balón Space Hopper (Pelota hinchable con asas)
+            const ballColor = ent.team === 'blue' ? '#0284c7' : '#ef4444';
+            ctx.beginPath();
+            ctx.arc(drawX, drawY - 14, 18, 0, Math.PI * 2);
+            ctx.fillStyle = ballColor;
+            ctx.fill();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Asas del Space Hopper
+            ctx.fillStyle = '#facc15';
+            ctx.fillRect(drawX - 8, drawY - 36, 4, 8);
+            ctx.fillRect(drawX + 4, drawY - 36, 4, 8);
+
+            // Cabeza del personaje Habbten sobre el hopper
+            ctx.fillStyle = '#fed7aa';
+            ctx.fillRect(drawX - 8, drawY - 48, 16, 14);
+            ctx.fillStyle = ent.team === 'blue' ? '#78350f' : '#1e293b';
+            ctx.fillRect(drawX - 9, drawY - 52, 18, 6);
+
+            // Etiqueta
+            ctx.font = 'bold 10px Ubuntu';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = ent.team === 'blue' ? '#38bdf8' : '#f87171';
+            ctx.fillText(ent === player ? 'TÚ' : 'CPU', drawX, drawY - 58);
+
+            ctx.restore();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Fondo Oficial de la Arena de BattleBall
+            if (assets.arena.complete && assets.arena.naturalWidth > 0) {
+                ctx.drawImage(assets.arena, 0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // 2. Cuadrícula Isométrica de baldosas
+            for (let r = 0; r < GRID_ROWS; r++) {
+                for (let c = 0; c < GRID_COLS; c++) {
+                    drawTile(r, c);
+                }
+            }
+
+            // 3. Power-ups en baldosas
+            activePowerups.forEach(pu => {
+                const iso = gridToIso(pu.r, pu.c);
+                const sprite = pu.type === 'bomb' ? assets.bomb : (pu.type === 'lightbulb' ? assets.lightbulb : assets.spring);
+                if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+                    ctx.drawImage(sprite, iso.x - 14, iso.y - 20, 28, 28);
+                } else {
+                    ctx.fillStyle = '#facc15';
+                    ctx.beginPath();
+                    ctx.arc(iso.x, iso.y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // 4. Space Hoppers con orden de profundidad Y
+            const entities = [player, ...bots];
+            entities.sort((a, b) => a.y - b.y);
+            entities.forEach(ent => drawSpaceHopper(ent));
+
+            // 5. Popups de puntos
+            popups.forEach(p => {
+                ctx.font = '900 13px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = p.color;
+                ctx.fillText(p.text, p.x, p.y);
+            });
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Controladores de etapas
+        document.getElementById('btnStartGame').addEventListener('click', () => {
+            document.getElementById('startModal').style.display = 'none';
+            document.getElementById('hudOverlay').style.display = 'flex';
+            startMatch();
+        });
+
+        document.getElementById('btnPlayAgain').addEventListener('click', () => {
+            document.getElementById('resultsModal').style.display = 'none';
+            document.getElementById('hudOverlay').style.display = 'flex';
+            startMatch();
+        });
+
+        function startMatch() {
+            isPlaying = true;
+            scoreBlue = 0;
+            scoreRed = 0;
+            timeLeft = 90;
+            totalBounces = 0;
+            totalLockedBlue = 0;
+            powerupsUsed = 0;
+            activePowerups = [];
+            popups = [];
+
+            initTiles();
+            player.gridR = 2; player.gridC = 2; player.targetR = 2; player.targetC = 2; player.bouncePhase = 0;
+            bots[0].gridR = 5; bots[0].gridC = 5; bots[0].targetR = 5; bots[0].targetC = 5;
+            bots[1].gridR = 6; bots[1].gridC = 2; bots[1].targetR = 6; bots[1].targetC = 2;
+
+            document.getElementById('scoreBlue').innerText = '0';
+            document.getElementById('scoreRed').innerText = '0';
+            document.getElementById('tilesStatus').innerText = '0 Bloqueadas';
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!isPlaying) return;
+                timeLeft--;
+                const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                const secs = String(timeLeft % 60).padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+
+                if (timeLeft <= 0) {
+                    endMatch();
+                }
+            }, 1000);
+        }
+
+        function endMatch() {
+            isPlaying = false;
+            if (timerInterval) clearInterval(timerInterval);
+
+            document.getElementById('hudOverlay').style.display = 'none';
+            document.getElementById('finalScoreBlue').innerText = scoreBlue;
+            document.getElementById('finalScoreRed').innerText = scoreRed;
+
+            const resTitle = document.getElementById('winnerTitle');
+            if (scoreBlue > scoreRed) {
+                resTitle.innerText = '¡EQUIPO AZUL CAMPEÓN!';
+                resTitle.style.color = '#38bdf8';
+            } else if (scoreRed > scoreBlue) {
+                resTitle.innerText = '¡VICTORIA DEL EQUIPO ROJO!';
+                resTitle.style.color = '#f87171';
+            } else {
+                resTitle.innerText = '¡EMPATE DE INFARTO!';
+                resTitle.style.color = '#facc15';
+            }
+
+            document.getElementById('statLocked').innerText = totalLockedBlue;
+            document.getElementById('statBounces').innerText = totalBounces;
+            document.getElementById('statPowerups').innerText = powerupsUsed;
+
+            document.getElementById('resultsModal').style.display = 'flex';
+        }
+
+        document.getElementById('btnFinishEarly').addEventListener('click', () => {
+            endMatch();
+        });
+
+        function exitToHotel() {
+            isPlaying = false;
+            if (timerInterval) clearInterval(timerInterval);
+            window.parent.postMessage('EXIT_GAME', '*');
+        }
+
+        document.getElementById('btnExit').addEventListener('click', exitToHotel);
+        document.getElementById('btnExitModal').addEventListener('click', exitToHotel);
+        document.getElementById('btnExitResults').addEventListener('click', exitToHotel);
+
+        initTiles();
+        gameLoop();
+    </script>
+</body>
+
+</html>

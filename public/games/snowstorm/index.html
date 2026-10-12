@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habbten SnowStorm</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700;800&family=Press+Start+2P&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #080d1a;
+            font-family: 'Ubuntu', sans-serif;
+            color: #fff;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #132238 0%, #080d1a 100%);
+        }
+
+        canvas {
+            max-width: 100vw;
+            max-height: 100vh;
+            width: auto;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: contain;
+            background: #0f172a;
+            border-radius: 8px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            cursor: crosshair;
+            display: block;
+        }
+
+        /* === HUD SUPERIOR (DURANTE EL JUEGO) === */
+        .hud-overlay {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .hud-panel {
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .team-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-blue {
+            color: #38bdf8;
+        }
+
+        .badge-red {
+            color: #f87171;
+        }
+
+        .score-box {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .timer-box {
+            font-size: 15px;
+            font-weight: bold;
+            color: #facc15;
+            font-family: 'Press Start 2P', monospace;
+            letter-spacing: 1px;
+        }
+
+        .ammo-bar {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .snowball-icon {
+            width: 18px;
+            height: 18px;
+            background: url('./assets/thumbnails_Snowball.png') no-repeat center center;
+            background-size: contain;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+            transition: all 0.15s ease;
+        }
+
+        .snowball-icon.empty {
+            opacity: 0.2;
+            filter: grayscale(100%);
+        }
+
+        .btn-hud {
+            background: #334155;
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-hud:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        .btn-hud-danger {
+            background: #be123c;
+            border-color: #9f1239;
+        }
+
+        .btn-hud-danger:hover {
+            background: #e11d48;
+        }
+
+        .btn-hud-test {
+            background: #d97706;
+            border-color: #b45309;
+        }
+
+        .btn-hud-test:hover {
+            background: #f59e0b;
+        }
+
+        /* === ETAPA 1 Y 3: MODALES (ANTES Y POST JUEGO) === */
+        .modal-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(8, 13, 26, 0.88);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            border: 2px solid rgba(56, 189, 248, 0.4);
+            border-radius: 12px;
+            padding: 24px 32px;
+            max-width: 580px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-card p {
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .arena-select {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .arena-btn {
+            background: #334155;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 6px;
+            cursor: pointer;
+            color: #cbd5e1;
+            font-size: 11px;
+            font-weight: 700;
+            transition: all 0.15s ease;
+        }
+
+        .arena-btn.active,
+        .arena-btn:hover {
+            border-color: #38bdf8;
+            background: #0284c7;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .arena-btn img {
+            width: 100%;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .btn-habbten-play {
+            background: #15803d;
+            color: #ffffff;
+            border: 1px solid #166534;
+            border-radius: 6px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            padding: 10px 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbten-play:hover {
+            background: #16a34a;
+            transform: translateY(-1px);
+        }
+
+        .btn-habbten-play:active {
+            background: #14532d;
+            transform: translateY(1px);
+        }
+
+        .btn-habbten-back {
+            background: #334155;
+            color: #e2e8f0;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-habbten-back:hover {
+            background: #475569;
+            color: #ffffff;
+        }
+
+        /* Post-game results */
+        .results-score-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-team-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .results-team-title {
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        .results-team-score {
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.5);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-val {
+            font-size: 16px;
+            font-weight: 900;
+            color: #facc15;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- Canvas de Batalla Isométrica -->
+        <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+        <!-- HUD Durante el Juego -->
+        <div class="hud-overlay" id="hudOverlay" style="display: none;">
+            <div class="hud-panel">
+                <div class="team-badge badge-blue">
+                    <span>AZUL (TÚ)</span>
+                    <span id="scoreBlue" class="score-box">0</span>
+                </div>
+                <div style="width: 2px; height: 22px; background: rgba(255,255,255,0.15);"></div>
+                <div class="team-badge badge-red">
+                    <span id="scoreRed" class="score-box">0</span>
+                    <span>ROJO (BOTS)</span>
+                </div>
+            </div>
+
+            <div class="hud-panel">
+                <div id="timerDisplay" class="timer-box">02:00</div>
+            </div>
+
+            <div class="hud-panel">
+                <div style="font-size: 12px; font-weight: bold; color: #94a3b8; margin-right: 2px;">BOLAS:</div>
+                <div id="ammoContainer" class="ammo-bar">
+                    <div class="snowball-icon"></div>
+                    <div class="snowball-icon"></div>
+                    <div class="snowball-icon"></div>
+                    <div class="snowball-icon"></div>
+                    <div class="snowball-icon"></div>
+                </div>
+                <button id="btnReload" class="btn-hud" style="margin-left: 6px;">[Espacio] Crear Bola</button>
+                <button id="btnFinishEarly" class="btn-hud btn-hud-test" title="Probar pantalla post-juego de inmediato">⚡ Finalizar</button>
+                <button id="btnExit" class="btn-hud btn-hud-danger">✕ Salir al Hotel</button>
+            </div>
+        </div>
+
+        <!-- ETAPA 1: ANTES DEL JUEGO (Lobby / Selección de Arena / Modo Solo) -->
+        <div id="startModal" class="modal-screen">
+            <div class="modal-card">
+                <img src="./assets/thumbnails_Snowstorm_Logo.png" alt="Habbten SnowStorm"
+                    style="max-width: 240px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));">
+                
+                <p>¡Bienvenido a <b>Habbten SnowStorm</b>! Puedes probar la partida tú solo contra la <b>CPU (Bots interactivos)</b>. Lanza bolas con el <b>Clic del Ratón</b>, muévete con <b>W A S D / Flechas</b> o <b>Clic en el suelo</b> y recarga bolas pulsando <b>Espacio</b>.</p>
+                
+                <div style="font-size: 11px; font-weight: 800; margin-bottom: 8px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">ELIGE TU ARENA DE BATALLA:</div>
+                <div class="arena-select">
+                    <div class="arena-btn active" data-map="1"><img src="./assets/Room_snowstorm_1.png">Arena 1</div>
+                    <div class="arena-btn" data-map="2"><img src="./assets/Room_snowstorm_2.png">Arena 2</div>
+                    <div class="arena-btn" data-map="3"><img src="./assets/Room_snowstorm_3.png">Arena 3</div>
+                    <div class="arena-btn" data-map="4"><img src="./assets/Room_snowstorm_4.png">Arena 4</div>
+                    <div class="arena-btn" data-map="5"><img src="./assets/Room_snowstorm_5.png">Arena 5</div>
+                </div>
+                
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button id="btnStartGame" class="btn-habbten-play">¡COMENZAR PARTIDA!</button>
+                    <button id="btnExitModal" class="btn-habbten-back">Volver al Hotel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 3: POST / DESPUÉS DEL JUEGO (Resultados / Volver o Jugar de Nuevo) -->
+        <div id="resultsModal" class="modal-screen" style="display: none;">
+            <div class="modal-card">
+                <h2 id="winnerTitle" style="font-size: 22px; font-weight: 900; margin-bottom: 4px; color: #38bdf8;">¡FIN DE LA BATALLA!</h2>
+                <div id="winnerSubtitle" style="font-size: 13px; color: #94a3b8; margin-bottom: 12px;">Resultados de la partida</div>
+
+                <div class="results-score-row">
+                    <div class="results-team-box badge-blue">
+                        <span class="results-team-title">EQUIPO AZUL (TÚ)</span>
+                        <span id="finalScoreBlue" class="results-team-score">0</span>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 900; color: #64748b;">VS</div>
+                    <div class="results-team-box badge-red">
+                        <span class="results-team-title">EQUIPO ROJO (BOTS)</span>
+                        <span id="finalScoreRed" class="results-team-score">0</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div>Bolas Lanzadas</div>
+                        <div id="statThrows" class="stat-val">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Impactos Conectados</div>
+                        <div id="statHits" class="stat-val">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>Precisión</div>
+                        <div id="statAccuracy" class="stat-val">0%</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button id="btnPlayAgain" class="btn-habbten-play">JUGAR OTRA VEZ</button>
+                    <button id="btnExitResults" class="btn-habbten-back">Volver al Hotel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Sintetizador de audio retro para efectos de sonido Habbten
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'throw') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(500, now);
+                    osc.frequency.exponentialRampToValueAtTime(160, now + 0.14);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
+                    osc.start(now);
+                    osc.stop(now + 0.14);
+                } else if (type === 'hit') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.exponentialRampToValueAtTime(45, now + 0.18);
+                    gain.gain.setValueAtTime(0.4, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                } else if (type === 'reload') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(280, now);
+                    osc.frequency.exponentialRampToValueAtTime(650, now + 0.12);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'gameover') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(350, now);
+                    osc.frequency.linearRampToValueAtTime(180, now + 0.4);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                }
+            } catch(e) {}
+        }
+
+        // Carga de Sprites Oficiales de Habbten
+        const assets = {
+            snowball: new Image(),
+            suitBlue: new Image(),
+            suitRed: new Image(),
+            iceBig: new Image(),
+            iceSmall: new Image(),
+            duckLeft: new Image(),
+            duckRight: new Image(),
+            machine: new Image()
+        };
+
+        assets.snowball.src = './assets/thumbnails_Snowball.png';
+        assets.suitBlue.src = './assets/thumbnails_Ss_costume_blue.png';
+        assets.suitRed.src = './assets/Ss_costume_red.png';
+        assets.iceBig.src = './assets/thumbnails_Icecube_big.png';
+        assets.iceSmall.src = './assets/thumbnails_Icecube_small.png';
+        assets.duckLeft.src = './assets/thumbnails_Extra_ss_duck_left.png';
+        assets.duckRight.src = './assets/thumbnails_Extra_ss_duck_right.png';
+        assets.machine.src = './assets/thumbnails_S_snowball_machine_name.png';
+
+        let currentMapIndex = 1;
+        const mapImages = {};
+        for (let i = 1; i <= 5; i++) {
+            const img = new Image();
+            img.src = `./assets/Room_snowstorm_${i}.png`;
+            mapImages[i] = img;
+        }
+
+        // Obstáculos Isométricos del Mapa (cubos de hielo y máquinas)
+        const obstacles = [
+            { x: 380, y: 220, type: 'machine', width: 56, height: 60 },
+            { x: 580, y: 320, type: 'machine', width: 56, height: 60 },
+            { x: 480, y: 160, type: 'iceBig', width: 58, height: 56 },
+            { x: 480, y: 380, type: 'iceBig', width: 58, height: 56 },
+            { x: 300, y: 340, type: 'iceSmall', width: 30, height: 28 },
+            { x: 660, y: 200, type: 'iceSmall', width: 30, height: 28 }
+        ];
+
+        // Estado del Juego
+        let isPlaying = false;
+        let scoreBlue = 0;
+        let scoreRed = 0;
+        let timeLeft = 120;
+        let timerInterval = null;
+        let totalPlayerThrows = 0;
+        let totalPlayerHits = 0;
+
+        // Jugador Humano (Equipo Azul)
+        const player = {
+            x: 240,
+            y: 280,
+            targetX: 240,
+            targetY: 280,
+            radius: 20,
+            speed: 3.8,
+            ammo: 5,
+            maxAmmo: 5,
+            team: 'blue',
+            hitTimer: 0,
+            isReloading: false
+        };
+
+        // Bots de IA para pruebas en solitario (1 Aliado Azul, 2 Enemigos Rojos)
+        const bots = [
+            { id: 1, name: 'HabbtenBot_Rojo1', x: 700, y: 210, targetX: 700, targetY: 210, radius: 20, speed: 2.2, ammo: 5, team: 'red', hitTimer: 0, lastAction: 0 },
+            { id: 2, name: 'HabbtenBot_Rojo2', x: 720, y: 360, targetX: 720, targetY: 360, radius: 20, speed: 2.4, ammo: 5, team: 'red', hitTimer: 0, lastAction: 0 },
+            { id: 3, name: 'HabbtenBot_Aliado', x: 260, y: 170, targetX: 260, targetY: 170, radius: 20, speed: 2.3, ammo: 5, team: 'blue', hitTimer: 0, lastAction: 0 }
+        ];
+
+        let snowballs = [];
+        let particles = [];
+        let hitPopups = [];
+        let moveMarker = null;
+
+        // Controles de teclado
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            keys[e.key.toLowerCase()] = true;
+            if (e.code === 'Space') {
+                e.preventDefault();
+                reloadSnowball();
+            }
+        });
+        window.addEventListener('keyup', e => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // Controles de ratón: Clic izquierdo para lanzar bola; Shift+Clic o Clic derecho para caminar
+        canvas.addEventListener('click', e => {
+            if (!isPlaying) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            if (e.shiftKey) {
+                setPlayerMoveTarget(mouseX, mouseY);
+            } else {
+                throwSnowball(player, mouseX, mouseY);
+            }
+        });
+
+        canvas.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            if (!isPlaying) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+            setPlayerMoveTarget(mouseX, mouseY);
+        });
+
+        function setPlayerMoveTarget(x, y) {
+            player.targetX = Math.max(90, Math.min(canvas.width - 90, x));
+            player.targetY = Math.max(90, Math.min(canvas.height - 90, y));
+            moveMarker = { x: player.targetX, y: player.targetY, time: 25 };
+        }
+
+        function throwSnowball(shooter, targetX, targetY) {
+            if (shooter.ammo <= 0) return;
+            shooter.ammo--;
+            if (shooter === player) {
+                totalPlayerThrows++;
+                updateAmmoUI();
+            }
+            playSound('throw');
+
+            const dx = targetX - shooter.x;
+            const dy = targetY - shooter.y;
+            const dist = Math.hypot(dx, dy);
+            const duration = Math.max(22, Math.min(48, dist / 11));
+
+            snowballs.push({
+                shooter: shooter,
+                startX: shooter.x,
+                startY: shooter.y,
+                targetX: targetX,
+                targetY: targetY,
+                x: shooter.x,
+                y: shooter.y,
+                team: shooter.team,
+                progress: 0,
+                duration: duration,
+                arcHeight: Math.min(65, dist * 0.28)
+            });
+        }
+
+        function reloadSnowball() {
+            if (player.ammo < player.maxAmmo && !player.isReloading) {
+                player.isReloading = true;
+                playSound('reload');
+                setTimeout(() => {
+                    if (player.ammo < player.maxAmmo) player.ammo++;
+                    player.isReloading = false;
+                    updateAmmoUI();
+                }, 300);
+            }
+        }
+
+        function updateAmmoUI() {
+            const container = document.getElementById('ammoContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < player.maxAmmo; i++) {
+                const icon = document.createElement('div');
+                icon.className = `snowball-icon ${i < player.ammo ? '' : 'empty'}`;
+                container.appendChild(icon);
+            }
+        }
+
+        function spawnSplash(x, y) {
+            for (let i = 0; i < 16; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 20,
+                    size: Math.random() * 4 + 2
+                });
+            }
+        }
+
+        function addHitPopup(x, y, text, color) {
+            hitPopups.push({ x: x, y: y - 20, text: text, color: color, life: 30 });
+        }
+
+        // Lógica de actualización (60 FPS)
+        function update() {
+            if (!isPlaying) return;
+
+            // Movimiento del jugador humano (WASD / Flechas)
+            let moveX = 0;
+            let moveY = 0;
+            if (keys['w'] || keys['arrowup']) moveY -= 1;
+            if (keys['s'] || keys['arrowdown']) moveY += 1;
+            if (keys['a'] || keys['arrowleft']) moveX -= 1;
+            if (keys['d'] || keys['arrowright']) moveX += 1;
+
+            if (moveX !== 0 || moveY !== 0) {
+                const factor = (moveX !== 0 && moveY !== 0) ? 0.707 : 1;
+                player.x += moveX * player.speed * factor * 1.15;
+                player.y += moveY * player.speed * factor * 0.75;
+                player.x = Math.max(90, Math.min(canvas.width - 90, player.x));
+                player.y = Math.max(80, Math.min(canvas.height - 80, player.y));
+                player.targetX = player.x;
+                player.targetY = player.y;
+            } else {
+                const tdx = player.targetX - player.x;
+                const tdy = player.targetY - player.y;
+                const tdist = Math.hypot(tdx, tdy);
+                if (tdist > 4) {
+                    player.x += (tdx / tdist) * player.speed * 1.1;
+                    player.y += (tdy / tdist) * player.speed * 0.7;
+                }
+            }
+
+            if (player.hitTimer > 0) player.hitTimer--;
+            if (moveMarker) {
+                moveMarker.time--;
+                if (moveMarker.time <= 0) moveMarker = null;
+            }
+
+            // IA de los Bots (Solo play interactivo)
+            const now = Date.now();
+            bots.forEach(bot => {
+                if (bot.hitTimer > 0) bot.hitTimer--;
+
+                // Movimiento del bot
+                const bdx = bot.targetX - bot.x;
+                const bdy = bot.targetY - bot.y;
+                const bdist = Math.hypot(bdx, bdy);
+                if (bdist > 8) {
+                    bot.x += (bdx / bdist) * bot.speed * 1.05;
+                    bot.y += (bdy / bdist) * bot.speed * 0.7;
+                } else {
+                    bot.targetX = bot.team === 'red' ? Math.random() * 320 + 550 : Math.random() * 300 + 100;
+                    bot.targetY = Math.random() * 320 + 90;
+                }
+
+                // Recarga automática de bot
+                if (bot.ammo < 3 && Math.random() < 0.02) {
+                    bot.ammo = Math.min(bot.maxAmmo || 5, bot.ammo + 1);
+                }
+
+                // Disparo de bola del bot
+                if (now - bot.lastAction > 1800 + Math.random() * 1200) {
+                    bot.lastAction = now;
+                    let target = null;
+                    if (bot.team === 'red') {
+                        // Enemigo apunta al jugador o al bot aliado
+                        target = (Math.random() < 0.7) ? player : bots.find(b => b.team === 'blue');
+                    } else {
+                        // Aliado apunta a un enemigo rojo
+                        const redBots = bots.filter(b => b.team === 'red');
+                        target = redBots[Math.floor(Math.random() * redBots.length)];
+                    }
+
+                    if (target && bot.ammo > 0) {
+                        const targetX = target.x + (Math.random() - 0.5) * 40;
+                        const targetY = target.y + (Math.random() - 0.5) * 30;
+                        throwSnowball(bot, targetX, targetY);
+                    }
+                }
+            });
+
+            // Físicas y Colisiones de Bolas de Nieve (Trayectoria Parabólica Isométrica)
+            for (let i = snowballs.length - 1; i >= 0; i--) {
+                const sb = snowballs[i];
+                sb.progress += 1;
+                const t = sb.progress / sb.duration;
+
+                const groundX = sb.startX + (sb.targetX - sb.startX) * t;
+                const groundY = sb.startY + (sb.targetY - sb.startY) * t;
+                const arc = Math.sin(Math.PI * Math.min(1, t)) * sb.arcHeight;
+
+                sb.x = groundX;
+                sb.y = groundY - arc;
+
+                // Colisión contra Jugador Humano
+                if (sb.team !== player.team && t >= 0.7) {
+                    if (Math.hypot(groundX - player.x, groundY - player.y) < player.radius + 10) {
+                        spawnSplash(player.x, player.y);
+                        playSound('hit');
+                        player.hitTimer = 25;
+                        scoreRed += 10;
+                        document.getElementById('scoreRed').innerText = scoreRed;
+                        addHitPopup(player.x, player.y, '+10 ROJO', '#f87171');
+                        snowballs.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                // Colisión contra Bots
+                let hitTarget = false;
+                for (let b of bots) {
+                    if (sb.team !== b.team && t >= 0.7) {
+                        if (Math.hypot(groundX - b.x, groundY - b.y) < b.radius + 10) {
+                            spawnSplash(b.x, b.y);
+                            playSound('hit');
+                            b.hitTimer = 25;
+                            if (sb.team === 'blue') {
+                                scoreBlue += 10;
+                                document.getElementById('scoreBlue').innerText = scoreBlue;
+                                addHitPopup(b.x, b.y, '+10 AZUL', '#38bdf8');
+                                if (sb.shooter === player) totalPlayerHits++;
+                            } else {
+                                scoreRed += 10;
+                                document.getElementById('scoreRed').innerText = scoreRed;
+                                addHitPopup(b.x, b.y, '+10 ROJO', '#f87171');
+                            }
+                            snowballs.splice(i, 1);
+                            hitTarget = true;
+                            break;
+                        }
+                    }
+                }
+                if (hitTarget) continue;
+
+                // Llegada a destino (Impacto contra el suelo)
+                if (t >= 1) {
+                    spawnSplash(sb.targetX, sb.targetY);
+                    snowballs.splice(i, 1);
+                }
+            }
+
+            // Partículas
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            // Popups de puntuación
+            for (let i = hitPopups.length - 1; i >= 0; i--) {
+                const hp = hitPopups[i];
+                hp.y -= 0.6;
+                hp.life--;
+                if (hp.life <= 0) hitPopups.splice(i, 1);
+            }
+        }
+
+        // Renderizado Gráfico Isométrico Auténtico de Habbten
+        function drawIsometricShadow(x, y, radius) {
+            ctx.beginPath();
+            ctx.ellipse(x, y + 14, radius, radius * 0.45, 0, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(10, 18, 30, 0.45)';
+            ctx.fill();
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Fondo de la Arena Seleccionada
+            const arenaBg = mapImages[currentMapIndex];
+            if (arenaBg && arenaBg.complete && arenaBg.naturalWidth > 0) {
+                ctx.drawImage(arenaBg, 0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = '#1e293b';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // 2. Indicador de clic para mover
+            if (moveMarker) {
+                ctx.beginPath();
+                ctx.ellipse(moveMarker.x, moveMarker.y, 20, 10, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(56, 189, 248, ${moveMarker.time / 25})`;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+
+            // 3. Obstáculos del Terreno (Hielo y Máquina de Bolas)
+            obstacles.forEach(obs => {
+                drawIsometricShadow(obs.x + obs.width / 2, obs.y + obs.height - 10, obs.width / 2.2);
+                const sprite = obs.type === 'machine' ? assets.machine : (obs.type === 'iceBig' ? assets.iceBig : assets.iceSmall);
+                if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+                    ctx.drawImage(sprite, obs.x, obs.y, obs.width, obs.height);
+                }
+            });
+
+            // 4. Entidades ordenadas por profundidad (Y-sorting para correcta perspectiva isométrica)
+            const entities = [
+                { type: 'player', data: player, y: player.y },
+                ...bots.map(b => ({ type: 'bot', data: b, y: b.y }))
+            ];
+            entities.sort((a, b) => a.y - b.y);
+
+            entities.forEach(ent => {
+                const char = ent.data;
+                drawIsometricShadow(char.x, char.y, char.radius);
+
+                // Sprite oficial del traje de nieve de Habbten
+                const suit = char.team === 'blue' ? assets.suitBlue : assets.suitRed;
+                const suitWidth = 44;
+                const suitHeight = 72;
+                const drawX = char.x - suitWidth / 2;
+                const drawY = char.y - suitHeight + 16;
+
+                if (suit && suit.complete && suit.naturalWidth > 0) {
+                    ctx.save();
+                    // Efecto de parpadeo cuando recibe impacto
+                    if (char.hitTimer > 0 && Math.floor(char.hitTimer / 3) % 2 === 0) {
+                        ctx.filter = 'brightness(2) contrast(1.5)';
+                    }
+                    ctx.drawImage(suit, drawX, drawY, suitWidth, suitHeight);
+                    ctx.restore();
+                } else {
+                    // Fallback visual si aún carga imagen
+                    ctx.beginPath();
+                    ctx.arc(char.x, char.y - 10, char.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = char.team === 'blue' ? '#0284c7' : '#ef4444';
+                    ctx.fill();
+                }
+
+                // Animación de estrellas/patito al recibir impacto
+                if (char.hitTimer > 0) {
+                    const duck = (Math.floor(char.hitTimer / 6) % 2 === 0) ? assets.duckLeft : assets.duckRight;
+                    if (duck && duck.complete && duck.naturalWidth > 0) {
+                        ctx.drawImage(duck, char.x - 12, char.y - suitHeight - 8, 24, 28);
+                    }
+                }
+
+                // Etiqueta del personaje
+                ctx.font = 'bold 11px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(char.x - 40, char.y - suitHeight - 16, 80, 16);
+                ctx.fillStyle = char.team === 'blue' ? '#38bdf8' : '#f87171';
+                ctx.fillText(char === player ? 'TÚ (Azul)' : (char.team === 'blue' ? 'Aliado' : 'CPU Rojo'), char.x, char.y - suitHeight - 4);
+            });
+
+            // 5. Bolas de nieve en vuelo (con sombra proyectada en el suelo)
+            snowballs.forEach(sb => {
+                // Sombra de la bola sobre el plano del suelo
+                const groundX = sb.startX + (sb.targetX - sb.startX) * (sb.progress / sb.duration);
+                const groundY = sb.startY + (sb.targetY - sb.startY) * (sb.progress / sb.duration);
+                ctx.beginPath();
+                ctx.ellipse(groundX, groundY, 6, 3, 0, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                ctx.fill();
+
+                // Sprite oficial de bola de nieve en el aire
+                if (assets.snowball.complete && assets.snowball.naturalWidth > 0) {
+                    ctx.drawImage(assets.snowball, sb.x - 10, sb.y - 10, 20, 20);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(sb.x, sb.y, 6, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fill();
+                }
+            });
+
+            // 6. Partículas de nieve salpicada
+            particles.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.life / 20})`;
+                ctx.fill();
+            });
+
+            // 7. Popups de impacto flotantes
+            hitPopups.forEach(hp => {
+                ctx.font = '900 13px Ubuntu';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = hp.color;
+                ctx.fillText(hp.text, hp.x, hp.y);
+            });
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // === CONTROLADORES DE ETAPAS (ANTES, DURANTE, POST) ===
+        // Selector de Arena (Etapa 1: Antes del juego)
+        document.querySelectorAll('.arena-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.arena-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMapIndex = parseInt(btn.getAttribute('data-map'), 10) || 1;
+            });
+        });
+
+        // Comenzar Partida (Transición Etapa 1 -> Etapa 2)
+        document.getElementById('btnStartGame').addEventListener('click', () => {
+            document.getElementById('startModal').style.display = 'none';
+            document.getElementById('hudOverlay').style.display = 'flex';
+            startMatch();
+        });
+
+        // Jugar Otra Vez (Transición Etapa 3 -> Etapa 2)
+        document.getElementById('btnPlayAgain').addEventListener('click', () => {
+            document.getElementById('resultsModal').style.display = 'none';
+            document.getElementById('hudOverlay').style.display = 'flex';
+            startMatch();
+        });
+
+        function startMatch() {
+            isPlaying = true;
+            scoreBlue = 0;
+            scoreRed = 0;
+            timeLeft = 120;
+            totalPlayerThrows = 0;
+            totalPlayerHits = 0;
+            snowballs = [];
+            particles = [];
+            hitPopups = [];
+
+            player.x = 240;
+            player.y = 280;
+            player.targetX = 240;
+            player.targetY = 280;
+            player.ammo = 5;
+            player.hitTimer = 0;
+
+            bots[0].x = 700; bots[0].y = 210; bots[0].ammo = 5; bots[0].hitTimer = 0;
+            bots[1].x = 720; bots[1].y = 360; bots[1].ammo = 5; bots[1].hitTimer = 0;
+            bots[2].x = 260; bots[2].y = 170; bots[2].ammo = 5; bots[2].hitTimer = 0;
+
+            document.getElementById('scoreBlue').innerText = '0';
+            document.getElementById('scoreRed').innerText = '0';
+            updateAmmoUI();
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!isPlaying) return;
+                timeLeft--;
+                const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                const secs = String(timeLeft % 60).padStart(2, '0');
+                document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+
+                if (timeLeft <= 0) {
+                    endMatch();
+                }
+            }, 1000);
+        }
+
+        // Finalizar Partida (Transición Etapa 2 -> Etapa 3)
+        function endMatch() {
+            isPlaying = false;
+            if (timerInterval) clearInterval(timerInterval);
+            playSound('gameover');
+
+            document.getElementById('hudOverlay').style.display = 'none';
+            document.getElementById('finalScoreBlue').innerText = scoreBlue;
+            document.getElementById('finalScoreRed').innerText = scoreRed;
+
+            const winnerTitle = document.getElementById('winnerTitle');
+            if (scoreBlue > scoreRed) {
+                winnerTitle.innerText = '¡VICTORIA DEL EQUIPO AZUL!';
+                winnerTitle.style.color = '#38bdf8';
+            } else if (scoreRed > scoreBlue) {
+                winnerTitle.innerText = '¡VICTORIA DEL EQUIPO ROJO!';
+                winnerTitle.style.color = '#f87171';
+            } else {
+                winnerTitle.innerText = '¡EMPATE DE INFARTO!';
+                winnerTitle.style.color = '#facc15';
+            }
+
+            document.getElementById('statThrows').innerText = totalPlayerThrows;
+            document.getElementById('statHits').innerText = totalPlayerHits;
+            const accuracy = totalPlayerThrows > 0 ? Math.round((totalPlayerHits / totalPlayerThrows) * 100) : 0;
+            document.getElementById('statAccuracy').innerText = `${accuracy}%`;
+
+            document.getElementById('resultsModal').style.display = 'flex';
+        }
+
+        // Botón de prueba rápida para terminar inmediatamente y verificar Etapa 3
+        document.getElementById('btnFinishEarly').addEventListener('click', () => {
+            endMatch();
+        });
+
+        // Botones de salida hacia el Hotel (Mensaje al cliente padre)
+        function exitToHotel() {
+            isPlaying = false;
+            if (timerInterval) clearInterval(timerInterval);
+            window.parent.postMessage('EXIT_GAME', '*');
+        }
+
+        document.getElementById('btnExit').addEventListener('click', exitToHotel);
+        document.getElementById('btnExitModal').addEventListener('click', exitToHotel);
+        document.getElementById('btnExitResults').addEventListener('click', exitToHotel);
+        document.getElementById('btnReload').addEventListener('click', reloadSnowball);
+
+        // Iniciar ciclo de dibujo
+        gameLoop();
+    </script>
+</body>
+
+</html>

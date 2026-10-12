@@ -70,6 +70,16 @@ export const useEraTheme = () =>
 {
     const [ currentEra, setCurrentEraState ] = useState<EraType>(() =>
     {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlEra = urlParams.get('era') as EraType;
+        if(urlEra === 'flash2012' || urlEra === 'shockwave2006' || urlEra === 'modern') return urlEra;
+
+        const parentEra = (window.parent as any)?.HabbtenConfig?.era as EraType;
+        if(parentEra === 'flash2012' || parentEra === 'shockwave2006' || parentEra === 'modern') return parentEra;
+
+        const m = document.cookie.match(/(?:^|; )habbten_era=([^;]*)/);
+        if (m && (m[1] === 'flash2012' || m[1] === 'shockwave2006' || m[1] === 'modern')) return m[1] as EraType;
+
         const saved = (localStorage.getItem(STORAGE_KEY) as EraType) || 'modern';
         if(saved === 'flash2012' || saved === 'shockwave2006' || saved === 'modern') return saved;
         return 'modern';
@@ -95,6 +105,14 @@ export const useEraTheme = () =>
     const setEra = useCallback((era: EraType) =>
     {
         localStorage.setItem(STORAGE_KEY, era);
+        document.cookie = `habbten_era=${era}; path=/; max-age=31536000`;
+        try {
+            fetch('/api/set-era', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ era })
+            }).catch(() => {});
+        } catch(e) {}
         setCurrentEraState(era);
         applyEraToDOM(era);
         window.dispatchEvent(new CustomEvent('nitro-era-changed', { detail: era }));

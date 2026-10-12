@@ -4,12 +4,13 @@ import { GetCommunication, GetConfiguration, GetNitroInstance, GetUIVersion } fr
 import { Base, TransitionAnimation, TransitionAnimationTypes } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { MainView } from './components/main/MainView';
-import { useConfigurationEvent, useLocalizationEvent, useMainEvent, useRoomEngineEvent } from './hooks';
+import { useConfigurationEvent, useEraTheme, useLocalizationEvent, useMainEvent, useRoomEngineEvent } from './hooks';
 
 NitroVersion.UI_VERSION = GetUIVersion();
 
 export const App: FC<{}> = props =>
 {
+    useEraTheme();
     const [ isReady, setIsReady ] = useState(false);
     const [ isError, setIsError ] = useState(false);
     const [ message, setMessage ] = useState('Getting Ready');

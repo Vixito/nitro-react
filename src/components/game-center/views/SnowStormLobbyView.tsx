@@ -390,7 +390,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                 </div>
             </DraggableWindow>
 
-            {/* Ventana Habbo Retro Illumina: Confirmación de compra de partidas */}
+            {/* Ventana Habbten Retro Illumina: Confirmación de compra de partidas */}
             {isBuyConfirmOpen && selectedPack && (
                 <NitroCardView uniqueKey="snowstorm-buy-games" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '330px', zIndex: 1100 }}>
                     <NitroCardHeaderView headerText={LocalizeText('snowwar.buy_more_games') || 'Compra más partidas'} onCloseClick={() => setIsBuyConfirmOpen(false)} />
@@ -416,7 +416,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                 </NitroCardView>
             )}
 
-            {/* Ventana Habbo Retro Illumina: Cómo jugar a SnowStorm con textos oficiales */}
+            {/* Ventana Habbten Retro Illumina: Cómo jugar a SnowStorm con textos oficiales */}
             {isHowToPlayOpen && (
                 <NitroCardView uniqueKey="snowstorm-howto" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '390px', zIndex: 1100 }}>
                     <NitroCardHeaderView headerText={LocalizeText('snowwar.instructions.link') || 'Cómo jugar a SnowStorm'} onCloseClick={() => setIsHowToPlayOpen(false)} />
@@ -440,7 +440,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                 </NitroCardView>
             )}
 
-            {/* Ventana Habbo Retro Illumina: Clasificación de SnowStorm */}
+            {/* Ventana Habbten Retro Illumina: Clasificación de SnowStorm */}
             {isLeaderboardOpen && (
                 <NitroCardView uniqueKey="snowstorm-leaderboard" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '380px', zIndex: 1100 }}>
                     <NitroCardHeaderView headerText={LocalizeText('snowwar.leaderboards.link') || 'Clasificación de SnowStorm'} onCloseClick={() => setIsLeaderboardOpen(false)} />

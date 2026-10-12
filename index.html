@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" />
@@ -9,21 +9,36 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" crossorigin="use-credentials" href="/site.webmanifest">
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000">
-    <meta name="apple-mobile-web-app-title" content="Nitro">
-    <meta name="application-name" content="Nitro">
+    <meta name="apple-mobile-web-app-title" content="Habbten">
+    <meta name="application-name" content="Habbten">
     <meta name="msapplication-TileColor" content="#000000">
     <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <base href="/game/">
-    <title>Nitro</title>
+    <title>Habbten Hotel</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>Necesitas habilitar JavaScript para jugar en Habbten.</noscript>
     <div id="root" class="w-100 h-100"></div>
     <script>
       (function () {
         var params = new URLSearchParams(window.location.search);
+        var eraParam = params.get('era');
+        var eraStorage = null;
+        try { eraStorage = localStorage.getItem('habbten_theme_era'); } catch (e) {}
+        var eraCookieMatch = document.cookie.match(/(?:^|; )habbten_era=([^;]*)/);
+        var eraCookie = eraCookieMatch ? decodeURIComponent(eraCookieMatch[1]) : null;
+        var chosenEra = eraParam || eraCookie || eraStorage || 'modern';
+        if (chosenEra === 'shockwave2006' || chosenEra === 'flash2012' || chosenEra === 'modern') {
+          try { localStorage.setItem('habbten_theme_era', chosenEra); } catch (e) {}
+          document.body.dataset.era = chosenEra;
+          document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006');
+          if (chosenEra === 'shockwave2006') document.body.classList.add('era-shockwave-2006');
+          else if (chosenEra === 'flash2012') document.body.classList.add('era-flash-2012');
+          else document.body.classList.add('era-modern');
+        }
+
         var fromQuery = params.get('sso');
         var fromCookie = null;
         var m = document.cookie.match(/(?:^|; )habbten_sso=([^;]*)/);

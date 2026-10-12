@@ -1,26 +1,26 @@
-// Flash Era 2012 Theme Styles
+// Flash Era 2012 Theme Styles - Authentic Habbten Illumina (r63b) Design
 body.era-flash-2012,
 body[data-era="flash2012"] {
 
-    // === Fixed Left Vertical Toolbar ===
+    // === Barra Lateral Vertical Fija Izquierda (Auténtica de 2012) ===
     .nitro-toolbar {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         bottom: 0 !important;
-        width: 44px !important;
+        width: 50px !important;
         height: 100vh !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
         align-items: center !important;
-        background: #555555 !important;
+        background: #2b3037 !important;
         border-top: none !important;
-        border-right: 2px solid #000000 !important;
+        border-right: 2px solid #1a1e23 !important;
         border-bottom: none !important;
         border-left: none !important;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.6) !important;
-        padding: 8px 0 !important;
-        gap: 6px !important;
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5) !important;
+        padding: 10px 0 !important;
+        gap: 8px !important;
         z-index: 1010 !important;
         margin: 0 !important;
 
@@ -28,67 +28,148 @@ body[data-era="flash2012"] {
             flex-direction: column !important;
             align-items: center !important;
             width: 100% !important;
-            gap: 6px !important;
+            gap: 8px !important;
 
             > div {
                 flex-direction: column !important;
                 align-items: center !important;
                 width: 100% !important;
-                gap: 6px !important;
+                gap: 8px !important;
             }
         }
 
         .navigation-item {
-            position: relative;
-            width: 38px !important;
-            height: 38px !important;
-            min-width: 38px !important;
-            min-height: 38px !important;
+            position: relative !important;
+            width: 44px !important;
+            height: 44px !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             justify-content: center !important;
-            background: rgba(0, 0, 0, 0.2) !important;
+            background-color: #383e47 !important;
+            border: 1px solid #1f2329 !important;
             border-radius: 6px !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+            background-repeat: no-repeat !important;
+            background-position: center center !important;
             transition: all 0.15s ease !important;
             margin: 0 auto !important;
 
             &:hover {
-                background: rgba(255, 255, 255, 0.25) !important;
-                border-color: #ffffff !important;
-                transform: scale(1.08) !important;
+                background-color: #484f5a !important;
+                border-color: #5d6674 !important;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)) brightness(1.1) !important;
+                transform: scale(1.05) !important;
             }
 
             &.active {
-                background: rgba(255, 255, 255, 0.35) !important;
-                border-color: #ffd700 !important;
+                background-color: #21252b !important;
+                border-color: #00d9cb !important;
+                box-shadow: inset 0 0 6px rgba(0, 217, 203, 0.4) !important;
             }
 
             &.item-avatar {
                 order: 99 !important;
                 margin-top: auto !important;
-                width: 36px !important;
-                height: 36px !important;
+                width: 38px !important;
+                height: 38px !important;
                 border-radius: 50% !important;
                 overflow: hidden !important;
                 border: 2px solid #ffffff !important;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
-                background: #2b353e !important;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+                background-color: #1f2328 !important;
+            }
+
+            &.icon-rooms {
+                background-image: url('@/assets/images/toolbar/icons/rooms.png') !important;
+                background-size: 28px 22px !important;
+            }
+            &.icon-catalog {
+                background-image: url('@/assets/images/toolbar/icons/catalog.png') !important;
+                background-size: 26px 26px !important;
+            }
+            &.icon-inventory {
+                background-image: url('@/assets/images/toolbar/icons/inventory.png') !important;
+                background-size: 28px 26px !important;
+            }
+            &.icon-game {
+                background-image: url('@/assets/images/toolbar/icons/game.png') !important;
+                background-size: 28px 18px !important;
+            }
+            &.icon-camera {
+                background-image: url('@/assets/images/toolbar/icons/camera.png') !important;
+                background-size: 26px 22px !important;
+            }
+            &.icon-friendall {
+                background-image: url('@/assets/images/toolbar/icons/friend_all.png') !important;
+                background-size: 26px 24px !important;
+            }
+            &.icon-habbo,
+            &.icon-house {
+                background-image: url('@/assets/images/toolbar/icons/house.png') !important;
+                background-size: 24px 24px !important;
+            }
+            &.icon-modtools {
+                background-image: url('@/assets/images/toolbar/icons/modtools.png') !important;
+                background-size: 22px 22px !important;
+            }
+            &.icon-battlepass {
+                background-image: url('@/assets/images/toolbar/icons/quest.png') !important;
+                background-size: 24px 24px !important;
             }
         }
 
-        // Hide friend bar on vertical toolbar to maintain clean 2012 look
+        // Reglas de respaldo directo sobre clases de icono
+        .icon-rooms {
+            background-image: url('@/assets/images/toolbar/icons/rooms.png') !important;
+            background-size: 28px 22px !important;
+        }
+        .icon-catalog {
+            background-image: url('@/assets/images/toolbar/icons/catalog.png') !important;
+            background-size: 26px 26px !important;
+        }
+        .icon-inventory {
+            background-image: url('@/assets/images/toolbar/icons/inventory.png') !important;
+            background-size: 28px 26px !important;
+        }
+        .icon-game {
+            background-image: url('@/assets/images/toolbar/icons/game.png') !important;
+            background-size: 28px 18px !important;
+        }
+        .icon-camera {
+            background-image: url('@/assets/images/toolbar/icons/camera.png') !important;
+            background-size: 26px 22px !important;
+        }
+        .icon-friendall {
+            background-image: url('@/assets/images/toolbar/icons/friend_all.png') !important;
+            background-size: 26px 24px !important;
+        }
+        .icon-habbo,
+        .icon-house {
+            background-image: url('@/assets/images/toolbar/icons/house.png') !important;
+            background-size: 24px 24px !important;
+        }
+        .icon-modtools {
+            background-image: url('@/assets/images/toolbar/icons/modtools.png') !important;
+            background-size: 22px 22px !important;
+        }
+        .icon-battlepass {
+            background-image: url('@/assets/images/toolbar/icons/quest.png') !important;
+            background-size: 24px 24px !important;
+        }
+
         > div:last-child {
             order: 98 !important;
             margin-top: auto !important;
             flex-direction: column !important;
             align-items: center !important;
-            gap: 6px !important;
+            gap: 8px !important;
 
             > div {
                 flex-direction: column !important;
-                gap: 6px !important;
+                gap: 8px !important;
             }
 
             #toolbar-friend-bar-container {
@@ -97,13 +178,13 @@ body[data-era="flash2012"] {
         }
     }
 
-    // === Bottom-Left Capsule Chat Input ===
+    // === Caja de Chat Flotante Estilo Cápsula Inferior Izquierda ===
     #toolbar-chat-input-container {
         position: fixed !important;
-        bottom: 8px !important;
-        left: 52px !important;
-        width: 340px !important;
-        max-width: calc(100vw - 70px) !important;
+        bottom: 10px !important;
+        left: 60px !important;
+        width: 360px !important;
+        max-width: calc(100vw - 80px) !important;
         z-index: 1020 !important;
 
         .nitro-chat-input-container {
@@ -111,10 +192,10 @@ body[data-era="flash2012"] {
             height: 36px !important;
             border-radius: 18px !important;
             background: #ffffff !important;
-            border: 2px solid #444444 !important;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.35) !important;
-            padding-left: 12px !important;
-            padding-right: 6px !important;
+            border: 2px solid #33373d !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+            padding-left: 14px !important;
+            padding-right: 8px !important;
             overflow: visible !important;
 
             &:before {
@@ -142,157 +223,127 @@ body[data-era="flash2012"] {
                         background: rgba(0, 0, 0, 0.18) !important;
                     }
                 }
-
-                .chatstyles-icon {
-                    background-color: #5cb85c !important;
-                    border: 1px solid #4cae4c !important;
-                    border-radius: 4px !important;
-                    width: 22px !important;
-                    height: 20px !important;
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
-                }
             }
         }
     }
 
-    // === Top-Right Colorful Pill Purse ===
+    // === Monedero Cápsulas Redondeadas Superiores Derechas (Illumina 2012) ===
     .nitro-purse-container {
         position: fixed !important;
         top: 10px !important;
-        right: 12px !important;
+        right: 14px !important;
         z-index: 1015 !important;
 
         .nitro-purse {
-            background: transparent !important;
-            box-shadow: none !important;
-            border: none !important;
-            padding: 0 !important;
-
-            > .row,
-            > div {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                gap: 8px !important;
-            }
-
-            .nitro-purse-subscription {
-                background: linear-gradient(180deg, #3498db 0%, #2980b9 100%) !important;
-                border: 2px solid #1b4f72 !important;
-                border-radius: 16px !important;
-                padding: 3px 10px !important;
-                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3) !important;
-            }
+            background: rgba(20, 24, 30, 0.85) !important;
+            backdrop-filter: blur(6px) !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
+            padding: 4px 8px !important;
 
             .nitro-purse-button {
-                background: #444444 !important;
-                border: 2px solid #222222 !important;
-                border-radius: 8px !important;
-                width: 28px !important;
-                height: 28px !important;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) !important;
+                border-radius: 14px !important;
+                padding: 3px 10px !important;
+                font-weight: 800 !important;
+                font-size: 11px !important;
+                margin: 0 2px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                transition: all 0.15s ease !important;
 
                 &:hover {
-                    background: #555555 !important;
+                    filter: brightness(1.15) !important;
+                    transform: scale(1.04) !important;
                 }
             }
 
-            .currency-item {
-                border-radius: 16px !important;
-                padding: 3px 12px !important;
-                font-weight: 700 !important;
-                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35) !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                gap: 6px !important;
+            // Créditos (Oro / Amarillo)
+            .nitro-purse-button:has([class*="credit"]),
+            .nitro-purse-button:has([type="-1"]) {
+                background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%) !important;
+                border: 1px solid #b45309 !important;
+                color: #ffffff !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+            }
 
-                // Credits capsule (Yellow gold)
-                &.currency--1,
-                &:has(.currency-icon-credits),
-                &:has([type="-1"]) {
-                    background: linear-gradient(180deg, #f1c40f 0%, #d4ac0d 100%) !important;
-                    border: 2px solid #b7950b !important;
-                    color: #4a3b00 !important;
-                    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) !important;
-                }
+            // Duckets (Púrpura / Violeta)
+            .nitro-purse-button:has([class*="ducket"]),
+            .nitro-purse-button:has([type="0"]) {
+                background: linear-gradient(180deg, #a855f7 0%, #7e22ce 100%) !important;
+                border: 1px solid #6b21a8 !important;
+                color: #ffffff !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+            }
 
-                // Duckets capsule (Purple)
-                &.currency-0,
-                &:has(.currency-icon-duckets),
-                &:has([type="0"]) {
-                    background: linear-gradient(180deg, #9b59b6 0%, #884ea0 100%) !important;
-                    border: 2px solid #6c3483 !important;
-                    color: #ffffff !important;
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
-                }
-
-                // Diamonds capsule (Cyan)
-                &.currency-5,
-                &:has(.currency-icon-diamonds),
-                &:has([type="5"]) {
-                    background: linear-gradient(180deg, #00b4d8 0%, #0077b6 100%) !important;
-                    border: 2px solid #023e8a !important;
-                    color: #ffffff !important;
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
-                }
+            // Diamantes (Cian / Celeste)
+            .nitro-purse-button:has([class*="diamond"]),
+            .nitro-purse-button:has([type="5"]) {
+                background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
+                border: 1px solid #0369a1 !important;
+                color: #ffffff !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
             }
         }
     }
 
-    // === Window Frame & Cards (Authentic Flash r63b 2012 Blue Header) ===
+    // === Ventanas y Tarjetas con Cabecera Azul Marina Illumina 2012 ===
     .nitro-card,
     .draggable-window {
         border-radius: 6px !important;
         border: 2px solid #133852 !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
-        background-color: #f0f0f0 !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5) !important;
+        background-color: #f4f5f7 !important;
         overflow: hidden !important;
 
         .nitro-card-header,
         .drag-handler {
-            background: linear-gradient(180deg, #377ea6 0%, #205c84 50%, #174b6f 51%, #1f5e88 100%) !important;
-            border-bottom: 2px solid #0f324c !important;
+            background: linear-gradient(180deg, #2b6187 0%, #1a4565 50%, #143752 51%, #1a4565 100%) !important;
+            border-bottom: 2px solid #0d283d !important;
             border-radius: 4px 4px 0 0 !important;
-            padding: 4px 8px !important;
+            padding: 4px 10px !important;
             min-height: 28px !important;
 
             .header-text,
             .nitro-card-header-text,
             h5, h6 {
                 color: #ffffff !important;
-                font-size: 12px !important;
+                font-size: 13px !important;
                 font-weight: 700 !important;
-                text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6) !important;
+                text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.7) !important;
             }
 
             .nitro-card-header-close,
             .close-button,
             .btn-close,
             [aria-label="Close"] {
-                background: linear-gradient(180deg, #d9534f 0%, #c9302c 100%) !important;
-                border: 1px solid #761c19 !important;
+                background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%) !important;
+                border: 1px solid #991b1b !important;
                 border-radius: 4px !important;
                 color: #ffffff !important;
-                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+                width: 16px !important;
+                height: 16px !important;
             }
         }
 
         .nitro-card-content,
         .nitro-card-body {
-            background-color: #f4f4f4 !important;
-            color: #222222 !important;
+            background-color: #f4f5f7 !important;
+            color: #1f2937 !important;
 
             .bg-muted,
             .card,
             .list-group {
                 background-color: #ffffff !important;
-                border: 1px solid #d0d0d0 !important;
+                border: 1px solid #d1d5db !important;
                 border-radius: 4px !important;
             }
         }
     }
 
-    // === Authentic Flash 2012 Glossy Buttons ===
+    // === Botones Satinados Glossy Illumina 2012 ===
     .btn,
     .nitro-button {
         border-radius: 4px !important;
@@ -302,26 +353,26 @@ body[data-era="flash2012"] {
 
         &.btn-success,
         &.btn-primary {
-            background: linear-gradient(180deg, #81ca29 0%, #589f13 100%) !important;
-            border: 1px solid #376d08 !important;
+            background: linear-gradient(180deg, #84cc16 0%, #65a30d 100%) !important;
+            border: 1px solid #4d7c0f !important;
             color: #ffffff !important;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2) !important;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5) !important;
 
             &:hover {
-                background: linear-gradient(180deg, #91da39 0%, #68af23 100%) !important;
+                background: linear-gradient(180deg, #93d623 0%, #72b512 100%) !important;
             }
         }
 
         &.btn-secondary {
-            background: linear-gradient(180deg, #6c7a89 0%, #515e6d 100%) !important;
-            border: 1px solid #3a4550 !important;
+            background: linear-gradient(180deg, #64748b 0%, #475569 100%) !important;
+            border: 1px solid #334155 !important;
             color: #ffffff !important;
         }
 
         &.btn-danger {
-            background: linear-gradient(180deg, #e74c3c 0%, #c0392b 100%) !important;
-            border: 1px solid #962d22 !important;
+            background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%) !important;
+            border: 1px solid #b91c1c !important;
             color: #ffffff !important;
         }
     }
