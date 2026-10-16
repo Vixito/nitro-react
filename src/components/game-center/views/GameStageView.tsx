@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { FaTimes, FaSpinner, FaRedo } from 'react-icons/fa';
+import { FaTimes, FaSpinner, FaRedo, FaExternalLinkAlt } from 'react-icons/fa';
 import { Base, Button, Flex, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
 
@@ -38,26 +38,24 @@ export const GameStageView: FC<{}> = () =>
 
     const gameTitle = GAME_NAMES[gameSlug] || (selectedGame ? selectedGame.gameNameId : 'Habbten Minijuego');
 
-    // Canonical path: /games/{slug}/index.html is static-served on both Express (CMS) and Nginx/Vite
-    const normalizedUrl = (() => {
-        if (!gameSlug) return gameURL;
-        // Retry alternative with /game prefix if primary failed
-        if (retryCount > 0) {
-            return `/game/games/${gameSlug}/index.html?r=${retryCount}`;
-        }
-        return `/games/${gameSlug}/index.html`;
-    })();
+    const origin = window.location.origin;
+    const directUrl = `${origin}/games/${gameSlug}/index.html${retryCount > 0 ? `?r=${retryCount}` : ''}`;
 
     const handleExitGame = () =>
     {
         setGameURL(null);
     };
 
+    const handleOpenInNewWindow = () =>
+    {
+        window.open(directUrl, '_blank', 'width=1000,height=600,menubar=no,toolbar=no');
+    };
+
     useEffect(() =>
     {
         setIsLoading(true);
         setHasError(false);
-        const timer = setTimeout(() => setIsLoading(false), 500);
+        const timer = setTimeout(() => setIsLoading(false), 400);
         const handleMessage = (event: MessageEvent) =>
         {
             if(event.data === 'EXIT_GAME') handleExitGame();
@@ -87,7 +85,7 @@ export const GameStageView: FC<{}> = () =>
                 justifyContent="between" 
                 className="px-3"
                 style={{ 
-                    height: '38px', 
+                    height: '40px', 
                     background: 'linear-gradient(180deg, #2b567a 0%, #1e4160 50%, #173550 51%, #1c3e5d 100%)',
                     borderBottom: '2px solid #0d2538',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.6)',
@@ -101,6 +99,22 @@ export const GameStageView: FC<{}> = () =>
                 </Flex>
 
                 <Flex alignItems="center" gap={ 2 }>
+                    <Button 
+                        variant="primary" 
+                        size="sm" 
+                        onClick={ handleOpenInNewWindow }
+                        style={{ 
+                            padding: '2px 10px',
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            background: '#0284c7',
+                            borderColor: '#0369a1'
+                        }}
+                        title="Abrir juego en pantalla completa / ventana emergente"
+                    >
+                        <FaExternalLinkAlt className="me-1" />
+                        <span>Abrir en ventana</span>
+                    </Button>
                     <Button 
                         variant="secondary" 
                         size="sm" 
@@ -135,7 +149,7 @@ export const GameStageView: FC<{}> = () =>
             <div style={{ 
                 position: 'relative', 
                 width: '100%', 
-                height: 'calc(100% - 38px)', 
+                height: 'calc(100% - 40px)', 
                 background: 'radial-gradient(circle at center, #132438 0%, #0b1522 60%, #060b12 100%)' 
             }}>
                 { isLoading && !hasError && (
@@ -152,13 +166,16 @@ export const GameStageView: FC<{}> = () =>
                             <Button variant="success" size="sm" onClick={ () => { setHasError(false); setRetryCount(prev => prev + 1); } }>
                                 <FaRedo className="me-1" /> Reintentar Carga
                             </Button>
-                            <Button variant="primary" size="sm" onClick={ handleExitGame }>Volver al Hotel</Button>
+                            <Button variant="primary" size="sm" onClick={ handleOpenInNewWindow }>
+                                <FaExternalLinkAlt className="me-1" /> Abrir en Ventana Separada
+                            </Button>
+                            <Button variant="secondary" size="sm" onClick={ handleExitGame }>Volver al Hotel</Button>
                         </Flex>
                     </Flex>
                 ) : (
                     <iframe 
-                        key={ `${normalizedUrl}-${retryCount}` }
-                        src={ normalizedUrl } 
+                        key={ `${directUrl}-${retryCount}` }
+                        src={ directUrl } 
                         title={ gameTitle }
                         allow="autoplay; fullscreen"
                         onLoad={ () => setIsLoading(false) }

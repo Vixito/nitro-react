@@ -280,27 +280,49 @@ body[data-era="shockwave2006"] {
         cursor: pointer !important;
         border: none !important;
         box-shadow: none !important;
+    }
 
-        &::-webkit-slider-runnable-track {
-            height: 6px !important;
-            background: #797979 !important;
-            border-top: 1px solid #404040 !important;
-            border-bottom: 1px solid #ffffff !important;
-            border-radius: 0px !important;
-        }
+    input[type="range"]::-webkit-slider-runnable-track,
+    input.custom-range[type="range"]::-webkit-slider-runnable-track {
+        height: 6px !important;
+        background: #797979 !important;
+        border-top: 1px solid #404040 !important;
+        border-bottom: 1px solid #ffffff !important;
+        border-radius: 0px !important;
+    }
 
-        &::-webkit-slider-thumb {
-            appearance: none !important;
-            -webkit-appearance: none !important;
-            width: 14px !important;
-            height: 18px !important;
-            background: #cfcbc0 !important;
-            border: 2px solid !important;
-            border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
-            border-radius: 0px !important;
-            margin-top: -6px !important;
-            box-shadow: 1px 1px 0px rgba(0,0,0,0.4) !important;
-        }
+    input[type="range"]::-moz-range-track,
+    input.custom-range[type="range"]::-moz-range-track {
+        height: 6px !important;
+        background: #797979 !important;
+        border-top: 1px solid #404040 !important;
+        border-bottom: 1px solid #ffffff !important;
+        border-radius: 0px !important;
+    }
+
+    input[type="range"]::-webkit-slider-thumb,
+    input.custom-range[type="range"]::-webkit-slider-thumb {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        width: 14px !important;
+        height: 18px !important;
+        background: #cfcbc0 !important;
+        border: 2px solid !important;
+        border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+        border-radius: 0px !important;
+        margin-top: -6px !important;
+        box-shadow: 1px 1px 0px rgba(0,0,0,0.4) !important;
+    }
+
+    input[type="range"]::-moz-range-thumb,
+    input.custom-range[type="range"]::-moz-range-thumb {
+        width: 14px !important;
+        height: 18px !important;
+        background: #cfcbc0 !important;
+        border: 2px solid !important;
+        border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+        border-radius: 0px !important;
+        box-shadow: 1px 1px 0px rgba(0,0,0,0.4) !important;
     }
 
     // === Barra de Herramientas Inferior Auténtica de Habbo Shockwave 2006 (Bottom Taskbar Dock) ===
@@ -409,6 +431,10 @@ body[data-era="shockwave2006"] {
             background-image: url('@/assets/images/toolbar/icons/camera.png') !important;
             background-size: 22px 18px !important;
         }
+        .icon-battlepass {
+            background-image: url('@/assets/images/toolbar/icons/quest.png') !important;
+            background-size: 20px 20px !important;
+        }
         .icon-friendall {
             background-image: url('@/assets/images/toolbar/icons/friend_all.png') !important;
             background-size: 22px 20px !important;
@@ -468,7 +494,7 @@ body[data-era="shockwave2006"] {
         }
     }
 
-    // === Monedero Auténtico Habbo Shockwave (Caja Biselada Superior Derecha) ===
+    // === Monedero Auténtico Habbo Shockwave 2006 (Caja Biselada Superior Derecha) ===
     .nitro-purse-container {
         position: fixed !important;
         top: 10px !important;
@@ -477,31 +503,107 @@ body[data-era="shockwave2006"] {
 
         .nitro-purse {
             border-radius: 0px !important;
-            border: 2px solid #000000 !important;
+            border: 2px solid !important;
+            border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
             background: #d4cfc5 !important;
             box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6) !important;
-            padding: 3px 6px !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 5px !important;
+            padding: 4px 6px !important;
+
+            .col-6, .col-4, .col-2 {
+                padding: 0 2px !important;
+            }
 
             .nitro-purse-button,
             .currency-item {
                 border-radius: 0px !important;
-                font-weight: 800 !important;
-                font-family: 'Ubuntu', 'Volter', Tahoma, sans-serif !important;
-                color: #000000 !important;
                 background: #ffffff !important;
                 border: 2px solid !important;
                 border-color: #797979 #ffffff #ffffff #797979 !important;
-                padding: 2px 8px !important;
-                font-size: 11px !important;
+                padding: 2px 6px !important;
+                margin-bottom: 2px !important;
+                height: 20px !important;
                 display: flex !important;
                 align-items: center !important;
-                gap: 5px !important;
-                text-shadow: none !important;
+                justify-content: space-between !important;
+
+                .nitro-text,
+                .text-white,
+                span,
+                div {
+                    color: #000000 !important;
+                    font-family: 'Ubuntu', 'Volter', Tahoma, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 800 !important;
+                    text-shadow: none !important;
+                }
+
+                .nitro-currency-icon {
+                    width: 14px !important;
+                    height: 14px !important;
+                    background-size: contain !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center !important;
+                    margin-left: 4px !important;
+                }
+            }
+
+            .nitro-purse-subscription {
+                border-radius: 0px !important;
+                background: #ffffff !important;
+                border: 2px solid !important;
+                border-color: #797979 #ffffff #ffffff #797979 !important;
+                padding: 4px 6px !important;
+                height: 100% !important;
+
+                .nitro-text,
+                .text-white,
+                span,
+                div {
+                    color: #000000 !important;
+                    font-family: 'Ubuntu', 'Volter', Tahoma, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 800 !important;
+                    text-shadow: none !important;
+                }
+
+                .nitro-currency-icon {
+                    width: 18px !important;
+                    height: 18px !important;
+                    background-size: contain !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center !important;
+                }
+            }
+
+            .nitro-purse-help,
+            .nitro-purse-settings {
+                border-radius: 0px !important;
+                background: #cfcbc0 !important;
+                border: 2px solid !important;
+                border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+                box-shadow: none !important;
+                margin-bottom: 2px !important;
+                height: 28px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+
+                &:hover {
+                    background: #dedad0 !important;
+                }
+
+                &:active {
+                    background: #bfbbb0 !important;
+                    border-color: #5c5950 #ffffff #ffffff #5c5950 !important;
+                }
             }
         }
+    }
+
+    // Ocultar herramientas modernas de sala que flotan en la esquina inferior izquierda
+    .nitro-room-tools-container,
+    .room-tools {
+        display: none !important;
     }
 
     // === Barras de Scroll Retro ===

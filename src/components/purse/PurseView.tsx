@@ -75,10 +75,10 @@ export const PurseView: FC<{}> = props =>
                             <Text variant="white">{ getClubText }</Text>
                         </Column> }
                     <Column justifyContent="center" size={ 2 } gap={ 0 }>
-                        <Flex center pointer fullHeight className="nitro-purse-button p-1 rounded" onClick={ event => CreateLinkEvent('help/show') }>
+                        <Flex center pointer fullHeight className="nitro-purse-button nitro-purse-help p-1 rounded" onClick={ event => CreateLinkEvent('help/show') }>
                             <i className="icon icon-help"/>
                         </Flex>
-                        <Flex center pointer fullHeight className="nitro-purse-button p-1 rounded" onClick={ event => CreateLinkEvent('user-settings/toggle') } >
+                        <Flex center pointer fullHeight className="nitro-purse-button nitro-purse-settings p-1 rounded" onClick={ event => CreateLinkEvent('user-settings/toggle') } >
                             <i className="icon icon-cog"/>
                         </Flex>
                     </Column>

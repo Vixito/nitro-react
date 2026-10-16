@@ -459,7 +459,7 @@
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                gain.connect(ctx.destination);
 
                 if (type === 'throw') {
                     osc.type = 'sine';
