@@ -56,7 +56,18 @@ const useGameCenterState = () =>
 
         setIsVisible(false);
         setIsSnowStormLobbyVisible(false);
-        setGameURL(parser.url);
+
+        const urlLower = parser.url.toLowerCase();
+        let targetUrl = parser.url;
+
+        if (urlLower.includes('basejump') || urlLower.includes('fastfood')) targetUrl = '/games/basejump/index.html';
+        else if (urlLower.includes('snowstorm') || urlLower.includes('snowwar')) targetUrl = '/games/snowstorm/index.html';
+        else if (urlLower.includes('wobblesquabble') || urlLower.includes('wobble')) targetUrl = '/games/wobblesquabble/index.html';
+        else if (urlLower.includes('battleball')) targetUrl = '/games/battleball/index.html';
+        else if (urlLower.includes('slotcar')) targetUrl = '/games/slotcar/index.html';
+        else if (targetUrl.startsWith('/game/games/')) targetUrl = targetUrl.replace('/game/games/', '/games/');
+
+        setGameURL(targetUrl);
     });
 
     const selectGame = (game: GameConfigurationData) =>

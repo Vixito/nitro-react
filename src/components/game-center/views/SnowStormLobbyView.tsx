@@ -58,7 +58,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
 
         setIsSnowStormLobbyVisible(false);
         setIsVisible(false);
-        setGameURL('/game/games/snowstorm/index.html');
+        setGameURL('/games/snowstorm/index.html');
     };
 
     const onHowToPlay = () => {

@@ -86,10 +86,10 @@ export const GameView = () => {
         SendMessageComposer(new JoinQueueMessageComposer(selectedGame.gameId));
 
         const gameUrls: { [name: string]: string } = {
-            basejump: '/game/games/basejump/index.html',
-            wobblesquabble: '/game/games/wobblesquabble/index.html',
-            battleball: '/game/games/battleball/index.html',
-            slotcar: '/game/games/slotcar/index.html'
+            basejump: '/games/basejump/index.html',
+            wobblesquabble: '/games/wobblesquabble/index.html',
+            battleball: '/games/battleball/index.html',
+            slotcar: '/games/slotcar/index.html'
         };
 
         if (selectedGame && gameUrls[selectedGame.gameNameId]) {
