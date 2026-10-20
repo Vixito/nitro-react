@@ -3,6 +3,7 @@ import { FC, useEffect } from 'react';
 import { AddEventLinkTracker, GetConfiguration, LocalizeText, RemoveLinkEventTracker } from '../../api';
 import { Column, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, Text } from '../../common';
 import { useCatalog } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { CatalogIconView } from './views/catalog-icon/CatalogIconView';
 import { CatalogGiftView } from './views/gift/CatalogGiftView';
 import { CatalogNavigationView } from './views/navigation/CatalogNavigationView';
@@ -12,6 +13,7 @@ import { MarketplacePostOfferView } from './views/page/layout/marketplace/Market
 export const CatalogView: FC<{}> = props =>
 {
     const { isVisible = false, setIsVisible = null, rootNode = null, currentPage = null, navigationHidden = false, setNavigationHidden = null, activeNodes = [], searchResult = null, setSearchResult = null, openPageByName = null, openPageByOfferId = null, openPageByFurniName = null, openSearchByName = null, activateNode = null, getNodeById } = useCatalog();
+    const { currentEra } = useEraTheme();
 
     useEffect(() =>
     {
@@ -75,7 +77,7 @@ export const CatalogView: FC<{}> = props =>
     return (
         <>
             { isVisible &&
-                <NitroCardView uniqueKey="catalog" className="nitro-catalog" style={ GetConfiguration('catalog.headers') ? { width: 710 } : {} }>
+                <NitroCardView uniqueKey="catalog" className={ `nitro-catalog ${ currentEra === 'flash2012' ? 'catalog-flash2012' : '' } ${ currentEra === 'shockwave2006' ? 'catalog-shockwave2006' : '' }` } style={ GetConfiguration('catalog.headers') ? { width: 710 } : {} }>
                     <NitroCardHeaderView headerText={ LocalizeText('catalog.title') } onCloseClick={ event => setIsVisible(false) } />
                     <NitroCardTabsView>
                         { rootNode && (rootNode.children.length > 0) && rootNode.children.map(child =>

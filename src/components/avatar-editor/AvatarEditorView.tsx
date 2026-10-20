@@ -4,6 +4,7 @@ import { FaDice, FaTrash, FaUndo } from 'react-icons/fa';
 import { AddEventLinkTracker, AvatarEditorAction, AvatarEditorUtilities, BodyModel, FigureData, generateRandomFigure, GetAvatarRenderManager, GetClubMemberLevel, GetConfiguration, GetSessionDataManager, HeadModel, IAvatarEditorCategoryModel, LegModel, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, TorsoModel } from '../../api';
 import { Button, ButtonGroup, Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useMessageEvent } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { AvatarEditorFigurePreviewView } from './views/AvatarEditorFigurePreviewView';
 import { AvatarEditorModelView } from './views/AvatarEditorModelView';
 import { AvatarEditorWardrobeView } from './views/AvatarEditorWardrobeView';
@@ -13,6 +14,7 @@ const DEFAULT_FEMALE_FIGURE: string = 'hr-515-33.hd-600-1.ch-635-70.lg-716-66-62
 
 export const AvatarEditorView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ figures, setFigures ] = useState<Map<string, FigureData>>(null);
     const [ figureData, setFigureData ] = useState<FigureData>(null);
@@ -276,7 +278,7 @@ export const AvatarEditorView: FC<{}> = props =>
     if(!isVisible || !figureData) return null;
 
     return (
-        <NitroCardView uniqueKey="avatar-editor" className="nitro-avatar-editor">
+        <NitroCardView uniqueKey="avatar-editor" className={ `nitro-avatar-editor ${ currentEra === 'flash2012' ? 'avatar-editor-flash2012' : '' } ${ currentEra === 'shockwave2006' ? 'avatar-editor-shockwave2006' : '' }` }>
             <NitroCardHeaderView headerText={ LocalizeText('avatareditor.title') } onCloseClick={ event => setIsVisible(false) } />
             <NitroCardTabsView>
                 { categories && (categories.size > 0) && Array.from(categories.keys()).map(category =>

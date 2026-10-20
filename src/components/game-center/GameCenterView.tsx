@@ -14,7 +14,10 @@ export const GameCenterView = () =>
 
     useEffect(() => {
         const checkEnabled = (e?: any) => {
-            const cfg = e?.detail || (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
+            let cfg = e?.detail;
+            if(!cfg) {
+                try { cfg = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig; } catch(err) { cfg = (window as any)?.HabbtenConfig; }
+            }
             if (cfg?.client?.toolbar_icons?.game_center === false && isVisible) {
                 setIsVisible(false);
             }
@@ -27,7 +30,8 @@ export const GameCenterView = () =>
     {
         const toggleGameCenter = () =>
         {
-            const cfg = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig;
+            let cfg = null;
+            try { cfg = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig; } catch(err) { cfg = (window as any)?.HabbtenConfig; }
             if (cfg?.client?.toolbar_icons?.game_center === false) return;
             setIsVisible(prev => !prev);
         };

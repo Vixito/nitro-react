@@ -4,18 +4,22 @@ import { createPortal } from 'react-dom';
 import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfiguration, GetSessionDataManager, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
 import { Text } from '../../../../common';
 import { useChatInputWidget, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
+import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 import { ChatInputEmojiPickerView } from './ChatInputEmojiPickerView';
 import { ChatInputGifPickerView } from './ChatInputGifPickerView';
 import { ChatInputStyleSelectorView } from './ChatInputStyleSelectorView';
 
 export const ChatInputView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ chatValue, setChatValue ] = useState<string>('');
     const { chatStyleId = 0, updateChatStyleId = null } = useSessionInfo();
     const { selectedUsername = '', floodBlocked = false, floodBlockedSeconds = 0, setIsTyping = null, setIsIdle = null, sendChat = null } = useChatInputWidget();
     const { roomSession = null } = useRoom();
+    const [ portalTarget, setPortalTarget ] = useState<HTMLElement | null>(null);
     const inputRef = useRef<HTMLInputElement>();
-
+    const [ chatMode, setChatMode ] = useState<'say' | 'shout' | 'whisper'>('say');
+    const [ isModeDropdownOpen, setModeDropdownOpen ] = useState(false);
     const chatModeIdWhisper = useMemo(() => LocalizeText('widgets.chatinput.mode.whisper'), []);
     const chatModeIdShout = useMemo(() => LocalizeText('widgets.chatinput.mode.shout'), []);
     const chatModeIdSpeak = useMemo(() => LocalizeText('widgets.chatinput.mode.speak'), []);
@@ -56,6 +60,11 @@ export const ChatInputView: FC<{}> = props =>
         if(!value || (value === '')) return;
 
         let chatType = (shiftKey ? ChatMessageTypeEnum.CHAT_SHOUT : ChatMessageTypeEnum.CHAT_DEFAULT);
+        if(currentEra === 'shockwave2006')
+        {
+            if(chatMode === 'shout') chatType = ChatMessageTypeEnum.CHAT_SHOUT;
+            else if(chatMode === 'whisper') chatType = ChatMessageTypeEnum.CHAT_WHISPER;
+        }
         let text = value;
 
         const parts = text.split(' ');
@@ -104,7 +113,7 @@ export const ChatInputView: FC<{}> = props =>
         }
 
         setChatValue(append);
-    }, [ chatModeIdWhisper, chatModeIdShout, chatModeIdSpeak, maxChatLength, chatStyleId, setIsTyping, setIsIdle, sendChat ]);
+    }, [ chatModeIdWhisper, chatModeIdShout, chatModeIdSpeak, maxChatLength, chatStyleId, setIsTyping, setIsIdle, sendChat, currentEra, chatMode ]);
 
     const updateChatInput = useCallback((value: string) =>
     {
@@ -170,6 +179,8 @@ export const ChatInputView: FC<{}> = props =>
     const chatStyleIds = useMemo(() =>
     {
         let styleIds: number[] = [];
+        const sessionDataManager = GetSessionDataManager();
+        if(!sessionDataManager) return styleIds;
 
         const styles = GetConfiguration<{ styleId: number, minRank: number, isSystemStyle: boolean, isHcOnly: boolean, isVipOnly?: boolean, isAmbassadorOnly: boolean }[]>('chat.styles');
 
@@ -184,13 +195,13 @@ export const ChatInputView: FC<{}> = props =>
 
                 if(style.minRank > 1)
                 {
-                    if(GetSessionDataManager().hasSecurity(style.minRank)) styleIds.push(style.styleId);
+                    if(sessionDataManager.hasSecurity(style.minRank)) styleIds.push(style.styleId);
                     continue;
                 }
 
                 if(style.isSystemStyle)
                 {
-                    if(GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR))
+                    if(sessionDataManager.hasSecurity(RoomControllerLevel.MODERATOR))
                     {
                         styleIds.push(style.styleId);
                         continue;
@@ -199,7 +210,7 @@ export const ChatInputView: FC<{}> = props =>
 
                 if(style.isVipOnly)
                 {
-                    if(GetClubMemberLevel() >= HabboClubLevelEnum.VIP || GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR))
+                    if(GetClubMemberLevel() >= HabboClubLevelEnum.VIP || sessionDataManager.hasSecurity(RoomControllerLevel.MODERATOR))
                     {
                         styleIds.push(style.styleId);
                     }
@@ -208,14 +219,14 @@ export const ChatInputView: FC<{}> = props =>
 
                 if(style.isHcOnly)
                 {
-                    if(GetClubMemberLevel() >= HabboClubLevelEnum.CLUB || GetSessionDataManager().hasSecurity(RoomControllerLevel.MODERATOR))
+                    if(GetClubMemberLevel() >= HabboClubLevelEnum.CLUB || sessionDataManager.hasSecurity(RoomControllerLevel.MODERATOR))
                     {
                         styleIds.push(style.styleId);
                     }
                     continue;
                 }
 
-                if(style.isAmbassadorOnly && GetSessionDataManager().isAmbassador)
+                if(style.isAmbassadorOnly && sessionDataManager.isAmbassador)
                 {
                     styleIds.push(style.styleId);
                     continue;
@@ -284,14 +295,44 @@ export const ChatInputView: FC<{}> = props =>
         }, 50);
     }, [ setIsTyping, setIsIdle ]);
 
+    useEffect(() =>
+    {
+        const updateTarget = () =>
+        {
+            const el = document.getElementById('toolbar-chat-input-container');
+            if(el) setPortalTarget(el);
+        };
+
+        updateTarget();
+        const timer = setTimeout(updateTarget, 100);
+        return () => clearTimeout(timer);
+    }, [ currentEra, roomSession ]);
+
     if(!roomSession || roomSession.isSpectator) return null;
+
+    const target = portalTarget || (typeof document !== 'undefined' ? document.getElementById('toolbar-chat-input-container') : null);
+    if(!target) return null;
 
     return (
         createPortal(
             <div className="nitro-chat-input-container">
+                { currentEra === 'shockwave2006' && (
+                    <div className="chat-mode-selector-shockwave2006" onClick={ () => setModeDropdownOpen(!isModeDropdownOpen) }>
+                        <span className="mode-label">{ chatMode === 'say' ? 'Decir' : chatMode === 'shout' ? 'Gritar' : 'Susurrar' }</span>
+                        <div className="mode-divider" />
+                        <span className="mode-arrow">▼</span>
+                        { isModeDropdownOpen && (
+                            <div className="chat-mode-dropdown-menu">
+                                <div className={ `dropdown-item ${ chatMode === 'say' ? 'active' : '' }` } onClick={ (e) => { e.stopPropagation(); setChatMode('say'); setModeDropdownOpen(false); } }>Decir</div>
+                                <div className={ `dropdown-item ${ chatMode === 'shout' ? 'active' : '' }` } onClick={ (e) => { e.stopPropagation(); setChatMode('shout'); setModeDropdownOpen(false); } }>Gritar</div>
+                                <div className={ `dropdown-item ${ chatMode === 'whisper' ? 'active' : '' }` } onClick={ (e) => { e.stopPropagation(); setChatMode('whisper'); setModeDropdownOpen(false); } }>Susurrar</div>
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className="input-sizer align-items-center">
                     { !floodBlocked &&
-                    <input ref={ inputRef } type="text" className="chat-input" placeholder={ LocalizeText('widgets.chatinput.default') } value={ chatValue } maxLength={ maxChatLength } onChange={ event => updateChatInput(event.target.value) } onMouseDown={ event => setInputFocus() } /> }
+                    <input ref={ inputRef } type="text" className="chat-input" placeholder={ currentEra === 'shockwave2006' ? '' : LocalizeText('widgets.chatinput.default') } value={ chatValue } maxLength={ maxChatLength } onChange={ event => updateChatInput(event.target.value) } onMouseDown={ event => setInputFocus() } /> }
                     { floodBlocked &&
                     <Text variant="danger">{ LocalizeText('chat.input.alert.flood', [ 'time' ], [ floodBlockedSeconds.toString() ]) } </Text> }
                 </div>
@@ -300,6 +341,6 @@ export const ChatInputView: FC<{}> = props =>
                     <ChatInputGifPickerView onSelectGif={ onSelectGif } />
                     <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
                 </div>
-            </div>, document.getElementById('toolbar-chat-input-container'))
+            </div>, target)
     );
 }

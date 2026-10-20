@@ -1,4 +1,4 @@
-import { ActivityPointNotificationMessageEvent, UserCreditsEvent, UserCurrencyComposer, UserCurrencyEvent, UserSubscriptionComposer, UserSubscriptionEvent, UserSubscriptionParser } from '@nitrots/nitro-renderer';
+import { ActivityPointNotificationMessageEvent, HabboClubLevelEnum, UserCreditsEvent, UserCurrencyComposer, UserCurrencyEvent, UserSubscriptionComposer, UserSubscriptionEvent, UserSubscriptionParser } from '@nitrots/nitro-renderer';
 import { useEffect, useMemo, useState } from 'react';
 import { useBetween } from 'use-between';
 import { CloneObject, ClubStatus, GetConfiguration, IPurse, PlaySound, Purse, SendMessageComposer, SoundNames } from '../../api';
@@ -17,6 +17,15 @@ const usePurseState = () =>
 
         return ClubStatus.NONE;
     }, [ purse, hcDisabled ]);
+
+    const getClubMemberLevel = () =>
+    {
+        if(hcDisabled) return HabboClubLevelEnum.VIP;
+
+        if(purse.clubDays > 0) return purse.clubLevel;
+
+        return HabboClubLevelEnum.NO_CLUB;
+    };
 
     const getCurrencyAmount = (type: number) =>
     {
@@ -120,7 +129,7 @@ const usePurseState = () =>
         SendMessageComposer(new UserCurrencyComposer());
     }, []);
 
-    return { purse, hcDisabled, clubStatus, getCurrencyAmount };
+    return { purse, hcDisabled, clubStatus, getCurrencyAmount, getClubMemberLevel };
 }
 
 export const usePurse = () => useBetween(usePurseState);

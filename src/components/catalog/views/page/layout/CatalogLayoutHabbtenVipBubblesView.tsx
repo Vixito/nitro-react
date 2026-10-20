@@ -225,7 +225,7 @@ export const CatalogLayoutHabbtenVipBubblesView: FC<CatalogLayoutProps> = props 
                         <Column center gap={ 2 } fullWidth>
                             <Text fontWeight="bold" fontSize={ 4 }>{ selectedBubble.name }</Text>
                             
-                            { /* Authentic In-Game Habbo Chat Bubble Preview with Avatar Head & Native Styles */ }
+                            { /* Authentic In-Game Habbten Chat Bubble Preview with Avatar Head & Native Styles */ }
                             <div className="p-3 bg-white rounded border border-gray-300 w-full shadow-inner my-2 flex items-center justify-center min-h-[75px] overflow-visible">
                                 <div className="bubble-container" style={ { position: 'relative', display: 'inline-block' } }>
                                     <div className={ `chat-bubble bubble-${ selectedBubble.bubble_id } type-0` }>

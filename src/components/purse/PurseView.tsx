@@ -1,14 +1,16 @@
 import { FriendlyTime, HabboClubLevelEnum } from '@nitrots/nitro-renderer';
 import { FC, useMemo } from 'react';
-import { CreateLinkEvent, GetConfiguration, LocalizeText } from '../../api';
+import { CreateLinkEvent, GetConfiguration, LocalizeFormattedNumber, LocalizeShortNumber, LocalizeText } from '../../api';
 import { Column, Flex, Grid, LayoutCurrencyIcon, Text } from '../../common';
 import { usePurse } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { CurrencyView } from './views/CurrencyView';
 import { SeasonalView } from './views/SeasonalView';
 
 export const PurseView: FC<{}> = props =>
 {
     const { purse = null, hcDisabled = false } = usePurse();
+    const { currentEra } = useEraTheme();
 
     const displayedCurrencies = useMemo(() => GetConfiguration<number[]>('system.currency.types', []), []);
     const currencyDisplayNumberShort = useMemo(() => GetConfiguration<boolean>('currency.display.number.short', false), []);
@@ -60,6 +62,62 @@ export const PurseView: FC<{}> = props =>
     }
 
     if(!purse) return null;
+
+    if(currentEra === 'flash2012')
+    {
+        return (
+            <div className="nitro-purse-container purse-flash2012">
+                <div className="purse-box">
+                    <div className="purse-currencies">
+                        <div className="currency-pill currency-credits" title="Créditos">
+                            <span className="amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(purse.credits) : LocalizeFormattedNumber(purse.credits) }</span>
+                            <LayoutCurrencyIcon type={ -1 } />
+                        </div>
+                        { getCurrencyElements(0, 2) }
+                    </div>
+                    <div className="purse-side">
+                        { !hcDisabled && (
+                            <div className="purse-club" title="Habbten Club" onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }>
+                                <LayoutCurrencyIcon type="hc" />
+                                <span className="club-text">{ getClubText }</span>
+                            </div>
+                        )}
+                        <div className="purse-actions">
+                            <div className="purse-btn btn-settings" title="Ajustes" onClick={ () => CreateLinkEvent('user-settings/toggle') }>
+                                <i className="icon icon-cog" />
+                            </div>
+                            <div className="purse-btn btn-help" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>
+                                <i className="icon icon-help" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                { getCurrencyElements(2, -1, true) }
+            </div>
+        );
+    }
+
+    if(currentEra === 'shockwave2006')
+    {
+        return (
+            <div className="nitro-purse-container purse-shockwave2006">
+                <div className="purse-bevel-box">
+                    <div className="credits-display" title="Créditos" onClick={ () => CreateLinkEvent('catalog/open/credits') }>
+                        <LayoutCurrencyIcon type={ -1 } />
+                        <span className="credits-val">{ LocalizeFormattedNumber(purse.credits) }</span>
+                    </div>
+                    <div className="purse-actions">
+                        <div className="purse-btn" title="Ajustes" onClick={ () => CreateLinkEvent('user-settings/toggle') }>
+                            <i className="icon icon-cog" />
+                        </div>
+                        <div className="purse-btn" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>
+                            <i className="icon icon-help" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <Column alignItems="end" className="nitro-purse-container" gap={ 1 }>

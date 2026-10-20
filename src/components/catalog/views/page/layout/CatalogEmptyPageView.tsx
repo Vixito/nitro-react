@@ -11,7 +11,7 @@ interface CatalogEmptyPageViewProps
     message?: string;
 }
 
-// Official Habbo Mascot: Frank the Concierge
+// Official Habbten Mascot: Frank the Concierge
 // - ha-3236-1072-1077: Red concierge pillbox hat with gold star/trim
 // - hr-893-90: Brown wavy hair
 // - hd-180-1: Classic smiling face

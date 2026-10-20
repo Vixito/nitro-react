@@ -74,8 +74,12 @@ export const useEraTheme = () =>
         const urlEra = urlParams.get('era') as EraType;
         if(urlEra === 'flash2012' || urlEra === 'shockwave2006' || urlEra === 'modern') return urlEra;
 
-        const parentEra = (window.parent as any)?.HabbtenConfig?.era as EraType;
-        if(parentEra === 'flash2012' || parentEra === 'shockwave2006' || parentEra === 'modern') return parentEra;
+        try
+        {
+            const parentEra = (window.parent as any)?.HabbtenConfig?.era as EraType;
+            if(parentEra === 'flash2012' || parentEra === 'shockwave2006' || parentEra === 'modern') return parentEra;
+        }
+        catch(e) {}
 
         const m = document.cookie.match(/(?:^|; )habbten_era=([^;]*)/);
         if (m && (m[1] === 'flash2012' || m[1] === 'shockwave2006' || m[1] === 'modern')) return m[1] as EraType;

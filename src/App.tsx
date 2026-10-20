@@ -8,6 +8,25 @@ import { useConfigurationEvent, useEraTheme, useLocalizationEvent, useMainEvent,
 
 NitroVersion.UI_VERSION = GetUIVersion();
 
+const debugLog = (step: string, data?: any) => {
+    console.log('[DEBUG_CLIENT]', step, data);
+    fetch('/api/debug-client-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ step, data, time: new Date().toISOString() })
+    }).catch(() => {});
+};
+
+if (typeof window !== 'undefined' && !(window as any).__debugHandlersAttached) {
+    (window as any).__debugHandlersAttached = true;
+    window.addEventListener('error', (e) => {
+        debugLog('WINDOW_UNCAUGHT_ERROR', { message: e.message, filename: e.filename, lineno: e.lineno, stack: e.error?.stack });
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+        debugLog('WINDOW_UNHANDLED_REJECTION', { reason: String(e.reason), stack: e.reason?.stack });
+    });
+}
+
 export const App: FC<{}> = props =>
 {
     useEraTheme();
@@ -20,9 +39,19 @@ export const App: FC<{}> = props =>
     if(!GetNitroInstance())
     {
         //@ts-ignore
-        if(!NitroConfig) throw new Error('NitroConfig is not defined!');
+        if(!NitroConfig) {
+            debugLog('NitroConfig is not defined in App!');
+            throw new Error('NitroConfig is not defined!');
+        }
 
-        Nitro.bootstrap();
+        try {
+            debugLog('Calling Nitro.bootstrap()...');
+            Nitro.bootstrap();
+            debugLog('Nitro.bootstrap() succeeded');
+        } catch (e: any) {
+            debugLog('Nitro.bootstrap() FAILED', { message: e?.message, stack: e?.stack });
+            throw e;
+        }
     }
 
     const handler = useCallback(async (event: NitroEvent) =>
@@ -30,6 +59,7 @@ export const App: FC<{}> = props =>
         switch(event.type)
         {
             case ConfigurationEvent.LOADED:
+                debugLog('ConfigurationEvent.LOADED');
                 GetNitroInstance().localization.init();
                 setPercent(prevValue => (prevValue + 20));
                 
@@ -128,6 +158,7 @@ export const App: FC<{}> = props =>
                 setTimeout(() => window.location.reload(), 1500);
                 return;
             case NitroCommunicationDemoEvent.CONNECTION_HANDSHAKING:
+                debugLog('NitroCommunicationDemoEvent.CONNECTION_HANDSHAKING');
                 setPercent(prevValue => (prevValue + 20));
                 return;
             case NitroCommunicationDemoEvent.CONNECTION_HANDSHAKE_FAILED:
@@ -135,29 +166,83 @@ export const App: FC<{}> = props =>
                 setMessage('Handshake Failed');
                 return;
             case NitroCommunicationDemoEvent.CONNECTION_AUTHENTICATED:
-                setPercent(prevValue => (prevValue + 20));
+                debugLog('NitroCommunicationDemoEvent.CONNECTION_AUTHENTICATED');
+                setPercent(prevValue => Math.min(100, prevValue + 20));
 
-                GetNitroInstance().init();
+                try {
+                    debugLog('Executing GetNitroInstance().init()...');
+                    GetNitroInstance().init();
+                    debugLog('GetNitroInstance().init() finished successfully');
+                } catch (err: any) {
+                    debugLog('GetNitroInstance().init() ERROR', { message: err?.message, stack: err?.stack });
+                    console.error('Failed to init Nitro instance:', err);
+                }
 
                 if(LegacyExternalInterface.available) LegacyExternalInterface.call('legacyTrack', 'authentication', 'authok', []);
+
+                // Non-invasive status poll to verify furnidata and room engine
+                {
+                    let ticks = 0;
+                    const statusPoll = setInterval(() => {
+                        try {
+                            ticks++;
+                            const nitro = GetNitroInstance();
+                            const sdm = (nitro as any)?.sessionDataManager;
+                            const re = (nitro as any)?.roomEngine;
+                            const floorCount = sdm?._floorItems?.size || 0;
+                            const furnitureReady = !!sdm?._furnitureReady;
+
+                            debugLog('ENGINE_POLL', {
+                                tick: ticks,
+                                furnitureReady,
+                                floorCount,
+                                roomEngineReady: re?.ready
+                            });
+
+                            if (re && re.ready) {
+                                debugLog('RoomEngine ready confirmed natively');
+                                clearInterval(statusPoll);
+                                setPercent(100);
+                                setTimeout(() => setIsReady(true), 150);
+                            } else if (re && furnitureReady && floorCount > 1000 && ticks >= 3) {
+                                // Furnidata is fully downloaded and verified loaded (>1000 items)
+                                debugLog(`Furniture data verified loaded (${floorCount} items). Finalizing RoomEngine initialization.`);
+                                re.onRoomEngineInitalized(true);
+                                clearInterval(statusPoll);
+                                setPercent(100);
+                                setTimeout(() => setIsReady(true), 150);
+                            }
+                        } catch (e: any) {
+                            debugLog('ENGINE_POLL_ERROR', { message: e?.message });
+                        }
+                    }, 1000);
+
+                    setTimeout(() => clearInterval(statusPoll), 30000);
+                }
                 return;
             case NitroCommunicationDemoEvent.CONNECTION_ERROR:
+                debugLog('NitroCommunicationDemoEvent.CONNECTION_ERROR');
                 setIsError(true);
-                setMessage('Connection Error');
+                setMessage('Error de conexión con el hotel');
                 return;
             case NitroCommunicationDemoEvent.CONNECTION_CLOSED:
-                //if(GetNitroInstance().roomEngine) GetNitroInstance().roomEngine.dispose();
-                //setIsError(true);
-                setMessage('Connection Error');
+                debugLog('NitroCommunicationDemoEvent.CONNECTION_CLOSED');
+                setIsError(true);
+                setMessage('Tu sesión ha finalizado o la conexión fue cerrada.');
 
                 HabboWebTools.send(-1, 'client.init.handshake.fail');
                 return;
             case RoomEngineEvent.ENGINE_INITIALIZED:
-                setPercent(prevValue => (prevValue + 20));
+                debugLog('RoomEngineEvent.ENGINE_INITIALIZED received');
+                setPercent(100);
 
-                setTimeout(() => setIsReady(true), 300);
+                setTimeout(() => {
+                    debugLog('Transitioning to isReady=true');
+                    setIsReady(true);
+                }, 200);
                 return;
             case NitroLocalizationEvent.LOADED: {
+                debugLog('NitroLocalizationEvent.LOADED');
                 const assetUrls = GetConfiguration<string[]>('preload.assets.urls');
                 const urls: string[] = [];
 
@@ -167,12 +252,28 @@ export const App: FC<{}> = props =>
                 
                 if(status)
                 {
+                    // Fetch a fresh single-use SSO ticket so reloads / iframe refreshes never fail with expired token
+                    try {
+                        const ssoRes = await fetch('/api/sso/ticket', { credentials: 'same-origin' });
+                        if (ssoRes.ok) {
+                            const ssoData = await ssoRes.json();
+                            if (ssoData && ssoData.ticket) {
+                                debugLog('Acquired fresh SSO ticket from /api/sso/ticket');
+                                NitroConfiguration.setValue('sso.ticket', ssoData.ticket);
+                            }
+                        }
+                    } catch (e) {
+                        debugLog('Could not refresh SSO ticket, using initial ticket', e);
+                    }
+
+                    debugLog('Assets downloaded successfully, calling GetCommunication().init()');
                     GetCommunication().init();
 
-                    setPercent(prevValue => (prevValue + 20))
+                    setPercent(prevValue => (prevValue + 20));
                 }
                 else
                 {
+                    debugLog('Assets download FAILED');
                     setIsError(true);
                     setMessage('Assets Failed');
                 }

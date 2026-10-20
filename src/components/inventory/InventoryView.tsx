@@ -3,6 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { AddEventLinkTracker, GetLocalization, GetRoomEngine, isObjectMoverRequested, LocalizeText, RemoveLinkEventTracker, setObjectMoverRequested, UnseenItemCategory } from '../../api';
 import { NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useInventoryTrade, useInventoryUnseenTracker, useMessageEvent, useRoomEngineEvent, useRoomSessionManagerEvent } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
@@ -18,6 +19,7 @@ const UNSEEN_CATEGORIES = [ UnseenItemCategory.FURNI, UnseenItemCategory.BOT, Un
 
 export const InventoryView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ currentTab, setCurrentTab ] = useState<string>(TABS[0]);
     const [ roomSession, setRoomSession ] = useState<IRoomSession>(null);
@@ -138,8 +140,8 @@ export const InventoryView: FC<{}> = props =>
     if(!isVisible) return null;
 
     return (
-        <NitroCardView uniqueKey={ 'inventory' } className="nitro-inventory" theme={ isTrading ? 'primary-slim' : '' } >
-            <NitroCardHeaderView headerText={ LocalizeText('inventory.title') } onCloseClick={ onClose } />
+        <NitroCardView uniqueKey={ 'inventory' } className={ `nitro-inventory ${ currentEra === 'shockwave2006' ? 'inventory-shockwave-hand' : '' } ${ currentEra === 'flash2012' ? 'inventory-flash2012' : '' }` } theme={ isTrading ? 'primary-slim' : '' } >
+            <NitroCardHeaderView headerText={ currentEra === 'shockwave2006' ? 'La Mano' : LocalizeText('inventory.title') } onCloseClick={ onClose } />
             { !isTrading &&
                 <>
                     <NitroCardTabsView>

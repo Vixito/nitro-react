@@ -16,7 +16,43 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <base href="/game/">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Habbten Hotel</title>
+    <script>
+      window.addEventListener('error', function (e) {
+        try {
+          fetch('/api/debug-client-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              step: 'EARLY_WINDOW_ERROR',
+              message: e.message,
+              filename: e.filename,
+              lineno: e.lineno,
+              colno: e.colno,
+              stack: e.error ? e.error.stack : null,
+              time: new Date().toISOString()
+            })
+          });
+        } catch (err) {}
+      });
+      window.addEventListener('unhandledrejection', function (e) {
+        try {
+          fetch('/api/debug-client-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              step: 'EARLY_PROMISE_REJECTION',
+              reason: String(e.reason),
+              stack: e.reason ? e.reason.stack : null,
+              time: new Date().toISOString()
+            })
+          });
+        } catch (err) {}
+      });
+    </script>
   </head>
   <body>
     <noscript>Necesitas habilitar JavaScript para jugar en Habbten.</noscript>
@@ -44,9 +80,9 @@
         var m = document.cookie.match(/(?:^|; )habbten_sso=([^;]*)/);
         if (m) {
           try { fromCookie = decodeURIComponent(m[1]); } catch (e) { fromCookie = m[1]; }
-          document.cookie = 'habbten_sso=; Max-Age=0; Path=/game';
         }
         var ticket = fromQuery || fromCookie || null;
+        try { sessionStorage.removeItem('habbten_sso'); } catch (e) {}
         var path = window.location.pathname || '';
         var gamePrefix = path.indexOf('/game') === 0 ? '/game' : '';
         var origin = window.location.origin;
@@ -68,8 +104,8 @@
           cfg['asset.url'] = root + '/assets';
           cfg['image.library.url'] = root + '/swf/c_images/';
           cfg['hof.furni.url'] = root + '/swf/dcr/hof_furni';
-          cfg['furnidata.url'] = root + '/assets/gamedata/FurnitureData.json?v=' + Date.now();
-          cfg['productdata.url'] = root + '/assets/gamedata/ProductData.json?v=' + Date.now();
+          cfg['furnidata.url'] = root + '/assets/gamedata/FurnitureData.json?v=20260821_v14';
+          cfg['productdata.url'] = root + '/assets/gamedata/ProductData.json?v=20260821_v14';
         }
         window.NitroConfig = cfg;
       })();

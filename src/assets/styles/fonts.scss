@@ -2,3 +2,13 @@
     font-family: Ubuntu;
     src: url('@/assets/webfonts/Ubuntu-C.ttf');
 }
+
+@font-face {
+    font-family: "Volter";
+    src: url('@/assets/webfonts/volter/volter.woff') format('woff');
+}
+
+@font-face {
+    font-family: "Volter Bold";
+    src: url('@/assets/webfonts/volter/volter-bold.woff') format('woff');
+}

@@ -2,6 +2,7 @@ export * from './AutoGrid';
 export * from './Base';
 export * from './Button';
 export * from './ButtonGroup';
+export * from './ErrorBoundary';
 export * from './card';
 export * from './card/accordion';
 export * from './card/tabs';

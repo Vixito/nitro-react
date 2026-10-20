@@ -4,6 +4,7 @@ import { FaPlus } from 'react-icons/fa';
 import { AddEventLinkTracker, GetConfiguration, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, TryVisitRoom } from '../../api';
 import { Base, Column, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useNavigator, useRoomSessionManagerEvent } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
@@ -14,6 +15,7 @@ import { NavigatorSearchView } from './views/search/NavigatorSearchView';
 
 export const NavigatorView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ isReady, setIsReady ] = useState(false);
     const [ isCreatorOpen, setCreatorOpen ] = useState(false);
@@ -215,7 +217,7 @@ export const NavigatorView: FC<{}> = props =>
     return (
         <>
             { isVisible &&
-                <NitroCardView uniqueKey="navigator" className="nitro-navigator">
+                <NitroCardView uniqueKey="navigator" className={ `nitro-navigator ${ currentEra === 'flash2012' ? 'navigator-flash2012' : '' } ${ currentEra === 'shockwave2006' ? 'navigator-shockwave2006' : '' }` }>
                     <NitroCardHeaderView headerText={ LocalizeText(isCreatorOpen ? 'navigator.createroom.title' : 'navigator.title') } onCloseClick={ event => setIsVisible(false) } />
                     <NitroCardTabsView>
                         { topLevelContexts && (topLevelContexts.length > 0) && topLevelContexts.map((context, index) =>

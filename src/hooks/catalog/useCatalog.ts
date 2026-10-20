@@ -687,11 +687,11 @@ const useCatalogState = () =>
             traverseByName(rootNode);
         }
 
-        const userRank = GetSessionDataManager().rank;
-        const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || n.isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
+        const userRank = (GetSessionDataManager() as any)?.rank || 1;
+        const isNodeInBc = (n: ICatalogNode) => (n.pageId === 222 || (n as any).isBuildersClub || n.parent?.pageId === 222 || n.parent?.parent?.pageId === 222 || n.pageName?.toLowerCase().startsWith('bc_') || n.pageName?.toLowerCase().includes('builder') || n.localization?.toLowerCase().includes('arquitecto'));
         const isRootTabNode = (n: ICatalogNode) => n.parent?.pageName === 'root';
 
-        const accessibleNodes = Array.from(candidateNodesMap.values()).filter(n => n.isVisible && (!n.minRank || n.minRank <= userRank));
+        const accessibleNodes = Array.from(candidateNodesMap.values()).filter(n => n.isVisible && (!(n as any).minRank || (n as any).minRank <= userRank));
 
         const primaryFurni = matchingFurnis[0] || null;
         const fLine = primaryFurni?.furniLine?.toLowerCase() || '';

@@ -26,7 +26,11 @@ const MODE_SIGNS = 4;
 export const AvatarInfoWidgetOwnAvatarView: FC<AvatarInfoWidgetOwnAvatarViewProps> = props =>
 {
     const { avatarInfo = null, isDancing = false, setIsDecorating = null, onClose = null } = props;
-    const habbtenConfig = (window as any).HabbtenConfig || (window.parent as any).HabbtenConfig;
+    let habbtenConfig: any = (window as any).HabbtenConfig;
+    if(!habbtenConfig)
+    {
+        try { habbtenConfig = (window.parent as any)?.HabbtenConfig; } catch(e) {}
+    }
     const canDanceAll = habbtenConfig?.client?.dances_enabled ?? (habbtenConfig?.dances_enabled ?? true);
     const { roomSession = null } = useRoom();
 

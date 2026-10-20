@@ -66,7 +66,7 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = pro
 
     const isEventsView = (topLevelContext?.code === 'events_view') || (searchResult?.code === 'events_view') || (searchResult?.data === 'events_view');
     const displayRooms = (isEventsView && searchResult?.rooms)
-        ? searchResult.rooms.filter(room => (room.hasEvent || room.staffPick || !!room.officialRoomPicRef))
+        ? searchResult.rooms.filter(room => ((room as any).hasEvent || (room as any).staffPick || !!room.officialRoomPicRef))
         : (searchResult?.rooms || []);
     const gridHasTwoColumns = (displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS);
 

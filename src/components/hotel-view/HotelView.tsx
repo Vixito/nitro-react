@@ -49,27 +49,40 @@ export const HotelView: FC<{}> = props =>
 
     if(!isVisible) return null;
 
-    const habbtenConfig = (window.parent as any).HabbtenConfig || (window as any).HabbtenConfig;
-    const backgroundColor = habbtenConfig?.hotel_view?.backgroundColor || GetConfiguration('hotelview')['images']['background.colour'];
-    const background = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['background']);
-    const sun = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['sun']);
-    const drape = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['drape']);
-    const left = habbtenConfig?.hotel_view?.custom_layout?.background_image || NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['left']);
-    const rightRepeat = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['right.repeat']);
-    const right = NitroConfiguration.interpolate(GetConfiguration('hotelview')['images']['right']);
+    let habbtenConfig: any = null;
+    try
+    {
+        habbtenConfig = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig || null;
+    }
+    catch(e)
+    {
+        habbtenConfig = (window as any)?.HabbtenConfig || null;
+    }
+
+    const hotelViewConf = GetConfiguration<Record<string, any>>('hotelview') || {};
+    const hotelViewImages = hotelViewConf['images'] || {};
+    const hotelViewWidgets = hotelViewConf['widgets'] || {};
+
+    const backgroundColor = habbtenConfig?.hotel_view?.backgroundColor || hotelViewImages['background.colour'] || '#6eadc8';
+    const background = hotelViewImages['background'] ? NitroConfiguration.interpolate(hotelViewImages['background']) : '';
+    const sun = hotelViewImages['sun'] ? NitroConfiguration.interpolate(hotelViewImages['sun']) : '';
+    const drape = hotelViewImages['drape'] ? NitroConfiguration.interpolate(hotelViewImages['drape']) : '';
+    const left = habbtenConfig?.hotel_view?.custom_layout?.background_image || (hotelViewImages['left'] ? NitroConfiguration.interpolate(hotelViewImages['left']) : '');
+    const rightRepeat = hotelViewImages['right.repeat'] ? NitroConfiguration.interpolate(hotelViewImages['right.repeat']) : '';
+    const right = hotelViewImages['right'] ? NitroConfiguration.interpolate(hotelViewImages['right']) : '';
 
     const getWidgetConf = (slotId: number) => {
         if (habbtenConfig?.hotel_view?.slots?.[slotId]) {
             return habbtenConfig.hotel_view.slots[slotId].conf;
         }
-        return GetConfiguration('hotelview')['widgets']['slot.' + slotId + '.conf'];
+        return hotelViewWidgets['slot.' + slotId + '.conf'] || {};
     };
 
     const getWidgetType = (slotId: number) => {
         if (habbtenConfig?.hotel_view?.slots?.[slotId]) {
             return habbtenConfig.hotel_view.slots[slotId].widget;
         }
-        return GetConfiguration('hotelview')['widgets']['slot.' + slotId + '.widget'];
+        return hotelViewWidgets['slot.' + slotId + '.widget'] || '';
     };
 
     // Helper: Build CSS shadow string from Fabric.js shadow object
@@ -347,7 +360,7 @@ export const HotelView: FC<{}> = props =>
             </div>
             { backgrounds }
             { customOverlay }
-            { GetConfiguration('hotelview')['show.avatar'] && (
+            { (hotelViewConf['show.avatar'] ?? true) && (
                 <div className="avatar-image" style={{ zIndex: 11 }}>
                     <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
                 </div>

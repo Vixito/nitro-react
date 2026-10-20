@@ -11,6 +11,22 @@
     width: 100%;
     overflow: hidden;
 
+    body.era-shockwave-2006 &,
+    body[data-era="shockwave2006"] &,
+    .chat-container-shockwave2006 & {
+        height: 26px !important;
+        background: #ffffff !important;
+        border: 1px solid #000000 !important;
+        border-radius: 13px !important;
+        padding-right: 0 !important;
+        justify-content: flex-start !important;
+
+        &:before {
+            display: none !important;
+            content: none !important;
+        }
+    }
+
     @include media-breakpoint-down(sm) {
         display: flex;
         position: absolute;
