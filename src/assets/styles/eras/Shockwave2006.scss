@@ -356,14 +356,25 @@ body[data-era="shockwave2006"] {
             // ESTADOS ACTIVOS DE ICONOS
             &:active,
             &.active {
+                .icon-friendall {
+                    background-image: url('@/assets/images/eras/shockwave_v14/console_icon_dark.png') !important;
+                }
+                .icon-rooms {
+                    background-image: url('@/assets/images/eras/shockwave_v14/building_icon_sd.png') !important;
+                }
+                .icon-credits {
+                    background-image: url('@/assets/images/eras/shockwave_v14/credits_icon_sd.png') !important;
+                }
                 .icon-catalog {
                     background-image: url('@/assets/images/eras/shockwave_v14/brochure_icon_sd.png') !important;
                 }
                 .icon-inventory {
                     background-image: url('@/assets/images/eras/shockwave_v14/hand_icon_sd.png') !important;
                 }
-                .icon-friendall {
-                    background-image: url('@/assets/images/eras/shockwave_v14/console_icon_dark.png') !important;
+                .icon-club,
+                .icon-help,
+                .icon-modtools {
+                    filter: brightness(0.8) !important;
                 }
             }
 
@@ -1157,6 +1168,194 @@ body[data-era="shockwave2006"] {
                 border-color: #000000 !important;
             }
         }
+    }
+
+    // =========================================================================
+    // 9.2 CONSOLA Y LISTA DE AMIGOS RETRO (SHOCKWAVE 2006 / ORIGINS)
+    // =========================================================================
+    .nitro-friends,
+    .nitro-friends-messenger {
+        border-radius: 0px !important;
+        border: 2px solid #000000 !important;
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.85) !important;
+        background: #eae7df !important;
+
+        .nitro-card-header {
+            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            border-bottom: 2px solid #000000 !important;
+        }
+
+        .nitro-card-content {
+            background: #eae7df !important;
+        }
+
+        .nitro-card-accordion-set {
+            border: 2px solid #000000 !important;
+            border-radius: 0px !important;
+            margin-bottom: 4px !important;
+            background: #ffffff !important;
+
+            .nitro-card-accordion-set-header {
+                background: #cfcbc0 !important;
+                border-bottom: 2px solid !important;
+                border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+                color: #000000 !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 12px !important;
+                padding: 4px 8px !important;
+
+                * {
+                    color: #000000 !important;
+                    font-family: 'Volter Bold', sans-serif !important;
+                    font-size: 12px !important;
+                }
+            }
+        }
+
+        .search-input,
+        input[type="text"] {
+            background: #ffffff !important;
+            border: 2px solid !important;
+            border-color: #797979 #ffffff #ffffff #797979 !important;
+            border-radius: 0px !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 12px !important;
+            padding: 3px 6px !important;
+            color: #000000 !important;
+        }
+
+        .friend-row,
+        .friends-list-group-item,
+        .list-item,
+        [class*="friend-item"] {
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 12px !important;
+            padding: 3px 6px !important;
+
+            &:hover {
+                background-color: #fdfae6 !important;
+            }
+
+            &.selected,
+            &.active {
+                background-color: #ffffcc !important;
+                font-weight: 700 !important;
+            }
+        }
+
+        .chat-messages,
+        .messages-container,
+        [class*="messenger-thread"] {
+            background: #ffffff !important;
+            border: 2px solid !important;
+            border-color: #797979 #ffffff #ffffff #797979 !important;
+            border-radius: 0px !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 12px !important;
+            color: #000000 !important;
+        }
+    }
+
+    // =========================================================================
+    // 9.3 HABBTEN CLUB RETRO (SHOCKWAVE 2006 / ORIGINS)
+    // =========================================================================
+    .nitro-hc-center {
+        border-radius: 0px !important;
+        border: 2px solid #000000 !important;
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.85) !important;
+        background: #eae7df !important;
+
+        .nitro-card-header {
+            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            border-bottom: 2px solid #000000 !important;
+        }
+
+        .bg-muted,
+        .card,
+        [class*="hc-box"],
+        [class*="hccenter"] {
+            background: #ffffff !important;
+            border: 2px solid !important;
+            border-color: #797979 #ffffff #ffffff #797979 !important;
+            border-radius: 0px !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 12px !important;
+            color: #000000 !important;
+        }
+
+        button.btn-success,
+        .btn-hc-buy,
+        [class*="buy-button"] {
+            border-radius: 0px !important;
+            background: #388a1b !important;
+            border: 2px solid !important;
+            border-color: #75cb45 #1d4f0d #1d4f0d #75cb45 !important;
+            color: #ffffff !important;
+            font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 12px !important;
+            text-shadow: 1px 1px 0px #113606 !important;
+            box-shadow: none !important;
+
+            * {
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #113606 !important;
+            }
+
+            &:hover { background: #44a322 !important; }
+            &:active { background: #2b6d14 !important; }
+        }
+    }
+
+    // =========================================================================
+    // 9.4 VENTANA DE AYUDA RETRO (SHOCKWAVE 2006 / ORIGINS)
+    // =========================================================================
+    .nitro-help {
+        border-radius: 0px !important;
+        border: 2px solid #000000 !important;
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.85) !important;
+        background: #eae7df !important;
+
+        .nitro-card-header {
+            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            border-bottom: 2px solid #000000 !important;
+        }
+
+        .list-group,
+        .list-group-item,
+        [class*="help-item"],
+        .help-item {
+            background: #ffffff !important;
+            border: 2px solid !important;
+            border-color: #797979 #ffffff #ffffff #797979 !important;
+            border-radius: 0px !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 12px !important;
+            color: #000000 !important;
+            margin-bottom: 4px !important;
+            cursor: pointer !important;
+
+            &:hover {
+                background: #fdfae6 !important;
+            }
+        }
+    }
+
+    // =========================================================================
+    // 9.5 PASE DE BATALLA / RETOS RETRO (SHOCKWAVE 2006 / ORIGINS)
+    // =========================================================================
+    .nitro-battle-pass {
+        border-radius: 0px !important;
+        border: 2px solid #000000 !important;
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.85) !important;
+        background: #eae7df !important;
+
+        .nitro-card-header {
+            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            border-bottom: 2px solid #000000 !important;
+        }
+
+        font-family: 'Volter', Tahoma, sans-serif !important;
     }
 
     // =========================================================================

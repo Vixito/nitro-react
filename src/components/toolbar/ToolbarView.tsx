@@ -34,8 +34,65 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const radioUrl = habbtenConfig?.radio?.url;
     const isGameCenterEnabled = habbtenConfig?.client ? (habbtenConfig.client.toolbar_icons?.game_center === true) : (habbtenConfig?.toolbar_icons?.game_center === true);
 
+    const [ activeWindows, setActiveWindows ] = useState<{
+        console?: boolean;
+        rooms?: boolean;
+        club?: boolean;
+        credits?: boolean;
+        catalog?: boolean;
+        inventory?: boolean;
+        help?: boolean;
+        modtools?: boolean;
+    }>({});
 
-    
+    useEffect(() =>
+    {
+        if(currentEra !== 'shockwave2006') return;
+
+        const checkWindows = () =>
+        {
+            const hasConsole = !!(document.querySelector('.nitro-friends') || document.querySelector('.nitro-friends-messenger'));
+            const hasRooms = !!document.querySelector('.nitro-navigator');
+            const hasClub = !!document.querySelector('.nitro-hc-center');
+            const hasCredits = !!document.querySelector('.nitro-catalog');
+            const hasCatalog = !!document.querySelector('.nitro-battle-pass');
+            const hasInventory = !!document.querySelector('.nitro-inventory');
+            const hasHelp = !!document.querySelector('.nitro-help');
+            const hasModTools = !!document.querySelector('.nitro-mod-tools');
+
+            setActiveWindows(prev =>
+            {
+                if(
+                    prev.console === hasConsole &&
+                    prev.rooms === hasRooms &&
+                    prev.club === hasClub &&
+                    prev.credits === hasCredits &&
+                    prev.catalog === hasCatalog &&
+                    prev.inventory === hasInventory &&
+                    prev.help === hasHelp &&
+                    prev.modtools === hasModTools
+                ) return prev;
+
+                return {
+                    console: hasConsole,
+                    rooms: hasRooms,
+                    club: hasClub,
+                    credits: hasCredits,
+                    catalog: hasCatalog,
+                    inventory: hasInventory,
+                    help: hasHelp,
+                    modtools: hasModTools
+                };
+            });
+        };
+
+        checkWindows();
+
+        const observer = new MutationObserver(() => checkWindows());
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        return () => observer.disconnect();
+    }, [ currentEra ]);
     useEffect(() =>
     {
         const linkTracker: ILinkEventTracker = {
@@ -304,40 +361,40 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         {/* GRUPO DERECHO: Iconos oficiales v14 (Origins 1:1) */}
                         <div className="toolbar-right-group">
                             {/* 1. Consola (Consola amarilla v14) */}
-                            <div className="navigation-item item-console" title="Consola" onClick={ () => CreateLinkEvent('friends/toggle') }>
+                            <div className={ `navigation-item item-console ${ activeWindows.console ? 'active ' : '' }` } title="Consola" onClick={ () => CreateLinkEvent('friends/toggle') }>
                                 <i className="toolbar-icon icon-friendall" />
                                 { (requests.length > 0) && <LayoutItemCountView count={ requests.length } /> }
                             </div>
 
                             {/* 2. Navegador de Salas (Estrella dorada con ventana azul v14) */}
-                            <div className="navigation-item item-rooms" title="Navegador de Salas" onClick={ () => CreateLinkEvent('navigator/toggle') }>
+                            <div className={ `navigation-item item-rooms ${ activeWindows.rooms ? 'active ' : '' }` } title="Navegador de Salas" onClick={ () => CreateLinkEvent('navigator/toggle') }>
                                 <i className="toolbar-icon icon-rooms" />
                             </div>
 
                             {/* 3. Habbten Club (Portapapeles con sello oficial v14) */}
-                            <div className="navigation-item item-club" title="Habbten Club" onClick={ () => CreateLinkEvent('habboUI/toggle/hccenter') }>
+                            <div className={ `navigation-item item-club ${ activeWindows.club ? 'active ' : '' }` } title="Habbten Club" onClick={ () => CreateLinkEvent('habboUI/toggle/hccenter') }>
                                 <i className="toolbar-icon icon-club" />
                             </div>
 
                             {/* 4. Monedero -> Tienda / Catálogo sin bugs */}
-                            <div className="navigation-item item-credits" title="Tienda de Habbten" onClick={ () => CreateLinkEvent('catalog/toggle') }>
+                            <div className={ `navigation-item item-credits ${ activeWindows.credits ? 'active ' : '' }` } title="Tienda de Habbten" onClick={ () => CreateLinkEvent('catalog/toggle') }>
                                 <i className="toolbar-icon icon-credits" />
                             </div>
 
                             {/* 5. Folleto blanco con silla -> Pase de Batalla */}
-                            <div className="navigation-item item-catalog" title="Pase de Batalla" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                            <div className={ `navigation-item item-catalog ${ activeWindows.catalog ? 'active ' : '' }` } title="Pase de Batalla" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
                                 <i className="toolbar-icon icon-catalog" />
                             </div>
 
                             {/* 6. Mano / Inventario (Mano abierta v14) */}
-                            <div className="navigation-item item-inventory" title="Mano" onClick={ () => CreateLinkEvent('inventory/toggle') }>
+                            <div className={ `navigation-item item-inventory ${ activeWindows.inventory ? 'active ' : '' }` } title="Mano" onClick={ () => CreateLinkEvent('inventory/toggle') }>
                                 <i className="toolbar-icon icon-inventory" />
                                 { (getFullCount > 0) && <LayoutItemCountView count={ getFullCount } /> }
                             </div>
 
                             {/* 7. Ayuda y Sonido del Juego con alternancia clara Activado / Desactivado */}
                             <div className="toolbar-help-sound-column">
-                                <div className="navigation-item item-help" title="Ayuda" onClick={ () => CreateLinkEvent('help/toggle') }>
+                                <div className={ `navigation-item item-help ${ activeWindows.help ? 'active ' : '' }` } title="Ayuda" onClick={ () => CreateLinkEvent('help/toggle') }>
                                     <i className="toolbar-icon icon-help" />
                                 </div>
                                 <div className={ `navigation-item item-sound ${ isSoundActive ? 'active' : 'muted' }` } title={ isSoundActive ? 'Sonido: Activado (Clic para silenciar)' : 'Sonido: Silenciado (Clic para activar)' } onClick={ toggleSound }>
@@ -347,7 +404,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
 
                             {/* 8. Mod Tools (si es staff) */}
                             { isMod && (
-                                <div className="navigation-item item-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
+                                <div className={ `navigation-item item-modtools ${ activeWindows.modtools ? 'active ' : '' }` } title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
                                     <i className="toolbar-icon icon-modtools" />
                                 </div>
                             )}
