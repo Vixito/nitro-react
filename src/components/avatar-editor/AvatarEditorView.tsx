@@ -279,7 +279,7 @@ export const AvatarEditorView: FC<{}> = props =>
 
     return (
         <NitroCardView uniqueKey="avatar-editor" className={ `nitro-avatar-editor ${ currentEra === 'flash2012' ? 'avatar-editor-flash2012' : '' } ${ currentEra === 'shockwave2006' ? 'avatar-editor-shockwave2006' : '' }` }>
-            <NitroCardHeaderView headerText={ LocalizeText('avatareditor.title') } onCloseClick={ event => setIsVisible(false) } />
+            <NitroCardHeaderView headerText={ currentEra === 'shockwave2006' ? 'Habbten Details' : LocalizeText('avatareditor.title') } onCloseClick={ event => setIsVisible(false) } />
             <NitroCardTabsView>
                 { categories && (categories.size > 0) && Array.from(categories.keys()).map(category =>
                 {

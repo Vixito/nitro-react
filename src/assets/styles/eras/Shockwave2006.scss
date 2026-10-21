@@ -578,7 +578,7 @@ body[data-era="shockwave2006"] {
 
                             &:hover,
                             &.active {
-                                background: #0b9aa0 !important;
+                                background: #4f8096 !important;
                                 color: #ffffff !important;
                             }
                         }
@@ -645,89 +645,119 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     // 4. MENÚ DE USUARIO RETRO (ESTILO MENÚ VERTICAL ORIGINS / SHOCKWAVE)
     // =========================================================================
-    .nitro-toolbar-me {
+    .shockwave-avatar-menu {
         position: fixed !important;
-        bottom: 54px !important;
-        left: 10px !important;
+        bottom: 52px !important;
+        left: 8px !important;
         width: 175px !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
         background: #ced5d8 !important;
         border: 2px solid #000000 !important;
-        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.85) !important;
         border-radius: 4px !important;
-        padding: 0px !important;
-        gap: 2px !important;
-        z-index: 1025 !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.85) !important;
         overflow: hidden !important;
+        z-index: 1025 !important;
+        display: flex !important;
+        flex-direction: column !important;
 
-        &::before {
-            content: "Menú";
-            display: block;
-            background: linear-gradient(180deg, #6ba1b7 0%, #4f8096 100%);
-            color: #ffffff;
-            font-family: 'Volter', 'Ubuntu', sans-serif;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 4px 8px;
-            border-bottom: 1px solid #2d4c5a;
-            letter-spacing: 0.5px;
-        }
-
-        .navigation-item {
-            width: 100% !important;
-            height: 26px !important;
-            border-radius: 2px !important;
-            background: #ffffff !important;
-            border: 1px solid #7c888e !important;
+        .shockwave-menu-header {
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            padding: 0 8px !important;
-            cursor: pointer !important;
-            font-family: 'Volter', 'Ubuntu', sans-serif !important;
-            font-size: 10px !important;
-            color: #000000 !important;
-            text-decoration: none !important;
+            background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
+            color: #ffffff !important;
+            padding: 4px 6px !important;
+            border-bottom: 1px solid #2d4c5a !important;
 
-            &::after {
-                content: "▶";
-                font-size: 8px;
-                color: #555555;
+            .shockwave-menu-title {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.7) !important;
+                letter-spacing: 0.5px !important;
             }
 
-            &.icon-me-clothing::before {
-                content: "👗 Cambiar Ropa";
-            }
+            .shockwave-menu-close {
+                font-family: 'Volter', Tahoma, monospace, sans-serif !important;
+                font-size: 9px !important;
+                background: #4f8096 !important;
+                border: 1px solid #ffffff !important;
+                color: #ffffff !important;
+                padding: 0 4px !important;
+                border-radius: 2px !important;
+                cursor: pointer !important;
+                line-height: 12px !important;
 
-            &.icon-me-rooms::before {
-                content: "🏠 Mis Salas";
+                &:hover {
+                    background: #6c9cb2 !important;
+                }
             }
+        }
 
-            &.icon-me-profile::before {
-                content: "👤 Mi Perfil";
-            }
+        .shockwave-menu-body {
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 3px !important;
+            gap: 2px !important;
 
-            &.icon-me-settings::before {
-                content: "⚙️ Ajustes";
-            }
+            .shockwave-menu-row {
+                display: flex !important;
+                align-items: center !important;
+                height: 26px !important;
+                background: #ffffff !important;
+                border: 1px solid #7c888e !important;
+                border-radius: 2px !important;
+                padding: 0 6px !important;
+                cursor: pointer !important;
+                user-select: none !important;
 
-            &.icon-me-achievements::before {
-                content: "🏆 Recompensas";
-            }
+                .shockwave-menu-icon {
+                    width: 18px !important;
+                    height: 18px !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center !important;
+                    background-size: contain !important;
+                    margin-right: 6px !important;
+                    flex-shrink: 0 !important;
 
-            &.icon-me-helper-tool::before {
-                content: "❓ Guía";
-            }
+                    &.icon-clothing { background-image: url('@/assets/images/toolbar/icons/me-menu/clothing.png') !important; }
+                    &.icon-rooms { background-image: url('@/assets/images/toolbar/icons/me-menu/my-rooms.png') !important; }
+                    &.icon-profile { background-image: url('@/assets/images/toolbar/icons/me-menu/profile.png') !important; }
+                    &.icon-settings { background-image: url('@/assets/images/toolbar/icons/me-menu/cog.png') !important; }
+                    &.icon-achievements { background-image: url('@/assets/images/toolbar/icons/me-menu/achievements.png') !important; }
+                    &.icon-guide { background-image: url('@/assets/images/toolbar/icons/me-menu/helper-tool.png') !important; }
+                }
 
-            &:hover {
-                background: #eef5f8 !important;
-                border-color: #3b6b80 !important;
-                color: #0d4661 !important;
-            }
+                .shockwave-menu-label {
+                    flex-grow: 1 !important;
+                    font-family: 'Volter', Tahoma, sans-serif !important;
+                    font-size: 10px !important;
+                    color: #000000 !important;
+                    white-space: nowrap !important;
+                }
 
-            &:active {
-                background: #dbe8ee !important;
+                .shockwave-menu-arrow {
+                    font-size: 8px !important;
+                    color: #555555 !important;
+                    margin-left: 4px !important;
+                }
+
+                &:hover {
+                    background: #eef5f8 !important;
+                    border-color: #3b6b80 !important;
+
+                    .shockwave-menu-label {
+                        color: #0d4661 !important;
+                        font-weight: bold !important;
+                    }
+
+                    .shockwave-menu-arrow {
+                        color: #0d4661 !important;
+                    }
+                }
+
+                &:active {
+                    background: #dbe8ee !important;
+                }
             }
         }
     }
@@ -777,7 +807,7 @@ body[data-era="shockwave2006"] {
         background: #eae7df !important;
 
         .nitro-card-header {
-            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
             border-bottom: 2px solid #000000 !important;
         }
 
@@ -912,7 +942,7 @@ body[data-era="shockwave2006"] {
         background: #eae7df !important;
 
         .nitro-card-header {
-            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
             border-bottom: 2px solid #000000 !important;
         }
 
@@ -1006,7 +1036,7 @@ body[data-era="shockwave2006"] {
         background: #eae7df !important;
 
         .nitro-card-header {
-            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
             border-bottom: 2px solid #000000 !important;
         }
 
@@ -1062,7 +1092,7 @@ body[data-era="shockwave2006"] {
         background: #eae7df !important;
 
         .nitro-card-header {
-            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+            background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
             border-bottom: 2px solid #000000 !important;
         }
 
@@ -1528,7 +1558,7 @@ body[data-era="shockwave2006"] {
 
             .header,
             [class*="header"] {
-                background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+                background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
                 border-bottom: 2px solid #000000 !important;
                 color: #ffffff !important;
                 font-family: 'Volter Bold', 'Volter', sans-serif !important;
@@ -1605,59 +1635,7 @@ body[data-era="shockwave2006"] {
         }
     }
 
-    // =========================================================================
-    // 13. MENÚ CONTEXTUAL RETRO EN SALA (AVATAR / FURNI CONTEXT MENU)
-    // =========================================================================
-    .nitro-context-menu {
-        border-radius: 0px !important;
-        background: #eae7df !important;
-        border: 2px solid !important;
-        border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
-        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.75) !important;
-        overflow: hidden !important;
-        padding: 0 !important;
 
-        .menu-header,
-        [class*="header"] {
-            background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
-            border-bottom: 2px solid #000000 !important;
-            border-radius: 0px !important;
-            color: #ffffff !important;
-            font-family: 'Volter Bold', 'Volter', sans-serif !important;
-            font-size: 13px !important;
-            text-shadow: 1px 1px 0px #000000 !important;
-            padding: 3px 8px !important;
-
-            * {
-                color: #ffffff !important;
-                font-family: 'Volter Bold', sans-serif !important;
-            }
-        }
-
-        .menu-list-item,
-        [class*="item"] {
-            background: #eae7df !important;
-            color: #000000 !important;
-            border-bottom: 1px solid #cfcbc0 !important;
-            border-radius: 0px !important;
-            font-family: 'Volter Bold', 'Volter', sans-serif !important;
-            font-size: 12px !important;
-            padding: 4px 10px !important;
-            cursor: pointer !important;
-
-            * {
-                color: #000000 !important;
-            }
-
-            &:hover {
-                background: #dedad0 !important;
-            }
-
-            &:active {
-                background: #bfbbb0 !important;
-            }
-        }
-    }
 
     // =========================================================================
     // 14. BURBUJAS DE CHAT EN SALA AUTÉNTICAS HABBTEN ORIGINS 2006 (SPEECH BUBBLES)
@@ -1779,7 +1757,7 @@ body[data-era="shockwave2006"] {
 
             .card-header-bar {
                 box-sizing: border-box !important;
-                background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+                background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
                 border-bottom: 2px solid #000000 !important;
                 display: flex !important;
                 align-items: flex-start !important;
