@@ -276,10 +276,13 @@ body[data-era="shockwave2006"] {
                 }
 
                 &.icon-club {
-                    width: 30px !important;
-                    height: 34px !important;
+                    width: 26px !important;
+                    height: 31px !important;
                     background-image: url('@/assets/images/eras/shockwave_v14/club_clipboard.png') !important;
-                    background-size: contain !important;
+                    background-size: 26px 31px !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center !important;
+                    image-rendering: pixelated !important;
                 }
 
                 &.icon-credits {
@@ -2038,7 +2041,7 @@ body[data-era="shockwave2006"] {
 
                     .stage-avatar-wrapper {
                         position: absolute !important;
-                        bottom: 0 !important;
+                        bottom: -21px !important;
                         left: 50% !important;
                         transform: translateX(-50%) !important;
                         width: 64px !important;
