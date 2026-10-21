@@ -9,6 +9,7 @@ export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement>
     gender?: string;
     headOnly?: boolean;
     direction?: number;
+    headDirection?: number;
     scale?: number;
     posture?: string;
     gesture?: string;
@@ -16,7 +17,7 @@ export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement>
 
 export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
 {
-    const { figure = '', gender = 'M', headOnly = false, direction = 0, scale = 1, posture = null, gesture = null, classNames = [], style = {}, ...rest } = props;
+    const { figure = '', gender = 'M', headOnly = false, direction = 0, headDirection = null, scale = 1, posture = null, gesture = null, classNames = [], style = {}, ...rest } = props;
     const [ avatarUrl, setAvatarUrl ] = useState<string>(null);
     const [ randomValue, setRandomValue ] = useState(-1);
     const isDisposed = useRef(false);
@@ -68,7 +69,8 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
 
         if(headOnly) setType = AvatarSetType.HEAD;
 
-        avatarImage.setDirection(setType, direction);
+        avatarImage.setDirection(AvatarSetType.FULL, direction);
+        avatarImage.setDirection(setType, (headDirection !== null && headDirection !== undefined) ? headDirection : direction);
 
         if(posture) avatarImage.appendAction(AvatarAction.POSTURE, posture);
         if(gesture) avatarImage.appendAction(AvatarAction.GESTURE, gesture);
@@ -78,7 +80,7 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
         if(image) setAvatarUrl(image.src);
 
         avatarImage.dispose();
-    }, [ figure, gender, direction, headOnly, posture, gesture, randomValue ]);
+    }, [ figure, gender, direction, headDirection, headOnly, posture, gesture, randomValue ]);
 
     useEffect(() =>
     {

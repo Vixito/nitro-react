@@ -67,11 +67,11 @@ const useNotificationState = () =>
 
     const showNitroAlert = useCallback(() => simpleAlert(null, NotificationAlertType.NITRO), [ simpleAlert ]);
 
-    const showSingleBubble = useCallback((message: string, type: string, imageUrl: string = null, internalLink: string = null) =>
+    const showSingleBubble = useCallback((message: string, type: string, imageUrl: string = null, internalLink: string = null, title: string = null) =>
     {
         if(bubblesDisabled) return;
 
-        const notificationItem = new NotificationBubbleItem(message, type, imageUrl, internalLink);
+        const notificationItem = new NotificationBubbleItem(message, type, imageUrl, internalLink, title);
 
         setBubbleAlerts(prevValue => [ notificationItem, ...prevValue ]);
     }, [ bubblesDisabled ]);
@@ -423,7 +423,7 @@ const useNotificationState = () =>
                 modDisclaimerTimeout = null;
             }
 
-            showSingleBubble(LocalizeText('mod.chatdisclaimer'), NotificationBubbleType.INFO);
+            showSingleBubble(LocalizeText('mod.chatdisclaimer'), NotificationBubbleType.INFO, null, null, 'Aviso de Seguridad');
 
             setModDisclaimerShown(true);
         }

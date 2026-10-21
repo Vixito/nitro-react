@@ -1,6 +1,6 @@
-import { Dispose, DropBounce, EaseOut, ILinkEventTracker, JumpBy, Motions, NitroToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, Wait } from '@nitrots/nitro-renderer';
+import { Dispose, DropBounce, EaseOut, ILinkEventTracker, JumpBy, Motions, NitroSettingsEvent, NitroToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, UserSettingsEvent, UserSettingsSoundComposer, Wait } from '@nitrots/nitro-renderer';
 import { FC, useState, useRef, useEffect } from 'react';
-import { AddEventLinkTracker, CreateLinkEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, RemoveLinkEventTracker, VisitDesktop } from '../../api';
+import { AddEventLinkTracker, CreateLinkEvent, DispatchMainEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, RemoveLinkEventTracker, SendMessageComposer, VisitDesktop } from '../../api';
 import { Base, Flex, LayoutAvatarImageView, LayoutItemCountView, TransitionAnimation, TransitionAnimationTypes } from '../../common';
 import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useRoomEngineEvent, useSessionInfo } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
@@ -20,6 +20,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const isMod = GetSessionDataManager() ? GetSessionDataManager().isModerator : false;
     
     const [isPlayingRadio, setIsPlayingRadio] = useState(false);
+    const [isSoundActive, setIsSoundActive] = useState(true);
     const audioRef = useRef<HTMLAudioElement>(null);
     const [radioVolume, setRadioVolume] = useState(0.5);
 
@@ -120,6 +121,27 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
             setIsPlayingRadio(!isPlayingRadio);
         }
     };
+
+    const toggleSound = () => {
+        const nextState = !isSoundActive;
+        setIsSoundActive(nextState);
+
+        const volume = nextState ? 100 : 0;
+        try {
+            const settings = new NitroSettingsEvent();
+            settings.volumeSystem = volume;
+            settings.volumeFurni = volume;
+            settings.volumeTrax = volume;
+            DispatchMainEvent(settings);
+            SendMessageComposer(new UserSettingsSoundComposer(volume, volume, volume));
+        } catch (e) {}
+    };
+
+    useMessageEvent<UserSettingsEvent>(UserSettingsEvent, event => {
+        const parser = event.getParser();
+        const isMuted = (parser.volumeSystem === 0 && parser.volumeFurni === 0 && parser.volumeTrax === 0);
+        setIsSoundActive(!isMuted);
+    });
     
     useMessageEvent<PerkAllowancesMessageEvent>(PerkAllowancesMessageEvent, event =>
     {
@@ -271,7 +293,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         {/* GRUPO IZQUIERDO: Avatar + Barra de Chat */}
                         <div className="toolbar-left-group">
                             <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } title="Mi Personaje" onClick={ () => setMeExpanded(!isMeExpanded) }>
-                                <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headOnly={ true } classNames={ ['shockwave-avatar-head'] } />
+                                <LayoutAvatarImageView figure={ userFigure } direction={ 3 } headDirection={ 3 } headOnly={ true } classNames={ ['shockwave-avatar-head'] } />
                                 { (getTotalUnseen > 0) && <LayoutItemCountView count={ getTotalUnseen } /> }
                             </div>
 
@@ -293,17 +315,17 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             </div>
 
                             {/* 3. Habbten Club (Portapapeles con sello oficial v14) */}
-                            <div className="navigation-item item-club" title="Habbten Club" onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }>
+                            <div className="navigation-item item-club" title="Habbten Club" onClick={ () => CreateLinkEvent('habboUI/toggle/hccenter') }>
                                 <i className="toolbar-icon icon-club" />
                             </div>
 
-                            {/* 4. Monedero (Bolsa de cuero con monedas v14) */}
-                            <div className="navigation-item item-credits" title="Monedero" onClick={ () => CreateLinkEvent('catalog/open/credits') }>
+                            {/* 4. Monedero -> Tienda / Catálogo sin bugs */}
+                            <div className="navigation-item item-credits" title="Tienda de Habbten" onClick={ () => CreateLinkEvent('catalog/toggle') }>
                                 <i className="toolbar-icon icon-credits" />
                             </div>
 
-                            {/* 5. Catálogo (Folleto blanco con silla v14) */}
-                            <div className="navigation-item item-catalog" title="Catálogo" onClick={ () => CreateLinkEvent('catalog/toggle') }>
+                            {/* 5. Folleto blanco con silla -> Pase de Batalla */}
+                            <div className="navigation-item item-catalog" title="Pase de Batalla" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
                                 <i className="toolbar-icon icon-catalog" />
                             </div>
 
@@ -313,14 +335,13 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                                 { (getFullCount > 0) && <LayoutItemCountView count={ getFullCount } /> }
                             </div>
 
-                            {/* 7. Ayuda y Sonido / Radio */}
+                            {/* 7. Ayuda y Sonido del Juego con alternancia clara Activado / Desactivado */}
                             <div className="toolbar-help-sound-column">
-                                <div className="navigation-item item-help" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>
+                                <div className="navigation-item item-help" title="Ayuda" onClick={ () => CreateLinkEvent('help/toggle') }>
                                     <i className="toolbar-icon icon-help" />
                                 </div>
-                                <div className="navigation-item item-sound" title={ radioUrl ? (isPlayingRadio ? 'Pausar Radio' : 'Escuchar Radio') : 'Sonido' } onClick={ toggleRadio }>
-                                    <audio ref={ audioRef } preload="none" />
-                                    <i className={ `toolbar-icon icon-sound ${ isPlayingRadio ? 'playing' : '' }` } />
+                                <div className={ `navigation-item item-sound ${ isSoundActive ? 'active' : 'muted' }` } title={ isSoundActive ? 'Sonido: Activado (Clic para silenciar)' : 'Sonido: Silenciado (Clic para activar)' } onClick={ toggleSound }>
+                                    <i className={ `toolbar-icon icon-sound ${ isSoundActive ? 'active' : 'muted' }` } />
                                 </div>
                             </div>
 

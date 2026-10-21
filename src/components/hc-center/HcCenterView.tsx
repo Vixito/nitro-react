@@ -69,6 +69,7 @@ export const HcCenterView: FC<{}> = props =>
 
                 switch(parts[1])
                 {
+                    case 'show':
                     case 'open':
                         if(parts.length > 2)
                         {
@@ -80,14 +81,67 @@ export const HcCenterView: FC<{}> = props =>
                             }
                         }
                         return;
+                    case 'hide':
+                    case 'close':
+                        if(parts.length > 2)
+                        {
+                            switch(parts[2])
+                            {
+                                case 'hccenter':
+                                    setIsVisible(false);
+                                    break;
+                            }
+                        }
+                        return;
+                    case 'toggle':
+                        if(parts.length > 2)
+                        {
+                            switch(parts[2])
+                            {
+                                case 'hccenter':
+                                    setIsVisible(prev => !prev);
+                                    break;
+                            }
+                        }
+                        return;
                 }
             },
             eventUrlPrefix: 'habboUI/'
         };
 
-        AddEventLinkTracker(linkTracker);
+        const hcLinkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) =>
+            {
+                const parts = url.split('/');
 
-        return () => RemoveLinkEventTracker(linkTracker);
+                if(parts.length < 2) return;
+
+                switch(parts[1])
+                {
+                    case 'show':
+                    case 'open':
+                        setIsVisible(true);
+                        return;
+                    case 'hide':
+                    case 'close':
+                        setIsVisible(false);
+                        return;
+                    case 'toggle':
+                        setIsVisible(prev => !prev);
+                        return;
+                }
+            },
+            eventUrlPrefix: 'hccenter/'
+        };
+
+        AddEventLinkTracker(linkTracker);
+        AddEventLinkTracker(hcLinkTracker);
+
+        return () =>
+        {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(hcLinkTracker);
+        };
     }, []);
 
     useEffect(() =>

@@ -162,10 +162,11 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     // 3. BARRA INFERIOR AUTÉNTICA HABBTEN SHOCKWAVE 2006 (CON ASSETS V14 REALES)
     // =========================================================================
-    // Hotel View adaptado para el alto de la barra Shockwave 2006 (exacto 52px Origins v14)
+    // Hotel View adaptado para el alto de la barra Shockwave 2006.
+    // Medido sobre el render real: la barra mide 100px (diseño 1:1 de 50px escalado x2, pixel-doubling).
     .nitro-hotel-view {
-        height: calc(100% - 52px) !important;
-        bottom: 52px !important;
+        height: calc(100% - 100px) !important;
+        bottom: 100px !important;
     }
 
     .nitro-toolbar.toolbar-shockwave2006 {
@@ -175,37 +176,41 @@ body[data-era="shockwave2006"] {
         right: 0 !important;
         top: auto !important;
         width: 100% !important;
-        height: 52px !important;
-        min-height: 52px !important;
-        max-height: 52px !important;
+        height: 100px !important;
+        min-height: 100px !important;
+        max-height: 100px !important;
         display: flex !important;
         flex-direction: row !important;
-        justify-content: space-between !important;
-        align-items: center !important;
+        justify-content: flex-start !important;
+        align-items: flex-start !important;
         background: #565656 !important;
         background-color: #565656 !important;
-        border-top: 1px solid #000000 !important;
+        border-top: 2px solid #000000 !important;
         border-bottom: none !important;
         border-left: none !important;
         border-right: none !important;
-        box-shadow: inset 0 1px 0 #7e7e7e !important;
+        box-shadow: inset 0 2px 0 #7e7e7e !important;
         z-index: 1010 !important;
-        padding: 0 10px !important;
+        padding: 0 !important;
         margin: 0 !important;
         box-sizing: border-box !important;
         overflow: visible !important;
 
+        // Contenido diseñado a 1:1 (49px de alto, ancho = mitad de pantalla) y escalado x2.
         .toolbar-inner {
             display: flex !important;
             flex-direction: row !important;
             align-items: center !important;
             justify-content: space-between !important;
-            width: 100% !important;
-            height: 100% !important;
-            padding: 0 !important;
+            width: 50% !important;
+            min-width: 0 !important;
+            height: 49px !important;
+            padding: 0 10px !important;
             margin: 0 !important;
             box-sizing: border-box !important;
             gap: 12px !important;
+            transform: scale(2) !important;
+            transform-origin: 0 0 !important;
         }
 
         .toolbar-left-group {
@@ -322,13 +327,21 @@ body[data-era="shockwave2006"] {
                 }
 
                 &.icon-sound {
-                    width: 12px !important;
+                    width: 14px !important;
                     height: 14px !important;
-                    background-image: url('@/assets/images/eras/shockwave_v14/sound_icon.png') !important;
+                    background-image: url('@/assets/images/eras/shockwave_v14/sound_icon_on.png') !important;
                     background-size: contain !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center !important;
 
+                    &.muted,
+                    &.off {
+                        background-image: url('@/assets/images/eras/shockwave_v14/sound_icon_off.png') !important;
+                    }
+
+                    &.active,
                     &.playing {
-                        background-image: url('@/assets/images/eras/shockwave_v14/sound_icon.png') !important;
+                        background-image: url('@/assets/images/eras/shockwave_v14/sound_icon_on.png') !important;
                     }
                 }
 
@@ -354,14 +367,25 @@ body[data-era="shockwave2006"] {
                 }
             }
 
+            &.item-sound {
+                &.muted .icon-sound {
+                    background-image: url('@/assets/images/eras/shockwave_v14/sound_icon_off.png') !important;
+                }
+                &.active .icon-sound {
+                    background-image: url('@/assets/images/eras/shockwave_v14/sound_icon_on.png') !important;
+                }
+            }
+
             // AVATAR HEAD DIRECTAMENTE SOBRE LA BARRA GRIS (HABBTEN ORIGINS 1:1)
+            // Sprite real medido en el DOM: 90x130px, cabeza (alfa>10) en x29-65 / y32-70 (37x39px).
+            // Contenedor 40x44: left = 20 - 47.5 = -28px ; top = 2.5 - 32 = -30px => cabeza completa y centrada.
             &.item-avatar {
-                width: 36px !important;
-                height: 40px !important;
-                min-width: 36px !important;
-                max-width: 36px !important;
-                min-height: 40px !important;
-                max-height: 40px !important;
+                width: 42px !important;
+                height: 46px !important;
+                min-width: 42px !important;
+                max-width: 42px !important;
+                min-height: 46px !important;
+                max-height: 46px !important;
                 padding: 0 !important;
                 margin: 0 6px 0 2px !important;
                 background: transparent !important;
@@ -369,9 +393,7 @@ body[data-era="shockwave2006"] {
                 border: none !important;
                 box-shadow: none !important;
                 overflow: hidden !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                display: block !important;
                 position: relative !important;
                 cursor: pointer !important;
                 flex-shrink: 0 !important;
@@ -383,18 +405,20 @@ body[data-era="shockwave2006"] {
                 .shockwave-avatar-head,
                 .avatar-image {
                     position: absolute !important;
-                    width: 64px !important;
-                    height: 110px !important;
+                    width: 90px !important;
+                    height: 130px !important;
+                    min-width: 90px !important;
+                    min-height: 130px !important;
                     max-width: none !important;
                     max-height: none !important;
-                    top: -4px !important;
-                    left: 50% !important;
-                    transform: translateX(-50%) !important;
+                    top: -26px !important;
+                    left: -24px !important;
+                    transform: none !important;
                     margin: 0 !important;
                     padding: 0 !important;
-                    background-position: center top !important;
+                    background-position: 0 0 !important;
                     background-repeat: no-repeat !important;
-                    background-size: auto !important;
+                    background-size: 90px 130px !important;
                     image-rendering: pixelated !important;
                     pointer-events: none !important;
                 }
@@ -460,7 +484,7 @@ body[data-era="shockwave2006"] {
             min-height: 28px !important;
             max-height: 28px !important;
             flex: 1 1 auto !important;
-            max-width: 680px !important;
+            max-width: none !important;
             min-width: 0 !important;
             background: transparent !important;
             background-color: transparent !important;
@@ -508,7 +532,7 @@ body[data-era="shockwave2006"] {
                     margin: 0 !important;
                     border: none !important;
                     border-right: 1px solid #000000 !important;
-                    border-radius: 13px 0 0 13px !important;
+                    border-radius: 13px !important;
                     background: linear-gradient(180deg, #ffffff 0%, #dcdcdc 100%) !important;
                     box-shadow: none !important;
                     cursor: pointer !important;
@@ -648,7 +672,7 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     .nitro-toolbar-me {
         position: fixed !important;
-        bottom: 58px !important;
+        bottom: 106px !important;
         left: 8px !important;
         background: #eae7df !important;
         border: 2px solid #000000 !important;
@@ -1041,11 +1065,106 @@ body[data-era="shockwave2006"] {
     }
 
     // =========================================================================
+    // 9.1 AVISOS Y NOTIFICACIONES RETRO (HABBTEN SHOCKWAVE 2006 / ORIGINS)
+    // =========================================================================
+    .nitro-right-side {
+        top: 14px !important;
+        right: 14px !important;
+        min-width: 310px !important;
+        max-width: 320px !important;
+        pointer-events: none !important;
+    }
+
+    .nitro-notification-bubble {
+        position: relative !important;
+        background-color: #ffffd4 !important;
+        border: 2px solid #000000 !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
+        padding: 8px 10px 9px 8px !important;
+        color: #000000 !important;
+        min-width: 290px !important;
+        max-width: 320px !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        pointer-events: all !important;
+
+        .bubble-image-container {
+            width: 38px !important;
+            height: 38px !important;
+            min-width: 38px !important;
+            margin-right: 9px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+
+            img, .bubble-icon {
+                width: 35px !important;
+                height: 35px !important;
+                max-width: 35px !important;
+                max-height: 35px !important;
+                object-fit: contain !important;
+                image-rendering: pixelated !important;
+            }
+        }
+
+        .bubble-content {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-grow: 1 !important;
+            padding-right: 16px !important;
+        }
+
+        .bubble-title {
+            font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            color: #000000 !important;
+            margin-bottom: 2px !important;
+            line-height: 1.2 !important;
+            text-shadow: none !important;
+        }
+
+        .bubble-text, .text-white {
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 10px !important;
+            color: #000000 !important;
+            line-height: 1.35 !important;
+            text-shadow: none !important;
+        }
+
+        .bubble-close-btn {
+            position: absolute !important;
+            top: 4px !important;
+            right: 5px !important;
+            width: 14px !important;
+            height: 14px !important;
+            cursor: pointer !important;
+            background: #e5e3d7 !important;
+            border: 1px solid #777777 !important;
+            border-radius: 2px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 9px !important;
+            font-weight: bold !important;
+            line-height: 1 !important;
+            color: #444444 !important;
+
+            &:hover {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border-color: #000000 !important;
+            }
+        }
+    }
+
+    // =========================================================================
     // 10. INFOSTAND / PERFIL DE USUARIO 2006
     // =========================================================================
     .nitro-infostand-container {
         position: fixed !important;
-        bottom: 58px !important;
+        bottom: 106px !important;
         right: 14px !important;
 
         .nitro-infostand {
@@ -1569,7 +1688,7 @@ body[data-era="shockwave2006"] {
     .nitro-infostand-container {
         position: fixed !important;
         right: 14px !important;
-        bottom: 58px !important;
+        bottom: 106px !important;
         z-index: 1005 !important;
 
         .body-image {
