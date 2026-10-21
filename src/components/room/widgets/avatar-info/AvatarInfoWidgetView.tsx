@@ -2,11 +2,12 @@ import { RoomEngineEvent, RoomEnterEffect, RoomSessionDanceEvent } from '@nitrot
 import { FC, useState } from 'react';
 import { AvatarInfoFurni, AvatarInfoPet, AvatarInfoRentableBot, AvatarInfoUser, GetConfiguration, GetSessionDataManager, RoomWidgetUpdateRentableBotChatEvent } from '../../../../api';
 import { Column } from '../../../../common';
-import { useAvatarInfoWidget, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent, useUiEvent } from '../../../../hooks';
+import { useAvatarInfoWidget, useEraTheme, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent, useUiEvent } from '../../../../hooks';
 import { AvatarInfoPetTrainingPanelView } from './AvatarInfoPetTrainingPanelView';
 import { AvatarInfoRentableBotChatView } from './AvatarInfoRentableBotChatView';
 import { AvatarInfoUseProductConfirmView } from './AvatarInfoUseProductConfirmView';
 import { AvatarInfoUseProductView } from './AvatarInfoUseProductView';
+import { InfoStandShockwaveView } from './infostand/InfoStandShockwaveView';
 import { InfoStandWidgetBotView } from './infostand/InfoStandWidgetBotView';
 import { InfoStandWidgetFurniView } from './infostand/InfoStandWidgetFurniView';
 import { InfoStandWidgetPetView } from './infostand/InfoStandWidgetPetView';
@@ -23,6 +24,7 @@ import { AvatarInfoWidgetRentableBotView } from './menu/AvatarInfoWidgetRentable
 
 export const AvatarInfoWidgetView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isGameMode, setGameMode ] = useState(false);
     const [ isDancing, setIsDancing ] = useState(false);
     const [ rentableBotChatEvent, setRentableBotChatEvent ] = useState<RoomWidgetUpdateRentableBotChatEvent>(null);
@@ -50,7 +52,7 @@ export const AvatarInfoWidgetView: FC<{}> = props =>
 
     const getMenuView = () =>
     {
-        if(!roomSession || isGameMode) return null;
+        if(!roomSession || isGameMode || currentEra === 'shockwave2006') return null;
 
         if(activeNameBubble) return <AvatarInfoWidgetNameView nameInfo={ activeNameBubble } onClose={ () => setActiveNameBubble(null) } />;
 
@@ -122,10 +124,21 @@ export const AvatarInfoWidgetView: FC<{}> = props =>
             { isDecorating &&
                 <AvatarInfoWidgetDecorateView userId={ GetSessionDataManager().userId } userName={ GetSessionDataManager().userName } roomIndex={ roomSession.ownRoomIndex } setIsDecorating={ setIsDecorating } /> }
             { getMenuView() }
-            { avatarInfo &&
-                <Column alignItems="end" className="nitro-infostand-container">
-                    { getInfostandView() }
-                </Column> }
+            { currentEra === 'shockwave2006' ? (
+                <InfoStandShockwaveView
+                    avatarInfo={ avatarInfo }
+                    setAvatarInfo={ setAvatarInfo }
+                    isDancing={ isDancing }
+                    setIsDecorating={ setIsDecorating }
+                    onClose={ () => setAvatarInfo(null) }
+                />
+            ) : (
+                avatarInfo && (
+                    <Column alignItems="end" className="nitro-infostand-container">
+                        { getInfostandView() }
+                    </Column>
+                )
+            ) }
             { (nameBubbles.length > 0) && nameBubbles.map((name, index) => <AvatarInfoWidgetNameView key={ index } nameInfo={ name } onClose={ () => removeNameBubble(index) } />) }
             { (productBubbles.length > 0) && productBubbles.map((item, index) =>
             {

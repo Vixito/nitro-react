@@ -1683,42 +1683,329 @@ body[data-era="shockwave2006"] {
     }
 
     // =========================================================================
-    // 15. BALDOSA ISOMÉTRICA DE DIAMANTE EN EL INFOSTAND (HABBTEN ORIGINS 2006)
+    // 15. INFOSTAND DOCK & PLATAFORMA ISOMÉTRICA DERECHA (HABBTEN ORIGINS 2006)
     // =========================================================================
-    .nitro-infostand-container {
+    .infostand-shockwave-container {
         position: fixed !important;
         right: 14px !important;
-        bottom: 106px !important;
+        bottom: 104px !important;
         z-index: 1005 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        pointer-events: none !important;
+        user-select: none !important;
 
-        .body-image {
+        * {
+            pointer-events: auto;
+        }
+
+        // Card expandida retro (arriba de la plataforma)
+        .infostand-shockwave-card {
+            width: 196px !important;
+            background: #eae7df !important;
+            border: 2px solid #000000 !important;
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8) !important;
+            margin-bottom: 14px !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            color: #000000 !important;
+            overflow: hidden !important;
+            z-index: 10 !important;
+
+            .card-header-bar {
+                background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
+                border-bottom: 2px solid #000000 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 3px 6px !important;
+
+                .header-title {
+                    color: #ffffff !important;
+                    font-family: 'Volter Bold', 'Volter', sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    text-shadow: 1px 1px 0px #000000 !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                }
+
+                .header-close {
+                    width: 13px !important;
+                    height: 13px !important;
+                    background: url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                    background-size: 13px 13px !important;
+                    cursor: pointer !important;
+
+                    &:hover {
+                        background: url('@/assets/images/eras/shockwave_v14/close_button_down.png') no-repeat center !important;
+                        background-size: 13px 13px !important;
+                    }
+                }
+            }
+
+            .card-body-content {
+                padding: 6px !important;
+
+                .retro-inset-box {
+                    background: #ffffff !important;
+                    border: 2px solid !important;
+                    border-color: #797979 #ffffff #ffffff #797979 !important;
+                    padding: 3px 5px !important;
+                    font-size: 11px !important;
+
+                    .motto-text {
+                        font-size: 11px !important;
+                        color: #000000 !important;
+                        word-break: break-word !important;
+
+                        &.clickable {
+                            cursor: pointer !important;
+                        }
+                    }
+
+                    .edit-pencil {
+                        font-size: 10px !important;
+                        color: #555555 !important;
+                        cursor: pointer !important;
+                    }
+
+                    .motto-input-shockwave {
+                        border: none !important;
+                        outline: none !important;
+                        width: 100% !important;
+                        font-family: 'Volter', Tahoma, sans-serif !important;
+                        font-size: 11px !important;
+                        background: transparent !important;
+                        color: #000000 !important;
+                    }
+
+                    .furni-desc-text {
+                        font-size: 10px !important;
+                        color: #000000 !important;
+                    }
+                }
+
+                .badges-grid-shockwave {
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                    gap: 4px !important;
+                    justify-content: flex-start !important;
+
+                    .retro-badge-slot {
+                        width: 44px !important;
+                        height: 44px !important;
+                        background: #ffffff !important;
+                        border: 2px solid !important;
+                        border-color: #797979 #ffffff #ffffff #797979 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                    }
+                }
+
+                .retro-group-row {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                    cursor: pointer !important;
+
+                    .group-badge {
+                        width: 28px !important;
+                        height: 28px !important;
+                    }
+
+                    .group-title {
+                        font-family: 'Volter Bold', sans-serif !important;
+                        font-size: 10px !important;
+                        text-decoration: underline !important;
+                        color: #000000 !important;
+                    }
+                }
+
+                .achievement-score-row {
+                    font-size: 10px !important;
+                    color: #000000 !important;
+                }
+            }
+        }
+
+        // Zona del pedestal y cápsula
+        .infostand-shockwave-stage-zone {
             position: relative !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            justify-content: flex-end !important;
-            background: transparent !important;
-            border: none !important;
-            min-height: 90px !important;
+            width: 170px !important;
 
-            &::before {
-                content: '' !important;
-                position: absolute !important;
-                bottom: 2px !important;
-                width: 68px !important;
-                height: 34px !important;
-                background-color: #dcd8cf !important;
-                border: 1px solid #797979 !important;
-                clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important;
-                z-index: 0 !important;
+            .stage-pedestal-wrapper {
+                position: relative !important;
+                width: 88px !important;
+                height: 70px !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: flex-end !important;
+                margin-bottom: -11px !important;
+                z-index: 1 !important;
+
+                .stage-pedestal-bg {
+                    position: absolute !important;
+                    bottom: 0 !important;
+                    left: 0 !important;
+                    width: 88px !important;
+                    height: 46px !important;
+                    background: url('@/assets/images/eras/shockwave_v14/infostand_stage.png') no-repeat center bottom !important;
+                    background-size: 88px 46px !important;
+                    image-rendering: pixelated !important;
+                    z-index: 1 !important;
+                    pointer-events: none !important;
+                }
+
+                .stage-entity-preview {
+                    position: relative !important;
+                    z-index: 2 !important;
+                    margin-bottom: 12px !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: flex-end !important;
+
+                    .stage-avatar-wrapper {
+                        position: relative !important;
+                        width: 64px !important;
+                        height: 75px !important;
+                        cursor: pointer !important;
+
+                        .avatar-image {
+                            position: absolute !important;
+                            bottom: 0 !important;
+                            left: 50% !important;
+                            transform: translateX(-50%) !important;
+                            image-rendering: pixelated !important;
+                        }
+                    }
+
+                    .stage-furni-wrapper {
+                        position: relative !important;
+                        display: flex !important;
+                        align-items: flex-end !important;
+                        justify-content: center !important;
+                        max-height: 70px !important;
+                        cursor: pointer !important;
+
+                        .stage-furni-img {
+                            max-height: 64px !important;
+                            max-width: 80px !important;
+                            image-rendering: pixelated !important;
+                        }
+                    }
+
+                    .stage-pet-wrapper {
+                        position: relative !important;
+                        cursor: pointer !important;
+                        image-rendering: pixelated !important;
+                    }
+                }
             }
 
-            .avatar-image {
+            // Cápsula pill con nombre
+            .stage-pill {
                 position: relative !important;
-                z-index: 1 !important;
-                transform: none !important;
-                background-position: center bottom !important;
+                z-index: 3 !important;
+                width: 100% !important;
+                height: 22px !important;
+                background: #4f4f4f !important;
+                border: 2px solid #ffffff !important;
+                border-radius: 11px !important;
+                box-shadow: 0 0 0 1px #000000, 2px 2px 0px rgba(0, 0, 0, 0.6) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 0 6px 0 10px !important;
+                box-sizing: border-box !important;
+                cursor: pointer !important;
+
+                &.empty {
+                    background: #505050 !important;
+                    cursor: default !important;
+                }
+
+                .pill-name {
+                    color: #ffffff !important;
+                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+                    text-shadow: 1px 1px 0px #000000 !important;
+                }
+
+                .pill-icons {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 5px !important;
+
+                    .pill-btn {
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        color: #ffffff !important;
+                        cursor: pointer !important;
+                        filter: drop-shadow(1px 1px 0px #000000) !important;
+
+                        &:hover {
+                            opacity: 0.8 !important;
+                        }
+                    }
+                }
+            }
+
+            // Botones de acción debajo de la cápsula
+            .stage-actions {
+                position: relative !important;
+                z-index: 4 !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 4px !important;
+                margin-top: 5px !important;
+                max-width: 170px !important;
+
+                .retro-action-btn {
+                    background: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 9px !important;
+                    padding: 2px 8px !important;
+                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                    font-size: 10px !important;
+                    font-weight: 700 !important;
+                    color: #000000 !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 4px !important;
+                    cursor: pointer !important;
+                    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.6) !important;
+                    white-space: nowrap !important;
+                    line-height: 1 !important;
+                    outline: none !important;
+
+                    &:hover {
+                        background: #e8e8e8 !important;
+                    }
+
+                    &:active {
+                        background: #d0d0d0 !important;
+                        box-shadow: inset 1px 1px 0px #000000 !important;
+                    }
+
+                    .btn-icon {
+                        font-size: 9px !important;
+                        color: #000000 !important;
+                    }
+                }
             }
         }
     }
 }
+
