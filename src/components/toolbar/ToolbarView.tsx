@@ -317,13 +317,13 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                                 <i className="toolbar-icon icon-club" />
                             </div>
 
-                            {/* 4. Monedero -> Tienda / Catálogo sin bugs */}
-                            <div className="navigation-item item-credits" title="Tienda de Habbten" onClick={ () => CreateLinkEvent('catalog/toggle') }>
+                            {/* 4. Monedero (Bolsa de créditos oficial v14) */}
+                            <div className="navigation-item item-credits" title="Monedero" onClick={ () => CreateLinkEvent('catalog/toggle') }>
                                 <i className="toolbar-icon icon-credits" />
                             </div>
 
-                            {/* 5. Folleto blanco con silla -> Pase de Batalla */}
-                            <div className="navigation-item item-catalog" title="Pase de Batalla" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                            {/* 5. Catálogo (Folleto blanco con silla Plasto oficial v14) */}
+                            <div className="navigation-item item-catalog" title="Catálogo" onClick={ () => CreateLinkEvent('catalog/toggle') }>
                                 <i className="toolbar-icon icon-catalog" />
                             </div>
 

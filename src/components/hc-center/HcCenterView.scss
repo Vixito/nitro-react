@@ -11,13 +11,15 @@
 
     .payday-special {
         min-height: 150px;
-        height: 150px;
+        height: auto;
     }
 
     .payday {
         width: 222px;
-        height: 150px;
+        min-height: 150px;
+        height: auto;
         background-image: url('@/assets/images/hc-center/payday.png');
+        background-repeat: no-repeat;
         z-index: 3;
         color: #6b3502;
     }

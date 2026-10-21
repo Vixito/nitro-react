@@ -642,40 +642,126 @@ body[data-era="shockwave2006"] {
     }
 
     // =========================================================================
-    // 4. MENÚ DE USUARIO (ME MENU) RETRO
+    // =========================================================================
+    // 4. MENÚ DE USUARIO RETRO (ESTILO MENÚ VERTICAL ORIGINS / SHOCKWAVE)
     // =========================================================================
     .nitro-toolbar-me {
         position: fixed !important;
-        bottom: 106px !important;
-        left: 8px !important;
-        background: #eae7df !important;
+        bottom: 54px !important;
+        left: 10px !important;
+        width: 175px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        background: #ced5d8 !important;
         border: 2px solid #000000 !important;
         box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.85) !important;
-        border-radius: 0px !important;
-        padding: 4px !important;
-        gap: 4px !important;
+        border-radius: 4px !important;
+        padding: 0px !important;
+        gap: 2px !important;
         z-index: 1025 !important;
+        overflow: hidden !important;
+
+        &::before {
+            content: "Menú";
+            display: block;
+            background: linear-gradient(180deg, #6ba1b7 0%, #4f8096 100%);
+            color: #ffffff;
+            font-family: 'Volter', 'Ubuntu', sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-bottom: 1px solid #2d4c5a;
+            letter-spacing: 0.5px;
+        }
 
         .navigation-item {
-            width: 32px !important;
-            height: 32px !important;
-            border-radius: 0px !important;
-            background: #cfcbc0 !important;
-            border: 2px solid !important;
-            border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+            width: 100% !important;
+            height: 26px !important;
+            border-radius: 2px !important;
+            background: #ffffff !important;
+            border: 1px solid #7c888e !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: center !important;
+            justify-content: space-between !important;
+            padding: 0 8px !important;
             cursor: pointer !important;
+            font-family: 'Volter', 'Ubuntu', sans-serif !important;
+            font-size: 10px !important;
+            color: #000000 !important;
+            text-decoration: none !important;
+
+            &::after {
+                content: "▶";
+                font-size: 8px;
+                color: #555555;
+            }
+
+            &.icon-me-clothing::before {
+                content: "👗 Cambiar Ropa";
+            }
+
+            &.icon-me-rooms::before {
+                content: "🏠 Mis Salas";
+            }
+
+            &.icon-me-profile::before {
+                content: "👤 Mi Perfil";
+            }
+
+            &.icon-me-settings::before {
+                content: "⚙️ Ajustes";
+            }
+
+            &.icon-me-achievements::before {
+                content: "🏆 Recompensas";
+            }
+
+            &.icon-me-helper-tool::before {
+                content: "❓ Guía";
+            }
 
             &:hover {
-                background: #dedad0 !important;
+                background: #eef5f8 !important;
+                border-color: #3b6b80 !important;
+                color: #0d4661 !important;
             }
 
             &:active {
-                border-color: #5c5950 #ffffff #ffffff #5c5950 !important;
-                background: #bfbbb0 !important;
+                background: #dbe8ee !important;
             }
+        }
+    }
+
+    // =========================================================================
+    // 4.1 CENTRO HC (HABBO CLUB) AJUSTES DE ESPACIADO Y LEGIBILIDAD
+    // =========================================================================
+    .nitro-hc-center {
+        width: 440px !important;
+
+        .payday-special {
+            height: auto !important;
+            min-height: 155px !important;
+            margin-bottom: 8px !important;
+            overflow: visible !important;
+        }
+
+        .payday {
+            height: auto !important;
+            min-height: 155px !important;
+            margin-bottom: 8px !important;
+            overflow: visible !important;
+        }
+
+        .bg-success {
+            margin-top: 10px !important;
+            margin-bottom: 10px !important;
+            clear: both !important;
+            display: flex !important;
+        }
+
+        .benefits {
+            margin-top: 10px !important;
+            min-height: 120px !important;
         }
     }
 
