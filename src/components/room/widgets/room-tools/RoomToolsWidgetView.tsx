@@ -1,8 +1,8 @@
-import { GetGuestRoomResultEvent, NavigatorSearchComposer, RateFlatMessageComposer } from '@nitrots/nitro-renderer';
+import { GetGuestRoomResultEvent, NavigatorSearchComposer, RateFlatMessageComposer, RoomEngineEvent } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Base, classNames, Column, Flex, Text, TransitionAnimation, TransitionAnimationTypes } from '../../../../common';
-import { useMessageEvent, useNavigator, useRoom } from '../../../../hooks';
+import { useMessageEvent, useNavigator, useRoom, useRoomEngineEvent } from '../../../../hooks';
 
 export const RoomToolsWidgetView: FC<{}> = props =>
 {
@@ -16,6 +16,22 @@ export const RoomToolsWidgetView: FC<{}> = props =>
 
     const isOwner = (roomOwner && GetSessionDataManager().userName && roomOwner.toLowerCase() === GetSessionDataManager().userName.toLowerCase()) || (roomSession && roomSession.isRoomOwner);
 
+    useEffect(() =>
+    {
+        if(!roomSession) return;
+
+        const currentScale = GetRoomEngine().getRoomInstanceRenderingCanvasScale(roomSession.roomId, 1);
+        setIsZoomedIn(currentScale < 1);
+    }, [ roomSession ]);
+
+    useRoomEngineEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, event =>
+    {
+        if(!roomSession || (event.roomId !== roomSession.roomId)) return;
+
+        const currentScale = GetRoomEngine().getRoomInstanceRenderingCanvasScale(roomSession.roomId, 1);
+        setIsZoomedIn(currentScale < 1);
+    });
+
     const handleToolClick = (action: string, value?: string) =>
     {
         switch(action)
@@ -23,19 +39,14 @@ export const RoomToolsWidgetView: FC<{}> = props =>
             case 'settings':
                 CreateLinkEvent('navigator/toggle-room-info');
                 return;
-            case 'zoom':
-                setIsZoomedIn(prevValue =>
-                {
-                    let scale = GetRoomEngine().getRoomInstanceRenderingCanvasScale(roomSession.roomId, 1);
+            case 'zoom': {
+                const currentScale = GetRoomEngine().getRoomInstanceRenderingCanvasScale(roomSession.roomId, 1);
+                const targetScale = (currentScale < 1) ? 1 : 0.5;
 
-                    if(!prevValue) scale /= 2;
-                    else scale *= 2;
-
-                    GetRoomEngine().setRoomInstanceRenderingCanvasScale(roomSession.roomId, 1, scale);
-
-                    return !prevValue;
-                });
+                GetRoomEngine().setRoomInstanceRenderingCanvasScale(roomSession.roomId, 1, targetScale);
+                setIsZoomedIn(targetScale < 1);
                 return;
+            }
             case 'chat_history':
                 CreateLinkEvent('chat-history/toggle');
                 return;

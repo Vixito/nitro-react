@@ -1702,7 +1702,10 @@ body[data-era="shockwave2006"] {
 
         // Card expandida retro (arriba de la plataforma)
         .infostand-shockwave-card {
-            width: 196px !important;
+            box-sizing: border-box !important;
+            min-width: 196px !important;
+            max-width: 280px !important;
+            width: max-content !important;
             align-self: flex-end !important;
             background: #eae7df !important;
             border: 2px solid #000000 !important;
@@ -1714,12 +1717,14 @@ body[data-era="shockwave2006"] {
             z-index: 10 !important;
 
             .card-header-bar {
+                box-sizing: border-box !important;
                 background: linear-gradient(180deg, #0b9aa0 0%, #07767b 100%) !important;
                 border-bottom: 2px solid #000000 !important;
                 display: flex !important;
-                align-items: center !important;
+                align-items: flex-start !important;
                 justify-content: space-between !important;
-                padding: 3px 6px !important;
+                padding: 4px 6px !important;
+                gap: 6px !important;
 
                 .header-title {
                     color: #ffffff !important;
@@ -1727,14 +1732,18 @@ body[data-era="shockwave2006"] {
                     font-size: 11px !important;
                     font-weight: 700 !important;
                     text-shadow: 1px 1px 0px #000000 !important;
-                    white-space: nowrap !important;
-                    overflow: hidden !important;
-                    text-overflow: ellipsis !important;
+                    white-space: normal !important;
+                    word-break: break-word !important;
+                    line-height: 13px !important;
+                    flex: 1 1 auto !important;
+                    padding-right: 2px !important;
                 }
 
                 .header-close {
+                    flex: 0 0 13px !important;
                     width: 13px !important;
                     height: 13px !important;
+                    margin-top: 1px !important;
                     background: url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
                     background-size: 13px 13px !important;
                     cursor: pointer !important;
@@ -1785,6 +1794,9 @@ body[data-era="shockwave2006"] {
                     .furni-desc-text {
                         font-size: 10px !important;
                         color: #000000 !important;
+                        word-break: break-word !important;
+                        white-space: normal !important;
+                        line-height: 13px !important;
                     }
                 }
 
@@ -1822,12 +1834,23 @@ body[data-era="shockwave2006"] {
                         font-size: 10px !important;
                         text-decoration: underline !important;
                         color: #000000 !important;
+                        word-break: break-word !important;
+                        white-space: normal !important;
                     }
                 }
 
                 .achievement-score-row {
                     font-size: 10px !important;
                     color: #000000 !important;
+                    word-break: break-word !important;
+                    white-space: normal !important;
+                }
+
+                .small {
+                    font-size: 10px !important;
+                    word-break: break-word !important;
+                    white-space: normal !important;
+                    line-height: 13px !important;
                 }
             }
         }
@@ -1838,7 +1861,9 @@ body[data-era="shockwave2006"] {
             display: flex !important;
             flex-direction: column !important;
             align-items: flex-end !important;
-            width: 156px !important;
+            min-width: 156px !important;
+            max-width: 240px !important;
+            width: auto !important;
 
             // Pedestal isométrico alineado a la derecha de la barra (Origins 1:1)
             .stage-pedestal-wrapper {
@@ -1933,7 +1958,9 @@ body[data-era="shockwave2006"] {
             .stage-pill {
                 position: relative !important;
                 z-index: 3 !important;
-                width: 156px !important;
+                min-width: 156px !important;
+                max-width: 240px !important;
+                width: auto !important;
                 height: 20px !important;
                 background: rgba(74, 74, 74, 0.72) !important;
                 backdrop-filter: blur(0.5px) !important;

@@ -506,7 +506,7 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
             return (
                 <div className="infostand-shockwave-card">
                     <div className="card-header-bar">
-                        <div className="header-title">{ userInfo.name }</div>
+                        <div className="header-title" title={ userInfo.name }>{ userInfo.name }</div>
                         <div className="header-close" onClick={ () => setIsCardExpanded(false) } title="Cerrar detalles" />
                     </div>
                     <div className="card-body-content">
@@ -582,8 +582,8 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
             return (
                 <div className="infostand-shockwave-card">
                     <div className="card-header-bar">
-                        <div className="header-title">{ furni.name }</div>
-                        <div className="header-close" onClick={ () => setIsCardExpanded(false) } />
+                        <div className="header-title" title={ furni.name }>{ furni.name }</div>
+                        <div className="header-close" onClick={ () => setIsCardExpanded(false) } title="Cerrar" />
                     </div>
                     <div className="card-body-content">
                         <div className="retro-inset-box p-1">
@@ -615,8 +615,8 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
             return (
                 <div className="infostand-shockwave-card">
                     <div className="card-header-bar">
-                        <div className="header-title">{ pet.name }</div>
-                        <div className="header-close" onClick={ () => setIsCardExpanded(false) } />
+                        <div className="header-title" title={ pet.name }>{ pet.name }</div>
+                        <div className="header-close" onClick={ () => setIsCardExpanded(false) } title="Cerrar" />
                     </div>
                     <div className="card-body-content small">
                         <div>Raza: <b>{ LocalizeText(`pet.breed.${ pet.petType }.${ pet.petBreed }`) }</b></div>

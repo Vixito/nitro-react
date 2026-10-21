@@ -218,6 +218,30 @@ const useRoomState = () =>
 
         if(!displayObject || !canvas) return;
 
+        const applyEraScale = (targetScale?: number) =>
+        {
+            if(!roomSession) return;
+            const isShockwaveEra = (document.body.dataset.era === 'shockwave2006') ||
+                                   document.body.classList.contains('era-shockwave-2006') ||
+                                   ((window.parent as any)?.HabbtenConfig?.era === 'shockwave2006') ||
+                                   (localStorage.getItem('habbten_theme_era') === 'shockwave2006') ||
+                                   (new URLSearchParams(window.location.search).get('era') === 'shockwave2006');
+
+            const scale = (targetScale !== undefined) ? targetScale : (isShockwaveEra ? 0.5 : 1.0);
+            roomEngine.setRoomInstanceRenderingCanvasScale(roomId, canvasId, scale, null, null, true);
+        };
+
+        applyEraScale();
+        const scaleTimer = setTimeout(() => applyEraScale(), 150);
+
+        const handleEraChange = (event: CustomEvent<string>) =>
+        {
+            const targetScale = (event.detail === 'shockwave2006') ? 0.5 : 1.0;
+            applyEraScale(targetScale);
+        };
+
+        window.addEventListener('nitro-era-changed' as any, handleEraChange);
+
         const background = new NitroSprite(NitroTexture.WHITE);
         const filter = new AdjustmentFilter();
         const master = (canvas.master as NitroContainer);
@@ -284,11 +308,13 @@ const useRoomState = () =>
 
         return () =>
         {
+            clearTimeout(scaleTimer);
             setRoomBackground(null);
             setRoomFilter(null);
             setOriginalRoomBackgroundColor(0);
 
             window.removeEventListener('resize', resize);
+            window.removeEventListener('nitro-era-changed' as any, handleEraChange);
         }
     }, [ roomSession ]);
 
