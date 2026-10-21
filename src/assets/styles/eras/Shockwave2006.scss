@@ -647,9 +647,9 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     .shockwave-avatar-menu {
         position: fixed !important;
-        bottom: 88px !important;
-        left: 10px !important;
-        width: 185px !important;
+        bottom: 50px !important;
+        left: 2px !important;
+        width: 175px !important;
         background: #ffffff !important;
         border: 2px solid #000000 !important;
         border-radius: 0px !important;
@@ -2038,7 +2038,7 @@ body[data-era="shockwave2006"] {
 
                     .stage-avatar-wrapper {
                         position: absolute !important;
-                        bottom: -21px !important;
+                        bottom: 0 !important;
                         left: 50% !important;
                         transform: translateX(-50%) !important;
                         width: 64px !important;
@@ -2145,7 +2145,7 @@ body[data-era="shockwave2006"] {
                 }
             }
 
-            // Botones de acción debajo de la cápsula (alineados a la derecha como Origins)
+            // Botones de acción debajo de la cápsula (idénticos a la versión 2006 / captura oficial)
             .stage-actions {
                 position: relative !important;
                 z-index: 4 !important;
@@ -2153,38 +2153,44 @@ body[data-era="shockwave2006"] {
                 flex-wrap: wrap !important;
                 justify-content: flex-end !important;
                 gap: 4px !important;
-                margin-top: 5px !important;
+                margin-top: 4px !important;
                 max-width: 156px !important;
 
                 .retro-action-btn {
-                    background: #ffffff !important;
-                    border: 1px solid #000000 !important;
-                    border-radius: 9px !important;
+                    background: #cfcbc0 !important;
+                    border: 2px solid !important;
+                    border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+                    border-radius: 0px !important;
                     padding: 2px 8px !important;
                     font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
-                    font-size: 10px !important;
+                    font-size: 11px !important;
                     font-weight: 700 !important;
                     color: #000000 !important;
                     display: inline-flex !important;
                     align-items: center !important;
-                    gap: 4px !important;
+                    gap: 5px !important;
                     cursor: pointer !important;
-                    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.6) !important;
+                    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.85) !important;
                     white-space: nowrap !important;
-                    line-height: 1 !important;
+                    line-height: 14px !important;
                     outline: none !important;
 
+                    * {
+                        color: #000000 !important;
+                    }
+
                     &:hover {
-                        background: #e8e8e8 !important;
+                        background: #dedad0 !important;
                     }
 
                     &:active {
-                        background: #d0d0d0 !important;
-                        box-shadow: inset 1px 1px 0px #000000 !important;
+                        border-color: #5c5950 #ffffff #ffffff #5c5950 !important;
+                        background: #bfbbb0 !important;
+                        box-shadow: none !important;
                     }
 
                     .btn-icon {
-                        font-size: 9px !important;
+                        font-size: 10px !important;
                         color: #000000 !important;
                     }
                 }
