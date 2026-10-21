@@ -647,12 +647,12 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     .shockwave-avatar-menu {
         position: fixed !important;
-        bottom: 52px !important;
-        left: 8px !important;
-        width: 175px !important;
-        background: #ced5d8 !important;
+        bottom: 88px !important;
+        left: 10px !important;
+        width: 185px !important;
+        background: #ffffff !important;
         border: 2px solid #000000 !important;
-        border-radius: 4px !important;
+        border-radius: 0px !important;
         box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.85) !important;
         overflow: hidden !important;
         z-index: 1025 !important;
@@ -665,14 +665,15 @@ body[data-era="shockwave2006"] {
             justify-content: space-between !important;
             background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
             color: #ffffff !important;
-            padding: 4px 6px !important;
-            border-bottom: 1px solid #2d4c5a !important;
+            padding: 3px 8px !important;
+            border-bottom: 2px solid #000000 !important;
 
             .shockwave-menu-title {
                 font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
                 font-size: 11px !important;
                 font-weight: bold !important;
-                text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.7) !important;
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #000000 !important;
                 letter-spacing: 0.5px !important;
             }
 
@@ -683,7 +684,7 @@ body[data-era="shockwave2006"] {
                 border: 1px solid #ffffff !important;
                 color: #ffffff !important;
                 padding: 0 4px !important;
-                border-radius: 2px !important;
+                border-radius: 0px !important;
                 cursor: pointer !important;
                 line-height: 12px !important;
 
@@ -696,27 +697,33 @@ body[data-era="shockwave2006"] {
         .shockwave-menu-body {
             display: flex !important;
             flex-direction: column !important;
-            padding: 3px !important;
-            gap: 2px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: #ffffff !important;
 
             .shockwave-menu-row {
                 display: flex !important;
                 align-items: center !important;
-                height: 26px !important;
+                height: 25px !important;
                 background: #ffffff !important;
-                border: 1px solid #7c888e !important;
-                border-radius: 2px !important;
-                padding: 0 6px !important;
+                border: none !important;
+                border-bottom: 1px solid #d4d8db !important;
+                border-radius: 0px !important;
+                padding: 0 8px !important;
                 cursor: pointer !important;
                 user-select: none !important;
 
+                &:last-child {
+                    border-bottom: none !important;
+                }
+
                 .shockwave-menu-icon {
-                    width: 18px !important;
-                    height: 18px !important;
+                    width: 16px !important;
+                    height: 16px !important;
                     background-repeat: no-repeat !important;
                     background-position: center !important;
                     background-size: contain !important;
-                    margin-right: 6px !important;
+                    margin-right: 8px !important;
                     flex-shrink: 0 !important;
 
                     &.icon-clothing { background-image: url('@/assets/images/toolbar/icons/me-menu/clothing.png') !important; }
@@ -730,7 +737,7 @@ body[data-era="shockwave2006"] {
                 .shockwave-menu-label {
                     flex-grow: 1 !important;
                     font-family: 'Volter', Tahoma, sans-serif !important;
-                    font-size: 10px !important;
+                    font-size: 11px !important;
                     color: #000000 !important;
                     white-space: nowrap !important;
                 }
@@ -743,7 +750,6 @@ body[data-era="shockwave2006"] {
 
                 &:hover {
                     background: #eef5f8 !important;
-                    border-color: #3b6b80 !important;
 
                     .shockwave-menu-label {
                         color: #0d4661 !important;
@@ -792,6 +798,96 @@ body[data-era="shockwave2006"] {
         .benefits {
             margin-top: 10px !important;
             min-height: 120px !important;
+        }
+    }
+
+    // =========================================================================
+    // 4.2 PASE DE BATALLA RETRO 2006 (ESTILO SHOCKWAVE / ORIGINS)
+    // =========================================================================
+    .nitro-battle-pass.battle-pass-shockwave2006 {
+        border-radius: 0px !important;
+        border: 2px solid #000000 !important;
+        box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.85) !important;
+        background: #eae7df !important;
+
+        .nitro-card-header {
+            background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
+            border-bottom: 2px solid #000000 !important;
+            color: #ffffff !important;
+            font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+            font-size: 13px !important;
+            text-shadow: 1px 1px 0px #000000 !important;
+        }
+
+        .bp-container,
+        .nitro-card-content {
+            background: #eae7df !important;
+            color: #000000 !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+
+            .bp-season-banner,
+            div[class*="rounded"],
+            .card,
+            .bg-dark,
+            .bp-card {
+                background: #ffffff !important;
+                border: 2px solid !important;
+                border-color: #797979 #ffffff #ffffff #797979 !important;
+                border-radius: 0px !important;
+                color: #000000 !important;
+
+                * {
+                    color: #000000 !important;
+                    font-family: 'Volter', Tahoma, sans-serif !important;
+                }
+            }
+
+            button,
+            .btn {
+                border-radius: 0px !important;
+                background: #cfcbc0 !important;
+                border: 2px solid !important;
+                border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+                color: #000000 !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+
+                &:hover {
+                    background: #dedad0 !important;
+                }
+
+                &:active,
+                &.active {
+                    background: #bfbbb0 !important;
+                    border-color: #5c5950 #ffffff #ffffff #5c5950 !important;
+                }
+
+                &.btn-success,
+                &.btn-primary {
+                    background: #388a1b !important;
+                    border-color: #75cb45 #1d4f0d #1d4f0d #75cb45 !important;
+                    color: #ffffff !important;
+                    text-shadow: 1px 1px 0px #113606 !important;
+
+                    &:hover { background: #44a322 !important; }
+                    &:active { background: #2b6d14 !important; }
+                }
+            }
+
+            .progress,
+            [class*="progress-bar-container"] {
+                background: #ffffff !important;
+                border: 2px solid !important;
+                border-color: #797979 #ffffff #ffffff #797979 !important;
+                border-radius: 0px !important;
+                height: 16px !important;
+
+                .progress-bar,
+                [class*="progress-bar"] {
+                    background: linear-gradient(180deg, #62c334 0%, #3d8a1c 100%) !important;
+                    border-radius: 0px !important;
+                }
+            }
         }
     }
 

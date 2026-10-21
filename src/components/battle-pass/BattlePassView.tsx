@@ -4,6 +4,7 @@ import { FaSearch, FaTimes } from 'react-icons/fa';
 import { AddEventLinkTracker, CreateLinkEvent, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
 import { Button, LayoutAvatarImageView, LayoutBadgeImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
 import { useSessionInfo } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 
 interface Mission {
     id: number;
@@ -84,6 +85,7 @@ const MissionImage: FC<{ image?: string; category: number; alt?: string }> = ({ 
 };
 
 export const BattlePassView: FC<{}> = () => {
+    const { currentEra } = useEraTheme();
     const [isVisible, setIsVisible] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [showRankingModal, setShowRankingModal] = useState(false);
@@ -490,7 +492,7 @@ export const BattlePassView: FC<{}> = () => {
     return (
         <NitroCardView
             uniqueKey="battle-pass"
-            className={`nitro-battle-pass ${bpData.theme?.isDark ? 'bp-theme-dark' : ''}`}
+            className={`nitro-battle-pass ${bpData.theme?.isDark ? 'bp-theme-dark' : ''} ${currentEra === 'shockwave2006' ? 'battle-pass-shockwave2006' : ''}`}
             theme="primary-slim"
             style={themeStyles as React.CSSProperties}
             onMouseEnter={() => {
