@@ -1688,7 +1688,7 @@ body[data-era="shockwave2006"] {
     .infostand-shockwave-container {
         position: fixed !important;
         right: 14px !important;
-        bottom: 104px !important;
+        bottom: 126px !important;
         z-index: 1005 !important;
         display: flex !important;
         flex-direction: column !important;
@@ -1703,10 +1703,11 @@ body[data-era="shockwave2006"] {
         // Card expandida retro (arriba de la plataforma)
         .infostand-shockwave-card {
             width: 196px !important;
+            align-self: flex-end !important;
             background: #eae7df !important;
             border: 2px solid #000000 !important;
             box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8) !important;
-            margin-bottom: 14px !important;
+            margin-bottom: 68px !important;
             font-family: 'Volter', Tahoma, sans-serif !important;
             color: #000000 !important;
             overflow: hidden !important;
@@ -1836,45 +1837,56 @@ body[data-era="shockwave2006"] {
             position: relative !important;
             display: flex !important;
             flex-direction: column !important;
-            align-items: center !important;
-            width: 170px !important;
+            align-items: flex-end !important;
+            width: 156px !important;
 
+            // Pedestal isométrico alineado a la derecha de la barra (Origins 1:1)
             .stage-pedestal-wrapper {
                 position: relative !important;
                 width: 88px !important;
-                height: 70px !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: flex-end !important;
-                margin-bottom: -11px !important;
+                height: 46px !important;
+                align-self: flex-end !important;
+                margin-right: 3px !important;
+                margin-bottom: -13px !important;
                 z-index: 1 !important;
 
                 .stage-pedestal-bg {
                     position: absolute !important;
-                    bottom: 0 !important;
+                    top: 0 !important;
                     left: 0 !important;
                     width: 88px !important;
                     height: 46px !important;
-                    background: url('@/assets/images/eras/shockwave_v14/infostand_stage.png') no-repeat center bottom !important;
+                    background: url('@/assets/images/eras/shockwave_v14/infostand_stage.png') no-repeat 0 0 !important;
                     background-size: 88px 46px !important;
                     image-rendering: pixelated !important;
                     z-index: 1 !important;
                     pointer-events: none !important;
                 }
 
+                // Centro del diamante (x: 44px, y: 22px desde el top del pedestal de 46px)
                 .stage-entity-preview {
-                    position: relative !important;
-                    z-index: 2 !important;
-                    margin-bottom: 12px !important;
+                    position: absolute !important;
+                    left: 44px !important;
+                    bottom: 24px !important;
+                    width: 0 !important;
+                    height: 0 !important;
                     display: flex !important;
                     justify-content: center !important;
                     align-items: flex-end !important;
+                    z-index: 2 !important;
+                    pointer-events: auto !important;
 
                     .stage-avatar-wrapper {
-                        position: relative !important;
+                        position: absolute !important;
+                        bottom: 0 !important;
+                        left: 50% !important;
+                        transform: translateX(-50%) !important;
                         width: 64px !important;
-                        height: 75px !important;
+                        height: 85px !important;
                         cursor: pointer !important;
+                        display: flex !important;
+                        justify-content: center !important;
+                        align-items: flex-end !important;
 
                         .avatar-image {
                             position: absolute !important;
@@ -1886,37 +1898,47 @@ body[data-era="shockwave2006"] {
                     }
 
                     .stage-furni-wrapper {
-                        position: relative !important;
-                        display: flex !important;
-                        align-items: flex-end !important;
-                        justify-content: center !important;
-                        max-height: 70px !important;
+                        position: absolute !important;
+                        bottom: -8px !important;
+                        left: 50% !important;
+                        transform: translateX(-50%) !important;
                         cursor: pointer !important;
+                        display: flex !important;
+                        justify-content: center !important;
+                        align-items: flex-end !important;
 
                         .stage-furni-img {
-                            max-height: 64px !important;
-                            max-width: 80px !important;
+                            max-height: 76px !important;
+                            max-width: 84px !important;
                             image-rendering: pixelated !important;
+                            display: block !important;
                         }
                     }
 
                     .stage-pet-wrapper {
-                        position: relative !important;
+                        position: absolute !important;
+                        bottom: 0 !important;
+                        left: 50% !important;
+                        transform: translateX(-50%) !important;
                         cursor: pointer !important;
+                        display: flex !important;
+                        justify-content: center !important;
+                        align-items: flex-end !important;
                         image-rendering: pixelated !important;
                     }
                 }
             }
 
-            // Cápsula pill con nombre
+            // Cápsula pill con toque de transparencia para que la plataforma debajo sea visible
             .stage-pill {
                 position: relative !important;
                 z-index: 3 !important;
-                width: 100% !important;
-                height: 22px !important;
-                background: #4f4f4f !important;
+                width: 156px !important;
+                height: 20px !important;
+                background: rgba(74, 74, 74, 0.72) !important;
+                backdrop-filter: blur(0.5px) !important;
                 border: 2px solid #ffffff !important;
-                border-radius: 11px !important;
+                border-radius: 10px !important;
                 box-shadow: 0 0 0 1px #000000, 2px 2px 0px rgba(0, 0, 0, 0.6) !important;
                 display: flex !important;
                 align-items: center !important;
@@ -1926,7 +1948,7 @@ body[data-era="shockwave2006"] {
                 cursor: pointer !important;
 
                 &.empty {
-                    background: #505050 !important;
+                    background: rgba(74, 74, 74, 0.72) !important;
                     cursor: default !important;
                 }
 
@@ -1961,16 +1983,16 @@ body[data-era="shockwave2006"] {
                 }
             }
 
-            // Botones de acción debajo de la cápsula
+            // Botones de acción debajo de la cápsula (alineados a la derecha como Origins)
             .stage-actions {
                 position: relative !important;
                 z-index: 4 !important;
                 display: flex !important;
                 flex-wrap: wrap !important;
-                justify-content: center !important;
+                justify-content: flex-end !important;
                 gap: 4px !important;
                 margin-top: 5px !important;
-                max-width: 170px !important;
+                max-width: 156px !important;
 
                 .retro-action-btn {
                     background: #ffffff !important;
@@ -2008,4 +2030,5 @@ body[data-era="shockwave2006"] {
         }
     }
 }
+
 

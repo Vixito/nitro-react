@@ -1,7 +1,7 @@
-import { AvatarAction, AvatarExpressionEnum, GroupInformationComposer, GroupInformationEvent, RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, TradingOpenComposer, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
+import { AvatarAction, AvatarExpressionEnum, GroupInformationComposer, GroupInformationEvent, RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, RoomUnitStatusEvent, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, TradingOpenComposer, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
 import { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronUp, FaCog, FaExchangeAlt, FaHandPaper, FaInfoCircle, FaMusic, FaPencilAlt, FaRedo, FaTimes, FaTrash, FaUserCheck, FaUserPlus, FaUserSlash } from 'react-icons/fa';
-import { AvatarInfoFurni, AvatarInfoPet, AvatarInfoRentableBot, AvatarInfoUser, CloneObject, CreateLinkEvent, DispatchUiEvent, GetConfiguration, GetGroupInformation, GetNitroInstance, GetOwnPosture, GetRoomEngine, GetSessionDataManager, GetUserProfile, HasHabboVip, LocalizeText, PostureTypeEnum, RoomWidgetUpdateChatInputContentEvent, SendMessageComposer } from '../../../../../api';
+import { AvatarInfoFurni, AvatarInfoPet, AvatarInfoRentableBot, AvatarInfoUser, CloneObject, CreateLinkEvent, DispatchUiEvent, GetCanStandUp, GetConfiguration, GetGroupInformation, GetNitroInstance, GetOwnPosture, GetRoomEngine, GetSessionDataManager, GetUserProfile, HasHabboVip, LocalizeText, PostureTypeEnum, RoomWidgetUpdateChatInputContentEvent, SendMessageComposer } from '../../../../../api';
 import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, LayoutLimitedEditionCompactPlateView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { useFriends, useMessageEvent, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent, useSessionInfo } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -34,6 +34,28 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
     const [ motto, setMotto ] = useState<string>('');
     const [ isEditingMotto, setIsEditingMotto ] = useState(false);
     const [ relationships, setRelationships ] = useState<RelationshipStatusInfoMessageParser>(null);
+    const [ ownPosture, setOwnPosture ] = useState<string>(() => GetOwnPosture());
+
+    // Listen to unit status updates (sitting, standing, walking, lying down)
+    useMessageEvent<RoomUnitStatusEvent>(RoomUnitStatusEvent, () =>
+    {
+        setOwnPosture(GetOwnPosture());
+    });
+
+    // Keep own posture updated dynamically when own avatar is active
+    useEffect(() =>
+    {
+        if(!avatarInfo || avatarInfo.type !== AvatarInfoUser.OWN_USER) return;
+
+        setOwnPosture(GetOwnPosture());
+        const interval = setInterval(() =>
+        {
+            const current = GetOwnPosture();
+            setOwnPosture(prev => (prev !== current ? current : prev));
+        }, 300);
+
+        return () => clearInterval(interval);
+    }, [ avatarInfo ]);
 
     // Furni-specific states
     const [ pickupMode, setPickupMode ] = useState(PICKUP_MODE_NONE);
@@ -209,8 +231,17 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                 roomSession.sendDanceMessage(isDancing ? 0 : 1);
                 break;
             case 'sit_stand': {
-                const isStanding = (GetOwnPosture() === AvatarAction.POSTURE_STAND);
-                roomSession.sendPostureMessage(isStanding ? PostureTypeEnum.POSTURE_SIT : PostureTypeEnum.POSTURE_STAND);
+                const isCurrentlySitting = (ownPosture === AvatarAction.POSTURE_SIT) || (ownPosture === AvatarAction.POSTURE_LAY) || Boolean(GetCanStandUp());
+                if(isCurrentlySitting)
+                {
+                    roomSession.sendPostureMessage(PostureTypeEnum.POSTURE_STAND);
+                    setOwnPosture(AvatarAction.POSTURE_STAND);
+                }
+                else
+                {
+                    roomSession.sendPostureMessage(PostureTypeEnum.POSTURE_SIT);
+                    setOwnPosture(AvatarAction.POSTURE_SIT);
+                }
                 break;
             }
             case 'change_looks':
@@ -343,7 +374,7 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
 
         if(isOwnUser)
         {
-            const isStanding = (GetOwnPosture() === AvatarAction.POSTURE_STAND);
+            const isSitting = (ownPosture === AvatarAction.POSTURE_SIT) || (ownPosture === AvatarAction.POSTURE_LAY) || Boolean(GetCanStandUp());
             return (
                 <div className="stage-actions">
                     <button type="button" className="retro-action-btn" onClick={ () => handleAction('wave') } title="Saludar a la sala">
@@ -354,8 +385,8 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                         <FaMusic className="btn-icon" />
                         <span>{ isDancing ? 'Parar' : 'Bailar' }</span>
                     </button>
-                    <button type="button" className="retro-action-btn" onClick={ () => handleAction('sit_stand') } title={ isStanding ? 'Sentarse' : 'Levantarse' }>
-                        <span>{ isStanding ? 'Sentarse' : 'Levantarse' }</span>
+                    <button type="button" className="retro-action-btn" onClick={ () => handleAction('sit_stand') } title={ isSitting ? 'Levantarse' : 'Sentarse' }>
+                        <span>{ isSitting ? 'Levantarse' : 'Sentarse' }</span>
                     </button>
                 </div>
             );
