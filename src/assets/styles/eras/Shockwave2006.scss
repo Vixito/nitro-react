@@ -45,19 +45,55 @@ body[data-era="shockwave2006"] {
             min-height: 26px !important;
             height: 28px !important;
             display: flex !important;
+            flex-direction: row !important;
             align-items: center !important;
-            justify-content: space-between !important;
+            justify-content: center !important;
+            position: relative !important;
+            gap: 0 !important;
+
+            > .w-100,
+            > div:first-child,
+            > div.d-flex {
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
 
             .header-text,
             .nitro-card-header-text,
             h5, h6 {
                 color: #ffffff !important;
                 font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
-                font-size: 13px !important;
+                font-size: 12px !important;
                 letter-spacing: 0.5px !important;
                 text-shadow: 1px 1px 0px #000000 !important;
+                margin: 0 auto !important;
+                padding: 0 8px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 100% !important;
+                line-height: 28px !important;
+            }
+
+            .end-2,
+            div:has(> .nitro-card-header-close),
+            div:has(> .close-button) {
+                position: absolute !important;
+                right: 8px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
                 margin: 0 !important;
-                padding: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
 
             // BOTÓN DE CIERRE V14 ORIGINAL DE HABBTEN (13x13px PNG)
@@ -829,10 +865,12 @@ body[data-era="shockwave2006"] {
             border-radius: 5px 5px 0 0 !important;
             padding: 0 6px !important;
             display: flex !important;
+            flex-direction: row !important;
             align-items: center !important;
-            justify-content: space-between !important;
+            justify-content: center !important;
             position: relative !important;
             cursor: grab !important;
+            gap: 0 !important;
 
             &:active { cursor: grabbing !important; }
 
@@ -840,22 +878,32 @@ body[data-era="shockwave2006"] {
                 content: '' !important;
                 position: absolute !important;
                 left: 6px !important;
+                right: 26px !important;
                 top: 50% !important;
                 transform: translateY(-50%) !important;
-                width: calc(50% - 75px) !important;
                 height: 10px !important;
                 background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                z-index: 1 !important;
+                pointer-events: none !important;
             }
 
             &::after {
-                content: '' !important;
-                position: absolute !important;
-                right: 28px !important;
-                top: 50% !important;
-                transform: translateY(-50%) !important;
-                width: calc(50% - 75px) !important;
-                height: 10px !important;
-                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                display: none !important;
+            }
+
+            > .w-100,
+            > div:first-child,
+            > div.d-flex {
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             .nitro-card-header-text {
@@ -871,6 +919,27 @@ body[data-era="shockwave2006"] {
                 padding: 0 8px !important;
                 margin: 0 auto !important;
                 white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: calc(100% - 36px) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 100% !important;
+                line-height: 24px !important;
+            }
+
+            .end-2,
+            div:has(> .nitro-card-header-close) {
+                position: absolute !important;
+                right: 6px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 3 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
 
             .nitro-card-header-close {
@@ -883,13 +952,21 @@ body[data-era="shockwave2006"] {
                 border: none !important;
                 border-radius: 0 !important;
                 cursor: pointer !important;
-                z-index: 3 !important;
                 padding: 0 !important;
+                display: block !important;
+                opacity: 1 !important;
 
-                svg { display: none !important; }
+                &:hover {
+                    filter: brightness(1.2) !important;
+                }
 
                 &:active {
                     background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                    filter: none !important;
+                }
+
+                svg, .fa-icon {
+                    display: none !important;
                 }
             }
         }
@@ -1232,10 +1309,12 @@ body[data-era="shockwave2006"] {
             border-radius: 5px 5px 0 0 !important;
             padding: 0 6px !important;
             display: flex !important;
+            flex-direction: row !important;
             align-items: center !important;
-            justify-content: space-between !important;
+            justify-content: center !important;
             position: relative !important;
             cursor: grab !important;
+            gap: 0 !important;
 
             &:active {
                 cursor: grabbing !important;
@@ -1245,22 +1324,32 @@ body[data-era="shockwave2006"] {
                 content: '' !important;
                 position: absolute !important;
                 left: 6px !important;
+                right: 26px !important;
                 top: 50% !important;
                 transform: translateY(-50%) !important;
-                width: calc(50% - 150px) !important;
                 height: 10px !important;
                 background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                z-index: 1 !important;
+                pointer-events: none !important;
             }
 
             &::after {
-                content: '' !important;
-                position: absolute !important;
-                right: 28px !important;
-                top: 50% !important;
-                transform: translateY(-50%) !important;
-                width: calc(50% - 150px) !important;
-                height: 10px !important;
-                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                display: none !important;
+            }
+
+            > .w-100,
+            > div:first-child,
+            > div.d-flex {
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
             .nitro-card-header-text {
@@ -1276,6 +1365,27 @@ body[data-era="shockwave2006"] {
                 padding: 0 8px !important;
                 margin: 0 auto !important;
                 white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: calc(100% - 36px) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 100% !important;
+                line-height: 24px !important;
+            }
+
+            .end-2,
+            div:has(> .nitro-card-header-close) {
+                position: absolute !important;
+                right: 6px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 3 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
 
             .nitro-card-header-close {
@@ -1288,13 +1398,21 @@ body[data-era="shockwave2006"] {
                 border: none !important;
                 border-radius: 0 !important;
                 cursor: pointer !important;
-                z-index: 3 !important;
                 padding: 0 !important;
+                display: block !important;
+                opacity: 1 !important;
 
-                svg { display: none !important; }
+                &:hover {
+                    filter: brightness(1.2) !important;
+                }
 
                 &:active {
                     background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                    filter: none !important;
+                }
+
+                svg, .fa-icon {
+                    display: none !important;
                 }
             }
         }
@@ -2074,6 +2192,726 @@ body[data-era="shockwave2006"] {
 
 
     // =========================================================================
+    // 4.3 SUBVENTANAS / DIÁLOGOS / NITROPEDIA (HABBO PAGES) SHOCKWAVE 2006
+    // =========================================================================
+    .nitro-card.theme-primary-slim,
+    .nitropedia,
+    .layout-notification-alert,
+    .nitro-alert,
+    .nitro-confirm,
+    .nitro-notification-bubble {
+        border-radius: 6px !important;
+        border: none !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
+        background: #5b90a4 !important;
+        overflow: hidden !important;
+        user-select: none !important;
+        cursor: default !important;
+
+        .nitro-card-header {
+            height: 24px !important;
+            min-height: 24px !important;
+            max-height: 24px !important;
+            background: #5b90a4 !important;
+            border-bottom: 1px solid #000000 !important;
+            border-radius: 5px 5px 0 0 !important;
+            padding: 0 6px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: relative !important;
+            cursor: grab !important;
+            gap: 0 !important;
+
+            &:active { cursor: grabbing !important; }
+
+            &::before {
+                content: '' !important;
+                position: absolute !important;
+                left: 6px !important;
+                right: 26px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                height: 10px !important;
+                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                z-index: 1 !important;
+                pointer-events: none !important;
+            }
+
+            &::after { display: none !important; }
+
+            > .w-100,
+            > div:first-child,
+            > div.d-flex {
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .nitro-card-header-text,
+            .header-text {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #000000 !important;
+                letter-spacing: 0.5px !important;
+                text-align: center !important;
+                z-index: 2 !important;
+                background: #5b90a4 !important;
+                padding: 0 8px !important;
+                margin: 0 auto !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: calc(100% - 36px) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 100% !important;
+                line-height: 24px !important;
+            }
+
+            .end-2,
+            div:has(> .nitro-card-header-close) {
+                position: absolute !important;
+                right: 6px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 3 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .nitro-card-header-close {
+                width: 13px !important;
+                height: 13px !important;
+                min-width: 13px !important;
+                min-height: 13px !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                cursor: pointer !important;
+                padding: 0 !important;
+                display: block !important;
+                opacity: 1 !important;
+
+                &:hover { filter: brightness(1.2) !important; }
+                &:active {
+                    background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                    filter: none !important;
+                }
+
+                svg, .fa-icon { display: none !important; }
+            }
+        }
+
+        .nitro-card-content {
+            background: #ffffff !important;
+            border: 1px solid #000000 !important;
+            border-radius: 4px !important;
+            margin: 4px 6px 6px 6px !important;
+            padding: 8px 10px !important;
+            color: #000000 !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 9px !important;
+            line-height: 1.4 !important;
+
+            // Nitropedia headings
+            h1, h2, h3, h4, .title, b:first-of-type {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                color: #d85e00 !important;
+                font-size: 12px !important;
+                margin-bottom: 6px !important;
+                display: block !important;
+            }
+
+            p, div, span, td, li {
+                font-family: 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+            }
+
+            // Highlight cards (Bonus racha, etc.)
+            .bg-light,
+            div[style*="background"],
+            div[class*="rounded"]:not(.nitro-card) {
+                background: #fff8ed !important;
+                border: 1px solid #e0cfbe !important;
+                border-radius: 6px !important;
+                padding: 8px 10px !important;
+                margin-top: 8px !important;
+
+                b, strong, .title {
+                    color: #c05000 !important;
+                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                }
+            }
+
+            // Buttons inside subventanas / alert dialogs
+            button, .btn {
+                background: #ebebe8 !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                padding: 3px 8px !important;
+                box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #a0a09e !important;
+                cursor: pointer !important;
+
+                &:hover:not(:disabled) {
+                    background: #ffffff !important;
+                }
+
+                &:active:not(:disabled) {
+                    background: #dedad0 !important;
+                    box-shadow: inset 1px 1px 0px #70706e !important;
+                }
+
+                &:disabled {
+                    opacity: 0.5 !important;
+                    cursor: not-allowed !important;
+                }
+            }
+        }
+    }
+
+
+    // =========================================================================
+    // 4.4 AYUDA / SOPORTE (CFH & GUÍAS) SHOCKWAVE 2006
+    // =========================================================================
+    .nitro-help,
+    .nitro-cfh-sanction-status,
+    .nitro-guide-tool,
+    .nitro-change-username {
+        border-radius: 6px !important;
+        border: none !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
+        background: #5b90a4 !important;
+        overflow: hidden !important;
+        user-select: none !important;
+        cursor: default !important;
+
+        .nitro-card-header {
+            height: 24px !important;
+            min-height: 24px !important;
+            max-height: 24px !important;
+            background: #5b90a4 !important;
+            border-bottom: 1px solid #000000 !important;
+            border-radius: 5px 5px 0 0 !important;
+            padding: 0 6px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: relative !important;
+            cursor: grab !important;
+            gap: 0 !important;
+
+            &:active { cursor: grabbing !important; }
+
+            &::before {
+                content: '' !important;
+                position: absolute !important;
+                left: 6px !important;
+                right: 26px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                height: 10px !important;
+                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                z-index: 1 !important;
+                pointer-events: none !important;
+            }
+
+            &::after { display: none !important; }
+
+            > .w-100,
+            > div:first-child,
+            > div.d-flex {
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .nitro-card-header-text,
+            .header-text {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #000000 !important;
+                letter-spacing: 0.5px !important;
+                text-align: center !important;
+                z-index: 2 !important;
+                background: #5b90a4 !important;
+                padding: 0 8px !important;
+                margin: 0 auto !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: calc(100% - 36px) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 100% !important;
+                line-height: 24px !important;
+            }
+
+            .end-2,
+            div:has(> .nitro-card-header-close) {
+                position: absolute !important;
+                right: 6px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 3 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .nitro-card-header-close {
+                width: 13px !important;
+                height: 13px !important;
+                min-width: 13px !important;
+                min-height: 13px !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                cursor: pointer !important;
+                padding: 0 !important;
+                display: block !important;
+                opacity: 1 !important;
+
+                &:hover { filter: brightness(1.2) !important; }
+                &:active {
+                    background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                    filter: none !important;
+                }
+
+                svg, .fa-icon { display: none !important; }
+            }
+        }
+
+        .nitro-card-content {
+            background: #ffffff !important;
+            border: 1px solid #000000 !important;
+            border-radius: 4px !important;
+            margin: 4px 6px 6px 6px !important;
+            padding: 8px 10px !important;
+            color: #000000 !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 9px !important;
+
+            // Illustration on left column
+            .index-image {
+                background: url('@/assets/images/help/help_index.png') no-repeat center !important;
+                image-rendering: pixelated !important;
+                width: 126px !important;
+                height: 105px !important;
+            }
+
+            .text-black, span, p, div {
+                font-family: 'Volter', Tahoma, sans-serif !important;
+                color: #000000 !important;
+            }
+
+            // Headings inside Help views
+            .h3, .h4, [class*="fs-3"], [class*="fs-4"] {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                color: #000000 !important;
+                margin-bottom: 4px !important;
+            }
+
+            // Retro buttons inside Help
+            button, .btn {
+                background: #ebebe8 !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                padding: 4px 8px !important;
+                box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #a0a09e !important;
+                cursor: pointer !important;
+                text-align: left !important;
+
+                &:hover:not(:disabled) {
+                    background: #ffffff !important;
+                }
+
+                &:active:not(:disabled) {
+                    background: #dedad0 !important;
+                    box-shadow: inset 1px 1px 0px #70706e !important;
+                }
+
+                &:disabled {
+                    opacity: 0.5 !important;
+                    cursor: not-allowed !important;
+                }
+
+                &.btn-link {
+                    background: transparent !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    text-decoration: underline !important;
+                    color: #1E7295 !important;
+                    padding: 0 !important;
+                    margin-top: 4px !important;
+                    font-size: 9px !important;
+                    text-align: center !important;
+                }
+
+                &.btn-danger {
+                    background: #c42626 !important;
+                    color: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    box-shadow: inset 1px 1px 0px #f26868, inset -1px -1px 0px #690f0f !important;
+                    text-shadow: 1px 1px 0px #400505 !important;
+
+                    * { color: #ffffff !important; }
+                    &:hover { background: #d32f2f !important; }
+                }
+
+                &.btn-secondary {
+                    background: #dcdcd8 !important;
+                    color: #000000 !important;
+                }
+            }
+
+            // Textarea inside report description
+            textarea.form-control {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 0px !important;
+                font-family: 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                padding: 4px 6px !important;
+                box-shadow: none !important;
+                resize: none !important;
+
+                &:focus {
+                    outline: none !important;
+                    border-color: #5b90a4 !important;
+                }
+            }
+        }
+    }
+
+
+    // =========================================================================
+    // 4.5 MOD TOOLS (HERRAMIENTAS DE MODERACIÓN) SHOCKWAVE 2006
+    // =========================================================================
+    .nitro-mod-tools,
+    .nitro-mod-tools-room,
+    .nitro-mod-tools-user,
+    .nitro-mod-tools-chatlog,
+    .nitro-mod-tools-tickets,
+    .nitro-mod-tools-handle-issue,
+    .nitro-mod-tools-user-action,
+    .nitro-mod-tools-user-message,
+    .nitro-mod-tools-user-visits {
+        border-radius: 6px !important;
+        border: none !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
+        background: #5b90a4 !important;
+        overflow: hidden !important;
+        user-select: none !important;
+        cursor: default !important;
+
+        .nitro-card-header {
+            height: 24px !important;
+            min-height: 24px !important;
+            max-height: 24px !important;
+            background: #5b90a4 !important;
+            border-bottom: 1px solid #000000 !important;
+            border-radius: 5px 5px 0 0 !important;
+            padding: 0 6px !important;
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: relative !important;
+            cursor: grab !important;
+            gap: 0 !important;
+
+            &:active { cursor: grabbing !important; }
+
+            &::before {
+                content: '' !important;
+                position: absolute !important;
+                left: 6px !important;
+                right: 26px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                height: 10px !important;
+                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                z-index: 1 !important;
+                pointer-events: none !important;
+            }
+
+            &::after { display: none !important; }
+
+            > .w-100,
+            > div:first-child,
+            > div.d-flex {
+                height: 100% !important;
+                min-height: 100% !important;
+                max-height: 100% !important;
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .nitro-card-header-text,
+            .header-text {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #000000 !important;
+                letter-spacing: 0.5px !important;
+                text-align: center !important;
+                z-index: 2 !important;
+                background: #5b90a4 !important;
+                padding: 0 8px !important;
+                margin: 0 auto !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                max-width: calc(100% - 36px) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 100% !important;
+                line-height: 24px !important;
+            }
+
+            .end-2,
+            div:has(> .nitro-card-header-close) {
+                position: absolute !important;
+                right: 6px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                z-index: 3 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+
+            .nitro-card-header-close {
+                width: 13px !important;
+                height: 13px !important;
+                min-width: 13px !important;
+                min-height: 13px !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                cursor: pointer !important;
+                padding: 0 !important;
+                display: block !important;
+                opacity: 1 !important;
+
+                &:hover { filter: brightness(1.2) !important; }
+                &:active {
+                    background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                    filter: none !important;
+                }
+
+                svg, .fa-icon { display: none !important; }
+            }
+        }
+
+        .nitro-card-content {
+            background: #ffffff !important;
+            border: 1px solid #000000 !important;
+            border-radius: 4px !important;
+            margin: 4px 6px 6px 6px !important;
+            padding: 8px 10px !important;
+            color: #000000 !important;
+            font-family: 'Volter', Tahoma, sans-serif !important;
+            font-size: 9px !important;
+
+            // Retro button styling for ModTools
+            button, .btn {
+                background: #ebebe8 !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                padding: 4px 8px !important;
+                box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #a0a09e !important;
+                cursor: pointer !important;
+
+                &:hover:not(:disabled) {
+                    background: #ffffff !important;
+                }
+
+                &:active:not(:disabled) {
+                    background: #dedad0 !important;
+                    box-shadow: inset 1px 1px 0px #70706e !important;
+                }
+
+                &:disabled {
+                    opacity: 0.5 !important;
+                    cursor: not-allowed !important;
+                }
+
+                &.btn-danger {
+                    background: #c42626 !important;
+                    color: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    box-shadow: inset 1px 1px 0px #f26868, inset -1px -1px 0px #690f0f !important;
+                    text-shadow: 1px 1px 0px #400505 !important;
+                    * { color: #ffffff !important; }
+                    &:hover { background: #d32f2f !important; }
+                }
+
+                &.btn-success {
+                    background: #2e7d32 !important;
+                    color: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    box-shadow: inset 1px 1px 0px #4caf50, inset -1px -1px 0px #1b5e20 !important;
+                    text-shadow: 1px 1px 0px #1b5e20 !important;
+                    * { color: #ffffff !important; }
+                }
+            }
+
+            // Tables in ModTools (User info, chatlog, ticket list)
+            .table {
+                font-family: 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                margin-bottom: 0 !important;
+                border: 1px solid #000000 !important;
+
+                th, td {
+                    padding: 3px 6px !important;
+                    border-bottom: 1px solid #e0e0e0 !important;
+                    color: #000000 !important;
+                }
+
+                th {
+                    background: #f0ede6 !important;
+                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                    border-right: 1px solid #d0ccc2 !important;
+                }
+
+                &.table-striped > tbody > tr:nth-of-type(odd) {
+                    background: #faf8f5 !important;
+                }
+
+                &.table-striped > tbody > tr:nth-of-type(even) {
+                    background: #ffffff !important;
+                }
+            }
+
+            // Input, select, textarea
+            .form-control, .form-select, textarea {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 0px !important;
+                font-family: 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                padding: 4px 6px !important;
+                box-shadow: none !important;
+
+                &:focus {
+                    outline: none !important;
+                    border-color: #5b90a4 !important;
+                }
+            }
+
+            // Checkboxes
+            .form-check-input {
+                border: 1px solid #000000 !important;
+                border-radius: 0px !important;
+                cursor: pointer !important;
+            }
+
+            // Inner cards (e.g., room actions box)
+            .bg-muted, .rounded {
+                background: #f6f4ee !important;
+                border: 1px solid #d4cfc5 !important;
+                border-radius: 4px !important;
+            }
+
+            // Links (username)
+            .username, a {
+                color: #1E7295 !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                text-decoration: underline !important;
+                cursor: pointer !important;
+            }
+
+            // Chatlog rows
+            .log-entry {
+                font-family: 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                padding: 2px 4px !important;
+
+                &.highlighted {
+                    border: 1px solid #c42626 !important;
+                    background: #ffebee !important;
+                }
+            }
+        }
+    }
+
+    // Palette principal de herramientas de moderación flotante
+    .nitro-mod-tools {
+        width: 210px !important;
+
+        .nitro-card-content {
+            button, .btn {
+                padding-left: 28px !important;
+                position: relative !important;
+                text-align: left !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                height: 28px !important;
+                margin-bottom: 4px !important;
+                width: 100% !important;
+
+                .icon {
+                    left: 6px !important;
+                    top: 50% !important;
+                    transform: translateY(-50%) !important;
+                }
+            }
+        }
+    }
     // 5. INVENTARIO RETRO "LA MANO" (AUTÉNTICO HABBTEN V14 SHOCKWAVE)
     // =========================================================================
     .nitro-card.nitro-inventory.inventory-shockwave-hand {
