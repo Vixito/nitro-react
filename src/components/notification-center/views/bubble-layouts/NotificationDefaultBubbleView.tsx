@@ -10,11 +10,23 @@ export interface NotificationDefaultBubbleViewProps extends LayoutNotificationBu
 
 export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProps> = props =>
 {
-    const { item = null, onClose = null, ...rest } = props;
+    const { item = null, onClose = null, classNames = [], ...rest } = props;
     
     const htmlText = item.message.replace(/\r\n|\r|\n/g, '<br />');
     const iconSrc = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : defaultSecurityIcon;
     const titleText = item.title || (item.message.toLowerCase().includes('seguridad') || item.message.toLowerCase().includes('conversaciones') ? 'Aviso de Seguridad' : null);
+
+    const isEvent = Boolean(
+        (titleText && /event/i.test(titleText)) ||
+        (item.message && /event/i.test(item.message)) ||
+        (item.notificationType && item.notificationType.toLowerCase().includes('event')) ||
+        (item.linkUrl && item.linkUrl.length > 0)
+    );
+
+    const finalClassNames = [
+        ...classNames,
+        isEvent ? 'bubble-event-alert' : 'bubble-default-alert'
+    ];
 
     const handleNavigate = (event: React.MouseEvent) =>
     {
@@ -58,7 +70,7 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     };
 
     return (
-        <LayoutNotificationBubbleView onClose={ onClose } gap={ 2 } alignItems="start" onClick={ handleBubbleClick } { ...rest }>
+        <LayoutNotificationBubbleView onClose={ onClose } gap={ 2 } alignItems="stretch" classNames={ finalClassNames } onClick={ handleBubbleClick } { ...rest }>
             <div className="bubble-image-container">
                 <img className="no-select bubble-icon" src={ iconSrc } alt="" />
             </div>
