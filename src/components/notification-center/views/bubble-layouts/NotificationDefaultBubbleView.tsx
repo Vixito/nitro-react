@@ -19,8 +19,9 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     const isEvent = Boolean(
         (titleText && /event/i.test(titleText)) ||
         (item.message && /event/i.test(item.message)) ||
-        (item.notificationType && item.notificationType.toLowerCase().includes('event')) ||
-        (item.linkUrl && item.linkUrl.length > 0)
+        (item.notificationType && /event/i.test(item.notificationType)) ||
+        (item.linkUrl && item.linkUrl.length > 0) ||
+        (item.iconUrl && !item.iconUrl.includes('badge') && !item.iconUrl.includes('security'))
     );
 
     const finalClassNames = [
