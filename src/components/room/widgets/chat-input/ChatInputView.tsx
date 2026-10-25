@@ -322,8 +322,8 @@ export const ChatInputView: FC<{}> = props =>
                 { currentEra === 'shockwave2006' && (
                     <div ref={ modeSelectorRef } className="chat-mode-selector-shockwave2006" onClick={ () => setModeDropdownOpen(!isModeDropdownOpen) }>
                         <span className="mode-label">{ chatMode === 'say' ? 'Decir' : chatMode === 'shout' ? 'Gritar' : 'Susurrar' }</span>
-                        <div className="mode-divider" />
                         <span className="mode-arrow">▼</span>
+                        <div className="mode-divider" />
                         { isModeDropdownOpen && (
                             <div className="chat-mode-dropdown-menu">
                                 <div className={ `dropdown-item ${ chatMode === 'say' ? 'active' : '' }` } onClick={ (e) => { e.stopPropagation(); setChatMode('say'); setModeDropdownOpen(false); } }>Decir</div>

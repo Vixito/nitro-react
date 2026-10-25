@@ -214,7 +214,7 @@ body[data-era="shockwave2006"] {
             flex: 0 0 auto !important;
             flex-shrink: 0 !important;
             margin-left: auto !important;
-            gap: 8px !important;
+            gap: 5px !important;
             height: 100% !important;
             padding-right: 2px !important;
         }
@@ -276,10 +276,10 @@ body[data-era="shockwave2006"] {
                 }
 
                 &.icon-club {
-                    width: 24px !important;
-                    height: 31px !important;
+                    width: 28px !important;
+                    height: 32px !important;
                     background-image: url('@/assets/images/eras/shockwave_v14/club_clipboard.png') !important;
-                    background-size: 24px 31px !important;
+                    background-size: 28px 32px !important;
                     background-repeat: no-repeat !important;
                     background-position: center bottom !important;
                     image-rendering: -webkit-optimize-contrast !important;
@@ -462,9 +462,10 @@ body[data-era="shockwave2006"] {
             height: 28px !important;
             min-height: 28px !important;
             max-height: 28px !important;
-            flex: 1 1 auto !important;
-            max-width: none !important;
-            min-width: 0 !important;
+            width: 240px !important;
+            max-width: 240px !important;
+            min-width: 200px !important;
+            flex: 0 0 240px !important;
             background: transparent !important;
             background-color: transparent !important;
             border: none !important;
@@ -478,17 +479,17 @@ body[data-era="shockwave2006"] {
                 width: 100% !important;
                 flex: 1 1 auto !important;
                 min-width: 0 !important;
-                height: 26px !important;
-                min-height: 26px !important;
-                max-height: 26px !important;
+                height: 24px !important;
+                min-height: 24px !important;
+                max-height: 24px !important;
                 background: #ffffff !important;
                 background-color: #ffffff !important;
                 border: 1px solid #000000 !important;
-                border-radius: 13px !important;
+                border-radius: 12px !important;
                 box-shadow: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                overflow: hidden !important;
+                overflow: visible !important;
                 position: relative !important;
 
                 &::before,
@@ -507,12 +508,10 @@ body[data-era="shockwave2006"] {
                     max-height: 100% !important;
                     width: auto !important;
                     padding-left: 10px !important;
-                    padding-right: 8px !important;
+                    padding-right: 0 !important;
                     margin: 0 !important;
                     border: none !important;
-                    border-right: 1px solid #000000 !important;
-                    border-radius: 13px !important;
-                    background: linear-gradient(180deg, #ffffff 0%, #dcdcdc 100%) !important;
+                    background: transparent !important;
                     box-shadow: none !important;
                     cursor: pointer !important;
                     position: relative !important;
@@ -520,11 +519,7 @@ body[data-era="shockwave2006"] {
                     flex-shrink: 0 !important;
 
                     &:hover {
-                        background: linear-gradient(180deg, #ffffff 0%, #ebebeb 100%) !important;
-                    }
-
-                    &:active {
-                        background: linear-gradient(180deg, #d0d0d0 0%, #e0e0e0 100%) !important;
+                        background: transparent !important;
                     }
 
                     .mode-label {
@@ -539,31 +534,32 @@ body[data-era="shockwave2006"] {
                         padding: 0 !important;
                     }
 
-                    // 1. LÍNEA DIVISORIA DE PUNTOS
-                    .mode-divider {
-                        width: 0px !important;
-                        height: 14px !important;
-                        align-self: center !important;
-                        border-left: 1px dotted #555555 !important;
-                        margin-left: 6px !important;
-                        margin-right: 6px !important;
-                        flex-shrink: 0 !important;
-                    }
-
-                    // 2. FLECHA ▼ DIRECTA
+                    // 1. FLECHA ▼ DIRECTA JUNTO A LA ETIQUETA
                     .mode-arrow {
-                        font-size: 8px !important;
+                        font-size: 7px !important;
                         line-height: 1 !important;
                         color: #000000 !important;
                         display: inline-block !important;
                         transform: scale(1.1, 0.8) !important;
-                        margin-right: 2px !important;
+                        margin-left: 4px !important;
+                        margin-right: 7px !important;
                         user-select: none !important;
+                    }
+
+                    // 2. LÍNEA DIVISORIA DE PUNTOS SEPARADORA
+                    .mode-divider {
+                        width: 0px !important;
+                        height: 14px !important;
+                        align-self: center !important;
+                        border-left: 1px dotted #888888 !important;
+                        margin: 0 !important;
+                        margin-right: 7px !important;
+                        flex-shrink: 0 !important;
                     }
 
                     .chat-mode-dropdown-menu {
                         position: absolute !important;
-                        bottom: 30px !important;
+                        bottom: 28px !important;
                         left: 0 !important;
                         background: #ebebe8 !important;
                         border: 1px solid #000000 !important;
@@ -794,22 +790,23 @@ body[data-era="shockwave2006"] {
             .shockwave-menu-pointer {
                 position: absolute !important;
                 bottom: -5px !important;
-                left: 32px !important;
+                left: 29px !important;
+                transform: translateX(-50%) !important;
                 width: 0 !important;
                 height: 0 !important;
-                border-left: 6px solid transparent !important;
-                border-right: 6px solid transparent !important;
+                border-left: 5px solid transparent !important;
+                border-right: 5px solid transparent !important;
                 border-top: 5px solid #5b90a4 !important;
 
                 &::after {
                     content: '' !important;
                     position: absolute !important;
-                    left: -6px !important;
+                    left: -5px !important;
                     top: -6px !important;
                     width: 0 !important;
                     height: 0 !important;
-                    border-left: 6px solid transparent !important;
-                    border-right: 6px solid transparent !important;
+                    border-left: 5px solid transparent !important;
+                    border-right: 5px solid transparent !important;
                     border-top: 6px solid #000000 !important;
                     z-index: -1 !important;
                 }
@@ -1483,30 +1480,31 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     // 11. FORMULARIOS, BOTONES GENERALES Y CONTROLES RETRO (SOBRESCRITURA TOTAL DE BOOTSTRAP)
     // =========================================================================
-    .btn:not(.btn-link):not(.btn-close):not([class*="link"]),
-    .btn-primary:not(.btn-link),
-    .btn-secondary:not(.btn-link),
-    button:not(.drag-handler button):not(.nitro-card-header button):not(.btn-link):not(.btn-close):not([class*="link"]):not([class*="close"]):not([class*="icon"]) {
-        border-radius: 0px !important;
+    // BOTONES PLANOS CLÁSICOS CON 1PX DE BORDE NEGRO
+    // =========================================================================
+    .btn:not(.btn-link):not(.btn-close):not([class*="link"]):not(.retro-action-btn),
+    .btn-primary:not(.btn-link):not(.retro-action-btn),
+    .btn-secondary:not(.btn-link):not(.retro-action-btn),
+    button:not(.drag-handler button):not(.nitro-card-header button):not(.btn-link):not(.btn-close):not([class*="link"]):not([class*="close"]):not([class*="icon"]):not(.retro-action-btn) {
+        border-radius: 6px !important;
         font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
-        font-size: 12px !important;
+        font-size: 11px !important;
         font-weight: 700 !important;
-        background: #cfcbc0 !important;
+        background: #ebebe8 !important;
         color: #000000 !important;
-        border: 2px solid !important;
-        border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
+        border: 1px solid #000000 !important;
         box-shadow: none !important;
         cursor: pointer !important;
+        padding: 3px 10px !important;
 
         * {
             color: #000000 !important;
             text-shadow: none !important;
         }
 
-        &:hover { background: #dedad0 !important; }
+        &:hover { background: #f5f5f3 !important; }
         &:active {
-            border-color: #5c5950 #ffffff #ffffff #5c5950 !important;
-            background: #bfbbb0 !important;
+            background: #dedad0 !important;
         }
 
         &.btn-warning {
@@ -2249,25 +2247,26 @@ body[data-era="shockwave2006"] {
                 flex-wrap: wrap !important;
                 justify-content: flex-end !important;
                 gap: 4px !important;
-                margin-top: 4px !important;
+                margin-top: 5px !important;
                 max-width: 156px !important;
 
-                .retro-action-btn {
-                    background: #ebebe8 !important;
+                .retro-action-btn,
+                button.retro-action-btn {
+                    background: #ffffff !important;
                     border: 1px solid #000000 !important;
-                    border-radius: 8px !important;
-                    padding: 2px 9px !important;
+                    border-radius: 9px !important;
+                    padding: 2px 8px !important;
                     font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
-                    font-size: 11px !important;
+                    font-size: 10px !important;
                     font-weight: 700 !important;
                     color: #000000 !important;
                     display: inline-flex !important;
                     align-items: center !important;
-                    gap: 5px !important;
+                    gap: 4px !important;
                     cursor: pointer !important;
-                    box-shadow: none !important;
+                    box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.6) !important;
                     white-space: nowrap !important;
-                    line-height: 14px !important;
+                    line-height: 1 !important;
                     outline: none !important;
 
                     * {
@@ -2275,16 +2274,16 @@ body[data-era="shockwave2006"] {
                     }
 
                     &:hover {
-                        background: #f5f5f3 !important;
+                        background: #e8e8e8 !important;
                     }
 
                     &:active {
-                        background: #dedad0 !important;
+                        background: #d0d0d0 !important;
                         box-shadow: inset 1px 1px 0px #000000 !important;
                     }
 
                     .btn-icon {
-                        font-size: 10px !important;
+                        font-size: 9px !important;
                         color: #000000 !important;
                     }
                 }
