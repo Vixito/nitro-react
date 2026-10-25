@@ -137,7 +137,10 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
                     )}
                 </div>
                 <div className="shockwave-menu-footer">
-                    <div className="shockwave-menu-pointer" style={ pointerStyle } />
+                    <svg className="shockwave-menu-pointer" style={ pointerStyle } width="16" height="9" viewBox="0 0 16 9">
+                        <polygon points="0,-2 16,-2 8,8" fill="#5b90a4" />
+                        <polyline points="0,0 8,8 16,0" fill="none" stroke="#000000" strokeWidth="1.5" strokeLinejoin="miter" />
+                    </svg>
                 </div>
             </div>
         );

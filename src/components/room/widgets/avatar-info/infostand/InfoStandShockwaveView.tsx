@@ -231,7 +231,14 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                 roomSession.sendDanceMessage(isDancing ? 0 : 1);
                 break;
             case 'sit_stand': {
-                const isCurrentlySitting = (ownPosture === AvatarAction.POSTURE_SIT) || (ownPosture === AvatarAction.POSTURE_LAY) || Boolean(GetCanStandUp());
+                const livePosture = GetOwnPosture();
+                const canStand = GetCanStandUp();
+                const isCurrentlySitting = (ownPosture === AvatarAction.POSTURE_SIT) ||
+                                           (ownPosture === AvatarAction.POSTURE_LAY) ||
+                                           (livePosture === AvatarAction.POSTURE_SIT) ||
+                                           (livePosture === AvatarAction.POSTURE_LAY) ||
+                                           (canStand === '1' || Boolean(canStand));
+
                 if(isCurrentlySitting)
                 {
                     roomSession.sendPostureMessage(PostureTypeEnum.POSTURE_STAND);
@@ -309,7 +316,7 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                 if(avatarInfo) roomSession?.pickupPet((avatarInfo as AvatarInfoPet).id);
                 break;
         }
-    }, [ roomSession, isDancing, avatarInfo, pickupMode, respectUser, respectPet ]);
+    }, [ roomSession, isDancing, avatarInfo, ownPosture, pickupMode, respectUser, respectPet ]);
 
     // If not in a room, nothing to render
     if(!roomSession) return null;
@@ -376,7 +383,13 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
 
         if(isOwnUser)
         {
-            const isSitting = (ownPosture === AvatarAction.POSTURE_SIT) || (ownPosture === AvatarAction.POSTURE_LAY) || Boolean(GetCanStandUp());
+            const canStand = GetCanStandUp();
+            const livePosture = GetOwnPosture();
+            const isSitting = (ownPosture === AvatarAction.POSTURE_SIT) ||
+                              (ownPosture === AvatarAction.POSTURE_LAY) ||
+                              (livePosture === AvatarAction.POSTURE_SIT) ||
+                              (livePosture === AvatarAction.POSTURE_LAY) ||
+                              (canStand === '1' || Boolean(canStand));
             return (
                 <div className="stage-actions">
                     <button type="button" className="retro-action-btn" onClick={ () => handleAction('wave') } title="Saludar a la sala">
