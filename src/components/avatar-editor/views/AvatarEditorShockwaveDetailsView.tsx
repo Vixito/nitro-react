@@ -106,7 +106,7 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
     } = props;
 
     const [ activeLayerIndex, setActiveLayerIndex ] = useState<number>(0);
-    const [ isSelectClothesOpen, setIsSelectClothesOpen ] = useState<boolean>(true);
+    const [ isSelectClothesOpen, setIsSelectClothesOpen ] = useState<boolean>(false);
     const [ colorPageIndex, setColorPageIndex ] = useState<number>(0);
     const [ updateId, setUpdateId ] = useState<number>(0);
     const [ motto, setMotto ] = useState<string>(() =>
@@ -287,7 +287,7 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                         <div className="shockwave-select-clothes-popup">
                             <div className="shockwave-details-header">
                                 <div className="shockwave-header-dither" />
-                                <span className="shockwave-header-title">Select Clothes</span>
+                                <span className="shockwave-header-title">Elegir Ropa</span>
                                 <div className="shockwave-header-dither" />
                                 <div
                                     className="shockwave-details-close"
@@ -442,9 +442,16 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                                                     className={ `slot-box ${ isSelected ? 'selected' : '' }` }
                                                     onClick={ () =>
                                                     {
-                                                        setActiveLayerIndex(index);
-                                                        setColorPageIndex(0);
-                                                        setIsSelectClothesOpen(true);
+                                                        if(activeLayerIndex === index && isSelectClothesOpen)
+                                                        {
+                                                            setIsSelectClothesOpen(false);
+                                                        }
+                                                        else
+                                                        {
+                                                            setActiveLayerIndex(index);
+                                                            setColorPageIndex(0);
+                                                            setIsSelectClothesOpen(true);
+                                                        }
                                                     } }
                                                 >
                                                     { curPart?.imageUrl ? (
@@ -472,9 +479,16 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                                                     style={{ backgroundColor: colorHex }}
                                                     onClick={ () =>
                                                     {
-                                                        setActiveLayerIndex(index);
-                                                        setColorPageIndex(0);
-                                                        setIsSelectClothesOpen(true);
+                                                        if(activeLayerIndex === index && isSelectClothesOpen)
+                                                        {
+                                                            setIsSelectClothesOpen(false);
+                                                        }
+                                                        else
+                                                        {
+                                                            setActiveLayerIndex(index);
+                                                            setColorPageIndex(0);
+                                                            setIsSelectClothesOpen(true);
+                                                        }
                                                     } }
                                                 />
 
