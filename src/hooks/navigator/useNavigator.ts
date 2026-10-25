@@ -167,6 +167,11 @@ const useNavigatorState = () =>
 
             if((parser.data.doorMode === RoomDataParser.NOOB_STATE) && !GetSessionDataManager().isAmbassador && !GetSessionDataManager().isRealNoob && !GetSessionDataManager().isModerator) return;
 
+            setDoorData({
+                roomInfo: parser.data,
+                state: DoorStateType.STATE_PENDING_SERVER
+            });
+
             CreateRoomSession(parser.data.roomId);
         }
         else

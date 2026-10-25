@@ -16,12 +16,16 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     const iconSrc = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : defaultSecurityIcon;
     const titleText = item.title || (item.message.toLowerCase().includes('seguridad') || item.message.toLowerCase().includes('conversaciones') ? 'Aviso de Seguridad' : null);
 
-    const isEvent = Boolean(
+    const isCurrencyOrReward = Boolean(
+        (titleText && /(diamante|crédito|ducket|reward|premio|moneda|gift)/i.test(titleText)) ||
+        (item.message && /(diamante|crédito|ducket|recibido.*diamante|recibido.*crédito)/i.test(item.message)) ||
+        (item.iconUrl && /(diamond|credit|ducket|badge|currency)/i.test(item.iconUrl))
+    );
+
+    const isEvent = !isCurrencyOrReward && Boolean(
         (titleText && /event/i.test(titleText)) ||
-        (item.message && /event/i.test(item.message)) ||
         (item.notificationType && /event/i.test(item.notificationType)) ||
-        (item.linkUrl && item.linkUrl.length > 0) ||
-        (item.iconUrl && !item.iconUrl.includes('badge') && !item.iconUrl.includes('security'))
+        (item.message && /^(\s*¡?\s*alerta de evento|event:)/i.test(item.message))
     );
 
     const finalClassNames = [

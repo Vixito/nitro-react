@@ -21,6 +21,7 @@ import { AvatarInfoWidgetOwnAvatarView } from './menu/AvatarInfoWidgetOwnAvatarV
 import { AvatarInfoWidgetOwnPetView } from './menu/AvatarInfoWidgetOwnPetView';
 import { AvatarInfoWidgetPetView } from './menu/AvatarInfoWidgetPetView';
 import { AvatarInfoWidgetRentableBotView } from './menu/AvatarInfoWidgetRentableBotView';
+import { ShockwaveAvatarPointerView } from './menu/ShockwaveAvatarPointerView';
 
 export const AvatarInfoWidgetView: FC<{}> = props =>
 {
@@ -52,7 +53,18 @@ export const AvatarInfoWidgetView: FC<{}> = props =>
 
     const getMenuView = () =>
     {
-        if(!roomSession || isGameMode || currentEra === 'shockwave2006') return null;
+        if(!roomSession || isGameMode) return null;
+
+        if(currentEra === 'shockwave2006')
+        {
+            if(avatarInfo && (avatarInfo.type === AvatarInfoUser.OWN_USER || avatarInfo.type === AvatarInfoUser.PEER || avatarInfo.type === AvatarInfoUser.BOT))
+            {
+                const info = (avatarInfo as AvatarInfoUser);
+                return <ShockwaveAvatarPointerView objectId={ info.roomIndex } onClose={ () => setAvatarInfo(null) } />;
+            }
+
+            return null;
+        }
 
         if(activeNameBubble) return <AvatarInfoWidgetNameView nameInfo={ activeNameBubble } onClose={ () => setActiveNameBubble(null) } />;
 

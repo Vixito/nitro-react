@@ -1,9 +1,9 @@
 import { FC, useEffect, useState } from 'react';
 import { CreateRoomSession, DoorStateType, GoToDesktop, LocalizeText } from '../../../api';
 import { Button, Column, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
-import { useNavigator } from '../../../hooks';
+import { useEraTheme, useNavigator } from '../../../hooks';
 
-const VISIBLE_STATES = [ DoorStateType.START_DOORBELL, DoorStateType.STATE_WAITING, DoorStateType.STATE_NO_ANSWER, DoorStateType.START_PASSWORD, DoorStateType.STATE_WRONG_PASSWORD ];
+const VISIBLE_STATES = [ DoorStateType.START_DOORBELL, DoorStateType.STATE_WAITING, DoorStateType.STATE_NO_ANSWER, DoorStateType.START_PASSWORD, DoorStateType.STATE_WRONG_PASSWORD, DoorStateType.STATE_PENDING_SERVER ];
 const DOORBELL_STATES = [ DoorStateType.START_DOORBELL, DoorStateType.STATE_WAITING, DoorStateType.STATE_NO_ANSWER ];
 const PASSWORD_STATES = [ DoorStateType.START_PASSWORD, DoorStateType.STATE_WRONG_PASSWORD ];
 
@@ -11,10 +11,11 @@ export const NavigatorDoorStateView: FC<{}> = props =>
 {
     const [ password, setPassword ] = useState('');
     const { doorData = null, setDoorData = null } = useNavigator();
+    const { currentEra } = useEraTheme();
 
     const onClose = () =>
     {
-        if(doorData && (doorData.state === DoorStateType.STATE_WAITING)) GoToDesktop();
+        if(doorData && (doorData.state === DoorStateType.STATE_WAITING || doorData.state === DoorStateType.STATE_PENDING_SERVER)) GoToDesktop();
 
         setDoorData(null);
     }
@@ -59,6 +60,27 @@ export const NavigatorDoorStateView: FC<{}> = props =>
     }, [ doorData ]);
 
     if(!doorData || (doorData.state === DoorStateType.NONE) || (VISIBLE_STATES.indexOf(doorData.state) === -1)) return null;
+
+    if(doorData.state === DoorStateType.STATE_PENDING_SERVER)
+    {
+        return (
+            <NitroCardView className="nitro-navigator-doorbell nitro-room-loading-modal" theme="primary-slim">
+                <NitroCardHeaderView headerText={ currentEra === 'shockwave2006' ? 'Cargando sala' : LocalizeText('navigator.doorbell.title') } onCloseClick={ onClose } />
+                <NitroCardContentView>
+                    <Column gap={ 2 } alignItems="center" className="p-2">
+                        <Text bold>{ currentEra === 'shockwave2006' ? 'Preparando la sala...' : 'Loading room...' }</Text>
+                        <Text small>"{ doorData?.roomInfo?.roomName }"</Text>
+                        <div className="shockwave-room-progress-bar">
+                            <div className="shockwave-room-progress-fill" />
+                        </div>
+                        <Button variant="danger" onClick={ onClose }>
+                            { LocalizeText('generic.cancel') }
+                        </Button>
+                    </Column>
+                </NitroCardContentView>
+            </NitroCardView>
+        );
+    }
 
     const isDoorbell = (DOORBELL_STATES.indexOf(doorData.state) >= 0);
 

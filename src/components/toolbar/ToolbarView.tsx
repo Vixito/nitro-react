@@ -23,6 +23,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const [isSoundActive, setIsSoundActive] = useState(true);
     const audioRef = useRef<HTMLAudioElement>(null);
     const [radioVolume, setRadioVolume] = useState(0.5);
+    const [ shockwaveHoverText, setShockwaveHoverText ] = useState<string>('');
 
     const [ habbtenConfig, setHabbtenConfig ] = useState<any>(() => {
         try {
@@ -290,62 +291,67 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     <div className="toolbar-inner">
                         {/* GRUPO IZQUIERDO: Avatar + Barra de Chat */}
                         <div className="toolbar-left-group">
-                            <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } title="Mi Personaje" onClick={ () => setMeExpanded(!isMeExpanded) }>
+                            <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } onMouseEnter={ () => setShockwaveHoverText('Mi Personaje') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => setMeExpanded(!isMeExpanded) }>
                                 <LayoutAvatarImageView figure={ userFigure } direction={ 3 } headDirection={ 3 } headOnly={ true } classNames={ ['shockwave-avatar-head'] } />
                                 { (getTotalUnseen > 0) && <LayoutItemCountView count={ getTotalUnseen } /> }
                             </div>
 
                             {/* Chat input integrado como cápsula clásica en la izquierda */}
                             <div id="toolbar-chat-input-container" className="chat-container-shockwave2006" />
+
+                            {/* Etiqueta instantánea Shockwave 2006 debajo del chat al hacer hover */}
+                            <div className="toolbar-shockwave-hover-label">
+                                { shockwaveHoverText }
+                            </div>
                         </div>
 
                         {/* GRUPO DERECHO: Iconos oficiales v14 (Origins 1:1) */}
                         <div className="toolbar-right-group">
                             {/* 1. Consola (Consola amarilla v14) */}
-                            <div className="navigation-item item-console" title="Consola" onClick={ () => CreateLinkEvent('friends/toggle') }>
+                            <div className="navigation-item item-console" onMouseEnter={ () => setShockwaveHoverText('Consola Habbten') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('friends/toggle') }>
                                 <i className="toolbar-icon icon-friendall" />
                                 { (requests.length > 0) && <LayoutItemCountView count={ requests.length } /> }
                             </div>
 
                             {/* 2. Navegador de Salas (Estrella dorada con ventana azul v14) */}
-                            <div className="navigation-item item-rooms" title="Navegador de Salas" onClick={ () => CreateLinkEvent('navigator/toggle') }>
+                            <div className="navigation-item item-rooms" onMouseEnter={ () => setShockwaveHoverText('Navegador de Salas') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('navigator/toggle') }>
                                 <i className="toolbar-icon icon-rooms" />
                             </div>
 
                             {/* 3. Habbten Club (Portapapeles con sello oficial v14) */}
-                            <div className="navigation-item item-club" title="Habbten Club" onClick={ () => CreateLinkEvent('habboUI/toggle/hccenter') }>
+                            <div className="navigation-item item-club" onMouseEnter={ () => setShockwaveHoverText('Habbten Club') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('habboUI/toggle/hccenter') }>
                                 <i className="toolbar-icon icon-club" />
                             </div>
 
                             {/* 4. Monedero -> Tienda / Catálogo */}
-                            <div className="navigation-item item-credits" title="Tienda de Habbten" onClick={ () => CreateLinkEvent('catalog/toggle') }>
+                            <div className="navigation-item item-credits" onMouseEnter={ () => setShockwaveHoverText('Monedero de Créditos') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('catalog/toggle') }>
                                 <i className="toolbar-icon icon-credits" />
                             </div>
 
                             {/* 5. Pase de Batalla */}
-                            <div className="navigation-item item-catalog" title="Pase de Batalla" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                            <div className="navigation-item item-catalog" onMouseEnter={ () => setShockwaveHoverText('Pase de Batalla') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('battlepass/toggle') }>
                                 <i className="toolbar-icon icon-catalog" />
                             </div>
 
                             {/* 6. Mano / Inventario (Mano abierta v14) */}
-                            <div className="navigation-item item-inventory" title="Mano" onClick={ () => CreateLinkEvent('inventory/toggle') }>
+                            <div className="navigation-item item-inventory" onMouseEnter={ () => setShockwaveHoverText('La Mano') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('inventory/toggle') }>
                                 <i className="toolbar-icon icon-inventory" />
                                 { (getFullCount > 0) && <LayoutItemCountView count={ getFullCount } /> }
                             </div>
 
-                            {/* 7. Ayuda y Sonido del Juego con alternancia clara Activado / Desactivado */}
+                            {/* 7. Ayuda y Sonido del Juego */}
                             <div className="toolbar-help-sound-column">
-                                <div className="navigation-item item-help" title="Ayuda" onClick={ () => CreateLinkEvent('help/toggle') }>
+                                <div className="navigation-item item-help" onMouseEnter={ () => setShockwaveHoverText('Ayuda Habbten') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('help/toggle') }>
                                     <i className="toolbar-icon icon-help" />
                                 </div>
-                                <div className={ `navigation-item item-sound ${ isSoundActive ? 'active' : 'muted' }` } title={ isSoundActive ? 'Sonido: Activado (Clic para silenciar)' : 'Sonido: Silenciado (Clic para activar)' } onClick={ toggleSound }>
+                                <div className={ `navigation-item item-sound ${ isSoundActive ? 'active' : 'muted' }` } onMouseEnter={ () => setShockwaveHoverText(isSoundActive ? 'Silenciar Sonido' : 'Activar Sonido') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ toggleSound }>
                                     <i className={ `toolbar-icon icon-sound ${ isSoundActive ? 'active' : 'muted' }` } />
                                 </div>
                             </div>
 
                             {/* 8. Mod Tools (si es staff) */}
                             { isMod && (
-                                <div className="navigation-item item-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
+                                <div className="navigation-item item-modtools" onMouseEnter={ () => setShockwaveHoverText('Herramientas de Moderación') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
                                     <i className="toolbar-icon icon-modtools" />
                                 </div>
                             )}

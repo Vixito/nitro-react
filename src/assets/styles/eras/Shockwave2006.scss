@@ -252,6 +252,21 @@ body[data-era="shockwave2006"] {
             gap: 10px !important;
             padding: 0 !important;
             margin: 0 !important;
+            position: relative !important;
+
+            .toolbar-shockwave-hover-label {
+                position: absolute !important;
+                bottom: 2px !important;
+                left: 48px !important;
+                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                font-size: 8px !important;
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #000000 !important;
+                pointer-events: none !important;
+                white-space: nowrap !important;
+                z-index: 10 !important;
+                -webkit-font-smoothing: none !important;
+            }
         }
 
         .toolbar-right-group {
@@ -3134,19 +3149,17 @@ body[data-era="shockwave2006"] {
                 width: 13px !important;
                 height: 13px !important;
                 min-width: 13px !important;
-                background: #ffffff !important;
-                border: 1px solid #000000 !important;
-                border-radius: 2px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                display: block !important;
                 cursor: pointer !important;
-                color: #000000 !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
                 z-index: 3 !important;
+                padding: 0 !important;
 
-                &:hover { background: #e5e5e5 !important; }
+                &:hover { opacity: 0.9 !important; }
+                &:active { background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important; }
             }
         }
 
@@ -3343,19 +3356,17 @@ body[data-era="shockwave2006"] {
                 width: 13px !important;
                 height: 13px !important;
                 min-width: 13px !important;
-                background: #ffffff !important;
-                border: 1px solid #000000 !important;
-                border-radius: 2px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                display: block !important;
                 cursor: pointer !important;
-                color: #000000 !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
                 z-index: 3 !important;
+                padding: 0 !important;
 
-                &:hover { background: #e5e5e5 !important; }
+                &:hover { opacity: 0.9 !important; }
+                &:active { background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important; }
             }
         }
 
@@ -3512,19 +3523,17 @@ body[data-era="shockwave2006"] {
                 width: 13px !important;
                 height: 13px !important;
                 min-width: 13px !important;
-                background: #ffffff !important;
-                border: 1px solid #000000 !important;
-                border-radius: 2px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                display: block !important;
                 cursor: pointer !important;
-                color: #000000 !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
                 z-index: 3 !important;
+                padding: 0 !important;
 
-                &:hover { background: #e5e5e5 !important; }
+                &:hover { opacity: 0.9 !important; }
+                &:active { background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important; }
             }
         }
 
@@ -3710,19 +3719,17 @@ body[data-era="shockwave2006"] {
                 width: 13px !important;
                 height: 13px !important;
                 min-width: 13px !important;
-                background: #ffffff !important;
-                border: 1px solid #000000 !important;
-                border-radius: 2px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                display: block !important;
                 cursor: pointer !important;
-                color: #000000 !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
                 z-index: 3 !important;
+                padding: 0 !important;
 
-                &:hover { background: #e5e5e5 !important; }
+                &:hover { opacity: 0.9 !important; }
+                &:active { background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important; }
             }
         }
 
@@ -3864,19 +3871,17 @@ body[data-era="shockwave2006"] {
                 width: 13px !important;
                 height: 13px !important;
                 min-width: 13px !important;
-                background: #ffffff !important;
-                border: 1px solid #000000 !important;
-                border-radius: 2px !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                display: block !important;
                 cursor: pointer !important;
-                color: #000000 !important;
-                font-size: 8px !important;
-                font-weight: bold !important;
                 z-index: 3 !important;
+                padding: 0 !important;
 
-                &:hover { background: #e5e5e5 !important; }
+                &:hover { opacity: 0.9 !important; }
+                &:active { background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important; }
             }
         }
 
@@ -5684,7 +5689,466 @@ body[data-era="shockwave2006"] {
                 }
             }
         }
+    // FLECHA DE SELECCIÓN DE PERSONAJE SHOCKWAVE 2006 (ISOMETRIC ORANGE ARROW)
+    .shockwave-avatar-pointer-container {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        pointer-events: none !important;
+        z-index: 50 !important;
+
+        .context-menu-caret {
+            display: none !important;
+        }
+
+        .shockwave-avatar-pointer-arrow {
+            width: 18px;
+            height: 28px;
+            margin: 0 auto;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 28'%3E%3Cpath d='M6 0h6v12h5l-8 15-8-15h5z' fill='%23f59f00' stroke='%23000' stroke-width='1.5' stroke-linejoin='miter'/%3E%3Cpath d='M7 2h4v11h4l-6 11-6-11h4z' fill='%23ffb72b'/%3E%3Cpath d='M7 2h2v10h2l-3 6-1-2h2V4H7z' fill='%23ffec80'/%3E%3C/svg%3E") no-repeat center;
+            background-size: 18px 28px;
+            image-rendering: pixelated;
+            animation: shockwave-arrow-bob 0.8s infinite ease-in-out;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+        }
+    }
+
+    @keyframes shockwave-arrow-bob {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+        100% { transform: translateY(0); }
+    }
+
+    // CONSOLA HABBTEN / HABBO CONSOLE AMARILLA SHOCKWAVE 2006 (ORIGINS 1:1)
+    .habbo-console-shockwave {
+        position: fixed !important;
+        top: 80px !important;
+        right: 40px !important;
+        width: 270px !important;
+        background-color: #f7ba00 !important;
+        border: 1px solid #000000 !important;
+        border-radius: 8px 8px 0 0 !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5) !important;
+        z-index: 1020 !important;
+        font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+        -webkit-font-smoothing: none !important;
+        image-rendering: pixelated !important;
+        overflow: hidden !important;
+
+        .console-header {
+            height: 24px !important;
+            background: #f7ba00 radial-gradient(circle, #d49800 1px, transparent 1px) 0 0 / 4px 4px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0 8px !important;
+            border-bottom: 1px solid #000000 !important;
+
+            .console-title {
+                font-weight: bold !important;
+                font-size: 9px !important;
+                color: #733e00 !important;
+                text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.4) !important;
+            }
+
+            .console-close-btn {
+                width: 13px !important;
+                height: 13px !important;
+                background: #f7ba00 !important;
+                border: 1px solid #000000 !important;
+                border-radius: 1px !important;
+                color: #000000 !important;
+                font-size: 8px !important;
+                font-weight: bold !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                padding: 0 !important;
+
+                &:hover {
+                    background: #ffcf33 !important;
+                }
+            }
+        }
+
+        .console-crt-screen {
+            margin: 6px !important;
+            height: 220px !important;
+            background: repeating-linear-gradient(0deg, #444444, #444444 1px, #4d4d4d 1px, #4d4d4d 2px) !important;
+            border: 2px solid #222222 !important;
+            border-radius: 2px !important;
+            padding: 8px !important;
+            color: #ffffff !important;
+            font-size: 9px !important;
+            overflow-y: auto !important;
+            position: relative !important;
+
+            .console-alert-overlay {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(0, 0, 0, 0.6) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 10px !important;
+                z-index: 10 !important;
+
+                .console-alert-box {
+                    background: #f7ba00 !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 4px !important;
+                    padding: 8px !important;
+                    text-align: center !important;
+                    color: #000000 !important;
+                    box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6) !important;
+
+                    .console-alert-text {
+                        font-size: 9px !important;
+                        margin-bottom: 8px !important;
+                        line-height: 1.2 !important;
+                    }
+                }
+            }
+
+            .myinfo-tab {
+                .myinfo-user-card {
+                    display: flex !important;
+                    gap: 8px !important;
+                    align-items: center !important;
+
+                    .avatar-preview-box {
+                        width: 38px !important;
+                        height: 38px !important;
+                        background: #333333 !important;
+                        border: 1px solid #666666 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        overflow: hidden !important;
+                    }
+
+                    .user-name {
+                        font-weight: bold !important;
+                        font-size: 10px !important;
+                        color: #ffffff !important;
+                    }
+
+                    .user-status {
+                        color: #a0ffa0 !important;
+                        font-size: 8px !important;
+                    }
+                }
+
+                .console-divider {
+                    border-bottom: 1px dashed #666666 !important;
+                    margin: 8px 0 !important;
+                }
+
+                .info-summary-list {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 3px !important;
+                    margin-bottom: 8px !important;
+
+                    .info-item {
+                        display: flex !important;
+                        justify-content: space-between !important;
+                        color: #dddddd !important;
+
+                        .info-value {
+                            font-weight: bold !important;
+                            color: #ffffff !important;
+                        }
+                    }
+                }
+
+                .console-instructions {
+                    color: #bbbbbb !important;
+                    font-size: 8px !important;
+                    line-height: 1.2 !important;
+                }
+            }
+
+            .friends-tab {
+                .friends-scroll-area {
+                    height: 100% !important;
+
+                    .friends-section-title {
+                        font-weight: bold !important;
+                        color: #ffcc00 !important;
+                        border-bottom: 1px solid #555555 !important;
+                        padding-bottom: 2px !important;
+                        margin-bottom: 4px !important;
+                    }
+
+                    .no-friends-notice {
+                        color: #999999 !important;
+                        font-style: italic !important;
+                        padding: 4px 0 !important;
+                    }
+
+                    .console-friend-row {
+                        display: flex !important;
+                        align-items: center !important;
+                        gap: 6px !important;
+                        padding: 3px 4px !important;
+                        cursor: pointer !important;
+                        border-bottom: 1px solid #3d3d3d !important;
+
+                        &:hover {
+                            background: rgba(255, 255, 255, 0.1) !important;
+                        }
+
+                        .status-dot {
+                            width: 6px !important;
+                            height: 6px !important;
+                            border-radius: 50% !important;
+
+                            &.green { background: #00ff00 !important; box-shadow: 0 0 3px #00ff00 !important; }
+                            &.grey { background: #888888 !important; }
+                        }
+
+                        .friend-name {
+                            flex: 1 !important;
+                            color: #ffffff !important;
+                        }
+
+                        .console-chat-btn {
+                            background: transparent !important;
+                            border: none !important;
+                            cursor: pointer !important;
+                            font-size: 10px !important;
+                        }
+                    }
+                }
+            }
+
+            .find-tab {
+                display: flex !important;
+                flex-direction: column !important;
+                height: 100% !important;
+                gap: 6px !important;
+
+                .find-search-bar {
+                    display: flex !important;
+                    gap: 4px !important;
+
+                    .console-search-input {
+                        flex: 1 !important;
+                        background: #2a2a2a !important;
+                        border: 1px solid #777777 !important;
+                        color: #ffffff !important;
+                        font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                        font-size: 9px !important;
+                        padding: 3px 5px !important;
+                        outline: none !important;
+                    }
+                }
+
+                .find-results-container {
+                    flex: 1 !important;
+                    background: #333333 !important;
+                    border: 1px solid #666666 !important;
+                    padding: 4px !important;
+                    overflow-y: auto !important;
+
+                    .results-header {
+                        font-size: 8px !important;
+                        color: #aaaaaa !important;
+                        margin-bottom: 4px !important;
+                    }
+
+                    .no-results-msg {
+                        color: #888888 !important;
+                        font-style: italic !important;
+                        text-align: center !important;
+                        margin-top: 15px !important;
+                    }
+
+                    .result-user-item {
+                        display: flex !important;
+                        align-items: center !important;
+                        gap: 4px !important;
+                        padding: 2px 4px !important;
+                        cursor: pointer !important;
+
+                        &.selected {
+                            background: #5b90a4 !important;
+                            color: #ffffff !important;
+                        }
+
+                        &:hover:not(.selected) {
+                            background: rgba(255, 255, 255, 0.1) !important;
+                        }
+                    }
+                }
+            }
+
+            .help-tab {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                height: 100% !important;
+
+                .help-title {
+                    font-weight: bold !important;
+                    color: #ffcc00 !important;
+                    margin-bottom: 6px !important;
+                }
+
+                p {
+                    margin-bottom: 6px !important;
+                    line-height: 1.2 !important;
+                    color: #dddddd !important;
+                }
+            }
+
+            .console-btn {
+                background: #e0e0e0 !important;
+                border: 1px solid #000000 !important;
+                border-radius: 2px !important;
+                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                padding: 2px 8px !important;
+                cursor: pointer !important;
+                box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #888888 !important;
+
+                &:active {
+                    box-shadow: inset 1px 1px 0px #000000 !important;
+                }
+            }
+
+            .console-btn-primary {
+                width: 100% !important;
+                background: #e0e0e0 !important;
+                border: 1px solid #000000 !important;
+                border-radius: 2px !important;
+                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                font-weight: bold !important;
+                color: #000000 !important;
+                padding: 4px 8px !important;
+                cursor: pointer !important;
+                box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #888888 !important;
+
+                &:disabled {
+                    opacity: 0.5 !important;
+                    cursor: not-allowed !important;
+                }
+
+                &:not(:disabled):active {
+                    box-shadow: inset 1px 1px 0px #000000 !important;
+                }
+            }
+        }
+
+        .console-bottom-tabs {
+            display: flex !important;
+            background: #e2a800 !important;
+            border-top: 1px solid #000000 !important;
+
+            .console-tab-btn {
+                flex: 1 !important;
+                height: 38px !important;
+                background: #f7ba00 !important;
+                border: none !important;
+                border-right: 1px solid #000000 !important;
+                border-top: 1px solid #ffde6b !important;
+                border-bottom: 1px solid #b88600 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                padding: 2px 0 !important;
+                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                font-size: 7px !important;
+                font-weight: bold !important;
+                color: #000000 !important;
+
+                &:last-child {
+                    border-right: none !important;
+                }
+
+                &:hover {
+                    background: #ffd033 !important;
+                }
+
+                &.active {
+                    background: #d49500 !important;
+                    border-top: 1px solid #996c00 !important;
+                    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+                }
+
+                .tab-icon {
+                    font-size: 11px !important;
+                    line-height: 1 !important;
+                }
+
+                .tab-label {
+                    margin-top: 1px !important;
+                    letter-spacing: 0.5px !important;
+                }
+
+                .tab-grip-lines {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 1px !important;
+                    margin-top: 2px !important;
+                    width: 16px !important;
+
+                    span {
+                        height: 1px !important;
+                        background: #885c00 !important;
+                        display: block !important;
+                    }
+                }
+            }
+        }
+    }
+
+    // MODAL DE CARGA DE SALA SHOCKWAVE 2006 ("Preparando la sala...")
+    .nitro-room-loading-modal {
+        width: 250px !important;
+        text-align: center !important;
+
+        .shockwave-room-progress-bar {
+            width: 180px !important;
+            height: 14px !important;
+            background: #ffffff !important;
+            border: 1px solid #000000 !important;
+            padding: 1px !important;
+            box-shadow: inset 1px 1px 0px #888888 !important;
+            margin: 6px 0 !important;
+            overflow: hidden !important;
+
+            .shockwave-room-progress-fill {
+                height: 100% !important;
+                width: 100% !important;
+                background: repeating-linear-gradient(
+                    -45deg,
+                    #00aa00,
+                    #00aa00 6px,
+                    #008800 6px,
+                    #008800 12px
+                ) !important;
+                animation: shockwave-progress-stripe 1s linear infinite !important;
+            }
+        }
+    }
+
+    @keyframes shockwave-progress-stripe {
+        0% { background-position: 0 0; }
+        100% { background-position: 24px 0; }
     }
 }
+}
+
 
 
