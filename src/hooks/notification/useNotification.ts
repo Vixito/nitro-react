@@ -92,9 +92,9 @@ const useNotificationState = () =>
         const linkUrl = getNotificationPart(options, type, 'linkUrl', false);
         const image = getNotificationImageUrl(options, type);
 
-        if(options.get('display') === 'BUBBLE' || type.toLowerCase().includes('battlepass') || type.toLowerCase().includes('quest') || type.toLowerCase().includes('reto'))
+        if(options.get('display') === 'BUBBLE' || type.toLowerCase().includes('battlepass') || type.toLowerCase().includes('quest') || type.toLowerCase().includes('reto') || type.toLowerCase().includes('event') || type.toLowerCase().includes('staff') || type.toLowerCase().includes('broadcast'))
         {
-            showSingleBubble(LocalizeText(message), NotificationBubbleType.INFO, image, linkUrl);
+            showSingleBubble(LocalizeText(message), NotificationBubbleType.INFO, image, linkUrl, LocalizeText(title));
         }
         else
         {
@@ -201,8 +201,24 @@ const useNotificationState = () =>
     useMessageEvent<HabboBroadcastMessageEvent>(HabboBroadcastMessageEvent, event =>
     {
         const parser = event.getParser();
+        const rawMessage = parser.message.replace(/\\r/g, '\r');
 
-        simpleAlert(parser.message.replace(/\\r/g, '\r'), null, null, LocalizeText('notifications.broadcast.title'));
+        let linkUrl: string = null;
+        const urlMatch = rawMessage.match(/(https?:\/\/[^\s]+)/i);
+        if(urlMatch)
+        {
+            linkUrl = urlMatch[0];
+        }
+        else
+        {
+            const roomMatch = rawMessage.match(/(?:sala|room|ir a)\s*:?\s*#?([0-9]+)/i);
+            if(roomMatch)
+            {
+                linkUrl = `navigator/goto/${ roomMatch[1] }`;
+            }
+        }
+
+        showSingleBubble(rawMessage, NotificationBubbleType.INFO, null, linkUrl, LocalizeText('notifications.broadcast.title'));
     });
 
     useMessageEvent<AchievementNotificationMessageEvent>(AchievementNotificationMessageEvent, event =>
@@ -393,8 +409,19 @@ const useNotificationState = () =>
     {
         const parser = event.getParser();
 
-        if (parser.titleMessage && (parser.titleMessage.toLowerCase().includes('pase de batalla') || parser.titleMessage.toLowerCase().includes('reto'))) {
-            showSingleBubble(LocalizeText(parser.alertMessage), NotificationBubbleType.INFO);
+        if (parser.titleMessage && (parser.titleMessage.toLowerCase().includes('pase de batalla') || parser.titleMessage.toLowerCase().includes('reto') || parser.titleMessage.toLowerCase().includes('alerta') || parser.titleMessage.toLowerCase().includes('evento') || parser.titleMessage.toLowerCase().includes('staff') || parser.titleMessage.toLowerCase().includes('hotel') || parser.titleMessage.toLowerCase().includes('broadcast'))) {
+            let linkUrl: string = null;
+            const urlMatch = parser.alertMessage.match(/(https?:\/\/[^\s]+)/i);
+            if(urlMatch)
+            {
+                linkUrl = urlMatch[0];
+            }
+            else
+            {
+                const roomMatch = parser.alertMessage.match(/(?:sala|room|ir a)\s*:?\s*#?([0-9]+)/i);
+                if(roomMatch) linkUrl = `navigator/goto/${ roomMatch[1] }`;
+            }
+            showSingleBubble(LocalizeText(parser.alertMessage), NotificationBubbleType.INFO, null, linkUrl, LocalizeText(parser.titleMessage));
             return;
         }
 

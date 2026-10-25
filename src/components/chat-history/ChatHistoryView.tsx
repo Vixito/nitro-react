@@ -57,11 +57,14 @@ export const ChatHistoryView: FC<{}> = props =>
 
     if(!isVisible) return null;
 
+    const headerTitle = LocalizeText('room.chathistory.button.text');
+    const displayTitle = (headerTitle && headerTitle !== 'room.chathistory.button.text') ? headerTitle : 'Historial de Chat';
+
     return (
         <NitroCardView uniqueKey="chat-history" className="nitro-chat-history" theme="primary-slim">
-            <NitroCardHeaderView headerText={ LocalizeText('room.chathistory.button.text') } onCloseClick={ event => setIsVisible(false) }/>
+            <NitroCardHeaderView headerText={ displayTitle } onCloseClick={ event => setIsVisible(false) }/>
             <NitroCardContentView innerRef={ elementRef } overflow="hidden" gap={ 2 }>
-                <input type="text" className="form-control form-control-sm" placeholder={ LocalizeText('generic.search') } value={ searchText } onChange={ event => setSearchText(event.target.value) } />
+                <input type="text" className="form-control form-control-sm" placeholder={ LocalizeText('generic.search') || 'Buscar...' } value={ searchText } onChange={ event => setSearchText(event.target.value) } />
                 <InfiniteScroll rows={ filteredChatHistory } scrollToBottom={ true } rowRender={ row =>
                 {
                     return (

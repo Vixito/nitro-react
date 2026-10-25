@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import defaultSecurityIcon from '../../../../assets/images/eras/shockwave_v14/security_badge.png';
-import { NotificationBubbleItem, OpenUrl } from '../../../../api';
+import { CreateLinkEvent, NotificationBubbleItem, OpenUrl } from '../../../../api';
 import { LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps } from '../../../../common';
 
 export interface NotificationDefaultBubbleViewProps extends LayoutNotificationBubbleViewProps
@@ -16,11 +16,40 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     const iconSrc = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : defaultSecurityIcon;
     const titleText = item.title || (item.message.toLowerCase().includes('seguridad') || item.message.toLowerCase().includes('conversaciones') ? 'Aviso de Seguridad' : null);
 
+    const handleNavigate = (event: React.MouseEvent) =>
+    {
+        event.stopPropagation();
+        if(item.linkUrl && item.linkUrl.length)
+        {
+            const link = item.linkUrl.trim();
+            if(link.startsWith('http://') || link.startsWith('https://'))
+            {
+                OpenUrl(link);
+            }
+            else if(link.startsWith('event:'))
+            {
+                CreateLinkEvent(link.substring(6));
+            }
+            else if(!isNaN(Number(link)))
+            {
+                CreateLinkEvent(`navigator/goto/${ link }`);
+            }
+            else
+            {
+                CreateLinkEvent(link);
+            }
+        }
+        else if(onClose)
+        {
+            onClose();
+        }
+    };
+
     const handleBubbleClick = (event: React.MouseEvent) =>
     {
         if(item.linkUrl && item.linkUrl.length)
         {
-            OpenUrl(item.linkUrl);
+            handleNavigate(event);
         }
         else if(onClose)
         {
@@ -38,8 +67,8 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
                 <div className="bubble-text" dangerouslySetInnerHTML={ { __html: htmlText } } />
                 { (item.linkUrl && item.linkUrl.length > 0) && (
                     <div className="bubble-action-btn-row">
-                        <div className="bubble-action-btn">
-                            Go ▶
+                        <div className="bubble-action-btn" onClick={ handleNavigate }>
+                            Ir ▶
                         </div>
                     </div>
                 ) }
