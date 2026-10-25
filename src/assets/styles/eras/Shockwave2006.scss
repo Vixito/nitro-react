@@ -3213,6 +3213,25 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     // 8. EDITOR DE AVATAR / DETALLES DE HABBTEN (SHOCKWAVE 2006 ORIGINAL)
     // =========================================================================
+    .draggable-window.shockwave-avatar-details-draggable,
+    .draggable-window:has(.shockwave-avatar-editor-layout),
+    .draggable-window:has(.shockwave-avatar-details-window) {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+
+    .shockwave-avatar-editor-layout {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+
     .shockwave-avatar-details-window {
         width: 276px !important;
         background: #5b90a4 !important;
@@ -3526,23 +3545,23 @@ body[data-era="shockwave2006"] {
                 }
             }
         }
+    }
 
-        // =====================================================================
-        // POPUP RETRO "SELECT CLOTHES" (AUTÉNTICO SHOCKWAVE 2006 / ORIGINS)
-        // =====================================================================
-        .shockwave-select-clothes-popup {
-            position: absolute !important;
-            right: calc(100% + 8px) !important;
-            top: 20px !important;
-            width: 270px !important;
-            background: #5b90a4 !important;
-            border-radius: 6px !important;
-            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
-            border: none !important;
-            z-index: 100 !important;
-            user-select: none !important;
-            display: flex !important;
-            flex-direction: column !important;
+    // =========================================================================
+    // POPUP RETRO "SELECT CLOTHES" (AUTÉNTICO SHOCKWAVE 2006 / ORIGINS)
+    // =========================================================================
+    .shockwave-select-clothes-popup {
+        position: relative !important;
+        width: 270px !important;
+        background: #5b90a4 !important;
+        border-radius: 6px !important;
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
+        border: none !important;
+        z-index: 100 !important;
+        user-select: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: visible !important;
 
             .shockwave-details-header {
                 height: 24px !important;
@@ -3703,7 +3722,6 @@ body[data-era="shockwave2006"] {
                 }
             }
         }
-    }
 
     .nitro-avatar-editor,
     .avatar-editor-shockwave2006 {

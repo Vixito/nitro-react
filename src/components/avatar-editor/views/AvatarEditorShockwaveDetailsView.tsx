@@ -1,6 +1,6 @@
 import { AvatarEditorFigureCategory, UserFigureComposer } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { AvatarEditorAction, AvatarEditorUtilities, CategoryData, FigureData, GetRoomSession, GetSessionDataManager, IAvatarEditorCategoryModel, SendMessageComposer } from '../../../api';
+import { AvatarEditorAction, AvatarEditorGridPartItem, AvatarEditorUtilities, CategoryData, FigureData, GetRoomSession, GetSessionDataManager, IAvatarEditorCategoryModel, SendMessageComposer } from '../../../api';
 import { DraggableWindow, DraggableWindowPosition, LayoutAvatarImageView } from '../../../common';
 
 interface AvatarEditorShockwaveDetailsViewProps
@@ -51,6 +51,46 @@ const RetroArrowButton: FC<{ direction: 'left' | 'right'; onClick: () => void }>
     </div>
 );
 
+const SelectClothesPartItemView: FC<{
+    part: AvatarEditorGridPartItem;
+    isSelected: boolean;
+    fallbackIcon: string;
+    onClick: () => void;
+}> = ({ part, isSelected, fallbackIcon, onClick }) =>
+{
+    const [ , setUpdate ] = useState<number>(0);
+
+    useEffect(() =>
+    {
+        if(!part) return;
+        if(!part.imageUrl)
+        {
+            part.init();
+        }
+
+        part.notify = () => setUpdate(prev => prev + 1);
+
+        return () =>
+        {
+            if(part.notify) part.notify = null;
+        };
+    }, [ part ]);
+
+    return (
+        <div
+            className={ `select-clothes-item ${ isSelected ? 'selected' : '' }` }
+            onClick={ onClick }
+        >
+            { part.imageUrl ? (
+                <img src={ part.imageUrl } alt="" />
+            ) : (
+                <div className={ `nitro-avatar-editor-spritesheet ${ fallbackIcon }-icon` } />
+            ) }
+            { part.isHC && <div className="hc-badge" /> }
+        </div>
+    );
+};
+
 export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsViewProps> = props =>
 {
     const {
@@ -66,7 +106,7 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
     } = props;
 
     const [ activeLayerIndex, setActiveLayerIndex ] = useState<number>(0);
-    const [ isSelectClothesOpen, setIsSelectClothesOpen ] = useState<boolean>(false);
+    const [ isSelectClothesOpen, setIsSelectClothesOpen ] = useState<boolean>(true);
     const [ colorPageIndex, setColorPageIndex ] = useState<number>(0);
     const [ updateId, setUpdateId ] = useState<number>(0);
     const [ motto, setMotto ] = useState<string>(() =>
@@ -221,151 +261,14 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
     };
 
     return (
-        <DraggableWindow uniqueKey="shockwave-avatar-details" handleSelector=".shockwave-details-header" windowPosition={ DraggableWindowPosition.CENTER }>
-            <div className="shockwave-avatar-details-window">
-                {/* Header */}
-                <div className="shockwave-details-header">
-                    <div className="shockwave-header-dither" />
-                    <span className="shockwave-header-title">Detalles de Habbten</span>
-                    <div className="shockwave-header-dither" />
-                    <div className="shockwave-details-close" onClick={ onClose } />
-                </div>
-
-                {/* Body */}
-                <div className="shockwave-details-body">
-                    <div className="shockwave-details-card">
-                        {/* User Card */}
-                        <div className="shockwave-user-card">
-                            <div className="user-name">{ userName }</div>
-                            <div className="mission-label">Tu Misión:</div>
-                            <input
-                                type="text"
-                                className="mission-input"
-                                value={ motto }
-                                maxLength={ 38 }
-                                onChange={ e => setMotto(e.target.value) }
-                            />
-                        </div>
-
-                        {/* Gender Selector */}
-                        <div className="shockwave-gender-selector">
-                            <div className="gender-option" onClick={ () => handleGenderChange(FigureData.FEMALE) }>
-                                <span className="gender-label">Chica</span>
-                                <input
-                                    type="radio"
-                                    name="shockwave-gender"
-                                    checked={ figureData.gender.toLowerCase() === 'f' }
-                                    onChange={ () => handleGenderChange(FigureData.FEMALE) }
-                                />
-                            </div>
-                            <div className="gender-option" onClick={ () => handleGenderChange(FigureData.MALE) }>
-                                <span className="gender-label">Chico</span>
-                                <input
-                                    type="radio"
-                                    name="shockwave-gender"
-                                    checked={ figureData.gender.toLowerCase() === 'm' }
-                                    onChange={ () => handleGenderChange(FigureData.MALE) }
-                                />
-                            </div>
-                        </div>
-
-                        {/* 5 Layer Rows & Center Avatar */}
-                        <div className="shockwave-layers-container">
-                            {/* Standing Avatar Preview */}
-                            <div className="shockwave-avatar-preview">
-                                <LayoutAvatarImageView
-                                    figure={ figureData.getFigureString() }
-                                    gender={ figureData.gender }
-                                    direction={ 2 }
-                                    scale={ 1.8 }
-                                />
-                            </div>
-
-                            {/* 5 Rows */}
-                            { SHOCKWAVE_LAYERS.map((layer, index) =>
-                            {
-                                const categoryData = getLayerData(layer.modelCategory, layer.figurePart);
-                                const isSelected = (activeLayerIndex === index);
-                                const curPart = categoryData?.getCurrentPart();
-                                const colorItem = categoryData?.getSelectedColor(0);
-                                const colorHex = colorItem ? colorItem.color : '#ffffff';
-
-                                return (
-                                    <div key={ layer.key } className={ `shockwave-layer-row row-${ index }` }>
-                                        {/* Left Side: Prev Arrow, Slot Box, Next Arrow */}
-                                        <div className="layer-controls-left">
-                                            <RetroArrowButton
-                                                direction="left"
-                                                onClick={ () => cyclePart(layer.modelCategory, layer.figurePart, -1, index) }
-                                            />
-
-                                            <div
-                                                className={ `slot-box ${ isSelected ? 'selected' : '' }` }
-                                                onClick={ () =>
-                                                {
-                                                    if(activeLayerIndex === index && isSelectClothesOpen)
-                                                    {
-                                                        setIsSelectClothesOpen(false);
-                                                    }
-                                                    else
-                                                    {
-                                                        setActiveLayerIndex(index);
-                                                        setColorPageIndex(0);
-                                                        setIsSelectClothesOpen(true);
-                                                    }
-                                                } }
-                                            >
-                                                { curPart?.imageUrl ? (
-                                                    <img src={ curPart.imageUrl } alt={ layer.key } />
-                                                ) : (
-                                                    <div className={ `nitro-avatar-editor-spritesheet ${ layer.fallbackIcon }-icon ${ isSelected ? 'selected' : '' }` } />
-                                                ) }
-                                            </div>
-
-                                            <RetroArrowButton
-                                                direction="right"
-                                                onClick={ () => cyclePart(layer.modelCategory, layer.figurePart, 1, index) }
-                                            />
-                                        </div>
-
-                                        {/* Right Side: Prev Arrow, Color Swatch, Next Arrow */}
-                                        <div className="layer-controls-right">
-                                            <RetroArrowButton
-                                                direction="left"
-                                                onClick={ () => cycleColor(layer.modelCategory, layer.figurePart, -1, index) }
-                                            />
-
-                                            <div
-                                                className="color-swatch"
-                                                style={{ backgroundColor: colorHex }}
-                                                onClick={ () =>
-                                                {
-                                                    if(activeLayerIndex === index && isSelectClothesOpen)
-                                                    {
-                                                        setIsSelectClothesOpen(false);
-                                                    }
-                                                    else
-                                                    {
-                                                        setActiveLayerIndex(index);
-                                                        setColorPageIndex(0);
-                                                        setIsSelectClothesOpen(true);
-                                                    }
-                                                } }
-                                            />
-
-                                            <RetroArrowButton
-                                                direction="right"
-                                                onClick={ () => cycleColor(layer.modelCategory, layer.figurePart, 1, index) }
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            }) }
-                        </div>
-                    </div>
-                </div>
-
-                {/* Select Clothes Popup Window */}
+        <DraggableWindow
+            uniqueKey="shockwave-avatar-details"
+            handleSelector=".shockwave-details-header"
+            windowPosition={ DraggableWindowPosition.CENTER }
+            className="shockwave-avatar-details-draggable"
+        >
+            <div className="shockwave-avatar-editor-layout">
+                {/* Select Clothes Window (docked to the left) */}
                 { isSelectClothesOpen && (() =>
                 {
                     const currentLayer = SHOCKWAVE_LAYERS[activeLayerIndex];
@@ -396,26 +299,20 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                                 <div className="select-clothes-parts-grid">
                                     { parts.map((part, pIdx) =>
                                     {
-                                        if(!part.imageUrl) part.init();
-                                        const isPartSelected = (categoryData.selectedPartIndex === pIdx || part.isSelected);
+                                        const isPartSelected = (categoryData?.selectedPartIndex === pIdx || part.isSelected);
 
                                         return (
-                                            <div
-                                                key={ pIdx }
-                                                className={ `select-clothes-item ${ isPartSelected ? 'selected' : '' }` }
+                                            <SelectClothesPartItemView
+                                                key={ `${ currentLayer.key }-${ pIdx }` }
+                                                part={ part }
+                                                isSelected={ isPartSelected }
+                                                fallbackIcon={ currentLayer.fallbackIcon }
                                                 onClick={ () =>
                                                 {
                                                     model?.selectPart(currentLayer.figurePart, pIdx);
                                                     setUpdateId(prev => prev + 1);
                                                 } }
-                                            >
-                                                { part.imageUrl ? (
-                                                    <img src={ part.imageUrl } alt="" />
-                                                ) : (
-                                                    <div className={ `nitro-avatar-editor-spritesheet ${ currentLayer.fallbackIcon }-icon` } />
-                                                ) }
-                                                { part.isHC && <div className="hc-badge" /> }
-                                            </div>
+                                            />
                                         );
                                     }) }
                                 </div>
@@ -463,17 +360,148 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                     );
                 })() }
 
-                {/* Footer Buttons */}
-                <div className="shockwave-details-footer">
-                    <button type="button" className="footer-btn shockwave-btn" onClick={ handleCancel }>
-                        Cancelar
-                    </button>
-                    <button type="button" className="footer-btn shockwave-btn" onClick={ handleDone }>
-                        Hecho
-                    </button>
-                    <button type="button" className="footer-btn shockwave-btn" onClick={ handleNext }>
-                        Siguiente
-                    </button>
+                {/* Detalles de Habbten Window (docked to the right) */}
+                <div className="shockwave-avatar-details-window">
+                    {/* Header */}
+                    <div className="shockwave-details-header">
+                        <div className="shockwave-header-dither" />
+                        <span className="shockwave-header-title">Detalles de Habbten</span>
+                        <div className="shockwave-header-dither" />
+                        <div className="shockwave-details-close" onClick={ onClose } />
+                    </div>
+
+                    {/* Body */}
+                    <div className="shockwave-details-body">
+                        <div className="shockwave-details-card">
+                            {/* User Card */}
+                            <div className="shockwave-user-card">
+                                <div className="user-name">{ userName }</div>
+                                <div className="mission-label">Tu Misión:</div>
+                                <input
+                                    type="text"
+                                    className="mission-input"
+                                    value={ motto }
+                                    maxLength={ 38 }
+                                    onChange={ e => setMotto(e.target.value) }
+                                />
+                            </div>
+
+                            {/* Gender Selector */}
+                            <div className="shockwave-gender-selector">
+                                <div className="gender-option" onClick={ () => handleGenderChange(FigureData.FEMALE) }>
+                                    <span className="gender-label">Chica</span>
+                                    <input
+                                        type="radio"
+                                        name="shockwave-gender"
+                                        checked={ figureData.gender.toLowerCase() === 'f' }
+                                        onChange={ () => handleGenderChange(FigureData.FEMALE) }
+                                    />
+                                </div>
+                                <div className="gender-option" onClick={ () => handleGenderChange(FigureData.MALE) }>
+                                    <span className="gender-label">Chico</span>
+                                    <input
+                                        type="radio"
+                                        name="shockwave-gender"
+                                        checked={ figureData.gender.toLowerCase() === 'm' }
+                                        onChange={ () => handleGenderChange(FigureData.MALE) }
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 5 Layer Rows & Center Avatar */}
+                            <div className="shockwave-layers-container">
+                                {/* Standing Avatar Preview */}
+                                <div className="shockwave-avatar-preview">
+                                    <LayoutAvatarImageView
+                                        figure={ figureData.getFigureString() }
+                                        gender={ figureData.gender }
+                                        direction={ 2 }
+                                        scale={ 1.8 }
+                                    />
+                                </div>
+
+                                {/* 5 Rows */}
+                                { SHOCKWAVE_LAYERS.map((layer, index) =>
+                                {
+                                    const categoryData = getLayerData(layer.modelCategory, layer.figurePart);
+                                    const isSelected = (activeLayerIndex === index);
+                                    const curPart = categoryData?.getCurrentPart();
+                                    const colorItem = categoryData?.getSelectedColor(0);
+                                    const colorHex = colorItem ? colorItem.color : '#ffffff';
+
+                                    return (
+                                        <div key={ layer.key } className={ `shockwave-layer-row row-${ index }` }>
+                                            {/* Left Side: Prev Arrow, Slot Box, Next Arrow */}
+                                            <div className="layer-controls-left">
+                                                <RetroArrowButton
+                                                    direction="left"
+                                                    onClick={ () => cyclePart(layer.modelCategory, layer.figurePart, -1, index) }
+                                                />
+
+                                                <div
+                                                    className={ `slot-box ${ isSelected ? 'selected' : '' }` }
+                                                    onClick={ () =>
+                                                    {
+                                                        setActiveLayerIndex(index);
+                                                        setColorPageIndex(0);
+                                                        setIsSelectClothesOpen(true);
+                                                    } }
+                                                >
+                                                    { curPart?.imageUrl ? (
+                                                        <img src={ curPart.imageUrl } alt={ layer.key } />
+                                                    ) : (
+                                                        <div className={ `nitro-avatar-editor-spritesheet ${ layer.fallbackIcon }-icon ${ isSelected ? 'selected' : '' }` } />
+                                                    ) }
+                                                </div>
+
+                                                <RetroArrowButton
+                                                    direction="right"
+                                                    onClick={ () => cyclePart(layer.modelCategory, layer.figurePart, 1, index) }
+                                                />
+                                            </div>
+
+                                            {/* Right Side: Prev Arrow, Color Swatch, Next Arrow */}
+                                            <div className="layer-controls-right">
+                                                <RetroArrowButton
+                                                    direction="left"
+                                                    onClick={ () => cycleColor(layer.modelCategory, layer.figurePart, -1, index) }
+                                                />
+
+                                                <div
+                                                    className="color-swatch"
+                                                    style={{ backgroundColor: colorHex }}
+                                                    onClick={ () =>
+                                                    {
+                                                        setActiveLayerIndex(index);
+                                                        setColorPageIndex(0);
+                                                        setIsSelectClothesOpen(true);
+                                                    } }
+                                                />
+
+                                                <RetroArrowButton
+                                                    direction="right"
+                                                    onClick={ () => cycleColor(layer.modelCategory, layer.figurePart, 1, index) }
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                }) }
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer Buttons */}
+                    <div className="shockwave-details-footer">
+                        <button type="button" className="footer-btn shockwave-btn" onClick={ handleCancel }>
+                            Cancelar
+                        </button>
+                        <button type="button" className="footer-btn shockwave-btn" onClick={ handleDone }>
+                            Hecho
+                        </button>
+                        <button type="button" className="footer-btn shockwave-btn" onClick={ handleNext }>
+                            Siguiente
+                        </button>
+                    </div>
                 </div>
             </div>
         </DraggableWindow>

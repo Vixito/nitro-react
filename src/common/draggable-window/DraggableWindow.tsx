@@ -18,12 +18,13 @@ export interface DraggableWindowProps
     dragStyle?: CSSProperties;
     offsetLeft?: number;
     offsetTop?: number;
+    className?: string;
     children?: ReactNode;
 }
 
 export const DraggableWindow: FC<DraggableWindowProps> = props =>
 {
-    const { uniqueKey = null, handleSelector = '.drag-handler', windowPosition = DraggableWindowPosition.CENTER, disableDrag = false, dragStyle = {}, children = null, offsetLeft = 0, offsetTop = 0 } = props;
+    const { uniqueKey = null, handleSelector = '.drag-handler', windowPosition = DraggableWindowPosition.CENTER, disableDrag = false, dragStyle = {}, children = null, offsetLeft = 0, offsetTop = 0, className = '' } = props;
     const [ delta, setDelta ] = useState<{ x: number, y: number }>(null);
     const [ offset, setOffset ] = useState<{ x: number, y: number }>(null);
     const [ start, setStart ] = useState<{ x: number, y: number }>({ x: 0, y: 0 });
@@ -263,7 +264,7 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
 
     return (
         createPortal(
-            <Base position="absolute" innerRef={ elementRef } className="draggable-window" onMouseDownCapture={ onMouseDown } onTouchStartCapture={ onTouchStart } style={ dragStyle }>
+            <Base position="absolute" innerRef={ elementRef } className={ `draggable-window ${ className }`.trim() } onMouseDownCapture={ onMouseDown } onTouchStartCapture={ onTouchStart } style={ dragStyle }>
                 { children }
             </Base>, document.getElementById('draggable-windows-container'))
     );
