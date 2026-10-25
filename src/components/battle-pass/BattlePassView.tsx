@@ -698,7 +698,7 @@ export const BattlePassView: FC<{}> = () => {
                 {statusMessage && (
                     <div className={`alert alert-${statusMessage.type} py-1.5 px-3 mb-0 d-flex align-items-center justify-content-between rounded`} style={{ fontSize: '13px' }}>
                         <span>{statusMessage.text}</span>
-                        <button type="button" className="btn-close" style={{ fontSize: '10px' }} onClick={() => setStatusMessage(null)} />
+                        <button type="button" className="btn-close" onClick={() => setStatusMessage(null)} />
                     </div>
                 )}
 
@@ -851,30 +851,30 @@ export const BattlePassView: FC<{}> = () => {
                                                         <span className="badge bg-danger text-white mt-1" style={{ fontSize: '10px' }}>{m.progress}/{m.task}</span>
                                                     </div>
                                                     <div className="flex-grow-1 min-w-0">
-                                                        <div className="d-flex align-items-center justify-content-between gap-1">
-                                                            <div className="d-flex align-items-center min-w-0" style={{ gap: '8px' }}>
-                                                                <span className="badge bg-dark text-white flex-shrink-0" style={{ fontSize: '9.5px', textTransform: 'uppercase', letterSpacing: '0.3px', padding: '3px 6px' }}>
-                                                                    {categoryTitles[m.category] || 'Reto'}
-                                                                </span>
-                                                                <span className="fw-bold text-dark text-truncate" style={{ fontSize: '13px' }}>{m.name}</span>
-                                                            </div>
-                                                            <span className="badge bg-danger text-white fw-bold px-2 py-1 rounded-1 flex-shrink-0" style={{ fontSize: '11px' }}>
-                                                                +{m.reward_xp} XP
+                                                        <div className="d-flex align-items-center min-w-0 gap-2 mb-0.5">
+                                                            <span className="badge bg-dark text-white flex-shrink-0" style={{ fontSize: '9.5px', textTransform: 'uppercase', letterSpacing: '0.3px', padding: '3px 6px' }}>
+                                                                {categoryTitles[m.category] || 'Reto'}
                                                             </span>
+                                                            <span className="fw-bold text-dark text-truncate" style={{ fontSize: '13px' }}>{m.name}</span>
                                                         </div>
-                                                        <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '12.5px' }}>{m.description}</div>
-                                                        <div className="progress mt-1.5" style={{ height: '8px', backgroundColor: '#e2e8f0' }}>
+                                                        <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '12px' }}>{m.description}</div>
+                                                        <div className="progress mt-1.5" style={{ height: '7px', backgroundColor: '#e2e8f0' }}>
                                                             <div
                                                                 className={`progress-bar ${m.completed ? 'bg-success' : 'bg-primary'}`}
                                                                 style={{ width: `${Math.min(100, Math.round((m.progress / m.task) * 100))}%` }}
                                                             />
                                                         </div>
                                                     </div>
-                                                    {m.completed ? (
-                                                        <span className="badge bg-success text-white flex-shrink-0" style={{ fontSize: '11px' }}>✓ Hecho</span>
-                                                    ) : (
-                                                        <span className="badge bg-light text-secondary border flex-shrink-0" style={{ fontSize: '11px' }}>En progreso</span>
-                                                    )}
+                                                    <div className="d-flex flex-column align-items-end justify-content-center flex-shrink-0 gap-1 ms-2" style={{ minWidth: '78px' }}>
+                                                        <span className="badge bg-danger text-white fw-bold px-2 py-0.5 rounded-1" style={{ fontSize: '11px' }}>
+                                                            +{m.reward_xp} XP
+                                                        </span>
+                                                        {m.completed ? (
+                                                            <span className="badge bg-success text-white" style={{ fontSize: '10px', padding: '2px 6px' }}>✓ Hecho</span>
+                                                        ) : (
+                                                            <span className="badge bp-status-badge" style={{ fontSize: '10px', padding: '2px 6px' }}>En progreso</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             ))
                                         )}
@@ -1076,25 +1076,25 @@ export const BattlePassView: FC<{}> = () => {
                                                     <span className="badge bg-danger text-white mt-1" style={{ fontSize: '10px' }}>{m.progress}/{m.task}</span>
                                                 </div>
                                                 <div className="flex-grow-1 min-w-0">
-                                                    <div className="d-flex align-items-center justify-content-between gap-1">
-                                                        <span className="fw-bold text-dark text-truncate" style={{ fontSize: '13.5px' }}>{m.name}</span>
-                                                        <span className="badge bg-danger text-white fw-bold px-2 py-1 rounded-1 flex-shrink-0" style={{ fontSize: '11px' }}>
-                                                            +{m.reward_xp} XP
-                                                        </span>
-                                                    </div>
-                                                    <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '12.5px' }}>{m.description}</div>
-                                                    <div className="progress mt-1.5" style={{ height: '8px', backgroundColor: '#e2e8f0' }}>
+                                                    <div className="fw-bold text-dark text-truncate mb-0.5" style={{ fontSize: '13px' }}>{m.name}</div>
+                                                    <div className="text-muted text-truncate mt-0.5" style={{ fontSize: '12px' }}>{m.description}</div>
+                                                    <div className="progress mt-1.5" style={{ height: '7px', backgroundColor: '#e2e8f0' }}>
                                                         <div
                                                             className={`progress-bar ${m.completed ? 'bg-success' : 'bg-primary'}`}
                                                             style={{ width: `${Math.min(100, Math.round((m.progress / m.task) * 100))}%` }}
                                                         />
                                                     </div>
                                                 </div>
-                                                {m.completed ? (
-                                                    <span className="badge bg-success text-white flex-shrink-0" style={{ fontSize: '11px' }}>✓ Hecho</span>
-                                                ) : (
-                                                    <span className="badge bg-light text-secondary border flex-shrink-0" style={{ fontSize: '11px' }}>En progreso</span>
-                                                )}
+                                                <div className="d-flex flex-column align-items-end justify-content-center flex-shrink-0 gap-1 ms-2" style={{ minWidth: '78px' }}>
+                                                    <span className="badge bg-danger text-white fw-bold px-2 py-0.5 rounded-1" style={{ fontSize: '11px' }}>
+                                                        +{m.reward_xp} XP
+                                                    </span>
+                                                    {m.completed ? (
+                                                        <span className="badge bg-success text-white" style={{ fontSize: '10px', padding: '2px 6px' }}>✓ Hecho</span>
+                                                    ) : (
+                                                        <span className="badge bp-status-badge" style={{ fontSize: '10px', padding: '2px 6px' }}>En progreso</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         ))
                                     )}
@@ -1117,7 +1117,7 @@ export const BattlePassView: FC<{}> = () => {
                                         <div className="text-muted" style={{ fontSize: '12px' }}>Top 10 usuarios con mayor nivel en el Pase de Batalla</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn-close" style={{ fontSize: '12px' }} onClick={() => setShowRankingModal(false)} />
+                                <button type="button" className="btn-close" onClick={() => setShowRankingModal(false)} />
                             </div>
 
                             { /* Column headers */}
@@ -1178,7 +1178,7 @@ export const BattlePassView: FC<{}> = () => {
                                 }}>
                                     {previewReward.isVip ? 'PASE VIP - NIVEL ' : 'PASE GRATUITO - NIVEL '}{previewReward.reward.level_required}
                                 </span>
-                                <button type="button" className="btn-close" style={{ fontSize: '12px' }} onClick={() => setPreviewReward(null)} />
+                                <button type="button" className="btn-close" onClick={() => setPreviewReward(null)} />
                             </div>
 
                             {(() => {

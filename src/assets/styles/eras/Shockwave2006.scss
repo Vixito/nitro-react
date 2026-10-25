@@ -2042,7 +2042,7 @@ body[data-era="shockwave2006"] {
                             display: flex !important;
                             align-items: center !important;
                             gap: 8px !important;
-                            min-height: 44px !important;
+                            min-height: 54px !important;
                             box-sizing: border-box !important;
                             flex-shrink: 0 !important;
 
@@ -2084,6 +2084,28 @@ body[data-era="shockwave2006"] {
                                     color: #ffffff !important;
                                     text-shadow: 1px 1px 0px #000000 !important;
                                 }
+
+                                &.bg-light,
+                                &[class*="bg-light"],
+                                &.bp-status-badge {
+                                    background: #334155 !important;
+                                    background-color: #334155 !important;
+                                    color: #ffffff !important;
+                                    text-shadow: 1px 1px 0px #000000 !important;
+                                    border: 1px solid #000000 !important;
+                                    opacity: 1 !important;
+                                }
+                            }
+
+                            .bp-status-badge {
+                                background: #334155 !important;
+                                background-color: #334155 !important;
+                                color: #ffffff !important;
+                                text-shadow: 1px 1px 0px #000000 !important;
+                                border: 1px solid #000000 !important;
+                                font-family: 'Volter Bold', sans-serif !important;
+                                font-size: 8.5px !important;
+                                opacity: 1 !important;
                             }
 
                             .progress {
@@ -2107,9 +2129,39 @@ body[data-era="shockwave2006"] {
                 }
             }
 
+            // Universal close button para BattlePass y sus modales/alertas
+            .btn-close,
+            button.btn-close {
+                width: 13px !important;
+                height: 13px !important;
+                min-width: 13px !important;
+                min-height: 13px !important;
+                max-width: 13px !important;
+                max-height: 13px !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                outline: none !important;
+                opacity: 1 !important;
+                cursor: pointer !important;
+
+                &:hover {
+                    filter: brightness(1.2) !important;
+                }
+
+                &:active {
+                    background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                    filter: none !important;
+                }
+            }
+
             // Botones dentro del BattlePass
-            button,
-            .btn {
+            button:not(.btn-close):not(.nitro-card-header-close),
+            .btn:not(.btn-close) {
                 background: #ffffff !important;
                 border: 1px solid #000000 !important;
                 border-radius: 4px !important;
@@ -2266,9 +2318,9 @@ body[data-era="shockwave2006"] {
                             border-radius: 6px !important;
                         }
 
-                        .btn,
-                        button,
-                        .btn-secondary {
+                        .btn:not(.btn-close),
+                        button:not(.btn-close),
+                        .btn-secondary:not(.btn-close) {
                             background: #2b394a !important;
                             color: #ffffff !important;
                             border: 1px solid #000000 !important;
