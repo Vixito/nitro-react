@@ -56,10 +56,10 @@ export const AvatarEditorModelView: FC<AvatarEditorModelViewProps> = props =>
             <Column size={ 2 }>
                 { model.canSetGender &&
                     <>
-                        <Flex center pointer className="category-item" onClick={ event => setGender(FigureData.MALE) }>
+                        <Flex center pointer className={ `category-item ${ (gender === FigureData.MALE) ? 'active' : '' }` } onClick={ event => setGender(FigureData.MALE) }>
                             <AvatarEditorIcon icon="male" selected={ (gender === FigureData.MALE) } />
                         </Flex>
-                        <Flex center pointer className="category-item" onClick={ event => setGender(FigureData.FEMALE) }>
+                        <Flex center pointer className={ `category-item ${ (gender === FigureData.FEMALE) ? 'active' : '' }` } onClick={ event => setGender(FigureData.FEMALE) }>
                             <AvatarEditorIcon icon="female" selected={ (gender === FigureData.FEMALE) } />
                         </Flex>
                     </> }
@@ -68,7 +68,7 @@ export const AvatarEditorModelView: FC<AvatarEditorModelViewProps> = props =>
                     const category = model.categories.get(name);
 
                     return (
-                        <Flex center pointer key={ name } className="category-item" onClick={ event => selectCategory(name) }>
+                        <Flex center pointer key={ name } className={ `category-item ${ (activeCategory === category) ? 'active' : '' }` } onClick={ event => selectCategory(name) }>
                             <AvatarEditorIcon icon={ category.name } selected={ (activeCategory === category) } />
                         </Flex>
                     );

@@ -1241,22 +1241,57 @@ body[data-era="shockwave2006"] {
             }
         }
 
-        .category-item,
-        .layout-grid-item {
+        .category-item {
             border-radius: 0px !important;
             border: 2px solid !important;
             border-color: #797979 #ffffff #ffffff #797979 !important;
-            background: #ffffff !important;
+            background-color: #ffffff !important;
 
             &:hover {
                 border-color: #000000 !important;
-                background: #fdfae6 !important;
+                background-color: #fdfae6 !important;
             }
 
             &.active {
                 border-color: #000000 !important;
-                background: #ffffcc !important;
+                background-color: #ffffcc !important;
                 outline: 1px dotted #000000 !important;
+            }
+        }
+
+        .layout-grid-item {
+            border-radius: 0px !important;
+            border: 2px solid !important;
+            border-color: #797979 #ffffff #ffffff #797979 !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+
+            &:not(.clear-bg) {
+                background-color: #ffffff !important;
+
+                &:hover {
+                    border-color: #000000 !important;
+                    background-color: #fdfae6 !important;
+                }
+
+                &.active {
+                    border-color: #000000 !important;
+                    background-color: #ffffcc !important;
+                    outline: 1px dotted #000000 !important;
+                }
+            }
+
+            &.clear-bg {
+                // Muestras de color de la paleta (conservan inline style backgroundColor)
+                &:hover {
+                    border-color: #000000 !important;
+                }
+
+                &.active {
+                    border-color: #000000 !important;
+                    outline: 2px solid #000000 !important;
+                    outline-offset: -2px !important;
+                }
             }
         }
 
@@ -1268,6 +1303,18 @@ body[data-era="shockwave2006"] {
 
             &:after {
                 display: none !important;
+            }
+
+            .arrow-container {
+                .nitro-avatar-editor-spritesheet {
+                    filter: invert(1) brightness(0.2) !important;
+                    opacity: 0.7 !important;
+                    cursor: pointer !important;
+
+                    &:hover {
+                        opacity: 1 !important;
+                    }
+                }
             }
         }
 
