@@ -221,13 +221,7 @@ const useRoomState = () =>
         const applyEraScale = (targetScale?: number) =>
         {
             if(!roomSession) return;
-            const isShockwaveEra = (document.body.dataset.era === 'shockwave2006') ||
-                                   document.body.classList.contains('era-shockwave-2006') ||
-                                   ((window.parent as any)?.HabbtenConfig?.era === 'shockwave2006') ||
-                                   (localStorage.getItem('habbten_theme_era') === 'shockwave2006') ||
-                                   (new URLSearchParams(window.location.search).get('era') === 'shockwave2006');
-
-            const scale = (targetScale !== undefined) ? targetScale : (isShockwaveEra ? 0.5 : 1.0);
+            const scale = (targetScale !== undefined) ? targetScale : 1.0;
             roomEngine.setRoomInstanceRenderingCanvasScale(roomId, canvasId, scale, null, null, true);
         };
 
@@ -236,7 +230,7 @@ const useRoomState = () =>
 
         const handleEraChange = (event: CustomEvent<string>) =>
         {
-            const targetScale = (event.detail === 'shockwave2006') ? 0.5 : 1.0;
+            const targetScale = 1.0;
             applyEraScale(targetScale);
         };
 
