@@ -1,5 +1,5 @@
 import { MouseEventType, RoomObjectCategory, RoomObjectType } from '@nitrots/nitro-renderer';
-import { Dispatch, FC, PropsWithChildren, SetStateAction, useEffect, useRef } from 'react';
+import { Dispatch, FC, PropsWithChildren, SetStateAction, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CreateLinkEvent, DispatchUiEvent, GetConfiguration, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile } from '../../api';
 import { Base, Flex, LayoutItemCountView } from '../../common';
 import { GuideToolEvent } from '../../events';
@@ -17,6 +17,7 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
     const { currentEra } = useEraTheme();
     const { useGuideTool = false, unseenAchievementCount = 0, setMeExpanded = null, children = null, ...rest } = props;
     const elementRef = useRef<HTMLDivElement>();
+    const [ pointerStyle, setPointerStyle ] = useState<React.CSSProperties>({});
 
     useEffect(() =>
     {
@@ -41,6 +42,32 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
 
         return () => document.removeEventListener('click', onClick);
     }, [ setMeExpanded ]);
+
+    useLayoutEffect(() =>
+    {
+        if(currentEra !== 'shockwave2006') return;
+
+        const updatePointer = () =>
+        {
+            const avatarEl = document.querySelector('.nitro-toolbar.toolbar-shockwave2006 .item-avatar');
+            const menuEl = elementRef.current;
+
+            if(avatarEl && menuEl)
+            {
+                const avatarRect = avatarEl.getBoundingClientRect();
+                const menuRect = menuEl.getBoundingClientRect();
+                const avatarCenter = avatarRect.left + (avatarRect.width / 2);
+                const pointerX = avatarCenter - menuRect.left;
+
+                setPointerStyle({ left: `${ pointerX }px`, transform: 'translateX(-50%)' });
+            }
+        };
+
+        updatePointer();
+        window.addEventListener('resize', updatePointer);
+
+        return () => window.removeEventListener('resize', updatePointer);
+    }, [ currentEra ]);
 
     if(currentEra === 'shockwave2006')
     {
@@ -110,7 +137,7 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
                     )}
                 </div>
                 <div className="shockwave-menu-footer">
-                    <div className="shockwave-menu-pointer" />
+                    <div className="shockwave-menu-pointer" style={ pointerStyle } />
                 </div>
             </div>
         );
