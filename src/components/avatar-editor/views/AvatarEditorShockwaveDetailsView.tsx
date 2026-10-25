@@ -32,6 +32,25 @@ const SHOCKWAVE_LAYERS: LayerRowConfig[] = [
     { key: 'shoes', modelCategory: AvatarEditorFigureCategory.LEGS, figurePart: FigureData.SHOES, fallbackIcon: 'sh' }
 ];
 
+const RetroArrowButton: FC<{ direction: 'left' | 'right'; onClick: () => void }> = ({ direction, onClick }) => (
+    <div className={ `retro-arrow-btn arrow-${ direction }` } onClick={ onClick }>
+        <svg
+            width="13"
+            height="15"
+            viewBox="0 0 13 15"
+            style={ direction === 'right' ? { transform: 'scaleX(-1)' } : undefined }
+        >
+            <polygon
+                points="1.5,7.5 7,2 7,5 12,5 12,10 7,10 7,13"
+                fill="#cccccc"
+                stroke="#000000"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
+            />
+        </svg>
+    </div>
+);
+
 export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsViewProps> = props =>
 {
     const {
@@ -273,20 +292,10 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                                     <div key={ layer.key } className={ `shockwave-layer-row row-${ index }` }>
                                         {/* Left Side: Prev Arrow, Slot Box, Next Arrow */}
                                         <div className="layer-controls-left">
-                                            <div
-                                                className="retro-arrow-btn arrow-left"
+                                            <RetroArrowButton
+                                                direction="left"
                                                 onClick={ () => cyclePart(layer.modelCategory, layer.figurePart, -1, index) }
-                                            >
-                                                <svg width="12" height="15" viewBox="0 0 12 15">
-                                                    <polygon
-                                                        points="0,7.5 7,1 7,4.5 12,4.5 12,10.5 7,10.5 7,14"
-                                                        fill="#cccccc"
-                                                        stroke="#000000"
-                                                        strokeWidth="1.2"
-                                                        strokeLinejoin="round"
-                                                    />
-                                                </svg>
-                                            </div>
+                                            />
 
                                             <div
                                                 className={ `slot-box ${ isSelected ? 'selected' : '' }` }
@@ -299,38 +308,18 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                                                 ) }
                                             </div>
 
-                                            <div
-                                                className="retro-arrow-btn arrow-right"
+                                            <RetroArrowButton
+                                                direction="right"
                                                 onClick={ () => cyclePart(layer.modelCategory, layer.figurePart, 1, index) }
-                                            >
-                                                <svg width="12" height="15" viewBox="0 0 12 15">
-                                                    <polygon
-                                                        points="12,7.5 5,1 5,4.5 0,4.5 0,10.5 5,10.5 5,14"
-                                                        fill="#cccccc"
-                                                        stroke="#000000"
-                                                        strokeWidth="1.2"
-                                                        strokeLinejoin="round"
-                                                    />
-                                                </svg>
-                                            </div>
+                                            />
                                         </div>
 
                                         {/* Right Side: Prev Arrow, Color Swatch, Next Arrow */}
                                         <div className="layer-controls-right">
-                                            <div
-                                                className="retro-arrow-btn arrow-left"
+                                            <RetroArrowButton
+                                                direction="left"
                                                 onClick={ () => cycleColor(layer.modelCategory, layer.figurePart, -1, index) }
-                                            >
-                                                <svg width="12" height="15" viewBox="0 0 12 15">
-                                                    <polygon
-                                                        points="0,7.5 7,1 7,4.5 12,4.5 12,10.5 7,10.5 7,14"
-                                                        fill="#cccccc"
-                                                        stroke="#000000"
-                                                        strokeWidth="1.2"
-                                                        strokeLinejoin="round"
-                                                    />
-                                                </svg>
-                                            </div>
+                                            />
 
                                             <div
                                                 className="color-swatch"
@@ -338,20 +327,10 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                                                 onClick={ () => setActiveLayerIndex(index) }
                                             />
 
-                                            <div
-                                                className="retro-arrow-btn arrow-right"
+                                            <RetroArrowButton
+                                                direction="right"
                                                 onClick={ () => cycleColor(layer.modelCategory, layer.figurePart, 1, index) }
-                                            >
-                                                <svg width="12" height="15" viewBox="0 0 12 15">
-                                                    <polygon
-                                                        points="12,7.5 5,1 5,4.5 0,4.5 0,10.5 5,10.5 5,14"
-                                                        fill="#cccccc"
-                                                        stroke="#000000"
-                                                        strokeWidth="1.2"
-                                                        strokeLinejoin="round"
-                                                    />
-                                                </svg>
-                                            </div>
+                                            />
                                         </div>
                                     </div>
                                 );
@@ -362,13 +341,13 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
 
                 {/* Footer Buttons */}
                 <div className="shockwave-details-footer">
-                    <button type="button" className="footer-btn" onClick={ handleCancel }>
+                    <button type="button" className="footer-btn shockwave-btn" onClick={ handleCancel }>
                         Cancelar
                     </button>
-                    <button type="button" className="footer-btn" onClick={ handleDone }>
+                    <button type="button" className="footer-btn shockwave-btn" onClick={ handleDone }>
                         Hecho
                     </button>
-                    <button type="button" className="footer-btn" onClick={ handleNext }>
+                    <button type="button" className="footer-btn shockwave-btn" onClick={ handleNext }>
                         Siguiente
                     </button>
                 </div>

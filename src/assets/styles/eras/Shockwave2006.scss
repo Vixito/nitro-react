@@ -843,91 +843,771 @@ body[data-era="shockwave2006"] {
     // 4.2 PASE DE BATALLA RETRO 2006 (ESTILO SHOCKWAVE / ORIGINS)
     // =========================================================================
     .nitro-battle-pass.battle-pass-shockwave2006 {
-        border-radius: 0px !important;
-        border: 2px solid #000000 !important;
+        width: 960px !important;
+        max-width: 96vw !important;
+        height: 630px !important;
+        max-height: 88vh !important;
+        border-radius: 6px !important;
+        border: none !important;
         box-shadow: none !important;
-        background: #eae7df !important;
+        background: #5b90a4 !important;
+        overflow: hidden !important;
+        user-select: none !important;
+        cursor: default !important;
 
         .nitro-card-header {
-            background: linear-gradient(180deg, #6c9cb2 0%, #4f8096 100%) !important;
-            border-bottom: 2px solid #000000 !important;
-            color: #ffffff !important;
-            font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
-            font-size: 13px !important;
-            text-shadow: 1px 1px 0px #000000 !important;
+            height: 24px !important;
+            min-height: 24px !important;
+            max-height: 24px !important;
+            background: #5b90a4 !important;
+            border-bottom: 1px solid #000000 !important;
+            border-radius: 5px 5px 0 0 !important;
+            padding: 0 6px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            position: relative !important;
+            cursor: grab !important;
+
+            &:active {
+                cursor: grabbing !important;
+            }
+
+            &::before {
+                content: '' !important;
+                position: absolute !important;
+                left: 6px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                width: calc(50% - 150px) !important;
+                height: 10px !important;
+                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+            }
+
+            &::after {
+                content: '' !important;
+                position: absolute !important;
+                right: 28px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                width: calc(50% - 150px) !important;
+                height: 10px !important;
+                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+            }
+
+            .nitro-card-header-text {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #000000 !important;
+                letter-spacing: 0.5px !important;
+                text-align: center !important;
+                z-index: 2 !important;
+                background: #5b90a4 !important;
+                padding: 0 8px !important;
+                margin: 0 auto !important;
+                white-space: nowrap !important;
+            }
+
+            .nitro-card-header-close {
+                width: 13px !important;
+                height: 13px !important;
+                min-width: 13px !important;
+                min-height: 13px !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                cursor: pointer !important;
+                z-index: 3 !important;
+                padding: 0 !important;
+
+                svg { display: none !important; }
+
+                &:active {
+                    background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                }
+            }
         }
 
-        .bp-container,
-        .nitro-card-content {
-            background: #eae7df !important;
+        .nitro-card-content,
+        .bp-container {
+            background: #5b90a4 !important;
+            padding: 3px 6px 6px 6px !important;
+            gap: 4px !important;
+            height: calc(100% - 24px) !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
             color: #000000 !important;
             font-family: 'Volter', Tahoma, sans-serif !important;
 
+            // Tarjetas blancas internas con borde fino de 1px negro
             .bp-season-banner,
-            div[class*="rounded"],
-            .card,
-            .bg-dark,
-            .bp-card {
+            .bp-card-box,
+            .bp-rewards-column,
+            .bp-challenges-column,
+            .bp-category-missions-column {
                 background: #ffffff !important;
-                border: 2px solid !important;
-                border-color: #797979 #ffffff #ffffff #797979 !important;
-                border-radius: 0px !important;
+                border: 1px solid #000000 !important;
+                border-radius: 6px !important;
+                box-shadow: none !important;
                 color: #000000 !important;
+            }
+
+            // Barra superior de temporada
+            .bp-season-banner {
+                padding: 2px 8px !important;
+                min-height: 30px !important;
+                height: 30px !important;
+                max-height: 30px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                flex-shrink: 0 !important;
+
+                .bp-banner-title {
+                    font-family: 'Volter', Tahoma, sans-serif !important;
+                    font-size: 9px !important;
+                    line-height: 12px !important;
+                    color: #000000 !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                    text-overflow: ellipsis !important;
+
+                    strong {
+                        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                        font-weight: bold !important;
+                    }
+                }
+
+                .bp-countdown-digit {
+                    background: #d9d9d9 !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 3px !important;
+                    font-family: 'Volter Bold', sans-serif !important;
+                    font-size: 10px !important;
+                    font-weight: bold !important;
+                    color: #000000 !important;
+                    padding: 0 4px !important;
+                    line-height: 14px !important;
+                    min-width: 18px !important;
+                    text-align: center !important;
+                }
+
+                .bp-countdown-label {
+                    font-family: 'Volter', Tahoma, sans-serif !important;
+                    font-size: 7px !important;
+                    color: #555555 !important;
+                    margin-top: 1px !important;
+                    text-align: center !important;
+                }
+
+                .bp-countdown-sep {
+                    font-family: 'Volter Bold', Tahoma, sans-serif !important;
+                    font-size: 10px !important;
+                    color: #000000 !important;
+                    margin-top: -6px !important;
+                }
+            }
+
+            // Fila superior: Mi Experiencia + Retos
+            .row.g-2\.5 {
+                margin: 0 !important;
+                gap: 4px !important;
+                height: 118px !important;
+                min-height: 118px !important;
+                max-height: 118px !important;
+                flex-shrink: 0 !important;
+                display: flex !important;
+
+                .col-12.col-md-6 {
+                    padding: 0 !important;
+                    flex: 1 !important;
+                    max-width: calc(50% - 2px) !important;
+                    height: 100% !important;
+                }
+            }
+
+            .bp-card-box {
+                padding: 4px 6px !important;
+                height: 100% !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+
+                .bp-box-header-title {
+                    font-family: 'Volter Bold', sans-serif !important;
+                    font-size: 10px !important;
+                    font-weight: bold !important;
+                    color: #000000 !important;
+                    letter-spacing: 0.5px !important;
+                    margin-bottom: 2px !important;
+                }
+
+                .bp-avatar-circle {
+                    width: 38px !important;
+                    height: 38px !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 6px !important;
+                    background: #d9d9d9 !important;
+                    overflow: hidden !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    flex-shrink: 0 !important;
+                }
+
+                .text-dark {
+                    color: #000000 !important;
+                    font-family: 'Volter Bold', sans-serif !important;
+                    font-size: 11px !important;
+                }
+
+                .bp-level-tag {
+                    background: #5b90a4 !important;
+                    color: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 4px !important;
+                    font-family: 'Volter Bold', sans-serif !important;
+                    font-size: 8.5px !important;
+                    padding: 1px 5px !important;
+                    display: inline-block !important;
+                }
+
+                .bp-xp-bar {
+                    height: 13px !important;
+                    background: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 6px !important;
+                    overflow: hidden !important;
+                    position: relative !important;
+
+                    .bp-xp-fill {
+                        background: #5b90a4 !important;
+                        height: 100% !important;
+                    }
+
+                    span {
+                        font-family: 'Volter Bold', sans-serif !important;
+                        font-size: 8px !important;
+                        line-height: 13px !important;
+                        text-shadow: 1px 1px 0 #000000 !important;
+                        color: #ffffff !important;
+                    }
+                }
+
+                .bp-mini-reward {
+                    background: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 4px !important;
+                    padding: 2px 4px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 4px !important;
+
+                    .fw-bold {
+                        font-family: 'Volter Bold', sans-serif !important;
+                        font-size: 8.5px !important;
+                    }
+                }
+
+                .bp-ranking-star-btn {
+                    background: transparent !important;
+                    border: none !important;
+                    padding: 0 !important;
+
+                    .bp-starburst-badge {
+                        width: 30px !important;
+                        height: 30px !important;
+                        line-height: 28px !important;
+                        font-family: 'Volter Bold', sans-serif !important;
+                        font-size: 9.5px !important;
+                        background: #5b90a4 !important;
+                        color: #ffffff !important;
+                        border: 1px solid #000000 !important;
+                        border-radius: 50% !important;
+                        text-shadow: 1px 1px 0 #000000 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                    }
+                }
+
+                .bp-missions-horizontal-track {
+                    display: flex !important;
+                    gap: 4px !important;
+                    overflow-x: auto !important;
+                    height: 66px !important;
+                    align-items: center !important;
+                    padding-bottom: 2px !important;
+
+                    .bp-quick-mission-card {
+                        background: #ffffff !important;
+                        border: 1px solid #000000 !important;
+                        border-radius: 4px !important;
+                        padding: 3px 5px !important;
+                        min-width: 145px !important;
+                        max-width: 165px !important;
+                        height: 60px !important;
+                        flex-shrink: 0 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        gap: 5px !important;
+
+                        .fw-bold {
+                            font-family: 'Volter Bold', sans-serif !important;
+                            font-size: 8.5px !important;
+                            color: #000000 !important;
+                        }
+
+                        .text-muted {
+                            font-family: 'Volter', sans-serif !important;
+                            font-size: 7.5px !important;
+                            line-height: 9px !important;
+                            color: #444444 !important;
+                        }
+                    }
+                }
+            }
+
+            // Sección inferior: Premios Track (Izq) + Categorías / Retos (Der)
+            .bp-bottom-section {
+                flex: 1 !important;
+                height: calc(100% - 158px) !important;
+                min-height: 0 !important;
+                display: flex !important;
+                gap: 4px !important;
+                margin-top: 0 !important;
+                overflow: hidden !important;
+
+                // Columna de premios
+                .bp-rewards-column {
+                    width: 275px !important;
+                    min-width: 275px !important;
+                    max-width: 275px !important;
+                    height: 100% !important;
+                    padding: 4px !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    box-sizing: border-box !important;
+                    overflow: hidden !important;
+
+                    .border-bottom {
+                        border-bottom: 1px solid #000000 !important;
+                        padding-bottom: 2px !important;
+                        margin-bottom: 3px !important;
+                        font-family: 'Volter Bold', sans-serif !important;
+                        font-size: 9.5px !important;
+                    }
+
+                    .bp-rewards-scroll-track {
+                        flex: 1 !important;
+                        overflow-y: auto !important;
+                        height: calc(100% - 22px) !important;
+                        position: relative !important;
+                        padding: 0 4px !important;
+
+                        .bp-vertical-line {
+                            background: #000000 !important;
+                            width: 2px !important;
+                        }
+
+                        .bp-vertical-line-reached {
+                            background: #5b90a4 !important;
+                            width: 2px !important;
+                        }
+
+                        .bp-level-row {
+                            height: 48px !important;
+                            margin-bottom: 3px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: space-between !important;
+                            position: relative !important;
+
+                            .bp-square-box {
+                                width: 40px !important;
+                                height: 40px !important;
+                                border: 1px solid #000000 !important;
+                                border-radius: 6px !important;
+                                background: #ffffff !important;
+                                box-shadow: none !important;
+
+                                &.claimable {
+                                    background: #e6f4ea !important;
+                                    border: 1.5px solid #2e7d32 !important;
+                                }
+
+                                &.claimed {
+                                    background: #e9ecef !important;
+                                    opacity: 0.65 !important;
+                                }
+                            }
+
+                            .bp-level-node,
+                            .bp-level-circle {
+                                width: 22px !important;
+                                height: 22px !important;
+                                line-height: 20px !important;
+                                border: 1px solid #000000 !important;
+                                border-radius: 50% !important;
+                                background: #5b90a4 !important;
+                                color: #ffffff !important;
+                                font-family: 'Volter Bold', sans-serif !important;
+                                font-size: 8.5px !important;
+                                text-shadow: 1px 1px 0 #000000 !important;
+                                text-align: center !important;
+                                z-index: 3 !important;
+                            }
+
+                            .bp-level-avatar-node {
+                                width: 26px !important;
+                                height: 26px !important;
+                                z-index: 3 !important;
+                                display: flex !important;
+                                align-items: center !important;
+                                justify-content: center !important;
+                            }
+                        }
+                    }
+                }
+
+                // Columna de retos y categorías
+                .bp-challenges-column,
+                .bp-category-missions-column {
+                    flex: 1 !important;
+                    height: 100% !important;
+                    min-width: 0 !important;
+                    padding: 4px 6px !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    box-sizing: border-box !important;
+                    overflow: hidden !important;
+
+                    .border-bottom {
+                        border-bottom: 1px solid #000000 !important;
+                        padding-bottom: 3px !important;
+                        margin-bottom: 3px !important;
+                    }
+
+                    // Grilla 2x3 de categorías
+                    .row.g-2\.5.flex-grow-1,
+                    .row.g-2\.5 {
+                        margin: 0 !important;
+                        gap: 4px !important;
+                        flex: 1 !important;
+                        height: calc(100% - 36px) !important;
+                        overflow: hidden !important;
+                        display: flex !important;
+                        flex-wrap: wrap !important;
+                        align-content: space-between !important;
+
+                        .col-6 {
+                            padding: 0 !important;
+                            width: calc(50% - 2px) !important;
+                            flex: 0 0 calc(50% - 2px) !important;
+                            max-width: calc(50% - 2px) !important;
+                            height: calc(33.333% - 3px) !important;
+                        }
+                    }
+
+                    .bp-category-card {
+                        background: #ffffff !important;
+                        border: 1px solid #000000 !important;
+                        border-radius: 6px !important;
+                        padding: 3px 6px !important;
+                        height: 100% !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        justify-content: center !important;
+                        cursor: pointer !important;
+                        box-sizing: border-box !important;
+                        box-shadow: none !important;
+
+                        &:hover {
+                            background: #eef5f8 !important;
+                        }
+
+                        &.active {
+                            background: #5b90a4 !important;
+                            color: #ffffff !important;
+
+                            * {
+                                color: #ffffff !important;
+                            }
+                        }
+
+                        .d-flex.gap-3 {
+                            gap: 6px !important;
+                            align-items: center !important;
+                            height: 100% !important;
+                        }
+
+                        .bp-category-icon-box {
+                            width: 34px !important;
+                            height: 34px !important;
+                            min-width: 34px !important;
+                            min-height: 34px !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 4px !important;
+                            background: #d9d9d9 !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            overflow: hidden !important;
+                            flex-shrink: 0 !important;
+                        }
+
+                        .badge.bg-danger {
+                            background: #c42626 !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 3px !important;
+                            font-family: 'Volter Bold', sans-serif !important;
+                            font-size: 7px !important;
+                            padding: 0 3px !important;
+                            margin-top: 1px !important;
+                            color: #ffffff !important;
+                        }
+
+                        .fw-bold.text-dark {
+                            font-family: 'Volter Bold', sans-serif !important;
+                            font-size: 9.5px !important;
+                            line-height: 11px !important;
+                            color: #000000 !important;
+                            margin-bottom: 1px !important;
+                            white-space: nowrap !important;
+                            text-overflow: ellipsis !important;
+                            overflow: hidden !important;
+                        }
+
+                        .text-muted {
+                            font-family: 'Volter', sans-serif !important;
+                            font-size: 7.5px !important;
+                            line-height: 9.5px !important;
+                            color: #444444 !important;
+                            display: -webkit-box !important;
+                            -webkit-line-clamp: 2 !important;
+                            -webkit-box-orient: vertical !important;
+                            overflow: hidden !important;
+                        }
+
+                        .bp-category-timer-pill {
+                            background: #5b90a4 !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 3px !important;
+                            padding: 1px 3px !important;
+                            color: #ffffff !important;
+                            font-family: 'Volter Bold', monospace !important;
+                            font-size: 7px !important;
+                            line-height: 1 !important;
+                            min-width: auto !important;
+                        }
+                    }
+
+                    input[type="text"],
+                    .bp-search-input,
+                    .form-control {
+                        border: 1px solid #000000 !important;
+                        border-radius: 10px !important;
+                        font-family: 'Volter', Tahoma, sans-serif !important;
+                        font-size: 8.5px !important;
+                        height: 20px !important;
+                        padding: 0 8px !important;
+                        background: #ffffff !important;
+                        outline: none !important;
+                        box-shadow: none !important;
+                    }
+
+                    .overflow-auto,
+                    .bp-missions-scroll-list {
+                        flex: 1 !important;
+                        max-height: none !important;
+                        height: calc(100% - 36px) !important;
+                        overflow-y: auto !important;
+                        padding-right: 2px !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        gap: 3px !important;
+
+                        .bp-mission-row,
+                        .card {
+                            background: #ffffff !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 4px !important;
+                            padding: 3px 6px !important;
+                            margin-bottom: 2px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            gap: 6px !important;
+                            min-height: 40px !important;
+                            box-sizing: border-box !important;
+                            flex-shrink: 0 !important;
+
+                            &.completed {
+                                background: #eef8f2 !important;
+                                border-color: #2e7d32 !important;
+                            }
+
+                            .fw-bold {
+                                font-family: 'Volter Bold', sans-serif !important;
+                                font-size: 9.5px !important;
+                                color: #000000 !important;
+                            }
+
+                            .text-muted {
+                                font-family: 'Volter', sans-serif !important;
+                                font-size: 8px !important;
+                                color: #444444 !important;
+                                line-height: 10px !important;
+                            }
+
+                            .badge {
+                                border: 1px solid #000000 !important;
+                                border-radius: 3px !important;
+                                font-family: 'Volter Bold', sans-serif !important;
+                                font-size: 8px !important;
+                                padding: 1px 4px !important;
+                            }
+
+                            .progress {
+                                height: 6px !important;
+                                border: 1px solid #000000 !important;
+                                border-radius: 3px !important;
+                                background: #ffffff !important;
+                                overflow: hidden !important;
+                                margin-top: 2px !important;
+
+                                .progress-bar {
+                                    background: #5b90a4 !important;
+
+                                    &.bg-success {
+                                        background: #2e7d32 !important;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Botones dentro del BattlePass
+            button,
+            .btn {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                font-weight: bold !important;
+                color: #000000 !important;
+                padding: 2px 8px !important;
+                box-shadow: none !important;
+                cursor: pointer !important;
 
                 * {
                     color: #000000 !important;
-                    font-family: 'Volter', Tahoma, sans-serif !important;
                 }
-            }
-
-            button,
-            .btn {
-                border-radius: 0px !important;
-                background: #cfcbc0 !important;
-                border: 2px solid !important;
-                border-color: #ffffff #5c5950 #5c5950 #ffffff !important;
-                color: #000000 !important;
-                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
-                font-size: 11px !important;
 
                 &:hover {
-                    background: #dedad0 !important;
+                    background: #eef5f8 !important;
+                    color: #000000 !important;
                 }
 
-                &:active,
-                &.active {
-                    background: #bfbbb0 !important;
-                    border-color: #5c5950 #ffffff #ffffff #5c5950 !important;
+                &:active {
+                    background: #dbe8ee !important;
+                    color: #000000 !important;
                 }
 
+                &.btn-primary,
                 &.btn-success,
-                &.btn-primary {
-                    background: #388a1b !important;
-                    border-color: #75cb45 #1d4f0d #1d4f0d #75cb45 !important;
-                    color: #ffffff !important;
-                    text-shadow: 1px 1px 0px #113606 !important;
+                &.btn-secondary {
+                    background: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    color: #000000 !important;
 
-                    &:hover { background: #44a322 !important; }
-                    &:active { background: #2b6d14 !important; }
+                    &:hover {
+                        background: #eef5f8 !important;
+                        color: #000000 !important;
+                    }
                 }
             }
 
-            .progress,
-            [class*="progress-bar-container"] {
-                background: #ffffff !important;
-                border: 2px solid !important;
-                border-color: #797979 #ffffff #ffffff #797979 !important;
-                border-radius: 0px !important;
-                height: 16px !important;
+            // Modal de Clasificación y Previews
+            .bp-modal-backdrop {
+                background: rgba(0, 0, 0, 0.4) !important;
 
-                .progress-bar,
-                [class*="progress-bar"] {
-                    background: linear-gradient(180deg, #62c334 0%, #3d8a1c 100%) !important;
-                    border-radius: 0px !important;
+                .bp-dialog {
+                    background: #5b90a4 !important;
+                    border: none !important;
+                    border-radius: 6px !important;
+                    padding: 4px 6px 6px 6px !important;
+                    box-shadow: none !important;
+
+                    .d-flex.border-bottom {
+                        border-bottom: 1px solid #000000 !important;
+                        margin-bottom: 4px !important;
+                        padding-bottom: 4px !important;
+
+                        .fw-bold.text-dark {
+                            font-family: 'Volter Bold', sans-serif !important;
+                            font-size: 11px !important;
+                            color: #ffffff !important;
+                            text-shadow: 1px 1px 0 #000000 !important;
+                        }
+
+                        .text-muted {
+                            font-family: 'Volter', sans-serif !important;
+                            font-size: 8.5px !important;
+                            color: #dbe8ee !important;
+                        }
+
+                        .btn-close {
+                            width: 13px !important;
+                            height: 13px !important;
+                            background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                            background-size: 13px 13px !important;
+                            border: none !important;
+
+                            &:active {
+                                background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                            }
+                        }
+                    }
+
+                    .bp-ranking-list,
+                    .bp-preview-box,
+                    .card {
+                        background: #ffffff !important;
+                        border: 1px solid #000000 !important;
+                        border-radius: 6px !important;
+                        padding: 4px !important;
+
+                        .bp-ranking-row {
+                            border: 1px solid #000000 !important;
+                            border-radius: 4px !important;
+                            margin-bottom: 2px !important;
+                            background: #ffffff !important;
+                            padding: 2px 6px !important;
+
+                            &:nth-child(odd) {
+                                background: #d9d9d9 !important;
+                            }
+
+                            .bp-rank-name {
+                                font-family: 'Volter Bold', sans-serif !important;
+                                font-size: 9.5px !important;
+                                color: #000000 !important;
+                            }
+                        }
+                    }
                 }
             }
         }
     }
+
 
     // =========================================================================
     // 5. INVENTARIO RETRO "LA MANO" (AUTÉNTICO HABBTEN V14 SHOCKWAVE)
@@ -1221,7 +1901,7 @@ body[data-era="shockwave2006"] {
     .shockwave-avatar-details-window {
         width: 276px !important;
         background: #5b90a4 !important;
-        border: 1px solid #000000 !important;
+        border: none !important;
         border-radius: 6px !important;
         box-shadow: none !important;
         overflow: hidden !important;
@@ -1499,7 +2179,9 @@ body[data-era="shockwave2006"] {
             padding: 0 8px 4px 8px !important;
             background: #5b90a4 !important;
 
-            .footer-btn {
+            button,
+            .footer-btn,
+            .shockwave-btn {
                 height: 19px !important;
                 background: #ffffff !important;
                 border: 1px solid #000000 !important;
@@ -1519,10 +2201,12 @@ body[data-era="shockwave2006"] {
 
                 &:hover {
                     background: #eef5f8 !important;
+                    color: #000000 !important;
                 }
 
                 &:active {
                     background: #dbe8ee !important;
+                    color: #000000 !important;
                 }
             }
         }
@@ -1831,10 +2515,10 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     // BOTONES PLANOS CLÁSICOS CON 1PX DE BORDE NEGRO
     // =========================================================================
-    .btn:not(.btn-link):not(.btn-close):not([class*="link"]):not(.retro-action-btn),
-    .btn-primary:not(.btn-link):not(.retro-action-btn),
-    .btn-secondary:not(.btn-link):not(.retro-action-btn),
-    button:not(.drag-handler button):not(.nitro-card-header button):not(.btn-link):not(.btn-close):not([class*="link"]):not([class*="close"]):not([class*="icon"]):not(.retro-action-btn) {
+    .btn:not(.btn-link):not(.btn-close):not([class*="link"]):not(.retro-action-btn):not(.footer-btn):not([class*="footer-btn"]):not(.shockwave-btn):not(.battle-pass-shockwave2006 button):not(.battle-pass-shockwave2006 .btn):not(.shockwave-details-footer button),
+    .btn-primary:not(.btn-link):not(.retro-action-btn):not(.footer-btn):not([class*="footer-btn"]):not(.shockwave-btn):not(.battle-pass-shockwave2006 button):not(.battle-pass-shockwave2006 .btn):not(.shockwave-details-footer button),
+    .btn-secondary:not(.btn-link):not(.retro-action-btn):not(.footer-btn):not([class*="footer-btn"]):not(.shockwave-btn):not(.battle-pass-shockwave2006 button):not(.battle-pass-shockwave2006 .btn):not(.shockwave-details-footer button),
+    button:not(.drag-handler button):not(.nitro-card-header button):not(.btn-link):not(.btn-close):not([class*="link"]):not([class*="close"]):not([class*="icon"]):not(.retro-action-btn):not(.footer-btn):not([class*="footer-btn"]):not(.shockwave-btn):not(.battle-pass-shockwave2006 button):not(.battle-pass-shockwave2006 .btn):not(.shockwave-details-footer button) {
         border-radius: 6px !important;
         font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
         font-size: 11px !important;
