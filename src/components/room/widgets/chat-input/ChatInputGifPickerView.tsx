@@ -3,9 +3,12 @@ import { Overlay, Popover } from 'react-bootstrap';
 import { Base, Button } from '../../../../common';
 import { isSafeGifUrl } from '../../../../api';
 
-interface ChatInputGifPickerViewProps
+export interface ChatInputGifPickerViewProps
 {
     onSelectGif: (gifUrl: string) => void;
+    forceOpen?: boolean;
+    onClose?: () => void;
+    customTarget?: HTMLElement | null;
 }
 
 interface GifItem
@@ -182,7 +185,7 @@ const GIF_CATEGORIES = [
     { id: 'custom', name: 'Pegar enlace' }
 ];
 
-export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSelectGif }) =>
+export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSelectGif, forceOpen = false, onClose = null, customTarget = null }) =>
 {
     const [ visible, setVisible ] = useState(false);
     const [ activeCategory, setActiveCategory ] = useState('popular');
@@ -190,6 +193,14 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
     const [ customUrl, setCustomUrl ] = useState('');
     const [ urlError, setUrlError ] = useState<string>('');
     const buttonRef = useRef<HTMLDivElement>(null);
+
+    const isShown = forceOpen || visible;
+
+    const handleClose = () =>
+    {
+        setVisible(false);
+        if(onClose) onClose();
+    };
 
     const filteredGifs = useMemo(() =>
     {
@@ -223,7 +234,7 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
             return;
         }
         onSelectGif(clean);
-        setVisible(false);
+        handleClose();
         setCustomUrl('');
         setUrlError('');
     };
@@ -254,17 +265,17 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
             />
 
             <Overlay
-                show={ visible }
-                target={ buttonRef.current }
+                show={ isShown }
+                target={ (forceOpen && customTarget) ? customTarget : buttonRef.current }
                 placement="top"
                 rootClose={ true }
-                onHide={ () => setVisible(false) }
+                onHide={ handleClose }
                 transition={ false }
             >
                 <Popover id="nitro-chat-gif-popover" style={ { width: '410px', maxWidth: 'none' } } className="nitro-chat-popover nitro-chat-gif-popover">
                     <div className="popover-header-custom d-flex align-items-center justify-content-between px-2 py-1">
                         <span className="fw-bold small text-white">Selector de GIFs</span>
-                        <div className="btn-close-popover" onClick={ () => setVisible(false) }>✕</div>
+                        <div className="btn-close-popover" onClick={ handleClose }>✕</div>
                     </div>
 
                     <div className="popover-tabs d-flex px-2 py-1 gap-1 border-bottom border-secondary overflow-auto">

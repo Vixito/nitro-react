@@ -18,8 +18,11 @@ export const ChatInputView: FC<{}> = props =>
     const { roomSession = null } = useRoom();
     const [ portalTarget, setPortalTarget ] = useState<HTMLElement | null>(null);
     const inputRef = useRef<HTMLInputElement>();
+    const modeSelectorRef = useRef<HTMLDivElement>(null);
     const [ chatMode, setChatMode ] = useState<'say' | 'shout' | 'whisper'>('say');
     const [ isModeDropdownOpen, setModeDropdownOpen ] = useState(false);
+    const [ isEmojiPickerOpen, setEmojiPickerOpen ] = useState(false);
+    const [ isGifPickerOpen, setGifPickerOpen ] = useState(false);
     const chatModeIdWhisper = useMemo(() => LocalizeText('widgets.chatinput.mode.whisper'), []);
     const chatModeIdShout = useMemo(() => LocalizeText('widgets.chatinput.mode.shout'), []);
     const chatModeIdSpeak = useMemo(() => LocalizeText('widgets.chatinput.mode.speak'), []);
@@ -317,7 +320,7 @@ export const ChatInputView: FC<{}> = props =>
         createPortal(
             <div className="nitro-chat-input-container">
                 { currentEra === 'shockwave2006' && (
-                    <div className="chat-mode-selector-shockwave2006" onClick={ () => setModeDropdownOpen(!isModeDropdownOpen) }>
+                    <div ref={ modeSelectorRef } className="chat-mode-selector-shockwave2006" onClick={ () => setModeDropdownOpen(!isModeDropdownOpen) }>
                         <span className="mode-label">{ chatMode === 'say' ? 'Decir' : chatMode === 'shout' ? 'Gritar' : 'Susurrar' }</span>
                         <div className="mode-divider" />
                         <span className="mode-arrow">▼</span>
@@ -326,6 +329,9 @@ export const ChatInputView: FC<{}> = props =>
                                 <div className={ `dropdown-item ${ chatMode === 'say' ? 'active' : '' }` } onClick={ (e) => { e.stopPropagation(); setChatMode('say'); setModeDropdownOpen(false); } }>Decir</div>
                                 <div className={ `dropdown-item ${ chatMode === 'shout' ? 'active' : '' }` } onClick={ (e) => { e.stopPropagation(); setChatMode('shout'); setModeDropdownOpen(false); } }>Gritar</div>
                                 <div className={ `dropdown-item ${ chatMode === 'whisper' ? 'active' : '' }` } onClick={ (e) => { e.stopPropagation(); setChatMode('whisper'); setModeDropdownOpen(false); } }>Susurrar</div>
+                                <div className="dropdown-divider" />
+                                <div className="dropdown-item" onClick={ (e) => { e.stopPropagation(); setModeDropdownOpen(false); setEmojiPickerOpen(true); setGifPickerOpen(false); } }>HabMoji</div>
+                                <div className="dropdown-item" onClick={ (e) => { e.stopPropagation(); setModeDropdownOpen(false); setGifPickerOpen(true); setEmojiPickerOpen(false); } }>GIFs</div>
                             </div>
                         )}
                     </div>
@@ -337,8 +343,8 @@ export const ChatInputView: FC<{}> = props =>
                     <Text variant="danger">{ LocalizeText('chat.input.alert.flood', [ 'time' ], [ floodBlockedSeconds.toString() ]) } </Text> }
                 </div>
                 <div className="chat-addons">
-                    <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } />
-                    <ChatInputGifPickerView onSelectGif={ onSelectGif } />
+                    <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                    <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
                     <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
                 </div>
             </div>, target)

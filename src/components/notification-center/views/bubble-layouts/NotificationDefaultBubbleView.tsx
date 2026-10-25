@@ -36,6 +36,13 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
             <div className="bubble-content">
                 { titleText && <div className="bubble-title">{ titleText }</div> }
                 <div className="bubble-text" dangerouslySetInnerHTML={ { __html: htmlText } } />
+                { (item.linkUrl && item.linkUrl.length > 0) && (
+                    <div className="bubble-action-btn-row">
+                        <div className="bubble-action-btn">
+                            Go ▶
+                        </div>
+                    </div>
+                ) }
             </div>
             <div className="bubble-close-btn" title="Cerrar" onClick={ event => { event.stopPropagation(); onClose(); } }>
                 ✕

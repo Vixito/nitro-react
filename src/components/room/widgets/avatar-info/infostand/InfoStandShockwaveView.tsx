@@ -235,11 +235,13 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                 if(isCurrentlySitting)
                 {
                     roomSession.sendPostureMessage(PostureTypeEnum.POSTURE_STAND);
+                    roomSession.sendChatMessage(':stand', 0);
                     setOwnPosture(AvatarAction.POSTURE_STAND);
                 }
                 else
                 {
                     roomSession.sendPostureMessage(PostureTypeEnum.POSTURE_SIT);
+                    roomSession.sendChatMessage(':sit', 0);
                     setOwnPosture(AvatarAction.POSTURE_SIT);
                 }
                 break;

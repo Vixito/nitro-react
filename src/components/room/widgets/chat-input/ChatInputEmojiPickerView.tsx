@@ -2,9 +2,12 @@ import { FC, useMemo, useRef, useState } from 'react';
 import { Overlay, Popover } from 'react-bootstrap';
 import { Base, Flex } from '../../../../common';
 
-interface ChatInputEmojiPickerViewProps
+export interface ChatInputEmojiPickerViewProps
 {
     onSelectEmoji: (emoji: string) => void;
+    forceOpen?: boolean;
+    onClose?: () => void;
+    customTarget?: HTMLElement | null;
 }
 
 interface HabbtenShortcut
@@ -80,11 +83,19 @@ const EMOJI_CATEGORIES = [
     }
 ];
 
-export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ onSelectEmoji }) =>
+export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ onSelectEmoji, forceOpen = false, onClose = null, customTarget = null }) =>
 {
     const [ visible, setVisible ] = useState(false);
     const [ activeCategory, setActiveCategory ] = useState('smileys');
     const buttonRef = useRef<HTMLDivElement>(null);
+
+    const isShown = forceOpen || visible;
+
+    const handleClose = () =>
+    {
+        setVisible(false);
+        if(onClose) onClose();
+    };
 
     const filteredEmojis = useMemo(() =>
     {
@@ -99,7 +110,7 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
     const handleSelect = (emoji: string) =>
     {
         onSelectEmoji(emoji);
-        setVisible(false);
+        handleClose();
     };
 
     return (
@@ -113,17 +124,17 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
             />
 
             <Overlay
-                show={ visible }
-                target={ buttonRef.current }
+                show={ isShown }
+                target={ (forceOpen && customTarget) ? customTarget : buttonRef.current }
                 placement="top"
                 rootClose={ true }
-                onHide={ () => setVisible(false) }
+                onHide={ handleClose }
                 transition={ false }
             >
                 <Popover id="nitro-chat-emoji-popover" style={ { width: '440px', maxWidth: 'none' } } className="nitro-chat-popover nitro-chat-emoji-popover">
                     <div className="popover-header-custom d-flex align-items-center justify-content-between px-2 py-1">
-                        <span className="fw-bold text-white" style={ { fontSize: '13px' } }>Selector de Emojis</span>
-                        <div className="btn-close-popover" onClick={ () => setVisible(false) }>✕</div>
+                        <span className="fw-bold text-white" style={ { fontSize: '13px' } }>Selector de Emojis (HabMoji)</span>
+                        <div className="btn-close-popover" onClick={ handleClose }>✕</div>
                     </div>
 
                     <div className="popover-tabs d-flex px-2 py-1 gap-1 border-bottom border-secondary">
