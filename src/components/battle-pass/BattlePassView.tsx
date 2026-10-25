@@ -580,7 +580,7 @@ export const BattlePassView: FC<{}> = () => {
                                 { /* Next Reward Box */}
                                 {nextReward && (
                                     <div className="d-flex flex-column align-items-start text-start">
-                                        <span className="text-secondary fw-semibold mb-1" style={{ fontSize: '12px' }}>Tu próximo premio es:</span>
+                                        <span className="bp-next-reward-label mb-1">Tu próximo premio es:</span>
                                         <div
                                             className="bp-mini-reward cursor-pointer"
                                             onClick={() => setPreviewReward({ reward: nextReward, isVip: false })}
@@ -598,7 +598,7 @@ export const BattlePassView: FC<{}> = () => {
 
                                 { /* Ranking Starburst */}
                                 <div className="d-flex flex-column align-items-center text-center">
-                                    <span className="text-secondary fw-semibold mb-1" style={{ fontSize: '12px' }}>Vas en el puesto</span>
+                                    <span className="bp-ranking-label mb-1">Vas en el puesto</span>
                                     <button
                                         type="button"
                                         className="bp-ranking-star-btn"
@@ -608,7 +608,7 @@ export const BattlePassView: FC<{}> = () => {
                                             {bpData.user.rankPosition || 1}°
                                         </div>
                                     </button>
-                                    <span style={{ fontSize: '12.5px', color: '#cbd5e1' }} className="mt-1">del ranking</span>
+                                    <span className="bp-ranking-label mt-1">del ranking</span>
                                 </div>
 
                             </div>
@@ -708,7 +708,7 @@ export const BattlePassView: FC<{}> = () => {
                     { /* Left Column: Premios Track */}
                     <div className="bp-rewards-column bp-card-box">
                         <div className="d-flex align-items-center justify-content-between pb-2 border-bottom mb-2 px-1">
-                            <span className="fw-bold text-secondary" style={{ fontSize: '12px' }}>GRATIS</span>
+                            <span className="fw-bold bp-free-label">GRATIS</span>
                             <div className="d-flex align-items-center gap-1">
                                 <span className="fw-bold" style={{ fontSize: '12px', color: '#b45309' }}>VIP</span>
                                 {bpData.isVip ? (
