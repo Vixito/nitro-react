@@ -2890,11 +2890,24 @@ body[data-era="shockwave2006"] {
 
     // Palette principal de herramientas de moderación flotante
     .nitro-mod-tools {
-        width: 210px !important;
+        min-width: 220px !important;
+        width: 220px;
+
+        .nitro-card-header {
+            .nitro-card-header-text,
+            .header-text {
+                font-size: 10px !important;
+                padding: 0 4px !important;
+                max-width: calc(100% - 22px) !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+        }
 
         .nitro-card-content {
             button, .btn {
-                padding-left: 28px !important;
+                padding-left: 36px !important;
                 position: relative !important;
                 text-align: left !important;
                 display: flex !important;
@@ -3206,7 +3219,8 @@ body[data-era="shockwave2006"] {
         border: none !important;
         border-radius: 6px !important;
         box-shadow: none !important;
-        overflow: hidden !important;
+        overflow: visible !important;
+        position: relative !important;
         display: flex !important;
         flex-direction: column !important;
         user-select: none !important;
@@ -3512,6 +3526,183 @@ body[data-era="shockwave2006"] {
                 }
             }
         }
+
+        // =====================================================================
+        // POPUP RETRO "SELECT CLOTHES" (AUTÉNTICO SHOCKWAVE 2006 / ORIGINS)
+        // =====================================================================
+        .shockwave-select-clothes-popup {
+            position: absolute !important;
+            right: calc(100% + 8px) !important;
+            top: 20px !important;
+            width: 270px !important;
+            background: #5b90a4 !important;
+            border-radius: 6px !important;
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4) !important;
+            border: none !important;
+            z-index: 100 !important;
+            user-select: none !important;
+            display: flex !important;
+            flex-direction: column !important;
+
+            .shockwave-details-header {
+                height: 24px !important;
+                min-height: 24px !important;
+                background: #5b90a4 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 0 6px !important;
+                cursor: default !important;
+
+                .shockwave-header-dither {
+                    flex: 1 !important;
+                    height: 10px !important;
+                    background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+                }
+
+                .shockwave-header-title {
+                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: bold !important;
+                    color: #ffffff !important;
+                    text-shadow: 1px 1px 0px #000000 !important;
+                    letter-spacing: 0.5px !important;
+                    padding: 0 8px !important;
+                    white-space: nowrap !important;
+                    text-align: center !important;
+                }
+
+                .shockwave-details-close {
+                    width: 13px !important;
+                    height: 13px !important;
+                    min-width: 13px !important;
+                    min-height: 13px !important;
+                    background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                    background-size: 13px 13px !important;
+                    cursor: pointer !important;
+                    border: none !important;
+
+                    &:active {
+                        background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                    }
+                }
+            }
+
+            .select-clothes-card {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                margin: 4px 6px 6px 6px !important;
+                padding: 6px !important;
+                display: flex !important;
+                flex-direction: column !important;
+
+                .select-clothes-parts-grid {
+                    display: grid !important;
+                    grid-template-columns: repeat(5, 46px) !important;
+                    gap: 4px !important;
+                    justify-content: center !important;
+                    max-height: 106px !important;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    padding: 2px !important;
+
+                    &::-webkit-scrollbar {
+                        width: 4px !important;
+                    }
+                    &::-webkit-scrollbar-thumb {
+                        background: #a0a09e !important;
+                    }
+
+                    .select-clothes-item {
+                        width: 46px !important;
+                        height: 46px !important;
+                        background: #ffffff !important;
+                        border: 1px solid #000000 !important;
+                        border-radius: 6px !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        position: relative !important;
+                        cursor: pointer !important;
+
+                        img {
+                            max-width: 38px !important;
+                            max-height: 38px !important;
+                            image-rendering: pixelated !important;
+                        }
+
+                        &:hover {
+                            background: #f2eee6 !important;
+                        }
+
+                        &.selected {
+                            background: #c8c4bc !important;
+                            border: 2px solid #000000 !important;
+                        }
+
+                        .hc-badge {
+                            position: absolute !important;
+                            top: 2px !important;
+                            right: 2px !important;
+                            width: 10px !important;
+                            height: 10px !important;
+                            background: url('@/assets/images/catalog/hc_small.png') no-repeat center !important;
+                            background-size: contain !important;
+                        }
+                    }
+                }
+
+                .select-clothes-colors-section {
+                    margin-top: 6px !important;
+                    padding-top: 6px !important;
+                    border-top: 1px solid #d4cfc5 !important;
+
+                    .select-clothes-colors-grid {
+                        display: grid !important;
+                        grid-template-columns: repeat(10, 20px) !important;
+                        gap: 4px 3px !important;
+                        justify-content: center !important;
+
+                        .select-clothes-color-swatch {
+                            width: 20px !important;
+                            height: 20px !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 2px !important;
+                            cursor: pointer !important;
+
+                            &:hover {
+                                opacity: 0.9 !important;
+                            }
+
+                            &.selected {
+                                box-shadow: inset 0 0 0 2px #000000, 0 0 0 1px #ffffff !important;
+                            }
+                        }
+
+                        .select-clothes-color-next-btn {
+                            width: 20px !important;
+                            height: 20px !important;
+                            background: #ffffff !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 2px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            cursor: pointer !important;
+
+                            &:hover {
+                                background: #ebebe8 !important;
+                            }
+
+                            &:active {
+                                background: #dedad0 !important;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     .nitro-avatar-editor,
@@ -3658,9 +3849,29 @@ body[data-era="shockwave2006"] {
         min-width: 310px !important;
         max-width: 320px !important;
         pointer-events: none !important;
+
+        .nitro-notification-bubble,
+        .layout-notification-alert {
+            animation: habboOriginsBubbleSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+        }
+    }
+
+    @keyframes habboOriginsBubbleSlideUp {
+        0% {
+            transform: translateY(calc(100vh - 120px));
+            opacity: 0;
+        }
+        20% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 
     .nitro-notification-bubble {
+        animation: habboOriginsBubbleSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both !important;
         position: relative !important;
         background-color: #ffffff !important;
         border: 1px solid #000000 !important;

@@ -66,6 +66,8 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
     } = props;
 
     const [ activeLayerIndex, setActiveLayerIndex ] = useState<number>(0);
+    const [ isSelectClothesOpen, setIsSelectClothesOpen ] = useState<boolean>(false);
+    const [ colorPageIndex, setColorPageIndex ] = useState<number>(0);
     const [ updateId, setUpdateId ] = useState<number>(0);
     const [ motto, setMotto ] = useState<string>(() =>
     {
@@ -299,7 +301,19 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
 
                                             <div
                                                 className={ `slot-box ${ isSelected ? 'selected' : '' }` }
-                                                onClick={ () => setActiveLayerIndex(index) }
+                                                onClick={ () =>
+                                                {
+                                                    if(activeLayerIndex === index && isSelectClothesOpen)
+                                                    {
+                                                        setIsSelectClothesOpen(false);
+                                                    }
+                                                    else
+                                                    {
+                                                        setActiveLayerIndex(index);
+                                                        setColorPageIndex(0);
+                                                        setIsSelectClothesOpen(true);
+                                                    }
+                                                } }
                                             >
                                                 { curPart?.imageUrl ? (
                                                     <img src={ curPart.imageUrl } alt={ layer.key } />
@@ -324,7 +338,19 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                                             <div
                                                 className="color-swatch"
                                                 style={{ backgroundColor: colorHex }}
-                                                onClick={ () => setActiveLayerIndex(index) }
+                                                onClick={ () =>
+                                                {
+                                                    if(activeLayerIndex === index && isSelectClothesOpen)
+                                                    {
+                                                        setIsSelectClothesOpen(false);
+                                                    }
+                                                    else
+                                                    {
+                                                        setActiveLayerIndex(index);
+                                                        setColorPageIndex(0);
+                                                        setIsSelectClothesOpen(true);
+                                                    }
+                                                } }
                                             />
 
                                             <RetroArrowButton
@@ -338,6 +364,104 @@ export const AvatarEditorShockwaveDetailsView: FC<AvatarEditorShockwaveDetailsVi
                         </div>
                     </div>
                 </div>
+
+                {/* Select Clothes Popup Window */}
+                { isSelectClothesOpen && (() =>
+                {
+                    const currentLayer = SHOCKWAVE_LAYERS[activeLayerIndex];
+                    const categoryData = getLayerData(currentLayer.modelCategory, currentLayer.figurePart);
+                    const model = categories?.get(currentLayer.modelCategory);
+                    const parts = categoryData?.parts || [];
+                    const palette = categoryData?.getPalette(0) || [];
+                    const PAGE_SIZE = 19;
+                    const hasPagination = palette.length > 20;
+                    const totalPages = hasPagination ? Math.ceil(palette.length / PAGE_SIZE) : 1;
+                    const displayedColors = hasPagination
+                        ? palette.slice(colorPageIndex * PAGE_SIZE, (colorPageIndex + 1) * PAGE_SIZE)
+                        : palette;
+
+                    return (
+                        <div className="shockwave-select-clothes-popup">
+                            <div className="shockwave-details-header">
+                                <div className="shockwave-header-dither" />
+                                <span className="shockwave-header-title">Select Clothes</span>
+                                <div className="shockwave-header-dither" />
+                                <div
+                                    className="shockwave-details-close"
+                                    onClick={ () => setIsSelectClothesOpen(false) }
+                                />
+                            </div>
+
+                            <div className="select-clothes-card">
+                                <div className="select-clothes-parts-grid">
+                                    { parts.map((part, pIdx) =>
+                                    {
+                                        if(!part.imageUrl) part.init();
+                                        const isPartSelected = (categoryData.selectedPartIndex === pIdx || part.isSelected);
+
+                                        return (
+                                            <div
+                                                key={ pIdx }
+                                                className={ `select-clothes-item ${ isPartSelected ? 'selected' : '' }` }
+                                                onClick={ () =>
+                                                {
+                                                    model?.selectPart(currentLayer.figurePart, pIdx);
+                                                    setUpdateId(prev => prev + 1);
+                                                } }
+                                            >
+                                                { part.imageUrl ? (
+                                                    <img src={ part.imageUrl } alt="" />
+                                                ) : (
+                                                    <div className={ `nitro-avatar-editor-spritesheet ${ currentLayer.fallbackIcon }-icon` } />
+                                                ) }
+                                                { part.isHC && <div className="hc-badge" /> }
+                                            </div>
+                                        );
+                                    }) }
+                                </div>
+
+                                { (palette && palette.length > 0) && (
+                                    <div className="select-clothes-colors-section">
+                                        <div className="select-clothes-colors-grid">
+                                            { displayedColors.map((colorItem, cIdx) =>
+                                            {
+                                                const isColorSelected = colorItem.isSelected;
+                                                return (
+                                                    <div
+                                                        key={ cIdx }
+                                                        className={ `select-clothes-color-swatch ${ isColorSelected ? 'selected' : '' }` }
+                                                        style={{ backgroundColor: colorItem.color }}
+                                                        onClick={ () =>
+                                                        {
+                                                            const realIndex = palette.indexOf(colorItem);
+                                                            if(realIndex >= 0)
+                                                            {
+                                                                model?.selectColor(currentLayer.figurePart, realIndex, 0);
+                                                                setUpdateId(prev => prev + 1);
+                                                            }
+                                                        } }
+                                                    />
+                                                );
+                                            }) }
+                                            { hasPagination && (
+                                                <div
+                                                    className="select-clothes-color-next-btn"
+                                                    title="Más colores"
+                                                    onClick={ () => setColorPageIndex(prev => (prev + 1) % totalPages) }
+                                                >
+                                                    <svg width="8" height="8" viewBox="0 0 10 10">
+                                                        <polygon points="1,2 5,5 1,8" fill="#000000" />
+                                                        <polygon points="5,2 9,5 5,8" fill="#000000" />
+                                                    </svg>
+                                                </div>
+                                            ) }
+                                        </div>
+                                    </div>
+                                ) }
+                            </div>
+                        </div>
+                    );
+                })() }
 
                 {/* Footer Buttons */}
                 <div className="shockwave-details-footer">
