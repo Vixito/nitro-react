@@ -7,6 +7,7 @@ import { useMessageEvent } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { AvatarEditorFigurePreviewView } from './views/AvatarEditorFigurePreviewView';
 import { AvatarEditorModelView } from './views/AvatarEditorModelView';
+import { AvatarEditorShockwaveDetailsView } from './views/AvatarEditorShockwaveDetailsView';
 import { AvatarEditorWardrobeView } from './views/AvatarEditorWardrobeView';
 
 const DEFAULT_MALE_FIGURE: string = 'hr-100.hd-180-7.ch-215-66.lg-270-79.sh-305-62.ha-1002-70.wa-2007';
@@ -277,9 +278,26 @@ export const AvatarEditorView: FC<{}> = props =>
 
     if(!isVisible || !figureData) return null;
 
+    if(currentEra === 'shockwave2006')
+    {
+        return (
+            <AvatarEditorShockwaveDetailsView
+                figureData={ figureData }
+                figures={ figures }
+                categories={ categories }
+                setGender={ setGender }
+                loadAvatarInEditor={ loadAvatarInEditor }
+                lastFigure={ lastFigure }
+                lastGender={ lastGender }
+                processAction={ processAction }
+                onClose={ () => setIsVisible(false) }
+            />
+        );
+    }
+
     return (
-        <NitroCardView uniqueKey="avatar-editor" className={ `nitro-avatar-editor ${ currentEra === 'flash2012' ? 'avatar-editor-flash2012' : '' } ${ currentEra === 'shockwave2006' ? 'avatar-editor-shockwave2006' : '' }` }>
-            <NitroCardHeaderView headerText={ currentEra === 'shockwave2006' ? 'Detalles de Habbten' : LocalizeText('avatareditor.title') } onCloseClick={ event => setIsVisible(false) } />
+        <NitroCardView uniqueKey="avatar-editor" className={ `nitro-avatar-editor ${ currentEra === 'flash2012' ? 'avatar-editor-flash2012' : '' }` }>
+            <NitroCardHeaderView headerText={ LocalizeText('avatareditor.title') } onCloseClick={ event => setIsVisible(false) } />
             <NitroCardTabsView>
                 { categories && (categories.size > 0) && Array.from(categories.keys()).map(category =>
                 {

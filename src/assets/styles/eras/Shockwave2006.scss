@@ -1216,8 +1216,318 @@ body[data-era="shockwave2006"] {
     }
 
     // =========================================================================
-    // 8. EDITOR DE AVATAR / ROPERO 2006 (HABBTEN SHOCKWAVE / ORIGINS)
+    // 8. EDITOR DE AVATAR / DETALLES DE HABBTEN (SHOCKWAVE 2006 ORIGINAL)
     // =========================================================================
+    .shockwave-avatar-details-window {
+        width: 276px !important;
+        background: #5b90a4 !important;
+        border: 1px solid #000000 !important;
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        user-select: none !important;
+
+        .shockwave-details-header {
+            height: 24px !important;
+            min-height: 24px !important;
+            background: #5b90a4 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0 6px !important;
+            cursor: grab !important;
+
+            &:active {
+                cursor: grabbing !important;
+            }
+
+            .shockwave-header-dither {
+                flex: 1 !important;
+                height: 10px !important;
+                background: radial-gradient(circle, #9dc4d4 1px, transparent 1px) 0 0 / 3px 3px, #5b90a4 !important;
+            }
+
+            .shockwave-header-title {
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 11px !important;
+                font-weight: bold !important;
+                color: #ffffff !important;
+                text-shadow: 1px 1px 0px #000000 !important;
+                letter-spacing: 0.5px !important;
+                padding: 0 8px !important;
+                white-space: nowrap !important;
+                text-align: center !important;
+            }
+
+            .shockwave-details-close {
+                width: 13px !important;
+                height: 13px !important;
+                min-width: 13px !important;
+                min-height: 13px !important;
+                background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+                background-size: 13px 13px !important;
+                cursor: pointer !important;
+                border: none !important;
+                margin-left: 2px !important;
+
+                &:active {
+                    background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+                }
+            }
+        }
+
+        .shockwave-details-body {
+            padding: 2px 6px 4px 6px !important;
+            background: #5b90a4 !important;
+
+            .shockwave-details-card {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 6px !important;
+                overflow: hidden !important;
+                padding: 5px 4px 0 4px !important;
+
+                .shockwave-user-card {
+                    background: #d9d9d9 !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 6px !important;
+                    padding: 4px 6px !important;
+                    text-align: center !important;
+
+                    .user-name {
+                        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                        font-size: 13px !important;
+                        font-weight: bold !important;
+                        color: #000000 !important;
+                        line-height: 15px !important;
+                    }
+
+                    .mission-label {
+                        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                        font-size: 9px !important;
+                        font-weight: bold !important;
+                        color: #000000 !important;
+                        margin: 2px 0 1px 0 !important;
+                    }
+
+                    .mission-input {
+                        width: 92% !important;
+                        height: 18px !important;
+                        background: #ffffff !important;
+                        border: 1px solid #000000 !important;
+                        border-radius: 10px !important;
+                        font-family: 'Volter', Tahoma, sans-serif !important;
+                        font-size: 9px !important;
+                        color: #000000 !important;
+                        text-align: center !important;
+                        margin: 0 auto !important;
+                        display: block !important;
+                        padding: 0 6px !important;
+                        outline: none !important;
+                        box-shadow: none !important;
+
+                        &:focus {
+                            border-color: #000000 !important;
+                        }
+                    }
+                }
+
+                .shockwave-gender-selector {
+                    display: flex !important;
+                    justify-content: center !important;
+                    gap: 36px !important;
+                    margin: 5px 0 3px 0 !important;
+
+                    .gender-option {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        cursor: pointer !important;
+
+                        .gender-label {
+                            font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                            font-size: 9px !important;
+                            color: #000000 !important;
+                            margin-bottom: 2px !important;
+                        }
+
+                        input[type="radio"] {
+                            margin: 0 !important;
+                            cursor: pointer !important;
+                        }
+                    }
+                }
+
+                .shockwave-layers-container {
+                    position: relative !important;
+                    width: 100% !important;
+                    margin-top: 2px !important;
+                    border-bottom-left-radius: 5px !important;
+                    border-bottom-right-radius: 5px !important;
+                    overflow: hidden !important;
+
+                    .shockwave-avatar-preview {
+                        position: absolute !important;
+                        left: 50% !important;
+                        top: -8px !important;
+                        transform: translateX(-50%) !important;
+                        z-index: 2 !important;
+                        pointer-events: none !important;
+                        width: 80px !important;
+                        height: 190px !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+
+                        .avatar-image {
+                            width: 64px !important;
+                            height: 110px !important;
+                        }
+                    }
+
+                    .shockwave-layer-row {
+                        height: 38px !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: space-between !important;
+                        padding: 0 4px !important;
+                        box-sizing: border-box !important;
+
+                        &:nth-child(odd) {
+                            background: #d9d9d9 !important;
+                        }
+
+                        &:nth-child(even) {
+                            background: #ffffff !important;
+                        }
+
+                        .layer-controls-left,
+                        .layer-controls-right {
+                            display: flex !important;
+                            align-items: center !important;
+                            gap: 2px !important;
+                            z-index: 3 !important;
+                        }
+
+                        .slot-box {
+                            width: 34px !important;
+                            height: 34px !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 6px !important;
+                            background: #ffffff !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            cursor: pointer !important;
+                            position: relative !important;
+                            box-sizing: border-box !important;
+                            overflow: hidden !important;
+
+                            &.selected {
+                                background: #252525 !important;
+
+                                img {
+                                    filter: brightness(0) invert(1) !important;
+                                }
+
+                                .nitro-avatar-editor-spritesheet {
+                                    filter: brightness(0) invert(1) !important;
+                                }
+                            }
+
+                            img {
+                                max-width: 100% !important;
+                                max-height: 100% !important;
+                                image-rendering: pixelated !important;
+                                pointer-events: none !important;
+                            }
+
+                            .nitro-avatar-editor-spritesheet {
+                                transform: scale(0.9) !important;
+                            }
+                        }
+
+                        .color-swatch {
+                            width: 34px !important;
+                            height: 30px !important;
+                            border: 1px solid #000000 !important;
+                            border-radius: 6px !important;
+                            cursor: pointer !important;
+                            box-sizing: border-box !important;
+                            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.4), inset -1px -1px 0 rgba(0, 0, 0, 0.2) !important;
+                        }
+
+                        .retro-arrow-btn {
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            cursor: pointer !important;
+                            user-select: none !important;
+                            padding: 0 1px !important;
+
+                            svg {
+                                display: block !important;
+
+                                polygon {
+                                    fill: #cccccc !important;
+                                    stroke: #000000 !important;
+                                    stroke-width: 1.2px !important;
+                                    stroke-linejoin: round !important;
+                                }
+                            }
+
+                            &:hover svg polygon {
+                                fill: #e8e8e8 !important;
+                            }
+
+                            &:active svg polygon {
+                                fill: #999999 !important;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .shockwave-details-footer {
+            height: 30px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 0 8px 4px 8px !important;
+            background: #5b90a4 !important;
+
+            .footer-btn {
+                height: 19px !important;
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 10px !important;
+                font-weight: bold !important;
+                color: #000000 !important;
+                padding: 0 10px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                user-select: none !important;
+                box-shadow: none !important;
+                outline: none !important;
+
+                &:hover {
+                    background: #eef5f8 !important;
+                }
+
+                &:active {
+                    background: #dbe8ee !important;
+                }
+            }
+        }
+    }
+
     .nitro-avatar-editor,
     .avatar-editor-shockwave2006 {
         border-radius: 8px !important;
