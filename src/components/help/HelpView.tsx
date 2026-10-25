@@ -3,10 +3,8 @@ import { FC, useEffect, useState } from 'react';
 import { AddEventLinkTracker, LocalizeText, RemoveLinkEventTracker, ReportState } from '../../api';
 import { Base, Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
 import { useHelp } from '../../hooks';
-import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { DescribeReportView } from './views/DescribeReportView';
 import { HelpIndexView } from './views/HelpIndexView';
-import { ShockwaveHelpIndexView } from './views/ShockwaveHelpIndexView';
 import { NameChangeView } from './views/name-change/NameChangeView';
 import { ReportSummaryView } from './views/ReportSummaryView';
 import { SanctionSatusView } from './views/SanctionStatusView';
@@ -16,7 +14,6 @@ import { SelectTopicView } from './views/SelectTopicView';
 
 export const HelpView: FC<{}> = props =>
 {
-    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const { activeReport = null, setActiveReport = null, report = null } = useHelp();
 
@@ -93,36 +90,23 @@ export const HelpView: FC<{}> = props =>
             }
         }
 
-        if(currentEra === 'shockwave2006')
-        {
-            return <ShockwaveHelpIndexView onClose={ onClose } />;
-        }
-
         return <HelpIndexView />;
     }
-
-    const headerText = (currentEra === 'shockwave2006')
-        ? 'Ayuda Habbten'
-        : LocalizeText('help.button.cfh');
 
     return (
         <>
             { isVisible &&
-                <NitroCardView className={ `nitro-help ${ currentEra === 'shockwave2006' ? 'nitro-help-shockwave' : '' }` } theme="primary-slim">
-                    <NitroCardHeaderView headerText={ headerText } onCloseClick={ onClose } />
-                    <NitroCardContentView className="text-black p-0">
-                        { (currentEra === 'shockwave2006' && !activeReport) ? (
-                            <ShockwaveHelpIndexView onClose={ onClose } />
-                        ) : (
-                            <Grid>
-                                <Column center size={ 5 } overflow="hidden">
-                                    <Base className="index-image" />
-                                </Column>
-                                <Column justifyContent="between" size={ 7 } overflow="auto">
-                                    <CurrentStepView />
-                                </Column>
-                            </Grid>
-                        ) }
+                <NitroCardView className="nitro-help" theme="primary-slim">
+                    <NitroCardHeaderView headerText={ LocalizeText('help.button.cfh') } onCloseClick={ onClose } />
+                    <NitroCardContentView className="text-black">
+                        <Grid>
+                            <Column center size={ 5 } overflow="hidden">
+                                <Base className="index-image" />
+                            </Column>
+                            <Column justifyContent="between" size={ 7 } overflow="auto">
+                                <CurrentStepView />
+                            </Column>
+                        </Grid>
                     </NitroCardContentView>
                 </NitroCardView> }
             <SanctionSatusView />
