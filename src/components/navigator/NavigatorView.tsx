@@ -1,7 +1,7 @@
 import { ConvertGlobalRoomIdMessageComposer, HabboWebTools, ILinkEventTracker, LegacyExternalInterface, NavigatorInitComposer, NavigatorSearchComposer, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { AddEventLinkTracker, GetConfiguration, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, TryVisitRoom } from '../../api';
+import { AddEventLinkTracker, GetConfiguration, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, TryVisitRoom, VisitDesktop } from '../../api';
 import { Base, Column, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useNavigator, useRoomSessionManagerEvent } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
@@ -24,6 +24,7 @@ export const NavigatorView: FC<{}> = props =>
     const [ isLoading, setIsLoading ] = useState(false);
     const [ needsInit, setNeedsInit ] = useState(true);
     const [ needsSearch, setNeedsSearch ] = useState(false);
+    const [ shockwaveSubTab, setShockwaveSubTab ] = useState<'info' | 'people'>('info');
     const { searchResult = null, topLevelContext = null, topLevelContexts = null, navigatorData = null } = useNavigator();
     const pendingSearch = useRef<{ value: string, code: string }>(null);
     const elementRef = useRef<HTMLDivElement>();
@@ -239,8 +240,32 @@ export const NavigatorView: FC<{}> = props =>
                             <>
                                 <NavigatorSearchView sendSearch={ sendSearch } />
                                 <Column innerRef={ elementRef } overflow="auto">
+                                    { (currentEra === 'shockwave2006' && topLevelContext?.code === 'official_view') && (
+                                        <div className="navigator-item navigator-hotelview-item" onClick={ () => { VisitDesktop(); setIsVisible(false); } }>
+                                            <span className="hotelview-title">Vista del hotel</span>
+                                        </div>
+                                    ) }
                                     { (searchResult && searchResult.results.map((result, index) => <NavigatorSearchResultView key={ index } searchResult={ result } />)) }
                                 </Column>
+                                { currentEra === 'shockwave2006' && (
+                                    <div className="shockwave-nav-bottom-panel">
+                                        <div className="nav-bottom-tabs">
+                                            <div className={ `nav-bottom-tab ${ shockwaveSubTab === 'info' ? 'active' : '' }` } onClick={ () => setShockwaveSubTab('info') }>
+                                                <span className="tab-icon">ℹ</span> Info sala
+                                            </div>
+                                            <div className={ `nav-bottom-tab ${ shockwaveSubTab === 'people' ? 'active' : '' }` } onClick={ () => setShockwaveSubTab('people') }>
+                                                <span className="tab-icon">👥</span> Gente
+                                            </div>
+                                        </div>
+                                        <div className="nav-bottom-content">
+                                            { shockwaveSubTab === 'info' ? (
+                                                <div>Para conseguir tu propia sala privada gratis, visita los kioscos Room-O-Matic en el Vestíbulo.</div>
+                                            ) : (
+                                                <div>No hay usuarios seleccionados.</div>
+                                            ) }
+                                        </div>
+                                    </div>
+                                ) }
                             </> }
                         { isCreatorOpen && <NavigatorRoomCreatorView /> }
                     </NitroCardContentView>

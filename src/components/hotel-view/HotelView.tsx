@@ -3,6 +3,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { GetConfiguration } from '../../api';
 import { LayoutAvatarImageView } from '../../common';
 import { useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { WidgetSlotView } from './views/widgets/WidgetSlotView';
 
 const widgetSlotCount = 7;
@@ -11,6 +12,7 @@ const CANVAS_H = 768;
 
 export const HotelView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(true);
     const { userFigure = null, userInfo = null } = useSessionInfo();
     const [ onlineUsers, setOnlineUsers ] = useState(0);
@@ -48,6 +50,19 @@ export const HotelView: FC<{}> = props =>
     }, [isVisible]);
 
     if(!isVisible) return null;
+
+    if(currentEra === 'shockwave2006')
+    {
+        return (
+            <div className="hotelview-shockwave2006">
+                <div className="hotelview-2006-bg" />
+                <div className="hotelview-2006-logo">
+                    <div className="logo-main-text">HABBTEN HOTEL</div>
+                    <div className="logo-sub-text">FIVE STAR LUXURY</div>
+                </div>
+            </div>
+        );
+    }
 
     let habbtenConfig: any = null;
     try

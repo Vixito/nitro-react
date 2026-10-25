@@ -2,7 +2,7 @@ import { Dispose, DropBounce, EaseOut, ILinkEventTracker, JumpBy, Motions, Nitro
 import { FC, useState, useRef, useEffect } from 'react';
 import { AddEventLinkTracker, CreateLinkEvent, DispatchMainEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, RemoveLinkEventTracker, SendMessageComposer, VisitDesktop } from '../../api';
 import { Base, Flex, LayoutAvatarImageView, LayoutItemCountView, TransitionAnimation, TransitionAnimationTypes } from '../../common';
-import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useRoomEngineEvent, useSessionInfo } from '../../hooks';
+import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, usePurse, useRoomEngineEvent, useSessionInfo } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { ToolbarMeView } from './ToolbarMeView';
 
@@ -12,11 +12,13 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { currentEra } = useEraTheme();
     const [ isMeExpanded, setMeExpanded ] = useState(false);
     const [ useGuideTool, setUseGuideTool ] = useState(false);
-    const { userFigure = null } = useSessionInfo();
+    const { userFigure = null, userInfo = null } = useSessionInfo();
+    const { purse = null } = usePurse();
     const { getFullCount = 0 } = useInventoryUnseenTracker();
     const { getTotalUnseen = 0 } = useAchievements();
     const { requests = [] } = useFriends();
-    const { iconState = MessengerIconState.HIDDEN } = useMessenger();
+    const { messageThreads = [], iconState = MessengerIconState.HIDDEN } = useMessenger();
+    const unreadMessagesCount = messageThreads.reduce((sum, t) => sum + (t.unreadCount || 0), 0);
     const isMod = GetSessionDataManager() ? GetSessionDataManager().isModerator : false;
     
     const [isPlayingRadio, setIsPlayingRadio] = useState(false);
@@ -279,6 +281,74 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
 
     if(currentEra === 'shockwave2006')
     {
+        if(!isInRoom)
+        {
+            return (
+                <>
+                    <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 300 }>
+                        <ToolbarMeView useGuideTool={ useGuideTool } unseenAchievementCount={ getTotalUnseen } setMeExpanded={ setMeExpanded } />
+                    </TransitionAnimation>
+
+                    {/* Auténtica Barra Inferior de la Vista del Hotel Shockwave 2006 (Imagen 3) */}
+                    <div className="nitro-toolbar toolbar-shockwave2006 toolbar-hotelview-2006">
+                        <div className="toolbar-hotelview-inner">
+                            {/* 1. Izquierda: Avatar, usuario, misión y Actualizar mi Habbten ID >> */}
+                            <div className="hotelview-user-section">
+                                <div className="hotelview-avatar" onClick={ () => setMeExpanded(!isMeExpanded) }>
+                                    <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headOnly={ true } />
+                                </div>
+                                <div className="hotelview-user-details">
+                                    <div className="hotelview-username">{ userInfo?.username || 'Habbten' }</div>
+                                    <div className="hotelview-mission">{ userInfo?.motto || '' }</div>
+                                    <div className="hotelview-id-link" onClick={ () => setMeExpanded(!isMeExpanded) }>
+                                        Actualizar mi Habbten ID &gt;&gt;
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 2. Centro-Izquierda: Consola amarilla con contadores */}
+                            <div className="hotelview-console-section" onClick={ () => CreateLinkEvent('console/toggle') }>
+                                <div className="hotelview-console-icon" />
+                                <div className="hotelview-console-counts">
+                                    <div>{ unreadMessagesCount } nuevo(s) mensaje(s)</div>
+                                    <div>{ requests.length } petición(es) de amistad</div>
+                                </div>
+                            </div>
+
+                            {/* 3. Centro-Derecha: Monedero -> Abre el Catálogo */}
+                            <div className="hotelview-purse-section" onClick={ () => CreateLinkEvent('catalog/toggle') }>
+                                <div className="hotelview-purse-icon" />
+                                <div className="hotelview-purse-details">
+                                    <div className="hotelview-credits-count">{ purse?.credits ?? 0 } Habbten Crédito(s)</div>
+                                    <div className="hotelview-catalog-link">Catálogo &gt;&gt;</div>
+                                </div>
+                            </div>
+
+                            {/* 4. Derecha: Navegador de salas, Ayuda y Sonido */}
+                            <div className="hotelview-right-icons">
+                                <div className="hotelview-icon-btn item-rooms" title="Navegador del Hotel" onClick={ () => CreateLinkEvent('navigator/toggle') }>
+                                    <i className="toolbar-icon icon-hotel-building" />
+                                </div>
+                                <div className="hotelview-icon-btn item-help" title="Ayuda Habbten" onClick={ () => CreateLinkEvent('help/toggle') }>
+                                    <i className="toolbar-icon icon-help-question" />
+                                </div>
+                                <div className={ `hotelview-icon-btn item-sound ${ isSoundActive ? 'active' : 'muted' }` } title={ isSoundActive ? 'Silenciar sonido' : 'Activar sonido' } onClick={ toggleSound }>
+                                    <i className={ `toolbar-icon icon-sound ${ isSoundActive ? 'active' : 'muted' }` } />
+                                </div>
+                                { isMod && (
+                                    <div className="hotelview-icon-btn item-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
+                                        <i className="toolbar-icon icon-modtools" />
+                                    </div>
+                                ) }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="toolbar-friend-bar-container" className="d-none" />
+                </>
+            );
+        }
+
         return (
             <>
                 <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 300 }>
@@ -302,7 +372,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         {/* GRUPO DERECHO: Iconos oficiales v14 (Origins 1:1) */}
                         <div className="toolbar-right-group">
                             {/* 1. Consola (Consola amarilla v14) */}
-                            <div className="navigation-item item-console" title="Consola" onClick={ () => CreateLinkEvent('friends/toggle') }>
+                            <div className="navigation-item item-console" title="Consola" onClick={ () => CreateLinkEvent('console/toggle') }>
                                 <i className="toolbar-icon icon-friendall" />
                                 { (requests.length > 0) && <LayoutItemCountView count={ requests.length } /> }
                             </div>
