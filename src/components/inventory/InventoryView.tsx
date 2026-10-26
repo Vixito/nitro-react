@@ -10,6 +10,8 @@ import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
 
+import { HabboHandShockwaveView } from './views/HabboHandShockwaveView';
+
 const TAB_FURNITURE: string = 'inventory.furni';
 const TAB_BOTS: string = 'inventory.bots';
 const TAB_PETS: string = 'inventory.furni.tab.pets';
@@ -138,6 +140,11 @@ export const InventoryView: FC<{}> = props =>
     }, [ isVisible, isTrading ]);
 
     if(!isVisible) return null;
+
+    if(currentEra === 'shockwave2006' && !isTrading)
+    {
+        return <HabboHandShockwaveView onClose={ onClose } />;
+    }
 
     return (
         <NitroCardView uniqueKey={ 'inventory' } className={ `nitro-inventory ${ currentEra === 'shockwave2006' ? 'inventory-shockwave-hand' : '' } ${ currentEra === 'flash2012' ? 'inventory-flash2012' : '' }` } theme={ isTrading ? 'primary-slim' : '' } >

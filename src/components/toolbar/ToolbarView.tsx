@@ -324,7 +324,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             </div>
 
                             {/* 4. Monedero -> Tienda / Catálogo */}
-                            <div className="navigation-item item-credits" onMouseEnter={ () => setShockwaveHoverText('Monedero de Créditos') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('catalog/toggle') }>
+                            <div className="navigation-item item-credits" onMouseEnter={ () => setShockwaveHoverText('Catálogo') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => CreateLinkEvent('catalog/toggle') }>
                                 <i className="toolbar-icon icon-credits" />
                             </div>
 

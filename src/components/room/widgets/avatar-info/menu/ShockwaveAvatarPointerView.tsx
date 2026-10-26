@@ -16,7 +16,7 @@ export const ShockwaveAvatarPointerView: FC<ShockwaveAvatarPointerViewProps> = (
             objectId={ objectId }
             category={ RoomObjectCategory.UNIT }
             userType={ userType }
-            classNames={ [ 'shockwave-avatar-pointer-container' ] }
+            classNames={ [ 'shockwave-avatar-pointer-container', 'name-only' ] }
             onClose={ onClose }
         >
             <div className="shockwave-avatar-pointer-arrow" />

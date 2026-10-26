@@ -23,9 +23,9 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     );
 
     const isEvent = !isCurrencyOrReward && Boolean(
-        (titleText && /event/i.test(titleText)) ||
-        (item.notificationType && /event/i.test(item.notificationType)) ||
-        (item.message && /^(\s*¡?\s*alerta de evento|event:)/i.test(item.message))
+        (titleText && /(event|evento)/i.test(titleText)) ||
+        (item.notificationType && /(event|evento)/i.test(item.notificationType)) ||
+        (item.message && /(event|evento)/i.test(item.message))
     );
 
     const finalClassNames = [

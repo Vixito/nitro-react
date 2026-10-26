@@ -256,10 +256,11 @@ body[data-era="shockwave2006"] {
 
             .toolbar-shockwave-hover-label {
                 position: absolute !important;
-                bottom: 2px !important;
-                left: 48px !important;
+                bottom: 0px !important;
+                left: 114px !important;
                 font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
                 font-size: 8px !important;
+                line-height: 9px !important;
                 color: #ffffff !important;
                 text-shadow: 1px 1px 0px #000000 !important;
                 pointer-events: none !important;
@@ -3099,6 +3100,141 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     // 5. INVENTARIO RETRO "LA MANO" (AUTÉNTICO HABBTEN V14 SHOCKWAVE)
     // =========================================================================
+    .habbo-hand-shockwave-container {
+        position: fixed !important;
+        top: 0px !important;
+        right: 0px !important;
+        z-index: 450 !important;
+        pointer-events: none !important;
+        user-select: none !important;
+        animation: shockwaveHandEnter 0.25s ease-out !important;
+
+        .habbo-hand-tooltip {
+            position: absolute !important;
+            top: 6px !important;
+            right: 42px !important;
+            background: #ffffff !important;
+            border: 1px solid #000000 !important;
+            border-radius: 3px !important;
+            padding: 2px 7px !important;
+            font-family: 'Volter (Goldfish)', 'Volter Goldfish', 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+            font-size: 9px !important;
+            color: #000000 !important;
+            text-shadow: none !important;
+            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.4) !important;
+            pointer-events: auto !important;
+            white-space: nowrap !important;
+            z-index: 5 !important;
+
+            .habbo-hand-status {
+                color: #555555 !important;
+            }
+        }
+
+        .habbo-hand-graphic {
+            position: relative !important;
+            width: 367px !important;
+            height: 191px !important;
+            background: url('@/assets/images/eras/shockwave_v14/room_hand_3.png') no-repeat center !important;
+            background-size: 367px 191px !important;
+            pointer-events: auto !important;
+            image-rendering: pixelated !important;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35)) !important;
+        }
+
+        .habbo-hand-close-btn {
+            position: absolute !important;
+            top: 4px !important;
+            right: 6px !important;
+            width: 13px !important;
+            height: 13px !important;
+            background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center !important;
+            background-size: 13px 13px !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            z-index: 10 !important;
+
+            &:hover,
+            &:active {
+                background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png') !important;
+            }
+        }
+
+        .habbo-hand-slot {
+            position: absolute !important;
+            width: 38px !important;
+            height: 38px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            border-radius: 4px !important;
+            z-index: 6 !important;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.35) !important;
+                outline: 1px dashed #000000 !important;
+            }
+
+            &.selected {
+                background: rgba(255, 255, 204, 0.5) !important;
+                outline: 1px solid #000000 !important;
+            }
+
+            .habbo-hand-furni-icon {
+                max-width: 36px !important;
+                max-height: 36px !important;
+                object-fit: contain !important;
+                image-rendering: pixelated !important;
+                filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35)) !important;
+            }
+
+            .habbo-hand-item-count {
+                position: absolute !important;
+                bottom: 1px !important;
+                right: 2px !important;
+                background: #000000 !important;
+                color: #ffffff !important;
+                border-radius: 2px !important;
+                padding: 0 2px !important;
+                font-family: 'Volter (Goldfish)', 'Volter Goldfish', 'Volter', Tahoma, sans-serif !important;
+                font-size: 8px !important;
+                line-height: 9px !important;
+                font-weight: bold !important;
+            }
+        }
+
+        .habbo-hand-next-btn {
+            position: absolute !important;
+            bottom: 8px !important;
+            left: 16px !important;
+            width: 77px !important;
+            height: 16px !important;
+            background: transparent url('@/assets/images/eras/shockwave_v14/room_hand_next.png') no-repeat center !important;
+            background-size: 77px 16px !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            z-index: 10 !important;
+
+            &:hover {
+                background-image: url('@/assets/images/eras/shockwave_v14/room_hand_next_hi.png') !important;
+            }
+        }
+    }
+
+    @keyframes shockwaveHandEnter {
+        0% {
+            transform: translate(120px, -60px);
+            opacity: 0;
+        }
+        100% {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+    }
+
     .nitro-card.nitro-inventory,
     .nitro-card.nitro-inventory.inventory-shockwave-hand {
         width: 480px !important;
@@ -5690,27 +5826,43 @@ body[data-era="shockwave2006"] {
             }
         }
     // FLECHA DE SELECCIÓN DE PERSONAJE SHOCKWAVE 2006 (ISOMETRIC ORANGE ARROW)
+    .nitro-context-menu.shockwave-avatar-pointer-container,
     .shockwave-avatar-pointer-container {
         background: transparent !important;
+        background-color: transparent !important;
         border: none !important;
+        border-radius: 0 !important;
         box-shadow: none !important;
         padding: 0 !important;
+        margin: 0 !important;
+        min-width: 0 !important;
+        width: 18px !important;
+        height: 28px !important;
         pointer-events: none !important;
+        overflow: visible !important;
         z-index: 50 !important;
+
+        &::before,
+        &::after {
+            display: none !important;
+            content: none !important;
+            border: none !important;
+            background: transparent !important;
+        }
 
         .context-menu-caret {
             display: none !important;
         }
 
         .shockwave-avatar-pointer-arrow {
-            width: 18px;
-            height: 28px;
-            margin: 0 auto;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 28'%3E%3Cpath d='M6 0h6v12h5l-8 15-8-15h5z' fill='%23f59f00' stroke='%23000' stroke-width='1.5' stroke-linejoin='miter'/%3E%3Cpath d='M7 2h4v11h4l-6 11-6-11h4z' fill='%23ffb72b'/%3E%3Cpath d='M7 2h2v10h2l-3 6-1-2h2V4H7z' fill='%23ffec80'/%3E%3C/svg%3E") no-repeat center;
-            background-size: 18px 28px;
-            image-rendering: pixelated;
-            animation: shockwave-arrow-bob 0.8s infinite ease-in-out;
-            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4));
+            width: 18px !important;
+            height: 28px !important;
+            margin: 0 auto !important;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 28'%3E%3Cpath d='M6 0h6v12h5l-8 15-8-15h5z' fill='%23f59f00' stroke='%23000' stroke-width='1.5' stroke-linejoin='miter'/%3E%3Cpath d='M7 2h4v11h4l-6 11-6-11h4z' fill='%23ffb72b'/%3E%3Cpath d='M7 2h2v10h2l-3 6-1-2h2V4H7z' fill='%23ffec80'/%3E%3C/svg%3E") no-repeat center !important;
+            background-size: 18px 28px !important;
+            image-rendering: pixelated !important;
+            animation: shockwave-arrow-bob 0.8s infinite ease-in-out !important;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4)) !important;
         }
     }
 

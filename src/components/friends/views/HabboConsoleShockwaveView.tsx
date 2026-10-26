@@ -22,31 +22,39 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
 
     useEffect(() =>
     {
-        const linkTracker: ILinkEventTracker = {
-            linkReceived: (url: string) =>
-            {
-                const parts = url.split('/');
-                if(parts.length < 2) return;
+        const handleLink = (url: string) =>
+        {
+            const parts = url.split('/');
+            if(parts.length < 2) return;
 
-                switch(parts[1])
-                {
-                    case 'show':
-                        setIsVisible(true);
-                        return;
-                    case 'hide':
-                        setIsVisible(false);
-                        return;
-                    case 'toggle':
-                        setIsVisible(prev => !prev);
-                        return;
-                }
-            },
-            eventUrlPrefix: 'friends/'
+            switch(parts[1])
+            {
+                case 'show':
+                    setIsVisible(true);
+                    return;
+                case 'hide':
+                    setIsVisible(false);
+                    return;
+                case 'toggle':
+                    setIsVisible(prev => !prev);
+                    return;
+            }
         };
 
-        AddEventLinkTracker(linkTracker);
+        const tracker1: ILinkEventTracker = { linkReceived: handleLink, eventUrlPrefix: 'friends/' };
+        const tracker2: ILinkEventTracker = { linkReceived: handleLink, eventUrlPrefix: 'friends-list/' };
+        const tracker3: ILinkEventTracker = { linkReceived: handleLink, eventUrlPrefix: 'habbo-console/' };
 
-        return () => RemoveLinkEventTracker(linkTracker);
+        AddEventLinkTracker(tracker1);
+        AddEventLinkTracker(tracker2);
+        AddEventLinkTracker(tracker3);
+
+        return () =>
+        {
+            RemoveLinkEventTracker(tracker1);
+            RemoveLinkEventTracker(tracker2);
+            RemoveLinkEventTracker(tracker3);
+        };
     }, []);
 
     useMessageEvent<HabboSearchResultEvent>(HabboSearchResultEvent, event =>

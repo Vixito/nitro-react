@@ -11,8 +11,6 @@ export const FriendsView: FC<{}> = props =>
     const { settings = null, onlineFriends = [] } = useFriends();
     const { currentEra } = useEraTheme();
 
-    if(!settings) return null;
-
     if(currentEra === 'shockwave2006')
     {
         return (
@@ -22,6 +20,8 @@ export const FriendsView: FC<{}> = props =>
             </>
         );
     }
+
+    if(!settings) return null;
 
     return (
         <>
