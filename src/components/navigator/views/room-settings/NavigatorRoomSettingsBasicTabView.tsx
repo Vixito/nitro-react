@@ -1,8 +1,7 @@
 import { RoomDeleteComposer, RoomSettingsSaveErrorEvent, RoomSettingsSaveErrorParser } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
 import { CreateLinkEvent, GetMaxVisitorsList, IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
-import { Base, Column, Flex, Text } from '../../../../common';
+import { Base, Column, Flex, ShockwaveDropdown, Text } from '../../../../common';
 import { useMessageEvent, useNavigator, useNotification } from '../../../../hooks';
 
 const ROOM_NAME_MIN_LENGTH = 3;
@@ -114,23 +113,34 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
             </Flex>
             <Flex alignItems="center" gap={ 1 }>
                 <Text className="col-3">{ LocalizeText('navigator.category') }</Text>
-                <select className="form-select form-select-sm" value={ roomData.categoryId } onChange={ event => handleChange('category', event.target.value) }>
-                    { categories && categories.map(category => <option key={ category.id } value={ category.id }>{ LocalizeText(category.name) }</option>) }
-                </select>
+                <ShockwaveDropdown
+                    className="w-100"
+                    value={ roomData.categoryId }
+                    options={ categories ? categories.map(category => ({ value: category.id, label: LocalizeText(category.name) })) : [] }
+                    onChange={ val => handleChange('category', val) }
+                />
             </Flex>
             <Flex alignItems="center" gap={ 1 }>
                 <Text className="col-3">{ LocalizeText('navigator.maxvisitors') }</Text>
-                <select className="form-select form-select-sm" value={ roomData.userCount } onChange={ event => handleChange('max_visitors', event.target.value) }>
-                    { GetMaxVisitorsList && GetMaxVisitorsList.map(value => <option key={ value } value={ value }>{ value }</option>) }
-                </select>
+                <ShockwaveDropdown
+                    className="w-100"
+                    value={ roomData.userCount }
+                    options={ GetMaxVisitorsList ? GetMaxVisitorsList.map(value => ({ value, label: String(value) })) : [] }
+                    onChange={ val => handleChange('max_visitors', val) }
+                />
             </Flex>
             <Flex alignItems="center" gap={ 1 }>
                 <Text className="col-3">{ LocalizeText('navigator.tradesettings') }</Text>
-                <select className="form-select form-select-sm" value={ roomData.tradeState } onChange={ event => handleChange('trade_state', event.target.value) }>
-                    <option value="0">{ LocalizeText('navigator.roomsettings.trade_not_allowed') }</option>
-                    <option value="1">{ LocalizeText('navigator.roomsettings.trade_not_with_Controller') }</option>
-                    <option value="2">{ LocalizeText('navigator.roomsettings.trade_allowed') }</option>
-                </select>
+                <ShockwaveDropdown
+                    className="w-100"
+                    value={ roomData.tradeState }
+                    options={ [
+                        { value: '0', label: LocalizeText('navigator.roomsettings.trade_not_allowed') },
+                        { value: '1', label: LocalizeText('navigator.roomsettings.trade_not_with_Controller') },
+                        { value: '2', label: LocalizeText('navigator.roomsettings.trade_allowed') }
+                    ] }
+                    onChange={ val => handleChange('trade_state', val) }
+                />
             </Flex>
             <Flex alignItems="center" gap={ 1 }>
                 <Text className="col-3">{ LocalizeText('navigator.tags') }</Text>
@@ -162,10 +172,11 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                 <input className="form-check-input" type="checkbox" checked={ roomData.allowWalkthrough } onChange={ event => handleChange('allow_walkthrough', event.target.checked) } />
                 <Text>{ LocalizeText('navigator.roomsettings.allow_walk_through') }</Text>
             </Flex>
-            <Text variant="danger" underline bold pointer className="d-flex justify-content-center align-items-center gap-1" onClick={ deleteRoom }>
-                <FaTimes className="fa-icon" />
-                { LocalizeText('navigator.roomsettings.delete') }
-            </Text>
+            <div className="room-settings-delete-row">
+                <button type="button" className="btn btn-danger btn-sm room-delete-btn" onClick={ deleteRoom }>
+                    { LocalizeText('navigator.roomsettings.delete') }
+                </button>
+            </div>
         </>
     );
 };

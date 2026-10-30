@@ -84,7 +84,7 @@ export const ShockwaveAvatarPointerView: FC<ShockwaveAvatarPointerViewProps> = (
                 top: 0,
                 display: 'none',
                 pointerEvents: 'none',
-                zIndex: 9999
+                zIndex: 25
             } }
         >
             <div

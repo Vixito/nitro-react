@@ -1,8 +1,10 @@
 import { FrontPageItem } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect } from 'react';
 import { CreateLinkEvent } from '../../../../../../api';
+import catalogFrontpageBanner from '../../../../../../assets/images/eras/shockwave_v14/catalog_frontpage_banner.png';
 import { Column, Flex, Grid, Text } from '../../../../../../common';
 import { useCatalog } from '../../../../../../hooks';
+import { useEraTheme } from '../../../../../../hooks/era/useEraTheme';
 import { CatalogHeaderView } from '../../../catalog-header/CatalogHeaderView';
 import { CatalogRedeemVoucherView } from '../../common/CatalogRedeemVoucherView';
 import { CatalogLayoutProps } from '../CatalogLayout.types';
@@ -12,6 +14,7 @@ export const CatalogLayoutFrontpage4View: FC<CatalogLayoutProps> = props =>
 {
     const { page = null, hideNavigation = null } = props;
     const { frontPageItems = [] } = useCatalog();
+    const { currentEra } = useEraTheme();
 
     const selectItem = useCallback((item: FrontPageItem) =>
     {
@@ -32,6 +35,35 @@ export const CatalogLayoutFrontpage4View: FC<CatalogLayoutProps> = props =>
     {
         if(hideNavigation) hideNavigation();
     }, [ page, hideNavigation ]);
+
+    if(currentEra === 'shockwave2006')
+    {
+        return (
+            <div className="shockwave-catalog-frontpage">
+                <div className="shockwave-frontpage-banner-wrap">
+                    <img
+                        src={ catalogFrontpageBanner }
+                        alt="Colección de Furnis Habbten"
+                        className="shockwave-frontpage-banner-img"
+                    />
+                </div>
+                <div className="shockwave-frontpage-text">
+                    <div className="frontpage-heading">
+                        Colección de Furnis del Hotel Habbten
+                    </div>
+                    <p className="frontpage-paragraph">
+                        Selecciona una categoría en las pestañas superiores. Si ya tienes Créditos puedes comprar objetos simplemente haciendo clic en el botón &apos;Comprar&apos; junto al furni que desees. Si no tienes Créditos puedes conseguirlos haciendo clic en tu Monedero Habbten.
+                    </p>
+                    <p className="frontpage-paragraph mb-2">
+                        ¡Hogar, dulce hogar!
+                    </p>
+                    <div className="shockwave-frontpage-voucher">
+                        <CatalogRedeemVoucherView text={ page?.localization?.getText(1) || 'Introduce aquí tu código voucher' } />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if(!frontPageItems || (frontPageItems.length < 4))
     {

@@ -1,8 +1,16 @@
 import { HabboSearchComposer, HabboSearchResultData, HabboSearchResultEvent, ILinkEventTracker, RemoveFriendComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
-import { AddEventLinkTracker, CreateLinkEvent, GetRoomSession, GetSessionDataManager, MessengerFriend, OpenMessengerChat, RemoveLinkEventTracker, SendMessageComposer } from '../../../api';
-import { DraggableWindow, DraggableWindowPosition, LayoutAvatarImageView } from '../../../common';
-import { useFriends, useMessageEvent, useSessionInfo } from '../../../hooks';
+import { AddEventLinkTracker, CreateLinkEvent, GetRoomSession, GetSessionDataManager, GetUserProfile, MessengerFriend, OpenMessengerChat, RemoveLinkEventTracker, SendMessageComposer } from '../../../api';
+import iconAccept from '../../../assets/images/friends/icon-accept.png';
+import iconAdd from '../../../assets/images/friends/icon-add.png';
+import iconChat from '../../../assets/images/friends/icon-chat.png';
+import iconDeny from '../../../assets/images/friends/icon-deny.png';
+import iconFollow from '../../../assets/images/friends/icon-follow.png';
+import iconNewMessage from '../../../assets/images/friends/icon-new-message.png';
+import iconProfileSm from '../../../assets/images/friends/icon-profile-sm.png';
+import iconSmile from '../../../assets/images/friends/icon-smile.png';
+import { DraggableWindow, DraggableWindowPosition, LayoutAvatarImageView, LayoutBadgeImageView } from '../../../common';
+import { useFriends, useMessageEvent, useMessenger, useSessionInfo } from '../../../hooks';
 
 export const HabboConsoleShockwaveView: FC<{}> = () =>
 {
@@ -15,17 +23,16 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
     const [ otherResults, setOtherResults ] = useState<HabboSearchResultData[]>([]);
     const [ alertMessage, setAlertMessage ] = useState<string | null>(null);
 
-    // Friend list selection state
     const [ selectedFriend, setSelectedFriend ] = useState<MessengerFriend | null>(null);
 
-    const { onlineFriends = [], offlineFriends = [], requests = [], requestFriend = null } = useFriends();
+    const { onlineFriends = [], offlineFriends = [], requests = [], requestFriend = null, requestResponse = null, followFriend = null } = useFriends();
+    const { visibleThreads = [] } = useMessenger();
     const { userInfo } = useSessionInfo();
 
     const sessionData = GetSessionDataManager();
     const userFigure = sessionData ? sessionData.figure : '';
     const userName = sessionData ? sessionData.userName : 'Habbten';
 
-    // Motto state
     const [ motto, setMotto ] = useState('');
 
     useEffect(() =>
@@ -128,35 +135,37 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
 
     if(!isVisible) return null;
 
+    const isRealFriend = (friend: MessengerFriend) => (friend.id > 0) && !friend.name.toLowerCase().includes('staff chat');
     const allFriendsList = [ ...onlineFriends, ...offlineFriends ];
+    const realOnlineFriendsCount = onlineFriends.filter(isRealFriend).length;
+    const realTotalFriendsCount = allFriendsList.filter(isRealFriend).length;
     const allSearchResults = [ ...friendResults, ...otherResults ];
+    const unreadMessagesCount = visibleThreads.reduce((acc, thread) => acc + (thread.unreadCount || 0), 0);
 
     return (
         <DraggableWindow
             uniqueKey="habbo-console-shockwave"
-            handleSelector=".console-header"
+            handleSelector=".console-drag-handle"
             windowPosition={ DraggableWindowPosition.TOP_LEFT }
             offsetLeft={ 200 }
             offsetTop={ 50 }
             className="habbo-console-draggable-window"
         >
             <div className="habbo-console-shockwave">
-                {/* Header Amarillo Clásico Game Boy / Pager con textura punteada */}
-                <div className="console-header drag-handler">
+                {/* Header Amarillo Clásico Consola Habbten con textura punteada y botón de cierre original */}
+                <div className="console-header console-drag-handle">
                     <span className="console-title">Consola Habbten</span>
                     <button
                         type="button"
                         className="console-close-btn"
                         onClick={ () => setIsVisible(false) }
                         title="Cerrar Consola"
-                    >
-                        ✕
-                    </button>
+                        aria-label="Cerrar Consola"
+                    />
                 </div>
 
                 {/* Pantalla CRT Central con Scanlines Horizontales */}
                 <div className="console-crt-screen">
-                    {/* Modal de Alerta Clásico si existe (Ej: confirmación de petición) */}
                     { alertMessage && (
                         <div className="console-alert-overlay">
                             <div className="console-alert-box">
@@ -168,12 +177,16 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                         </div>
                     ) }
 
-                    {/* TAB 1: MI INFO (Exacto a Referencia Imagen 2) */}
+                    {/* TAB 1: MI INFO */}
                     { activeTab === 'myinfo' && (
                         <div className="console-tab-content myinfo-tab">
-                            {/* Sección Superior: Avatar monocromático + Nombre + Input Lema/Misión + Link Perfil */}
                             <div className="myinfo-user-card">
-                                <div className="avatar-preview-box">
+                                <div
+                                    className="avatar-preview-box"
+                                    style={ { cursor: 'pointer' } }
+                                    title="Ver mi perfil"
+                                    onClick={ () => sessionData && GetUserProfile(sessionData.userId) }
+                                >
                                     <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headOnly={ true } />
                                 </div>
                                 <div className="user-details">
@@ -187,96 +200,173 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                                             onChange={ e => setMotto(e.target.value) }
                                             onKeyDown={ e => e.key === 'Enter' && handleSaveMotto() }
                                             onBlur={ handleSaveMotto }
-                                            placeholder="Tu lema o misión..."
+                                            placeholder="Tu misión en Habbten..."
                                         />
                                     </div>
                                     <div
                                         className="profile-link"
-                                        onClick={ () => CreateLinkEvent('habboUI/open/' + (sessionData ? sessionData.userId : 0)) }
+                                        onClick={ () => sessionData && GetUserProfile(sessionData.userId) }
                                     >
-                                        Perfil Habbten &gt;&gt;
+                                        <img src={ iconProfileSm } alt="" className="pixel-icon" />
+                                        <span>Perfil Habbten &gt;&gt;</span>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="console-dashed-divider" />
 
-                            {/* Sección Central: Contadores oficiales de mensajes y peticiones */}
                             <div className="myinfo-counts-section">
-                                <div className="count-row">0 nuevo(s) mensaje(s)</div>
+                                <div
+                                    className={ `count-row ${ visibleThreads.length > 0 ? 'clickable' : '' }` }
+                                    onClick={ () => visibleThreads.length > 0 ? CreateLinkEvent('friends-messenger/open') : setActiveTab('friends') }
+                                >
+                                    <img src={ unreadMessagesCount > 0 ? iconNewMessage : iconChat } alt="" className="pixel-icon" />
+                                    <span>{ unreadMessagesCount } nuevo(s) mensaje(s)</span>
+                                </div>
                                 <div
                                     className="count-row clickable"
                                     onClick={ () => setActiveTab('friends') }
                                 >
-                                    { requests.length } Solicitud(es) de amistad
+                                    <img src={ iconAdd } alt="" className="pixel-icon" />
+                                    <span>{ requests.length } Solicitud(es) de amistad</span>
                                 </div>
-                                <div className="count-row dim">No hay mensajes guardados.</div>
+                                <div className="count-row dim">
+                                    { visibleThreads.length > 0 ? `${ visibleThreads.length } conversación(es) activa(s).` : 'No hay mensajes guardados.' }
+                                </div>
                             </div>
 
                             <div className="console-dashed-divider" />
 
-                            {/* Sección Inferior: Enlace móvil / Pager clásico */}
-                            <div className="myinfo-mobile-section">
-                                <div className="pager-phone-icon">
-                                    <span className="pager-icon">📟</span>
-                                    <span className="link-dots">&lt;···&gt;</span>
-                                    <span className="phone-icon">📱</span>
+                            <div className="myinfo-status-section">
+                                <div
+                                    className="status-summary-row clickable"
+                                    onClick={ () => setActiveTab('friends') }
+                                >
+                                    <img src={ iconSmile } alt="" className="pixel-icon" />
+                                    <span>{ realOnlineFriendsCount } amig@(s) conectad@(s) en el Hotel</span>
                                 </div>
-                                <div className="mobile-text">
-                                    <div>Enlace con móvil inactivo.</div>
-                                    <div>Comprueba tu número en tu Habbten ID.</div>
+                                <div className="status-summary-sub">
+                                    Total en tu lista: { realTotalFriendsCount } amig@(s)
                                 </div>
                             </div>
                         </div>
                     ) }
 
-                    {/* TAB 2: AMIGOS (Exacto a Referencia Imagen 3) */}
+                    {/* TAB 2: AMIGOS */}
                     { activeTab === 'friends' && (
                         <div className="console-tab-content friends-tab">
                             <div className="friends-screen-inner">
                                 <div className="friends-scroll-area">
+                                    { requests.length > 0 && (
+                                        <div className="console-requests-section">
+                                            <div className="requests-section-title">Peticiones pendientes ({ requests.length })</div>
+                                            { requests.map(req => (
+                                                <div key={ req.id } className="console-request-row">
+                                                    <span
+                                                        className="request-user-name"
+                                                        onClick={ () => GetUserProfile(req.requesterUserId) }
+                                                    >
+                                                        { req.name }
+                                                    </span>
+                                                    <div className="request-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="request-icon-btn"
+                                                            title="Aceptar amistad"
+                                                            onClick={ () => requestResponse && requestResponse(req.id, true) }
+                                                        >
+                                                            <img src={ iconAccept } alt="Aceptar" className="pixel-icon" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="request-icon-btn"
+                                                            title="Rechazar"
+                                                            onClick={ () => requestResponse && requestResponse(req.id, false) }
+                                                        >
+                                                            <img src={ iconDeny } alt="Rechazar" className="pixel-icon" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )) }
+                                        </div>
+                                    ) }
+
                                     { allFriendsList.length === 0 ? (
                                         <div className="no-friends-notice">No tienes amig@s en tu lista todavía.</div>
                                     ) : (
-                                        allFriendsList.map(friend => (
-                                            <div
-                                                key={ friend.id }
-                                                className={ `console-friend-row ${ selectedFriend?.id === friend.id ? 'selected' : '' }` }
-                                                onClick={ () => setSelectedFriend(friend) }
-                                                onDoubleClick={ () => OpenMessengerChat(friend.id) }
-                                            >
-                                                <div className="friend-head-col">
-                                                    <LayoutAvatarImageView figure={ friend.figure } direction={ 2 } headOnly={ true } />
+                                        allFriendsList.map(friend =>
+                                        {
+                                            const isStaffChat = (friend.id <= 0) || friend.name.toLowerCase().includes('staff chat');
+                                            const staffBadgeCode = (friend.figure && !friend.figure.includes('-') && friend.figure !== 'default') ? friend.figure : 'ADM';
+
+                                            return (
+                                                <div
+                                                    key={ friend.id }
+                                                    className={ `console-friend-row ${ selectedFriend?.id === friend.id ? 'selected' : '' }` }
+                                                    onClick={ () => setSelectedFriend(friend) }
+                                                    onDoubleClick={ () => OpenMessengerChat(friend.id) }
+                                                >
+                                                    <div
+                                                        className="friend-head-col"
+                                                        style={ !isStaffChat ? { cursor: 'pointer' } : undefined }
+                                                        title={ !isStaffChat ? `Ver perfil de ${ friend.name }` : undefined }
+                                                        onClick={ e => {
+                                                            if(!isStaffChat && friend.id > 0)
+                                                            {
+                                                                e.stopPropagation();
+                                                                GetUserProfile(friend.id);
+                                                            }
+                                                        } }
+                                                    >
+                                                        { isStaffChat ? (
+                                                            <LayoutBadgeImageView isGroup={ false } badgeCode={ staffBadgeCode } />
+                                                        ) : (
+                                                            <LayoutAvatarImageView figure={ friend.figure } direction={ 2 } headOnly={ true } />
+                                                        ) }
+                                                    </div>
+                                                    <div className="friend-info-col">
+                                                        <div className="friend-name-row">
+                                                            { !isStaffChat && (
+                                                                <img src={ iconSmile } alt="" className={ `pixel-icon ${ !friend.online ? 'icon-offline' : '' }` } />
+                                                            ) }
+                                                            <span className="friend-name">{ friend.name }</span>
+                                                            { !isStaffChat && friend.online && friend.followingAllowed && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="friend-inline-action"
+                                                                    title="Seguir a la sala"
+                                                                    onClick={ e => { e.stopPropagation(); followFriend && followFriend(friend); } }
+                                                                >
+                                                                    <img src={ iconFollow } alt="Seguir" className="pixel-icon" />
+                                                                </button>
+                                                            ) }
+                                                        </div>
+                                                        <div className="friend-status-row">
+                                                            { isStaffChat ? 'Canal Oficial Staff' : (friend.online ? (friend.followingAllowed ? '(En una sala)' : '(En el Hotel)') : 'Desconectad@') }
+                                                        </div>
+                                                        { !isStaffChat && (
+                                                            <div className="friend-motto-row">
+                                                                &ldquo;{ friend.motto || '...' }&rdquo;
+                                                            </div>
+                                                        ) }
+                                                    </div>
                                                 </div>
-                                                <div className="friend-info-col">
-                                                    <div className="friend-name-row">
-                                                        <span className="friend-name">{ friend.name }</span>
-                                                        <span className="phone-icon">📱</span>
-                                                        <span className="friend-msgs">- 0_msgs</span>
-                                                    </div>
-                                                    <div className="friend-status-row">
-                                                        { friend.online ? ((friend as any).inRoom ? '(En sala privada)' : '(En el Hotel)') : 'Desconectad@' }
-                                                    </div>
-                                                    <div className="friend-motto-row">
-                                                        &ldquo;{ friend.motto || '...' }&rdquo;
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))
+                                            );
+                                        })
                                     ) }
                                 </div>
                             </div>
 
-                            {/* 3 Botones de acción integrados dentro de la pantalla CRT */}
+                            {/* Botones de acción integrados dentro de la pantalla CRT */}
                             <div className="friends-crt-actions">
                                 <button
                                     type="button"
                                     className="console-crt-btn help-btn"
-                                    title="Información de amigo"
-                                    disabled={ !selectedFriend }
-                                    onClick={ () => selectedFriend && CreateLinkEvent('habboUI/open/' + selectedFriend.id) }
+                                    title="Perfil de Habbten"
+                                    disabled={ !selectedFriend || selectedFriend.id <= 0 }
+                                    onClick={ () => selectedFriend && selectedFriend.id > 0 && GetUserProfile(selectedFriend.id) }
                                 >
-                                    ?
+                                    <img src={ iconProfileSm } alt="Perfil" className="pixel-icon" />
                                 </button>
                                 <button
                                     type="button"
@@ -284,12 +374,13 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                                     disabled={ !selectedFriend }
                                     onClick={ () => selectedFriend && OpenMessengerChat(selectedFriend.id) }
                                 >
-                                    Enviar un mensaje
+                                    <img src={ iconChat } alt="" className="pixel-icon" />
+                                    <span>Mensaje</span>
                                 </button>
                                 <button
                                     type="button"
                                     className="console-crt-btn remove-btn"
-                                    disabled={ !selectedFriend }
+                                    disabled={ !selectedFriend || selectedFriend.id <= 0 }
                                     onClick={ handleRemoveFriend }
                                 >
                                     Eliminar
@@ -298,11 +389,11 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                         </div>
                     ) }
 
-                    {/* TAB 3: BUSCAR (Exacto a Referencia Imagen 4) */}
+                    {/* TAB 3: BUSCAR */}
                     { activeTab === 'find' && (
                         <div className="console-tab-content find-tab">
                             <div className="find-input-section">
-                                <div className="find-label">Buscar Habbo:</div>
+                                <div className="find-label">Buscar Habbten:</div>
                                 <div className="find-search-bar">
                                     <input
                                         type="text"
@@ -310,6 +401,7 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                                         value={ searchValue }
                                         onChange={ e => setSearchValue(e.target.value) }
                                         onKeyDown={ e => e.key === 'Enter' && handleSearch() }
+                                        placeholder="Nombre de usuario..."
                                     />
                                     <button type="button" className="console-crt-btn search-btn" onClick={ handleSearch }>
                                         Buscar
@@ -319,7 +411,7 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
 
                             <div className="find-results-container">
                                 { hasSearched && allSearchResults.length === 0 ? (
-                                    <div className="find-not-found">Habbo no encontrado</div>
+                                    <div className="find-not-found">Habbten no encontrado</div>
                                 ) : (
                                     <div className="results-scroll-list">
                                         { allSearchResults.map(user => (
@@ -328,12 +420,12 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                                                 className={ `result-user-item ${ selectedSearchUser?.avatarId === user.avatarId ? 'selected' : '' }` }
                                                 onClick={ () => setSelectedSearchUser(user) }
                                             >
-                                                <span className="user-icon">👤</span>
+                                                <img src={ iconSmile } alt="" className="pixel-icon" />
                                                 <span className="user-name">{ user.avatarName }</span>
                                             </div>
                                         )) }
                                     </div>
-                                )}
+                                ) }
                             </div>
 
                             <div className="find-bottom-actions">
@@ -343,19 +435,20 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                                     disabled={ !selectedSearchUser }
                                     onClick={ handleSendRequest }
                                 >
-                                    Pedir Amistad
+                                    <img src={ iconAdd } alt="" className="pixel-icon" />
+                                    <span>Pedir Amistad</span>
                                 </button>
                             </div>
                         </div>
                     ) }
 
-                    {/* TAB 4: AYUDA (Exacto a Referencia Imagen 5) */}
+                    {/* TAB 4: AYUDA */}
                     { activeTab === 'help' && (
                         <div className="console-tab-content help-tab">
                             <div className="help-header-title">Ayuda de la Consola Habbten</div>
                             <div className="help-content-box">
-                                <p>Puedes usar la Consola Habbten para mantenerte en contacto constante con tus amigos, usando mensajes instantáneos, correo electrónico y SMS, incluso cuando no estén conectados.</p>
-                                <p>Solo los Habbos que hayas elegido añadir a tu Lista de Amigos pueden hablar contigo a través de la Consola, por lo que no hay riesgo de ser molestado por personas que no te agraden. Los mensajes que envíes son privados y seguros.</p>
+                                <p>Puedes usar la Consola Habbten para mantenerte en contacto con tus amig@s dentro del Hotel mediante mensajes instantáneos y gestionar tus solicitudes de amistad en tiempo real.</p>
+                                <p>Solo los usuarios de Habbten que hayas elegido añadir a tu Lista de Amig@s pueden hablar contigo a través de la Consola, por lo que los mensajes que envíes son privados y seguros.</p>
                             </div>
                             <div className="help-bottom-actions">
                                 <button
@@ -363,14 +456,14 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                                     className="console-crt-btn emergency-btn"
                                     onClick={ () => CreateLinkEvent('help/toggle') }
                                 >
-                                    Llamada de Emergencia / Soporte
+                                    Ayuda / Soporte Habbten
                                 </button>
                             </div>
                         </div>
                     ) }
                 </div>
 
-                {/* BARRA INFERIOR DE 4 PESTAÑAS PAGER / GAME BOY (Exacto a Referencia Imágenes 2, 3, 4, 5) */}
+                {/* BARRA INFERIOR DE 4 PESTAÑAS PAGER / CONSOLA 2006 */}
                 <div className="console-bottom-tabs">
                     <button
                         type="button"
@@ -378,12 +471,16 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                         onClick={ () => setActiveTab('myinfo') }
                     >
                         <div className="pager-tab-icon">
-                            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-                                <circle cx="8" cy="8" r="6" />
-                                <circle cx="8" cy="6" r="4" fill="#d49b04" />
-                                <path d="M5 5h6v2H5z" />
-                                <rect x="6" y="8" width="1" height="1" />
-                                <rect x="9" y="8" width="1" height="1" />
+                            <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges">
+                                <rect x="4" y="2" width="8" height="2" fill="#000000" />
+                                <rect x="2" y="4" width="2" height="8" fill="#000000" />
+                                <rect x="12" y="4" width="2" height="8" fill="#000000" />
+                                <rect x="4" y="12" width="8" height="2" fill="#000000" />
+                                <rect x="4" y="4" width="8" height="8" fill="#f7be00" />
+                                <rect x="4" y="4" width="8" height="2" fill="#000000" />
+                                <rect x="5" y="7" width="2" height="2" fill="#000000" />
+                                <rect x="9" y="7" width="2" height="2" fill="#000000" />
+                                <rect x="6" y="10" width="4" height="1" fill="#000000" />
                             </svg>
                         </div>
                         <div className="pager-tab-label">MI INFO</div>
@@ -398,11 +495,23 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                         onClick={ () => setActiveTab('friends') }
                     >
                         <div className="pager-tab-icon">
-                            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-                                <circle cx="6" cy="7" r="4" />
-                                <circle cx="10" cy="8" r="4" fill="#a57700" />
-                                <circle cx="6" cy="7" r="3" fill="#d49b04" />
-                                <circle cx="10" cy="8" r="3" fill="#e5ad02" />
+                            <svg width="18" height="16" viewBox="0 0 18 16" shapeRendering="crispEdges">
+                                <rect x="2" y="3" width="6" height="2" fill="#000000" />
+                                <rect x="1" y="5" width="1" height="5" fill="#000000" />
+                                <rect x="8" y="5" width="1" height="5" fill="#000000" />
+                                <rect x="2" y="10" width="6" height="2" fill="#000000" />
+                                <rect x="2" y="5" width="6" height="5" fill="#f7be00" />
+                                <rect x="3" y="6" width="1" height="1" fill="#000000" />
+                                <rect x="6" y="6" width="1" height="1" fill="#000000" />
+                                <rect x="4" y="8" width="2" height="1" fill="#000000" />
+                                <rect x="10" y="4" width="6" height="2" fill="#000000" />
+                                <rect x="9" y="6" width="1" height="5" fill="#000000" />
+                                <rect x="16" y="6" width="1" height="5" fill="#000000" />
+                                <rect x="10" y="11" width="6" height="2" fill="#000000" />
+                                <rect x="10" y="6" width="6" height="5" fill="#d49b04" />
+                                <rect x="11" y="7" width="1" height="1" fill="#000000" />
+                                <rect x="14" y="7" width="1" height="1" fill="#000000" />
+                                <rect x="12" y="9" width="2" height="1" fill="#000000" />
                             </svg>
                         </div>
                         <div className="pager-tab-label">AMIGOS</div>
@@ -417,9 +526,13 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                         onClick={ () => setActiveTab('find') }
                     >
                         <div className="pager-tab-icon">
-                            <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="6.5" cy="6.5" r="4.5" />
-                                <line x1="10" y1="10" x2="14" y2="14" strokeWidth="2.5" />
+                            <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges">
+                                <rect x="4" y="2" width="5" height="2" fill="#000000" />
+                                <rect x="2" y="4" width="2" height="5" fill="#000000" />
+                                <rect x="9" y="4" width="2" height="5" fill="#000000" />
+                                <rect x="4" y="9" width="5" height="2" fill="#000000" />
+                                <rect x="9" y="9" width="2" height="2" fill="#000000" />
+                                <rect x="11" y="11" width="3" height="3" fill="#000000" />
                             </svg>
                         </div>
                         <div className="pager-tab-label">BUSCAR</div>
@@ -434,8 +547,13 @@ export const HabboConsoleShockwaveView: FC<{}> = () =>
                         onClick={ () => setActiveTab('help') }
                     >
                         <div className="pager-tab-icon">
-                            <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
-                                <path d="M6 3h4v2h2v3h-2v1H7V8h3V6H6V3zM7 11h2v2H7v-2z" />
+                            <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges">
+                                <rect x="5" y="2" width="6" height="2" fill="#000000" />
+                                <rect x="4" y="4" width="2" height="2" fill="#000000" />
+                                <rect x="10" y="4" width="2" height="3" fill="#000000" />
+                                <rect x="7" y="7" width="3" height="2" fill="#000000" />
+                                <rect x="7" y="9" width="2" height="2" fill="#000000" />
+                                <rect x="7" y="12" width="2" height="2" fill="#000000" />
                             </svg>
                         </div>
                         <div className="pager-tab-label">AYUDA</div>

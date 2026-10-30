@@ -32,7 +32,7 @@ export const CatalogLayouGuildCustomFurniView: FC<CatalogLayoutProps> = props =>
                             <CatalogGuildBadgeWidgetView position="absolute" className="bottom-1 end-1" />
                         </Base>
                         <Column grow gap={ 1 }>
-                            <Text truncate>{ currentOffer.localizationName }</Text>
+                            <Text bold>{ currentOffer.localizationName }</Text>
                             <Base grow>
                                 <CatalogGuildSelectorWidgetView />
                             </Base>

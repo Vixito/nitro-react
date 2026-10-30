@@ -266,6 +266,16 @@ const useAvatarInfoWidgetState = () =>
 
     useObjectSelectedEvent(event =>
     {
+        if(roomSession)
+        {
+            const engineArrow = (GetRoomEngine() as any)?.getRoomObjectSelectionArrow(roomSession.roomId);
+            if(engineArrow)
+            {
+                engineArrow.setState(1, 0);
+                if(engineArrow.logic) engineArrow.logic.processUpdateMessage = () => engineArrow.setState(1, 0);
+            }
+        }
+
         getObjectInfo(event.id, event.category);
 
         if(event.category === RoomObjectCategory.FLOOR || event.category === RoomObjectCategory.WALL)
@@ -276,6 +286,12 @@ const useAvatarInfoWidgetState = () =>
 
     useObjectDeselectedEvent(event =>
     {
+        if(roomSession)
+        {
+            const engineArrow = (GetRoomEngine() as any)?.getRoomObjectSelectionArrow(roomSession.roomId);
+            if(engineArrow) engineArrow.setState(1, 0);
+        }
+
         setAvatarInfo(null);
         setProductBubbles([]);
     });

@@ -32,8 +32,12 @@ export const NitroCardHeaderView: FC<NitroCardHeaderViewProps> = props =>
 
     return (
         <Column center position="relative" classNames={ getClassNames } { ...rest }>
-            <Flex fullWidth center>
-                <span className="nitro-card-header-text">{ headerText }</span>
+            <Flex fullWidth center className="nitro-card-header-inner">
+                <div className="shockwave-header-dots left" />
+                <span className="nitro-card-header-text">
+                    { headerText ? headerText.replace(/\bHabbos\b/gi, 'Habbten').replace(/\bHabbo\b/gi, 'Habbten') : '' }
+                </span>
+                <div className="shockwave-header-dots right" />
                 <Flex center position="absolute" className="end-2" gap={ 1 }>
                     { children }
                     { isGalleryPhoto &&

@@ -53,7 +53,7 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
                             </Flex>
                             <Column grow gap={ 1 }>
                                 { !currentOffer.product.isUniqueLimitedItem && <CatalogLimitedItemWidgetView fullWidth /> }
-                                <Text grow truncate bold>{ currentOffer.localizationName }</Text>
+                                <Text grow bold>{ currentOffer.localizationName }</Text>
                                 <Flex justifyContent="between">
                                     { (!currentOffer.product.isUniqueLimitedItem && currentPage?.pageId !== 761) &&
                                         <Column gap={ 1 }>

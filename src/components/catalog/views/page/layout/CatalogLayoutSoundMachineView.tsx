@@ -94,7 +94,7 @@ export const CatalogLayoutSoundMachineView: FC<CatalogLayoutProps> = props =>
                             </Flex>
                             <Column grow gap={ 1 }>
                                 <CatalogLimitedItemWidgetView fullWidth />
-                                <Text grow truncate>{ currentOffer.localizationName }</Text>
+                                <Text grow bold>{ currentOffer.localizationName }</Text>
                                 { songId > -1 && <Button onClick={ () => previewSong(songId) }>{ LocalizeText('play_preview_button') }</Button>
                                 }
                                 <Flex justifyContent="between">

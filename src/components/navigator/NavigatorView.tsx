@@ -9,6 +9,7 @@ import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
 import { NavigatorRoomLinkView } from './views/NavigatorRoomLinkView';
+import { NavigatorShockwaveView } from './views/NavigatorShockwaveView';
 import { NavigatorRoomSettingsView } from './views/room-settings/NavigatorRoomSettingsView';
 import { NavigatorSearchResultView } from './views/search/NavigatorSearchResultView';
 import { NavigatorSearchView } from './views/search/NavigatorSearchView';
@@ -216,8 +217,16 @@ export const NavigatorView: FC<{}> = props =>
 
     return (
         <>
-            { isVisible &&
-                <NitroCardView uniqueKey="navigator" className={ `nitro-navigator ${ currentEra === 'flash2012' ? 'navigator-flash2012' : '' } ${ currentEra === 'shockwave2006' ? 'navigator-shockwave2006' : '' }` }>
+            { isVisible && (currentEra === 'shockwave2006' ? (
+                <NavigatorShockwaveView
+                    isVisible={ isVisible }
+                    onClose={ () => setIsVisible(false) }
+                    isCreatorOpen={ isCreatorOpen }
+                    setCreatorOpen={ setCreatorOpen }
+                    sendSearch={ sendSearch }
+                />
+            ) : (
+                <NitroCardView uniqueKey="navigator" className={ `nitro-navigator ${ currentEra === 'flash2012' ? 'navigator-flash2012' : '' }` }>
                     <NitroCardHeaderView headerText={ LocalizeText(isCreatorOpen ? 'navigator.createroom.title' : 'navigator.title') } onCloseClick={ event => setIsVisible(false) } />
                     <NitroCardTabsView>
                         { topLevelContexts && (topLevelContexts.length > 0) && topLevelContexts.map((context, index) =>
@@ -244,7 +253,8 @@ export const NavigatorView: FC<{}> = props =>
                             </> }
                         { isCreatorOpen && <NavigatorRoomCreatorView /> }
                     </NitroCardContentView>
-                </NitroCardView> }
+                </NitroCardView>
+            )) }
             <NavigatorDoorStateView />
             { isRoomInfoOpen && <NavigatorRoomInfoView onCloseClick={ () => setRoomInfoOpen(false) } /> }
             { isRoomLinkOpen && <NavigatorRoomLinkView onCloseClick={ () => setRoomLinkOpen(false) } /> }

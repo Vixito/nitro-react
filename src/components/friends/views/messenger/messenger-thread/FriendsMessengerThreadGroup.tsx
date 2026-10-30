@@ -1,5 +1,5 @@
 import { FC, useMemo } from 'react';
-import { GetGroupChatData, GetSessionDataManager, LocalizeText, MessengerGroupType, MessengerThread, MessengerThreadChat, MessengerThreadChatGroup } from '../../../../../api';
+import { GetGroupChatData, GetSessionDataManager, GetUserProfile, LocalizeText, MessengerGroupType, MessengerThread, MessengerThreadChat, MessengerThreadChatGroup } from '../../../../../api';
 import { Base, Flex, LayoutAvatarImageView } from '../../../../../common';
 
 export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread, group: MessengerThreadChatGroup }> = props =>
@@ -18,6 +18,25 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread, group: M
 
         return false;
     }, [ thread, group, groupChatData ]);
+
+    const handleOpenProfile = () =>
+    {
+        if(isOwnChat)
+        {
+            const ownUserId = GetSessionDataManager().userId;
+            if(ownUserId > 0) GetUserProfile(ownUserId);
+            return;
+        }
+
+        if(groupChatData && (groupChatData.userId > 0))
+        {
+            GetUserProfile(groupChatData.userId);
+            return;
+        }
+
+        const participantId = (group.userId && (group.userId > 0)) ? group.userId : (thread?.participant?.id || 0);
+        if(participantId > 0) GetUserProfile(participantId);
+    };
 
     if(!thread || !group) return null;
     
@@ -50,21 +69,22 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread, group: M
     
     return (
         <Flex fullWidth justifyContent={ isOwnChat ? 'end' : 'start' } gap={ 2 }>
-            <Base shrink className="message-avatar">
-                { ((group.type === MessengerGroupType.PRIVATE_CHAT) && !isOwnChat) &&
-                    <LayoutAvatarImageView figure={ thread.participant.figure } direction={ 2 } /> }
-                { (groupChatData && !isOwnChat) &&
-                    <LayoutAvatarImageView figure={ groupChatData.figure } direction={ 2 } /> }
-            </Base>
+            { !isOwnChat &&
+                <Base shrink className="message-avatar cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
+                    { (group.type === MessengerGroupType.PRIVATE_CHAT) &&
+                        <LayoutAvatarImageView figure={ thread.participant.figure } direction={ 2 } /> }
+                    { groupChatData &&
+                        <LayoutAvatarImageView figure={ groupChatData.figure } direction={ 2 } /> }
+                </Base> }
             <Base className={ 'bg-light text-black border-radius mb-2 rounded py-1 px-2 messages-group-' + (isOwnChat ? 'right' : 'left') }>
-                <Base className="fw-bold">
+                <Base className="fw-bold cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
                     { isOwnChat && GetSessionDataManager().userName }
                     { !isOwnChat && (groupChatData ? groupChatData.username : thread.participant.name) }
                 </Base>
                 { group.chats.map((chat, index) => <Base key={ index } className="text-break">{ chat.message }</Base>) }
             </Base>
             { isOwnChat &&
-                <Base shrink className="message-avatar">
+                <Base shrink className="message-avatar cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
                     <LayoutAvatarImageView figure={ GetSessionDataManager().figure } direction={ 4 } />
                 </Base> }
         </Flex>

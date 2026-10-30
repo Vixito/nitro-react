@@ -35,7 +35,7 @@ export const CatalogLayoutSpacesView: FC<CatalogLayoutProps> = props =>
                             <CatalogViewProductWidgetView />
                         </Base>
                         <Column grow gap={ 1 }>
-                            <Text grow truncate>{ currentOffer.localizationName }</Text>
+                            <Text grow bold>{ currentOffer.localizationName }</Text>
                             <Flex justifyContent="end">
                                 <CatalogTotalPriceWidget alignItems="end" />
                             </Flex>
