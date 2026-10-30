@@ -291,7 +291,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     <div className="toolbar-inner">
                         {/* GRUPO IZQUIERDO: Avatar + Barra de Chat */}
                         <div className="toolbar-left-group">
-                            <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } onMouseEnter={ () => setShockwaveHoverText('Mi Personaje') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ () => setMeExpanded(!isMeExpanded) }>
+                            <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } onMouseEnter={ () => setShockwaveHoverText('Mi Personaje') } onMouseLeave={ () => setShockwaveHoverText('') } onClick={ event => { event.stopPropagation(); setMeExpanded(prev => !prev); } }>
                                 <LayoutAvatarImageView figure={ userFigure } direction={ 3 } headDirection={ 3 } headOnly={ true } classNames={ ['shockwave-avatar-head'] } />
                                 { (getTotalUnseen > 0) && <LayoutItemCountView count={ getTotalUnseen } /> }
                             </div>

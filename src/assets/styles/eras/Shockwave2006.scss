@@ -257,7 +257,7 @@ body[data-era="shockwave2006"] {
             .toolbar-shockwave-hover-label {
                 position: absolute !important;
                 bottom: 0px !important;
-                left: 114px !important;
+                left: 78px !important;
                 font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
                 font-size: 8px !important;
                 line-height: 9px !important;
@@ -3109,6 +3109,25 @@ body[data-era="shockwave2006"] {
         user-select: none !important;
         animation: shockwaveHandEnter 0.25s ease-out !important;
 
+        &.closing {
+            animation: shockwaveHandExit 0.25s ease-in forwards !important;
+        }
+
+        .habbo-hand-empty-notice {
+            position: absolute !important;
+            top: 103px !important;
+            left: 155px !important;
+            transform: translate(-50%, -50%) !important;
+            font-family: 'Volter Bold', 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+            font-size: 9px !important;
+            font-weight: bold !important;
+            color: #3a2b18 !important;
+            text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.7) !important;
+            pointer-events: none !important;
+            white-space: nowrap !important;
+            z-index: 8 !important;
+        }
+
         .habbo-hand-tooltip {
             position: absolute !important;
             top: 6px !important;
@@ -3135,11 +3154,22 @@ body[data-era="shockwave2006"] {
             position: relative !important;
             width: 367px !important;
             height: 191px !important;
-            background: url('@/assets/images/eras/shockwave_v14/room_hand_3.png') no-repeat center !important;
-            background-size: 367px 191px !important;
+            background-repeat: no-repeat !important;
+            background-position: right top !important;
+            background-image: url('@/assets/images/eras/shockwave_v14/room_hand_3.png') !important;
             pointer-events: auto !important;
             image-rendering: pixelated !important;
             filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35)) !important;
+
+            &.frame-1 {
+                background-image: url('@/assets/images/eras/shockwave_v14/room_hand_1.png') !important;
+            }
+            &.frame-2 {
+                background-image: url('@/assets/images/eras/shockwave_v14/room_hand_2.png') !important;
+            }
+            &.frame-3 {
+                background-image: url('@/assets/images/eras/shockwave_v14/room_hand_3.png') !important;
+            }
         }
 
         .habbo-hand-close-btn {
@@ -3226,12 +3256,31 @@ body[data-era="shockwave2006"] {
 
     @keyframes shockwaveHandEnter {
         0% {
-            transform: translate(120px, -60px);
+            transform: translate(380px, -200px);
             opacity: 0;
+        }
+        50% {
+            transform: translate(140px, -70px);
+            opacity: 0.9;
         }
         100% {
             transform: translate(0, 0);
             opacity: 1;
+        }
+    }
+
+    @keyframes shockwaveHandExit {
+        0% {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        50% {
+            transform: translate(140px, -70px);
+            opacity: 0.9;
+        }
+        100% {
+            transform: translate(380px, -200px);
+            opacity: 0;
         }
     }
 
@@ -3728,6 +3777,39 @@ body[data-era="shockwave2006"] {
                 background: transparent !important;
             }
 
+            // Categorías de salas (Acordeones retro Shockwave 2006)
+            .border-muted,
+            .nitro-navigator-search-result,
+            div[class*="border-muted"] {
+                border: 1px solid #336173 !important;
+                border-radius: 3px !important;
+                margin-bottom: 6px !important;
+                overflow: hidden !important;
+                box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.15) !important;
+
+                // Barra de título de la categoría
+                > div:first-child,
+                .px-2.py-1 {
+                    background: #5b90a4 radial-gradient(circle, #7ca8b8 1px, transparent 1px) 0 0 / 3px 3px !important;
+                    color: #ffffff !important;
+                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                    font-size: 9px !important;
+                    font-weight: bold !important;
+                    padding: 3px 8px !important;
+                    border-bottom: 1px solid #336173 !important;
+                    text-shadow: 1px 1px 0px #000000 !important;
+
+                    .text-secondary {
+                        color: #ffffff !important;
+                    }
+
+                    // Ocultar botones modernos de vista (cuadrícula/lista/maximizar)
+                    > div:last-child {
+                        display: none !important;
+                    }
+                }
+            }
+
             .navigator-item {
                 position: relative !important;
                 display: flex !important;
@@ -3743,8 +3825,8 @@ body[data-era="shockwave2006"] {
                     background: #eef6f8 !important;
                 }
 
-                // Auténtico botón verde "Ir ▶" al extremo derecho característico
-                &::after {
+                // Auténtico botón verde "Ir ▶" al extremo derecho para filas de lista
+                &:not(.flex-column)::after {
                     content: 'Ir ▶' !important;
                     margin-left: auto !important;
                     background: #468e27 !important;
@@ -3761,6 +3843,16 @@ body[data-era="shockwave2006"] {
                     flex-shrink: 0 !important;
                 }
 
+                &.flex-column {
+                    border: 1px solid #336173 !important;
+                    border-radius: 2px !important;
+                    background: #ffffff !important;
+
+                    &:hover {
+                        background: #f0f7f9 !important;
+                    }
+                }
+
                 .badge,
                 .user-count {
                     background: #cfcbc0 !important;
@@ -3773,6 +3865,11 @@ body[data-era="shockwave2006"] {
                     padding: 1px 4px !important;
                     min-width: 24px !important;
                     text-align: center !important;
+
+                    .fa-user,
+                    .fa-icon {
+                        display: none !important;
+                    }
                 }
             }
 
@@ -5825,89 +5922,69 @@ body[data-era="shockwave2006"] {
                 }
             }
         }
-    // FLECHA DE SELECCIÓN DE PERSONAJE SHOCKWAVE 2006 (ISOMETRIC ORANGE ARROW)
-    .nitro-context-menu.shockwave-avatar-pointer-container,
-    .shockwave-avatar-pointer-container {
-        background: transparent !important;
-        background-color: transparent !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        min-width: 0 !important;
-        width: 18px !important;
-        height: 28px !important;
-        pointer-events: none !important;
-        overflow: visible !important;
-        z-index: 50 !important;
-
-        &::before,
-        &::after {
-            display: none !important;
-            content: none !important;
-            border: none !important;
-            background: transparent !important;
-        }
-
-        .context-menu-caret {
-            display: none !important;
-        }
-
-        .shockwave-avatar-pointer-arrow {
-            width: 18px !important;
-            height: 28px !important;
-            margin: 0 auto !important;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 28'%3E%3Cpath d='M6 0h6v12h5l-8 15-8-15h5z' fill='%23f59f00' stroke='%23000' stroke-width='1.5' stroke-linejoin='miter'/%3E%3Cpath d='M7 2h4v11h4l-6 11-6-11h4z' fill='%23ffb72b'/%3E%3Cpath d='M7 2h2v10h2l-3 6-1-2h2V4H7z' fill='%23ffec80'/%3E%3C/svg%3E") no-repeat center !important;
-            background-size: 18px 28px !important;
-            image-rendering: pixelated !important;
-            animation: shockwave-arrow-bob 0.8s infinite ease-in-out !important;
-            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.4)) !important;
-        }
     }
 
-    @keyframes shockwave-arrow-bob {
-        0% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-        100% { transform: translateY(0); }
+
+    // EXENCIÓN CONTENEDOR DRAGGABLE WINDOW PARA CONSOLA HABBTEN SHOCKWAVE 2006
+    .draggable-window.habbo-console-draggable-window,
+    .draggable-window:has(.habbo-console-shockwave) {
+        background-color: transparent !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        overflow: visible !important;
+        padding: 0 !important;
+
+        .console-header,
+        .drag-handler {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            min-height: unset !important;
+            height: auto !important;
+            padding: 0 !important;
+        }
     }
 
     // CONSOLA HABBTEN / HABBO CONSOLE AMARILLA SHOCKWAVE 2006 (ORIGINS 1:1)
     .habbo-console-shockwave {
-        position: fixed !important;
-        top: 80px !important;
-        right: 40px !important;
-        width: 270px !important;
-        background-color: #f7ba00 !important;
-        border: 1px solid #000000 !important;
-        border-radius: 8px 8px 0 0 !important;
+        width: 284px !important;
+        background-color: #f7be00 !important;
+        border: 2px solid #000000 !important;
+        border-radius: 14px 14px 6px 6px !important;
         box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5) !important;
-        z-index: 1020 !important;
         font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
         -webkit-font-smoothing: none !important;
         image-rendering: pixelated !important;
         overflow: hidden !important;
+        user-select: none !important;
 
         .console-header {
-            height: 24px !important;
-            background: #f7ba00 radial-gradient(circle, #d49800 1px, transparent 1px) 0 0 / 4px 4px !important;
+            height: 26px !important;
+            background: #f7be00 radial-gradient(circle, #c99300 1px, transparent 1px) 0 0 / 3px 3px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            padding: 0 8px !important;
-            border-bottom: 1px solid #000000 !important;
+            padding: 0 10px 0 12px !important;
+            border-bottom: 2px solid #000000 !important;
+            cursor: grab !important;
+
+            &:active {
+                cursor: grabbing !important;
+            }
 
             .console-title {
-                font-weight: bold !important;
-                font-size: 9px !important;
-                color: #733e00 !important;
-                text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.4) !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                font-size: 10px !important;
+                color: #523500 !important;
+                letter-spacing: 0.3px !important;
             }
 
             .console-close-btn {
-                width: 13px !important;
-                height: 13px !important;
-                background: #f7ba00 !important;
+                width: 14px !important;
+                height: 14px !important;
+                background: #f7be00 !important;
                 border: 1px solid #000000 !important;
                 border-radius: 1px !important;
                 color: #000000 !important;
@@ -5918,24 +5995,31 @@ body[data-era="shockwave2006"] {
                 justify-content: center !important;
                 cursor: pointer !important;
                 padding: 0 !important;
+                box-shadow: inset 1px 1px 0px #ffea75, inset -1px -1px 0px #a87e00 !important;
 
                 &:hover {
-                    background: #ffcf33 !important;
+                    background: #ffd533 !important;
+                }
+
+                &:active {
+                    box-shadow: inset 1px 1px 0px #000000 !important;
                 }
             }
         }
 
         .console-crt-screen {
-            margin: 6px !important;
-            height: 220px !important;
-            background: repeating-linear-gradient(0deg, #444444, #444444 1px, #4d4d4d 1px, #4d4d4d 2px) !important;
-            border: 2px solid #222222 !important;
-            border-radius: 2px !important;
-            padding: 8px !important;
+            margin: 5px 6px 6px 6px !important;
+            height: 250px !important;
+            background: repeating-linear-gradient(0deg, #383838, #383838 1px, #424242 1px, #424242 2px) !important;
+            border: 3px solid #141414 !important;
+            border-radius: 8px !important;
+            padding: 6px 8px !important;
             color: #ffffff !important;
             font-size: 9px !important;
-            overflow-y: auto !important;
+            font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+            overflow: hidden !important;
             position: relative !important;
+            box-sizing: border-box !important;
 
             .console-alert-overlay {
                 position: absolute !important;
@@ -5943,16 +6027,16 @@ body[data-era="shockwave2006"] {
                 left: 0 !important;
                 right: 0 !important;
                 bottom: 0 !important;
-                background: rgba(0, 0, 0, 0.6) !important;
+                background: rgba(0, 0, 0, 0.7) !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 padding: 10px !important;
-                z-index: 10 !important;
+                z-index: 20 !important;
 
                 .console-alert-box {
-                    background: #f7ba00 !important;
-                    border: 1px solid #000000 !important;
+                    background: #f7be00 !important;
+                    border: 2px solid #000000 !important;
                     border-radius: 4px !important;
                     padding: 8px !important;
                     text-align: center !important;
@@ -5967,297 +6051,500 @@ body[data-era="shockwave2006"] {
                 }
             }
 
+            .console-tab-content {
+                height: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                box-sizing: border-box !important;
+            }
+
+            .console-dashed-divider {
+                border-top: 1px dashed #ffffff !important;
+                margin: 6px 0 !important;
+                width: 100% !important;
+                opacity: 0.7 !important;
+            }
+
+            .console-pixel-input {
+                background: #000000 !important;
+                border: 1px solid #ffffff !important;
+                border-radius: 1px !important;
+                color: #ffffff !important;
+                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                padding: 2px 4px !important;
+                outline: none !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+
+                &::placeholder {
+                    color: #777777 !important;
+                }
+            }
+
+            .console-crt-btn {
+                background: #2a2a2a !important;
+                border: 1px solid #ffffff !important;
+                border-radius: 2px !important;
+                color: #ffffff !important;
+                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                font-size: 9px !important;
+                padding: 2px 8px !important;
+                cursor: pointer !important;
+                text-align: center !important;
+                white-space: nowrap !important;
+                user-select: none !important;
+
+                &:hover:not(:disabled) {
+                    background: #444444 !important;
+                }
+
+                &:active:not(:disabled) {
+                    background: #111111 !important;
+                    transform: translateY(1px) !important;
+                }
+
+                &:disabled {
+                    border-color: #666666 !important;
+                    color: #777777 !important;
+                    cursor: not-allowed !important;
+                    opacity: 0.45 !important;
+                }
+            }
+
+            // --- TAB 1: MI INFO ---
             .myinfo-tab {
+                justify-content: flex-start !important;
+
                 .myinfo-user-card {
                     display: flex !important;
                     gap: 8px !important;
                     align-items: center !important;
 
                     .avatar-preview-box {
-                        width: 38px !important;
-                        height: 38px !important;
-                        background: #333333 !important;
-                        border: 1px solid #666666 !important;
+                        width: 44px !important;
+                        height: 44px !important;
+                        background: transparent !important;
                         display: flex !important;
                         align-items: center !important;
                         justify-content: center !important;
                         overflow: hidden !important;
+                        filter: grayscale(1) contrast(1.1) !important;
+                        flex-shrink: 0 !important;
                     }
 
-                    .user-name {
-                        font-weight: bold !important;
-                        font-size: 10px !important;
-                        color: #ffffff !important;
-                    }
+                    .user-details {
+                        flex: 1 !important;
+                        min-width: 0 !important;
 
-                    .user-status {
-                        color: #a0ffa0 !important;
-                        font-size: 8px !important;
+                        .user-name {
+                            font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                            font-size: 11px !important;
+                            color: #ffffff !important;
+                            margin-bottom: 2px !important;
+                        }
+
+                        .motto-input-container {
+                            margin-bottom: 2px !important;
+                        }
+
+                        .profile-link {
+                            color: #ffffff !important;
+                            font-size: 8px !important;
+                            cursor: pointer !important;
+                            text-decoration: underline !important;
+
+                            &:hover {
+                                color: #ffdc52 !important;
+                            }
+                        }
                     }
                 }
 
-                .console-divider {
-                    border-bottom: 1px dashed #666666 !important;
-                    margin: 8px 0 !important;
-                }
-
-                .info-summary-list {
+                .myinfo-counts-section {
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 3px !important;
-                    margin-bottom: 8px !important;
+                    gap: 2px !important;
+                    font-size: 9px !important;
+                    text-align: center !important;
 
-                    .info-item {
-                        display: flex !important;
-                        justify-content: space-between !important;
-                        color: #dddddd !important;
-
-                        .info-value {
-                            font-weight: bold !important;
-                            color: #ffffff !important;
-                        }
-                    }
-                }
-
-                .console-instructions {
-                    color: #bbbbbb !important;
-                    font-size: 8px !important;
-                    line-height: 1.2 !important;
-                }
-            }
-
-            .friends-tab {
-                .friends-scroll-area {
-                    height: 100% !important;
-
-                    .friends-section-title {
-                        font-weight: bold !important;
-                        color: #ffcc00 !important;
-                        border-bottom: 1px solid #555555 !important;
-                        padding-bottom: 2px !important;
-                        margin-bottom: 4px !important;
-                    }
-
-                    .no-friends-notice {
-                        color: #999999 !important;
-                        font-style: italic !important;
-                        padding: 4px 0 !important;
-                    }
-
-                    .console-friend-row {
-                        display: flex !important;
-                        align-items: center !important;
-                        gap: 6px !important;
-                        padding: 3px 4px !important;
-                        cursor: pointer !important;
-                        border-bottom: 1px solid #3d3d3d !important;
-
-                        &:hover {
-                            background: rgba(255, 255, 255, 0.1) !important;
-                        }
-
-                        .status-dot {
-                            width: 6px !important;
-                            height: 6px !important;
-                            border-radius: 50% !important;
-
-                            &.green { background: #00ff00 !important; box-shadow: 0 0 3px #00ff00 !important; }
-                            &.grey { background: #888888 !important; }
-                        }
-
-                        .friend-name {
-                            flex: 1 !important;
-                            color: #ffffff !important;
-                        }
-
-                        .console-chat-btn {
-                            background: transparent !important;
-                            border: none !important;
-                            cursor: pointer !important;
-                            font-size: 10px !important;
-                        }
-                    }
-                }
-            }
-
-            .find-tab {
-                display: flex !important;
-                flex-direction: column !important;
-                height: 100% !important;
-                gap: 6px !important;
-
-                .find-search-bar {
-                    display: flex !important;
-                    gap: 4px !important;
-
-                    .console-search-input {
-                        flex: 1 !important;
-                        background: #2a2a2a !important;
-                        border: 1px solid #777777 !important;
+                    .count-row {
                         color: #ffffff !important;
-                        font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+
+                        &.clickable {
+                            cursor: pointer !important;
+                            text-decoration: underline !important;
+
+                            &:hover {
+                                color: #ffdc52 !important;
+                            }
+                        }
+
+                        &.dim {
+                            color: #888888 !important;
+                        }
+                    }
+                }
+
+                .myinfo-mobile-section {
+                    display: flex !important;
+                    gap: 8px !important;
+                    align-items: center !important;
+                    margin-top: 2px !important;
+
+                    .pager-phone-icon {
+                        display: flex !important;
+                        gap: 2px !important;
+                        align-items: center !important;
+                        font-size: 11px !important;
+                        flex-shrink: 0 !important;
+
+                        .link-dots {
+                            font-size: 8px !important;
+                            color: #ffffff !important;
+                        }
+                    }
+
+                    .mobile-text {
+                        font-size: 8px !important;
+                        line-height: 1.25 !important;
+                        color: #ffffff !important;
+                    }
+                }
+            }
+
+            // --- TAB 2: AMIGOS ---
+            .friends-tab {
+                .friends-screen-inner {
+                    flex: 1 !important;
+                    overflow: hidden !important;
+                    position: relative !important;
+
+                    .friends-scroll-area {
+                        height: 100% !important;
+                        overflow-y: auto !important;
+                        overflow-x: hidden !important;
+                        padding-right: 4px !important;
+
+                        &::-webkit-scrollbar {
+                            width: 12px !important;
+                        }
+                        &::-webkit-scrollbar-track {
+                            background: #282828 !important;
+                            border-left: 1px solid #ffffff !important;
+                        }
+                        &::-webkit-scrollbar-thumb {
+                            background: #4a4a4a !important;
+                            border: 1px solid #ffffff !important;
+                        }
+
+                        .no-friends-notice {
+                            color: #888888 !important;
+                            font-style: italic !important;
+                            text-align: center !important;
+                            margin-top: 40px !important;
+                        }
+
+                        .console-friend-row {
+                            display: flex !important;
+                            align-items: center !important;
+                            gap: 6px !important;
+                            padding: 3px 2px !important;
+                            border-bottom: 1px dashed #777777 !important;
+                            cursor: pointer !important;
+
+                            &.selected {
+                                background: #1c3d52 !important;
+                                border-bottom: 1px dashed #ffffff !important;
+                            }
+
+                            &:hover:not(.selected) {
+                                background: rgba(255, 255, 255, 0.08) !important;
+                            }
+
+                            .friend-head-col {
+                                width: 32px !important;
+                                height: 32px !important;
+                                filter: grayscale(1) !important;
+                                overflow: hidden !important;
+                                flex-shrink: 0 !important;
+                                display: flex !important;
+                                align-items: center !important;
+                                justify-content: center !important;
+                            }
+
+                            .friend-info-col {
+                                flex: 1 !important;
+                                min-width: 0 !important;
+
+                                .friend-name-row {
+                                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                                    font-size: 9px !important;
+                                    color: #ffffff !important;
+                                    display: flex !important;
+                                    align-items: center !important;
+                                    gap: 3px !important;
+
+                                    .phone-icon {
+                                        font-size: 8px !important;
+                                    }
+
+                                    .friend-msgs {
+                                        font-size: 8px !important;
+                                        color: #ffffff !important;
+                                        font-weight: normal !important;
+                                    }
+                                }
+
+                                .friend-status-row {
+                                    font-size: 8px !important;
+                                    color: #ffffff !important;
+                                    line-height: 1.1 !important;
+                                }
+
+                                .friend-motto-row {
+                                    font-size: 8px !important;
+                                    color: #cccccc !important;
+                                    font-style: italic !important;
+                                    white-space: nowrap !important;
+                                    overflow: hidden !important;
+                                    text-overflow: ellipsis !important;
+                                    line-height: 1.1 !important;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .friends-crt-actions {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    gap: 6px !important;
+                    padding-top: 6px !important;
+                    border-top: 1px dashed #ffffff !important;
+                    margin-top: 4px !important;
+
+                    .help-btn {
+                        width: 22px !important;
+                        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
                         font-size: 9px !important;
-                        padding: 3px 5px !important;
-                        outline: none !important;
+                        padding: 2px 0 !important;
+                    }
+
+                    .compose-btn {
+                        flex: 1 !important;
+                    }
+
+                    .remove-btn {
+                        min-width: 55px !important;
+                    }
+                }
+            }
+
+            // --- TAB 3: BUSCAR ---
+            .find-tab {
+                .find-input-section {
+                    margin-bottom: 6px !important;
+
+                    .find-label {
+                        font-size: 9px !important;
+                        color: #ffffff !important;
+                        margin-bottom: 2px !important;
+                    }
+
+                    .find-search-bar {
+                        display: flex !important;
+                        gap: 4px !important;
+
+                        .find-input {
+                            flex: 1 !important;
+                        }
+
+                        .search-btn {
+                            min-width: 50px !important;
+                        }
                     }
                 }
 
                 .find-results-container {
                     flex: 1 !important;
-                    background: #333333 !important;
-                    border: 1px solid #666666 !important;
+                    border: 1px solid #ffffff !important;
+                    border-radius: 2px !important;
                     padding: 4px !important;
                     overflow-y: auto !important;
+                    margin-bottom: 6px !important;
+                    box-sizing: border-box !important;
 
-                    .results-header {
-                        font-size: 8px !important;
-                        color: #aaaaaa !important;
-                        margin-bottom: 4px !important;
+                    &::-webkit-scrollbar {
+                        width: 12px !important;
+                    }
+                    &::-webkit-scrollbar-track {
+                        background: #282828 !important;
+                        border-left: 1px solid #ffffff !important;
+                    }
+                    &::-webkit-scrollbar-thumb {
+                        background: #4a4a4a !important;
+                        border: 1px solid #ffffff !important;
                     }
 
-                    .no-results-msg {
-                        color: #888888 !important;
-                        font-style: italic !important;
+                    .find-not-found {
+                        color: #ffffff !important;
                         text-align: center !important;
-                        margin-top: 15px !important;
+                        margin-top: 30px !important;
+                        font-size: 9px !important;
                     }
 
-                    .result-user-item {
+                    .results-scroll-list {
                         display: flex !important;
-                        align-items: center !important;
-                        gap: 4px !important;
-                        padding: 2px 4px !important;
-                        cursor: pointer !important;
+                        flex-direction: column !important;
+                        gap: 2px !important;
 
-                        &.selected {
-                            background: #5b90a4 !important;
-                            color: #ffffff !important;
-                        }
+                        .result-user-item {
+                            display: flex !important;
+                            align-items: center !important;
+                            gap: 4px !important;
+                            padding: 2px 4px !important;
+                            cursor: pointer !important;
 
-                        &:hover:not(.selected) {
-                            background: rgba(255, 255, 255, 0.1) !important;
+                            &.selected {
+                                background: #1c3d52 !important;
+                                border: 1px solid #ffffff !important;
+                            }
+
+                            &:hover:not(.selected) {
+                                background: rgba(255, 255, 255, 0.1) !important;
+                            }
+
+                            .user-name {
+                                color: #ffffff !important;
+                                font-size: 9px !important;
+                            }
                         }
+                    }
+                }
+
+                .find-bottom-actions {
+                    display: flex !important;
+                    justify-content: center !important;
+
+                    .request-btn {
+                        width: 100% !important;
                     }
                 }
             }
 
+            // --- TAB 4: AYUDA ---
             .help-tab {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-                height: 100% !important;
+                .help-header-title {
+                    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                    font-size: 9px !important;
+                    color: #ffffff !important;
+                    margin-bottom: 4px !important;
+                }
 
-                .help-title {
-                    font-weight: bold !important;
-                    color: #ffcc00 !important;
+                .help-content-box {
+                    flex: 1 !important;
+                    border: 1px solid #ffffff !important;
+                    border-radius: 2px !important;
+                    padding: 6px !important;
+                    overflow-y: auto !important;
+                    font-size: 8.5px !important;
+                    line-height: 1.25 !important;
                     margin-bottom: 6px !important;
+                    color: #ffffff !important;
+                    box-sizing: border-box !important;
+
+                    &::-webkit-scrollbar {
+                        width: 12px !important;
+                    }
+                    &::-webkit-scrollbar-track {
+                        background: #282828 !important;
+                        border-left: 1px solid #ffffff !important;
+                    }
+                    &::-webkit-scrollbar-thumb {
+                        background: #4a4a4a !important;
+                        border: 1px solid #ffffff !important;
+                    }
+
+                    p {
+                        margin: 0 0 6px 0 !important;
+                    }
                 }
 
-                p {
-                    margin-bottom: 6px !important;
-                    line-height: 1.2 !important;
-                    color: #dddddd !important;
-                }
-            }
+                .help-bottom-actions {
+                    display: flex !important;
+                    justify-content: center !important;
 
-            .console-btn {
-                background: #e0e0e0 !important;
-                border: 1px solid #000000 !important;
-                border-radius: 2px !important;
-                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
-                font-size: 9px !important;
-                color: #000000 !important;
-                padding: 2px 8px !important;
-                cursor: pointer !important;
-                box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #888888 !important;
-
-                &:active {
-                    box-shadow: inset 1px 1px 0px #000000 !important;
-                }
-            }
-
-            .console-btn-primary {
-                width: 100% !important;
-                background: #e0e0e0 !important;
-                border: 1px solid #000000 !important;
-                border-radius: 2px !important;
-                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
-                font-size: 9px !important;
-                font-weight: bold !important;
-                color: #000000 !important;
-                padding: 4px 8px !important;
-                cursor: pointer !important;
-                box-shadow: inset 1px 1px 0px #ffffff, inset -1px -1px 0px #888888 !important;
-
-                &:disabled {
-                    opacity: 0.5 !important;
-                    cursor: not-allowed !important;
-                }
-
-                &:not(:disabled):active {
-                    box-shadow: inset 1px 1px 0px #000000 !important;
+                    .emergency-btn {
+                        width: 100% !important;
+                    }
                 }
             }
         }
 
         .console-bottom-tabs {
-            display: flex !important;
-            background: #e2a800 !important;
-            border-top: 1px solid #000000 !important;
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 2px !important;
+            padding: 0 6px 6px 6px !important;
+            background: transparent !important;
 
-            .console-tab-btn {
-                flex: 1 !important;
-                height: 38px !important;
-                background: #f7ba00 !important;
-                border: none !important;
-                border-right: 1px solid #000000 !important;
-                border-top: 1px solid #ffde6b !important;
-                border-bottom: 1px solid #b88600 !important;
+            .console-pager-tab {
+                height: 52px !important;
+                background: #db9f00 !important;
+                border-top: 2px solid #fedc66 !important;
+                border-left: 2px solid #fedc66 !important;
+                border-right: 2px solid #825c00 !important;
+                border-bottom: 2px solid #825c00 !important;
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
-                justify-content: center !important;
+                justify-content: space-between !important;
                 cursor: pointer !important;
-                padding: 2px 0 !important;
-                font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
-                font-size: 7px !important;
-                font-weight: bold !important;
-                color: #000000 !important;
+                padding: 3px 1px !important;
+                font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif !important;
+                color: #4a3200 !important;
+                outline: none !important;
 
-                &:last-child {
-                    border-right: none !important;
-                }
-
-                &:hover {
-                    background: #ffd033 !important;
+                &:hover:not(.active) {
+                    background: #e5a700 !important;
                 }
 
                 &.active {
-                    background: #d49500 !important;
-                    border-top: 1px solid #996c00 !important;
-                    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.4) !important;
+                    background: #a37200 !important;
+                    border-top: 2px solid #5a3c00 !important;
+                    border-left: 2px solid #5a3c00 !important;
+                    border-right: 2px solid #e0a300 !important;
+                    border-bottom: 2px solid #e0a300 !important;
+                    color: #291a00 !important;
+                    transform: translateY(1px) !important;
                 }
 
-                .tab-icon {
-                    font-size: 11px !important;
+                .pager-tab-icon {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    width: 18px !important;
+                    height: 18px !important;
+                }
+
+                .pager-tab-label {
+                    font-size: 8px !important;
+                    letter-spacing: 0.2px !important;
+                    text-align: center !important;
                     line-height: 1 !important;
                 }
 
-                .tab-label {
-                    margin-top: 1px !important;
-                    letter-spacing: 0.5px !important;
-                }
-
-                .tab-grip-lines {
+                .pager-tab-grip {
                     display: flex !important;
                     flex-direction: column !important;
                     gap: 1px !important;
-                    margin-top: 2px !important;
-                    width: 16px !important;
+                    width: 22px !important;
 
                     span {
                         height: 1px !important;
-                        background: #885c00 !important;
+                        background: #784e00 !important;
                         display: block !important;
                     }
                 }
@@ -6299,7 +6586,6 @@ body[data-era="shockwave2006"] {
         0% { background-position: 0 0; }
         100% { background-position: 24px 0; }
     }
-}
 }
 
 

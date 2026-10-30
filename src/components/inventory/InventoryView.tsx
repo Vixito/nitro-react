@@ -1,5 +1,5 @@
 import { BadgePointLimitsEvent, ILinkEventTracker, IRoomSession, RoomEngineObjectEvent, RoomEngineObjectPlacedEvent, RoomPreviewer, RoomSessionEvent } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { AddEventLinkTracker, GetLocalization, GetRoomEngine, isObjectMoverRequested, LocalizeText, RemoveLinkEventTracker, setObjectMoverRequested, UnseenItemCategory } from '../../api';
 import { NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useInventoryTrade, useInventoryUnseenTracker, useMessageEvent, useRoomEngineEvent, useRoomSessionManagerEvent } from '../../hooks';
@@ -28,13 +28,38 @@ export const InventoryView: FC<{}> = props =>
     const [ roomPreviewer, setRoomPreviewer ] = useState<RoomPreviewer>(null);
     const { isTrading = false, stopTrading = null } = useInventoryTrade();
     const { getCount = null, resetCategory = null } = useInventoryUnseenTracker();
+    const [ isClosingHand, setIsClosingHand ] = useState(false);
+    const isVisibleRef = useRef(isVisible);
+    const isClosingHandRef = useRef(isClosingHand);
 
-    const onClose = () =>
+    useEffect(() => { isVisibleRef.current = isVisible; }, [ isVisible ]);
+    useEffect(() => { isClosingHandRef.current = isClosingHand; }, [ isClosingHand ]);
+
+    const handleClose = useCallback(() =>
     {
-        if(isTrading) stopTrading();
+        if(isTrading)
+        {
+            stopTrading();
+            setIsVisible(false);
+            return;
+        }
+
+        if(currentEra === 'shockwave2006')
+        {
+            if(isClosingHandRef.current) return;
+            setIsClosingHand(true);
+            setTimeout(() =>
+            {
+                setIsVisible(false);
+                setIsClosingHand(false);
+            }, 250);
+            return;
+        }
 
         setIsVisible(false);
-    }
+    }, [ isTrading, stopTrading, currentEra ]);
+
+    const onClose = handleClose;
 
     useRoomEngineEvent<RoomEngineObjectPlacedEvent>(RoomEngineObjectEvent.PLACED, event =>
     {
@@ -81,13 +106,22 @@ export const InventoryView: FC<{}> = props =>
                 switch(parts[1])
                 {
                     case 'show':
+                        setIsClosingHand(false);
                         setIsVisible(true);
                         return;
                     case 'hide':
-                        setIsVisible(false);
+                        handleClose();
                         return;
                     case 'toggle':
-                        setIsVisible(prevValue => !prevValue);
+                        if(isVisibleRef.current)
+                        {
+                            handleClose();
+                        }
+                        else
+                        {
+                            setIsClosingHand(false);
+                            setIsVisible(true);
+                        }
                         return;
                     case 'badges':
                     case 'badge':
@@ -143,7 +177,7 @@ export const InventoryView: FC<{}> = props =>
 
     if(currentEra === 'shockwave2006' && !isTrading)
     {
-        return <HabboHandShockwaveView onClose={ onClose } />;
+        return <HabboHandShockwaveView isClosing={ isClosingHand } onClose={ handleClose } />;
     }
 
     return (

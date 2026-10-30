@@ -25,7 +25,7 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
 
         if(!roomSession) return;
 
-        const ownUser = roomSession.userDataManager?.getDataByType(GetSessionDataManager().userId, RoomObjectType.USER);
+        const ownUser = roomSession.userDataManager?.getUserData(GetSessionDataManager().userId);
         const userIndex = ownUser ? ownUser.roomIndex : roomSession.ownRoomIndex;
 
         if(userIndex >= 0)
