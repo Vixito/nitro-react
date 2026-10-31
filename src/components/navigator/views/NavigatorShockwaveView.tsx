@@ -1,5 +1,5 @@
-import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer, FavouriteChangedEvent, FavouritesEvent, RoomDataParser, RoomObjectType, RoomSettingsComposer } from '@nitrots/nitro-renderer';
-import { FC, KeyboardEvent, MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer, FavouriteChangedEvent, FavouritesEvent, GetGuestRoomMessageComposer, RoomDataParser, RoomObjectType, RoomSettingsComposer } from '@nitrots/nitro-renderer';
+import { FC, KeyboardEvent, MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CreateRoomSession, DoorStateType, GetSessionDataManager, GetUserProfile, SendMessageComposer, TryVisitRoom, VisitDesktop } from '../../../api';
 import doorInvisibleIcon from '../../../assets/images/eras/shockwave_v14/door_invisible.png';
 import doorLockedIcon from '../../../assets/images/eras/shockwave_v14/door_locked.png';
@@ -40,7 +40,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
     sendSearch
 }) =>
 {
-    const { searchResult = null, topLevelContext = null, setDoorData = null } = useNavigator();
+    const { searchResult = null, topLevelContext = null, setDoorData = null, navigatorData = null } = useNavigator();
     const { roomSession = null } = useRoom();
 
     const [ mainTab, setMainTab ] = useState<'public' | 'private'>('public');
@@ -51,6 +51,42 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
     const [ isHotelViewSelected, setIsHotelViewSelected ] = useState(false);
     const [ favRoomIds, setFavRoomIds ] = useState<number[]>([]);
     const [ hasLoadedFavs, setHasLoadedFavs ] = useState(false);
+
+    const getRoomUserCount = useCallback((room: RoomDataParser | null) =>
+    {
+        if(!room) return 0;
+        if(roomSession && roomSession.roomId === room.roomId)
+        {
+            const rawUsers = (roomSession.userDataManager as any)?._userDataByRoomIndex;
+            let activeCount = 0;
+            if(rawUsers)
+            {
+                rawUsers.forEach((u: any) => { if(u && u.type === RoomObjectType.USER) activeCount++; });
+            }
+            return Math.max(room.userCount, activeCount);
+        }
+        if(navigatorData?.enteredGuestRoom && navigatorData.enteredGuestRoom.roomId === room.roomId)
+        {
+            return navigatorData.enteredGuestRoom.userCount;
+        }
+        return room.userCount;
+    }, [ roomSession, navigatorData ]);
+
+    const handleSelectRoom = useCallback((room: RoomDataParser) =>
+    {
+        setLoadingRoom(null);
+        setIsHotelViewSelected(false);
+        setSelectedRoom(room);
+        SendMessageComposer(new GetGuestRoomMessageComposer(room.roomId, false, false));
+    }, []);
+
+    useEffect(() =>
+    {
+        if(selectedRoom && navigatorData?.enteredGuestRoom && navigatorData.enteredGuestRoom.roomId === selectedRoom.roomId)
+        {
+            setSelectedRoom(navigatorData.enteredGuestRoom);
+        }
+    }, [ navigatorData?.enteredGuestRoom, selectedRoom ]);
 
     useMessageEvent<FavouritesEvent>(FavouritesEvent, event =>
     {
@@ -178,6 +214,19 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
         if(!searchResult || !searchResult.results) return [];
         const list: RoomDataParser[] = [];
 
+        const pushOrUpdate = (r: RoomDataParser) =>
+        {
+            const existingIndex = list.findIndex(existing => existing.roomId === r.roomId);
+            if(existingIndex === -1)
+            {
+                list.push(r);
+            }
+            else if(r.userCount > list[existingIndex].userCount)
+            {
+                list[existingIndex] = r;
+            }
+        };
+
         if(mainTab === 'private' && privateFilter === 'fav')
         {
             // En "Salas favoritas" NUNCA mostrar todas las salas del usuario si no ha marcado ninguna como favorita
@@ -192,9 +241,9 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                 for(const r of group.rooms)
                 {
                     const isExplicitFav = favRoomIds.includes(r.roomId) || (!hasLoadedFavs && isFavGroup);
-                    if(isExplicitFav && !list.some(existing => existing.roomId === r.roomId))
+                    if(isExplicitFav)
                     {
-                        list.push(r);
+                        pushOrUpdate(r);
                     }
                 }
             }
@@ -212,9 +261,9 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
 
                 for(const r of group.rooms)
                 {
-                    if((isMyGroup || r.ownerId === myUserId) && !list.some(existing => existing.roomId === r.roomId))
+                    if(isMyGroup || r.ownerId === myUserId)
                     {
-                        list.push(r);
+                        pushOrUpdate(r);
                     }
                 }
             }
@@ -226,10 +275,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
             if(!group || !group.rooms) continue;
             for(const r of group.rooms)
             {
-                if(!list.some(existing => existing.roomId === r.roomId))
-                {
-                    list.push(r);
-                }
+                pushOrUpdate(r);
             }
         }
 
@@ -500,7 +546,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                                         <div
                                             key={ room.roomId }
                                             className={ `nav-public-row ${ selectedRoom?.roomId === room.roomId ? 'selected' : '' }` }
-                                            onClick={ () => { setLoadingRoom(null); setIsHotelViewSelected(false); setSelectedRoom(room); } }
+                                            onClick={ () => handleSelectRoom(room) }
                                         >
                                             <svg className="pub-room-cube" width="18" height="14" viewBox="0 0 18 14" shapeRendering="crispEdges">
                                                 <path d="M8 0h2v1h2v1h2v1h2v1h1v5h-1v1h-2v1h-2v1h-2v1H8v-1H6v-1H4v-1H2V9H1V4h1V3h2V2h2V1h2V0z" fill="#000000" />
@@ -510,7 +556,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                                                 <rect x="8" y="3" width="2" height="1" fill="#555d61" />
                                             </svg>
                                             <span className="pub-room-name">{ sanitizeHabbtenName(room.roomName) }</span>
-                                            <span className="pub-user-count">{ room.userCount }</span>
+                                            <span className="pub-user-count">{ getRoomUserCount(room) }</span>
                                             <span className="pub-dots-short" />
                                             <span
                                                 className="nav-go-link"
@@ -528,11 +574,11 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                                         <div
                                             key={ room.roomId }
                                             className={ `nav-private-row ${ selectedRoom?.roomId === room.roomId ? 'selected' : '' }` }
-                                            onClick={ () => { setLoadingRoom(null); setIsHotelViewSelected(false); setSelectedRoom(room); } }
+                                            onClick={ () => handleSelectRoom(room) }
                                         >
                                             <div className="priv-row-top">
                                                 <span className="priv-user-count">
-                                                    { room.userCount }
+                                                    { getRoomUserCount(room) }
                                                 </span>
                                                 <span className="priv-room-name">{ sanitizeHabbtenName(room.roomName) }</span>
                                                 <span
@@ -665,7 +711,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                                     <div className="nav-room-details">
                                         <div className="details-info-top">
                                             <div className="details-title">
-                                                { sanitizeHabbtenName(selectedRoom.roomName) } ({ selectedRoom.userCount }/{ selectedRoom.maxUserCount })
+                                                { sanitizeHabbtenName(selectedRoom.roomName) } ({ getRoomUserCount(selectedRoom) }/{ selectedRoom.maxUserCount })
                                             </div>
                                             { selectedRoom.showOwner && selectedRoom.ownerName ? (
                                                 <div
@@ -733,7 +779,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                                         <div className="people-header-row">
                                             <img src={ iconSmile } alt="" className="pixel-icon" />
                                             <span>
-                                                { selectedRoom.userCount } / { selectedRoom.maxUserCount } usuario(s) en <b>{ sanitizeHabbtenName(selectedRoom.roomName) }</b>
+                                                { getRoomUserCount(selectedRoom) } / { selectedRoom.maxUserCount } usuario(s) en <b>{ sanitizeHabbtenName(selectedRoom.roomName) }</b>
                                             </span>
                                         </div>
                                         { currentRoomUsers.length > 0 ? (

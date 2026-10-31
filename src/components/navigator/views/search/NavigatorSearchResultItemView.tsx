@@ -1,9 +1,9 @@
-import { RoomDataParser } from '@nitrots/nitro-renderer';
-import { FC, MouseEvent } from 'react';
+import { RoomDataParser, RoomObjectType } from '@nitrots/nitro-renderer';
+import { FC, MouseEvent, useMemo } from 'react';
 import { FaUser } from 'react-icons/fa';
 import { CreateRoomSession, DoorStateType, GetSessionDataManager, TryVisitRoom } from '../../../../api';
 import { Column, Flex, LayoutBadgeImageView, LayoutGridItemProps, LayoutRoomThumbnailView, Text } from '../../../../common';
-import { useNavigator } from '../../../../hooks';
+import { useNavigator, useRoom } from '../../../../hooks';
 import { NavigatorSearchResultItemInfoView } from './NavigatorSearchResultItemInfoView';
 
 export interface NavigatorSearchResultItemViewProps extends LayoutGridItemProps
@@ -15,11 +15,32 @@ export interface NavigatorSearchResultItemViewProps extends LayoutGridItemProps
 export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProps> = props =>
 {
     const { roomData = null, children = null, thumbnail = false, ...rest } = props;
-    const { setDoorData = null } = useNavigator();
+    const { setDoorData = null, navigatorData = null } = useNavigator();
+    const { roomSession = null } = useRoom();
+
+    const effectiveUserCount = useMemo(() =>
+    {
+        if(!roomData) return 0;
+        if(roomSession && roomSession.roomId === roomData.roomId)
+        {
+            const rawUsers = (roomSession.userDataManager as any)?._userDataByRoomIndex;
+            let activeCount = 0;
+            if(rawUsers)
+            {
+                rawUsers.forEach((u: any) => { if(u && u.type === RoomObjectType.USER) activeCount++; });
+            }
+            return Math.max(roomData.userCount, activeCount);
+        }
+        if(navigatorData?.enteredGuestRoom && navigatorData.enteredGuestRoom.roomId === roomData.roomId)
+        {
+            return Math.max(roomData.userCount, navigatorData.enteredGuestRoom.userCount);
+        }
+        return roomData.userCount;
+    }, [ roomData, roomSession, navigatorData ]);
 
     const getUserCounterColor = () =>
     {
-        const num: number = (100 * (roomData.userCount / roomData.maxUserCount));
+        const num: number = (100 * (effectiveUserCount / roomData.maxUserCount));
 
         let bg = 'bg-primary';
 
@@ -86,7 +107,7 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
                 { roomData.habboGroupId > 0 && <LayoutBadgeImageView badgeCode={ roomData.groupBadgeCode } isGroup={ true } className={ 'position-absolute top-0 start-0 m-1' } /> }
                 <Flex center className={ 'badge p-1 position-absolute m-1 ' + getUserCounterColor() } gap={ 1 }>
                     <FaUser className="fa-icon" />
-                    { roomData.userCount }
+                    { effectiveUserCount }
                 </Flex>
                 { (roomData.doorMode !== RoomDataParser.OPEN_STATE) && 
                 <i className={ ('position-absolute end-0 mb-1 me-1 icon icon-navigator-room-' + ((roomData.doorMode === RoomDataParser.DOORBELL_STATE) ? 'locked' : (roomData.doorMode === RoomDataParser.PASSWORD_STATE) ? 'password' : (roomData.doorMode === RoomDataParser.INVISIBLE_STATE) ? 'invisible' : '')) } /> }
@@ -106,7 +127,7 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
         <Flex pointer overflow="hidden" alignItems="center" onClick={ visitRoom } gap={ 2 } className="navigator-item px-2 py-1 small" { ...rest }>
             <Flex center className={ 'badge p-1 ' + getUserCounterColor() } gap={ 1 }>
                 <FaUser className="fa-icon" />
-                { roomData.userCount }
+                { effectiveUserCount }
             </Flex>
             <Text truncate grow>{ roomData.roomName }</Text>
             <Flex reverse alignItems="center" gap={ 1 }>

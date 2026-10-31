@@ -1,7 +1,7 @@
 import { NitroConfiguration, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { GetConfiguration } from '../../api';
-import shockwaveEntryAuImg from '../../assets/images/eras/shockwave_v14/hh_entry_au.png';
+import shockwaveEntryAuGif from '../../assets/images/eras/shockwave_v14/hh_entry_au.gif';
 import { LayoutAvatarImageView } from '../../common';
 import { useEraTheme, useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
 import { WidgetSlotView } from './views/widgets/WidgetSlotView';
@@ -314,11 +314,9 @@ export const HotelView: FC<{}> = props =>
                 <div 
                     className="shockwave-hotel-entry"
                     style={{
-                        width: 718,
-                        height: 480,
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        backgroundImage: `url(${ shockwaveEntryAuImg })`,
+                        width: '100%',
+                        height: '100%',
+                        backgroundImage: `url(${ shockwaveEntryAuGif })`,
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center',
                         backgroundSize: 'contain',
