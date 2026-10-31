@@ -108,7 +108,9 @@ export const HotelView: FC<{}> = props =>
         </>
     );
 
-    const layout = habbtenConfig?.hotel_view?.custom_layouts?.[currentEra] || habbtenConfig?.hotel_view?.custom_layout;
+    const layout = (currentEra === 'shockwave2006')
+        ? habbtenConfig?.hotel_view?.custom_layouts?.['shockwave2006']
+        : (habbtenConfig?.hotel_view?.custom_layouts?.[currentEra] || habbtenConfig?.hotel_view?.custom_layout);
     const customBg = (layout?.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') 
         ? layout.background 
         : backgroundColor;
