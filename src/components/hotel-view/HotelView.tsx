@@ -314,12 +314,14 @@ export const HotelView: FC<{}> = props =>
                 <div 
                     className="shockwave-hotel-entry"
                     style={{
-                        width: '100%',
-                        height: '100%',
+                        width: 718,
+                        height: 480,
+                        maxWidth: '100%',
+                        maxHeight: '100%',
                         backgroundImage: `url(${ shockwaveEntryAuGif })`,
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'center',
-                        backgroundSize: 'contain',
+                        backgroundSize: '718px 480px',
                         imageRendering: 'pixelated',
                         position: 'relative'
                     }}
