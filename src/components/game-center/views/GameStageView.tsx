@@ -82,76 +82,39 @@ export const GameStageView: FC<{}> = () =>
                 userSelect: 'none' 
             }}
         >
-            <Flex 
-                alignItems="center" 
-                justifyContent="between" 
-                className="px-3"
-                style={{ 
-                    height: '40px', 
-                    background: 'linear-gradient(180deg, #2b567a 0%, #1e4160 50%, #173550 51%, #1c3e5d 100%)',
-                    borderBottom: '2px solid #0d2538',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.6)',
-                    zIndex: 10
+            <button
+                type="button"
+                onClick={ handleExitGame }
+                style={{
+                    position: 'absolute',
+                    top: '14px',
+                    right: '16px',
+                    zIndex: 100,
+                    background: 'rgba(15, 23, 42, 0.75)',
+                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    borderRadius: '50%',
+                    width: '34px',
+                    height: '34px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+                    backdropFilter: 'blur(4px)',
+                    transition: 'all 0.15s ease'
                 }}
+                title="Volver al Hotel"
+                onMouseEnter={ (e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.85)') }
+                onMouseLeave={ (e) => (e.currentTarget.style.background = 'rgba(15, 23, 42, 0.75)') }
             >
-                <Flex alignItems="center" gap={ 2 }>
-                    <Text bold variant="white" style={{ fontSize: '13px', textShadow: '0 1px 2px rgba(0,0,0,0.8)', letterSpacing: '0.5px' }}>
-                        🎮 { gameTitle }
-                    </Text>
-                </Flex>
-
-                <Flex alignItems="center" gap={ 2 }>
-                    <Button 
-                        variant="primary" 
-                        size="sm" 
-                        onClick={ handleOpenInNewWindow }
-                        style={{ 
-                            padding: '2px 10px',
-                            fontSize: '11px',
-                            fontWeight: 'bold',
-                            background: '#0284c7',
-                            borderColor: '#0369a1'
-                        }}
-                        title="Abrir juego en pantalla completa / ventana emergente"
-                    >
-                        <FaExternalLinkAlt className="me-1" />
-                        <span>Abrir en ventana</span>
-                    </Button>
-                    <Button 
-                        variant="secondary" 
-                        size="sm" 
-                        onClick={ () => setRetryCount(prev => prev + 1) }
-                        style={{ 
-                            padding: '2px 8px',
-                            fontSize: '11px',
-                            fontWeight: 'bold'
-                        }}
-                        title="Recargar pantalla del juego"
-                    >
-                        <FaRedo className="me-1" />
-                        <span>Recargar</span>
-                    </Button>
-                    <Button 
-                        variant="danger" 
-                        size="sm" 
-                        onClick={ handleExitGame }
-                        style={{ 
-                            padding: '2px 12px',
-                            fontSize: '12px',
-                            fontWeight: 'bold',
-                            boxShadow: '0 0 0 1px rgba(255,255,255,0.4)'
-                        }}
-                    >
-                        <FaTimes className="me-1" />
-                        <span>Volver al Hotel</span>
-                    </Button>
-                </Flex>
-            </Flex>
+                <FaTimes size={ 14 } />
+            </button>
 
             <div style={{ 
                 position: 'relative', 
                 width: '100%', 
-                height: 'calc(100% - 40px)', 
+                height: '100%', 
                 background: 'radial-gradient(circle at center, #132438 0%, #0b1522 60%, #060b12 100%)' 
             }}>
                 { isLoading && !hasError && (

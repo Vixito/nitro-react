@@ -242,7 +242,10 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
                             className="btn-sm flex-grow-1" 
                             onClick={ () => setColorsShowing(false) }
                         >
-                            { LocalizeText('catalog.pets.tab.breeds') || 'Razas' }
+                            { (() => {
+                                const txt = LocalizeText('catalog.pets.tab.breeds');
+                                return (!txt || txt.includes('catalog.pets.')) ? 'Razas' : txt;
+                            })() }
                         </Button>
                         <Button 
                             variant={ colorsShowing ? 'primary' : 'secondary' } 
@@ -250,7 +253,10 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
                             onClick={ () => setColorsShowing(true) }
                         >
                             <FaFillDrip className="fa-icon me-1" />
-                            { LocalizeText('catalog.pets.tab.colors') || 'Colores' }
+                            { (() => {
+                                const txt = LocalizeText('catalog.pets.tab.colors');
+                                return (!txt || txt.includes('catalog.pets.')) ? 'Colores' : txt;
+                            })() }
                         </Button>
                     </Flex>
                 ) }
@@ -263,7 +269,20 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
                             </LayoutGridItem>
                         );
                     }) }
-                    { colorsShowing && (sellableColors.length > 0) && sellableColors.map((colorSet, index) => <LayoutGridItem itemHighlight key={ index } itemActive={ (selectedColorIndex === index) } itemColor={ ColorConverter.int2rgb(colorSet[0]) } className="clear-bg" onClick={ event => setSelectedColorIndex(index) } />) }
+                    { colorsShowing && (sellableColors.length > 0) && sellableColors.map((colorSet, index) => {
+                        const swatchHex = ColorConverter.int2rgb(colorSet[0]);
+                        return (
+                            <LayoutGridItem 
+                                itemHighlight 
+                                key={ index } 
+                                itemActive={ (selectedColorIndex === index) } 
+                                itemColor={ swatchHex } 
+                                style={{ backgroundColor: `${ swatchHex } !important` }} 
+                                className="clear-bg pet-color-swatch" 
+                                onClick={ event => setSelectedColorIndex(index) } 
+                            />
+                        );
+                    }) }
                 </AutoGrid>
             </Column>
             <Column center={ !currentOffer } size={ 5 } overflow="hidden">

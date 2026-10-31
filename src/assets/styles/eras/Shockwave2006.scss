@@ -4937,7 +4937,7 @@ body[data-era="shockwave2006"] {
             background-position: center !important;
             background-repeat: no-repeat !important;
 
-            &:not(.clear-bg) {
+            &:not(.clear-bg):not(.pet-color-swatch) {
                 background-color: #ffffff !important;
 
                 &:hover {
@@ -4952,7 +4952,8 @@ body[data-era="shockwave2006"] {
                 }
             }
 
-            &.clear-bg {
+            &.clear-bg,
+            &.pet-color-swatch {
                 // Muestras de color de la paleta (conservan inline style backgroundColor)
                 &:hover {
                     border-color: #000000 !important;
@@ -8552,22 +8553,38 @@ body[data-era="shockwave2006"] {
 
                     // Celdas de furnis en páginas de productos (usar background-color para NUNCA borrar el backgroundImage inline del furni)
                     .layout-grid-item {
-                        background-color: #ffffff !important;
                         background-repeat: no-repeat !important;
                         background-position: center !important;
                         border: 1px solid #888888 !important;
                         border-radius: 2px !important;
                         image-rendering: pixelated !important;
 
-                        &:hover {
-                            border-color: #000000 !important;
-                            background-color: #f9f9f9 !important;
+                        &:not(.clear-bg):not(.pet-color-swatch) {
+                            background-color: #ffffff !important;
+
+                            &:hover {
+                                border-color: #000000 !important;
+                                background-color: #f9f9f9 !important;
+                            }
+
+                            &.item-active,
+                            &.active {
+                                border: 2px solid #000000 !important;
+                                background-color: #ffffcc !important;
+                            }
                         }
 
-                        &.item-active,
-                        &.active {
-                            border: 2px solid #000000 !important;
-                            background-color: #ffffcc !important;
+                        &.clear-bg,
+                        &.pet-color-swatch {
+                            &:hover {
+                                border-color: #000000 !important;
+                            }
+
+                            &.item-active,
+                            &.active {
+                                border: 2px solid #000000 !important;
+                                outline: 1px dotted #000000 !important;
+                            }
                         }
                     }
 
