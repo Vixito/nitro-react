@@ -64,6 +64,8 @@ export const GameView = () => {
         }
     }, [selectedGame]);
 
+    const controls = useMemo(() => (selectedGame && GAME_CONTROLS[ selectedGame.gameNameId ]) || DEFAULT_CONTROLS, [ selectedGame ]);
+
     if (!selectedGame) return null;
 
     const getBgColour = (): string => {
@@ -101,7 +103,6 @@ export const GameView = () => {
     const hasUnlimited = accountStatus ? accountStatus.hasUnlimitedGames : true;
     const freeGamesLeft = accountStatus ? accountStatus.freeGamesLeft : 5;
 
-    const controls = useMemo(() => GAME_CONTROLS[ selectedGame.gameNameId ] || DEFAULT_CONTROLS, [ selectedGame ]);
     const gameDesc = GAME_DESCRIPTIONS[ selectedGame.gameNameId ] || {
         title: '¡Prepárate para la acción!',
         desc: 'Disfruta de este clásico minijuego multijugador con tus amigos en Habbten.'

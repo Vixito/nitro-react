@@ -234,13 +234,32 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
 
     return (
         <Grid>
-            <Column size={ 7 } overflow="hidden">
+            <Column size={ 7 } overflow="hidden" gap={ 1 }>
+                { (sellableColors.length > 0) && (
+                    <Flex gap={ 1 } className="mb-1">
+                        <Button 
+                            variant={ !colorsShowing ? 'primary' : 'secondary' } 
+                            className="btn-sm flex-grow-1" 
+                            onClick={ () => setColorsShowing(false) }
+                        >
+                            { LocalizeText('catalog.pets.tab.breeds') || 'Razas' }
+                        </Button>
+                        <Button 
+                            variant={ colorsShowing ? 'primary' : 'secondary' } 
+                            className="btn-sm flex-grow-1" 
+                            onClick={ () => setColorsShowing(true) }
+                        >
+                            <FaFillDrip className="fa-icon me-1" />
+                            { LocalizeText('catalog.pets.tab.colors') || 'Colores' }
+                        </Button>
+                    </Flex>
+                ) }
                 <AutoGrid columnCount={ 5 }>
                     { !colorsShowing && (sellablePalettes.length > 0) && sellablePalettes.map((palette, index) =>
                     {
                         return (
                             <LayoutGridItem key={ index } itemActive={ (selectedPaletteIndex === index) } onClick={ event => setSelectedPaletteIndex(index) }>
-                                <LayoutPetImageView typeId={ petIndex } paletteId={ palette.paletteId } direction={ 2 } headOnly={ true } />
+                                <LayoutPetImageView typeId={ petIndex } paletteId={ palette.paletteId } petColor={ getColor } direction={ 2 } headOnly={ true } />
                             </LayoutGridItem>
                         );
                     }) }

@@ -19,6 +19,31 @@ export const GameStageView: FC<{}> = () =>
     const [ hasError, setHasError ] = useState<boolean>(false);
     const [ retryCount, setRetryCount ] = useState<number>(0);
 
+    const handleExitGame = () =>
+    {
+        setGameURL(null);
+    };
+
+    useEffect(() =>
+    {
+        if(!gameURL) return;
+
+        setIsLoading(true);
+        setHasError(false);
+        const timer = setTimeout(() => setIsLoading(false), 400);
+        const handleMessage = (event: MessageEvent) =>
+        {
+            if(event.data === 'EXIT_GAME') handleExitGame();
+        };
+
+        window.addEventListener('message', handleMessage);
+        return () =>
+        {
+            clearTimeout(timer);
+            window.removeEventListener('message', handleMessage);
+        };
+    }, [ gameURL, retryCount ]);
+
     if(!gameURL) return null;
 
     const gameSlug = (() => {
@@ -41,33 +66,10 @@ export const GameStageView: FC<{}> = () =>
     const origin = window.location.origin;
     const directUrl = `${origin}/games/${gameSlug}/index.html${retryCount > 0 ? `?r=${retryCount}` : ''}`;
 
-    const handleExitGame = () =>
-    {
-        setGameURL(null);
-    };
-
     const handleOpenInNewWindow = () =>
     {
         window.open(directUrl, '_blank', 'width=1000,height=600,menubar=no,toolbar=no');
     };
-
-    useEffect(() =>
-    {
-        setIsLoading(true);
-        setHasError(false);
-        const timer = setTimeout(() => setIsLoading(false), 400);
-        const handleMessage = (event: MessageEvent) =>
-        {
-            if(event.data === 'EXIT_GAME') handleExitGame();
-        };
-
-        window.addEventListener('message', handleMessage);
-        return () =>
-        {
-            clearTimeout(timer);
-            window.removeEventListener('message', handleMessage);
-        };
-    }, [ gameURL, retryCount ]);
 
     return (
         <Flex 
