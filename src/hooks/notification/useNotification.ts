@@ -15,6 +15,8 @@ const getTimeZeroPadded = (time: number) =>
 
 let modDisclaimerTimeout: ReturnType<typeof setTimeout> = null;
 
+const isShockwaveEra = () => (typeof document !== 'undefined') && (document.body?.dataset?.era === 'shockwave2006' || document.body?.classList?.contains('era-shockwave-2006'));
+
 const useNotificationState = () =>
 {
     const [ alerts, setAlerts ] = useState<NotificationAlertItem[]>([]);
@@ -92,9 +94,11 @@ const useNotificationState = () =>
         const linkUrl = getNotificationPart(options, type, 'linkUrl', false);
         const image = getNotificationImageUrl(options, type);
 
-        if(options.get('display') === 'BUBBLE' || type.toLowerCase().includes('battlepass') || type.toLowerCase().includes('quest') || type.toLowerCase().includes('reto') || type.toLowerCase().includes('event') || type.toLowerCase().includes('staff') || type.toLowerCase().includes('broadcast'))
+        const isShockwaveBubble = isShockwaveEra() && (type.toLowerCase().includes('event') || type.toLowerCase().includes('staff') || type.toLowerCase().includes('broadcast'));
+
+        if(options.get('display') === 'BUBBLE' || type.toLowerCase().includes('battlepass') || type.toLowerCase().includes('quest') || type.toLowerCase().includes('reto') || isShockwaveBubble)
         {
-            showSingleBubble(LocalizeText(message), NotificationBubbleType.INFO, image, linkUrl, LocalizeText(title));
+            showSingleBubble(LocalizeText(message), NotificationBubbleType.INFO, image, linkUrl, isShockwaveEra() ? LocalizeText(title) : null);
         }
         else
         {
@@ -203,22 +207,28 @@ const useNotificationState = () =>
         const parser = event.getParser();
         const rawMessage = parser.message.replace(/\\r/g, '\r');
 
-        let linkUrl: string = null;
-        const urlMatch = rawMessage.match(/(https?:\/\/[^\s]+)/i);
-        if(urlMatch)
+        if(isShockwaveEra())
         {
-            linkUrl = urlMatch[0];
-        }
-        else
-        {
-            const roomMatch = rawMessage.match(/(?:sala|room|ir a)\s*:?\s*#?([0-9]+)/i);
-            if(roomMatch)
+            let linkUrl: string = null;
+            const urlMatch = rawMessage.match(/(https?:\/\/[^\s]+)/i);
+            if(urlMatch)
             {
-                linkUrl = `navigator/goto/${ roomMatch[1] }`;
+                linkUrl = urlMatch[0];
             }
+            else
+            {
+                const roomMatch = rawMessage.match(/(?:sala|room|ir a)\s*:?\s*#?([0-9]+)/i);
+                if(roomMatch)
+                {
+                    linkUrl = `navigator/goto/${ roomMatch[1] }`;
+                }
+            }
+
+            showSingleBubble(rawMessage, NotificationBubbleType.INFO, null, linkUrl, LocalizeText('notifications.broadcast.title'));
+            return;
         }
 
-        showSingleBubble(rawMessage, NotificationBubbleType.INFO, null, linkUrl, LocalizeText('notifications.broadcast.title'));
+        simpleAlert(rawMessage, null, null, LocalizeText('notifications.broadcast.title'));
     });
 
     useMessageEvent<AchievementNotificationMessageEvent>(AchievementNotificationMessageEvent, event =>
@@ -408,8 +418,14 @@ const useNotificationState = () =>
     useMessageEvent<SimpleAlertMessageEvent>(SimpleAlertMessageEvent, event =>
     {
         const parser = event.getParser();
+        const titleLower = parser.titleMessage ? parser.titleMessage.toLowerCase() : '';
 
-        if (parser.titleMessage && (parser.titleMessage.toLowerCase().includes('pase de batalla') || parser.titleMessage.toLowerCase().includes('reto') || parser.titleMessage.toLowerCase().includes('alerta') || parser.titleMessage.toLowerCase().includes('evento') || parser.titleMessage.toLowerCase().includes('staff') || parser.titleMessage.toLowerCase().includes('hotel') || parser.titleMessage.toLowerCase().includes('broadcast'))) {
+        if (titleLower && (titleLower.includes('pase de batalla') || titleLower.includes('reto'))) {
+            showSingleBubble(LocalizeText(parser.alertMessage), NotificationBubbleType.INFO, null, null, isShockwaveEra() ? LocalizeText(parser.titleMessage) : null);
+            return;
+        }
+
+        if (isShockwaveEra() && titleLower && (titleLower.includes('alerta') || titleLower.includes('evento') || titleLower.includes('staff') || titleLower.includes('hotel') || titleLower.includes('broadcast'))) {
             let linkUrl: string = null;
             const urlMatch = parser.alertMessage.match(/(https?:\/\/[^\s]+)/i);
             if(urlMatch)
@@ -450,7 +466,7 @@ const useNotificationState = () =>
                 modDisclaimerTimeout = null;
             }
 
-            showSingleBubble(LocalizeText('mod.chatdisclaimer'), NotificationBubbleType.INFO, null, null, 'Aviso de Seguridad');
+            showSingleBubble(LocalizeText('mod.chatdisclaimer'), NotificationBubbleType.INFO, null, null, isShockwaveEra() ? 'Aviso de Seguridad' : null);
 
             setModDisclaimerShown(true);
         }

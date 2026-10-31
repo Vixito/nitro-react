@@ -552,7 +552,7 @@ export const BattlePassView: FC<{}> = () => {
                                 <div className="d-flex flex-column gap-2" style={{ minWidth: '190px' }}>
                                     <div className="d-flex align-items-center gap-3">
                                         <div className="bp-avatar-circle">
-                                            <LayoutAvatarImageView figure={userFigure || ''} direction={2} headOnly={true} gesture={AvatarAction.GESTURE_SMILE} scale={1} />
+                                            <LayoutAvatarImageView figure={userFigure || ''} direction={2} headOnly={currentEra === 'shockwave2006'} gesture={AvatarAction.GESTURE_SMILE} scale={currentEra === 'shockwave2006' ? 1 : 1.25} />
                                         </div>
                                         <div className="min-w-0 d-flex flex-column gap-2">
                                             <div className="fw-bold text-dark text-truncate" style={{ fontSize: '17px', maxWidth: '120px' }}>
@@ -580,7 +580,7 @@ export const BattlePassView: FC<{}> = () => {
                                 { /* Next Reward Box */}
                                 {nextReward && (
                                     <div className="d-flex flex-column align-items-start text-start">
-                                        <span className="bp-next-reward-label mb-1">Tu próximo premio es:</span>
+                                        <span className="text-secondary fw-semibold bp-next-reward-label mb-1" style={{ fontSize: '12px' }}>Tu próximo premio es:</span>
                                         <div
                                             className="bp-mini-reward cursor-pointer"
                                             onClick={() => setPreviewReward({ reward: nextReward, isVip: false })}
@@ -598,7 +598,7 @@ export const BattlePassView: FC<{}> = () => {
 
                                 { /* Ranking Starburst */}
                                 <div className="d-flex flex-column align-items-center text-center">
-                                    <span className="bp-ranking-label mb-1">Vas en el puesto</span>
+                                    <span className="text-secondary fw-semibold bp-ranking-label mb-1" style={{ fontSize: '12px' }}>Vas en el puesto</span>
                                     <button
                                         type="button"
                                         className="bp-ranking-star-btn"
@@ -608,7 +608,7 @@ export const BattlePassView: FC<{}> = () => {
                                             {bpData.user.rankPosition || 1}°
                                         </div>
                                     </button>
-                                    <span className="bp-ranking-label mt-1">del ranking</span>
+                                    <span className="bp-ranking-label mt-1" style={{ fontSize: '12.5px', color: '#cbd5e1' }}>del ranking</span>
                                 </div>
 
                             </div>
@@ -698,7 +698,7 @@ export const BattlePassView: FC<{}> = () => {
                 {statusMessage && (
                     <div className={`alert alert-${statusMessage.type} py-1.5 px-3 mb-0 d-flex align-items-center justify-content-between rounded`} style={{ fontSize: '13px' }}>
                         <span>{statusMessage.text}</span>
-                        <button type="button" className="btn-close" onClick={() => setStatusMessage(null)} />
+                        <button type="button" className="btn-close" style={currentEra === 'shockwave2006' ? undefined : { fontSize: '10px' }} onClick={() => setStatusMessage(null)} />
                     </div>
                 )}
 
@@ -708,7 +708,7 @@ export const BattlePassView: FC<{}> = () => {
                     { /* Left Column: Premios Track */}
                     <div className="bp-rewards-column bp-card-box">
                         <div className="d-flex align-items-center justify-content-between pb-2 border-bottom mb-2 px-1">
-                            <span className="fw-bold bp-free-label">GRATIS</span>
+                            <span className="fw-bold text-secondary bp-free-label" style={{ fontSize: '12px' }}>GRATIS</span>
                             <div className="d-flex align-items-center gap-1">
                                 <span className="fw-bold" style={{ fontSize: '12px', color: '#b45309' }}>VIP</span>
                                 {bpData.isVip ? (

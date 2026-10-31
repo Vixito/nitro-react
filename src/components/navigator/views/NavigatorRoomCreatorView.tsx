@@ -2,8 +2,9 @@
 import { CreateFlatMessageComposer, HabboClubLevelEnum } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { GetClubMemberLevel, GetConfiguration, IRoomModel, LocalizeText, SendMessageComposer } from '../../../api';
-import { Button, Flex, LayoutCurrencyIcon, LayoutGridItem, ShockwaveDropdown, Text } from '../../../common';
+import { Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, ShockwaveDropdown, Text } from '../../../common';
 import { useNavigator } from '../../../hooks';
+import { useEraTheme } from '../../../hooks/era/useEraTheme';
 
 export const NavigatorRoomCreatorView: FC<{}> = props =>
 {
@@ -16,6 +17,7 @@ export const NavigatorRoomCreatorView: FC<{}> = props =>
     const [ roomModels, setRoomModels ] = useState<IRoomModel[]>([]);
     const [ selectedModelName, setSelectedModelName ] = useState<string>('');
     const { categories = null } = useNavigator();
+    const { currentEra } = useEraTheme();
 
     const hcDisabled = GetConfiguration<boolean>('hc.disabled', false);
 
@@ -62,6 +64,62 @@ export const NavigatorRoomCreatorView: FC<{}> = props =>
             setSelectedModelName(models[0].name);
         }
     }, []);
+
+    if(currentEra !== 'shockwave2006')
+    {
+        return (
+            <Column overflow="hidden">
+                <Grid overflow="hidden">
+                    <Column size={ 6 } gap={ 1 } overflow="auto">
+                        <Column gap={ 1 }>
+                            <Text>{ LocalizeText('navigator.createroom.roomnameinfo') }</Text>
+                            <input type="text" className="form-control form-control-sm" maxLength={ 60 } value={ name } onChange={ event => setName(event.target.value) } placeholder={ LocalizeText('navigator.createroom.roomnameinfo') } />
+                        </Column>
+                        <Column grow gap={ 1 }>
+                            <Text>{ LocalizeText('navigator.createroom.roomdescinfo') }</Text>
+                            <textarea className="flex-grow-1 form-control form-control-sm w-100" maxLength={ 255 } value={ description } onChange={ event => setDescription(event.target.value) } placeholder={ LocalizeText('navigator.createroom.roomdescinfo') } />
+                        </Column>
+                        <Column gap={ 1 }>
+                            <Text>{ LocalizeText('navigator.category') }</Text>
+                            <select className="form-select form-select-sm" value={ category ?? '' } onChange={ event => setCategory(Number(event.target.value)) }>
+                                { categories && (categories.length > 0) && categories.map(cat => (
+                                    <option key={ cat.id } value={ cat.id }>{ LocalizeText(cat.name) }</option>
+                                )) }
+                            </select>
+                        </Column>
+                        <Column gap={ 1 }>
+                            <Text>{ LocalizeText('navigator.maxvisitors') }</Text>
+                            <select className="form-select form-select-sm" value={ visitorsCount ?? 10 } onChange={ event => setVisitorsCount(Number(event.target.value)) }>
+                                { maxVisitorsList && maxVisitorsList.map(value => (
+                                    <option key={ value } value={ value }>{ value }</option>
+                                )) }
+                            </select>
+                        </Column>
+                        <Column gap={ 1 }>
+                            <Text>{ LocalizeText('navigator.tradesettings') }</Text>
+                            <select className="form-select form-select-sm" value={ tradesSetting } onChange={ event => setTradesSetting(Number(event.target.value)) }>
+                                <option value="0">{ LocalizeText('navigator.roomsettings.trade_not_allowed') }</option>
+                                <option value="1">{ LocalizeText('navigator.roomsettings.trade_not_with_Controller') }</option>
+                                <option value="2">{ LocalizeText('navigator.roomsettings.trade_allowed') }</option>
+                            </select>
+                        </Column>
+                    </Column>
+                    <Column size={ 6 } gap={ 1 } overflow="auto">
+                        { roomModels && (roomModels.length > 0) && roomModels.map((model, index) => (
+                            <LayoutGridItem key={ model.name } onClick={ () => selectModel(model, index) } itemActive={ (selectedModelName === model.name) } overflow="unset" gap={ 0 } className="p-1" disabled={ (GetClubMemberLevel() < model.clubLevel) }>
+                                <Flex fullHeight center overflow="hidden">
+                                    <img alt="" src={ getRoomModelImage(model.name) } />
+                                </Flex>
+                                <Text bold>{ model.tileSize } { LocalizeText('navigator.createroom.tilesize') }</Text>
+                                { !hcDisabled && model.clubLevel > HabboClubLevelEnum.NO_CLUB && <LayoutCurrencyIcon position="absolute" className="top-1 end-1" type="hc" /> }
+                            </LayoutGridItem>
+                        )) }
+                    </Column>
+                </Grid>
+                <Button fullWidth variant={ (!name || (name.length < 3)) ? 'danger' : 'success' } onClick={ createRoom } disabled={ (!name || (name.length < 3)) }>{ LocalizeText('navigator.createroom.create') }</Button>
+            </Column>
+        );
+    }
 
     return (
         <div className="shockwave-room-creator">

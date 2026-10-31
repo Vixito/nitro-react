@@ -1,4 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
+import { useEraTheme } from '../hooks/era/useEraTheme';
 
 export interface IShockwaveDropdownOption {
     value: string | number;
@@ -20,6 +21,7 @@ export const ShockwaveDropdown: FC<IShockwaveDropdownProps> = ({
     className = '',
     disabled = false
 }) => {
+    const { currentEra } = useEraTheme();
     const [ isOpen, setIsOpen ] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -33,6 +35,23 @@ export const ShockwaveDropdown: FC<IShockwaveDropdownProps> = ({
         document.addEventListener('mousedown', handleOutside);
         return () => document.removeEventListener('mousedown', handleOutside);
     }, [ isOpen ]);
+
+    if(currentEra !== 'shockwave2006') {
+        return (
+            <select
+                className={ `form-select form-select-sm ${ className }` }
+                disabled={ disabled }
+                value={ value }
+                onChange={ e => onChange(e.target.value) }
+            >
+                { options.map((opt, idx) => (
+                    <option key={ `${ opt.value }-${ idx }` } value={ opt.value }>
+                        { opt.label }
+                    </option>
+                )) }
+            </select>
+        );
+    }
 
     const selectedOption = options.find(opt => String(opt.value) === String(value)) || options[0];
 

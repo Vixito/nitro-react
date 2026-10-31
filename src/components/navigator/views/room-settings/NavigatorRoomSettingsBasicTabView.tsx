@@ -1,8 +1,9 @@
 import { RoomDeleteComposer, RoomSettingsSaveErrorEvent, RoomSettingsSaveErrorParser } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
+import { FaTimes } from 'react-icons/fa';
 import { CreateLinkEvent, GetMaxVisitorsList, IRoomData, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Base, Column, Flex, ShockwaveDropdown, Text } from '../../../../common';
-import { useMessageEvent, useNavigator, useNotification } from '../../../../hooks';
+import { useEraTheme, useMessageEvent, useNavigator, useNotification } from '../../../../hooks';
 
 const ROOM_NAME_MIN_LENGTH = 3;
 const ROOM_NAME_MAX_LENGTH = 60;
@@ -19,6 +20,7 @@ interface NavigatorRoomSettingsTabViewProps
 export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewProps> = props =>
 {
     const { roomData = null, handleChange = null, onClose = null } = props;
+    const { currentEra } = useEraTheme();
     const [ roomName, setRoomName ] = useState<string>('');
     const [ roomDescription, setRoomDescription ] = useState<string>('');
     const [ roomTag1, setRoomTag1 ] = useState<string>('');
@@ -172,11 +174,18 @@ export const NavigatorRoomSettingsBasicTabView: FC<NavigatorRoomSettingsTabViewP
                 <input className="form-check-input" type="checkbox" checked={ roomData.allowWalkthrough } onChange={ event => handleChange('allow_walkthrough', event.target.checked) } />
                 <Text>{ LocalizeText('navigator.roomsettings.allow_walk_through') }</Text>
             </Flex>
-            <div className="room-settings-delete-row">
-                <button type="button" className="btn btn-danger btn-sm room-delete-btn" onClick={ deleteRoom }>
+            { currentEra === 'shockwave2006' ? (
+                <div className="room-settings-delete-row">
+                    <button type="button" className="btn btn-danger btn-sm room-delete-btn" onClick={ deleteRoom }>
+                        { LocalizeText('navigator.roomsettings.delete') }
+                    </button>
+                </div>
+            ) : (
+                <Text variant="danger" underline bold pointer className="d-flex justify-content-center align-items-center gap-1" onClick={ deleteRoom }>
+                    <FaTimes className="fa-icon" />
                     { LocalizeText('navigator.roomsettings.delete') }
-                </button>
-            </div>
+                </Text>
+            ) }
         </>
     );
 };

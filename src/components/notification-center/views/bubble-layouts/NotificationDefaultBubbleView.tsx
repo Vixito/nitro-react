@@ -1,7 +1,8 @@
 import { FC } from 'react';
 import defaultSecurityIcon from '../../../../assets/images/eras/shockwave_v14/security_badge.png';
 import { CreateLinkEvent, NotificationBubbleItem, OpenUrl } from '../../../../api';
-import { LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps } from '../../../../common';
+import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';
+import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 
 export interface NotificationDefaultBubbleViewProps extends LayoutNotificationBubbleViewProps
 {
@@ -11,8 +12,23 @@ export interface NotificationDefaultBubbleViewProps extends LayoutNotificationBu
 export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProps> = props =>
 {
     const { item = null, onClose = null, classNames = [], ...rest } = props;
+    const { currentEra } = useEraTheme();
     
     const htmlText = item.message.replace(/\r\n|\r|\n/g, '<br />');
+
+    if(currentEra !== 'shockwave2006')
+    {
+        return (
+            <LayoutNotificationBubbleView onClose={ onClose } gap={ 2 } alignItems="center" classNames={ classNames } onClick={ event => (item.linkUrl && item.linkUrl.length && OpenUrl(item.linkUrl)) } { ...rest }>
+                <Flex center className="bubble-image-container">
+                    { (item.iconUrl && item.iconUrl.length) &&
+                        <img className="no-select" src={ item.iconUrl } alt="" /> }
+                </Flex>
+                <Text wrap variant="white" dangerouslySetInnerHTML={ { __html: htmlText } } />
+            </LayoutNotificationBubbleView>
+        );
+    }
+
     const iconSrc = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : defaultSecurityIcon;
     const titleText = item.title || (item.message.toLowerCase().includes('seguridad') || item.message.toLowerCase().includes('conversaciones') ? 'Aviso de Seguridad' : null);
 

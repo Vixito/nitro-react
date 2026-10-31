@@ -167,10 +167,13 @@ const useNavigatorState = () =>
 
             if((parser.data.doorMode === RoomDataParser.NOOB_STATE) && !GetSessionDataManager().isAmbassador && !GetSessionDataManager().isRealNoob && !GetSessionDataManager().isModerator) return;
 
-            setDoorData({
-                roomInfo: parser.data,
-                state: DoorStateType.STATE_PENDING_SERVER
-            });
+            if((typeof document !== 'undefined') && (document.body?.dataset?.era === 'shockwave2006' || document.body?.classList?.contains('era-shockwave-2006')))
+            {
+                setDoorData({
+                    roomInfo: parser.data,
+                    state: DoorStateType.STATE_PENDING_SERVER
+                });
+            }
 
             CreateRoomSession(parser.data.roomId);
         }

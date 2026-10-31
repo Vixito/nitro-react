@@ -44,11 +44,16 @@ export const ERAS_CONFIG: EraInfo[] = [
 ];
 
 const STORAGE_KEY = 'habbten_theme_era';
+let activeEraMemory: EraType | null = null;
+
+const isValidEra = (val: any): val is EraType =>
+    val === 'flash2012' || val === 'shockwave2006' || val === 'modern';
 
 const applyEraToDOM = (era: EraType) =>
 {
     if(typeof document === 'undefined') return;
 
+    activeEraMemory = era;
     document.body.dataset.era = era;
     document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006');
 
@@ -66,28 +71,58 @@ const applyEraToDOM = (era: EraType) =>
     }
 };
 
+const resolveCurrentEra = (): EraType =>
+{
+    // 1. Si ya hay una era activa en memoria o en el DOM (por ejemplo tras cambiar de versión en vivo), respetarla siempre
+    if(isValidEra(activeEraMemory)) return activeEraMemory;
+
+    if(typeof document !== 'undefined' && isValidEra(document.body?.dataset?.era))
+    {
+        activeEraMemory = document.body.dataset.era;
+        return activeEraMemory;
+    }
+
+    // 2. Carga inicial por primera vez
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlEra = urlParams.get('era');
+    if(isValidEra(urlEra))
+    {
+        activeEraMemory = urlEra;
+        return urlEra;
+    }
+
+    try
+    {
+        const parentEra = (window.parent as any)?.HabbtenConfig?.era;
+        if(isValidEra(parentEra))
+        {
+            activeEraMemory = parentEra;
+            return parentEra;
+        }
+    }
+    catch(e) {}
+
+    const m = document.cookie.match(/(?:^|; )habbten_era=([^;]*)/);
+    if(m && isValidEra(m[1]))
+    {
+        activeEraMemory = m[1];
+        return m[1];
+    }
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(isValidEra(saved))
+    {
+        activeEraMemory = saved;
+        return saved;
+    }
+
+    activeEraMemory = 'modern';
+    return 'modern';
+};
+
 export const useEraTheme = () =>
 {
-    const [ currentEra, setCurrentEraState ] = useState<EraType>(() =>
-    {
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlEra = urlParams.get('era') as EraType;
-        if(urlEra === 'flash2012' || urlEra === 'shockwave2006' || urlEra === 'modern') return urlEra;
-
-        try
-        {
-            const parentEra = (window.parent as any)?.HabbtenConfig?.era as EraType;
-            if(parentEra === 'flash2012' || parentEra === 'shockwave2006' || parentEra === 'modern') return parentEra;
-        }
-        catch(e) {}
-
-        const m = document.cookie.match(/(?:^|; )habbten_era=([^;]*)/);
-        if (m && (m[1] === 'flash2012' || m[1] === 'shockwave2006' || m[1] === 'modern')) return m[1] as EraType;
-
-        const saved = (localStorage.getItem(STORAGE_KEY) as EraType) || 'modern';
-        if(saved === 'flash2012' || saved === 'shockwave2006' || saved === 'modern') return saved;
-        return 'modern';
-    });
+    const [ currentEra, setCurrentEraState ] = useState<EraType>(() => resolveCurrentEra());
 
     useEffect(() =>
     {
@@ -95,8 +130,9 @@ export const useEraTheme = () =>
 
         const handleEraChange = (e: CustomEvent<EraType>) =>
         {
-            if(e.detail && e.detail !== currentEra)
+            if(e.detail && isValidEra(e.detail))
             {
+                activeEraMemory = e.detail;
                 setCurrentEraState(e.detail);
                 applyEraToDOM(e.detail);
             }
@@ -108,8 +144,27 @@ export const useEraTheme = () =>
 
     const setEra = useCallback((era: EraType) =>
     {
+        activeEraMemory = era;
         localStorage.setItem(STORAGE_KEY, era);
         document.cookie = `habbten_era=${era}; path=/; max-age=31536000`;
+        try
+        {
+            if((window.parent as any)?.HabbtenConfig)
+            {
+                (window.parent as any).HabbtenConfig.era = era;
+            }
+        }
+        catch(e) {}
+        try
+        {
+            const url = new URL(window.location.href);
+            if(url.searchParams.has('era'))
+            {
+                url.searchParams.set('era', era);
+                window.history.replaceState({}, '', url.toString());
+            }
+        }
+        catch(e) {}
         try {
             fetch('/api/set-era', {
                 method: 'POST',
