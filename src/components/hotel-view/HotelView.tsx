@@ -108,7 +108,7 @@ export const HotelView: FC<{}> = props =>
         </>
     );
 
-    const layout = habbtenConfig?.hotel_view?.custom_layout;
+    const layout = habbtenConfig?.hotel_view?.custom_layouts?.[currentEra] || habbtenConfig?.hotel_view?.custom_layout;
     const customBg = (layout?.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') 
         ? layout.background 
         : backgroundColor;
@@ -311,6 +311,15 @@ export const HotelView: FC<{}> = props =>
 
     if(currentEra === 'shockwave2006')
     {
+        if(validObjects.length > 0)
+        {
+            return (
+                <div className="nitro-hotel-view shockwave-hotel-view" style={ (customBg) ? { background: customBg } : { backgroundColor: '#000000' } }>
+                    { customOverlay }
+                </div>
+            );
+        }
+
         return (
             <div className="nitro-hotel-view shockwave-hotel-view" style={{ backgroundColor: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 <div 
