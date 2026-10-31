@@ -175,6 +175,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
         const nextFilter = val as 'popular' | 'my' | 'fav';
         setPrivateFilter(nextFilter);
         setSelectedRoom(null);
+        setSearchQuery('');
         if(nextFilter === 'my' || nextFilter === 'fav')
         {
             sendSearch('', 'myworld_view');
@@ -188,7 +189,46 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
     const handleSearchSubmit = () =>
     {
         setSelectedRoom(null);
-        sendSearch(searchQuery.trim(), 'hotel_view');
+        const query = searchQuery.trim();
+        if(query.length > 0)
+        {
+            if(privateFilter === 'my' || privateFilter === 'fav')
+            {
+                sendSearch(query, 'myworld_view');
+            }
+            else
+            {
+                sendSearch(query, 'hotel_view');
+            }
+        }
+        else
+        {
+            if(privateFilter === 'my' || privateFilter === 'fav')
+            {
+                sendSearch('', 'myworld_view');
+            }
+            else
+            {
+                sendSearch('', 'hotel_view');
+            }
+        }
+    };
+
+    const handleSearchChange = (val: string) =>
+    {
+        setSearchQuery(val);
+        if(val.trim() === '' && searchQuery.trim() !== '')
+        {
+            setSelectedRoom(null);
+            if(privateFilter === 'my' || privateFilter === 'fav')
+            {
+                sendSearch('', 'myworld_view');
+            }
+            else
+            {
+                sendSearch('', 'hotel_view');
+            }
+        }
     };
 
     const handleSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) =>
@@ -203,7 +243,6 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
 
         if(mainTab === 'private' && privateFilter === 'fav')
         {
-            // En "Salas favoritas" NUNCA mostrar todas las salas del usuario si no ha marcado ninguna como favorita
             if(hasLoadedFavs && favRoomIds.length === 0) return [];
 
             for(const group of searchResult.results)
@@ -221,43 +260,55 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                     }
                 }
             }
-            return list;
         }
-
-        if(mainTab === 'private' && privateFilter === 'my')
+        else if(mainTab === 'private' && privateFilter === 'my')
         {
             const myUserId = GetSessionDataManager().userId;
+            const myUserName = (GetSessionDataManager().userName || '').toLowerCase();
             for(const group of searchResult.results)
             {
                 if(!group || !group.rooms) continue;
                 const code = (group.code || '').toLowerCase();
-                const isMyGroup = code.includes('my') || code.includes('own');
+                const isMyGroup = code.includes('my') || code.includes('own') || code === 'guest_me';
 
                 for(const r of group.rooms)
                 {
-                    if((isMyGroup || r.ownerId === myUserId) && !list.some(existing => existing.roomId === r.roomId))
+                    const isMine = isMyGroup || r.ownerId === myUserId || (r.ownerName && r.ownerName.toLowerCase() === myUserName);
+                    if(isMine && !list.some(existing => existing.roomId === r.roomId))
                     {
                         list.push(r);
                     }
                 }
             }
-            return list;
         }
-
-        for(const group of searchResult.results)
+        else
         {
-            if(!group || !group.rooms) continue;
-            for(const r of group.rooms)
+            for(const group of searchResult.results)
             {
-                if(!list.some(existing => existing.roomId === r.roomId))
+                if(!group || !group.rooms) continue;
+                for(const r of group.rooms)
                 {
-                    list.push(r);
+                    if(!list.some(existing => existing.roomId === r.roomId))
+                    {
+                        list.push(r);
+                    }
                 }
             }
         }
 
+        const q = searchQuery.trim().toLowerCase();
+        if(q.length > 0)
+        {
+            return list.filter(r =>
+                (r.roomName && r.roomName.toLowerCase().includes(q)) ||
+                (r.description && r.description.toLowerCase().includes(q)) ||
+                (r.tags && r.tags.some(t => t.toLowerCase().includes(q))) ||
+                (r.ownerName && r.ownerName.toLowerCase().includes(q))
+            );
+        }
+
         return list;
-    }, [ searchResult, mainTab, privateFilter, favRoomIds, hasLoadedFavs ]);
+    }, [ searchResult, mainTab, privateFilter, favRoomIds, hasLoadedFavs, searchQuery ]);
 
     const executeVisitRoom = (roomData: RoomDataParser) =>
     {
@@ -487,7 +538,7 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                                         type="text"
                                         className="nav-pill-input"
                                         value={ searchQuery }
-                                        onChange={ e => setSearchQuery(e.target.value) }
+                                        onChange={ e => handleSearchChange(e.target.value) }
                                         onKeyDown={ handleSearchKeyDown }
                                     />
                                     <button
