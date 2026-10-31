@@ -36,7 +36,11 @@ export const MainView: FC<{}> = props =>
     const [ landingViewVisible, setLandingViewVisible ] = useState(true);
 
     useRoomSessionManagerEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, event => setLandingViewVisible(false));
-    useRoomSessionManagerEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, event => setLandingViewVisible(event.openLandingView));
+    useRoomSessionManagerEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, event =>
+    {
+        if(document.body.style.cursor === 'pointer') document.body.style.cursor = 'default';
+        setLandingViewVisible(event.openLandingView);
+    });
 
     useEffect(() =>
     {

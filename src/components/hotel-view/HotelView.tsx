@@ -28,6 +28,7 @@ export const HotelView: FC<{}> = props =>
                 setIsVisible(false);
                 return;
             case RoomSessionEvent.ENDED:
+                if(document.body.style.cursor === 'pointer') document.body.style.cursor = 'default';
                 setIsVisible(event.openLandingView);
                 return;
         }
@@ -35,6 +36,7 @@ export const HotelView: FC<{}> = props =>
 
     useEffect(() => {
         if (!isVisible) return;
+        if(document.body.style.cursor === 'pointer') document.body.style.cursor = 'default';
         const fetchStats = async () => {
             try {
                 const response = await fetch('/api/stats');

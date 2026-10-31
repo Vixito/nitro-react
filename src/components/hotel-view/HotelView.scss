@@ -4,6 +4,15 @@
 	width: 100%;
 	height: calc(100% - 55px);
 	background: rgba($black, 1);
+    cursor: default;
+
+    &.shockwave-hotel-view {
+        cursor: default;
+
+        .shockwave-hotel-entry {
+            cursor: default;
+        }
+    }
 
     body.era-shockwave-2006 &,
     body[data-era="shockwave2006"] & {

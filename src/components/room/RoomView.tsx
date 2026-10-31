@@ -20,6 +20,10 @@ export const RoomView: FC<{}> = props =>
         canvas.onmousemove = event => DispatchMouseEvent(event);
         canvas.onmousedown = event => DispatchMouseEvent(event);
         canvas.onmouseup = event => DispatchMouseEvent(event);
+        canvas.onmouseleave = () =>
+        {
+            if(document.body.style.cursor === 'pointer') document.body.style.cursor = 'default';
+        };
 
         canvas.ontouchstart = event => DispatchTouchEvent(event);
         canvas.ontouchmove = event => DispatchTouchEvent(event);
@@ -32,6 +36,14 @@ export const RoomView: FC<{}> = props =>
 
         element.appendChild(canvas);
     }, []);
+
+    useEffect(() =>
+    {
+        if(!roomSession)
+        {
+            if(document.body.style.cursor === 'pointer') document.body.style.cursor = 'default';
+        }
+    }, [ roomSession ]);
 
     return (
         <Base fit innerRef={ elementRef } className={ (!roomSession && 'd-none') }>
