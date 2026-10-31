@@ -106,31 +106,6 @@ const useNavigatorState = () =>
     {
         const parser = event.getParser();
 
-        if(parser.data)
-        {
-            setSearchResult(prevValue =>
-            {
-                if(!prevValue || !prevValue.results) return prevValue;
-
-                let didUpdate = false;
-
-                for(const group of prevValue.results)
-                {
-                    if(!group.rooms) continue;
-
-                    const index = group.rooms.findIndex(r => r.roomId === parser.data.roomId);
-
-                    if(index !== -1)
-                    {
-                        group.rooms[index] = parser.data;
-                        didUpdate = true;
-                    }
-                }
-
-                return didUpdate ? { ...prevValue } : prevValue;
-            });
-        }
-
         if(parser.roomEnter)
         {
             setDoorData({ roomInfo: null, state: DoorStateType.NONE });

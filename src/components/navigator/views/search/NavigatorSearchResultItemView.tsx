@@ -15,7 +15,7 @@ export interface NavigatorSearchResultItemViewProps extends LayoutGridItemProps
 export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProps> = props =>
 {
     const { roomData = null, children = null, thumbnail = false, ...rest } = props;
-    const { setDoorData = null, navigatorData = null } = useNavigator();
+    const { setDoorData = null } = useNavigator();
     const { roomSession = null } = useRoom();
 
     const effectiveUserCount = useMemo(() =>
@@ -31,12 +31,8 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
             }
             return Math.max(roomData.userCount, activeCount);
         }
-        if(navigatorData?.enteredGuestRoom && navigatorData.enteredGuestRoom.roomId === roomData.roomId)
-        {
-            return Math.max(roomData.userCount, navigatorData.enteredGuestRoom.userCount);
-        }
         return roomData.userCount;
-    }, [ roomData, roomSession, navigatorData ]);
+    }, [ roomData, roomSession ]);
 
     const getUserCounterColor = () =>
     {

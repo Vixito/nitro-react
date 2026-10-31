@@ -1,8 +1,8 @@
 import { Dispose, DropBounce, EaseOut, ILinkEventTracker, JumpBy, Motions, NitroSettingsEvent, NitroToolbarAnimateIconEvent, PerkAllowancesMessageEvent, PerkEnum, Queue, UserSettingsEvent, UserSettingsSoundComposer, Wait } from '@nitrots/nitro-renderer';
 import { FC, useState, useRef, useEffect } from 'react';
 import { AddEventLinkTracker, CreateLinkEvent, DispatchMainEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, RemoveLinkEventTracker, SendMessageComposer, VisitDesktop } from '../../api';
-import { Base, Flex, LayoutAvatarImageView, LayoutItemCountView, TransitionAnimation, TransitionAnimationTypes } from '../../common';
-import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useRoomEngineEvent, useSessionInfo } from '../../hooks';
+import { Base, Flex, LayoutAvatarImageView, LayoutCurrencyIcon, LayoutItemCountView, TransitionAnimation, TransitionAnimationTypes } from '../../common';
+import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, usePurse, useRoomEngineEvent, useSessionInfo } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { ToolbarMeView } from './ToolbarMeView';
 
@@ -15,6 +15,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { userFigure = null } = useSessionInfo();
     const { getFullCount = 0 } = useInventoryUnseenTracker();
     const { getTotalUnseen = 0 } = useAchievements();
+    const { purse = null } = usePurse();
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
     const isMod = GetSessionDataManager() ? GetSessionDataManager().isModerator : false;
@@ -296,8 +297,40 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                                 { (getTotalUnseen > 0) && <LayoutItemCountView count={ getTotalUnseen } /> }
                             </div>
 
-                            {/* Chat input integrado como cápsula clásica en la izquierda */}
-                            <div id="toolbar-chat-input-container" className="chat-container-shockwave2006" />
+                            {/* Chat input en sala, o Economía del usuario en la Vista del Hotel */}
+                            { isInRoom ? (
+                                <div id="toolbar-chat-input-container" className="chat-container-shockwave2006" />
+                            ) : (
+                                <div className="shockwave-hotel-economy">
+                                    <div
+                                        className="shockwave-economy-pill"
+                                        onMouseEnter={ () => setShockwaveHoverText(`${ purse?.credits ?? 0 } Créditos`) }
+                                        onMouseLeave={ () => setShockwaveHoverText('') }
+                                        onClick={ () => CreateLinkEvent('catalog/open') }
+                                    >
+                                        <LayoutCurrencyIcon type={ -1 } />
+                                        <span className="shockwave-economy-value">{ purse?.credits ?? 0 }</span>
+                                    </div>
+                                    <div
+                                        className="shockwave-economy-pill"
+                                        onMouseEnter={ () => setShockwaveHoverText(`${ purse?.activityPoints?.get(0) ?? 0 } Duckets`) }
+                                        onMouseLeave={ () => setShockwaveHoverText('') }
+                                        onClick={ () => CreateLinkEvent('catalog/open') }
+                                    >
+                                        <LayoutCurrencyIcon type={ 0 } />
+                                        <span className="shockwave-economy-value">{ purse?.activityPoints?.get(0) ?? 0 }</span>
+                                    </div>
+                                    <div
+                                        className="shockwave-economy-pill"
+                                        onMouseEnter={ () => setShockwaveHoverText(`${ purse?.activityPoints?.get(5) ?? 0 } Diamantes`) }
+                                        onMouseLeave={ () => setShockwaveHoverText('') }
+                                        onClick={ () => CreateLinkEvent('catalog/open') }
+                                    >
+                                        <LayoutCurrencyIcon type={ 5 } />
+                                        <span className="shockwave-economy-value">{ purse?.activityPoints?.get(5) ?? 0 }</span>
+                                    </div>
+                                </div>
+                            ) }
 
                             {/* Etiqueta instantánea Shockwave 2006 debajo del chat al hacer hover */}
                             <div className="toolbar-shockwave-hover-label">

@@ -65,28 +65,15 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
             }
             return Math.max(room.userCount, activeCount);
         }
-        if(navigatorData?.enteredGuestRoom && navigatorData.enteredGuestRoom.roomId === room.roomId)
-        {
-            return navigatorData.enteredGuestRoom.userCount;
-        }
         return room.userCount;
-    }, [ roomSession, navigatorData ]);
+    }, [ roomSession ]);
 
     const handleSelectRoom = useCallback((room: RoomDataParser) =>
     {
         setLoadingRoom(null);
         setIsHotelViewSelected(false);
         setSelectedRoom(room);
-        SendMessageComposer(new GetGuestRoomMessageComposer(room.roomId, false, false));
     }, []);
-
-    useEffect(() =>
-    {
-        if(selectedRoom && navigatorData?.enteredGuestRoom && navigatorData.enteredGuestRoom.roomId === selectedRoom.roomId)
-        {
-            setSelectedRoom(navigatorData.enteredGuestRoom);
-        }
-    }, [ navigatorData?.enteredGuestRoom, selectedRoom ]);
 
     useMessageEvent<FavouritesEvent>(FavouritesEvent, event =>
     {
@@ -214,19 +201,6 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
         if(!searchResult || !searchResult.results) return [];
         const list: RoomDataParser[] = [];
 
-        const pushOrUpdate = (r: RoomDataParser) =>
-        {
-            const existingIndex = list.findIndex(existing => existing.roomId === r.roomId);
-            if(existingIndex === -1)
-            {
-                list.push(r);
-            }
-            else if(r.userCount > list[existingIndex].userCount)
-            {
-                list[existingIndex] = r;
-            }
-        };
-
         if(mainTab === 'private' && privateFilter === 'fav')
         {
             // En "Salas favoritas" NUNCA mostrar todas las salas del usuario si no ha marcado ninguna como favorita
@@ -241,9 +215,9 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
                 for(const r of group.rooms)
                 {
                     const isExplicitFav = favRoomIds.includes(r.roomId) || (!hasLoadedFavs && isFavGroup);
-                    if(isExplicitFav)
+                    if(isExplicitFav && !list.some(existing => existing.roomId === r.roomId))
                     {
-                        pushOrUpdate(r);
+                        list.push(r);
                     }
                 }
             }
@@ -261,9 +235,9 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
 
                 for(const r of group.rooms)
                 {
-                    if(isMyGroup || r.ownerId === myUserId)
+                    if((isMyGroup || r.ownerId === myUserId) && !list.some(existing => existing.roomId === r.roomId))
                     {
-                        pushOrUpdate(r);
+                        list.push(r);
                     }
                 }
             }
@@ -275,7 +249,10 @@ export const NavigatorShockwaveView: FC<NavigatorShockwaveViewProps> = ({
             if(!group || !group.rooms) continue;
             for(const r of group.rooms)
             {
-                pushOrUpdate(r);
+                if(!list.some(existing => existing.roomId === r.roomId))
+                {
+                    list.push(r);
+                }
             }
         }
 

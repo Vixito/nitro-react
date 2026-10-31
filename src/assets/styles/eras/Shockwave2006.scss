@@ -304,6 +304,40 @@ body[data-era="shockwave2006"] {
             margin: 0 !important;
             position: relative !important;
 
+            .shockwave-hotel-economy {
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                background: #2a2a2a !important;
+                border: 1px solid #1a1a1a !important;
+                border-top: 1px solid #444444 !important;
+                border-radius: 4px !important;
+                padding: 2px 6px !important;
+                height: 22px !important;
+                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+                cursor: pointer !important;
+
+                .shockwave-economy-pill {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 3px !important;
+
+                    .layout-currency-icon {
+                        transform: scale(0.8) !important;
+                        image-rendering: pixelated !important;
+                    }
+
+                    .shockwave-economy-value {
+                        font-family: 'Volter (Goldfish)', 'Volter', Tahoma, sans-serif !important;
+                        font-size: 8px !important;
+                        line-height: 9px !important;
+                        color: #ffffff !important;
+                        text-shadow: 1px 1px 0px #000000 !important;
+                        -webkit-font-smoothing: none !important;
+                    }
+                }
+            }
+
             .toolbar-shockwave-hover-label {
                 position: absolute !important;
                 bottom: 0px !important;
