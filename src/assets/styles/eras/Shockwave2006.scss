@@ -3598,6 +3598,20 @@ body[data-era="shockwave2006"] {
                     outline: 1px dotted #000000 !important;
                 }
 
+                &.pet-color-swatch {
+                    padding: 3px !important;
+                    background-color: #ece9d8 !important;
+
+                    &:hover {
+                        background-color: #f5f4ea !important;
+                    }
+
+                    &.active {
+                        background-color: #316ac5 !important;
+                        outline: 1px solid #000000 !important;
+                    }
+                }
+
                 .badge,
                 [class*="count"] {
                     background: #cfcbc0 !important;
@@ -3776,6 +3790,20 @@ body[data-era="shockwave2006"] {
                     border-color: #000000 !important;
                     background-color: #ffffcc !important;
                     outline: 1px dotted #000000 !important;
+                }
+
+                &.pet-color-swatch {
+                    padding: 3px !important;
+                    background-color: #ece9d8 !important;
+
+                    &:hover {
+                        background-color: #f5f4ea !important;
+                    }
+
+                    &.active {
+                        background-color: #316ac5 !important;
+                        outline: 1px solid #000000 !important;
+                    }
                 }
             }
 

@@ -265,7 +265,7 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
                     {
                         return (
                             <LayoutGridItem key={ index } itemActive={ (selectedPaletteIndex === index) } onClick={ event => setSelectedPaletteIndex(index) }>
-                                <LayoutPetImageView typeId={ petIndex } paletteId={ palette.paletteId } petColor={ getColor } direction={ 2 } headOnly={ true } />
+                                <LayoutPetImageView typeId={ petIndex } paletteId={ palette.paletteId } direction={ 2 } headOnly={ true } />
                             </LayoutGridItem>
                         );
                     }) }
@@ -277,10 +277,20 @@ export const CatalogLayoutPetView: FC<CatalogLayoutProps> = props =>
                                 key={ index } 
                                 itemActive={ (selectedColorIndex === index) } 
                                 itemColor={ swatchHex } 
-                                style={{ backgroundColor: `${ swatchHex } !important` }} 
-                                className="clear-bg pet-color-swatch" 
+                                className="pet-color-swatch d-flex align-items-center justify-content-center p-1" 
                                 onClick={ event => setSelectedColorIndex(index) } 
-                            />
+                            >
+                                <div 
+                                    className="w-100 h-100 rounded-1" 
+                                    style={{ 
+                                        backgroundColor: swatchHex, 
+                                        minWidth: '22px', 
+                                        minHeight: '22px',
+                                        border: (selectedColorIndex === index) ? '2px solid #000' : '1px solid rgba(0,0,0,0.3)',
+                                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4)'
+                                    }} 
+                                />
+                            </LayoutGridItem>
                         );
                     }) }
                 </AutoGrid>
