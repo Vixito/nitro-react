@@ -1,8 +1,9 @@
 import { NitroConfiguration, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { GetConfiguration } from '../../api';
+import shockwaveEntryAuImg from '../../assets/images/eras/shockwave_v14/hh_entry_au.png';
 import { LayoutAvatarImageView } from '../../common';
-import { useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
+import { useEraTheme, useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
 import { WidgetSlotView } from './views/widgets/WidgetSlotView';
 
 const widgetSlotCount = 7;
@@ -12,6 +13,7 @@ const CANVAS_H = 768;
 export const HotelView: FC<{}> = props =>
 {
     const [ isVisible, setIsVisible ] = useState(true);
+    const { currentEra } = useEraTheme();
     const { userFigure = null, userInfo = null } = useSessionInfo();
     const [ onlineUsers, setOnlineUsers ] = useState(0);
     const [ layoutState, setLayoutState ] = useState<Record<string, any>>({});
@@ -304,6 +306,29 @@ export const HotelView: FC<{}> = props =>
             })}
         </div>
     ) : null;
+
+    if(currentEra === 'shockwave2006')
+    {
+        return (
+            <div className="nitro-hotel-view shockwave-hotel-view" style={{ backgroundColor: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <div 
+                    className="shockwave-hotel-entry"
+                    style={{
+                        width: 718,
+                        height: 480,
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        backgroundImage: `url(${ shockwaveEntryAuImg })`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center',
+                        backgroundSize: 'contain',
+                        imageRendering: 'pixelated',
+                        position: 'relative'
+                    }}
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : (backgroundColor ? { background: backgroundColor } : {}) }>
