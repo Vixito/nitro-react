@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import defaultSecurityIcon from '../../../../assets/images/eras/shockwave_v14/security_badge.png';
-import { CreateLinkEvent, NotificationBubbleItem, OpenUrl } from '../../../../api';
+import { CreateLinkEvent, LocalizeText, NotificationBubbleItem, OpenUrl } from '../../../../api';
 import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';
 import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 
@@ -30,7 +30,36 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     }
 
     const iconSrc = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : defaultSecurityIcon;
-    const titleText = item.title || (item.message.toLowerCase().includes('seguridad') || item.message.toLowerCase().includes('conversaciones') ? 'Aviso de Seguridad' : null);
+    let titleText = item.title || (item.message.toLowerCase().includes('seguridad') || item.message.toLowerCase().includes('conversaciones') ? 'Aviso de Seguridad' : null);
+
+    if (titleText)
+    {
+        const rawKey = titleText.replace(/^\$\{/, '').replace(/\}$/, '');
+        if (rawKey.startsWith('notification.'))
+        {
+            const localized = LocalizeText(rawKey);
+            if (localized && localized !== rawKey && !localized.startsWith('notification.'))
+            {
+                titleText = localized;
+            }
+            else if (rawKey.includes('battlepass'))
+            {
+                titleText = '¡Reto Completado!';
+            }
+            else if (rawKey.includes('badge'))
+            {
+                titleText = '¡Placa Recibida!';
+            }
+            else if (rawKey.includes('gift'))
+            {
+                titleText = '¡Regalo Recibido!';
+            }
+            else
+            {
+                titleText = 'Aviso';
+            }
+        }
+    }
 
     const isCurrencyOrReward = Boolean(
         (titleText && /(diamante|crédito|ducket|reward|premio|moneda|gift)/i.test(titleText)) ||
