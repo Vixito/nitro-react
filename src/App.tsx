@@ -239,6 +239,7 @@ export const App: FC<{}> = props =>
                 setTimeout(() => {
                     debugLog('Transitioning to isReady=true');
                     setIsReady(true);
+                    try { window.parent?.postMessage({ type: 'NITRO_READY' }, '*'); } catch(e) {}
                 }, 200);
                 return;
             case NitroLocalizationEvent.LOADED: {
