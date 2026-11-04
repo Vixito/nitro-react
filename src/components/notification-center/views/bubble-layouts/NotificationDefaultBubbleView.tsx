@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import defaultSecurityIcon from '../../../../assets/images/eras/shockwave_v14/security_badge.png';
+import safetyDinoIcon from '../../../../assets/images/eras/shockwave_v14/safety_dino.png';
 import { CreateLinkEvent, LocalizeText, NotificationBubbleItem, OpenUrl } from '../../../../api';
 import { Flex, LayoutNotificationBubbleView, LayoutNotificationBubbleViewProps, Text } from '../../../../common';
 import { useEraTheme } from '../../../../hooks/era/useEraTheme';
@@ -16,21 +17,28 @@ export const NotificationDefaultBubbleView: FC<NotificationDefaultBubbleViewProp
     
     const htmlText = item.message.replace(/\r\n|\r|\n/g, '<br />');
 
+    const isSecurity = Boolean(
+        (item.title && /(seguridad|disclaimer)/i.test(item.title)) ||
+        (item.message && /(conversaciones|seguridad)/i.test(item.message))
+    );
+
     if(currentEra !== 'shockwave2006')
     {
+        const iconToShow = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : (isSecurity ? safetyDinoIcon : null);
         return (
             <LayoutNotificationBubbleView onClose={ onClose } gap={ 2 } alignItems="center" classNames={ classNames } onClick={ event => (item.linkUrl && item.linkUrl.length && OpenUrl(item.linkUrl)) } { ...rest }>
-                <Flex center className="bubble-image-container">
-                    { (item.iconUrl && item.iconUrl.length) &&
-                        <img className="no-select" src={ item.iconUrl } alt="" /> }
-                </Flex>
+                { iconToShow && (
+                    <Flex center className="bubble-image-container">
+                        <img className="no-select" src={ iconToShow } alt="" />
+                    </Flex>
+                ) }
                 <Text wrap variant="white" dangerouslySetInnerHTML={ { __html: htmlText } } />
             </LayoutNotificationBubbleView>
         );
     }
 
-    const iconSrc = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : defaultSecurityIcon;
-    let titleText = item.title || (item.message.toLowerCase().includes('seguridad') || item.message.toLowerCase().includes('conversaciones') ? 'Aviso de Seguridad' : null);
+    const iconSrc = (item.iconUrl && item.iconUrl.length) ? item.iconUrl : (isSecurity ? safetyDinoIcon : defaultSecurityIcon);
+    let titleText = item.title || (isSecurity ? 'Aviso de Seguridad' : null);
 
     if (titleText)
     {
