@@ -211,51 +211,39 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                                 <span className="avatar-label">Salas</span>
                             </div>
                         )}
-                        <div className="toolbar-divider" />
                         <div className="navigation-item item-games icon-games" title="Centro de Juegos" onClick={ () => CreateLinkEvent('gamecenter/toggle') }>
                             <i className="toolbar-icon icon-games" />
                             <span className="avatar-label">Juegos</span>
                         </div>
-                        <div className="toolbar-divider" />
-                        <div className="navigation-item item-quests icon-quests" title="Misiones" onClick={ () => CreateLinkEvent('quest-engine/toggle') }>
-                            <i className="toolbar-icon icon-quests" />
-                            <span className="avatar-label">Misiones</span>
+                        <div className="navigation-item item-battlepass icon-battlepass" title="Pase de Batalla" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                            <i className="toolbar-icon icon-battlepass" />
+                            <span className="avatar-label">Pase de Batalla</span>
                         </div>
-                        <div className="toolbar-divider" />
                         <div className="navigation-item item-achievements icon-achievements" title="Logros y Recompensas" onClick={ () => CreateLinkEvent('achievements/toggle') }>
                             <i className="toolbar-icon icon-achievements" />
                             <span className="avatar-label">Logros</span>
                         </div>
-                        <div className="toolbar-divider" />
                         <div className="navigation-item item-catalog icon-catalog" title="Tienda de Habbten" onClick={ () => CreateLinkEvent('catalog/toggle') }>
                             <i className="toolbar-icon icon-catalog" />
                             <span className="avatar-label">Tienda</span>
                         </div>
-                        <div className="toolbar-divider" />
                         <div className="navigation-item item-inventory icon-inventory" title="Inventario" onClick={ () => CreateLinkEvent('inventory/toggle') }>
                             <i className="toolbar-icon icon-inventory" />
                             { (getFullCount > 0) && <LayoutItemCountView count={ getFullCount } /> }
                             <span className="avatar-label">Cosas</span>
                         </div>
                         { isMod && (
-                            <>
-                                <div className="toolbar-divider" />
-                                <div className="navigation-item item-modtools icon-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
-                                    <i className="toolbar-icon icon-modtools" />
-                                    <span className="avatar-label">Mod</span>
-                                </div>
-                            </>
+                            <div className="navigation-item item-modtools icon-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
+                                <i className="toolbar-icon icon-modtools" />
+                                <span className="avatar-label">Mod</span>
+                            </div>
                         )}
                         { isInRoom && (
-                            <>
-                                <div className="toolbar-divider" />
-                                <div className="navigation-item item-camera icon-camera" title="Cámara" onClick={ () => CreateLinkEvent('camera/toggle') }>
-                                    <i className="toolbar-icon icon-camera" />
-                                    <span className="avatar-label">Cámara</span>
-                                </div>
-                            </>
+                            <div className="navigation-item item-camera icon-camera" title="Cámara" onClick={ () => CreateLinkEvent('camera/toggle') }>
+                                <i className="toolbar-icon icon-camera" />
+                                <span className="avatar-label">Cámara</span>
+                            </div>
                         )}
-                        <div className="toolbar-divider" />
                         <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } title="Mi Personaje" onClick={ () => setMeExpanded(!isMeExpanded) }>
                             <div className="avatar-circle">
                                 <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headOnly={ true } />

@@ -16,7 +16,7 @@ body[data-era="flash2012"] {
         top: 65px !important;
         left: 8px !important;
         bottom: auto !important;
-        width: 72px !important;
+        width: 84px !important;
         height: auto !important;
         max-height: calc(100vh - 120px) !important;
         z-index: 1020 !important;
@@ -33,29 +33,21 @@ body[data-era="flash2012"] {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            width: 70px !important;
+            width: 84px !important;
             background: #46423c !important;
-            border: 1px solid #5a554e !important;
+            border: 1px solid #2b2723 !important;
             border-radius: 8px !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.6) !important;
             padding: 6px 0 !important;
             gap: 2px !important;
         }
 
-        .toolbar-divider {
-            width: 54px !important;
-            height: 1px !important;
-            background: rgba(0, 0, 0, 0.5) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-            margin: 3px 0 !important;
-        }
-
         .navigation-item {
             position: relative !important;
-            width: 62px !important;
-            height: 52px !important;
-            min-width: 62px !important;
-            min-height: 52px !important;
+            width: 78px !important;
+            height: 74px !important;
+            min-width: 78px !important;
+            min-height: 74px !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
@@ -66,7 +58,7 @@ body[data-era="flash2012"] {
             box-shadow: none !important;
             cursor: pointer !important;
             transition: transform 0.12s ease, background-color 0.12s ease !important;
-            padding: 2px 0 !important;
+            padding: 4px 0 !important;
             margin: 0 !important;
 
             &:hover {
@@ -92,61 +84,66 @@ body[data-era="flash2012"] {
                 background-repeat: no-repeat !important;
                 background-position: center !important;
                 background-size: contain !important;
+                image-rendering: pixelated !important;
                 filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)) !important;
                 transition: filter 0.1s ease !important;
 
-                &.icon-hotel,
+                &.icon-hotel {
+                    width: 28px !important;
+                    height: 28px !important;
+                    background-image: url('@/assets/images/toolbar/icons/habbo.png') !important;
+                }
+
                 &.icon-rooms {
-                    width: 36px !important;
-                    height: 32px !important;
-                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_rooms_iso.png') !important;
+                    width: 44px !important;
+                    height: 30px !important;
+                    background-image: url('@/assets/images/toolbar/icons/rooms.png') !important;
                 }
 
                 &.icon-games {
-                    width: 36px !important;
+                    width: 44px !important;
                     height: 25px !important;
-                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_games.png') !important;
+                    background-image: url('@/assets/images/toolbar/icons/game.png') !important;
                 }
 
+                &.icon-battlepass,
                 &.icon-quests {
                     width: 28px !important;
-                    height: 32px !important;
-                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_quests.png') !important;
+                    height: 31px !important;
+                    background-image: url('@/assets/images/toolbar/icons/quest.png') !important;
                 }
 
                 &.icon-achievements {
-                    width: 32px !important;
-                    height: 32px !important;
-                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_achievements.png') !important;
+                    width: 31px !important;
+                    height: 30px !important;
+                    background-image: url('@/assets/images/toolbar/icons/me-menu/achievements.png') !important;
                 }
 
                 &.icon-catalog,
                 &.icon-shop {
-                    width: 32px !important;
-                    height: 32px !important;
-                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_shop.png') !important;
+                    width: 37px !important;
+                    height: 37px !important;
+                    background-image: url('@/assets/images/toolbar/icons/catalog.png') !important;
                 }
 
                 &.icon-inventory {
-                    width: 32px !important;
-                    height: 32px !important;
-                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_inventory.png') !important;
+                    width: 44px !important;
+                    height: 41px !important;
+                    background-image: url('@/assets/images/toolbar/icons/inventory.png') !important;
                 }
 
                 &.icon-modtools {
-                    width: 28px !important;
-                    height: 28px !important;
-                    background-image: url('@/assets/images/eras/illumina/spritesheet.png') !important;
-                    background-position: -158px -49px !important;
-                    background-size: auto !important;
+                    width: 29px !important;
+                    height: 34px !important;
+                    background-image: url('@/assets/images/toolbar/icons/modtools.png') !important;
+                    background-position: center !important;
                 }
 
                 &.icon-camera {
-                    width: 28px !important;
-                    height: 28px !important;
-                    background-image: url('@/assets/images/eras/illumina/spritesheet.png') !important;
-                    background-position: -226px -49px !important;
-                    background-size: auto !important;
+                    width: 38px !important;
+                    height: 45px !important;
+                    background-image: url('@/assets/images/toolbar/icons/camera.png') !important;
+                    background-position: center !important;
                 }
             }
 
@@ -154,30 +151,30 @@ body[data-era="flash2012"] {
             .avatar-label,
             .toolbar-label {
                 display: block !important;
-                font-family: 'Ubuntu', 'Segoe UI', sans-serif !important;
+                font-family: 'Ubuntu', sans-serif !important;
                 font-size: 11px !important;
                 font-weight: 700 !important;
                 color: #ffffff !important;
                 text-align: center !important;
-                margin-top: 1px !important;
-                line-height: 1 !important;
-                text-shadow: 0 1px 2px #000000 !important;
+                margin-top: 3px !important;
+                line-height: 1.1 !important;
+                text-shadow: 0 1px 2px #000000, 0 2px 4px #000000 !important;
                 pointer-events: none !important;
             }
 
             // Avatar circular al fondo de la barra vertical
             &.item-avatar {
                 flex-direction: column !important;
-                height: auto !important;
-                min-height: 52px !important;
-                padding-top: 2px !important;
+                height: 74px !important;
+                min-height: 74px !important;
+                padding-top: 4px !important;
 
                 .avatar-circle {
-                    width: 32px !important;
-                    height: 32px !important;
+                    width: 36px !important;
+                    height: 36px !important;
                     border-radius: 50% !important;
                     overflow: hidden !important;
-                    background: #1e1e1e !important;
+                    background: #1c1b19 !important;
                     border: 2px solid #ffffff !important;
                     display: flex !important;
                     align-items: center !important;
@@ -348,23 +345,24 @@ body[data-era="flash2012"] {
                         }
 
                         &.friend-bar-search {
-                            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%) !important;
-                            border-color: #0369a1 !important;
+                            background: #3d3934 !important;
+                            border: 1px solid #57514a !important;
                             color: #ffffff !important;
+                            text-shadow: 0 1px 2px #000000 !important;
 
                             &:hover {
-                                background: linear-gradient(180deg, #7dd3fc 0%, #0ea5e9 100%) !important;
+                                background: #4f4a43 !important;
                             }
                         }
 
                         &:not(.friend-bar-search) {
-                            background: linear-gradient(180deg, #ffffff 0%, #ededed 50%, #dcdcdc 51%, #c5c5c5 100%) !important;
-                            border-color: #555555 !important;
-                            color: #1f2937 !important;
-                            text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+                            background: #3d3934 !important;
+                            border: 1px solid #57514a !important;
+                            color: #ffffff !important;
+                            text-shadow: 0 1px 2px #000000 !important;
 
                             &:hover {
-                                background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 50%, #e6e6e6 51%, #d2d2d2 100%) !important;
+                                background: #4f4a43 !important;
                             }
                         }
                     }
@@ -454,10 +452,11 @@ body[data-era="flash2012"] {
                     display: block !important;
                     width: 24px !important;
                     height: 24px !important;
-                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_chat_bubble.png') !important;
+                    background-image: url('@/assets/images/toolbar/icons/message.png') !important;
                     background-size: contain !important;
                     background-repeat: no-repeat !important;
                     background-position: center !important;
+                    image-rendering: pixelated !important;
                 }
             }
         }
@@ -570,15 +569,19 @@ body[data-era="flash2012"] {
             .purse-row {
                 display: flex !important;
                 align-items: center !important;
+                justify-content: flex-end !important;
                 gap: 5px !important;
+                width: 100% !important;
 
                 .purse-pill {
                     display: flex !important;
                     align-items: center !important;
-                    height: 25px !important;
+                    justify-content: space-between !important;
+                    width: 95px !important;
+                    height: 26px !important;
                     border-radius: 13px !important;
-                    padding: 2px 8px !important;
-                    gap: 5px !important;
+                    padding: 0 8px 0 10px !important;
+                    gap: 4px !important;
                     cursor: pointer !important;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
                     transition: transform 0.1s ease, filter 0.1s ease !important;
@@ -595,11 +598,14 @@ body[data-era="flash2012"] {
                     .pill-amount,
                     .pill-text {
                         font-family: 'Ubuntu', sans-serif !important;
-                        font-size: 12px !important;
+                        font-size: 11px !important;
                         font-weight: 700 !important;
                         color: #ffffff !important;
                         text-shadow: 0 1px 2px #000000 !important;
                         line-height: 1 !important;
+                        overflow: hidden !important;
+                        text-overflow: ellipsis !important;
+                        white-space: nowrap !important;
                     }
 
                     .purse-icon {
@@ -607,6 +613,8 @@ body[data-era="flash2012"] {
                         background-size: contain !important;
                         background-repeat: no-repeat !important;
                         background-position: center !important;
+                        image-rendering: pixelated !important;
+                        flex-shrink: 0 !important;
                     }
 
                     .purse-badge {
@@ -614,27 +622,29 @@ body[data-era="flash2012"] {
                         background-size: contain !important;
                         background-repeat: no-repeat !important;
                         background-position: center !important;
+                        image-rendering: pixelated !important;
+                        flex-shrink: 0 !important;
                     }
 
                     &.pill-credits {
-                        background: linear-gradient(180deg, #fcd34d 0%, #d97706 100%) !important;
-                        border: 1px solid #b45309 !important;
-                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.4) !important;
+                        background: linear-gradient(180deg, #e5b338 0%, #c48b1c 50%, #99690d 100%) !important;
+                        border: 1px solid #6b4700 !important;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.4) !important;
 
                         .icon-credits {
-                            width: 17px !important;
-                            height: 17px !important;
+                            width: 15px !important;
+                            height: 15px !important;
                             background-image: url('@/assets/images/eras/illumina/purse/coin_habbo.png') !important;
                         }
                     }
 
                     &.pill-vip {
-                        background: linear-gradient(180deg, #3d3b38 0%, #1f1d1b 100%) !important;
-                        border: 1px solid #5a554e !important;
+                        background: linear-gradient(180deg, #5b5750 0%, #3a3733 100%) !important;
+                        border: 1px solid #23211e !important;
                         box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4) !important;
 
                         .badge-vip {
-                            width: 19px !important;
+                            width: 20px !important;
                             height: 16px !important;
                             background-image: url('@/assets/images/eras/illumina/purse/badge_vip.png') !important;
                         }
@@ -645,12 +655,12 @@ body[data-era="flash2012"] {
                     }
 
                     &.pill-hc {
-                        background: linear-gradient(180deg, #3d3b38 0%, #1f1d1b 100%) !important;
-                        border: 1px solid #5a554e !important;
+                        background: linear-gradient(180deg, #5b5750 0%, #3a3733 100%) !important;
+                        border: 1px solid #23211e !important;
                         box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4) !important;
 
                         .badge-hc {
-                            width: 19px !important;
+                            width: 20px !important;
                             height: 16px !important;
                             background-image: url('@/assets/images/eras/illumina/purse/badge_hc.png') !important;
                         }
@@ -661,8 +671,8 @@ body[data-era="flash2012"] {
                     }
 
                     &.pill-duckets {
-                        background: linear-gradient(180deg, #c084fc 0%, #8b5cf6 50%, #6d28d9 100%) !important;
-                        border: 1px solid #5b21b6 !important;
+                        background: linear-gradient(180deg, #af50b5 0%, #872e8d 50%, #631969 100%) !important;
+                        border: 1px solid #450e4a !important;
                         box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4) !important;
 
                         .icon-duckets {
@@ -673,13 +683,13 @@ body[data-era="flash2012"] {
                     }
 
                     &.pill-diamonds {
-                        background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%) !important;
-                        border: 1px solid #075985 !important;
+                        background: linear-gradient(180deg, #44a5d8 0%, #207cae 50%, #11557c 100%) !important;
+                        border: 1px solid #0b3d5b !important;
                         box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4) !important;
 
                         .icon-diamonds {
-                            width: 16px !important;
-                            height: 16px !important;
+                            width: 20px !important;
+                            height: 20px !important;
                             background-image: url('@/assets/images/eras/illumina/purse/icon_diamonds.png') !important;
                         }
                     }
@@ -691,31 +701,32 @@ body[data-era="flash2012"] {
                 align-items: center !important;
                 justify-content: center !important;
                 gap: 8px !important;
-                width: 100% !important;
-                height: 22px !important;
-                background: rgba(30, 28, 26, 0.94) !important;
-                border: 1px solid rgba(255, 255, 255, 0.12) !important;
-                border-radius: 4px !important;
+                width: 195px !important;
+                height: 24px !important;
+                background: #38444b !important;
+                border: 1px solid #1c272c !important;
+                border-radius: 12px !important;
                 padding: 0 8px !important;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 
                 .action-link {
                     font-family: 'Ubuntu', sans-serif !important;
                     font-size: 11px !important;
-                    font-weight: 600 !important;
-                    color: #7dd3fc !important;
+                    font-weight: 700 !important;
+                    color: #ffffff !important;
                     text-decoration: underline !important;
                     cursor: pointer !important;
                     transition: color 0.12s ease !important;
 
                     &:hover {
-                        color: #ffffff !important;
+                        color: #facc15 !important;
                     }
                 }
 
                 .action-sep {
-                    color: #6b7280 !important;
+                    color: #8c9fa8 !important;
                     font-size: 10px !important;
+                    font-weight: 700 !important;
                     user-select: none !important;
                 }
             }

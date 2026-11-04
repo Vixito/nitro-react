@@ -82,15 +82,15 @@ export const PurseView: FC<{}> = props =>
         return (
             <div className="nitro-purse-container purse-flash2012">
                 <div className="purse-widget-2012">
-                    {/* FILA 1: Créditos + VIP + HC */}
-                    <div className="purse-row purse-row-primary">
+                    {/* FILA 1: Créditos + VIP */}
+                    <div className="purse-row">
                         <div 
                             className="purse-pill pill-credits" 
                             title="Créditos" 
                             onClick={ () => CreateLinkEvent('catalog/open/credits') }
                         >
-                            <i className="purse-icon icon-credits" />
                             <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(purse.credits) : LocalizeFormattedNumber(purse.credits) }</span>
+                            <i className="purse-icon icon-credits" />
                         </div>
 
                         <div 
@@ -98,8 +98,20 @@ export const PurseView: FC<{}> = props =>
                             title="Habbten VIP" 
                             onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }
                         >
-                            <i className="purse-badge badge-vip" />
                             <span className="pill-text">{ hasVip ? getClubText : 'Únete' }</span>
+                            <i className="purse-badge badge-vip" />
+                        </div>
+                    </div>
+
+                    {/* FILA 2: Duckets + HC */}
+                    <div className="purse-row">
+                        <div 
+                            className="purse-pill pill-duckets" 
+                            title="Duckets" 
+                            onClick={ () => CreateLinkEvent('catalog/open') }
+                        >
+                            <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(duckets) : LocalizeFormattedNumber(duckets) }</span>
+                            <i className="purse-icon icon-duckets" />
                         </div>
 
                         <div 
@@ -107,33 +119,24 @@ export const PurseView: FC<{}> = props =>
                             title="Habbten Club" 
                             onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }
                         >
-                            <i className="purse-badge badge-hc" />
                             <span className="pill-text">{ hasHc ? getClubText : 'Únete' }</span>
+                            <i className="purse-badge badge-hc" />
                         </div>
                     </div>
 
-                    {/* FILA 2: Duckets + Diamantes */}
-                    <div className="purse-row purse-row-secondary">
-                        <div 
-                            className="purse-pill pill-duckets" 
-                            title="Duckets" 
-                            onClick={ () => CreateLinkEvent('catalog/open') }
-                        >
-                            <i className="purse-icon icon-duckets" />
-                            <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(duckets) : LocalizeFormattedNumber(duckets) }</span>
-                        </div>
-
+                    {/* FILA 3: Diamantes */}
+                    <div className="purse-row">
                         <div 
                             className="purse-pill pill-diamonds" 
                             title="Diamantes" 
                             onClick={ () => CreateLinkEvent('catalog/open') }
                         >
-                            <i className="purse-icon icon-diamonds" />
                             <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(diamonds) : LocalizeFormattedNumber(diamonds) }</span>
+                            <i className="purse-icon icon-diamonds" />
                         </div>
                     </div>
 
-                    {/* FILA 3: Barra oscura inferior con Ayuda, Ajustes, Salir */}
+                    {/* FILA 4: Barra oscura inferior con Ayuda, Ajustes, Salir */}
                     <div className="purse-action-bar">
                         <span className="action-link" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>Ayuda</span>
                         <span className="action-sep">|</span>
