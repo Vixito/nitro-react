@@ -65,34 +65,83 @@ export const PurseView: FC<{}> = props =>
 
     if(currentEra === 'flash2012')
     {
+        const duckets = purse?.activityPoints?.get(0) ?? 0;
+        const diamonds = purse?.activityPoints?.get(5) ?? 0;
+        const hasVip = (purse.clubLevel === HabboClubLevelEnum.VIP);
+        const hasHc = (purse.clubLevel >= HabboClubLevelEnum.CLUB);
+
+        const handleLogout = () =>
+        {
+            try {
+                window.top.location.href = '/logout';
+            } catch(e) {
+                window.location.href = '/logout';
+            }
+        };
+
         return (
             <div className="nitro-purse-container purse-flash2012">
-                <div className="purse-box">
-                    <div className="purse-currencies">
-                        <div className="currency-pill currency-credits" title="Créditos">
-                            <span className="amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(purse.credits) : LocalizeFormattedNumber(purse.credits) }</span>
-                            <LayoutCurrencyIcon type={ -1 } />
+                <div className="purse-widget-2012">
+                    {/* FILA 1: Créditos + VIP + HC */}
+                    <div className="purse-row purse-row-primary">
+                        <div 
+                            className="purse-pill pill-credits" 
+                            title="Créditos" 
+                            onClick={ () => CreateLinkEvent('catalog/open/credits') }
+                        >
+                            <i className="purse-icon icon-credits" />
+                            <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(purse.credits) : LocalizeFormattedNumber(purse.credits) }</span>
                         </div>
-                        { getCurrencyElements(0, 2) }
+
+                        <div 
+                            className={ `purse-pill pill-vip ${ hasVip ? 'is-active' : '' }` } 
+                            title="Habbten VIP" 
+                            onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }
+                        >
+                            <i className="purse-badge badge-vip" />
+                            <span className="pill-text">{ hasVip ? getClubText : 'Únete' }</span>
+                        </div>
+
+                        <div 
+                            className={ `purse-pill pill-hc ${ hasHc ? 'is-active' : '' }` } 
+                            title="Habbten Club" 
+                            onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }
+                        >
+                            <i className="purse-badge badge-hc" />
+                            <span className="pill-text">{ hasHc ? getClubText : 'Únete' }</span>
+                        </div>
                     </div>
-                    <div className="purse-side">
-                        { !hcDisabled && (
-                            <div className="purse-club" title="Habbten Club" onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }>
-                                <LayoutCurrencyIcon type="hc" />
-                                <span className="club-text">{ getClubText }</span>
-                            </div>
-                        )}
-                        <div className="purse-actions">
-                            <div className="purse-btn btn-settings" title="Ajustes" onClick={ () => CreateLinkEvent('user-settings/toggle') }>
-                                <i className="icon icon-cog" />
-                            </div>
-                            <div className="purse-btn btn-help" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>
-                                <i className="icon icon-help" />
-                            </div>
+
+                    {/* FILA 2: Duckets + Diamantes */}
+                    <div className="purse-row purse-row-secondary">
+                        <div 
+                            className="purse-pill pill-duckets" 
+                            title="Duckets" 
+                            onClick={ () => CreateLinkEvent('catalog/open') }
+                        >
+                            <i className="purse-icon icon-duckets" />
+                            <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(duckets) : LocalizeFormattedNumber(duckets) }</span>
                         </div>
+
+                        <div 
+                            className="purse-pill pill-diamonds" 
+                            title="Diamantes" 
+                            onClick={ () => CreateLinkEvent('catalog/open') }
+                        >
+                            <i className="purse-icon icon-diamonds" />
+                            <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(diamonds) : LocalizeFormattedNumber(diamonds) }</span>
+                        </div>
+                    </div>
+
+                    {/* FILA 3: Barra oscura inferior con Ayuda, Ajustes, Salir */}
+                    <div className="purse-action-bar">
+                        <span className="action-link" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>Ayuda</span>
+                        <span className="action-sep">|</span>
+                        <span className="action-link" title="Ajustes" onClick={ () => CreateLinkEvent('user-settings/toggle') }>Ajustes</span>
+                        <span className="action-sep">|</span>
+                        <span className="action-link" title="Cerrar sesión" onClick={ handleLogout }>Salir</span>
                     </div>
                 </div>
-                { getCurrencyElements(2, -1, true) }
             </div>
         );
     }

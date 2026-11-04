@@ -13,12 +13,12 @@ body[data-era="flash2012"] {
     // =========================================================================
     .nitro-toolbar.toolbar-flash2012 {
         position: fixed !important;
-        top: 100px !important;
-        left: 0 !important;
+        top: 65px !important;
+        left: 8px !important;
         bottom: auto !important;
-        width: 52px !important;
+        width: 72px !important;
         height: auto !important;
-        max-height: calc(100vh - 130px) !important;
+        max-height: calc(100vh - 120px) !important;
         z-index: 1020 !important;
         background: transparent !important;
         border: none !important;
@@ -33,30 +33,29 @@ body[data-era="flash2012"] {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            width: 52px !important;
-            background: #1e1d1c !important;
-            border: 1px solid rgba(255, 255, 255, 0.16) !important;
-            border-left: none !important;
-            border-radius: 0 10px 10px 0 !important;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6) !important;
+            width: 70px !important;
+            background: #46423c !important;
+            border: 1px solid #5a554e !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
             padding: 6px 0 !important;
             gap: 2px !important;
         }
 
         .toolbar-divider {
-            width: 38px !important;
+            width: 54px !important;
             height: 1px !important;
-            background: rgba(255, 255, 255, 0.1) !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.4) !important;
-            margin: 2px 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+            margin: 3px 0 !important;
         }
 
         .navigation-item {
             position: relative !important;
-            width: 48px !important;
-            height: 46px !important;
-            min-width: 48px !important;
-            min-height: 46px !important;
+            width: 62px !important;
+            height: 52px !important;
+            min-width: 62px !important;
+            min-height: 52px !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
@@ -71,11 +70,11 @@ body[data-era="flash2012"] {
             margin: 0 !important;
 
             &:hover {
-                background: rgba(255, 255, 255, 0.1) !important;
+                background: rgba(255, 255, 255, 0.12) !important;
                 transform: translateY(-1px) !important;
 
                 .toolbar-icon {
-                    filter: drop-shadow(2px 2px 0 #46423E) brightness(1.1) !important;
+                    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)) brightness(1.1) !important;
                 }
             }
 
@@ -84,29 +83,71 @@ body[data-era="flash2012"] {
                 background: rgba(0, 0, 0, 0.25) !important;
 
                 .toolbar-icon {
-                    filter: drop-shadow(1px 1px 0 #46423E) brightness(0.9) !important;
+                    filter: brightness(0.9) !important;
                 }
             }
 
             .toolbar-icon {
                 display: block !important;
-                width: 30px !important;
-                height: 30px !important;
-                background-image: url('@/assets/images/eras/illumina/spritesheet.png') !important;
                 background-repeat: no-repeat !important;
-                filter: drop-shadow(1px 1px 0 #46423E) !important;
+                background-position: center !important;
+                background-size: contain !important;
+                filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)) !important;
                 transition: filter 0.1s ease !important;
 
-                &.icon-habbo { background-position: 0px -49px !important; }
-                &.icon-house { background-position: -29px -49px !important; }
-                &.icon-rooms { background-position: -91px -49px !important; }
-                &.icon-friends,
-                &.icon-friendall { background-position: -190px -49px !important; }
-                &.icon-message { background-position: -222px -23px !important; }
-                &.icon-catalog { background-position: -124px -49px !important; }
-                &.icon-inventory { background-position: -62px -49px !important; }
-                &.icon-modtools { background-position: -158px -49px !important; }
-                &.icon-camera { background-position: -226px -49px !important; }
+                &.icon-hotel,
+                &.icon-rooms {
+                    width: 36px !important;
+                    height: 32px !important;
+                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_rooms_iso.png') !important;
+                }
+
+                &.icon-games {
+                    width: 36px !important;
+                    height: 25px !important;
+                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_games.png') !important;
+                }
+
+                &.icon-quests {
+                    width: 28px !important;
+                    height: 32px !important;
+                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_quests.png') !important;
+                }
+
+                &.icon-achievements {
+                    width: 32px !important;
+                    height: 32px !important;
+                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_achievements.png') !important;
+                }
+
+                &.icon-catalog,
+                &.icon-shop {
+                    width: 32px !important;
+                    height: 32px !important;
+                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_shop.png') !important;
+                }
+
+                &.icon-inventory {
+                    width: 32px !important;
+                    height: 32px !important;
+                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_inventory.png') !important;
+                }
+
+                &.icon-modtools {
+                    width: 28px !important;
+                    height: 28px !important;
+                    background-image: url('@/assets/images/eras/illumina/spritesheet.png') !important;
+                    background-position: -158px -49px !important;
+                    background-size: auto !important;
+                }
+
+                &.icon-camera {
+                    width: 28px !important;
+                    height: 28px !important;
+                    background-image: url('@/assets/images/eras/illumina/spritesheet.png') !important;
+                    background-position: -226px -49px !important;
+                    background-size: auto !important;
+                }
             }
 
             // Etiquetas de texto debajo de los iconos (idéntico a la referencia 2012)
@@ -114,8 +155,8 @@ body[data-era="flash2012"] {
             .toolbar-label {
                 display: block !important;
                 font-family: 'Ubuntu', 'Segoe UI', sans-serif !important;
-                font-size: 12px !important;
-                font-weight: 600 !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
                 color: #ffffff !important;
                 text-align: center !important;
                 margin-top: 1px !important;
@@ -128,12 +169,12 @@ body[data-era="flash2012"] {
             &.item-avatar {
                 flex-direction: column !important;
                 height: auto !important;
-                min-height: 48px !important;
+                min-height: 52px !important;
                 padding-top: 2px !important;
 
                 .avatar-circle {
-                    width: 30px !important;
-                    height: 30px !important;
+                    width: 32px !important;
+                    height: 32px !important;
                     border-radius: 50% !important;
                     overflow: hidden !important;
                     background: #1e1e1e !important;
@@ -171,14 +212,14 @@ body[data-era="flash2012"] {
             .nitro-item-count,
             .layout-item-count {
                 position: absolute !important;
-                top: 0px !important;
-                right: 2px !important;
+                top: 2px !important;
+                right: 4px !important;
                 background: #e11d48 !important;
                 color: #ffffff !important;
                 border: 1px solid #ffffff !important;
                 border-radius: 10px !important;
                 font-family: 'Ubuntu', sans-serif !important;
-                font-size: 12px !important;
+                font-size: 11px !important;
                 font-weight: 800 !important;
                 padding: 1px 4px !important;
                 min-width: 15px !important;
@@ -195,12 +236,12 @@ body[data-era="flash2012"] {
     // Menú de usuario (Me Menu) flotante al lado de la barra vertical
     .nitro-toolbar-me {
         position: fixed !important;
-        bottom: 25px !important;
-        left: 60px !important;
-        background: #1e1d1c !important;
-        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        bottom: 50px !important;
+        left: 85px !important;
+        background: #2b2724 !important;
+        border: 1px solid #4a443e !important;
         border-radius: 8px !important;
-        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
         padding: 6px !important;
         gap: 6px !important;
         display: flex !important;
@@ -224,13 +265,218 @@ body[data-era="flash2012"] {
     }
 
     // =========================================================================
-    // 2. CHAT FLOTANTE INFERIOR IZQUIERDO (HABBTEN 2012)
+    // 2. BARRA INFERIOR HORIZONTAL FLASH 2012 (FRIEND BAR - SIN SNOWSTORM)
+    // =========================================================================
+    .nitro-bottom-bar-2012 {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: 42px !important;
+        z-index: 1010 !important;
+        background: linear-gradient(180deg, #2c2825 0%, #191716 100%) !important;
+        border-top: 1px solid #4a443e !important;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.5) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 12px 0 88px !important;
+
+        .bottom-bar-left {
+            display: flex !important;
+            align-items: center !important;
+            flex: 1 !important;
+            height: 100% !important;
+
+            .friend-bar-stream-container {
+                display: flex !important;
+                align-items: center !important;
+                height: 100% !important;
+
+                .friend-bar {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                    height: 100% !important;
+
+                    .friend-bar-button {
+                        width: 24px !important;
+                        height: 28px !important;
+                        background: #3d3934 !important;
+                        border: 1px solid #57514a !important;
+                        border-radius: 4px !important;
+                        color: #ffffff !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        padding: 0 !important;
+                        cursor: pointer !important;
+
+                        &:hover {
+                            background: #4f4a43 !important;
+                        }
+
+                        &:disabled {
+                            opacity: 0.4 !important;
+                            cursor: default !important;
+                        }
+
+                        .fa-icon {
+                            width: 10px !important;
+                            height: 10px !important;
+                        }
+                    }
+
+                    .friend-bar-item {
+                        height: 28px !important;
+                        border-radius: 4px !important;
+                        padding: 2px 10px 2px 28px !important;
+                        font-family: 'Ubuntu', sans-serif !important;
+                        font-size: 11px !important;
+                        font-weight: 700 !important;
+                        border: 1px solid rgba(0,0,0,0.3) !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        position: relative !important;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.3) !important;
+                        cursor: pointer !important;
+
+                        .friend-bar-item-head {
+                            left: 2px !important;
+                            top: 50% !important;
+                            transform: translateY(-50%) !important;
+                        }
+
+                        &.friend-bar-search {
+                            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%) !important;
+                            border-color: #0369a1 !important;
+                            color: #ffffff !important;
+
+                            &:hover {
+                                background: linear-gradient(180deg, #7dd3fc 0%, #0ea5e9 100%) !important;
+                            }
+                        }
+
+                        &:not(.friend-bar-search) {
+                            background: linear-gradient(180deg, #ffffff 0%, #ededed 50%, #dcdcdc 51%, #c5c5c5 100%) !important;
+                            border-color: #555555 !important;
+                            color: #1f2937 !important;
+                            text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+
+                            &:hover {
+                                background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 50%, #e6e6e6 51%, #d2d2d2 100%) !important;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .bottom-bar-right {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+
+            .btn-all-friends {
+                background: linear-gradient(180deg, #ffffff 0%, #ededed 50%, #dcdcdc 51%, #c5c5c5 100%) !important;
+                border: 1px solid #4b463f !important;
+                border-radius: 4px !important;
+                height: 28px !important;
+                padding: 0 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                cursor: pointer !important;
+                box-shadow: inset 0 1px 0 #ffffff, 0 1px 2px rgba(0,0,0,0.3) !important;
+                position: relative !important;
+
+                .btn-label {
+                    font-family: 'Ubuntu', sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    color: #1f2937 !important;
+                    text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+                }
+
+                &:hover {
+                    background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 50%, #e2e2e2 51%, #d0d0d0 100%) !important;
+                }
+
+                &:active {
+                    background: #b8b8b8 !important;
+                    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4) !important;
+                }
+
+                .nitro-item-count,
+                .layout-item-count {
+                    position: absolute !important;
+                    top: -5px !important;
+                    right: -5px !important;
+                    background: #e11d48 !important;
+                    color: #ffffff !important;
+                    border: 1px solid #ffffff !important;
+                    border-radius: 10px !important;
+                    font-size: 10px !important;
+                    font-weight: 800 !important;
+                    padding: 1px 4px !important;
+                    min-width: 14px !important;
+                    height: 14px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                }
+            }
+
+            .btn-messenger {
+                width: 32px !important;
+                height: 32px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                border-radius: 4px !important;
+                background: rgba(255, 255, 255, 0.08) !important;
+                border: 1px solid rgba(255, 255, 255, 0.15) !important;
+                transition: background-color 0.1s, transform 0.1s !important;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.18) !important;
+                    transform: scale(1.05) !important;
+                }
+
+                &.is-unread {
+                    background: rgba(56, 189, 248, 0.25) !important;
+                    border-color: #38bdf8 !important;
+                    animation: pulse-messenger 1.2s infinite ease-in-out !important;
+                }
+
+                .icon-chat-bubble {
+                    display: block !important;
+                    width: 24px !important;
+                    height: 24px !important;
+                    background-image: url('@/assets/images/eras/illumina/toolbar/icon_chat_bubble.png') !important;
+                    background-size: contain !important;
+                    background-repeat: no-repeat !important;
+                    background-position: center !important;
+                }
+            }
+        }
+    }
+
+    @keyframes pulse-messenger {
+        0% { transform: scale(1); filter: brightness(1); }
+        50% { transform: scale(1.1); filter: brightness(1.3); }
+        100% { transform: scale(1); filter: brightness(1); }
+    }
+
+    // =========================================================================
+    // 3. CHAT FLOTANTE INFERIOR IZQUIERDO (HABBTEN 2012)
     // =========================================================================
     .chat-container-flash2012,
     #toolbar-chat-input-container {
         position: fixed !important;
-        bottom: 12px !important;
-        left: 62px !important;
+        bottom: 48px !important;
+        left: 88px !important;
         width: 340px !important;
         max-width: 45vw !important;
         z-index: 1010 !important;
@@ -287,7 +533,7 @@ body[data-era="flash2012"] {
     .nitro-room-tools-container {
         position: fixed !important;
         bottom: 50px !important;
-        left: 60px !important;
+        left: 88px !important;
         z-index: 1000 !important;
 
         .nitro-room-tools {
@@ -307,173 +553,218 @@ body[data-era="flash2012"] {
     }
 
     // =========================================================================
-    // 3. MONEDERO COMPACTO SUPERIOR DERECHO (AUTÉNTICA CÁPSULA ILLUMINA 2012)
+    // 4. MONEDERO / ECONOMÍA FLASH 2012 (CRÉDITOS, VIP, HC, DUCKETS, DIAMANTES)
     // =========================================================================
     .nitro-purse-container.purse-flash2012 {
         position: fixed !important;
-        top: 10px !important;
-        right: 12px !important;
+        top: 8px !important;
+        right: 10px !important;
         z-index: 1020 !important;
 
-        .purse-box {
+        .purse-widget-2012 {
             display: flex !important;
-            align-items: center !important;
-            background: #1e1d1c !important;
-            border: 1px solid rgba(255, 255, 255, 0.16) !important;
-            border-radius: 18px !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
-            padding: 3px 6px !important;
-            gap: 6px !important;
+            flex-direction: column !important;
+            align-items: flex-end !important;
+            gap: 4px !important;
 
-            .purse-currencies {
+            .purse-row {
                 display: flex !important;
-                flex-direction: row !important;
                 align-items: center !important;
-                gap: 4px !important;
+                gap: 5px !important;
 
-                .currency-pill,
-                .nitro-purse-button {
+                .purse-pill {
                     display: flex !important;
                     align-items: center !important;
-                    gap: 6px !important;
-                    border-radius: 12px !important;
-                    padding: 2px 10px !important;
-                    height: 22px !important;
-                    margin: 0 !important;
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+                    height: 25px !important;
+                    border-radius: 13px !important;
+                    padding: 2px 8px !important;
+                    gap: 5px !important;
+                    cursor: pointer !important;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+                    transition: transform 0.1s ease, filter 0.1s ease !important;
 
-                    .amount,
-                    span,
-                    div {
+                    &:hover {
+                        filter: brightness(1.1) !important;
+                        transform: translateY(-1px) !important;
+                    }
+
+                    &:active {
+                        transform: translateY(0) scale(0.97) !important;
+                    }
+
+                    .pill-amount,
+                    .pill-text {
                         font-family: 'Ubuntu', sans-serif !important;
                         font-size: 12px !important;
                         font-weight: 700 !important;
                         color: #ffffff !important;
-                        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6) !important;
+                        text-shadow: 0 1px 2px #000000 !important;
+                        line-height: 1 !important;
                     }
 
-                    .nitro-currency-icon {
-                        width: 14px !important;
-                        height: 14px !important;
+                    .purse-icon {
+                        display: block !important;
                         background-size: contain !important;
                         background-repeat: no-repeat !important;
                         background-position: center !important;
                     }
 
-                    &.currency-credits {
-                        background: linear-gradient(180deg, #facc15 0%, #ca8a04 100%) !important;
-                        border: 1px solid #a16207 !important;
+                    .purse-badge {
+                        display: block !important;
+                        background-size: contain !important;
+                        background-repeat: no-repeat !important;
+                        background-position: center !important;
                     }
-                    &.currency-duckets,
-                    &[class*="currency-0"] {
-                        background: linear-gradient(180deg, #c084fc 0%, #9333ea 100%) !important;
-                        border: 1px solid #7e22ce !important;
+
+                    &.pill-credits {
+                        background: linear-gradient(180deg, #fcd34d 0%, #d97706 100%) !important;
+                        border: 1px solid #b45309 !important;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.4) !important;
+
+                        .icon-credits {
+                            width: 17px !important;
+                            height: 17px !important;
+                            background-image: url('@/assets/images/eras/illumina/purse/coin_habbo.png') !important;
+                        }
                     }
-                    &.currency-diamonds,
-                    &[class*="currency-5"] {
-                        background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%) !important;
-                        border: 1px solid #0369a1 !important;
+
+                    &.pill-vip {
+                        background: linear-gradient(180deg, #3d3b38 0%, #1f1d1b 100%) !important;
+                        border: 1px solid #5a554e !important;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4) !important;
+
+                        .badge-vip {
+                            width: 19px !important;
+                            height: 16px !important;
+                            background-image: url('@/assets/images/eras/illumina/purse/badge_vip.png') !important;
+                        }
+
+                        &.is-active {
+                            border-color: #f59e0b !important;
+                        }
+                    }
+
+                    &.pill-hc {
+                        background: linear-gradient(180deg, #3d3b38 0%, #1f1d1b 100%) !important;
+                        border: 1px solid #5a554e !important;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4) !important;
+
+                        .badge-hc {
+                            width: 19px !important;
+                            height: 16px !important;
+                            background-image: url('@/assets/images/eras/illumina/purse/badge_hc.png') !important;
+                        }
+
+                        &.is-active {
+                            border-color: #10b981 !important;
+                        }
+                    }
+
+                    &.pill-duckets {
+                        background: linear-gradient(180deg, #c084fc 0%, #8b5cf6 50%, #6d28d9 100%) !important;
+                        border: 1px solid #5b21b6 !important;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4) !important;
+
+                        .icon-duckets {
+                            width: 15px !important;
+                            height: 15px !important;
+                            background-image: url('@/assets/images/eras/illumina/purse/icon_duckets.png') !important;
+                        }
+                    }
+
+                    &.pill-diamonds {
+                        background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%) !important;
+                        border: 1px solid #075985 !important;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4) !important;
+
+                        .icon-diamonds {
+                            width: 16px !important;
+                            height: 16px !important;
+                            background-image: url('@/assets/images/eras/illumina/purse/icon_diamonds.png') !important;
+                        }
                     }
                 }
             }
 
-            .purse-side {
+            .purse-action-bar {
                 display: flex !important;
                 align-items: center !important;
-                gap: 6px !important;
-                border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
-                padding-left: 8px !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                width: 100% !important;
+                height: 22px !important;
+                background: rgba(30, 28, 26, 0.94) !important;
+                border: 1px solid rgba(255, 255, 255, 0.12) !important;
+                border-radius: 4px !important;
+                padding: 0 8px !important;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 
-                .purse-club {
-                    display: flex !important;
-                    align-items: center !important;
-                    gap: 4px !important;
-                    background: linear-gradient(180deg, #d97706 0%, #92400e 100%) !important;
-                    border: 1px solid #78350f !important;
-                    border-radius: 4px !important;
-                    padding: 3px 8px !important;
+                .action-link {
+                    font-family: 'Ubuntu', sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 600 !important;
+                    color: #7dd3fc !important;
+                    text-decoration: underline !important;
                     cursor: pointer !important;
+                    transition: color 0.12s ease !important;
 
-                    .club-text {
-                        font-family: 'Ubuntu', sans-serif !important;
-                        font-size: 12px !important;
-                        font-weight: 700 !important;
+                    &:hover {
                         color: #ffffff !important;
-                        text-shadow: 0 1px 1px #000000 !important;
                     }
                 }
 
-                .purse-actions {
-                    display: flex !important;
-                    align-items: center !important;
-                    gap: 4px !important;
-
-                    .purse-btn {
-                        width: 24px !important;
-                        height: 24px !important;
-                        border-radius: 4px !important;
-                        background: rgba(255, 255, 255, 0.1) !important;
-                        display: flex !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        cursor: pointer !important;
-                        transition: background-color 0.12s ease !important;
-
-                        &:hover {
-                            background: rgba(255, 255, 255, 0.2) !important;
-                        }
-
-                        i.icon {
-                            display: block !important;
-                        }
-                    }
+                .action-sep {
+                    color: #6b7280 !important;
+                    font-size: 10px !important;
+                    user-select: none !important;
                 }
             }
         }
     }
 
     // =========================================================================
-    // 4. VENTANAS Y DIÁLOGOS ESTILO FLASH 2012 (MARCO METÁLICO ILLUMINA)
+    // 5. VENTANAS Y DIÁLOGOS ESTILO FLASH 2012 (AUTÉNTICO ILLUMINA BISELADO)
     // =========================================================================
     .nitro-card,
     .draggable-window {
-        border-radius: 8px !important;
-        border: 1px solid #4b5563 !important;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6) !important;
-        background-color: #374151 !important;
+        border-radius: 6px !important;
+        border: 1px solid #202020 !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 30px rgba(0, 0, 0, 0.6) !important;
+        background-color: #d6d6d6 !important;
         overflow: hidden !important;
 
         .nitro-card-header,
         .drag-handler {
-            background: linear-gradient(180deg, #374151 0%, #1f2937 100%) !important;
-            border-bottom: 1px solid #111827 !important;
-            border-radius: 8px 8px 0 0 !important;
-            padding: 8px 12px !important;
-            min-height: 36px !important;
+            background: linear-gradient(180deg, #5da3bd 0%, #3a829e 50%, #256a86 100%) !important;
+            border-bottom: 1px solid #164658 !important;
+            border-radius: 5px 5px 0 0 !important;
+            padding: 6px 10px !important;
+            min-height: 32px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4) !important;
 
             .header-text,
             .nitro-card-header-text,
             h5, h6 {
                 color: #ffffff !important;
                 font-family: 'Ubuntu', sans-serif !important;
-                font-size: 13px !important;
+                font-size: 12px !important;
                 font-weight: 700 !important;
-                letter-spacing: 0.3px !important;
-                text-shadow: 0 1px 2px #000000 !important;
+                letter-spacing: 0.2px !important;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important;
             }
 
             .nitro-card-header-close {
-                width: 18px !important;
-                height: 18px !important;
-                min-width: 18px !important;
-                min-height: 18px !important;
-                background: #ef4444 !important;
-                border: 1px solid #b91c1c !important;
-                border-radius: 4px !important;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+                width: 17px !important;
+                height: 17px !important;
+                min-width: 17px !important;
+                min-height: 17px !important;
+                background: linear-gradient(180deg, #f87171 0%, #dc2626 50%, #b91c1c 100%) !important;
+                border: 1px solid #7f1d1d !important;
+                border-radius: 3px !important;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.4) !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -481,58 +772,89 @@ body[data-era="flash2012"] {
                 padding: 0 !important;
 
                 svg, .fa-icon {
-                    width: 10px !important;
-                    height: 10px !important;
+                    width: 9px !important;
+                    height: 9px !important;
                     color: #ffffff !important;
                 }
 
                 &:hover {
-                    background: #dc2626 !important;
+                    filter: brightness(1.15) !important;
+                }
+
+                &:active {
+                    filter: brightness(0.9) !important;
                 }
             }
         }
 
         // Pestañas de las ventanas en Flash 2012
         .nitro-card-tabs {
-            background: #1f2937 !important;
-            border-bottom: 1px solid #111827 !important;
+            background: #c8c8c8 !important;
+            border-bottom: 1px solid #a8a8a8 !important;
             padding: 4px 8px 0 8px !important;
             gap: 4px !important;
             display: flex !important;
 
             .nav-item,
             .nitro-card-tabs-item {
-                background: #374151 !important;
-                border: 1px solid rgba(255, 255, 255, 0.12) !important;
+                background: #e2e2e2 !important;
+                border: 1px solid #999999 !important;
                 border-bottom: none !important;
-                color: #d1d5db !important;
-                border-radius: 6px 6px 0 0 !important;
+                color: #333333 !important;
+                border-radius: 4px 4px 0 0 !important;
                 font-family: 'Ubuntu', sans-serif !important;
-                font-size: 12px !important;
-                font-weight: 600 !important;
-                padding: 4px 12px !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                padding: 4px 10px !important;
                 cursor: pointer !important;
 
                 &:hover {
-                    background: #4b5563 !important;
-                    color: #ffffff !important;
+                    background: #f0f0f0 !important;
+                    color: #000000 !important;
                 }
 
                 &.active {
-                    background: #2563eb !important;
-                    color: #ffffff !important;
-                    border-color: #3b82f6 !important;
-                    font-weight: 700 !important;
+                    background: #d6d6d6 !important;
+                    color: #000000 !important;
+                    border-color: #777777 !important;
+                    font-weight: 800 !important;
                 }
             }
         }
 
         .nitro-card-content,
         .nitro-card-body {
-            background-color: #1f2937 !important;
-            color: #f3f4f6 !important;
-            border-radius: 0 0 8px 8px !important;
-            padding: 10px !important;
+            background-color: #d6d6d6 !important;
+            color: #1e1e1e !important;
+            border-radius: 0 0 6px 6px !important;
+            padding: 8px !important;
+        }
+    }
+
+    // BOTONES BISELADOS ILLUMINA (REFERENCIA DE VENTANAS FLASH 2012)
+    .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button),
+    .btn-secondary,
+    .btn-light {
+        background: linear-gradient(180deg, #ffffff 0%, #ededed 50%, #dcdcdc 51%, #c5c5c5 100%) !important;
+        border: 1px solid #555555 !important;
+        border-radius: 4px !important;
+        color: #1f2937 !important;
+        font-family: 'Ubuntu', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+        box-shadow: inset 0 1px 0 #ffffff, inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.2) !important;
+        padding: 4px 12px !important;
+        cursor: pointer !important;
+
+        &:hover {
+            background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 50%, #e6e6e6 51%, #d2d2d2 100%) !important;
+            color: #000000 !important;
+        }
+
+        &:active {
+            background: #b8b8b8 !important;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4) !important;
         }
     }
 
