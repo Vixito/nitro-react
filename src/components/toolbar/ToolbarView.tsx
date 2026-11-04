@@ -200,18 +200,17 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                 {/* Auténtica Barra Lateral Vertical 2012 Flash (Illumina) */}
                 <div className="nitro-toolbar toolbar-flash2012">
                     <div className="toolbar-capsule">
-                        { isInRoom ? (
+                        { isInRoom && (
                             <div className="navigation-item item-hotel icon-hotel" title="Vista del Hotel" onClick={ () => VisitDesktop() }>
                                 <i className="toolbar-icon icon-hotel" />
                                 <span className="avatar-label">Hotel</span>
                             </div>
-                        ) : (
-                            <div className="navigation-item item-rooms icon-rooms" title="Navegador de Salas" onClick={ () => CreateLinkEvent('navigator/toggle') }>
-                                <i className="toolbar-icon icon-rooms" />
-                                <span className="avatar-label">Salas</span>
-                            </div>
                         )}
-                        <div className="navigation-item item-games icon-games" title="Centro de Juegos" onClick={ () => CreateLinkEvent('gamecenter/toggle') }>
+                        <div className="navigation-item item-rooms icon-rooms" title="Navegador de Salas" onClick={ () => CreateLinkEvent('navigator/toggle') }>
+                            <i className="toolbar-icon icon-rooms" />
+                            <span className="avatar-label">Salas</span>
+                        </div>
+                        <div className="navigation-item item-games icon-games" title="Centro de Juegos" onClick={ () => CreateLinkEvent('games/toggle') }>
                             <i className="toolbar-icon icon-games" />
                             <span className="avatar-label">Juegos</span>
                         </div>
@@ -230,7 +229,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                         <div className="navigation-item item-inventory icon-inventory" title="Inventario" onClick={ () => CreateLinkEvent('inventory/toggle') }>
                             <i className="toolbar-icon icon-inventory" />
                             { (getFullCount > 0) && <LayoutItemCountView count={ getFullCount } /> }
-                            <span className="avatar-label">Cosas</span>
+                            <span className="avatar-label">Inventario</span>
                         </div>
                         { isMod && (
                             <div className="navigation-item item-modtools icon-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
@@ -245,7 +244,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             </div>
                         )}
                         <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } title="Mi Personaje" onClick={ () => setMeExpanded(!isMeExpanded) }>
-                            <div className="avatar-circle">
+                            <div className="avatar-head-wrapper">
                                 <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headOnly={ true } />
                             </div>
                             { (getTotalUnseen > 0) && <LayoutItemCountView count={ getTotalUnseen } /> }

@@ -13,12 +13,12 @@ body[data-era="flash2012"] {
     // =========================================================================
     .nitro-toolbar.toolbar-flash2012 {
         position: fixed !important;
-        top: 65px !important;
+        top: 8px !important;
         left: 8px !important;
         bottom: auto !important;
         width: 84px !important;
         height: auto !important;
-        max-height: calc(100vh - 120px) !important;
+        max-height: calc(100vh - 54px) !important;
         z-index: 1020 !important;
         background: transparent !important;
         border: none !important;
@@ -38,16 +38,20 @@ body[data-era="flash2012"] {
             border: 1px solid #2b2723 !important;
             border-radius: 8px !important;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.6) !important;
-            padding: 6px 0 !important;
-            gap: 2px !important;
+            padding: 4px 0 !important;
+            gap: 1px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            scrollbar-width: none !important;
+            &::-webkit-scrollbar { display: none !important; }
         }
 
         .navigation-item {
             position: relative !important;
             width: 78px !important;
-            height: 74px !important;
-            min-width: 78px !important;
-            min-height: 74px !important;
+            height: clamp(44px, 6.8vh, 76px) !important;
+            min-height: 44px !important;
+            flex-shrink: 0 !important;
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
@@ -58,7 +62,7 @@ body[data-era="flash2012"] {
             box-shadow: none !important;
             cursor: pointer !important;
             transition: transform 0.12s ease, background-color 0.12s ease !important;
-            padding: 4px 0 !important;
+            padding: 2px 0 !important;
             margin: 0 !important;
 
             &:hover {
@@ -89,59 +93,59 @@ body[data-era="flash2012"] {
                 transition: filter 0.1s ease !important;
 
                 &.icon-hotel {
-                    width: 28px !important;
-                    height: 28px !important;
+                    width: 26px !important;
+                    height: 26px !important;
                     background-image: url('@/assets/images/toolbar/icons/habbo.png') !important;
                 }
 
                 &.icon-rooms {
-                    width: 44px !important;
-                    height: 30px !important;
+                    width: 38px !important;
+                    height: 26px !important;
                     background-image: url('@/assets/images/toolbar/icons/rooms.png') !important;
                 }
 
                 &.icon-games {
-                    width: 44px !important;
-                    height: 25px !important;
+                    width: 38px !important;
+                    height: 22px !important;
                     background-image: url('@/assets/images/toolbar/icons/game.png') !important;
                 }
 
                 &.icon-battlepass,
                 &.icon-quests {
-                    width: 28px !important;
-                    height: 31px !important;
+                    width: 24px !important;
+                    height: 26px !important;
                     background-image: url('@/assets/images/toolbar/icons/quest.png') !important;
                 }
 
                 &.icon-achievements {
-                    width: 31px !important;
-                    height: 30px !important;
+                    width: 26px !important;
+                    height: 26px !important;
                     background-image: url('@/assets/images/toolbar/icons/me-menu/achievements.png') !important;
                 }
 
                 &.icon-catalog,
                 &.icon-shop {
-                    width: 37px !important;
-                    height: 37px !important;
+                    width: 30px !important;
+                    height: 30px !important;
                     background-image: url('@/assets/images/toolbar/icons/catalog.png') !important;
                 }
 
                 &.icon-inventory {
-                    width: 44px !important;
-                    height: 41px !important;
+                    width: 36px !important;
+                    height: 30px !important;
                     background-image: url('@/assets/images/toolbar/icons/inventory.png') !important;
                 }
 
                 &.icon-modtools {
-                    width: 29px !important;
-                    height: 34px !important;
+                    width: 25px !important;
+                    height: 28px !important;
                     background-image: url('@/assets/images/toolbar/icons/modtools.png') !important;
                     background-position: center !important;
                 }
 
                 &.icon-camera {
-                    width: 38px !important;
-                    height: 45px !important;
+                    width: 30px !important;
+                    height: 34px !important;
                     background-image: url('@/assets/images/toolbar/icons/camera.png') !important;
                     background-position: center !important;
                 }
@@ -152,35 +156,32 @@ body[data-era="flash2012"] {
             .toolbar-label {
                 display: block !important;
                 font-family: 'Ubuntu', sans-serif !important;
-                font-size: 11px !important;
+                font-size: 10px !important;
                 font-weight: 700 !important;
                 color: #ffffff !important;
                 text-align: center !important;
-                margin-top: 3px !important;
-                line-height: 1.1 !important;
+                margin-top: 2px !important;
+                line-height: 1 !important;
                 text-shadow: 0 1px 2px #000000, 0 2px 4px #000000 !important;
                 pointer-events: none !important;
+                white-space: nowrap !important;
             }
 
-            // Avatar circular al fondo de la barra vertical
+            // Avatar al fondo de la barra vertical (sin marco circular, auténtico pixel art)
             &.item-avatar {
                 flex-direction: column !important;
-                height: 74px !important;
-                min-height: 74px !important;
-                padding-top: 4px !important;
+                height: clamp(44px, 6.8vh, 76px) !important;
+                min-height: 44px !important;
+                padding-top: 2px !important;
 
-                .avatar-circle {
-                    width: 36px !important;
-                    height: 36px !important;
-                    border-radius: 50% !important;
-                    overflow: hidden !important;
-                    background: #1c1b19 !important;
-                    border: 2px solid #ffffff !important;
+                .avatar-head-wrapper {
+                    width: 38px !important;
+                    height: 30px !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
                     position: relative !important;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+                    overflow: visible !important;
 
                     .avatar-image {
                         width: 100% !important;
@@ -188,20 +189,21 @@ body[data-era="flash2012"] {
                         margin: 0 !important;
                         margin-left: 0 !important;
                         margin-top: 0 !important;
-                        background-position: center center !important;
+                        background-position: center bottom !important;
                         background-repeat: no-repeat !important;
                         background-size: contain !important;
-                        transform: none !important;
+                        image-rendering: pixelated !important;
+                        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)) !important;
+                        transition: transform 0.12s ease !important;
                     }
                 }
 
-                &:hover .avatar-circle {
-                    border-color: #f59e0b !important;
+                &:hover .avatar-head-wrapper .avatar-image {
+                    transform: scale(1.1) !important;
                 }
 
-                &.active .avatar-circle {
-                    border-color: #38bdf8 !important;
-                    box-shadow: 0 0 8px rgba(56, 189, 248, 0.6) !important;
+                &.active .avatar-head-wrapper .avatar-image {
+                    filter: drop-shadow(0 0 4px #38bdf8) !important;
                 }
             }
 
@@ -565,13 +567,13 @@ body[data-era="flash2012"] {
             flex-direction: column !important;
             align-items: flex-end !important;
             gap: 4px !important;
+            width: 195px !important;
 
-            .purse-row {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: flex-end !important;
+            .purse-grid {
+                display: grid !important;
+                grid-template-columns: 95px 95px !important;
                 gap: 5px !important;
-                width: 100% !important;
+                width: 195px !important;
 
                 .purse-pill {
                     display: flex !important;

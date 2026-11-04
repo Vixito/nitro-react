@@ -82,8 +82,8 @@ export const PurseView: FC<{}> = props =>
         return (
             <div className="nitro-purse-container purse-flash2012">
                 <div className="purse-widget-2012">
-                    {/* FILA 1: Créditos + VIP */}
-                    <div className="purse-row">
+                    <div className="purse-grid">
+                        {/* Celda (1, 1): Créditos */}
                         <div 
                             className="purse-pill pill-credits" 
                             title="Créditos" 
@@ -93,6 +93,7 @@ export const PurseView: FC<{}> = props =>
                             <i className="purse-icon icon-credits" />
                         </div>
 
+                        {/* Celda (1, 2): VIP */}
                         <div 
                             className={ `purse-pill pill-vip ${ hasVip ? 'is-active' : '' }` } 
                             title="Habbten VIP" 
@@ -101,10 +102,8 @@ export const PurseView: FC<{}> = props =>
                             <span className="pill-text">{ hasVip ? getClubText : 'Únete' }</span>
                             <i className="purse-badge badge-vip" />
                         </div>
-                    </div>
 
-                    {/* FILA 2: Duckets + HC */}
-                    <div className="purse-row">
+                        {/* Celda (2, 1): Duckets */}
                         <div 
                             className="purse-pill pill-duckets" 
                             title="Duckets" 
@@ -114,6 +113,7 @@ export const PurseView: FC<{}> = props =>
                             <i className="purse-icon icon-duckets" />
                         </div>
 
+                        {/* Celda (2, 2): HC */}
                         <div 
                             className={ `purse-pill pill-hc ${ hasHc ? 'is-active' : '' }` } 
                             title="Habbten Club" 
@@ -122,10 +122,8 @@ export const PurseView: FC<{}> = props =>
                             <span className="pill-text">{ hasHc ? getClubText : 'Únete' }</span>
                             <i className="purse-badge badge-hc" />
                         </div>
-                    </div>
 
-                    {/* FILA 3: Diamantes */}
-                    <div className="purse-row">
+                        {/* Celda (3, 1): Diamantes */}
                         <div 
                             className="purse-pill pill-diamonds" 
                             title="Diamantes" 
@@ -136,7 +134,7 @@ export const PurseView: FC<{}> = props =>
                         </div>
                     </div>
 
-                    {/* FILA 4: Barra oscura inferior con Ayuda, Ajustes, Salir */}
+                    {/* Barra oscura inferior con Ayuda, Ajustes, Salir */}
                     <div className="purse-action-bar">
                         <span className="action-link" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>Ayuda</span>
                         <span className="action-sep">|</span>
