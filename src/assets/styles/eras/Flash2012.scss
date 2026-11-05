@@ -33,13 +33,13 @@ body[data-era="flash2012"] {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            width: 84px !important;
-            background: #46423c !important;
-            border: 1px solid #2b2723 !important;
+            width: 86px !important;
+            background: #555149 !important;
+            border: 1px solid #33302b !important;
             border-radius: 8px !important;
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.6) !important;
             padding: 4px 0 !important;
-            gap: 1px !important;
+            gap: 2px !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
             scrollbar-width: none !important;
@@ -48,9 +48,9 @@ body[data-era="flash2012"] {
 
         .navigation-item {
             position: relative !important;
-            width: 78px !important;
-            height: clamp(44px, 6.8vh, 76px) !important;
-            min-height: 44px !important;
+            width: 80px !important;
+            height: clamp(52px, 7.8vh, 82px) !important;
+            min-height: 48px !important;
             flex-shrink: 0 !important;
             display: flex !important;
             flex-direction: column !important;
@@ -93,46 +93,46 @@ body[data-era="flash2012"] {
                 transition: filter 0.1s ease !important;
 
                 &.icon-hotel {
-                    width: 26px !important;
-                    height: 26px !important;
+                    width: 38px !important;
+                    height: 38px !important;
                     background-image: url('@/assets/images/toolbar/icons/habbo.png') !important;
                 }
 
                 &.icon-rooms {
-                    width: 38px !important;
-                    height: 26px !important;
+                    width: 48px !important;
+                    height: 42px !important;
                     background-image: url('@/assets/images/toolbar/icons/rooms.png') !important;
                 }
 
                 &.icon-games {
-                    width: 38px !important;
-                    height: 22px !important;
+                    width: 46px !important;
+                    height: 30px !important;
                     background-image: url('@/assets/images/toolbar/icons/game.png') !important;
                 }
 
                 &.icon-battlepass,
                 &.icon-quests {
-                    width: 24px !important;
-                    height: 26px !important;
+                    width: 42px !important;
+                    height: 44px !important;
                     background-image: url('@/assets/images/toolbar/icons/quest.png') !important;
                 }
 
                 &.icon-achievements {
-                    width: 26px !important;
-                    height: 26px !important;
+                    width: 46px !important;
+                    height: 39px !important;
                     background-image: url('@/assets/images/toolbar/icons/me-menu/achievements.png') !important;
                 }
 
                 &.icon-catalog,
                 &.icon-shop {
-                    width: 30px !important;
-                    height: 30px !important;
+                    width: 45px !important;
+                    height: 42px !important;
                     background-image: url('@/assets/images/toolbar/icons/catalog.png') !important;
                 }
 
                 &.icon-inventory {
-                    width: 36px !important;
-                    height: 30px !important;
+                    width: 44px !important;
+                    height: 44px !important;
                     background-image: url('@/assets/images/toolbar/icons/inventory.png') !important;
                 }
 
@@ -581,7 +581,7 @@ body[data-era="flash2012"] {
                     justify-content: space-between !important;
                     width: 95px !important;
                     height: 26px !important;
-                    border-radius: 13px !important;
+                    border-radius: 5px !important;
                     padding: 0 8px 0 10px !important;
                     gap: 4px !important;
                     cursor: pointer !important;
@@ -705,11 +705,11 @@ body[data-era="flash2012"] {
                 gap: 8px !important;
                 width: 195px !important;
                 height: 24px !important;
-                background: #38444b !important;
-                border: 1px solid #1c272c !important;
-                border-radius: 12px !important;
+                background: #57544c !important;
+                border: 1px solid #1c1c1c !important;
+                border-radius: 5px !important;
                 padding: 0 8px !important;
-                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
 
                 .action-link {
                     font-family: 'Ubuntu', sans-serif !important;
@@ -741,14 +741,14 @@ body[data-era="flash2012"] {
     .nitro-card,
     .draggable-window {
         border-radius: 6px !important;
-        border: 1px solid #202020 !important;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 30px rgba(0, 0, 0, 0.6) !important;
+        border: 1px solid #1c1c1c !important;
+        box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), inset -1px -1px 0 rgba(0,0,0,0.35), 0 8px 32px rgba(0, 0, 0, 0.65) !important;
         background-color: #d6d6d6 !important;
         overflow: hidden !important;
 
         .nitro-card-header,
         .drag-handler {
-            background: linear-gradient(180deg, #5da3bd 0%, #3a829e 50%, #256a86 100%) !important;
+            background: linear-gradient(180deg, #64a6bf 0%, #468ca8 50%, #2f7996 100%) !important;
             border-bottom: 1px solid #164658 !important;
             border-radius: 5px 5px 0 0 !important;
             padding: 6px 10px !important;
@@ -756,7 +756,7 @@ body[data-era="flash2012"] {
             display: flex !important;
             align-items: center !important;
             justify-content: space-between !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4) !important;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.3) !important;
 
             .header-text,
             .nitro-card-header-text,
