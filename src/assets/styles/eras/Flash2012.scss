@@ -1,22 +1,195 @@
-// Flash Era 2012 Theme Styles - Authentic Habbten Illumina (r63b) Design
-// Matches exact Habbten Flash 2012 in-game interface:
-// Vertical left toolbar with official icons & labels, cyan room navigator,
-// compact horizontal pill purse, dark metallic window headers, and clean Illumina controls.
+// =============================================================================
+// Habbten 2012 Historical Flash Client Reconstruction (March–Nov 2012 R63B)
+// Authentic coexistence of Sulake's 5 2012 Window Skins + Reception + Toolbar:
+//   1. volter-blue    (Navigator, Inventory, Room Settings — Habbo Beta Blue)
+//   2. volter-yellow  (Friends List, Messenger Console — Habbo Beta Yellow)
+//   3. ubuntu-blue    (Achievements, Catalog/Shop, Games — 2012 Steel Blue + Red [X])
+//   4. illumina-dark  (Avatar Editor, Settings, Wired, ModTools — Illumina Dark)
+//   5. illumina-light (User Profile, Alerts, Help — Illumina Light)
+// Strictly scoped to body.era-flash-2012 / body[data-era="flash2012"].
+// =============================================================================
+
+@font-face {
+    font-family: 'Volter2012';
+    src: url('@/assets/webfonts/volter/volter.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Volter2012';
+    src: url('@/assets/webfonts/volter/volter-bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Ubuntu2012';
+    src: url('@/assets/fonts/eras/flash2012/Ubuntu.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Ubuntu2012';
+    src: url('@/assets/fonts/eras/flash2012/UbuntuMedium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Ubuntu2012';
+    src: url('@/assets/fonts/eras/flash2012/UbuntuBold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
 body.era-flash-2012,
 body[data-era="flash2012"] {
 
-    font-family: 'Ubuntu', 'Segoe UI', Tahoma, sans-serif !important;
+    font-family: 'Ubuntu2012', 'Ubuntu', Tahoma, sans-serif !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+
+    // Eliminate any global dark-theme text-stroke / halo inside 2012 windows
+    .nitro-card {
+        text-shadow: none !important;
+        -webkit-text-stroke: 0 !important;
+
+        span,
+        div,
+        p,
+        label,
+        button,
+        input,
+        select,
+        textarea,
+        a {
+            text-shadow: none;
+            -webkit-text-stroke: 0 !important;
+        }
+    }
+
+    // Ensure outer DraggableWindow never paints a duplicate frame around .nitro-card
+    .draggable-window {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+    }
+
+    // Authentic 2012 Shiny Silver/White Beveled Button inside Windows
+    .btn-shiny-2012,
+    .nitro-card :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button),
+    .btn:not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button) {
+        background: linear-gradient(180deg, #ffffff 0%, #f4f4f4 48%, #e2e2e2 52%, #cfcfcf 100%) !important;
+        border: 1px solid #303030 !important;
+        border-radius: 4px !important;
+        color: #141414 !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        line-height: 1.15 !important;
+        min-height: 23px !important;
+        text-shadow: none !important;
+        box-shadow: inset 0 1px 0 #ffffff, 0 1px 1px rgba(0, 0, 0, 0.2) !important;
+        padding: 3px 10px !important;
+        cursor: pointer !important;
+        user-select: none !important;
+
+        &:hover:not(:disabled) {
+            background: linear-gradient(180deg, #ffffff 0%, #fafafa 48%, #ececec 52%, #dbdbdb 100%) !important;
+            border-color: #111111 !important;
+            color: #000000 !important;
+            filter: none !important;
+        }
+
+        &:active:not(:disabled) {
+            background: linear-gradient(180deg, #c6c6c6 0%, #dcdcdc 100%) !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+        }
+
+        &:disabled {
+            opacity: 0.55 !important;
+            cursor: default !important;
+        }
+    }
+
+    // Compact 2012 Danger / Report Action Button (crisp bevel, never a giant modern red block)
+    .btn-danger,
+    .nitro-card .btn-danger {
+        background: linear-gradient(180deg, #fff5f5 0%, #f7dede 48%, #eccaca 52%, #dfb4b4 100%) !important;
+        border: 1px solid #6b1d19 !important;
+        border-radius: 4px !important;
+        color: #7f1510 !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        line-height: 1.15 !important;
+        min-height: 23px !important;
+        padding: 3px 10px !important;
+        text-shadow: none !important;
+        box-shadow: inset 0 1px 0 #ffffff, 0 1px 1px rgba(0, 0, 0, 0.2) !important;
+
+        &:hover:not(:disabled) {
+            background: linear-gradient(180deg, #ffffff 0%, #fceaea 48%, #f3d5d5 52%, #e8c2c2 100%) !important;
+            color: #5c0c08 !important;
+        }
+    }
+
+    // Clean 2012 Inputs & Selects inside Windows
+    .nitro-card .form-control,
+    .nitro-card .form-select {
+        background-color: #ffffff !important;
+        border: 1px solid #6e6e6e !important;
+        border-radius: 3px !important;
+        color: #111111 !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 400 !important;
+        min-height: 23px !important;
+        height: 23px !important;
+        padding: 2px 7px !important;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12) !important;
+        text-shadow: none !important;
+
+        &:focus {
+            border-color: #2b6782 !important;
+            outline: none !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(69, 140, 168, 0.35) !important;
+        }
+    }
+
+    // ModTools 2012 button icon alignment
+    .nitro-mod-tools {
+        .btn {
+            position: relative !important;
+            padding-left: 26px !important;
+            text-align: left !important;
+            justify-content: flex-start !important;
+
+            .icon.position-absolute {
+                left: 5px !important;
+                top: 50% !important;
+                transform: translateY(-50%) scale(0.85) !important;
+            }
+        }
+    }
 
     // =========================================================================
-    // 1. BARRA LATERAL VERTICAL IZQUIERDA (AUTÉNTICA FLASH 2012 ILLUMINA)
+    // 1. BARRA LATERAL VERTICAL IZQUIERDA (HABBOTOOLBARCOM MARZO 2012)
     // =========================================================================
     .nitro-toolbar.toolbar-flash2012 {
         position: fixed !important;
         top: 8px !important;
         left: 8px !important;
         bottom: auto !important;
-        width: 84px !important;
+        width: 68px !important;
         height: auto !important;
         max-height: calc(100vh - 54px) !important;
         z-index: 1020 !important;
@@ -28,29 +201,44 @@ body[data-era="flash2012"] {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
+        gap: 4px !important;
+        user-select: none !important;
 
         .toolbar-capsule {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
-            width: 86px !important;
-            background: #555149 !important;
-            border: 1px solid #33302b !important;
-            border-radius: 8px !important;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.6) !important;
-            padding: 4px 0 !important;
+            width: 66px !important;
+            background: rgba(56, 54, 49, 0.92) !important;
+            border: 1px solid #1e1d1a !important;
+            border-radius: 6px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 3px 10px rgba(0, 0, 0, 0.45) !important;
+            padding: 5px 0 !important;
             gap: 2px !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
             scrollbar-width: none !important;
-            &::-webkit-scrollbar { display: none !important; }
+
+            &::-webkit-scrollbar {
+                display: none !important;
+            }
+        }
+
+        .toolbar-divider-2012 {
+            width: 54px !important;
+            height: 2px !important;
+            margin: 2px 0 !important;
+            flex-shrink: 0 !important;
+            background-image: url('@/assets/images/eras/flash2012/toolbar/divider.png') !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            opacity: 0.85 !important;
         }
 
         .navigation-item {
             position: relative !important;
-            width: 80px !important;
-            height: clamp(52px, 7.8vh, 82px) !important;
-            min-height: 48px !important;
+            width: 60px !important;
+            min-height: 52px !important;
             flex-shrink: 0 !important;
             display: flex !important;
             flex-direction: column !important;
@@ -58,29 +246,18 @@ body[data-era="flash2012"] {
             justify-content: center !important;
             background: transparent !important;
             border: none !important;
-            border-radius: 6px !important;
-            box-shadow: none !important;
+            border-radius: 4px !important;
             cursor: pointer !important;
-            transition: transform 0.12s ease, background-color 0.12s ease !important;
-            padding: 2px 0 !important;
+            padding: 3px 2px !important;
             margin: 0 !important;
 
             &:hover {
-                background: rgba(255, 255, 255, 0.12) !important;
-                transform: translateY(-1px) !important;
-
-                .toolbar-icon {
-                    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)) brightness(1.1) !important;
-                }
+                background: rgba(255, 255, 255, 0.08) !important;
             }
 
             &:active {
-                transform: translateY(0) scale(0.96) !important;
                 background: rgba(0, 0, 0, 0.25) !important;
-
-                .toolbar-icon {
-                    filter: brightness(0.9) !important;
-                }
+                transform: translateY(1px) !important;
             }
 
             .toolbar-icon {
@@ -89,221 +266,302 @@ body[data-era="flash2012"] {
                 background-position: center !important;
                 background-size: contain !important;
                 image-rendering: pixelated !important;
-                filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)) !important;
-                transition: filter 0.1s ease !important;
 
                 &.icon-hotel {
-                    width: 38px !important;
-                    height: 38px !important;
-                    background-image: url('@/assets/images/toolbar/icons/habbo.png') !important;
+                    width: 37px !important;
+                    height: 37px !important;
+                    background-image: url('@/assets/images/eras/flash2012/toolbar/reception_normal.png') !important;
+                }
+
+                &.icon-home {
+                    width: 37px !important;
+                    height: 37px !important;
+                    background-image: url('@/assets/images/eras/flash2012/toolbar/home_normal.png') !important;
                 }
 
                 &.icon-rooms {
-                    width: 48px !important;
-                    height: 42px !important;
-                    background-image: url('@/assets/images/toolbar/icons/rooms.png') !important;
+                    width: 46px !important;
+                    height: 40px !important;
+                    background-image: url('@/assets/images/eras/flash2012/toolbar/navigator_normal.png') !important;
+                }
+
+                &.icon-quests {
+                    width: 38px !important;
+                    height: 40px !important;
+                    background-image: url('@/assets/images/eras/flash2012/toolbar/quests_normal.png') !important;
                 }
 
                 &.icon-games {
-                    width: 46px !important;
-                    height: 30px !important;
-                    background-image: url('@/assets/images/toolbar/icons/game.png') !important;
-                }
-
-                &.icon-battlepass,
-                &.icon-quests {
                     width: 42px !important;
-                    height: 44px !important;
-                    background-image: url('@/assets/images/toolbar/icons/quest.png') !important;
+                    height: 29px !important;
+                    background-image: url('@/assets/images/eras/flash2012/toolbar/games_normal.png') !important;
                 }
 
-                &.icon-achievements {
-                    width: 46px !important;
+                &.icon-catalog {
+                    width: 42px !important;
                     height: 39px !important;
-                    background-image: url('@/assets/images/toolbar/icons/me-menu/achievements.png') !important;
-                }
-
-                &.icon-catalog,
-                &.icon-shop {
-                    width: 45px !important;
-                    height: 42px !important;
-                    background-image: url('@/assets/images/toolbar/icons/catalog.png') !important;
+                    background-image: url('@/assets/images/eras/flash2012/toolbar/catalogue_normal.png') !important;
                 }
 
                 &.icon-inventory {
-                    width: 44px !important;
-                    height: 44px !important;
-                    background-image: url('@/assets/images/toolbar/icons/inventory.png') !important;
-                }
-
-                &.icon-modtools {
-                    width: 25px !important;
-                    height: 28px !important;
-                    background-image: url('@/assets/images/toolbar/icons/modtools.png') !important;
-                    background-position: center !important;
-                }
-
-                &.icon-camera {
-                    width: 30px !important;
-                    height: 34px !important;
-                    background-image: url('@/assets/images/toolbar/icons/camera.png') !important;
-                    background-position: center !important;
+                    width: 40px !important;
+                    height: 40px !important;
+                    background-image: url('@/assets/images/eras/flash2012/toolbar/inventory_normal.png') !important;
                 }
             }
 
-            // Etiquetas de texto debajo de los iconos (idéntico a la referencia 2012)
-            .avatar-label,
-            .toolbar-label {
+            // Authentic 2012 Hover Sprite States
+            &:hover .toolbar-icon {
+                &.icon-hotel { background-image: url('@/assets/images/eras/flash2012/toolbar/reception_hover.png') !important; }
+                &.icon-home { background-image: url('@/assets/images/eras/flash2012/toolbar/home_hover.png') !important; }
+                &.icon-rooms { background-image: url('@/assets/images/eras/flash2012/toolbar/navigator_hover.png') !important; }
+                &.icon-quests { background-image: url('@/assets/images/eras/flash2012/toolbar/quests_hover.png') !important; }
+                &.icon-games { background-image: url('@/assets/images/eras/flash2012/toolbar/games_hover.png') !important; }
+                &.icon-catalog { background-image: url('@/assets/images/eras/flash2012/toolbar/catalogue_hover.png') !important; }
+                &.icon-inventory { background-image: url('@/assets/images/eras/flash2012/toolbar/inventory_hover.png') !important; }
+            }
+
+            .avatar-label {
                 display: block !important;
-                font-family: 'Ubuntu', sans-serif !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 10px !important;
-                font-weight: 700 !important;
-                color: #ffffff !important;
+                font-weight: 500 !important;
+                color: #f3f2ee !important;
                 text-align: center !important;
                 margin-top: 2px !important;
-                line-height: 1 !important;
-                text-shadow: 0 1px 2px #000000, 0 2px 4px #000000 !important;
+                line-height: 1.05 !important;
+                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.85) !important;
                 pointer-events: none !important;
                 white-space: nowrap !important;
             }
 
-            // Avatar al fondo de la barra vertical (sin marco circular, auténtico pixel art)
+            // Native 1:1 90x130 Head Canvas Crop (never shrink to a tiny dot!)
             &.item-avatar {
-                flex-direction: column !important;
-                height: clamp(44px, 6.8vh, 76px) !important;
-                min-height: 44px !important;
-                padding-top: 2px !important;
+                min-height: 54px !important;
 
                 .avatar-head-wrapper {
-                    width: 38px !important;
-                    height: 30px !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
+                    width: 42px !important;
+                    height: 38px !important;
+                    display: block !important;
                     position: relative !important;
-                    overflow: visible !important;
+                    overflow: hidden !important;
+                    flex-shrink: 0 !important;
 
                     .avatar-image {
-                        width: 100% !important;
-                        height: 100% !important;
+                        position: absolute !important;
+                        width: 90px !important;
+                        height: 130px !important;
+                        min-width: 90px !important;
+                        min-height: 130px !important;
+                        top: -28px !important;
+                        left: -24px !important;
                         margin: 0 !important;
-                        margin-left: 0 !important;
-                        margin-top: 0 !important;
-                        background-position: center bottom !important;
+                        transform: none !important;
+                        background-position: 0 0 !important;
                         background-repeat: no-repeat !important;
-                        background-size: contain !important;
+                        background-size: 90px 130px !important;
                         image-rendering: pixelated !important;
-                        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6)) !important;
-                        transition: transform 0.12s ease !important;
                     }
                 }
 
-                &:hover .avatar-head-wrapper .avatar-image {
-                    transform: scale(1.1) !important;
-                }
-
-                &.active .avatar-head-wrapper .avatar-image {
-                    filter: drop-shadow(0 0 4px #38bdf8) !important;
+                &.active {
+                    background: rgba(255, 255, 255, 0.14) !important;
                 }
             }
 
-            // Badges numéricos (notificaciones rojas 2012)
+            // 2012 Red Square-Rounded Unread Badge (matching reference screenshot)
             .nitro-item-count,
             .layout-item-count {
                 position: absolute !important;
                 top: 2px !important;
-                right: 4px !important;
-                background: #e11d48 !important;
+                right: 3px !important;
+                background: #cc2929 !important;
                 color: #ffffff !important;
-                border: 1px solid #ffffff !important;
-                border-radius: 10px !important;
-                font-family: 'Ubuntu', sans-serif !important;
-                font-size: 11px !important;
-                font-weight: 800 !important;
-                padding: 1px 4px !important;
-                min-width: 15px !important;
-                height: 15px !important;
+                border: 1px solid #f8b4b4 !important;
+                border-radius: 3px !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                padding: 0 4px !important;
+                min-width: 14px !important;
+                height: 14px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.65) !important;
                 z-index: 5 !important;
             }
         }
-    }
 
-    // Menú de usuario (Me Menu) flotante al lado de la barra vertical
-    .nitro-toolbar-me {
-        position: fixed !important;
-        bottom: 50px !important;
-        left: 85px !important;
-        background: #2b2724 !important;
-        border: 1px solid #4a443e !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
-        padding: 6px !important;
-        gap: 6px !important;
-        display: flex !important;
-        align-items: center !important;
-        z-index: 1025 !important;
-
-        .navigation-item {
-            width: 36px !important;
-            height: 36px !important;
-            border-radius: 6px !important;
+        // Separate Compact Staff Mod Pill below main 2012 capsule
+        .toolbar-mod-pill-2012 {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            gap: 4px !important;
+            width: 66px !important;
+            height: 24px !important;
+            background: rgba(56, 54, 49, 0.92) !important;
+            border: 1px solid #1e1d1a !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 6px rgba(0, 0, 0, 0.4) !important;
             cursor: pointer !important;
-            transition: background-color 0.12s ease !important;
+            padding: 0 5px !important;
+
+            .icon-modtools {
+                display: block !important;
+                width: 16px !important;
+                height: 16px !important;
+                background: url('@/assets/images/toolbar/icons/modtools.png') center / contain no-repeat !important;
+                image-rendering: pixelated !important;
+            }
+
+            .mod-label-2012 {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                color: #f3f2ee !important;
+                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.85) !important;
+                line-height: 1 !important;
+            }
 
             &:hover {
-                background: rgba(255, 255, 255, 0.1) !important;
+                background: rgba(74, 71, 65, 0.96) !important;
             }
         }
     }
 
     // =========================================================================
-    // 2. BARRA INFERIOR HORIZONTAL FLASH 2012 (FRIEND BAR - SIN SNOWSTORM)
+    // 2B. MENÚ "YO" ILLUMINA 2012 (ICONOS BLANCOS -> COLOR EN HOVER)
+    // =========================================================================
+    .nitro-toolbar-me.flash2012-me-menu {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 46px !important;
+        left: 80px !important;
+        background: rgba(40, 38, 35, 0.96) !important;
+        border: 1px solid #141312 !important;
+        border-radius: 6px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 6px 18px rgba(0, 0, 0, 0.6) !important;
+        padding: 6px 8px !important;
+        gap: 6px !important;
+        display: flex !important;
+        align-items: center !important;
+        z-index: 1025 !important;
+        user-select: none !important;
+
+        .me-item-2012 {
+            position: relative !important;
+            width: 56px !important;
+            height: 54px !important;
+            border-radius: 4px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            cursor: pointer !important;
+            padding: 3px !important;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.09) !important;
+
+                .icon-2012-achievements { background-image: url('@/assets/images/eras/flash2012/memenu/achievements_color.png') !important; }
+                .icon-2012-profile      { background-image: url('@/assets/images/eras/flash2012/memenu/profile_color.png') !important; }
+                .icon-2012-rooms        { background-image: url('@/assets/images/eras/flash2012/memenu/rooms_color.png') !important; }
+                .icon-2012-clothes      { background-image: url('@/assets/images/eras/flash2012/memenu/clothes_color.png') !important; }
+                .icon-2012-settings     { background-image: url('@/assets/images/eras/flash2012/memenu/settings_color.png') !important; }
+                .icon-2012-guide        { background-image: url('@/assets/images/eras/flash2012/memenu/guide_color.png') !important; }
+                .icon-2012-camera       { filter: none !important; opacity: 1 !important; }
+            }
+
+            .me-icon-2012 {
+                display: block !important;
+                width: 38px !important;
+                height: 32px !important;
+                background-repeat: no-repeat !important;
+                background-position: center !important;
+                background-size: contain !important;
+                image-rendering: pixelated !important;
+
+                &.icon-2012-achievements { background-image: url('@/assets/images/eras/flash2012/memenu/achievements_white.png') !important; }
+                &.icon-2012-profile      { background-image: url('@/assets/images/eras/flash2012/memenu/profile_white.png') !important; }
+                &.icon-2012-rooms        { background-image: url('@/assets/images/eras/flash2012/memenu/rooms_white.png') !important; }
+                &.icon-2012-clothes      { background-image: url('@/assets/images/eras/flash2012/memenu/clothes_white.png') !important; }
+                &.icon-2012-settings     { background-image: url('@/assets/images/eras/flash2012/memenu/settings_white.png') !important; }
+                &.icon-2012-guide        { background-image: url('@/assets/images/eras/flash2012/memenu/guide_white.png') !important; }
+                &.icon-2012-camera {
+                    width: 28px !important;
+                    height: 30px !important;
+                    background-image: url('@/assets/images/toolbar/icons/camera.png') !important;
+                    filter: grayscale(1) brightness(1.75) !important;
+                    opacity: 0.92 !important;
+                }
+            }
+
+            .me-label-2012 {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 10px !important;
+                font-weight: 500 !important;
+                color: #f3f2ee !important;
+                margin-top: 2px !important;
+                line-height: 1 !important;
+                white-space: nowrap !important;
+            }
+        }
+    }
+
+    // =========================================================================
+    // 3. BARRA INFERIOR DE AMIGOS (HABBOFRIENDBARCOM 2012)
     // =========================================================================
     .nitro-bottom-bar-2012 {
         position: fixed !important;
         bottom: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        height: 42px !important;
-        z-index: 1010 !important;
-        background: linear-gradient(180deg, #2c2825 0%, #191716 100%) !important;
-        border-top: 1px solid #4a443e !important;
-        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.5) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        height: 36px !important;
+        z-index: 1015 !important;
+        background: linear-gradient(180deg, #3c3a36 0%, #2c2a27 100%) !important;
+        border-top: 1px solid #141312 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        padding: 0 12px 0 88px !important;
+        padding: 0 8px 0 80px !important;
+        gap: 8px !important;
+        user-select: none !important;
 
         .bottom-bar-left {
             display: flex !important;
             align-items: center !important;
-            flex: 1 !important;
+            justify-content: center !important;
+            flex: 1 1 0% !important;
+            min-width: 0 !important;
+            overflow: visible !important;
             height: 100% !important;
 
             .friend-bar-stream-container {
                 display: flex !important;
                 align-items: center !important;
+                justify-content: center !important;
+                max-width: 100% !important;
                 height: 100% !important;
 
                 .friend-bar {
                     display: flex !important;
                     align-items: center !important;
-                    gap: 6px !important;
+                    gap: 4px !important;
                     height: 100% !important;
 
                     .friend-bar-button {
-                        width: 24px !important;
-                        height: 28px !important;
-                        background: #3d3934 !important;
-                        border: 1px solid #57514a !important;
-                        border-radius: 4px !important;
+                        width: 20px !important;
+                        height: 26px !important;
+                        flex-shrink: 0 !important;
+                        background: linear-gradient(180deg, #57544e 0%, #403e39 100%) !important;
+                        border: 1px solid #1a1917 !important;
+                        border-radius: 3px !important;
+                        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
                         color: #ffffff !important;
                         display: flex !important;
                         align-items: center !important;
@@ -311,60 +569,120 @@ body[data-era="flash2012"] {
                         padding: 0 !important;
                         cursor: pointer !important;
 
-                        &:hover {
-                            background: #4f4a43 !important;
+                        &:hover:not(:disabled) {
+                            background: linear-gradient(180deg, #69655e 0%, #4d4a44 100%) !important;
                         }
 
                         &:disabled {
-                            opacity: 0.4 !important;
+                            opacity: 0.35 !important;
                             cursor: default !important;
                         }
 
                         .fa-icon {
-                            width: 10px !important;
-                            height: 10px !important;
+                            width: 9px !important;
+                            height: 9px !important;
                         }
                     }
 
                     .friend-bar-item {
                         height: 28px !important;
+                        min-width: 118px !important;
+                        max-width: 150px !important;
                         border-radius: 4px !important;
-                        padding: 2px 10px 2px 28px !important;
-                        font-family: 'Ubuntu', sans-serif !important;
-                        font-size: 11px !important;
+                        padding: 2px 8px 2px 32px !important;
+                        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                        font-size: 10px !important;
                         font-weight: 700 !important;
-                        border: 1px solid rgba(0,0,0,0.3) !important;
+                        line-height: 1.05 !important;
+                        border: 1px solid #1a1917 !important;
                         display: flex !important;
                         align-items: center !important;
                         position: relative !important;
-                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 2px rgba(0,0,0,0.3) !important;
+                        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
                         cursor: pointer !important;
+                        color: #ffffff !important;
+                        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8) !important;
 
-                        .friend-bar-item-head {
-                            left: 2px !important;
-                            top: 50% !important;
-                            transform: translateY(-50%) !important;
-                        }
-
+                        // "Find new friends" / "Encuentra amig@s" grey 2012 pill with green [+] icon
                         &.friend-bar-search {
-                            background: #3d3934 !important;
-                            border: 1px solid #57514a !important;
-                            color: #ffffff !important;
-                            text-shadow: 0 1px 2px #000000 !important;
+                            background: linear-gradient(180deg, #74716a 0%, #585650 100%) !important;
+
+                            .friend-bar-item-head {
+                                position: absolute !important;
+                                width: 25px !important;
+                                height: 25px !important;
+                                left: 3px !important;
+                                top: 50% !important;
+                                transform: translateY(-50%) !important;
+                                background-image: url('@/assets/images/eras/flash2012/friendbar/plus_friend_icon.png') !important;
+                                background-repeat: no-repeat !important;
+                                background-position: center !important;
+                                background-size: 25px 25px !important;
+                                image-rendering: pixelated !important;
+                            }
 
                             &:hover {
-                                background: #4f4a43 !important;
+                                background: linear-gradient(180deg, #85827a 0%, #66635c 100%) !important;
                             }
                         }
 
+                        // Online friend / group chat pill
                         &:not(.friend-bar-search) {
-                            background: #3d3934 !important;
-                            border: 1px solid #57514a !important;
-                            color: #ffffff !important;
-                            text-shadow: 0 1px 2px #000000 !important;
+                            background: linear-gradient(180deg, #63963b 0%, #497528 100%) !important;
+
+                            .friend-bar-item-head.avatar {
+                                position: absolute !important;
+                                left: -27px !important;
+                                top: -31px !important;
+                                width: auto !important;
+                                height: auto !important;
+                                transform: none !important;
+                                pointer-events: none !important;
+
+                                .avatar-image {
+                                    image-rendering: pixelated !important;
+                                }
+                            }
+
+                            .friend-bar-item-head.group {
+                                position: absolute !important;
+                                left: 2px !important;
+                                top: 50% !important;
+                                width: 28px !important;
+                                height: 28px !important;
+                                transform: translateY(-50%) scale(0.66) !important;
+                                transform-origin: left center !important;
+                                pointer-events: none !important;
+                            }
 
                             &:hover {
-                                background: #4f4a43 !important;
+                                filter: brightness(1.08) !important;
+                            }
+
+                            &.friend-bar-item-active {
+                                min-width: 170px !important;
+                                max-width: 210px !important;
+                                gap: 6px !important;
+                                justify-content: space-between !important;
+                            }
+
+                            // 2012 Friend Action Icons (Chat, Follow, Profile)
+                            .icon-friendbar-chat {
+                                width: 21px !important;
+                                height: 21px !important;
+                                background: url('@/assets/images/eras/flash2012/friendbar/friend_chat.png') center no-repeat !important;
+                            }
+
+                            .icon-friendbar-visit {
+                                width: 21px !important;
+                                height: 21px !important;
+                                background: url('@/assets/images/eras/flash2012/friendbar/friend_follow.png') center no-repeat !important;
+                            }
+
+                            .icon-profile {
+                                width: 21px !important;
+                                height: 21px !important;
+                                background: url('@/assets/images/eras/flash2012/friendbar/friend_profile.png') center no-repeat !important;
                             }
                         }
                     }
@@ -375,122 +693,287 @@ body[data-era="flash2012"] {
         .bottom-bar-right {
             display: flex !important;
             align-items: center !important;
-            gap: 8px !important;
+            flex: 0 0 auto !important;
+            gap: 5px !important;
 
             .btn-all-friends {
-                background: linear-gradient(180deg, #ffffff 0%, #ededed 50%, #dcdcdc 51%, #c5c5c5 100%) !important;
-                border: 1px solid #4b463f !important;
-                border-radius: 4px !important;
                 height: 28px !important;
-                padding: 0 10px !important;
+                padding: 0 9px !important;
+                background: linear-gradient(180deg, #6b6861 0%, #4e4c47 100%) !important;
+                border: 1px solid #171615 !important;
+                border-radius: 4px !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
                 display: flex !important;
                 align-items: center !important;
-                gap: 6px !important;
+                gap: 5px !important;
                 cursor: pointer !important;
-                box-shadow: inset 0 1px 0 #ffffff, 0 1px 2px rgba(0,0,0,0.3) !important;
                 position: relative !important;
+                flex-shrink: 0 !important;
+
+                .icon-friends-list {
+                    display: block !important;
+                    width: 20px !important;
+                    height: 24px !important;
+                    background: url('@/assets/images/eras/flash2012/friendbar/icon_friendlist.png') center / contain no-repeat !important;
+                    image-rendering: pixelated !important;
+                }
 
                 .btn-label {
-                    font-family: 'Ubuntu', sans-serif !important;
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                     font-size: 11px !important;
                     font-weight: 700 !important;
-                    color: #1f2937 !important;
-                    text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+                    color: #ffffff !important;
+                    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8) !important;
+                    white-space: nowrap !important;
                 }
 
                 &:hover {
-                    background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 50%, #e2e2e2 51%, #d0d0d0 100%) !important;
-                }
+                    background: linear-gradient(180deg, #7c7971 0%, #5c5953 100%) !important;
 
-                &:active {
-                    background: #b8b8b8 !important;
-                    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4) !important;
-                }
-
-                .nitro-item-count,
-                .layout-item-count {
-                    position: absolute !important;
-                    top: -5px !important;
-                    right: -5px !important;
-                    background: #e11d48 !important;
-                    color: #ffffff !important;
-                    border: 1px solid #ffffff !important;
-                    border-radius: 10px !important;
-                    font-size: 10px !important;
-                    font-weight: 800 !important;
-                    padding: 1px 4px !important;
-                    min-width: 14px !important;
-                    height: 14px !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
+                    .icon-friends-list {
+                        background-image: url('@/assets/images/eras/flash2012/friendbar/icon_friendlist_hover.png') !important;
+                    }
                 }
             }
 
             .btn-messenger {
                 width: 32px !important;
-                height: 32px !important;
+                height: 28px !important;
+                flex-shrink: 0 !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 cursor: pointer !important;
                 border-radius: 4px !important;
-                background: rgba(255, 255, 255, 0.08) !important;
-                border: 1px solid rgba(255, 255, 255, 0.15) !important;
-                transition: background-color 0.1s, transform 0.1s !important;
-
-                &:hover {
-                    background: rgba(255, 255, 255, 0.18) !important;
-                    transform: scale(1.05) !important;
-                }
-
-                &.is-unread {
-                    background: rgba(56, 189, 248, 0.25) !important;
-                    border-color: #38bdf8 !important;
-                    animation: pulse-messenger 1.2s infinite ease-in-out !important;
-                }
+                background: linear-gradient(180deg, #6b6861 0%, #4e4c47 100%) !important;
+                border: 1px solid #171615 !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 
                 .icon-chat-bubble {
                     display: block !important;
-                    width: 24px !important;
+                    width: 22px !important;
                     height: 24px !important;
-                    background-image: url('@/assets/images/toolbar/icons/message.png') !important;
-                    background-size: contain !important;
-                    background-repeat: no-repeat !important;
-                    background-position: center !important;
+                    background: url('@/assets/images/eras/flash2012/friendbar/icon_messenger.png') center / contain no-repeat !important;
                     image-rendering: pixelated !important;
+                }
+
+                &.is-unread {
+                    border-color: #facc15 !important;
+
+                    .icon-chat-bubble {
+                        background-image: url('@/assets/images/eras/flash2012/friendbar/icon_messenger_notify.png') !important;
+                    }
+                }
+
+                &:hover {
+                    filter: brightness(1.1) !important;
                 }
             }
         }
     }
 
-    @keyframes pulse-messenger {
-        0% { transform: scale(1); filter: brightness(1); }
-        50% { transform: scale(1.1); filter: brightness(1.3); }
-        100% { transform: scale(1); filter: brightness(1); }
+    // =========================================================================
+    // 4. MONEDERO / ECONOMÍA 2012 (2x2 BEVELED PILLS — CERO "PÍXELES")
+    // =========================================================================
+    .nitro-purse-container.purse-flash2012 {
+        position: fixed !important;
+        top: 8px !important;
+        right: 8px !important;
+        z-index: 1020 !important;
+        user-select: none !important;
+
+        .purse-widget-2012 {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-end !important;
+            gap: 4px !important;
+            width: 204px !important;
+
+            .purse-grid {
+                display: grid !important;
+                grid-template-columns: 100px 100px !important;
+                gap: 4px !important;
+                width: 204px !important;
+
+                .purse-pill {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    width: 100px !important;
+                    height: 25px !important;
+                    border-radius: 3px !important;
+                    padding: 0 6px 0 8px !important;
+                    gap: 4px !important;
+                    cursor: pointer !important;
+                    transition: filter 0.1s ease !important;
+
+                    &:hover {
+                        filter: brightness(1.08) !important;
+                    }
+
+                    &:active {
+                        filter: brightness(0.95) !important;
+                    }
+
+                    .pill-amount,
+                    .pill-text {
+                        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                        font-size: 11px !important;
+                        font-weight: 700 !important;
+                        color: #ffffff !important;
+                        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.85) !important;
+                        line-height: 1 !important;
+                        overflow: hidden !important;
+                        text-overflow: ellipsis !important;
+                        white-space: nowrap !important;
+                    }
+
+                    .purse-icon,
+                    .purse-badge {
+                        display: block !important;
+                        background-size: contain !important;
+                        background-repeat: no-repeat !important;
+                        background-position: center !important;
+                        image-rendering: pixelated !important;
+                        flex-shrink: 0 !important;
+                    }
+
+                    // (1, 1) Créditos (Dorado 2012)
+                    &.pill-credits {
+                        background: linear-gradient(180deg, #f3c64f 0%, #d89b1e 55%, #b57c0d 100%) !important;
+                        border: 1px solid #4a3100 !important;
+                        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+
+                        .pill-amount {
+                            flex: 1 !important;
+                            text-align: right !important;
+                            margin-right: 3px !important;
+                        }
+
+                        .icon-credits {
+                            width: 18px !important;
+                            height: 18px !important;
+                            background-image: url('@/assets/images/eras/flash2012/purse/credit_icon.png') !important;
+                        }
+                    }
+
+                    // (1, 2) Club HC / VIP (Gris carbón 2012)
+                    &.pill-hc {
+                        background: linear-gradient(180deg, #636059 0%, #45433e 100%) !important;
+                        border: 1px solid #1c1b19 !important;
+                        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+                        justify-content: center !important;
+                        gap: 6px !important;
+
+                        .badge-hc {
+                            width: 19px !important;
+                            height: 18px !important;
+                            background-image: url('@/assets/images/eras/flash2012/purse/hc_icon.png') !important;
+                        }
+
+                        .badge-vip {
+                            width: 20px !important;
+                            height: 16px !important;
+                            background-image: url('@/assets/images/eras/illumina/purse/badge_vip.png') !important;
+                        }
+                    }
+
+                    // (2, 1) Diamantes (Celeste 2012)
+                    &.pill-diamonds {
+                        background: linear-gradient(180deg, #74cae9 0%, #48a4c9 55%, #2f83a6 100%) !important;
+                        border: 1px solid #134459 !important;
+                        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+
+                        .pill-amount {
+                            flex: 1 !important;
+                            text-align: right !important;
+                            margin-right: 3px !important;
+                        }
+
+                        .icon-diamonds {
+                            width: 17px !important;
+                            height: 17px !important;
+                            background-image: url('@/assets/images/eras/illumina/purse/icon_diamonds.png') !important;
+                        }
+                    }
+
+                    // (2, 2) Duckets (Lavanda/Púrpura 2012 — reemplaza Píxeles)
+                    &.pill-duckets {
+                        background: linear-gradient(180deg, #b59be4 0%, #8e6fc9 55%, #6d4ea8 100%) !important;
+                        border: 1px solid #35205c !important;
+                        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+
+                        .pill-amount {
+                            flex: 1 !important;
+                            text-align: right !important;
+                            margin-right: 3px !important;
+                        }
+
+                        .icon-duckets {
+                            width: 18px !important;
+                            height: 18px !important;
+                            background-image: url('@/assets/images/eras/flash2012/purse/ducket_icon.png') !important;
+                        }
+                    }
+                }
+            }
+
+            .purse-action-bar {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 7px !important;
+                width: 204px !important;
+                height: 21px !important;
+                background: rgba(45, 43, 39, 0.92) !important;
+                border: 1px solid #171615 !important;
+                border-radius: 3px !important;
+                padding: 0 8px !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+
+                .action-link {
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                    font-size: 10px !important;
+                    font-weight: 700 !important;
+                    color: #e5e3de !important;
+                    cursor: pointer !important;
+
+                    &:hover {
+                        color: #ffffff !important;
+                        text-decoration: underline !important;
+                    }
+                }
+
+                .action-sep {
+                    color: #78756e !important;
+                    font-size: 10px !important;
+                }
+            }
+        }
     }
 
     // =========================================================================
-    // 3. CHAT FLOTANTE INFERIOR IZQUIERDO (HABBTEN 2012)
+    // 5. CHAT EN SALA Y HERRAMIENTAS DE SALA (HABBOROOMUICOM 2012)
     // =========================================================================
     .chat-container-flash2012,
     #toolbar-chat-input-container {
         position: fixed !important;
-        bottom: 48px !important;
-        left: 88px !important;
-        width: 340px !important;
-        max-width: 45vw !important;
-        z-index: 1010 !important;
+        bottom: 44px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 390px !important;
+        max-width: calc(100vw - 180px) !important;
+        z-index: 1012 !important;
 
         .nitro-chat-input-container {
             display: flex !important;
             align-items: center !important;
             background: #ffffff !important;
-            border: 2px solid #555555 !important;
-            border-radius: 20px !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
-            height: 32px !important;
-            padding: 0 8px 0 12px !important;
+            border: 2px solid #232220 !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+            height: 30px !important;
+            padding: 0 8px 0 10px !important;
 
             &::before,
             &::after {
@@ -503,9 +986,9 @@ body[data-era="flash2012"] {
                 align-items: center !important;
 
                 input.chat-input {
-                    font-family: 'Ubuntu', sans-serif !important;
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                     font-size: 12px !important;
-                    color: #1f2937 !important;
+                    color: #111111 !important;
                     border: none !important;
                     background: transparent !important;
                     box-shadow: none !important;
@@ -513,7 +996,7 @@ body[data-era="flash2012"] {
                     width: 100% !important;
 
                     &::placeholder {
-                        color: #9ca3af !important;
+                        color: #888888 !important;
                     }
 
                     &:focus {
@@ -521,252 +1004,505 @@ body[data-era="flash2012"] {
                     }
                 }
             }
-
-            .chat-addons {
-                display: flex !important;
-                align-items: center !important;
-                gap: 4px !important;
-            }
         }
     }
 
-    // Reposicionamiento del widget de herramientas de sala en Flash 2012
     .nitro-room-tools-container {
         position: fixed !important;
-        bottom: 50px !important;
-        left: 88px !important;
-        z-index: 1000 !important;
+        bottom: 42px !important;
+        left: 8px !important;
+        z-index: 1005 !important;
 
         .nitro-room-tools {
-            background: #1e1d1c !important;
-            border: 1px solid rgba(255, 255, 255, 0.16) !important;
-            border-radius: 6px !important;
+            background: rgba(45, 43, 39, 0.92) !important;
+            border: 1px solid #141312 !important;
+            border-radius: 5px !important;
             padding: 3px !important;
             gap: 3px !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 6px rgba(0, 0, 0, 0.45) !important;
         }
 
         .nitro-room-tools-info {
-            background: #1e1d1c !important;
-            border: 1px solid rgba(255, 255, 255, 0.16) !important;
-            border-radius: 6px !important;
+            background: rgba(45, 43, 39, 0.94) !important;
+            border: 1px solid #141312 !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        }
+    }
+
+    // 2012 Camera Capture Window Close Button (replaces modern white-bordered striped red button)
+    .nitro-camera-capture {
+        .header-close {
+            width: 19px !important;
+            height: 20px !important;
+            min-width: 19px !important;
+            min-height: 20px !important;
+            top: 7px !important;
+            right: 7px !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            background: transparent url('@/assets/images/eras/flash2012/skins/close_ubuntu_normal.png') center no-repeat !important;
+            image-rendering: pixelated !important;
+            cursor: pointer !important;
+
+            &::before,
+            &::after,
+            svg,
+            .fa-icon {
+                display: none !important;
+                content: none !important;
+            }
+
+            &:hover {
+                background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_hover.png') !important;
+            }
+
+            &:active {
+                background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_pressed.png') !important;
+            }
         }
     }
 
     // =========================================================================
-    // 4. MONEDERO / ECONOMÍA FLASH 2012 (CRÉDITOS, VIP, HC, DUCKETS, DIAMANTES)
+    // 6. LOS 5 SKINS DE VENTANA HISTÓRICOS DE HABBO 2012 (COEXISTENCIA REAL)
     // =========================================================================
-    .nitro-purse-container.purse-flash2012 {
-        position: fixed !important;
-        top: 8px !important;
-        right: 10px !important;
-        z-index: 1020 !important;
 
-        .purse-widget-2012 {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-end !important;
-            gap: 4px !important;
-            width: 195px !important;
+    // Base shared reset for .nitro-card in 2012 (kills NitroCardView.scss pseudo-elements & centers title)
+    .nitro-card {
+        overflow: hidden !important;
 
-            .purse-grid {
-                display: grid !important;
-                grid-template-columns: 95px 95px !important;
-                gap: 5px !important;
-                width: 195px !important;
+        &::before,
+        &::after {
+            display: none !important;
+            content: none !important;
+        }
 
-                .purse-pill {
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: space-between !important;
-                    width: 95px !important;
-                    height: 26px !important;
-                    border-radius: 5px !important;
-                    padding: 0 8px 0 10px !important;
-                    gap: 4px !important;
-                    cursor: pointer !important;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) !important;
-                    transition: transform 0.1s ease, filter 0.1s ease !important;
+        .nitro-card-header {
+            user-select: none !important;
+            padding: 0 2px !important;
 
-                    &:hover {
-                        filter: brightness(1.1) !important;
-                        transform: translateY(-1px) !important;
-                    }
-
-                    &:active {
-                        transform: translateY(0) scale(0.97) !important;
-                    }
-
-                    .pill-amount,
-                    .pill-text {
-                        font-family: 'Ubuntu', sans-serif !important;
-                        font-size: 11px !important;
-                        font-weight: 700 !important;
-                        color: #ffffff !important;
-                        text-shadow: 0 1px 2px #000000 !important;
-                        line-height: 1 !important;
-                        overflow: hidden !important;
-                        text-overflow: ellipsis !important;
-                        white-space: nowrap !important;
-                    }
-
-                    .purse-icon {
-                        display: block !important;
-                        background-size: contain !important;
-                        background-repeat: no-repeat !important;
-                        background-position: center !important;
-                        image-rendering: pixelated !important;
-                        flex-shrink: 0 !important;
-                    }
-
-                    .purse-badge {
-                        display: block !important;
-                        background-size: contain !important;
-                        background-repeat: no-repeat !important;
-                        background-position: center !important;
-                        image-rendering: pixelated !important;
-                        flex-shrink: 0 !important;
-                    }
-
-                    &.pill-credits {
-                        background: linear-gradient(180deg, #e5b338 0%, #c48b1c 50%, #99690d 100%) !important;
-                        border: 1px solid #6b4700 !important;
-                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.4) !important;
-
-                        .icon-credits {
-                            width: 15px !important;
-                            height: 15px !important;
-                            background-image: url('@/assets/images/eras/illumina/purse/coin_habbo.png') !important;
-                        }
-                    }
-
-                    &.pill-vip {
-                        background: linear-gradient(180deg, #5b5750 0%, #3a3733 100%) !important;
-                        border: 1px solid #23211e !important;
-                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4) !important;
-
-                        .badge-vip {
-                            width: 20px !important;
-                            height: 16px !important;
-                            background-image: url('@/assets/images/eras/illumina/purse/badge_vip.png') !important;
-                        }
-
-                        &.is-active {
-                            border-color: #f59e0b !important;
-                        }
-                    }
-
-                    &.pill-hc {
-                        background: linear-gradient(180deg, #5b5750 0%, #3a3733 100%) !important;
-                        border: 1px solid #23211e !important;
-                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4) !important;
-
-                        .badge-hc {
-                            width: 20px !important;
-                            height: 16px !important;
-                            background-image: url('@/assets/images/eras/illumina/purse/badge_hc.png') !important;
-                        }
-
-                        &.is-active {
-                            border-color: #10b981 !important;
-                        }
-                    }
-
-                    &.pill-duckets {
-                        background: linear-gradient(180deg, #af50b5 0%, #872e8d 50%, #631969 100%) !important;
-                        border: 1px solid #450e4a !important;
-                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4) !important;
-
-                        .icon-duckets {
-                            width: 15px !important;
-                            height: 15px !important;
-                            background-image: url('@/assets/images/eras/illumina/purse/icon_duckets.png') !important;
-                        }
-                    }
-
-                    &.pill-diamonds {
-                        background: linear-gradient(180deg, #44a5d8 0%, #207cae 50%, #11557c 100%) !important;
-                        border: 1px solid #0b3d5b !important;
-                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.4) !important;
-
-                        .icon-diamonds {
-                            width: 20px !important;
-                            height: 20px !important;
-                            background-image: url('@/assets/images/eras/illumina/purse/icon_diamonds.png') !important;
-                        }
-                    }
-                }
+            &::before,
+            &::after {
+                display: none !important;
+                content: none !important;
             }
 
-            .purse-action-bar {
+            .nitro-card-header-inner {
+                position: relative !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                gap: 8px !important;
-                width: 195px !important;
-                height: 24px !important;
-                background: #57544c !important;
-                border: 1px solid #1c1c1c !important;
-                border-radius: 5px !important;
-                padding: 0 8px !important;
-                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.4) !important;
+                width: 100% !important;
+                padding: 0 24px !important;
+                gap: 5px !important;
 
-                .action-link {
-                    font-family: 'Ubuntu', sans-serif !important;
-                    font-size: 11px !important;
-                    font-weight: 700 !important;
-                    color: #ffffff !important;
-                    text-decoration: underline !important;
-                    cursor: pointer !important;
-                    transition: color 0.12s ease !important;
-
-                    &:hover {
-                        color: #facc15 !important;
-                    }
+                .end-2 {
+                    right: 2px !important;
+                    top: 50% !important;
+                    transform: translateY(-50%) !important;
+                    margin: 0 !important;
                 }
+            }
 
-                .action-sep {
-                    color: #8c9fa8 !important;
-                    font-size: 10px !important;
-                    font-weight: 700 !important;
-                    user-select: none !important;
+            .nitro-card-header-close {
+                cursor: pointer !important;
+                padding: 0 !important;
+
+                &::before,
+                &::after,
+                svg,
+                .fa-icon {
+                    display: none !important;
+                    content: none !important;
+                }
+            }
+        }
+
+        // Left-aligned 2012 Tabs + removal of NitroCardView.scss grey top pill (:before)
+        .nitro-card-tabs {
+            justify-content: flex-start !important;
+
+            .nav-item,
+            .nitro-card-tabs-item {
+                text-shadow: none !important;
+
+                &::before,
+                &::after {
+                    display: none !important;
+                    content: none !important;
                 }
             }
         }
     }
 
-    // =========================================================================
-    // 5. VENTANAS Y DIÁLOGOS ESTILO FLASH 2012 (AUTÉNTICO ILLUMINA BISELADO)
-    // =========================================================================
-    .nitro-card,
-    .draggable-window {
-        border-radius: 6px !important;
-        border: 1px solid #1c1c1c !important;
-        box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8), inset -1px -1px 0 rgba(0,0,0,0.35), 0 8px 32px rgba(0, 0, 0, 0.65) !important;
-        background-color: #d6d6d6 !important;
-        overflow: hidden !important;
+    // -------------------------------------------------------------------------
+    // SKIN 1: VOLTER BLUE (Navigator, Inventory, Room Info/Settings — Beta Blue)
+    // -------------------------------------------------------------------------
+    .nitro-card[data-skin-2012="volter-blue"] {
+        background: #5f9eb9 !important;
+        border: 1px solid #000000 !important;
+        border-radius: 7px !important;
+        box-shadow:
+            inset 0 1px 0 #9ad0e8,
+            inset 1px 0 0 #82b8d0,
+            inset -1px -1px 0 #3a6b82,
+            0 6px 20px rgba(0, 0, 0, 0.45) !important;
+        padding: 0 5px 5px 5px !important;
 
-        .nitro-card-header,
-        .drag-handler {
-            background: linear-gradient(180deg, #64a6bf 0%, #468ca8 50%, #2f7996 100%) !important;
-            border-bottom: 1px solid #164658 !important;
-            border-radius: 5px 5px 0 0 !important;
-            padding: 6px 10px !important;
-            min-height: 32px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.3) !important;
+        .nitro-card-header {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            min-height: 24px !important;
+            height: 24px !important;
 
-            .header-text,
-            .nitro-card-header-text,
-            h5, h6 {
+            // Pixel-exact 3 Horizontal Etched Grip Lines flanking Volter title
+            .shockwave-header-dots {
+                display: block !important;
+                flex: 1 1 auto !important;
+                height: 8px !important;
+                min-width: 14px !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/grip_volter_blue.png') center repeat-x !important;
+                image-rendering: pixelated !important;
+            }
+
+            .nitro-card-header-text {
+                font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
+                font-size: 9px !important;
+                font-weight: 700 !important;
                 color: #ffffff !important;
-                font-family: 'Ubuntu', sans-serif !important;
+                text-shadow: 0 1px 0 #244b5c !important;
+                -webkit-font-smoothing: none !important;
+                letter-spacing: 0 !important;
+                padding: 0 4px !important;
+                white-space: nowrap !important;
+            }
+
+            .nitro-card-header-close {
+                width: 15px !important;
+                height: 15px !important;
+                min-width: 15px !important;
+                min-height: 15px !important;
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/close_volter_blue_normal.png') center no-repeat !important;
+                image-rendering: pixelated !important;
+
+                &:hover {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_volter_blue_hover.png') !important;
+                }
+
+                &:active {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_volter_blue_active.png') !important;
+                }
+            }
+        }
+
+        // Classic Rounded Left-Aligned Beta Tabs (Official | Rooms | Events | Me | Search)
+        .nitro-card-tabs {
+            background: transparent !important;
+            border-bottom: 1px solid #356074 !important;
+            padding: 2px 4px 0 4px !important;
+            gap: 2px !important;
+
+            .nav-item,
+            .nitro-card-tabs-item {
+                background: #cde0ea !important;
+                border: 1px solid #356074 !important;
+                border-bottom: none !important;
+                border-radius: 5px 5px 0 0 !important;
+                color: #16262e !important;
+                font-family: 'Volter2012', 'Volter', sans-serif !important;
+                font-size: 9px !important;
+                font-weight: 400 !important;
+                -webkit-font-smoothing: none !important;
+                padding: 4px 9px !important;
+                margin-bottom: 0 !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+                cursor: pointer !important;
+
+                &:hover {
+                    background: #e4f0f6 !important;
+                }
+
+                &.active {
+                    background: #ffffff !important;
+                    color: #000000 !important;
+                    font-weight: 700 !important;
+                    margin-bottom: -1px !important;
+                    padding-bottom: 5px !important;
+                    z-index: 2 !important;
+                }
+            }
+        }
+
+        .nitro-card-content,
+        .nitro-card-body {
+            background-color: #ffffff !important;
+            border: 1px solid #356074 !important;
+            border-top: none !important;
+            border-radius: 0 0 4px 4px !important;
+            color: #111111 !important;
+            padding: 6px !important;
+        }
+
+        // When a volter-blue window has no tabs (e.g. Información de Sala), keep top border crisp
+        &:not(:has(.nitro-card-tabs)) {
+            .nitro-card-content,
+            .nitro-card-body {
+                border-top: 1px solid #356074 !important;
+                border-radius: 4px !important;
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // SKIN 2: VOLTER YELLOW (Friends List, Messenger Console — Beta Yellow)
+    // -------------------------------------------------------------------------
+    .nitro-card[data-skin-2012="volter-yellow"] {
+        background: #f3be00 !important;
+        border: 1px solid #000000 !important;
+        border-radius: 7px !important;
+        box-shadow:
+            inset 0 1px 0 #ffe680,
+            inset 1px 0 0 #ffd644,
+            inset -1px -1px 0 #b38800,
+            0 6px 20px rgba(0, 0, 0, 0.45) !important;
+        padding: 0 5px 5px 5px !important;
+
+        .nitro-card-header {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            min-height: 24px !important;
+            height: 24px !important;
+
+            .shockwave-header-dots {
+                display: block !important;
+                flex: 1 1 auto !important;
+                height: 8px !important;
+                min-width: 14px !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/grip_volter_yellow.png') center repeat-x !important;
+                image-rendering: pixelated !important;
+            }
+
+            .nitro-card-header-text {
+                font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
+                font-size: 9px !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+                text-shadow: 0 1px 0 #8a6400 !important;
+                -webkit-font-smoothing: none !important;
+                padding: 0 4px !important;
+            }
+
+            .nitro-card-header-close {
+                width: 15px !important;
+                height: 15px !important;
+                min-width: 15px !important;
+                min-height: 15px !important;
+                border-radius: 2px !important;
+                border: 1px solid #8a6500 !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/close_volter_yellow_normal.png') center no-repeat !important;
+                image-rendering: pixelated !important;
+
+                &:hover {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_volter_yellow_hover.png') !important;
+                }
+
+                &:active {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_volter_yellow_pressed.png') !important;
+                }
+            }
+        }
+
+        .nitro-card-content,
+        .nitro-card-body {
+            background-color: #ffffff !important;
+            border: 1px solid #8c6900 !important;
+            border-radius: 3px !important;
+            color: #000000 !important;
+            font-family: 'Volter2012', 'Volter', sans-serif !important;
+            font-size: 9px !important;
+        }
+
+        // Authentic 2012 Yellow Console Accordion Bars (Friends (0) / Offline / Search)
+        .nitro-card-accordion-set {
+            border-bottom: 1px solid #d4d4d4 !important;
+
+            .nitro-card-accordion-set-header {
+                background: #bce3f5 !important;
+                border-bottom: 1px solid #8ab8ce !important;
+                color: #000000 !important;
+                font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
+                font-size: 9px !important;
+                font-weight: 700 !important;
+                -webkit-font-smoothing: none !important;
+                padding: 4px 8px !important;
+            }
+
+            &:nth-child(2) .nitro-card-accordion-set-header {
+                background: #f2f2f2 !important;
+                border-bottom-color: #cccccc !important;
+            }
+
+            &:last-child .nitro-card-accordion-set-header {
+                background: #737169 !important;
+                border-bottom-color: #4a4944 !important;
+                color: #ffffff !important;
+
+                * {
+                    color: #ffffff !important;
+                }
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // SKIN 3: UBUNTU BLUE (Achievements, Catalog/Shop, Games — Steel Blue + Red [X])
+    // -------------------------------------------------------------------------
+    .nitro-card[data-skin-2012="ubuntu-blue"] {
+        background-color: #e6e6e1 !important;
+        border: 1px solid #000000 !important;
+        border-radius: 6px !important;
+        box-shadow: inset 0 0 0 1px #ffffff, 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+        padding: 0 !important;
+
+        .nitro-card-header {
+            background: linear-gradient(180deg, #5da0bc 0%, #468ca8 55%, #377893 100%) !important;
+            border-bottom: 1px solid #000000 !important;
+            border-radius: 5px 5px 0 0 !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 0 4px !important;
+
+            .nitro-card-header-inner {
+                padding: 0 26px !important;
+            }
+
+            .shockwave-header-dots {
+                display: none !important;
+            }
+
+            .nitro-card-header-text {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 12px !important;
                 font-weight: 700 !important;
-                letter-spacing: 0.2px !important;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important;
+                color: #ffffff !important;
+                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65) !important;
+            }
+
+            // Iconic Red Square Beveled [X] Close Button (close_ubuntu_*.png)
+            .nitro-card-header-close {
+                width: 19px !important;
+                height: 20px !important;
+                min-width: 19px !important;
+                min-height: 20px !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/close_ubuntu_normal.png') center no-repeat !important;
+                image-rendering: pixelated !important;
+
+                &:hover {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_hover.png') !important;
+                }
+
+                &:active {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_pressed.png') !important;
+                }
+            }
+        }
+
+        .nitro-card-tabs {
+            background: #d8d8d2 !important;
+            border-bottom: 1px solid #9e9e98 !important;
+            padding: 4px 8px 0 8px !important;
+            gap: 3px !important;
+
+            .nav-item,
+            .nitro-card-tabs-item {
+                background: linear-gradient(180deg, #f2f2ee 0%, #dcdcd6 100%) !important;
+                border: 1px solid #8a8a84 !important;
+                border-bottom: none !important;
+                border-radius: 5px 5px 0 0 !important;
+                color: #242422 !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 500 !important;
+                padding: 4px 10px !important;
+                cursor: pointer !important;
+
+                &:hover {
+                    background: #f8f8f5 !important;
+                }
+
+                &.active {
+                    background: #e6e6e1 !important;
+                    color: #000000 !important;
+                    font-weight: 700 !important;
+                    margin-bottom: -1px !important;
+                    padding-bottom: 5px !important;
+                }
+            }
+        }
+
+        .nitro-card-content,
+        .nitro-card-body {
+            background-color: #e6e6e1 !important;
+            color: #1f1f1d !important;
+            padding: 8px !important;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // SKIN 4: ILLUMINA DARK (Avatar Editor, User Settings, Wired, ModTools)
+    // -------------------------------------------------------------------------
+    .nitro-card[data-skin-2012="illumina-dark"] {
+        background: rgba(45, 43, 40, 0.95) !important;
+        border: 1px solid #141312 !important;
+        border-radius: 6px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 8px 28px rgba(0, 0, 0, 0.65) !important;
+        padding: 0 6px 6px 6px !important;
+        color: #f3f2ee !important;
+
+        .nitro-card-header {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            min-height: 28px !important;
+            height: 28px !important;
+
+            // Pixel-exact Double Etched Illumina Header Lines
+            .shockwave-header-dots {
+                display: block !important;
+                flex: 1 1 auto !important;
+                height: 5px !important;
+                min-width: 14px !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/grip_illumina_dark.png') center repeat-x !important;
+                image-rendering: pixelated !important;
+            }
+
+            .nitro-card-header-text {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                color: #e5e3de !important;
+                text-shadow: 0 1px 1px #000000 !important;
+                padding: 0 6px !important;
+                white-space: nowrap !important;
             }
 
             .nitro-card-header-close {
@@ -774,323 +1510,633 @@ body[data-era="flash2012"] {
                 height: 17px !important;
                 min-width: 17px !important;
                 min-height: 17px !important;
-                background: linear-gradient(180deg, #f87171 0%, #dc2626 50%, #b91c1c 100%) !important;
-                border: 1px solid #7f1d1d !important;
-                border-radius: 3px !important;
-                box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.4) !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                cursor: pointer !important;
-                padding: 0 !important;
-
-                svg, .fa-icon {
-                    width: 9px !important;
-                    height: 9px !important;
-                    color: #ffffff !important;
-                }
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                filter: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/close_illumina_dark.png') center no-repeat !important;
+                image-rendering: pixelated !important;
 
                 &:hover {
-                    filter: brightness(1.15) !important;
-                }
-
-                &:active {
-                    filter: brightness(0.9) !important;
+                    filter: brightness(1.25) !important;
                 }
             }
         }
 
-        // Pestañas de las ventanas en Flash 2012
         .nitro-card-tabs {
-            background: #c8c8c8 !important;
-            border-bottom: 1px solid #a8a8a8 !important;
-            padding: 4px 8px 0 8px !important;
-            gap: 4px !important;
-            display: flex !important;
+            background: transparent !important;
+            border-bottom: 1px solid #1b1a18 !important;
+            padding: 2px 4px 0 4px !important;
+            gap: 3px !important;
 
             .nav-item,
             .nitro-card-tabs-item {
-                background: #e2e2e2 !important;
-                border: 1px solid #999999 !important;
+                background: rgba(28, 27, 25, 0.75) !important;
+                border: 1px solid #191816 !important;
                 border-bottom: none !important;
-                color: #333333 !important;
-                border-radius: 4px 4px 0 0 !important;
-                font-family: 'Ubuntu', sans-serif !important;
+                border-radius: 5px 5px 0 0 !important;
+                color: #c7c4bc !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 11px !important;
-                font-weight: 700 !important;
-                padding: 4px 10px !important;
+                font-weight: 500 !important;
+                padding: 5px 10px !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
                 cursor: pointer !important;
 
                 &:hover {
-                    background: #f0f0f0 !important;
-                    color: #000000 !important;
+                    background: rgba(65, 62, 58, 0.85) !important;
+                    color: #ffffff !important;
                 }
 
                 &.active {
-                    background: #d6d6d6 !important;
-                    color: #000000 !important;
-                    border-color: #777777 !important;
-                    font-weight: 800 !important;
+                    background: #595651 !important;
+                    border-color: #191816 !important;
+                    color: #ffffff !important;
+                    font-weight: 700 !important;
+                    margin-bottom: -1px !important;
+                    padding-bottom: 6px !important;
+                    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
                 }
             }
         }
 
         .nitro-card-content,
         .nitro-card-body {
-            background-color: #d6d6d6 !important;
-            color: #1e1e1e !important;
-            border-radius: 0 0 6px 6px !important;
+            background: transparent !important;
+            color: #f3f2ee !important;
             padding: 8px !important;
         }
     }
 
-    // BOTONES BISELADOS ILLUMINA (REFERENCIA DE VENTANAS FLASH 2012)
-    .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button),
-    .btn-secondary,
-    .btn-light {
-        background: linear-gradient(180deg, #ffffff 0%, #ededed 50%, #dcdcdc 51%, #c5c5c5 100%) !important;
-        border: 1px solid #555555 !important;
-        border-radius: 4px !important;
-        color: #1f2937 !important;
-        font-family: 'Ubuntu', sans-serif !important;
-        font-weight: 700 !important;
-        font-size: 11px !important;
-        text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
-        box-shadow: inset 0 1px 0 #ffffff, inset 0 -1px 0 rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.2) !important;
-        padding: 4px 12px !important;
-        cursor: pointer !important;
+    // -------------------------------------------------------------------------
+    // SKIN 5: ILLUMINA LIGHT (User Profile, Alerts, Era Selector, Help)
+    // -------------------------------------------------------------------------
+    .nitro-card[data-skin-2012="illumina-light"],
+    .nitro-alert {
+        background-color: #eceae4 !important;
+        border: 1px solid #2b2926 !important;
+        border-radius: 6px !important;
+        box-shadow: inset 0 1px 0 #ffffff, 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+        padding: 0 6px 6px 6px !important;
+        color: #242321 !important;
 
-        &:hover {
-            background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 50%, #e6e6e6 51%, #d2d2d2 100%) !important;
-            color: #000000 !important;
-        }
+        .nitro-card-header {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            min-height: 28px !important;
+            height: 28px !important;
 
-        &:active {
-            background: #b8b8b8 !important;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4) !important;
-        }
-    }
+            .shockwave-header-dots {
+                display: block !important;
+                flex: 1 1 auto !important;
+                height: 5px !important;
+                min-width: 14px !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/grip_illumina_light.png') center repeat-x !important;
+                image-rendering: pixelated !important;
+            }
 
-    // =========================================================================
-    // 5. CATÁLOGO FLASH 2012 (BOTÓN AMARILLO COMPRAR E ILLUMINA)
-    // =========================================================================
-    .nitro-catalog,
-    .catalog-flash2012 {
-        border-radius: 8px !important;
+            .nitro-card-header-text {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #363430 !important;
+                text-shadow: 0 1px 0 #ffffff !important;
+                padding: 0 6px !important;
+            }
 
-        .nitro-card-content {
-            background: #ffffff !important;
-            color: #1f2937 !important;
-            border-radius: 0 0 8px 8px !important;
+            .nitro-card-header-close {
+                width: 20px !important;
+                height: 20px !important;
+                min-width: 20px !important;
+                min-height: 20px !important;
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent url('@/assets/images/eras/flash2012/skins/close_illumina_light_sheet.png') center no-repeat !important;
 
-            // Árbol de categorías
-            [class*="catalog-navigation"],
-            [class*="navigation"] {
-                background: #f0f9ff !important;
-                border-right: 1px solid #bae6fd !important;
-                border-radius: 4px 0 0 4px !important;
-
-                .list-group-item.active,
-                [class*="item"].active {
-                    background: #0284c7 !important;
-                    color: #ffffff !important;
-                    font-weight: 700 !important;
-                    border-radius: 4px !important;
+                &:hover {
+                    filter: brightness(0.85) !important;
                 }
             }
         }
 
-        // ¡BOTÓN AMARILLO "COMPRAR" FLASH 2012!
+        .nitro-card-content,
+        .nitro-card-body {
+            background: #eceae4 !important;
+            color: #242321 !important;
+            padding: 8px !important;
+        }
+
+        .bg-muted {
+            background: #dfddd6 !important;
+            border: 1px solid #c4c1b8 !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 0 #ffffff !important;
+        }
+    }
+
+    // =========================================================================
+    // 7. COMPONENTES ESPECÍFICOS DE CADA VENTANA 2012
+    // =========================================================================
+
+    // 7A. NAVEGADOR DE SALAS 2012 (Píldoras de aforo verdes/ámbar/rojas + Volter 9px)
+    .navigator-flash2012,
+    .nitro-card[data-window-key="navigator"] {
+        .navigator-grid {
+            gap: 1px !important;
+        }
+
+        .navigator-item {
+            border-radius: 2px !important;
+            padding: 3px 6px !important;
+            font-family: 'Volter2012', 'Volter', sans-serif !important;
+            font-size: 9px !important;
+            -webkit-font-smoothing: none !important;
+            color: #111111 !important;
+
+            &:nth-child(even) {
+                background-color: #edf4f8 !important;
+            }
+
+            &:hover {
+                background-color: #d6eaf5 !important;
+            }
+
+            // 2012 Population Pill on right/left
+            .badge {
+                min-width: 34px !important;
+                height: 15px !important;
+                border-radius: 3px !important;
+                font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
+                font-size: 9px !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+                padding: 0 5px !important;
+                border: 1px solid rgba(0, 0, 0, 0.25) !important;
+
+                &.bg-primary { background-color: #b0b8bf !important; }
+                &.bg-success { background-color: #62b851 !important; }
+                &.bg-warning { background-color: #f29c1f !important; }
+                &.bg-danger  { background-color: #d93b3b !important; }
+
+                .fa-icon {
+                    width: 8px !important;
+                    height: 8px !important;
+                }
+            }
+        }
+    }
+
+    // 7B. INVENTARIO 2012 (Celdas grises biseladas + Vista previa cálida amarilla 2012)
+    .inventory-flash2012,
+    .nitro-card[data-window-key="inventory"] {
+        .layout-grid-item {
+            background: #dcdcdc !important;
+            border: 1px solid #8c8c8c !important;
+            border-radius: 3px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+
+            &:hover {
+                background: #eaeaea !important;
+            }
+
+            &.active {
+                background: #ffffff !important;
+                border: 2px solid #000000 !important;
+            }
+        }
+
+        .room-preview-container {
+            background: #eda800 !important;
+            border: 1px solid #916900 !important;
+            border-radius: 3px !important;
+            overflow: hidden !important;
+
+            .room-preview-image {
+                background: radial-gradient(circle at 50% 42%, #ffe159 0%, #eda800 100%) !important;
+                background-color: #eda800 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+
+                &::before,
+                &::after {
+                    display: none !important;
+                    content: none !important;
+                }
+            }
+        }
+    }
+
+    // 7C. LOGROS / RECOMPENSAS 2012 (Cuadrícula 3x3 biselada + Barra oscura inferior)
+    .nitro-achievements {
+        .layout-grid-item {
+            background: linear-gradient(180deg, #e8e8e4 0%, #d4d4ce 100%) !important;
+            border: 1px solid #ababab !important;
+            border-radius: 4px !important;
+            box-shadow: inset 0 1px 0 #ffffff !important;
+            color: #1f1f1d !important;
+
+            &:hover,
+            &.active {
+                background: #ffffff !important;
+                border-color: #454545 !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+            }
+        }
+
+        .layout-progress-bar {
+            background: #595752 !important;
+            border: 1px solid #1c1b19 !important;
+            border-radius: 4px !important;
+            height: 22px !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+
+            .layout-progress-bar-progress {
+                background: linear-gradient(180deg, #65b8d6 0%, #3d89a8 100%) !important;
+                border-radius: 3px !important;
+            }
+        }
+    }
+
+    // 7D. CATÁLOGO / TIENDA 2012
+    .nitro-catalog.catalog-flash2012 {
+        .nitro-card-content {
+            background: #e6e6e1 !important;
+            color: #1e1e1c !important;
+        }
+
         button.btn-success,
         .purchase-button,
         .nitro-catalog-purchase-button {
-            border-radius: 6px !important;
-            background: linear-gradient(180deg, #facc15 0%, #eab308 100%) !important;
-            border: 1px solid #ca8a04 !important;
-            box-shadow: 0 2px 4px rgba(202, 138, 4, 0.4) !important;
-            color: #713f12 !important;
-            font-family: 'Ubuntu', sans-serif !important;
-            font-size: 13px !important;
-            font-weight: 800 !important;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
-            padding: 6px 20px !important;
-            cursor: pointer !important;
+            background: linear-gradient(180deg, #ffe047 0%, #f2b705 55%, #d49600 100%) !important;
+            border: 1px solid #6e4b00 !important;
+            border-radius: 4px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+            color: #2b1d00 !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 
             &:hover {
-                background: linear-gradient(180deg, #fde047 0%, #facc15 100%) !important;
-                box-shadow: 0 4px 8px rgba(202, 138, 4, 0.5) !important;
-            }
-
-            &:active {
-                background: #ca8a04 !important;
-                color: #ffffff !important;
-                text-shadow: none !important;
+                filter: brightness(1.06) !important;
             }
         }
     }
 
-    // =========================================================================
-    // 6. FORMULARIOS Y CONTROLES FLASH 2012
-    // =========================================================================
-    input[type="checkbox"],
-    .form-check-input[type="checkbox"] {
-        border-radius: 4px !important;
-        border: 1px solid #6b7280 !important;
-        background-color: #374151 !important;
-        cursor: pointer !important;
+    // 7E. EDITOR DE ROPA ILLUMINA DARK 2012 ("Change Your Looks")
+    .avatar-editor-flash2012 {
+        .ae-tab-icon-2012 {
+            display: block !important;
+            width: 41px !important;
+            height: 22px !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: contain !important;
+            image-rendering: pixelated !important;
+            opacity: 0.78 !important;
 
-        &:checked {
-            background-color: #2563eb !important;
-            border-color: #3b82f6 !important;
-        }
-    }
-
-    input[type="radio"],
-    .form-check-input[type="radio"] {
-        border-radius: 50% !important;
-        border: 1px solid #6b7280 !important;
-        background-color: #374151 !important;
-        cursor: pointer !important;
-
-        &:checked {
-            background-color: #2563eb !important;
-            border-color: #3b82f6 !important;
-        }
-    }
-
-    ::-webkit-scrollbar {
-        width: 10px !important;
-        height: 10px !important;
-    }
-    ::-webkit-scrollbar-track {
-        background: #1f2937 !important;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #4b5563 !important;
-        border-radius: 4px !important;
-
-        &:hover {
-            background: #6b7280 !important;
-        }
-    }
-
-    // SLIDERS FLASH 2012 ILLUMINA (PISTA METÁLICA OSCURA CON PUNTERO CYAN)
-    input[type="range"],
-    .custom-range,
-    .form-range {
-        appearance: none !important;
-        -webkit-appearance: none !important;
-        width: 100% !important;
-        height: 8px !important;
-        background: #1c1a18 !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 4px !important;
-        outline: none !important;
-        margin: 6px 0 !important;
-        padding: 0 !important;
-        cursor: pointer !important;
-
-        &::-webkit-slider-runnable-track {
-            background: transparent !important;
-            border: none !important;
-            height: 100% !important;
+            &.ae-tab-generic,
+            &.ae-tab-hd { background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_ae_tabs_generic.png') !important; }
+            &.ae-tab-head { background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_ae_tabs_head.png') !important; }
+            &.ae-tab-torso { background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_ae_tabs_torso.png') !important; }
+            &.ae-tab-legs { background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_ae_tabs_legs.png') !important; }
+            &.ae-tab-wardrobe {
+                width: 29px !important;
+                height: 21px !important;
+                background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_ae_tabs_wardrobe.png') !important;
+            }
         }
 
-        &::-moz-range-track {
-            background: transparent !important;
-            border: none !important;
-            height: 100% !important;
-        }
-
-        &::-webkit-slider-thumb {
-            appearance: none !important;
-            -webkit-appearance: none !important;
-            width: 14px !important;
-            height: 14px !important;
-            border-radius: 50% !important;
-            background: #0284c7 !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
-            cursor: pointer !important;
-        }
-
-        &::-moz-range-thumb {
-            width: 14px !important;
-            height: 14px !important;
-            border-radius: 50% !important;
-            background: #0284c7 !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
-            cursor: pointer !important;
-        }
-    }
-
-    // BOTONES ILLUMINA
-    .btn-primary {
-        background: linear-gradient(180deg, #1fa2d6 0%, #0d79a8 100%) !important;
-        border: 1px solid #0b6086 !important;
-        color: #ffffff !important;
-        border-radius: 4px !important;
-        font-family: 'Ubuntu', sans-serif !important;
-        font-weight: 700 !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
-
-        * {
-            color: #ffffff !important;
-        }
-
-        &:hover {
-            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%) !important;
-        }
-
-        &:active {
-            background: #0369a1 !important;
-        }
-    }
-
-    // VENTANA DE AJUSTES FLASH 2012 ILLUMINA
-    .user-settings-window {
-        background: rgba(28, 27, 26, 0.96) !important;
-        border: 1px solid rgba(255, 255, 255, 0.16) !important;
-        border-radius: 6px !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
-        color: #ffffff !important;
-
-        .nitro-card-header {
-            background: linear-gradient(180deg, #383532 0%, #22201e 100%) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
-            color: #ffffff !important;
+        .nitro-card-tabs-item.active .ae-tab-icon-2012,
+        .nitro-card-tabs-item:hover .ae-tab-icon-2012 {
+            opacity: 1 !important;
         }
 
         .nitro-card-content {
-            background: transparent !important;
-            color: #ffffff !important;
+            background: #595651 !important;
+            border: 1px solid #191816 !important;
+            border-radius: 0 4px 4px 4px !important;
+        }
 
-            * {
-                color: #ffffff !important;
+        // Light grey rounded clothing parts box (matching reference screenshot)
+        .avatar-parts-container,
+        [class*="figure-set"] {
+            background: #cfcfcf !important;
+            border: 1px solid #363431 !important;
+            border-radius: 5px !important;
+            padding: 6px !important;
+
+            .layout-grid-item {
+                background: #c2c2c2 !important;
+                border: 1px solid #969696 !important;
+                border-radius: 4px !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+
+                &:hover {
+                    background: #dedede !important;
+                }
+
+                &.active {
+                    background: #ececec !important;
+                    border: 2px solid #363431 !important;
+                }
             }
+        }
+
+        // Crisp square 2012 color swatches
+        .palette-container,
+        [class*="palette"] {
+            .layout-grid-item {
+                border-radius: 2px !important;
+                border: 1px solid #2b2926 !important;
+
+                &.active {
+                    border: 2px solid #ffffff !important;
+                    box-shadow: 0 0 0 1px #000000 !important;
+                }
+            }
+        }
+
+        // Sunken dark avatar preview stage + rotation button
+        .figure-preview-container {
+            background: #474541 !important;
+            border: 1px solid #262522 !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45) !important;
+
+            .arrow-container {
+                background: url('@/assets/images/eras/flash2012/avatareditor/rotate_avatar_button.png') center no-repeat !important;
+                width: 44px !important;
+                height: 29px !important;
+                margin: 0 auto 8px auto !important;
+                cursor: pointer !important;
+
+                * {
+                    opacity: 0 !important;
+                }
+            }
+        }
+
+        // Gender icons from 2012 avatareditor sprites
+        .male-icon {
+            background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_gender_male.png') !important;
+            width: 39px !important;
+            height: 35px !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+
+            &.selected {
+                background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_gender_male_on.png') !important;
+            }
+        }
+
+        .female-icon {
+            background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_gender_female.png') !important;
+            width: 36px !important;
+            height: 35px !important;
+            background-size: contain !important;
+            background-repeat: no-repeat !important;
+
+            &.selected {
+                background-image: url('@/assets/images/eras/flash2012/avatareditor/tabs_gender_female_on.png') !important;
+            }
+        }
+
+        // Save Changes shiny 2012 button
+        button.btn-success {
+            background: linear-gradient(180deg, #ffffff 0%, #f2f2f2 48%, #dedede 52%, #cccccc 100%) !important;
+            border: 1px solid #222222 !important;
+            color: #111111 !important;
+            text-shadow: 0 1px 0 #ffffff !important;
         }
     }
 
-    // INFOSTAND Y MENÚ CONTEXTUAL FLASH 2012 ILLUMINA
+    // 7F. AJUSTES ILLUMINA DARK 2012 (0..10 Tick Sliders + Altavoces Originales)
+    .settings-flash2012 {
+        width: 345px !important;
+
+        .settings-2012-body {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            padding: 8px 10px !important;
+        }
+
+        .settings-2012-checks {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 5px !important;
+        }
+
+        .settings-2012-check-row {
+            display: flex !important;
+            align-items: center !important;
+            gap: 7px !important;
+            margin: 0 !important;
+            cursor: pointer !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11px !important;
+            color: #f3f2ee !important;
+
+            .form-check-input {
+                width: 14px !important;
+                height: 14px !important;
+                margin: 0 !important;
+                background-color: #ffffff !important;
+                border: 1px solid #1a1917 !important;
+                flex-shrink: 0 !important;
+
+                &:checked {
+                    background-color: #468ca8 !important;
+                    border-color: #ffffff !important;
+                }
+            }
+        }
+
+        .settings-2012-sunk-box {
+            background: rgba(28, 27, 25, 0.65) !important;
+            border: 1px solid rgba(0, 0, 0, 0.7) !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+            padding: 8px 10px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+        }
+
+        .settings-2012-box-title {
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            color: #e5e3de !important;
+            text-align: center !important;
+            margin-bottom: 2px !important;
+        }
+
+        .settings-2012-volume-row {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+
+            .settings-2012-vol-label {
+                width: 56px !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 10px !important;
+                color: #d6d3cb !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                white-space: nowrap !important;
+            }
+
+            .settings-2012-spk {
+                width: 29px !important;
+                height: 22px !important;
+                border: none !important;
+                background-color: transparent !important;
+                background-repeat: no-repeat !important;
+                background-position: center !important;
+                background-size: 29px 22px !important;
+                image-rendering: pixelated !important;
+                padding: 0 !important;
+                cursor: pointer !important;
+                flex-shrink: 0 !important;
+
+                &.spk-off {
+                    background-image: url('@/assets/images/eras/flash2012/memenu/sound_off_color.png') !important;
+                    opacity: 0.75 !important;
+
+                    &.is-muted,
+                    &:hover {
+                        opacity: 1 !important;
+                    }
+                }
+
+                &.spk-on {
+                    background-image: url('@/assets/images/eras/flash2012/memenu/sound_on_white.png') !important;
+                    opacity: 0.65 !important;
+
+                    &.is-active,
+                    &:hover {
+                        opacity: 1 !important;
+                    }
+                }
+            }
+
+            .settings-2012-slider-wrap {
+                position: relative !important;
+                width: 139px !important;
+                height: 24px !important;
+                display: flex !important;
+                align-items: flex-end !important;
+                flex-shrink: 0 !important;
+
+                // Original 2012 "0 1 2 3 4 5 6 7 8 9 10" tick scale inverted to crisp white
+                .settings-2012-slider-ticks {
+                    position: absolute !important;
+                    inset: 0 !important;
+                    background: url('@/assets/images/eras/flash2012/memenu/slider_base.png') center top no-repeat !important;
+                    image-rendering: pixelated !important;
+                    filter: invert(1) brightness(1.6) !important;
+                    pointer-events: none !important;
+                }
+
+                // Accessible native <input type="range"> with separate WebKit & Firefox rules
+                input.settings-2012-range {
+                    --slider-track-size: 4px;
+                    --slider-thumb-w: 12px;
+                    --slider-thumb-h: 15px;
+
+                    position: relative !important;
+                    z-index: 2 !important;
+                    appearance: none !important;
+                    -webkit-appearance: none !important;
+                    width: 139px !important;
+                    height: 18px !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    background: transparent !important;
+                    cursor: pointer !important;
+
+                    &:focus-visible {
+                        outline: 2px solid #facc15 !important;
+                        outline-offset: 2px !important;
+                    }
+                }
+
+                input.settings-2012-range::-webkit-slider-runnable-track {
+                    height: var(--slider-track-size) !important;
+                    border: 0 !important;
+                    background: transparent !important;
+                }
+
+                input.settings-2012-range::-webkit-slider-thumb {
+                    -webkit-appearance: none !important;
+                    appearance: none !important;
+                    width: var(--slider-thumb-w) !important;
+                    height: var(--slider-thumb-h) !important;
+                    margin-block-start: calc((var(--slider-track-size) - var(--slider-thumb-h)) / 2) !important;
+                    border: 0 !important;
+                    border-radius: 0 !important;
+                    background: transparent url('@/assets/images/eras/flash2012/memenu/slider_button.png') center no-repeat !important;
+                    box-shadow: none !important;
+                    image-rendering: pixelated !important;
+                }
+
+                input.settings-2012-range::-moz-range-track {
+                    height: var(--slider-track-size) !important;
+                    border: 0 !important;
+                    background: transparent !important;
+                }
+
+                input.settings-2012-range::-moz-range-thumb {
+                    width: var(--slider-thumb-w) !important;
+                    height: var(--slider-thumb-h) !important;
+                    border: 0 !important;
+                    border-radius: 0 !important;
+                    background: transparent url('@/assets/images/eras/flash2012/memenu/slider_button.png') center no-repeat !important;
+                    box-shadow: none !important;
+                    image-rendering: pixelated !important;
+                }
+            }
+        }
+
+        .settings-2012-eras {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+        }
+
+        .settings-2012-footer {
+            display: flex !important;
+            justify-content: flex-start !important;
+            padding-top: 2px !important;
+        }
+    }
+
+    // =========================================================================
+    // 8. INFOSTANDS EN SALA Y SCROLLBARS 2012
+    // =========================================================================
     .nitro-infostand-container .nitro-infostand,
     .nitro-context-menu {
-        background: #1e1d1c !important;
-        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        background: rgba(34, 32, 30, 0.94) !important;
+        border: 1px solid #141312 !important;
         border-radius: 6px !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 4px 12px rgba(0, 0, 0, 0.55) !important;
         color: #ffffff !important;
 
         .header,
         [class*="header"] {
-            background: linear-gradient(180deg, #383532 0%, #22201e 100%) !important;
+            background: transparent !important;
             border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
             color: #ffffff !important;
-            font-family: 'Ubuntu', sans-serif !important;
-            font-size: 12px !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11px !important;
             font-weight: 700 !important;
-            text-shadow: 0 1px 2px #000000 !important;
         }
 
         * {
@@ -1100,10 +2146,19 @@ body[data-era="flash2012"] {
         .bg-muted,
         [class*="previewer"],
         [class*="motto"] {
-            background: rgba(15, 14, 13, 0.6) !important;
+            background: rgba(18, 17, 16, 0.65) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             border-radius: 4px !important;
-            color: #ffffff !important;
         }
+    }
+
+    // Accessible Scrollbar Theming (>= 3:1 contrast ratio)
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #7c858e #e4e7eb;
+    }
+
+    [data-skin-2012="illumina-dark"] * {
+        scrollbar-color: #8a867e #262522;
     }
 }

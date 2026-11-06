@@ -10,12 +10,13 @@ interface ToolbarMeViewProps
     useGuideTool: boolean;
     unseenAchievementCount: number;
     setMeExpanded: Dispatch<SetStateAction<boolean>>;
+    isInRoom?: boolean;
 }
 
 export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
 {
     const { currentEra } = useEraTheme();
-    const { useGuideTool = false, unseenAchievementCount = 0, setMeExpanded = null, children = null, ...rest } = props;
+    const { useGuideTool = false, unseenAchievementCount = 0, setMeExpanded = null, isInRoom = false, children = null, ...rest } = props;
     const elementRef = useRef<HTMLDivElement>();
     const [ pointerStyle, setPointerStyle ] = useState<React.CSSProperties>({});
 
@@ -68,6 +69,54 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
 
         return () => window.removeEventListener('resize', updatePointer);
     }, [ currentEra ]);
+
+    if(currentEra === 'flash2012')
+    {
+        const handle2012Action = (callback: () => void) =>
+        {
+            callback();
+            setMeExpanded(false);
+        };
+
+        return (
+            <div ref={ elementRef as any } className="nitro-toolbar-me flash2012-me-menu" onClick={ event => event.stopPropagation() }>
+                { (GetConfiguration('guides.enabled') && useGuideTool) && (
+                    <div className="me-item-2012" title="Guía de Ayuda" onClick={ () => handle2012Action(() => DispatchUiEvent(new GuideToolEvent(GuideToolEvent.TOGGLE_GUIDE_TOOL))) }>
+                        <i className="me-icon-2012 icon-2012-guide" />
+                        <span className="me-label-2012">Guía</span>
+                    </div>
+                ) }
+                <div className="me-item-2012" title="Recompensas y Logros" onClick={ () => handle2012Action(() => CreateLinkEvent('achievements/toggle')) }>
+                    <i className="me-icon-2012 icon-2012-achievements" />
+                    { (unseenAchievementCount > 0) && <LayoutItemCountView count={ unseenAchievementCount } /> }
+                    <span className="me-label-2012">Logros</span>
+                </div>
+                <div className="me-item-2012" title="Mi Perfil" onClick={ () => handle2012Action(() => GetUserProfile(GetSessionDataManager().userId)) }>
+                    <i className="me-icon-2012 icon-2012-profile" />
+                    <span className="me-label-2012">Mi Perfil</span>
+                </div>
+                <div className="me-item-2012" title="Mis Salas" onClick={ () => handle2012Action(() => CreateLinkEvent('navigator/search/myworld_view')) }>
+                    <i className="me-icon-2012 icon-2012-rooms" />
+                    <span className="me-label-2012">Mis Salas</span>
+                </div>
+                <div className="me-item-2012" title="Cambiar Look" onClick={ () => handle2012Action(() => CreateLinkEvent('avatar-editor/toggle')) }>
+                    <i className="me-icon-2012 icon-2012-clothes" />
+                    <span className="me-label-2012">Ropa</span>
+                </div>
+                { (isInRoom || !!GetRoomSession()) && (
+                    <div className="me-item-2012" title="Cámara" onClick={ () => handle2012Action(() => CreateLinkEvent('camera/toggle')) }>
+                        <i className="me-icon-2012 icon-2012-camera" />
+                        <span className="me-label-2012">Cámara</span>
+                    </div>
+                ) }
+                <div className="me-item-2012" title="Ajustes" onClick={ () => handle2012Action(() => CreateLinkEvent('user-settings/toggle')) }>
+                    <i className="me-icon-2012 icon-2012-settings" />
+                    <span className="me-label-2012">Ajustes</span>
+                </div>
+                { children }
+            </div>
+        );
+    }
 
     if(currentEra === 'shockwave2006')
     {

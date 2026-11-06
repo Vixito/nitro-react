@@ -2,6 +2,11 @@ import { NitroConfiguration, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { GetConfiguration } from '../../api';
 import shockwaveEntryAuGif from '../../assets/images/eras/shockwave_v14/hh_entry_au.gif';
+import receptionHorizon2012 from '../../assets/images/eras/flash2012/reception/backdrop_horizon.png';
+import receptionLeft2012 from '../../assets/images/eras/flash2012/reception/backdrop_left.png';
+import receptionRight2012 from '../../assets/images/eras/flash2012/reception/backdrop_right.png';
+import receptionStretch2012 from '../../assets/images/eras/flash2012/reception/backdrop_stretch.png';
+import receptionTopStretch2012 from '../../assets/images/eras/flash2012/reception/hotel_top_stretch.png';
 import { LayoutAvatarImageView } from '../../common';
 import { useEraTheme, useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
 import { WidgetSlotView } from './views/widgets/WidgetSlotView';
@@ -110,7 +115,9 @@ export const HotelView: FC<{}> = props =>
 
     const layout = (currentEra === 'shockwave2006')
         ? habbtenConfig?.hotel_view?.custom_layouts?.['shockwave2006']
-        : (habbtenConfig?.hotel_view?.custom_layouts?.[currentEra] || habbtenConfig?.hotel_view?.custom_layout);
+        : (currentEra === 'flash2012')
+            ? habbtenConfig?.hotel_view?.custom_layouts?.['flash2012']
+            : (habbtenConfig?.hotel_view?.custom_layouts?.[currentEra] || habbtenConfig?.hotel_view?.custom_layout);
     const customBg = (layout?.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') 
         ? layout.background 
         : backgroundColor;
@@ -310,6 +317,162 @@ export const HotelView: FC<{}> = props =>
             })}
         </div>
     ) : null;
+
+    if(currentEra === 'flash2012')
+    {
+        return (
+            <div
+                className="nitro-hotel-view flash2012-hotel-view"
+                style={{
+                    backgroundColor: '#89d4f1',
+                    backgroundImage: `url(${ receptionStretch2012 })`,
+                    backgroundRepeat: 'repeat-x',
+                    backgroundSize: '100% calc(100% - 36px)',
+                    backgroundPosition: 'top left',
+                    overflow: 'hidden'
+                }}
+            >
+                {/* Paseo costero con palmeras y horizonte lejano (Marzo 2012) */}
+                <div
+                    className="reception-2012-horizon position-absolute"
+                    style={{
+                        left: 112,
+                        bottom: 36,
+                        width: 693,
+                        height: 341,
+                        backgroundImage: `url(${ receptionHorizon2012 })`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'bottom left',
+                        imageRendering: 'pixelated',
+                        pointerEvents: 'none',
+                        zIndex: 2
+                    }}
+                />
+
+                {/* Arboleda derecha con montañas y paloma blanca (Marzo 2012) */}
+                <div
+                    className="reception-2012-right position-absolute"
+                    style={{
+                        right: 0,
+                        bottom: -12,
+                        width: 526,
+                        height: 455,
+                        backgroundImage: `url(${ receptionRight2012 })`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'bottom right',
+                        imageRendering: 'pixelated',
+                        pointerEvents: 'none',
+                        zIndex: 3
+                    }}
+                />
+
+                {/* Extensión vertical de la torre naranja para monitores altos */}
+                <div
+                    className="reception-2012-tower-top position-absolute"
+                    style={{
+                        left: 0,
+                        top: 0,
+                        bottom: 1100,
+                        width: 134,
+                        backgroundImage: `url(${ receptionTopStretch2012 })`,
+                        backgroundRepeat: 'repeat-y',
+                        backgroundSize: '134px 1px',
+                        imageRendering: 'pixelated',
+                        pointerEvents: 'none',
+                        zIndex: 4
+                    }}
+                />
+
+                {/* Torre principal de Recepción Habbten 2012 sobre las nubes con toldo rojo 'H' */}
+                <div
+                    className="reception-2012-left position-absolute"
+                    style={{
+                        left: 0,
+                        bottom: 36,
+                        width: 874,
+                        height: 1064,
+                        backgroundImage: `url(${ receptionLeft2012 })`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'bottom left',
+                        imageRendering: 'pixelated',
+                        pointerEvents: 'none',
+                        zIndex: 4
+                    }}
+                />
+
+                {/* Avatar del jugador sobre la alfombra roja de la entrada 'H' */}
+                { (hotelViewConf['show.avatar'] ?? true) && (
+                    <div
+                        className="reception-2012-avatar position-absolute"
+                        style={{
+                            left: 98,
+                            bottom: 62,
+                            zIndex: 6,
+                            pointerEvents: 'none',
+                            imageRendering: 'pixelated'
+                        }}
+                    >
+                        <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
+                    </div>
+                ) }
+
+                {/* Widgets de noticias / promociones del Hotel View */}
+                <div className="container h-100 py-3 overflow-hidden landing-widgets position-relative" style={{ zIndex: 7, paddingLeft: 180 }}>
+                    <div className="row h-100">
+                        <div className="col-9 h-100 d-flex flex-column">
+                            <WidgetSlotView
+                                widgetSlot={ 1 }
+                                widgetType={ getWidgetType(1) }
+                                widgetConf={ getWidgetConf(1) }
+                                className="col-6"
+                            />
+                            <div className="col-12 row mx-0">
+                                <WidgetSlotView
+                                    widgetSlot={ 2 }
+                                    widgetType={ getWidgetType(2) }
+                                    widgetConf={ getWidgetConf(2) }
+                                    className="col-7"
+                                />
+                                <WidgetSlotView
+                                    widgetSlot={ 3 }
+                                    widgetType={ getWidgetType(3) }
+                                    widgetConf={ getWidgetConf(3) }
+                                    className="col-5"
+                                />
+                                <WidgetSlotView
+                                    widgetSlot={ 4 }
+                                    widgetType={ getWidgetType(4) }
+                                    widgetConf={ getWidgetConf(4) }
+                                    className="col-7"
+                                />
+                                <WidgetSlotView
+                                    widgetSlot={ 5 }
+                                    widgetType={ getWidgetType(5) }
+                                    widgetConf={ getWidgetConf(5) }
+                                    className="col-5"
+                                />
+                            </div>
+                            <WidgetSlotView
+                                widgetSlot={ 6 }
+                                widgetType={ getWidgetType(6) }
+                                widgetConf={ getWidgetConf(6) }
+                                className="mt-auto"
+                            />
+                        </div>
+                        <div className="col-3 h-100">
+                            <WidgetSlotView
+                                widgetSlot={ 7 }
+                                widgetType={ getWidgetType(7) }
+                                widgetConf={ getWidgetConf(7) }
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                { customOverlay }
+            </div>
+        );
+    }
 
     if(currentEra === 'shockwave2006')
     {

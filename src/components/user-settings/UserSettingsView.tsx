@@ -160,6 +160,219 @@ export const UserSettingsView: FC<{}> = props => {
 
     if (!isVisible || !userSettings) return null;
 
+    if (currentEra === 'flash2012') {
+        const renderVolumeRow2012 = (label: string, id: string, val: number, actionType: string) => (
+            <div className="settings-2012-volume-row">
+                <label htmlFor={ id } className="settings-2012-vol-label">{ label }</label>
+                <button
+                    type="button"
+                    className={ `settings-2012-spk spk-off ${ val === 0 ? 'is-muted' : '' }` }
+                    title="Silenciar"
+                    onClick={ () => {
+                        processAction(actionType, 0);
+                        SendMessageComposer(new UserSettingsSoundComposer(
+                            actionType === 'system_volume' ? 0 : Math.round(userSettings.volumeSystem),
+                            actionType === 'furni_volume' ? 0 : Math.round(userSettings.volumeFurni),
+                            actionType === 'trax_volume' ? 0 : Math.round(userSettings.volumeTrax)
+                        ));
+                    } }
+                />
+                <div className="settings-2012-slider-wrap">
+                    <div className="settings-2012-slider-ticks" />
+                    <input
+                        type="range"
+                        id={ id }
+                        className="settings-2012-range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={ val }
+                        aria-valuetext={ `${ Math.round(val / 10) } de 10` }
+                        onChange={ event => processAction(actionType, Number(event.target.value)) }
+                        onMouseUp={ () => saveRangeSlider('volume') }
+                        onTouchEnd={ () => saveRangeSlider('volume') }
+                    />
+                </div>
+                <button
+                    type="button"
+                    className={ `settings-2012-spk spk-on ${ val > 0 ? 'is-active' : '' }` }
+                    title="Volumen máximo"
+                    onClick={ () => {
+                        processAction(actionType, 100);
+                        SendMessageComposer(new UserSettingsSoundComposer(
+                            actionType === 'system_volume' ? 100 : Math.round(userSettings.volumeSystem),
+                            actionType === 'furni_volume' ? 100 : Math.round(userSettings.volumeFurni),
+                            actionType === 'trax_volume' ? 100 : Math.round(userSettings.volumeTrax)
+                        ));
+                    } }
+                />
+            </div>
+        );
+
+        return (
+            <>
+                <NitroCardView uniqueKey="user-settings" className="user-settings-window settings-flash2012" theme="primary-slim">
+                    <NitroCardHeaderView headerText={ LocalizeText('widget.memenu.settings.title') } onCloseClick={ () => processAction('close_view') } />
+                    <NitroCardContentView className="settings-2012-body">
+                        <div className="settings-2012-checks">
+                            <label className="settings-2012-check-row">
+                                <input className="form-check-input" type="checkbox" checked={ userSettings.oldChat } onChange={ event => processAction('oldchat', event.target.checked) } />
+                                <span>{ LocalizeText('memenu.settings.chat.prefer.old.chat') }</span>
+                            </label>
+                            <label className="settings-2012-check-row">
+                                <input className="form-check-input" type="checkbox" checked={ userSettings.roomInvites } onChange={ event => processAction('room_invites', event.target.checked) } />
+                                <span>{ LocalizeText('memenu.settings.other.ignore.room.invites') }</span>
+                            </label>
+                            <label className="settings-2012-check-row">
+                                <input className="form-check-input" type="checkbox" checked={ userSettings.cameraFollow } onChange={ event => processAction('camera_follow', event.target.checked) } />
+                                <span>{ LocalizeText('memenu.settings.other.disable.room.camera.follow') }</span>
+                            </label>
+                            <label className="settings-2012-check-row">
+                                <input className="form-check-input" type="checkbox" checked={ catalogSkipPurchaseConfirmation } onChange={ event => setCatalogSkipPurchaseConfirmation(event.target.checked) } />
+                                <span>{ LocalizeText('memenu.settings.other.skip.purchase.confirmation') }</span>
+                            </label>
+                            <label className="settings-2012-check-row">
+                                <input className="form-check-input" type="checkbox" checked={ catalogPlaceMultipleObjects } onChange={ event => setCatalogPlaceMultipleObjects(event.target.checked) } />
+                                <span>{ LocalizeText('memenu.settings.other.place.multiple.objects') }</span>
+                            </label>
+                        </div>
+
+                        { infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) && (
+                            <div className="settings-2012-sunk-box">
+                                <div className="settings-2012-box-title">{ LocalizeText('memenu.settings.other.infinite.permissions.title') }</div>
+                                { infinitePermissions.credits.rankHas && (
+                                    <label className="settings-2012-check-row">
+                                        <input className="form-check-input" type="checkbox" checked={ infinitePermissions.credits.enabled } onChange={ event => toggleInfinitePermission('credits', event.target.checked) } />
+                                        <span>{ LocalizeText('memenu.settings.other.infinite.credits') }</span>
+                                    </label>
+                                ) }
+                                { infinitePermissions.pixels.rankHas && (
+                                    <label className="settings-2012-check-row">
+                                        <input className="form-check-input" type="checkbox" checked={ infinitePermissions.pixels.enabled } onChange={ event => toggleInfinitePermission('pixels', event.target.checked) } />
+                                        <span>Duckets infinitos</span>
+                                    </label>
+                                ) }
+                                { infinitePermissions.points.rankHas && (
+                                    <label className="settings-2012-check-row">
+                                        <input className="form-check-input" type="checkbox" checked={ infinitePermissions.points.enabled } onChange={ event => toggleInfinitePermission('points', event.target.checked) } />
+                                        <span>{ LocalizeText('memenu.settings.other.infinite.points') }</span>
+                                    </label>
+                                ) }
+                            </div>
+                        ) }
+
+                        <div className="settings-2012-sunk-box">
+                            <div className="settings-2012-box-title">{ LocalizeText('widget.memenu.settings.volume') }</div>
+                            { renderVolumeRow2012(LocalizeText('widget.memenu.settings.volume.ui'), 'vol2012-sys', userSettings.volumeSystem, 'system_volume') }
+                            { renderVolumeRow2012(LocalizeText('widget.memenu.settings.volume.furni'), 'vol2012-furni', userSettings.volumeFurni, 'furni_volume') }
+                            { renderVolumeRow2012(LocalizeText('widget.memenu.settings.volume.trax'), 'vol2012-trax', userSettings.volumeTrax, 'trax_volume') }
+                        </div>
+
+                        <div className="settings-2012-sunk-box">
+                            <div className="settings-2012-box-title">Versión / Era del Cliente</div>
+                            <div className="settings-2012-eras">
+                                { eras.map(era => (
+                                    <label key={ era.id } className="settings-2012-check-row">
+                                        <input
+                                            type="radio"
+                                            name="era_theme_radio_2012"
+                                            className="form-check-input"
+                                            checked={ currentEra === era.id }
+                                            onChange={ () => setEra(era.id) }
+                                        />
+                                        <span><strong>{ era.name }</strong> — { era.subtitle }</span>
+                                    </label>
+                                )) }
+                            </div>
+                            <div className="d-flex gap-2 mt-2">
+                                <button type="button" className="btn-shiny-2012 flex-fill" onClick={ () => CreateLinkEvent('era-selector/open') }>
+                                    Selector Visual
+                                </button>
+                                <button type="button" className="btn-shiny-2012 flex-fill" onClick={ () => setShowDiscordModal(true) }>
+                                    Discord
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="settings-2012-footer">
+                            <button type="button" className="btn-shiny-2012 px-3" onClick={ () => processAction('close_view') }>
+                                Volver
+                            </button>
+                        </div>
+                    </NitroCardContentView>
+                </NitroCardView>
+                { showDiscordModal && (
+                    <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={{ zIndex: 1050, width: 430, backgroundColor: '#2d2847', color: '#ffffff', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}>
+                        <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
+                        <NitroCardContentView className="p-3" style={{ backgroundColor: '#2d2847', color: '#ffffff' }}>
+                            <div className="d-flex align-items-center gap-3 mb-3">
+                                <div style={{ width: 64, height: 64, minWidth: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M32 6L56 18V44L32 58L8 44V18L32 6Z" fill="#5865F2" stroke="#4752C4" strokeWidth="2" />
+                                        <path d="M32 6L56 18L32 30L8 18L32 6Z" fill="#7983F5" />
+                                        <path d="M32 30V58L8 44V18L32 30Z" fill="#4752C4" />
+                                        <path d="M32 30V58L56 44V18L32 30Z" fill="#5865F2" />
+                                        <path d="M24 24C22.5 24.5 21 25.5 20 27.5C20 33.5 23 39 27 41C28 40 29 38.5 30 37.5C27.5 36.8 26.5 35 26.5 35C26.5 35 27 35.3 28 35.8C30.5 37 33 37.5 35.5 37.5C38 37.5 40.5 37 43 35.8C44 35.3 44.5 35 44.5 35C44.5 35 43.5 36.8 41 37.5C42 38.5 43 40 44 41C48 39 51 33.5 51 27.5C50 25.5 48.5 24.5 47 24C45.5 26 44.5 28 44 30C41.5 29.5 39 29.5 35.5 29.5C32 29.5 29.5 29.5 27 30C26.5 28 25.5 26 24 24Z" fill="white" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div className="fw-bold mb-1" style={{ fontSize: '15px', color: '#ffffff' }}>Conecta Habbten a Discord</div>
+                                    <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.4' }}>
+                                        ¡Hemos detectado que tienes un auténtico espíritu gamer! *Choca esos cinco*<br />
+                                        ¿Quieres que tus amigos/as sepan lo que estás haciendo en este loco hotel?
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-3 rounded mb-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                <div className="fw-bold mb-2 text-white" style={{ fontSize: '12px' }}>Escribe tu Usuario de Discord:</div>
+                                <div className="input-group">
+                                    <span className="input-group-text bg-dark text-white border-secondary">@</span>
+                                    <input
+                                        type="text"
+                                        className="form-control bg-dark text-white border-secondary"
+                                        placeholder="tu_usuario_discord"
+                                        value={discordTag}
+                                        onChange={e => setDiscordTag(e.target.value)}
+                                        style={{ fontSize: '12px' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={`btn ${isDiscordConnected ? 'btn-success' : 'btn-primary'} fw-bold px-3`}
+                                        style={{ fontSize: '12px' }}
+                                        onClick={() => {
+                                            if (discordTag.trim()) {
+                                                localStorage.setItem('habbten_discord_tag', discordTag.trim());
+                                                setIsDiscordConnected(true);
+                                                setDiscordStatusMsg('¡Cuenta vinculada correctamente!');
+                                                setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                            } else {
+                                                localStorage.removeItem('habbten_discord_tag');
+                                                setIsDiscordConnected(false);
+                                                setDiscordStatusMsg('Cuenta desvinculada.');
+                                                setTimeout(() => setDiscordStatusMsg(''), 3000);
+                                            }
+                                        }}
+                                    >
+                                        {isDiscordConnected ? '✓ Vinculado' : 'Vincular'}
+                                    </button>
+                                </div>
+                                {discordStatusMsg && <div className="text-success small text-center mt-1.5">{discordStatusMsg}</div>}
+                            </div>
+                            <button
+                                type="button"
+                                className="btn w-100 py-2 fw-bold"
+                                style={{ background: '#4a406b', color: '#ffffff', border: '2px solid #2b2344', borderRadius: '6px', fontSize: '12px' }}
+                                onClick={() => setShowDiscordModal(false)}
+                            >
+                                Cerrar
+                            </button>
+                        </NitroCardContentView>
+                    </NitroCardView>
+                ) }
+            </>
+        );
+    }
+
     return (
         <>
             <NitroCardView uniqueKey="user-settings" className="user-settings-window" theme="primary-slim">

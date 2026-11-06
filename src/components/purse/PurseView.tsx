@@ -68,7 +68,7 @@ export const PurseView: FC<{}> = props =>
         const duckets = purse?.activityPoints?.get(0) ?? 0;
         const diamonds = purse?.activityPoints?.get(5) ?? 0;
         const hasVip = (purse.clubLevel === HabboClubLevelEnum.VIP);
-        const hasHc = (purse.clubLevel >= HabboClubLevelEnum.CLUB);
+        const hasClub = (purse.clubLevel >= HabboClubLevelEnum.CLUB);
 
         const handleLogout = () =>
         {
@@ -83,7 +83,7 @@ export const PurseView: FC<{}> = props =>
             <div className="nitro-purse-container purse-flash2012">
                 <div className="purse-widget-2012">
                     <div className="purse-grid">
-                        {/* Celda (1, 1): Créditos */}
+                        {/* (1, 1): Créditos */}
                         <div 
                             className="purse-pill pill-credits" 
                             title="Créditos" 
@@ -93,37 +93,17 @@ export const PurseView: FC<{}> = props =>
                             <i className="purse-icon icon-credits" />
                         </div>
 
-                        {/* Celda (1, 2): VIP */}
+                        {/* (1, 2): Club HC / VIP */}
                         <div 
-                            className={ `purse-pill pill-vip ${ hasVip ? 'is-active' : '' }` } 
-                            title="Habbten VIP" 
+                            className={ `purse-pill pill-hc ${ hasClub ? 'is-active' : '' }` } 
+                            title={ hasVip ? 'Habbten VIP' : 'Habbten Club' } 
                             onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }
                         >
-                            <span className="pill-text">{ hasVip ? getClubText : 'Únete' }</span>
-                            <i className="purse-badge badge-vip" />
+                            <i className={ `purse-badge ${ hasVip ? 'badge-vip' : 'badge-hc' }` } />
+                            <span className="pill-text">{ hasClub ? getClubText : 'Únete' }</span>
                         </div>
 
-                        {/* Celda (2, 1): Duckets */}
-                        <div 
-                            className="purse-pill pill-duckets" 
-                            title="Duckets" 
-                            onClick={ () => CreateLinkEvent('catalog/open') }
-                        >
-                            <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(duckets) : LocalizeFormattedNumber(duckets) }</span>
-                            <i className="purse-icon icon-duckets" />
-                        </div>
-
-                        {/* Celda (2, 2): HC */}
-                        <div 
-                            className={ `purse-pill pill-hc ${ hasHc ? 'is-active' : '' }` } 
-                            title="Habbten Club" 
-                            onClick={ () => CreateLinkEvent('habboUI/open/hccenter') }
-                        >
-                            <span className="pill-text">{ hasHc ? getClubText : 'Únete' }</span>
-                            <i className="purse-badge badge-hc" />
-                        </div>
-
-                        {/* Celda (3, 1): Diamantes */}
+                        {/* (2, 1): Diamantes */}
                         <div 
                             className="purse-pill pill-diamonds" 
                             title="Diamantes" 
@@ -132,9 +112,19 @@ export const PurseView: FC<{}> = props =>
                             <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(diamonds) : LocalizeFormattedNumber(diamonds) }</span>
                             <i className="purse-icon icon-diamonds" />
                         </div>
+
+                        {/* (2, 2): Duckets (reemplaza Píxeles con la divisa real del hotel) */}
+                        <div 
+                            className="purse-pill pill-duckets" 
+                            title="Duckets" 
+                            onClick={ () => CreateLinkEvent('catalog/open') }
+                        >
+                            <span className="pill-amount">{ currencyDisplayNumberShort ? LocalizeShortNumber(duckets) : LocalizeFormattedNumber(duckets) }</span>
+                            <i className="purse-icon icon-duckets" />
+                        </div>
                     </div>
 
-                    {/* Barra oscura inferior con Ayuda, Ajustes, Salir */}
+                    {/* Barra superior/inferior compacta de utilidades 2012 (Ayuda | Ajustes | Salir) */}
                     <div className="purse-action-bar">
                         <span className="action-link" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>Ayuda</span>
                         <span className="action-sep">|</span>

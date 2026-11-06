@@ -4,6 +4,7 @@ import { attemptItemPlacement, DispatchUiEvent, FurniCategory, GetRoomEngine, Ge
 import { AutoGrid, Button, Column, Grid, LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, LayoutRoomPreviewerView, Text } from '../../../../common';
 import { CatalogPostMarketplaceOfferEvent } from '../../../../events';
 import { useInventoryFurni, useInventoryUnseenTracker } from '../../../../hooks';
+import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { InventoryFurnitureSearchView } from './InventoryFurnitureSearchView';
@@ -28,6 +29,7 @@ const attemptPlaceMarketplaceOffer = (groupItem: GroupItem) =>
 export const InventoryFurnitureView: FC<InventoryFurnitureViewProps> = props =>
 {
     const { roomSession = null, roomPreviewer = null } = props;
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ filteredGroupItems, setFilteredGroupItems ] = useState<GroupItem[]>([]);
     const { groupItems = [], selectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
@@ -50,6 +52,13 @@ export const InventoryFurnitureView: FC<InventoryFurnitureViewProps> = props =>
         wallType = (wallType && wallType.length) ? wallType : '101';
         floorType = (floorType && floorType.length) ? floorType : '101';
         landscapeType = (landscapeType && landscapeType.length) ? landscapeType : '1.1';
+
+        if(currentEra === 'flash2012')
+        {
+            wallType = '101';
+            floorType = '101';
+            roomPreviewer.backgroundColor = 0xEDA800;
+        }
 
         roomPreviewer.reset(false);
         roomPreviewer.updateObjectRoom(floorType, wallType, landscapeType);
@@ -81,7 +90,7 @@ export const InventoryFurnitureView: FC<InventoryFurnitureViewProps> = props =>
                 roomPreviewer.addFurnitureIntoRoom(selectedItem.type, new Vector3d(90), selectedItem.stuffData, (furnitureItem.extra.toString()));
             }
         }
-    }, [ roomPreviewer, selectedItem ]);
+    }, [ roomPreviewer, selectedItem, currentEra ]);
 
     useEffect(() =>
     {

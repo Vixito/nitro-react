@@ -305,12 +305,16 @@ export const AvatarEditorView: FC<{}> = props =>
 
                     return (
                         <NitroCardTabsItemView key={ category } isActive={ isActive } onClick={ event => selectCategory(category) }>
-                            { LocalizeText(`avatareditor.category.${ category }`) }
+                            { currentEra === 'flash2012'
+                                ? <i className={ `ae-tab-icon-2012 ae-tab-${ category }` } title={ LocalizeText(`avatareditor.category.${ category }`) } />
+                                : LocalizeText(`avatareditor.category.${ category }`) }
                         </NitroCardTabsItemView>
                     );
                 }) }
                 <NitroCardTabsItemView isActive={ isWardrobeVisible } onClick={ event => setIsWardrobeVisible(true) }>
-                    { LocalizeText('avatareditor.category.wardrobe') }
+                    { currentEra === 'flash2012'
+                        ? <i className="ae-tab-icon-2012 ae-tab-wardrobe" title={ LocalizeText('avatareditor.category.wardrobe') } />
+                        : LocalizeText('avatareditor.category.wardrobe') }
                 </NitroCardTabsItemView>
             </NitroCardTabsView>
             <NitroCardContentView>

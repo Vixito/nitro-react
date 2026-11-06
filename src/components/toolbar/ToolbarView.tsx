@@ -2,7 +2,7 @@ import { Dispose, DropBounce, EaseOut, ILinkEventTracker, JumpBy, Motions, Nitro
 import { FC, useState, useRef, useEffect } from 'react';
 import { AddEventLinkTracker, CreateLinkEvent, DispatchMainEvent, GetConfiguration, GetSessionDataManager, MessengerIconState, OpenMessengerChat, RemoveLinkEventTracker, SendMessageComposer, VisitDesktop } from '../../api';
 import { Base, Flex, LayoutAvatarImageView, LayoutCurrencyIcon, LayoutItemCountView, TransitionAnimation, TransitionAnimationTypes } from '../../common';
-import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, usePurse, useRoomEngineEvent, useSessionInfo } from '../../hooks';
+import { useAchievements, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useNavigator, usePurse, useRoomEngineEvent, useSessionInfo } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { ToolbarMeView } from './ToolbarMeView';
 
@@ -16,6 +16,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { getFullCount = 0 } = useInventoryUnseenTracker();
     const { getTotalUnseen = 0 } = useAchievements();
     const { purse = null } = usePurse();
+    const { navigatorData = null } = useNavigator();
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
     const isMod = GetSessionDataManager() ? GetSessionDataManager().isModerator : false;
@@ -193,89 +194,98 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     {
         return (
             <>
-                <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 300 }>
-                    <ToolbarMeView useGuideTool={ useGuideTool } unseenAchievementCount={ getTotalUnseen } setMeExpanded={ setMeExpanded } />
+                <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 200 }>
+                    <ToolbarMeView useGuideTool={ useGuideTool } unseenAchievementCount={ getTotalUnseen } setMeExpanded={ setMeExpanded } isInRoom={ isInRoom } />
                 </TransitionAnimation>
 
-                {/* Auténtica Barra Lateral Vertical 2012 Flash (Illumina) */}
+                {/* Auténtica Barra Lateral Vertical Izquierda Marzo 2012 (HabboToolbarCom) */}
                 <div className="nitro-toolbar toolbar-flash2012">
                     <div className="toolbar-capsule">
-                        { isInRoom && (
-                            <div className="navigation-item item-hotel icon-hotel" title="Vista del Hotel" onClick={ () => VisitDesktop() }>
+                        { isInRoom ? (
+                            <div className="navigation-item item-hotel icon-hotel" title="Recepción / Vista del Hotel" onClick={ () => VisitDesktop() }>
                                 <i className="toolbar-icon icon-hotel" />
                                 <span className="avatar-label">Hotel</span>
                             </div>
-                        )}
+                        ) : (
+                            <div className="navigation-item item-home icon-home" title="Ir a Mi Sala" onClick={ () => CreateLinkEvent('navigator/goto/home') }>
+                                <i className="toolbar-icon icon-home" />
+                                <span className="avatar-label">Mi Sala</span>
+                            </div>
+                        ) }
+
                         <div className="navigation-item item-rooms icon-rooms" title="Navegador de Salas" onClick={ () => CreateLinkEvent('navigator/toggle') }>
                             <i className="toolbar-icon icon-rooms" />
                             <span className="avatar-label">Salas</span>
                         </div>
-                        <div className="navigation-item item-games icon-games" title="Centro de Juegos" onClick={ () => CreateLinkEvent('games/toggle') }>
-                            <i className="toolbar-icon icon-games" />
-                            <span className="avatar-label">Juegos</span>
+
+                        <div className="navigation-item item-quests icon-quests" title="Misiones y Pase" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                            <i className="toolbar-icon icon-quests" />
+                            <span className="avatar-label">Misiones</span>
                         </div>
-                        <div className="navigation-item item-battlepass icon-battlepass" title="Pase de Batalla" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
-                            <i className="toolbar-icon icon-battlepass" />
-                            <span className="avatar-label">Pase de Batalla</span>
-                        </div>
-                        <div className="navigation-item item-achievements icon-achievements" title="Logros y Recompensas" onClick={ () => CreateLinkEvent('achievements/toggle') }>
-                            <i className="toolbar-icon icon-achievements" />
-                            <span className="avatar-label">Logros</span>
-                        </div>
-                        <div className="navigation-item item-catalog icon-catalog" title="Tienda de Habbten" onClick={ () => CreateLinkEvent('catalog/toggle') }>
+
+                        { isGameCenterEnabled && (
+                            <div className="navigation-item item-games icon-games" title="Centro de Juegos" onClick={ () => CreateLinkEvent('games/toggle') }>
+                                <i className="toolbar-icon icon-games" />
+                                <span className="avatar-label">Juegos</span>
+                            </div>
+                        ) }
+
+                        <div className="toolbar-divider-2012" />
+
+                        <div className="navigation-item item-catalog icon-catalog" title="Catálogo / Tienda" onClick={ () => CreateLinkEvent('catalog/toggle') }>
                             <i className="toolbar-icon icon-catalog" />
                             <span className="avatar-label">Tienda</span>
                         </div>
+
                         <div className="navigation-item item-inventory icon-inventory" title="Inventario" onClick={ () => CreateLinkEvent('inventory/toggle') }>
                             <i className="toolbar-icon icon-inventory" />
                             { (getFullCount > 0) && <LayoutItemCountView count={ getFullCount } /> }
                             <span className="avatar-label">Inventario</span>
                         </div>
-                        { isMod && (
-                            <div className="navigation-item item-modtools icon-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
-                                <i className="toolbar-icon icon-modtools" />
-                                <span className="avatar-label">Mod</span>
-                            </div>
-                        )}
-                        { isInRoom && (
-                            <div className="navigation-item item-camera icon-camera" title="Cámara" onClick={ () => CreateLinkEvent('camera/toggle') }>
-                                <i className="toolbar-icon icon-camera" />
-                                <span className="avatar-label">Cámara</span>
-                            </div>
-                        )}
-                        <div className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` } title="Mi Personaje" onClick={ () => setMeExpanded(!isMeExpanded) }>
+
+                        <div className="toolbar-divider-2012" />
+
+                        <div
+                            className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` }
+                            title="Mi Menú"
+                            onClick={ event => { event.stopPropagation(); setMeExpanded(prev => !prev); } }
+                        >
                             <div className="avatar-head-wrapper">
-                                <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headOnly={ true } />
+                                <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headDirection={ 2 } headOnly={ true } />
                             </div>
                             { (getTotalUnseen > 0) && <LayoutItemCountView count={ getTotalUnseen } /> }
                             <span className="avatar-label">Yo</span>
                         </div>
                     </div>
+
+                    { isMod && (
+                        <div className="toolbar-mod-pill-2012" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
+                            <i className="toolbar-icon icon-modtools" />
+                            <span className="mod-label-2012">Mod</span>
+                        </div>
+                    ) }
                 </div>
 
-                {/* Auténtica Barra Inferior 2012 Flash (Friend Bar Stream + Todos los amigos + Messenger - Sin SnowStorm) */}
+                {/* Auténtica Barra Inferior 2012 Flash (Friend Bar Stream + Amigos + Messenger) */}
                 <div className="nitro-bottom-bar-2012">
                     <div className="bottom-bar-left">
-                        {/* Stream de amigos (Friend bar) montado vía portal */}
                         <div id="toolbar-friend-bar-container" className="friend-bar-stream-container" />
                     </div>
 
                     <div className="bottom-bar-right">
-                        {/* Botón 'Todos los amigos' */}
-                        <div 
-                            className="bottom-bar-btn btn-all-friends" 
-                            title="Todos los amigos" 
+                        <div
+                            className="bottom-bar-btn btn-all-friends"
+                            title="Lista de Amig@s"
                             onClick={ () => CreateLinkEvent('friends/toggle') }
                         >
                             <i className="icon icon-friends-list" />
-                            <span className="btn-label">Todos los amigos</span>
+                            <span className="btn-label">Amig@s</span>
                             { (requests.length > 0) && <LayoutItemCountView count={ requests.length } /> }
                         </div>
 
-                        {/* Botón de Messenger con burbuja de chat azul */}
-                        <div 
-                            className={ `bottom-bar-btn btn-messenger ${ (iconState === MessengerIconState.UNREAD) ? 'is-unread pulse-animation' : '' }` } 
-                            title="Chat y Mensajes" 
+                        <div
+                            className={ `bottom-bar-btn btn-messenger ${ (iconState === MessengerIconState.UNREAD) ? 'is-unread pulse-animation' : '' }` }
+                            title="Consola / Mensajes"
                             onClick={ () => OpenMessengerChat() }
                         >
                             <i className="icon icon-chat-bubble" />
@@ -283,7 +293,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     </div>
                 </div>
 
-                {/* Floating Bottom Left Chat Input Container (2012 Flash) */}
+                {/* Entrada de Chat Flotante en Sala (2012 Flash) */}
                 <div id="toolbar-chat-input-container" className="chat-container-flash2012" />
             </>
         );
