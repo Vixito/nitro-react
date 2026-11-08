@@ -26,10 +26,15 @@ export const AchievementsView: FC<{}> = props =>
                         setIsVisible(true);
                         return;
                     case 'hide':
+                        if(selectedCategoryCode) setSelectedCategoryCode(null);
                         setIsVisible(false);
                         return;
                     case 'toggle':
-                        setIsVisible(prevValue => !prevValue);
+                        setIsVisible(prevValue =>
+                        {
+                            if(prevValue && selectedCategoryCode) setSelectedCategoryCode(null);
+                            return !prevValue;
+                        });
                         return;
                 }
             },
@@ -39,13 +44,13 @@ export const AchievementsView: FC<{}> = props =>
         AddEventLinkTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
+    }, [ selectedCategoryCode, setSelectedCategoryCode ]);
 
     if(!isVisible) return null;
 
     return (
         <NitroCardView uniqueKey="achievements" className="nitro-achievements" theme="primary-slim">
-            <NitroCardHeaderView headerText={ LocalizeText('inventory.achievements') } onCloseClick={ event => setIsVisible(false) } />
+            <NitroCardHeaderView headerText={ LocalizeText('inventory.achievements') } onCloseClick={ event => { if(selectedCategoryCode) setSelectedCategoryCode(null); setIsVisible(false); } } />
             { selectedCategory &&
                 <NitroCardSubHeaderView position="relative" className="justify-content-center align-items-center cursor-pointer" gap={ 3 }>
                     <Base onClick={ event => setSelectedCategoryCode(null) } className="nitro-achievements-back-arrow" />

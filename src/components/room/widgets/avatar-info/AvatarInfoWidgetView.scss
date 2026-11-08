@@ -55,7 +55,16 @@
             border-radius: $border-radius;
 
             &.pet {
+                min-width: 68px;
                 max-width: 75px;
+                min-height: 75px;
+                flex-shrink: 0;
+
+                .pet-image {
+                    flex-shrink: 0;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                }
             }
 
             &.bot {

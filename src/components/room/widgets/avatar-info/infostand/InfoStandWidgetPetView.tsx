@@ -178,7 +178,7 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = props =>
                     </Column>
                 </Column>
             </Column>
-            <Flex gap={ 1 } justifyContent="end">
+            <Flex gap={ 1 } justifyContent="end" className="button-container mt-2">
                 { (avatarInfo.petType !== PetType.MONSTERPLANT) &&
                     <Button variant="dark" onClick={ event => processButtonAction('buyfood') }>
                         { LocalizeText('infostand.button.buyfood') }

@@ -109,25 +109,25 @@ export const FriendsMessengerView: FC<{}> = props =>
         <NitroCardView className="nitro-friends-messenger" uniqueKey="nitro-friends-messenger" theme="primary-slim">
             <NitroCardHeaderView headerText={ LocalizeText('messenger.window.title', [ 'OPEN_CHAT_COUNT' ], [ visibleThreads.length.toString() ]) } onCloseClick={ event => setIsVisible(false) } />
             <NitroCardContentView>
-                <Grid overflow="hidden">
-                    <Column size={ 4 } overflow="hidden">
-                        <Text bold>{ LocalizeText('toolbar.icon.label.messenger') }</Text>
-                        <Column fit overflow="auto">
-                            <Column>
+                <Grid overflow="hidden" className="messenger-main-grid">
+                    <Column size={ 4 } overflow="hidden" className="messenger-threads-col">
+                        <Text bold className="messenger-threads-label">{ LocalizeText('toolbar.icon.label.messenger') }</Text>
+                        <Column fit overflow="auto" className="messenger-threads-scroll">
+                            <Column className="messenger-threads-list">
                                 { visibleThreads && (visibleThreads.length > 0) && visibleThreads.map(thread =>
                                 {
                                     return (
-                                        <LayoutGridItem key={ thread.threadId } itemActive={ (activeThread === thread) } onClick={ event => setActiveThreadId(thread.threadId) }>
+                                        <LayoutGridItem key={ thread.threadId } className="messenger-thread-tab" itemActive={ (activeThread === thread) } onClick={ event => setActiveThreadId(thread.threadId) }>
                                             { thread.unread &&
                                             <LayoutItemCountView count={ thread.unreadCount } /> }
-                                            <Flex fullWidth alignItems="center" gap={ 1 }>
+                                            <Flex fullWidth alignItems="center" gap={ 1 } className="messenger-thread-tab-inner">
                                                 <Flex alignItems="center" className="friend-head px-1">
                                                     { (thread.participant.id > 0) &&
                                                     <LayoutAvatarImageView figure={ thread.participant.figure } headOnly={ true } direction={ 3 } /> }
                                                     { (thread.participant.id <= 0) &&
                                                     <LayoutBadgeImageView isGroup={ false } badgeCode={ thread.participant.figure || 'ADM' } /> }
                                                 </Flex>
-                                                <Text truncate grow>{ thread.participant.name }</Text>
+                                                <Text truncate grow className="messenger-thread-tab-name">{ thread.participant.name }</Text>
                                             </Flex>
                                         </LayoutGridItem>
                                     );
@@ -135,23 +135,26 @@ export const FriendsMessengerView: FC<{}> = props =>
                             </Column>
                         </Column>
                     </Column>
-                    <Column size={ 8 } overflow="hidden">
+                    <Column size={ 8 } overflow="hidden" className="messenger-active-col">
                         { activeThread &&
                             <>
-                                <Text bold center>{ LocalizeText('messenger.window.separator', [ 'FRIEND_NAME' ], [ activeThread.participant.name ]) }</Text>
-                                <Flex alignItems="center" justifyContent="between" gap={ 1 }>
-                                    <Flex gap={ 1 }>
+                                <div className="messenger-separator-row">
+                                    <Text bold center className="messenger-separator-text">{ LocalizeText('messenger.window.separator', [ 'FRIEND_NAME' ], [ activeThread.participant.name ]) }</Text>
+                                    <span className="messenger-separator-line" />
+                                </div>
+                                <Flex alignItems="center" justifyContent="between" gap={ 1 } className="messenger-toolbar-row">
+                                    <Flex gap={ 1 } className="messenger-toolbar-left">
                                         { activeThread.participant.id > 0 ? (
                                             <>
-                                                <ButtonGroup>
-                                                    <Button onClick={ followFriend }>
+                                                <ButtonGroup className="messenger-action-group">
+                                                    <Button className="messenger-btn-follow" onClick={ followFriend }>
                                                         <Base className="nitro-friends-spritesheet icon-follow" />
                                                     </Button>
-                                                    <Button onClick={ openProfile }>
+                                                    <Button className="messenger-btn-profile" onClick={ openProfile }>
                                                         <Base className="nitro-friends-spritesheet icon-profile-sm" />
                                                     </Button>
                                                 </ButtonGroup>
-                                                <Button variant="danger" onClick={ () => report(ReportType.IM, { reportedUserId: activeThread.participant.id }) }>
+                                                <Button variant="danger" className="messenger-btn-report" onClick={ () => report(ReportType.IM, { reportedUserId: activeThread.participant.id }) }>
                                                     { LocalizeText('messenger.window.button.report') }
                                                 </Button>
                                             </>
@@ -159,18 +162,18 @@ export const FriendsMessengerView: FC<{}> = props =>
                                             <span className="badge bg-primary text-white text-xs px-2 py-1">Canal Oficial Staff</span>
                                         ) }
                                     </Flex>
-                                    <Button onClick={ event => closeThread(activeThread.threadId) }>
+                                    <Button className="messenger-btn-close-thread" onClick={ event => closeThread(activeThread.threadId) }>
                                         <FaTimes className="fa-icon" />
                                     </Button>
                                 </Flex>
                                 <Column fit className="bg-muted p-2 rounded chat-messages">
-                                    <Column innerRef={ messagesBox } overflow="auto">
+                                    <Column innerRef={ messagesBox } overflow="auto" className="chat-messages-scroll">
                                         <FriendsMessengerThreadView thread={ activeThread } />
                                     </Column>
                                 </Column>
-                                <Flex gap={ 1 }>
-                                    <input type="text" className="form-control form-control-sm" maxLength={ 255 } placeholder={ LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ activeThread.participant.name ]) } value={ messageText } onChange={ event => setMessageText(event.target.value) } onKeyDown={ onKeyDown } />
-                                    <Button variant="success" onClick={ send }>
+                                <Flex gap={ 1 } className="messenger-input-row">
+                                    <input type="text" className="form-control form-control-sm messenger-chat-input" maxLength={ 255 } placeholder={ LocalizeText('messenger.window.input.default', [ 'FRIEND_NAME' ], [ activeThread.participant.name ]) } value={ messageText } onChange={ event => setMessageText(event.target.value) } onKeyDown={ onKeyDown } />
+                                    <Button variant="success" className="messenger-btn-send" onClick={ send }>
                                         { LocalizeText('generic.send') }
                                     </Button>
                                 </Flex>

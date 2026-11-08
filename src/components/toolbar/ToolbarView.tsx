@@ -245,25 +245,25 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
 
                         <div className="toolbar-divider-2012" />
 
+                        { isMod && (
+                            <div className="navigation-item item-modtools icon-modtools" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
+                                <i className="toolbar-icon icon-modtools" />
+                                <span className="avatar-label">Mod</span>
+                            </div>
+                        ) }
+
                         <div
                             className={ `navigation-item item-avatar ${ isMeExpanded ? 'active ' : '' }` }
                             title="Mi Menú"
                             onClick={ event => { event.stopPropagation(); setMeExpanded(prev => !prev); } }
                         >
                             <div className="avatar-head-wrapper">
-                                <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headDirection={ 2 } headOnly={ true } />
+                                <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headDirection={ 2 } headOnly={ false } />
                             </div>
                             { (getTotalUnseen > 0) && <LayoutItemCountView count={ getTotalUnseen } /> }
                             <span className="avatar-label">Yo</span>
                         </div>
                     </div>
-
-                    { isMod && (
-                        <div className="toolbar-mod-pill-2012" title="Herramientas de Moderación" onClick={ () => CreateLinkEvent('mod-tools/toggle') }>
-                            <i className="toolbar-icon icon-modtools" />
-                            <span className="mod-label-2012">Mod</span>
-                        </div>
-                    ) }
                 </div>
 
                 {/* Auténtica Barra Inferior 2012 Flash (Friend Bar Stream + Amigos + Messenger) */}

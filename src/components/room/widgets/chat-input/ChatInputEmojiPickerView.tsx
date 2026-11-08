@@ -154,8 +154,8 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
                     <div className="popover-body-custom p-2">
                         { activeCategory === 'commands' ? (
                             <div className="habbten-shortcuts-grid">
-                                <div className="mb-2" style={ { fontSize: '13px', color: '#f1f5f9' } }>
-                                    Escribe en el chat <strong style={ { color: '#facc15' } }>:emoji &lt;número o texto&gt;</strong> o haz clic para enviar:
+                                <div className="mb-2 habbten-shortcuts-instruction" style={ { fontSize: '13px' } }>
+                                    Escribe en el chat <strong className="shortcuts-highlight" style={ { color: '#c46200' } }>:emoji &lt;número o texto&gt;</strong> o haz clic para enviar:
                                 </div>
                                 { HABBTEN_COMMAND_SHORTCUTS.map(s => (
                                     <div

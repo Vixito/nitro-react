@@ -307,7 +307,7 @@ export const ChatInputGifPickerView: FC<ChatInputGifPickerViewProps> = ({ onSele
                     <div className="popover-body-custom p-2">
                         { activeCategory === 'custom' ? (
                             <form onSubmit={ handleCustomSubmit } className="custom-gif-container">
-                                <div className="mb-2" style={ { fontSize: '13px', color: '#f1f5f9' } }>
+                                <div className="mb-2 custom-gif-label" style={ { fontSize: '13px' } }>
                                     Pega un enlace directo de GIF en formato HTTPS seguro:
                                 </div>
                                 <div className="d-flex gap-2 mb-2">

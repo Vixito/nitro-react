@@ -40,9 +40,19 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
 
     return (
         <>
-            <Base pointer innerRef={ elementRef } className="icon icon-navigator-info" onMouseOver={ event => setIsVisible(true) } onMouseLeave={ event => setIsVisible(false) } />
-            <Overlay show={ isVisible } target={ elementRef.current } placement="right">
-                <Popover>
+            <Base
+                pointer
+                innerRef={ elementRef }
+                className="icon icon-navigator-info"
+                onClick={ event =>
+                {
+                    event.stopPropagation();
+                    setIsVisible(prevValue => !prevValue);
+                } }
+                onMouseDown={ event => event.stopPropagation() }
+            />
+            <Overlay show={ isVisible } target={ elementRef.current } placement="right" rootClose={ true } onHide={ () => setIsVisible(false) }>
+                <Popover className="navigator-room-info-popover" style={ { zIndex: 1085 } } onClick={ event => event.stopPropagation() }>
                     <NitroCardContentView overflow="hidden" className="room-info image-rendering-pixelated bg-transparent">
                         <Flex gap={ 2 } overflow="hidden">
                             <LayoutRoomThumbnailView roomId={ roomData.roomId } customUrl={ roomData.officialRoomPicRef } className="d-flex flex-column align-items-center justify-content-end mb-1">

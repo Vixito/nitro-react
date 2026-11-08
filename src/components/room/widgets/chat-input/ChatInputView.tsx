@@ -336,17 +336,26 @@ export const ChatInputView: FC<{}> = props =>
                         )}
                     </div>
                 )}
+                { currentEra === 'flash2012' && (
+                    <div className="chat-addons chat-addons-2012-left">
+                        <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
+                        <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                        <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                    </div>
+                ) }
                 <div className="input-sizer align-items-center">
                     { !floodBlocked &&
                     <input ref={ inputRef } type="text" className="chat-input" placeholder={ currentEra === 'shockwave2006' ? '' : LocalizeText('widgets.chatinput.default') } value={ chatValue } maxLength={ maxChatLength } onChange={ event => updateChatInput(event.target.value) } onMouseDown={ event => setInputFocus() } /> }
                     { floodBlocked &&
                     <Text variant="danger">{ LocalizeText('chat.input.alert.flood', [ 'time' ], [ floodBlockedSeconds.toString() ]) } </Text> }
                 </div>
-                <div className="chat-addons">
-                    <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
-                    <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
-                    <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
-                </div>
+                { currentEra !== 'flash2012' && (
+                    <div className="chat-addons">
+                        <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                        <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                        <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
+                    </div>
+                ) }
             </div>, target)
     );
 }

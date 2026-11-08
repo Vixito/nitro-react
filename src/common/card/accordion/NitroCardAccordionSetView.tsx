@@ -7,11 +7,12 @@ export interface NitroCardAccordionSetViewProps extends ColumnProps
 {
     headerText: string;
     isExpanded?: boolean;
+    expandTrigger?: number;
 }
 
 export const NitroCardAccordionSetView: FC<NitroCardAccordionSetViewProps> = props =>
 {
-    const { headerText = '', isExpanded = false, gap = 0, classNames = [], children = null, ...rest } = props;
+    const { headerText = '', isExpanded = false, expandTrigger = 0, gap = 0, classNames = [], children = null, ...rest } = props;
     const [ isOpen, setIsOpen ] = useState(false);
     const { setClosers = null, closeAll = null } = useNitroCardAccordionContext();
 
@@ -37,8 +38,9 @@ export const NitroCardAccordionSetView: FC<NitroCardAccordionSetViewProps> = pro
 
     useEffect(() =>
     {
+        if(isExpanded && expandTrigger > 0 && closeAll) closeAll();
         setIsOpen(isExpanded);
-    }, [ isExpanded ]);
+    }, [ isExpanded, expandTrigger ]);
 
     useEffect(() =>
     {

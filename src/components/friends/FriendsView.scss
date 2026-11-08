@@ -95,6 +95,17 @@
         border: 0;
         border-bottom: 1px solid rgba($black, 0.2);
     }
+
+    .friends-action-bar-2012 {
+        display: none;
+    }
+}
+
+.nitro-friends-messenger {
+    .messenger-sender-name,
+    .messenger-separator-line {
+        display: none;
+    }
 }
 
 .nitro-friends-room-invite {

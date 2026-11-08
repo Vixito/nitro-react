@@ -1,5 +1,14 @@
 .game-center-root {
-    z-index: 1000;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 52px !important;
+    z-index: 1018 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px 24px !important;
     background: radial-gradient(circle at center, rgba(15, 23, 42, 0.95) 0%, rgba(2, 6, 23, 0.98) 100%);
     backdrop-filter: blur(12px);
     overflow: hidden;
@@ -8,8 +17,9 @@
 .game-center-main {
     width: 1180px;
     max-width: 95vw;
-    height: 85vh;
-    max-height: 780px;
+    height: min(82vh, calc(100% - 16px));
+    max-height: min(760px, calc(100% - 16px));
+    margin: auto;
     background: #0f172a;
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.12);

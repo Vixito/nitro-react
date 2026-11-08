@@ -1,6 +1,6 @@
 import { FC, useMemo } from 'react';
 import { GetGroupChatData, GetSessionDataManager, GetUserProfile, LocalizeText, MessengerGroupType, MessengerThread, MessengerThreadChat, MessengerThreadChatGroup } from '../../../../../api';
-import { Base, Flex, LayoutAvatarImageView } from '../../../../../common';
+import { Base, Flex, LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../../common';
 
 export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread, group: MessengerThreadChatGroup }> = props =>
 {
@@ -68,21 +68,32 @@ export const FriendsMessengerThreadGroup: FC<{ thread: MessengerThread, group: M
     }
     
     return (
-        <Flex fullWidth justifyContent={ isOwnChat ? 'end' : 'start' } gap={ 2 }>
+        <Flex fullWidth justifyContent={ isOwnChat ? 'end' : 'start' } gap={ 2 } className={ 'messenger-message-row ' + (isOwnChat ? 'is-own-chat' : 'is-friend-chat') }>
             { !isOwnChat &&
                 <Base shrink className="message-avatar cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
-                    { (group.type === MessengerGroupType.PRIVATE_CHAT) &&
-                        <LayoutAvatarImageView figure={ thread.participant.figure } direction={ 2 } /> }
+                    { (group.type === MessengerGroupType.PRIVATE_CHAT) && (
+                        (thread.participant.id > 0) ? (
+                            <LayoutAvatarImageView figure={ thread.participant.figure } direction={ 2 } />
+                        ) : (
+                            <LayoutBadgeImageView isGroup={ false } badgeCode={ thread.participant.figure || 'ADM' } />
+                        )
+                    ) }
                     { groupChatData &&
                         <LayoutAvatarImageView figure={ groupChatData.figure } direction={ 2 } /> }
                 </Base> }
-            <Base className={ 'bg-light text-black border-radius mb-2 rounded py-1 px-2 messages-group-' + (isOwnChat ? 'right' : 'left') }>
-                <Base className="fw-bold cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
+            <div className={ 'messenger-bubble-col ' + (isOwnChat ? 'is-own' : 'is-friend') }>
+                <Base className="messenger-sender-name fw-bold cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
                     { isOwnChat && GetSessionDataManager().userName }
                     { !isOwnChat && (groupChatData ? groupChatData.username : thread.participant.name) }
                 </Base>
-                { group.chats.map((chat, index) => <Base key={ index } className="text-break">{ chat.message }</Base>) }
-            </Base>
+                <Base className={ 'bg-light text-black border-radius mb-2 rounded py-1 px-2 messages-group-' + (isOwnChat ? 'right' : 'left') }>
+                    <Base className="messenger-inline-sender fw-bold cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
+                        { isOwnChat && GetSessionDataManager().userName }
+                        { !isOwnChat && (groupChatData ? groupChatData.username : thread.participant.name) }
+                    </Base>
+                    { group.chats.map((chat, index) => <Base key={ index } className="text-break messenger-chat-line">{ chat.message }</Base>) }
+                </Base>
+            </div>
             { isOwnChat &&
                 <Base shrink className="message-avatar cursor-pointer" style={ { cursor: 'pointer' } } onClick={ handleOpenProfile }>
                     <LayoutAvatarImageView figure={ GetSessionDataManager().figure } direction={ 4 } />

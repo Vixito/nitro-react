@@ -171,7 +171,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                     <hr className="m-0" />
                 </Column>
                 <Column gap={ 1 }>
-                    <Flex alignItems="center" className="bg-light-dark rounded py-1 px-2">
+                    <Flex alignItems="center" className="motto-row py-1 px-1">
                         { (avatarInfo.type !== AvatarInfoUser.OWN_USER) &&
                             <Flex grow alignItems="center" className="motto-content">
                                 <Text fullWidth pointer wrap textBreak small variant="white">{ motto }</Text>

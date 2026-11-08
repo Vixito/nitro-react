@@ -8,7 +8,7 @@ const useAchievementsState = () =>
 {
     const [ needsUpdate, setNeedsUpdate ] = useState<boolean>(true);
     const [ achievementCategories, setAchievementCategories ] = useState<AchievementCategory[]>([]);
-    const [ selectedCategoryCode, setSelectedCategoryCode ] = useState<string>(null);
+    const [ selectedCategoryCode, setSelectedCategoryCodeState ] = useState<string>(null);
     const [ selectedAchievementId, setSelectedAchievementId ] = useState<number>(-1);
     const [ achievementScore, setAchievementScore ] = useState<number>(0);
 
@@ -79,6 +79,44 @@ const useAchievementsState = () =>
             return newValue;
         });
     }, []);
+
+    const setCategorySeen = useCallback((categoryCode: string) =>
+    {
+        if(!categoryCode) return;
+
+        setAchievementCategories(prevValue =>
+        {
+            let changed = false;
+            const newValue = prevValue.map(category =>
+            {
+                if(category.code !== categoryCode) return category;
+
+                const hasUnseen = category.achievements.some(achievement => (achievement.unseen > 0));
+                if(!hasUnseen) return category;
+
+                changed = true;
+                const clone = CloneObject(category);
+                clone.achievements = category.achievements.map(ach =>
+                {
+                    if(ach.unseen > 0) ach.unseen = 0;
+                    return ach;
+                });
+                return clone;
+            });
+
+            return changed ? newValue : prevValue;
+        });
+    }, []);
+
+    const setSelectedCategoryCode = useCallback((code: string) =>
+    {
+        setSelectedCategoryCodeState(prevCode =>
+        {
+            if(prevCode) setCategorySeen(prevCode);
+            if(code) setCategorySeen(code);
+            return code;
+        });
+    }, [ setCategorySeen ]);
 
     useMessageEvent<AchievementEvent>(AchievementEvent, event =>
     {

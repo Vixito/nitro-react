@@ -36,7 +36,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
             <div 
                 ref={ elementRef } 
                 className="btn btn-primary friend-bar-item friend-bar-search d-flex align-items-center cursor-pointer"
-                onClick={ () => CreateLinkEvent('friends/toggle') }
+                onClick={ () => CreateLinkEvent('friends/search') }
             >
                 <div className="friend-bar-item-head position-absolute"/>
                 <div className="text-nowrap text-white">{ LocalizeText('friend.bar.find.title') || 'Encuentra amig@s' }</div>

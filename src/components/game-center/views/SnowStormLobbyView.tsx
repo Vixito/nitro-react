@@ -5,6 +5,9 @@ import { CreateLinkEvent, LocalizeText, SendMessageComposer } from '../../../api
 import { Button, Column, DraggableWindow, DraggableWindowPosition, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
 import SnowStormLobbyImg from '../../../assets/images/gamecenter/snowstorm_lobby.png';
+import CloseUbuntuNormalImg from '../../../assets/images/eras/flash2012/skins/close_ubuntu_normal.png';
+import CloseUbuntuHoverImg from '../../../assets/images/eras/flash2012/skins/close_ubuntu_hover.png';
+import CloseUbuntuPressedImg from '../../../assets/images/eras/flash2012/skins/close_ubuntu_pressed.png';
 
 export const SnowStormLobbyView: FC<{}> = () => {
     const { isSnowStormLobbyVisible, setIsSnowStormLobbyVisible, setIsVisible, selectedGame, accountStatus, setGameURL } = useGameCenter();
@@ -138,35 +141,29 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         }}
                     />
 
-                    {/* Botón cerrar X superior derecho: alineado con la X del fondo */}
+                    {/* Botón cerrar X superior derecho: sprite original de 2012 (19x20) */}
                     <div
                         className="snowstorm-lobby-close-btn"
                         onClick={onClose}
                         title="Cerrar ventana"
                         style={{
                             position: 'absolute',
-                            top: '8px',
-                            right: '9px',
-                            width: '17px',
-                            height: '17px',
-                            borderRadius: '3px',
-                            border: '2px solid #921911',
-                            boxShadow: '0 0 0 1.6px #ffffff',
-                            background: 'repeating-linear-gradient(#f55041, #f55041 50%, #c23027 50%, #c23027 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            top: '7px',
+                            right: '7px',
+                            width: '19px',
+                            height: '20px',
+                            backgroundImage: `url(${CloseUbuntuNormalImg})`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundSize: '19px 20px',
                             cursor: 'pointer',
-                            zIndex: 20,
-                            transition: 'filter 0.1s ease, transform 0.05s ease'
+                            zIndex: 20
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.25)')}
-                        onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
-                        onMouseDown={e => { e.currentTarget.style.filter = 'brightness(0.85)'; e.currentTarget.style.transform = 'translateY(1px)'; }}
-                        onMouseUp={e => (e.currentTarget.style.transform = 'none')}
-                    >
-                        <FaTimes style={{ color: '#ffffff', fontSize: '10px', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.5))' }} />
-                    </div>
+                        onMouseEnter={e => (e.currentTarget.style.backgroundImage = `url(${CloseUbuntuHoverImg})`)}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundImage = `url(${CloseUbuntuNormalImg})`)}
+                        onMouseDown={e => (e.currentTarget.style.backgroundImage = `url(${CloseUbuntuPressedImg})`)}
+                        onMouseUp={e => (e.currentTarget.style.backgroundImage = `url(${CloseUbuntuHoverImg})`)}
+                    />
 
                     {/* Toast de confirmación dentro del lobby */}
                     {toastMsg && (

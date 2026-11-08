@@ -55,13 +55,22 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = pro
             const title = LocalizeText(getResultTitle());
             const isPublicRooms = (title === 'Salas Públicas' || searchResult.code === 'official_root' || searchResult.data === 'Salas Públicas' || searchResult.code === 'official-root');
             setIsExtended(isPublicRooms);
+            setDisplayMode(searchResult.mode);
+        }
+        else if (topLevelContext?.code === 'hotel_view')
+        {
+            const title = LocalizeText(getResultTitle()).toLowerCase();
+            const code = (searchResult.code || '').toLowerCase();
+            const data = (searchResult.data || '').toLowerCase();
+            const isPopularRooms = (code === 'popular' || code.includes('popular') || title.includes('popular') || data.includes('popular'));
+            setIsExtended(isPopularRooms);
+            setDisplayMode(NavigatorSearchResultViewDisplayMode.LIST);
         }
         else
         {
             setIsExtended(!searchResult.closed);
+            setDisplayMode(searchResult.mode);
         }
-        
-        setDisplayMode(searchResult.mode);
     }, [ searchResult, topLevelContext ]);
 
     const isEventsView = (topLevelContext?.code === 'events_view') || (searchResult?.code === 'events_view') || (searchResult?.data === 'events_view');

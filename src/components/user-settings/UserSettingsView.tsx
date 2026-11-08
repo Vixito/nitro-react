@@ -161,53 +161,61 @@ export const UserSettingsView: FC<{}> = props => {
     if (!isVisible || !userSettings) return null;
 
     if (currentEra === 'flash2012') {
-        const renderVolumeRow2012 = (label: string, id: string, val: number, actionType: string) => (
-            <div className="settings-2012-volume-row">
-                <label htmlFor={ id } className="settings-2012-vol-label">{ label }</label>
-                <button
-                    type="button"
-                    className={ `settings-2012-spk spk-off ${ val === 0 ? 'is-muted' : '' }` }
-                    title="Silenciar"
-                    onClick={ () => {
-                        processAction(actionType, 0);
-                        SendMessageComposer(new UserSettingsSoundComposer(
-                            actionType === 'system_volume' ? 0 : Math.round(userSettings.volumeSystem),
-                            actionType === 'furni_volume' ? 0 : Math.round(userSettings.volumeFurni),
-                            actionType === 'trax_volume' ? 0 : Math.round(userSettings.volumeTrax)
-                        ));
-                    } }
-                />
-                <div className="settings-2012-slider-wrap">
-                    <div className="settings-2012-slider-ticks" />
-                    <input
-                        type="range"
-                        id={ id }
-                        className="settings-2012-range"
-                        min="0"
-                        max="100"
-                        step="1"
-                        value={ val }
-                        aria-valuetext={ `${ Math.round(val / 10) } de 10` }
-                        onChange={ event => processAction(actionType, Number(event.target.value)) }
-                        onMouseUp={ () => saveRangeSlider('volume') }
-                        onTouchEnd={ () => saveRangeSlider('volume') }
+        const renderVolumeRow2012 = (label: string, id: string, val: number, actionType: string) => {
+            const stepIndex = Math.max(0, Math.min(11, Math.round((val / 100) * 11)));
+
+            return (
+                <div className="settings-2012-volume-row">
+                    <label htmlFor={ id } className="settings-2012-vol-label">{ label }</label>
+                    <button
+                        type="button"
+                        className={ `settings-2012-spk spk-off ${ val === 0 ? 'is-muted' : '' }` }
+                        title="Silenciar"
+                        onClick={ () => {
+                            processAction(actionType, 0);
+                            SendMessageComposer(new UserSettingsSoundComposer(
+                                actionType === 'system_volume' ? 0 : Math.round(userSettings.volumeSystem),
+                                actionType === 'furni_volume' ? 0 : Math.round(userSettings.volumeFurni),
+                                actionType === 'trax_volume' ? 0 : Math.round(userSettings.volumeTrax)
+                            ));
+                        } }
+                    />
+                    <div className="settings-2012-slider-wrap">
+                        <div className="settings-2012-slider-ticks" />
+                        <input
+                            type="range"
+                            id={ id }
+                            className="settings-2012-range"
+                            min="0"
+                            max="11"
+                            step="1"
+                            value={ stepIndex }
+                            aria-valuetext={ `${ stepIndex } de 11` }
+                            onChange={ event => {
+                                const nextStep = Math.max(0, Math.min(11, Number(event.target.value)));
+                                const nextVol = Math.round((nextStep / 11) * 100);
+                                processAction(actionType, nextVol);
+                            } }
+                            onMouseUp={ () => saveRangeSlider('volume') }
+                            onTouchEnd={ () => saveRangeSlider('volume') }
+                        />
+                    </div>
+                    <button
+                        type="button"
+                        className={ `settings-2012-spk spk-on ${ val > 0 ? 'is-active' : '' }` }
+                        title="Volumen máximo"
+                        onClick={ () => {
+                            processAction(actionType, 100);
+                            SendMessageComposer(new UserSettingsSoundComposer(
+                                actionType === 'system_volume' ? 100 : Math.round(userSettings.volumeSystem),
+                                actionType === 'furni_volume' ? 100 : Math.round(userSettings.volumeFurni),
+                                actionType === 'trax_volume' ? 100 : Math.round(userSettings.volumeTrax)
+                            ));
+                        } }
                     />
                 </div>
-                <button
-                    type="button"
-                    className={ `settings-2012-spk spk-on ${ val > 0 ? 'is-active' : '' }` }
-                    title="Volumen máximo"
-                    onClick={ () => {
-                        processAction(actionType, 100);
-                        SendMessageComposer(new UserSettingsSoundComposer(
-                            actionType === 'system_volume' ? 100 : Math.round(userSettings.volumeSystem),
-                            actionType === 'furni_volume' ? 100 : Math.round(userSettings.volumeFurni),
-                            actionType === 'trax_volume' ? 100 : Math.round(userSettings.volumeTrax)
-                        ));
-                    } }
-                />
-            </div>
-        );
+            );
+        };
 
         return (
             <>
@@ -302,13 +310,13 @@ export const UserSettingsView: FC<{}> = props => {
                     </NitroCardContentView>
                 </NitroCardView>
                 { showDiscordModal && (
-                    <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={{ zIndex: 1050, width: 430, backgroundColor: '#2d2847', color: '#ffffff', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}>
+                    <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings settings-flash2012" style={{ zIndex: 1050, width: 380 }}>
                         <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
-                        <NitroCardContentView className="p-3" style={{ backgroundColor: '#2d2847', color: '#ffffff' }}>
-                            <div className="d-flex align-items-center gap-3 mb-3">
-                                <div style={{ width: 64, height: 64, minWidth: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M32 6L56 18V44L32 58L8 44V18L32 6Z" fill="#5865F2" stroke="#4752C4" strokeWidth="2" />
+                        <NitroCardContentView className="settings-2012-body">
+                            <div className="settings-2012-sunk-box d-flex align-items-center gap-2">
+                                <div style={{ width: 48, height: 48, minWidth: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <svg width="44" height="44" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M32 6L56 18V44L32 58L8 44V18L32 6Z" fill="#5865F2" stroke="#000000" strokeWidth="2" />
                                         <path d="M32 6L56 18L32 30L8 18L32 6Z" fill="#7983F5" />
                                         <path d="M32 30V58L8 44V18L32 30Z" fill="#4752C4" />
                                         <path d="M32 30V58L56 44V18L32 30Z" fill="#5865F2" />
@@ -316,29 +324,25 @@ export const UserSettingsView: FC<{}> = props => {
                                     </svg>
                                 </div>
                                 <div>
-                                    <div className="fw-bold mb-1" style={{ fontSize: '15px', color: '#ffffff' }}>Conecta Habbten a Discord</div>
-                                    <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.4' }}>
-                                        ¡Hemos detectado que tienes un auténtico espíritu gamer! *Choca esos cinco*<br />
-                                        ¿Quieres que tus amigos/as sepan lo que estás haciendo en este loco hotel?
+                                    <div className="settings-2012-box-title mb-1">Conecta Habbten a Discord</div>
+                                    <div style={{ fontSize: '11px', color: '#e6e4de', lineHeight: '1.35' }}>
+                                        ¡Comparte tu actividad del hotel con tus amigos en Discord!
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-3 rounded mb-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                <div className="fw-bold mb-2 text-white" style={{ fontSize: '12px' }}>Escribe tu Usuario de Discord:</div>
-                                <div className="input-group">
-                                    <span className="input-group-text bg-dark text-white border-secondary">@</span>
+                            <div className="settings-2012-sunk-box">
+                                <div className="settings-2012-box-title">Escribe tu Usuario de Discord:</div>
+                                <div className="d-flex align-items-center gap-1 mt-1">
                                     <input
                                         type="text"
-                                        className="form-control bg-dark text-white border-secondary"
-                                        placeholder="tu_usuario_discord"
+                                        className="form-control form-control-sm"
+                                        placeholder="@tu_usuario_discord"
                                         value={discordTag}
                                         onChange={e => setDiscordTag(e.target.value)}
-                                        style={{ fontSize: '12px' }}
                                     />
                                     <button
                                         type="button"
-                                        className={`btn ${isDiscordConnected ? 'btn-success' : 'btn-primary'} fw-bold px-3`}
-                                        style={{ fontSize: '12px' }}
+                                        className="btn-shiny-2012 px-3"
                                         onClick={() => {
                                             if (discordTag.trim()) {
                                                 localStorage.setItem('habbten_discord_tag', discordTag.trim());
@@ -356,16 +360,17 @@ export const UserSettingsView: FC<{}> = props => {
                                         {isDiscordConnected ? '✓ Vinculado' : 'Vincular'}
                                     </button>
                                 </div>
-                                {discordStatusMsg && <div className="text-success small text-center mt-1.5">{discordStatusMsg}</div>}
+                                {discordStatusMsg && <div className="small text-center mt-1" style={{ color: '#7ce850' }}>{discordStatusMsg}</div>}
                             </div>
-                            <button
-                                type="button"
-                                className="btn w-100 py-2 fw-bold"
-                                style={{ background: '#4a406b', color: '#ffffff', border: '2px solid #2b2344', borderRadius: '6px', fontSize: '12px' }}
-                                onClick={() => setShowDiscordModal(false)}
-                            >
-                                Cerrar
-                            </button>
+                            <div className="settings-2012-footer">
+                                <button
+                                    type="button"
+                                    className="btn-shiny-2012 px-3"
+                                    onClick={() => setShowDiscordModal(false)}
+                                >
+                                    Volver
+                                </button>
+                            </div>
                         </NitroCardContentView>
                     </NitroCardView>
                 ) }

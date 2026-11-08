@@ -10,7 +10,7 @@ export interface NitroCardViewProps extends DraggableWindowProps, ColumnProps
 
 const SKIN_2012_BY_KEY: Record<string, string> = {
     'nitro-friends': 'volter-yellow',
-    'nitro-friends-messenger': 'volter-yellow',
+    'nitro-friends-messenger': 'illumina-light',
     'nitro-friends-room-invite': 'volter-yellow',
     'achievements': 'ubuntu-blue',
     'catalog': 'ubuntu-blue',
@@ -32,10 +32,15 @@ const SKIN_2012_BY_KEY: Record<string, string> = {
     'mod-tools': 'illumina-dark',
     'nitro-user-profile': 'illumina-light',
     'era-selector': 'illumina-light',
+    'help-center': 'illumina-light',
+    'guide-tool': 'illumina-light',
     'navigator': 'volter-blue',
     'inventory': 'volter-blue',
     'nitro-room-settings': 'volter-blue',
-    'pet-training': 'volter-blue'
+    'nitro-room-info': 'volter-blue',
+    'nitro-room-filter': 'volter-blue',
+    'pet-training': 'volter-blue',
+    'commands-alert': 'volter-blue'
 };
 
 export const NitroCardView: FC<NitroCardViewProps> = props =>
@@ -48,11 +53,11 @@ export const NitroCardView: FC<NitroCardViewProps> = props =>
         if(uniqueKey && SKIN_2012_BY_KEY[uniqueKey]) return SKIN_2012_BY_KEY[uniqueKey];
 
         const joined = [ ...(classNames || []), ((rest as any)?.className || '') ].join(' ');
-        if(/nitro-alert|nitro-help|nitro-guide|user-profile/i.test(joined)) return 'illumina-light';
+        if(/nitro-alert|nitro-help|nitro-guide|user-profile|nitro-friends-messenger/i.test(joined)) return 'illumina-light';
         if(/nitro-friends/i.test(joined)) return 'volter-yellow';
-        if(/nitro-wired|user-settings|avatar-editor|mod-tools|chat-history/i.test(joined)) return 'illumina-dark';
-        if(/nitro-catalog|nitro-achievements/i.test(joined)) return 'ubuntu-blue';
-        if(/nitro-room-info|nitro-room-link|nitro-room-settings/i.test(joined)) return 'volter-blue';
+        if(/nitro-wired|user-settings|nitro-discord-settings|avatar-editor|mod-tools|chat-history|floorplan-editor/i.test(joined)) return 'illumina-dark';
+        if(/nitro-catalog|nitro-achievements|nitro-battle-pass/i.test(joined)) return 'ubuntu-blue';
+        if(/nitro-room-info|nitro-room-link|nitro-room-settings|nitro-room-filter|pet-training|commands-alert/i.test(joined)) return 'volter-blue';
 
         return 'volter-blue';
     }, [ uniqueKey, classNames, (rest as any)?.className ]);

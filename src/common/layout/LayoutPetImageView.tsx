@@ -23,12 +23,13 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = props =>
     const [ width, setWidth ] = useState(0);
     const [ height, setHeight ] = useState(0);
     const isDisposed = useRef(false);
+    const partsKey = useMemo(() => (customParts && customParts.length) ? JSON.stringify(customParts) : '', [ customParts ]);
 
     const getStyle = useMemo(() =>
     {
         let newStyle: CSSProperties = {};
 
-        if(petUrl && petUrl.length) newStyle.backgroundImage = `url(${ petUrl })`;
+        if(petUrl && petUrl.length) newStyle.backgroundImage = `url('${ petUrl }')`;
 
         if(scale !== 1)
         {
@@ -37,8 +38,8 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = props =>
             if(!(scale % 1)) newStyle.imageRendering = 'pixelated';
         }
 
-        newStyle.width = width;
-        newStyle.height = height;
+        newStyle.width = width || 64;
+        newStyle.height = height || 64;
 
         if(Object.keys(style).length) newStyle = { ...newStyle, ...style };
 
@@ -47,6 +48,8 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = props =>
 
     useEffect(() =>
     {
+        isDisposed.current = false;
+
         let url = null;
 
         let petTypeId = typeId;
@@ -75,15 +78,15 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = props =>
                 if(image)
                 {
                     setPetUrl(image.src);
-                    setWidth(image.width);
-                    setHeight(image.height);
+                    setWidth(image.width || 64);
+                    setHeight(image.height || 64);
                 }
 
                 else if(texture)
                 {
                     setPetUrl(TextureUtils.generateImageUrl(texture));
-                    setWidth(texture.width);
-                    setHeight(texture.height);
+                    setWidth(texture.width || 64);
+                    setHeight(texture.height || 64);
                 }
             },
             imageFailed: (id) =>
@@ -99,11 +102,17 @@ export const LayoutPetImageView: FC<LayoutPetImageViewProps> = props =>
             if(image)
             {
                 setPetUrl(image.src);
-                setWidth(image.width);
-                setHeight(image.height);
+                setWidth(image.width || 64);
+                setHeight(image.height || 64);
+            }
+            else if(imageResult.data)
+            {
+                setPetUrl(TextureUtils.generateImageUrl(imageResult.data));
+                setWidth(imageResult.data.width || 64);
+                setHeight(imageResult.data.height || 64);
             }
         }
-    }, [ figure, typeId, paletteId, petColor, customParts, posture, headOnly, direction ]);
+    }, [ figure, typeId, paletteId, petColor, partsKey, posture, headOnly, direction ]);
 
     useEffect(() =>
     {
