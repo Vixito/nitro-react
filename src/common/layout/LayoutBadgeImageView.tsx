@@ -90,12 +90,16 @@ export const LayoutBadgeImageView: FC<LayoutBadgeImageViewProps> = props =>
         return () => GetSessionDataManager().events.removeEventListener(BadgeImageReadyEvent.IMAGE_READY, onBadgeImageReadyEvent);
     }, [ badgeCode, isGroup ]);
 
+    const badgeName = isGroup ? customTitle : LocalizeBadgeName(badgeCode);
+    const rawDesc = isGroup ? LocalizeText('group.badgepopup.body') : LocalizeBadgeDescription(badgeCode);
+    const hasDescription = Boolean(rawDesc && rawDesc.length > 0 && !rawDesc.startsWith('badge_desc_'));
+
     return (
         <Base classNames={ getClassNames } style={ getStyle } { ...rest }>
             { (showInfo && GetConfiguration<boolean>('badge.descriptions.enabled', true)) &&
                 <Base className="badge-information text-black py-1 px-2 small">
-                    <div className="fw-bold mb-1">{ isGroup ? customTitle : LocalizeBadgeName(badgeCode) }</div>
-                    <div>{ isGroup ? LocalizeText('group.badgepopup.body') : LocalizeBadgeDescription(badgeCode) }</div>
+                    <div className="badge-title fw-bold mb-1">{ badgeName }</div>
+                    { hasDescription && <div className="badge-desc">{ rawDesc }</div> }
                 </Base> }
             { children }
         </Base>

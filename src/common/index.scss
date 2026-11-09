@@ -283,8 +283,29 @@
         width: 210px;
         border-radius: $border-radius;
         background: $white;
+        color: #111111;
         left: -220px;
         z-index: 100;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(0, 0, 0, 0.8);
+
+        * {
+            color: #111111 !important;
+            -webkit-text-fill-color: #111111 !important;
+            text-shadow: none !important;
+        }
+
+        .badge-title,
+        .fw-bold {
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            font-weight: 700 !important;
+        }
+
+        .badge-desc {
+            color: #444444 !important;
+            -webkit-text-fill-color: #444444 !important;
+        }
 
         &:before {
             position: absolute;

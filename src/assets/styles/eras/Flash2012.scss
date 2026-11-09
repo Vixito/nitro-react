@@ -3734,6 +3734,65 @@ body[data-era="flash2012"] {
             font-weight: 700 !important;
         }
 
+        // BADGE POPUP / TOOLTIP: Recuadro blanco con texto oscuro y legible
+        .badge-image {
+            overflow: visible !important;
+
+            .badge-information {
+                background-color: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
+                padding: 5px 8px !important;
+                width: 200px !important;
+                max-width: 220px !important;
+                left: -212px !important;
+                top: 0 !important;
+                z-index: 1000 !important;
+                pointer-events: none !important;
+
+                * {
+                    color: #111111 !important;
+                    -webkit-text-fill-color: #111111 !important;
+                    text-shadow: none !important;
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                }
+
+                .badge-title,
+                .fw-bold {
+                    color: #000000 !important;
+                    -webkit-text-fill-color: #000000 !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    line-height: 1.2 !important;
+                    margin-bottom: 3px !important;
+                    word-break: break-word !important;
+                }
+
+                .badge-desc,
+                div:not(.fw-bold) {
+                    color: #444444 !important;
+                    -webkit-text-fill-color: #444444 !important;
+                    font-size: 10px !important;
+                    font-weight: 400 !important;
+                    line-height: 1.25 !important;
+                    word-break: break-word !important;
+                }
+
+                &::before {
+                    position: absolute !important;
+                    content: ' ' !important;
+                    width: 0 !important;
+                    height: 0 !important;
+                    border-left: 8px solid #ffffff !important;
+                    border-bottom: 6px solid transparent !important;
+                    border-top: 6px solid transparent !important;
+                    top: 12px !important;
+                    right: -8px !important;
+                }
+            }
+        }
+
         // Custom variables (e.g. "Enlace:") & input fields inside infostand must be 100% visible
         input,
         textarea,
