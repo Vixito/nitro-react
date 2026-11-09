@@ -129,7 +129,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                     <Flex alignItems="center" justifyContent="between">
                         <Flex alignItems="center" gap={ 1 }>
                             <UserProfileIconView userId={ avatarInfo.webID } />
-                            <Text variant="white" small wrap>{ avatarInfo.name }</Text>
+                            <Text bold variant="white" small wrap className="infostand-name fw-bold"><b>{ avatarInfo.name }</b></Text>
                         </Flex>
                         <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } />
                     </Flex>
@@ -190,8 +190,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                     <hr className="m-0" />
                 </Column>
                 <Column gap={ 1 }>
-                    <Text variant="white" small wrap>
-                        { LocalizeText('infostand.text.achievement_score') + ' ' + avatarInfo.achievementScore }
+                    <Text bold variant="white" small wrap className="infostand-score fw-bold">
+                        <b>{ LocalizeText('infostand.text.achievement_score') + ' ' + avatarInfo.achievementScore }</b>
                     </Text>
                     { (avatarInfo.carryItem > 0) &&
                         <>
