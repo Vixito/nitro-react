@@ -1,6 +1,6 @@
 import { ClubOfferData, GetClubOffersMessageComposer, PurchaseFromCatalogComposer } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { CatalogPurchaseState, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { CatalogPurchaseState, CreateLinkEvent, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { AutoGrid, Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, LayoutLoadingSpinnerView, Text } from '../../../../../common';
 import { CatalogEvent, CatalogPurchasedEvent, CatalogPurchaseFailureEvent } from '../../../../../events';
 import { useCatalog, usePurse, useUiEvent } from '../../../../../hooks';
@@ -156,7 +156,23 @@ export const CatalogLayoutVipBuyView: FC<CatalogLayoutProps> = props =>
                         );
                     }) }
                 </AutoGrid>
-                <Text center dangerouslySetInnerHTML={ { __html: LocalizeText('catalog.vip.buy.hccenter') } }></Text>
+                <Text
+                    center
+                    dangerouslySetInnerHTML={ { __html: LocalizeText('catalog.vip.buy.hccenter') } }
+                    onClick={ event =>
+                    {
+                        const target = event.target as HTMLElement;
+                        const anchor = target?.closest('a');
+                        if (anchor)
+                        {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            const href = anchor.getAttribute('href');
+                            if (href) CreateLinkEvent(href);
+                            CreateLinkEvent('habboUI/open/hccenter');
+                        }
+                    } }
+                />
             </Column>
             <Column size={ 5 } overflow="hidden">
                 <Column fullHeight center overflow="hidden">

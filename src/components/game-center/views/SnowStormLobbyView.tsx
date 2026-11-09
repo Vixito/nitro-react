@@ -195,7 +195,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                             left: '0px',
                             width: '410px',
                             textAlign: 'center',
-                            fontFamily: 'Ubuntu, "Segoe UI", sans-serif',
+                            fontFamily: '\'Ubuntu2012\', \'Ubuntu\', Tahoma, sans-serif',
                             fontSize: '12px',
                             color: '#14729f',
                             lineHeight: '1.28',
@@ -263,7 +263,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                             lineHeight: '1',
                             display: 'flex',
                             alignItems: 'center',
-                            fontFamily: 'Ubuntu, "Segoe UI", sans-serif',
+                            fontFamily: '\'Ubuntu2012\', \'Ubuntu\', Tahoma, sans-serif',
                             fontSize: '14px',
                             fontWeight: 'bold',
                             color: '#ffffff',
@@ -450,7 +450,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                                 <Text small bold className="text-secondary">Top Jugadores de Habbten</Text>
                             </Flex>
                             <div className="table-responsive" style={{ border: '1px solid #c7d2d9', borderRadius: '4px', overflow: 'hidden' }}>
-                                <table className="table table-sm table-striped m-0" style={{ fontSize: '13px', fontFamily: 'Ubuntu, "Segoe UI", sans-serif' }}>
+                                <table className="table table-sm table-striped m-0" style={{ fontSize: '12px', fontFamily: '\'Ubuntu2012\', \'Ubuntu\', Tahoma, sans-serif' }}>
                                     <thead style={{ background: '#e2ebf0', borderBottom: '2px solid #b1c6d3' }}>
                                         <tr>
                                             <th style={{ width: '42px', padding: '6px 10px', textAlign: 'center' }}>#</th>

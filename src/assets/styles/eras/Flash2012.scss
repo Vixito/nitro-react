@@ -56,6 +56,15 @@ body[data-era="flash2012"] {
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
 
+    // Tables, rankings and text inside windows must use authentic Habbo 2012 font
+    table, th, td, tr, .table, .table * {
+        font-family: 'Ubuntu2012', 'Ubuntu', Tahoma, sans-serif !important;
+    }
+
+    a {
+        cursor: pointer !important;
+    }
+
     // Sanity rule: inputs, textareas, selects must never have white-on-white invisible text
     input:not([type="checkbox"]):not([type="radio"]),
     textarea,
