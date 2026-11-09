@@ -99,8 +99,8 @@ body[data-era="flash2012"] {
 
     // Authentic 2012 Two-Tone Stepped Button inside Windows (no smooth modern gradients, 1px solid #000000)
     .btn-shiny-2012,
-    .nitro-card :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.btn-reconnect-hotel),
-    .btn:not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.btn-reconnect-hotel) {
+    .nitro-card :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link),
+    .btn:not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link) {
         background: linear-gradient(180deg, #f3f3f3 0%, #f3f3f3 52%, #d9d9d9 52%, #d9d9d9 100%) !important;
         border: 1px solid #000000 !important;
         border-bottom-width: 2px !important;
@@ -1416,7 +1416,7 @@ body[data-era="flash2012"] {
             content: none !important;
         }
 
-        &:not(.no-resize) {
+        &:not(.no-resize):not([data-skin-2012="illumina-light"]):not(.nitro-alert):not(.nitro-confirm):not(.nitro-help):not(.user-profile) {
             &::after {
                 content: '' !important;
                 display: block !important;
@@ -2160,6 +2160,18 @@ body[data-era="flash2012"] {
         box-shadow: inset 0 0 0 1px #ffffff !important;
         padding: 0 6px 6px 6px !important;
         color: #1f1e1c !important;
+        resize: none !important;
+
+        &::after {
+            display: none !important;
+            content: none !important;
+        }
+
+        &::-webkit-resizer {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
 
         .nitro-card-header {
             background: transparent !important;

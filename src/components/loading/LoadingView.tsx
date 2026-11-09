@@ -12,8 +12,14 @@ export const LoadingView: FC<LoadingViewProps> = props =>
 {
     const { isError = false, message = '', percent = 0 } = props;
 
-    const reload = () =>
+    const reload = (event?: any) =>
     {
+        if(event)
+        {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
         if (window.parent && window.parent !== window) {
             window.parent.location.reload();
         } else {
@@ -24,21 +30,26 @@ export const LoadingView: FC<LoadingViewProps> = props =>
     return (
         <div className={ `nitro-loading ${ isError ? 'is-error' : '' }` }>
             { isError ?
-                <div className="nitro-alert-backdrop d-flex align-items-center justify-content-center">
-                    <div className="disconnect-alert-wrap" style={{ width: 380, maxWidth: '90vw' }}>
-                        <LayoutNotificationAlertView
-                            title="Desconexión"
-                            onClose={ reload }
-                        >
-                            <Column gap={ 2 } className="p-3 text-center">
-                                <Text bold fontSize={ 4 } className="text-black mb-1">
-                                    { message || 'Tu sesión ha finalizado o la conexión fue cerrada.' }
-                                </Text>
-                                <Button className="btn-reconnect-hotel w-100 fw-bold py-2 mt-2" onClick={ reload }>
-                                    Reconectar al Hotel
-                                </Button>
-                            </Column>
-                        </LayoutNotificationAlertView>
+                <div className="nitro-alert-backdrop d-flex align-items-center justify-content-center" onClick={ (e) => e.stopPropagation() }>
+                    <div className="nitro-card nitro-alert no-resize rounded shadow" data-skin-2012="illumina-light" style={{ width: 380, maxWidth: '90vw', position: 'relative', zIndex: 1000001, pointerEvents: 'auto' }}>
+                        <div className="drag-handler container-fluid nitro-card-header d-flex align-items-center justify-content-center">
+                            <div className="nitro-card-header-inner d-flex align-items-center justify-content-center w-100">
+                                <span className="nitro-card-header-text">Desconexión</span>
+                            </div>
+                        </div>
+                        <div className="nitro-card-content text-black p-3 text-center d-flex flex-column align-items-center justify-content-between">
+                            <div className="fs-5 fw-bold text-black mb-3 text-center w-100">
+                                { message || 'Tu sesión ha finalizado o la conexión fue cerrada.' }
+                            </div>
+                            <button
+                                type="button"
+                                className="btn w-100 fw-bold py-2 mt-2"
+                                style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                                onClick={ reload }
+                            >
+                                Reconectar al Hotel
+                            </button>
+                        </div>
                     </div>
                 </div>
                 :

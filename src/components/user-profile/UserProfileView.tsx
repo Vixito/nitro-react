@@ -121,7 +121,7 @@ export const UserProfileView: FC<{}> = props =>
     if(!userProfile) return null;
 
     return (
-        <NitroCardView uniqueKey="nitro-user-profile" theme="primary-slim" className="user-profile">
+        <NitroCardView uniqueKey="nitro-user-profile" theme="primary-slim" className="user-profile no-resize">
             <NitroCardHeaderView headerText={ LocalizeText('extendedprofile.caption') } onCloseClick={ onClose } />
             <NitroCardContentView overflow="hidden">
                 <Grid fullHeight={ false } gap={ 2 }>
