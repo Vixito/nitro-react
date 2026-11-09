@@ -405,8 +405,8 @@ export const HotelView: FC<{}> = props =>
                     <div
                         className="reception-2012-avatar position-absolute"
                         style={{
-                            left: 98,
-                            bottom: 62,
+                            left: 28,
+                            bottom: 60,
                             zIndex: 6,
                             pointerEvents: 'none',
                             imageRendering: 'pixelated'
