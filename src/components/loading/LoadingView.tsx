@@ -25,16 +25,19 @@ export const LoadingView: FC<LoadingViewProps> = props =>
         <div className={ `nitro-loading ${ isError ? 'is-error' : '' }` }>
             { isError ?
                 <div className="nitro-alert-backdrop d-flex align-items-center justify-content-center">
-                    <div className="disconnect-alert-wrap" style={{ width: 380, maxWidth: '90vw' }}>
+                    <div className="disconnect-alert-wrap" style={{ width: 400, maxWidth: '92vw' }}>
                         <LayoutNotificationAlertView
-                            title="Desconexión"
+                            title="¡Conexión perdida!"
                             onClose={ reload }
                         >
                             <Column gap={ 2 } className="p-3 text-center">
                                 <Text bold fontSize={ 4 } className="text-black mb-1">
                                     { message || 'Tu sesión ha finalizado o la conexión fue cerrada.' }
                                 </Text>
-                                <Button variant="success" className="w-100 fw-bold py-2 mt-2" onClick={ reload }>
+                                <Text fontSize={ 6 } className="text-muted mb-2">
+                                    Has sido desconectado de Habbo Hotel. Haz clic abajo para volver a entrar.
+                                </Text>
+                                <Button className="btn-reconnect-hotel w-100 fw-bold py-2 mt-1" onClick={ reload }>
                                     Reconectar al Hotel
                                 </Button>
                             </Column>

@@ -20,14 +20,43 @@
             left: 0 !important;
             width: 100vw !important;
             height: 100vh !important;
-            background: rgba(0, 0, 0, 0.65) !important;
-            backdrop-filter: blur(3.5px) !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
             z-index: 999999 !important;
+            pointer-events: auto !important;
         }
 
         .disconnect-alert-wrap {
             position: relative;
             z-index: 1000000;
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.65));
+        }
+
+        .btn-reconnect-hotel {
+            background: linear-gradient(180deg, #6ec034 0%, #468c1d 100%) !important;
+            border: 1px solid #1e3f0c !important;
+            border-bottom: 2px solid #132808 !important;
+            border-radius: 4px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.7) !important;
+            cursor: pointer !important;
+
+            &:hover {
+                background: linear-gradient(180deg, #7ad23a 0%, #4f9d22 100%) !important;
+                filter: brightness(1.08) !important;
+                color: #ffffff !important;
+            }
+
+            &:active {
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+                filter: brightness(0.95) !important;
+            }
         }
     }
 

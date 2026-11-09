@@ -99,8 +99,8 @@ body[data-era="flash2012"] {
 
     // Authentic 2012 Two-Tone Stepped Button inside Windows (no smooth modern gradients, 1px solid #000000)
     .btn-shiny-2012,
-    .nitro-card :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile),
-    .btn:not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile) {
+    .nitro-card :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.btn-reconnect-hotel),
+    .btn:not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.btn-reconnect-hotel) {
         background: linear-gradient(180deg, #f3f3f3 0%, #f3f3f3 52%, #d9d9d9 52%, #d9d9d9 100%) !important;
         border: 1px solid #000000 !important;
         border-bottom-width: 2px !important;
@@ -132,6 +132,27 @@ body[data-era="flash2012"] {
         &:disabled {
             opacity: 0.55 !important;
             cursor: default !important;
+        }
+    }
+
+    // Clean text links inside windows (like "Estatus de mi sanción" in Ayuda) without button styling
+    .nitro-card .btn.btn-link,
+    .btn.btn-link {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        color: #1f1e1c !important;
+        text-decoration: underline !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        padding: 4px !important;
+        cursor: pointer !important;
+
+        &:hover {
+            background: transparent !important;
+            color: #000000 !important;
+            text-decoration: underline !important;
         }
     }
 
@@ -2136,7 +2157,7 @@ body[data-era="flash2012"] {
         background-color: #e6e4de !important;
         border: 1px solid #000000 !important;
         border-radius: 6px !important;
-        box-shadow: inset 0 0 0 1px #ffffff !important;
+        box-shadow: inset 0 0 0 1px #ffffff, 0 8px 24px rgba(0, 0, 0, 0.45) !important;
         padding: 0 6px 6px 6px !important;
         color: #1f1e1c !important;
 
@@ -2147,6 +2168,15 @@ body[data-era="flash2012"] {
             min-height: 28px !important;
             height: 28px !important;
 
+            .end-2 {
+                position: absolute !important;
+                right: 4px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                margin: 0 !important;
+                z-index: 10 !important;
+            }
+
             .shockwave-header-dots {
                 display: block !important;
                 flex: 1 1 auto !important;
@@ -2156,6 +2186,7 @@ body[data-era="flash2012"] {
                 box-shadow: none !important;
                 background: transparent url('@/assets/images/eras/flash2012/skins/grip_illumina_light.png') center repeat-x !important;
                 image-rendering: pixelated !important;
+                opacity: 0.95 !important;
             }
 
             .nitro-card-header-text {
@@ -2168,16 +2199,43 @@ body[data-era="flash2012"] {
             }
 
             .nitro-card-header-close {
-                width: 20px !important;
-                height: 20px !important;
-                min-width: 20px !important;
-                min-height: 20px !important;
-                border: none !important;
-                box-shadow: none !important;
-                background: transparent url('@/assets/images/eras/flash2012/skins/close_illumina_light_sheet.png') center no-repeat !important;
+                width: 18px !important;
+                height: 18px !important;
+                min-width: 18px !important;
+                min-height: 18px !important;
+                border-radius: 50% !important;
+                border: 1px solid #737068 !important;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+                background: linear-gradient(180deg, #faf9f6 0%, #dcd9d0 100%) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 0 !important;
+                cursor: pointer !important;
+
+                svg,
+                .fa-icon {
+                    display: block !important;
+                    width: 9px !important;
+                    height: 9px !important;
+                    color: #38352e !important;
+                    -webkit-text-fill-color: #38352e !important;
+                    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.6)) !important;
+                }
 
                 &:hover {
-                    filter: brightness(0.85) !important;
+                    background: linear-gradient(180deg, #ffffff 0%, #e6e3da 100%) !important;
+                    border-color: #4a473e !important;
+
+                    svg,
+                    .fa-icon {
+                        color: #11100f !important;
+                    }
+                }
+
+                &:active {
+                    background: #c8c5bc !important;
+                    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4) !important;
                 }
             }
         }
