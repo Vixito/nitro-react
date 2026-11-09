@@ -3734,16 +3734,16 @@ body[data-era="flash2012"] {
             font-weight: 700 !important;
         }
 
-        // BADGE POPUP / TOOLTIP: Recuadro blanco con texto oscuro y legible
+        // BADGE POPUP / TOOLTIP: Recuadro blanco con tipografía Volter pixelada original de Habbo 2012
         .badge-image {
             overflow: visible !important;
 
             .badge-information {
                 background-color: #ffffff !important;
                 border: 1px solid #000000 !important;
-                border-radius: 4px !important;
+                border-radius: 2px !important;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
-                padding: 5px 8px !important;
+                padding: 4px 6px !important;
                 width: 200px !important;
                 max-width: 220px !important;
                 left: -212px !important;
@@ -3752,31 +3752,43 @@ body[data-era="flash2012"] {
                 pointer-events: none !important;
 
                 * {
-                    color: #111111 !important;
-                    -webkit-text-fill-color: #111111 !important;
+                    color: #000000 !important;
+                    -webkit-text-fill-color: #000000 !important;
                     text-shadow: none !important;
-                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                    font-family: 'Volter2012', 'Volter', 'Volter (Goldfish)', monospace, sans-serif !important;
+                    font-size: 9px !important;
+                    -webkit-font-smoothing: none !important;
+                    -moz-osx-font-smoothing: none !important;
+                    font-smooth: never !important;
                 }
 
                 .badge-title,
                 .fw-bold {
                     color: #000000 !important;
                     -webkit-text-fill-color: #000000 !important;
-                    font-size: 11px !important;
+                    font-family: 'Volter2012', 'Volter', 'Volter (Goldfish)', monospace, sans-serif !important;
+                    font-size: 9px !important;
                     font-weight: 700 !important;
-                    line-height: 1.2 !important;
-                    margin-bottom: 3px !important;
+                    line-height: 12px !important;
+                    margin-bottom: 2px !important;
                     word-break: break-word !important;
+                    -webkit-font-smoothing: none !important;
+                    -moz-osx-font-smoothing: none !important;
+                    font-smooth: never !important;
                 }
 
                 .badge-desc,
                 div:not(.fw-bold) {
-                    color: #444444 !important;
-                    -webkit-text-fill-color: #444444 !important;
-                    font-size: 10px !important;
+                    color: #000000 !important;
+                    -webkit-text-fill-color: #000000 !important;
+                    font-family: 'Volter2012', 'Volter', 'Volter (Goldfish)', monospace, sans-serif !important;
+                    font-size: 9px !important;
                     font-weight: 400 !important;
-                    line-height: 1.25 !important;
+                    line-height: 12px !important;
                     word-break: break-word !important;
+                    -webkit-font-smoothing: none !important;
+                    -moz-osx-font-smoothing: none !important;
+                    font-smooth: never !important;
                 }
 
                 &::before {

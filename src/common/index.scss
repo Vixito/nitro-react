@@ -283,16 +283,24 @@
         width: 210px;
         border-radius: $border-radius;
         background: $white;
-        color: #111111;
+        color: #000000;
         left: -220px;
         z-index: 100;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(0, 0, 0, 0.8);
+        font-family: 'Volter', 'Volter (Goldfish)', monospace;
+        font-size: 9px;
+        -webkit-font-smoothing: none;
+        -moz-osx-font-smoothing: none;
 
         * {
-            color: #111111 !important;
-            -webkit-text-fill-color: #111111 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
             text-shadow: none !important;
+            font-family: 'Volter', 'Volter (Goldfish)', monospace !important;
+            font-size: 9px !important;
+            -webkit-font-smoothing: none !important;
+            -moz-osx-font-smoothing: none !important;
         }
 
         .badge-title,
@@ -300,11 +308,13 @@
             color: #000000 !important;
             -webkit-text-fill-color: #000000 !important;
             font-weight: 700 !important;
+            line-height: 12px !important;
         }
 
         .badge-desc {
-            color: #444444 !important;
-            -webkit-text-fill-color: #444444 !important;
+            color: #000000 !important;
+            -webkit-text-fill-color: #000000 !important;
+            line-height: 12px !important;
         }
 
         &:before {
