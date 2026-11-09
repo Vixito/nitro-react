@@ -1,4 +1,4 @@
-import { ILinkEventTracker } from '@nitrots/nitro-renderer';
+import { ILinkEventTracker, RoomObjectType } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { AddEventLinkTracker, ChatEntryType, LocalizeText, RemoveLinkEventTracker } from '../../api';
 import { Flex, InfiniteScroll, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
@@ -75,9 +75,9 @@ export const ChatHistoryView: FC<{}> = props =>
                                     { (row.style === 0) &&
                                     <div className="user-container-bg" style={ { backgroundColor: row.color } } /> }
                                     <div className={ `chat-bubble bubble-${ row.style } type-${ row.chatType }` } style={ { maxWidth: '100%' } }>
-                                        <div className="user-container">
+                                        <div className={ `user-container ${ (row.entityType === RoomObjectType.PET) ? 'is-pet' : '' }` }>
                                             { row.imageUrl && (row.imageUrl.length > 0) &&
-                                <div className="user-image" style={ { backgroundImage: `url(${ row.imageUrl })` } } /> }
+                                                <div className={ `user-image ${ (row.entityType === RoomObjectType.PET) ? 'pet-image' : '' }` } style={ { backgroundImage: `url(${ row.imageUrl })` } } /> }
                                         </div>
                                         <div className="chat-content">
                                             <b className="username mr-1" dangerouslySetInnerHTML={ { __html: `${ row.name }: ` } } />

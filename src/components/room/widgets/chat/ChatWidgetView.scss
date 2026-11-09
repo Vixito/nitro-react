@@ -706,6 +706,16 @@
                 transform: scale(0.5);
                 overflow: hidden;
                 image-rendering: initial;
+
+                &.pet-image {
+                    top: 50%;
+                    left: 1px;
+                    width: 26px;
+                    height: 26px;
+                    transform: translateY(-50%);
+                    background-position: center;
+                    image-rendering: pixelated;
+                }
             }
         }
 

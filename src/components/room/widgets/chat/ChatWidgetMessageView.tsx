@@ -14,6 +14,7 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = props =>
     const { chat = null, makeRoom = null, bubbleWidth = RoomChatSettings.CHAT_BUBBLE_WIDTH_NORMAL } = props;
     const [ isVisible, setIsVisible ] = useState(false);
     const [ isReady, setIsReady ] = useState<boolean>(false);
+    const [ imageUrl, setImageUrl ] = useState<string>(chat ? chat.imageUrl : null);
     const elementRef = useRef<HTMLDivElement>();
 
     const getBubbleWidth = useMemo(() =>
@@ -28,6 +29,24 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = props =>
                 return 2000;
         }
     }, [ bubbleWidth ]);
+
+    useEffect(() =>
+    {
+        if(!chat) return;
+
+        setImageUrl(chat.imageUrl);
+
+        chat.setImageUrl = (newUrl: string) =>
+        {
+            chat.imageUrl = newUrl;
+            setImageUrl(newUrl);
+        };
+
+        return () =>
+        {
+            chat.setImageUrl = null;
+        };
+    }, [ chat ]);
 
     useEffect(() =>
     {
@@ -101,9 +120,9 @@ export const ChatWidgetMessageView: FC<ChatWidgetMessageViewProps> = props =>
             { (chat.styleId === 0) &&
                 <div className="user-container-bg" style={ { backgroundColor: chat.color } } /> }
             <div className={ `chat-bubble bubble-${ chat.styleId } type-${ chat.type }` } style={ { maxWidth: getBubbleWidth } }>
-                <div className="user-container">
-                    { chat.imageUrl && (chat.imageUrl.length > 0) &&
-                        <div className="user-image" style={ { backgroundImage: `url(${ chat.imageUrl })` } } /> }
+                <div className={ `user-container ${ (chat.petType >= 0) ? 'is-pet' : '' }` }>
+                    { imageUrl && (imageUrl.length > 0) &&
+                        <div className={ `user-image ${ (chat.petType >= 0) ? 'pet-image' : '' }` } style={ { backgroundImage: `url(${ imageUrl })` } } /> }
                 </div>
                 <div className="chat-content">
                     <b className="username mr-1" dangerouslySetInnerHTML={ { __html: `${ chat.username }: ` } } />

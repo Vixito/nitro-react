@@ -379,7 +379,7 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
         {
             const userInfo = avatarInfo as AvatarInfoUser;
             return (
-                <div className="stage-avatar-wrapper" onClick={ () => setIsCardExpanded(!isCardExpanded) }>
+                <div className="stage-avatar-wrapper cursor-pointer" onClick={ () => setIsCardExpanded(!isCardExpanded) } style={ { cursor: 'pointer' } }>
                     <LayoutAvatarImageView figure={ userInfo.figure } direction={ 4 } />
                 </div>
             );

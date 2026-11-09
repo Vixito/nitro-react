@@ -178,7 +178,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                 </Column>
                 <Column gap={ 1 }>
                     <Flex gap={ 1 }>
-                        <Column fullWidth className="body-image" onClick={ event => GetUserProfile(avatarInfo.webID) }>
+                        <Column fullWidth pointer className="body-image cursor-pointer" onClick={ event => GetUserProfile(avatarInfo.webID) }>
                             <LayoutAvatarImageView figure={ avatarInfo.figure } direction={ 4 } />
                         </Column>
                         <Column grow alignItems="center" gap={ 0 }>

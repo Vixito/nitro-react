@@ -8,6 +8,7 @@ import { useChatHistory } from './../../chat-history';
 const avatarColorCache: Map<string, number> = new Map();
 const avatarImageCache: Map<string, string> = new Map();
 const petImageCache: Map<string, string> = new Map();
+const pendingPetCallbacks: Map<string, ((url: string) => void)[]> = new Map();
 
 const useChatWidgetState = () =>
 {
@@ -75,22 +76,69 @@ const useChatWidgetState = () =>
         return existing;
     }
 
-    const getPetImage = (figure: string, direction: number = 3, _arg_3: boolean = true, scale: number = 64, posture: string = null, headOnly: boolean = true) =>
+    const getPetImage = (figure: string, direction: number = 3, _arg_3: boolean = true, scale: number = 64, posture: string = 'std', headOnly: boolean = true, onReady?: (url: string) => void) =>
     {
-        let existing = petImageCache.get((figure + posture + headOnly));
+        const cacheKey = (figure + (posture || 'std') + headOnly);
+        let existing = petImageCache.get(cacheKey);
 
         if(existing) return existing;
+
+        if(onReady)
+        {
+            let callbacks = pendingPetCallbacks.get(cacheKey);
+
+            if(!callbacks)
+            {
+                callbacks = [];
+                pendingPetCallbacks.set(cacheKey, callbacks);
+            }
+
+            callbacks.push(onReady);
+        }
 
         const figureData = new PetFigureData(figure);
         const typeId = figureData.typeId;
         const petHeadOnly = (typeId === 16) ? false : headOnly;
-        const image = GetRoomEngine().getRoomObjectPetImage(typeId, figureData.paletteId, figureData.color, new Vector3d((direction * 45)), scale, null, petHeadOnly, 0, figureData.customParts, posture);
+        const petPosture = posture || 'std';
+
+        const image = GetRoomEngine().getRoomObjectPetImage(typeId, figureData.paletteId, figureData.color, new Vector3d((direction * 45)), scale, {
+            imageReady: (id, texture, image) =>
+            {
+                if(isDisposed.current) return;
+
+                let readyUrl: string = null;
+
+                if(image) readyUrl = image.src;
+                else if(texture) readyUrl = TextureUtils.generateImageUrl(texture);
+
+                if(readyUrl)
+                {
+                    petImageCache.set(cacheKey, readyUrl);
+
+                    const callbacks = pendingPetCallbacks.get(cacheKey);
+
+                    if(callbacks && callbacks.length)
+                    {
+                        pendingPetCallbacks.delete(cacheKey);
+
+                        for(const cb of callbacks) cb(readyUrl);
+                    }
+                }
+            },
+            imageFailed: id =>
+            {
+                pendingPetCallbacks.delete(cacheKey);
+            }
+        }, petHeadOnly, 0, figureData.customParts, petPosture);
 
         if(image)
         {
-            existing = TextureUtils.generateImageUrl(image.data);
+            if((image.id === 0) && image.data)
+            {
+                existing = TextureUtils.generateImageUrl(image.data);
 
-            petImageCache.set((figure + posture + headOnly), existing);
+                petImageCache.set(cacheKey, existing);
+            }
         }
 
         return existing;
@@ -110,6 +158,7 @@ const useChatWidgetState = () =>
         let userType = 0;
         let petType = -1;
         let text = event.message;
+        let chatMessage: ChatBubbleMessage = null;
 
         if(userData)
         {
@@ -120,8 +169,11 @@ const useChatWidgetState = () =>
             switch(userType)
             {
                 case RoomObjectType.PET:
-                    imageUrl = getPetImage(figure, 3, true, 64, null, true);
                     petType = new PetFigureData(figure).typeId;
+                    imageUrl = getPetImage(figure, 3, true, 64, 'std', true, readyUrl =>
+                    {
+                        if(chatMessage && chatMessage.setImageUrl) chatMessage.setImageUrl(readyUrl);
+                    });
                     break;
                 case RoomObjectType.USER:
                     imageUrl = getUserImage(figure);
@@ -195,7 +247,7 @@ const useChatWidgetState = () =>
         const formattedText = RoomChatFormatter(text);
         const color = (avatarColor && (('#' + (avatarColor.toString(16).padStart(6, '0'))) || null));
 
-        const chatMessage = new ChatBubbleMessage(
+        chatMessage = new ChatBubbleMessage(
             userData.roomIndex,
             RoomObjectCategory.UNIT,
             roomSession.roomId,
@@ -206,7 +258,8 @@ const useChatWidgetState = () =>
             chatType,
             styleId,
             imageUrl,
-            color);
+            color,
+            petType);
 
         setChatMessages(prevValue => [ ...prevValue, chatMessage ]);
         addChatEntry({ id: -1, webId: userData.webID, entityId: userData.roomIndex, name: username, imageUrl, style: styleId, chatType: chatType, entityType: userData.type, message: formattedText, timestamp: ChatHistoryCurrentDate(), type: ChatEntryType.TYPE_CHAT, roomId: roomSession.roomId, color });

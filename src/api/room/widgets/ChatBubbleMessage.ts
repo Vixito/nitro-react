@@ -9,6 +9,7 @@ export class ChatBubbleMessage
     public height: number = 0;
     public elementRef: HTMLDivElement = null;
     public skipMovement: boolean = false;
+    public setImageUrl: (url: string) => void = null;
 
     private _top: number = 0;
     private _left: number = 0;
@@ -24,7 +25,8 @@ export class ChatBubbleMessage
         public type: number = 0,
         public styleId: number = 0,
         public imageUrl: string = null,
-        public color: string = null
+        public color: string = null,
+        public petType: number = -1
     ) 
     {
         this.id = ++ChatBubbleMessage.BUBBLE_COUNTER;
