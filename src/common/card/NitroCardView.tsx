@@ -40,7 +40,8 @@ const SKIN_2012_BY_KEY: Record<string, string> = {
     'nitro-room-info': 'volter-blue',
     'nitro-room-filter': 'volter-blue',
     'pet-training': 'volter-blue',
-    'commands-alert': 'volter-blue'
+    'commands-alert': 'volter-blue',
+    'nitropedia': 'volter-blue'
 };
 
 export const NitroCardView: FC<NitroCardViewProps> = props =>

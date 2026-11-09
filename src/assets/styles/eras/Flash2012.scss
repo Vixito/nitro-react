@@ -56,6 +56,20 @@ body[data-era="flash2012"] {
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
 
+    // Sanity rule: inputs, textareas, selects must never have white-on-white invisible text
+    input:not([type="checkbox"]):not([type="radio"]),
+    textarea,
+    select,
+    .form-control,
+    .form-select {
+        color: #111111;
+        -webkit-text-fill-color: #111111;
+        &::placeholder {
+            color: #777777;
+            -webkit-text-fill-color: #777777;
+        }
+    }
+
     // Eliminate any global dark-theme text-stroke / halo inside 2012 windows
     .nitro-card {
         text-shadow: none !important;
@@ -1161,7 +1175,7 @@ body[data-era="flash2012"] {
 
     // Notification & Right Side Positioning: positioned cleanly below the fixed 2x2 purse (top: 94px)
     .nitro-right-side {
-        top: 94px !important;
+        top: 98px !important;
         z-index: 1050 !important;
         pointer-events: none !important;
     }
@@ -1221,7 +1235,7 @@ body[data-era="flash2012"] {
     .chat-container-flash2012,
     #toolbar-chat-input-container {
         position: fixed !important;
-        bottom: 40px !important;
+        bottom: 33px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 470px !important;
@@ -1360,16 +1374,13 @@ body[data-era="flash2012"] {
             content: none !important;
         }
 
-        // In 2012 Flash, fixed-size dialogs (Amig@s, Messenger, Mod Tools, Room Info) have no resize grip.
-        // Only genuine resizable windows (such as Catalog / Tienda) display the authentic 16x16 embossed scaler.
+        // Authentic 2012 Flash embossed 16x16 resize grip for all resizable windows (Catalog, Inventario, Navegador, Nitropedia, etc.)
         &::after {
             display: none !important;
             content: none !important;
         }
 
-        &.nitro-catalog,
-        &[data-window-key="catalog"],
-        &.catalog-flash2012 {
+        &:not(.no-resize) {
             &::after {
                 content: '' !important;
                 display: block !important;
@@ -1395,7 +1406,7 @@ body[data-era="flash2012"] {
             }
         }
 
-        &:not(.nitro-catalog):not([data-window-key="catalog"]):not(.catalog-flash2012)::-webkit-resizer {
+        &.no-resize::-webkit-resizer {
             display: none !important;
             background: transparent !important;
             width: 0 !important;
@@ -1514,13 +1525,14 @@ body[data-era="flash2012"] {
                 image-rendering: pixelated !important;
             }
 
+            .nitro-card-header-inner .nitro-card-header-text,
             .nitro-card-header-text {
                 font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
                 font-size: 9px !important;
-                font-weight: 400 !important;
+                font-weight: 700 !important;
                 line-height: 14px !important;
                 color: #ffffff !important;
-                text-shadow: 0 1px 0 #1e4d63 !important;
+                text-shadow: 0 1px 0 #1b4354 !important;
                 -webkit-font-smoothing: none !important;
                 -moz-osx-font-smoothing: unset !important;
                 text-rendering: geometricPrecision !important;
@@ -1754,23 +1766,23 @@ body[data-era="flash2012"] {
                 }
             }
 
-            &.active > .nitro-card-accordion-set-header::after {
+            &.active>.nitro-card-accordion-set-header::after {
                 background-image: url('@/assets/images/eras/flash2012/friends/arrow_down_black.png') !important;
             }
 
-            &.friends-online-set > .nitro-card-accordion-set-header {
+            &.friends-online-set>.nitro-card-accordion-set-header {
                 background-color: #bce3f5 !important;
                 border-bottom: 1px solid #8ab8ce !important;
             }
 
-            &.friends-offline-set > .nitro-card-accordion-set-header {
+            &.friends-offline-set>.nitro-card-accordion-set-header {
                 background-color: #f2f2f2 !important;
                 border-top: 1px solid #d9d9d9 !important;
                 border-bottom: 1px solid #cccccc !important;
             }
 
-            &.friends-search-set > .nitro-card-accordion-set-header,
-            &:last-child > .nitro-card-accordion-set-header {
+            &.friends-search-set>.nitro-card-accordion-set-header,
+            &:last-child>.nitro-card-accordion-set-header {
                 background-color: #78756e !important;
                 border-top: 1px solid #000000 !important;
                 border-bottom: none !important;
@@ -2174,18 +2186,24 @@ body[data-era="flash2012"] {
     // 7. COMPONENTES ESPECÍFICOS DE CADA VENTANA 2012
     // =========================================================================
 
-    // 7A. NAVEGADOR DE SALAS 2012 (Píldoras de aforo verdes/ámbar/rojas + Volter 9px + Popup Info)
+    // 7A. NAVEGADOR DE SALAS Y GUÍA DE COMANDOS NITROPEDIA 2012 (Volter 9px Bold + Popup Info)
     .navigator-flash2012,
     .nitro-navigator,
-    .nitro-card[data-window-key="navigator"] {
+    .nitro-card[data-window-key="navigator"],
+    .nitropedia,
+    .nitro-card[data-window-key="nitropedia"],
+    .inventory-flash2012,
+    .nitro-inventory,
+    .nitro-card[data-window-key="inventory"] {
         .nitro-card-header {
+            .nitro-card-header-inner .nitro-card-header-text,
             .nitro-card-header-text {
                 font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
                 font-size: 9px !important;
-                font-weight: 400 !important;
+                font-weight: 700 !important;
                 line-height: 14px !important;
                 color: #ffffff !important;
-                text-shadow: 0 1px 0 #1e4d63 !important;
+                text-shadow: 0 1px 0 #1b4354 !important;
                 -webkit-font-smoothing: none !important;
                 -moz-osx-font-smoothing: unset !important;
                 text-rendering: geometricPrecision !important;
@@ -3548,6 +3566,7 @@ body[data-era="flash2012"] {
             }
 
             .custom-gif-container {
+
                 .custom-gif-label,
                 div {
                     color: #1a1a1a !important;
@@ -3618,6 +3637,7 @@ body[data-era="flash2012"] {
     }
 
     .nitro-battle-pass {
+
         .content-area,
         .nitro-card-content {
             background-color: #e6e6e1 !important;
@@ -3684,6 +3704,28 @@ body[data-era="flash2012"] {
 
         * {
             color: #ffffff !important;
+        }
+
+        // Custom variables (e.g. "Enlace:") & input fields inside infostand must be 100% visible
+        input,
+        textarea,
+        select,
+        .form-control,
+        .form-select {
+            background-color: #ffffff !important;
+            color: #111111 !important;
+            -webkit-text-fill-color: #111111 !important;
+            border: 1px solid #000000 !important;
+            border-radius: 2px !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11px !important;
+            caret-color: #000000 !important;
+            box-shadow: none !important;
+
+            &::placeholder {
+                color: #888888 !important;
+                -webkit-text-fill-color: #888888 !important;
+            }
         }
 
         .bg-muted,

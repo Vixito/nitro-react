@@ -82,7 +82,15 @@ const resolveCurrentEra = (): EraType =>
         return activeEraMemory;
     }
 
-    // 2. Carga inicial por primera vez
+    // 2. Si el usuario guardó explícitamente su era en localStorage, esa es la máxima prioridad del cliente
+    const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('habbten_era');
+    if(isValidEra(saved))
+    {
+        activeEraMemory = saved;
+        return saved;
+    }
+
+    // 3. Parámetro de URL
     const urlParams = new URLSearchParams(window.location.search);
     const urlEra = urlParams.get('era');
     if(isValidEra(urlEra))
@@ -107,13 +115,6 @@ const resolveCurrentEra = (): EraType =>
     {
         activeEraMemory = m[1];
         return m[1];
-    }
-
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if(isValidEra(saved))
-    {
-        activeEraMemory = saved;
-        return saved;
     }
 
     activeEraMemory = 'modern';
@@ -146,6 +147,7 @@ export const useEraTheme = () =>
     {
         activeEraMemory = era;
         localStorage.setItem(STORAGE_KEY, era);
+        localStorage.setItem('habbten_era', era);
         document.cookie = `habbten_era=${era}; path=/; max-age=31536000`;
         try
         {
@@ -169,9 +171,15 @@ export const useEraTheme = () =>
             fetch('/api/set-era', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ era })
             }).catch(() => {});
         } catch(e) {}
+        try
+        {
+            window.parent?.postMessage({ type: 'nitro-era-changed', era }, '*');
+        }
+        catch(e) {}
         setCurrentEraState(era);
         applyEraToDOM(era);
         window.dispatchEvent(new CustomEvent('nitro-era-changed', { detail: era }));
