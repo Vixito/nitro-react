@@ -218,9 +218,9 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <span className="avatar-label">Salas</span>
                         </div>
 
-                        <div className="navigation-item item-quests icon-quests" title="Misiones y Pase" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                        <div className="navigation-item item-quests icon-quests" title="Retos" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
                             <i className="toolbar-icon icon-quests" />
-                            <span className="avatar-label">Misiones</span>
+                            <span className="avatar-label">Retos</span>
                         </div>
 
                         { isGameCenterEnabled && (
@@ -237,10 +237,10 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <span className="avatar-label">Tienda</span>
                         </div>
 
-                        <div className="navigation-item item-inventory icon-inventory" title="Inventario" onClick={ () => CreateLinkEvent('inventory/toggle') }>
+                        <div className="navigation-item item-inventory icon-inventory" title="Mis cosas" onClick={ () => CreateLinkEvent('inventory/toggle') }>
                             <i className="toolbar-icon icon-inventory" />
                             { (getFullCount > 0) && <LayoutItemCountView count={ getFullCount } /> }
-                            <span className="avatar-label">Inventario</span>
+                            <span className="avatar-label">Mis cosas</span>
                         </div>
 
                         <div className="toolbar-divider-2012" />
