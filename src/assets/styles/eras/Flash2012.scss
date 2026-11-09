@@ -1361,33 +1361,45 @@ body[data-era="flash2012"] {
         }
 
         // In 2012 Flash, fixed-size dialogs (Amig@s, Messenger, Mod Tools, Room Info) have no resize grip.
-        // Only genuine resizable windows (such as Catalog / Tienda) display the subtle 8x8 scaler sprite.
+        // Only genuine resizable windows (such as Catalog / Tienda) display the authentic 16x16 embossed scaler.
         &::after {
             display: none !important;
             content: none !important;
         }
 
         &.nitro-catalog,
-        &[data-window-key="catalog"] {
+        &[data-window-key="catalog"],
+        &.catalog-flash2012 {
             &::after {
                 content: '' !important;
                 display: block !important;
                 position: absolute !important;
-                right: 2px !important;
-                bottom: 2px !important;
+                right: 1px !important;
+                bottom: 1px !important;
                 width: 16px !important;
                 height: 16px !important;
-                background: transparent url('@/assets/images/eras/flash2012/skins/scaler_2012.png') no-repeat !important;
+                background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cline x1='12' y1='16' x2='16' y2='12' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='8' y1='16' x2='16' y2='8' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='4' y1='16' x2='16' y2='4' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='11' y1='15' x2='15' y2='11' stroke='%235e5d59' stroke-width='1'/%3E%3Cline x1='7' y1='15' x2='15' y2='7' stroke='%235e5d59' stroke-width='1'/%3E%3Cline x1='3' y1='15' x2='15' y2='3' stroke='%235e5d59' stroke-width='1'/%3E%3C/svg%3E") no-repeat right bottom !important;
                 image-rendering: pixelated !important;
                 pointer-events: none !important;
-                z-index: 30 !important;
+                z-index: 9999 !important;
+            }
+
+            &::-webkit-resizer {
+                display: block !important;
+                width: 16px !important;
+                height: 16px !important;
+                background-color: transparent !important;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cline x1='12' y1='16' x2='16' y2='12' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='8' y1='16' x2='16' y2='8' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='4' y1='16' x2='16' y2='4' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='11' y1='15' x2='15' y2='11' stroke='%235e5d59' stroke-width='1'/%3E%3Cline x1='7' y1='15' x2='15' y2='7' stroke='%235e5d59' stroke-width='1'/%3E%3Cline x1='3' y1='15' x2='15' y2='3' stroke='%235e5d59' stroke-width='1'/%3E%3C/svg%3E") !important;
+                background-repeat: no-repeat !important;
+                background-position: right bottom !important;
             }
         }
 
-        &::-webkit-resizer {
-            width: 18px !important;
-            height: 18px !important;
+        &:not(.nitro-catalog):not([data-window-key="catalog"]):not(.catalog-flash2012)::-webkit-resizer {
+            display: none !important;
             background: transparent !important;
+            width: 0 !important;
+            height: 0 !important;
         }
 
         .nitro-card-header {
@@ -1510,8 +1522,11 @@ body[data-era="flash2012"] {
                 color: #ffffff !important;
                 text-shadow: 0 1px 0 #1e4d63 !important;
                 -webkit-font-smoothing: none !important;
+                -moz-osx-font-smoothing: unset !important;
+                text-rendering: geometricPrecision !important;
                 letter-spacing: 0 !important;
-                padding: 0 6px 2px 6px !important;
+                padding: 1px 6px 0 6px !important;
+                margin-top: 1px !important;
                 overflow: visible !important;
                 white-space: nowrap !important;
             }
@@ -1635,8 +1650,13 @@ body[data-era="flash2012"] {
                 color: #ffffff !important;
                 text-shadow: 0 1px 0 #8a6400 !important;
                 -webkit-font-smoothing: none !important;
-                padding: 0 6px 2px 6px !important;
+                -moz-osx-font-smoothing: unset !important;
+                text-rendering: geometricPrecision !important;
+                letter-spacing: 0 !important;
+                padding: 1px 6px 0 6px !important;
+                margin-top: 1px !important;
                 overflow: visible !important;
+                white-space: nowrap !important;
             }
 
             .nitro-card-header-close {
@@ -2156,7 +2176,27 @@ body[data-era="flash2012"] {
 
     // 7A. NAVEGADOR DE SALAS 2012 (Píldoras de aforo verdes/ámbar/rojas + Volter 9px + Popup Info)
     .navigator-flash2012,
+    .nitro-navigator,
     .nitro-card[data-window-key="navigator"] {
+        .nitro-card-header {
+            .nitro-card-header-text {
+                font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
+                font-size: 9px !important;
+                font-weight: 400 !important;
+                line-height: 14px !important;
+                color: #ffffff !important;
+                text-shadow: 0 1px 0 #1e4d63 !important;
+                -webkit-font-smoothing: none !important;
+                -moz-osx-font-smoothing: unset !important;
+                text-rendering: geometricPrecision !important;
+                letter-spacing: 0 !important;
+                padding: 1px 6px 0 6px !important;
+                margin-top: 1px !important;
+                overflow: visible !important;
+                white-space: nowrap !important;
+            }
+        }
+
         .navigator-grid {
             gap: 1px !important;
         }
