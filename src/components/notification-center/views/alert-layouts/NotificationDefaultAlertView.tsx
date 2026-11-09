@@ -145,6 +145,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
 
     return (
         <LayoutNotificationAlertView 
+            uniqueKey={ isCommandsList ? 'commands-alert' : undefined }
             title={ isCommandsList ? 'Lista de Comandos' : title } 
             onClose={ onClose } 
             { ...rest } 

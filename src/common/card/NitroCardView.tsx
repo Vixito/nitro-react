@@ -54,6 +54,7 @@ export const NitroCardView: FC<NitroCardViewProps> = props =>
         if(uniqueKey && SKIN_2012_BY_KEY[uniqueKey]) return SKIN_2012_BY_KEY[uniqueKey];
 
         const joined = [ ...(classNames || []), ((rest as any)?.className || '') ].join(' ');
+        if(/commands-alert/i.test(joined)) return 'volter-blue';
         if(/nitro-alert|nitro-help|nitro-guide|user-profile|nitro-friends-messenger/i.test(joined)) return 'illumina-light';
         if(/nitro-friends/i.test(joined)) return 'volter-yellow';
         if(/nitro-wired|user-settings|nitro-discord-settings|avatar-editor|mod-tools|chat-history|floorplan-editor/i.test(joined)) return 'illumina-dark';

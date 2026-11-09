@@ -1497,9 +1497,12 @@ body[data-era="flash2012"] {
     }
 
     // -------------------------------------------------------------------------
-    // SKIN 1: VOLTER BLUE (Navigator, Inventory, Room Info/Settings — Beta Blue)
+    // SKIN 1: VOLTER BLUE (Navigator, Inventory, Room Info/Settings, Commands Alert — Beta Blue)
     // -------------------------------------------------------------------------
-    .nitro-card[data-skin-2012="volter-blue"] {
+    .nitro-card[data-skin-2012="volter-blue"],
+    .nitro-card.commands-alert,
+    .commands-alert,
+    .nitro-card[data-window-key="commands-alert"] {
         background-color: #4591b2 !important;
         border: 1px solid #000000 !important;
         border-radius: 6px !important;
@@ -2114,7 +2117,7 @@ body[data-era="flash2012"] {
     // SKIN 5: ILLUMINA LIGHT (User Profile, Alerts, Era Selector, Help, Guide)
     // -------------------------------------------------------------------------
     .nitro-card[data-skin-2012="illumina-light"],
-    .nitro-alert {
+    .nitro-alert:not(.commands-alert):not([data-skin-2012="volter-blue"]) {
         background-color: #e6e4de !important;
         border: 1px solid #000000 !important;
         border-radius: 6px !important;
@@ -2194,7 +2197,9 @@ body[data-era="flash2012"] {
     .nitro-card[data-window-key="nitropedia"],
     .inventory-flash2012,
     .nitro-inventory,
-    .nitro-card[data-window-key="inventory"] {
+    .nitro-card[data-window-key="inventory"],
+    .commands-alert,
+    .nitro-card[data-window-key="commands-alert"] {
         .nitro-card-header {
             .nitro-card-header-inner .nitro-card-header-text,
             .nitro-card-header-text {
