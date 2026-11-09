@@ -693,6 +693,14 @@ body[data-era="flash2012"] {
         user-select: none !important;
         pointer-events: none !important;
 
+        // Disabling any transition so hover states trigger instantaneously (0s / no animation)
+        &,
+        *,
+        *::before,
+        *::after {
+            transition: none !important;
+        }
+
         // Dead-center on 50% axis directly beneath #toolbar-chat-input-container
         .bottom-bar-left {
             position: fixed !important;
@@ -958,6 +966,7 @@ body[data-era="flash2012"] {
                 border: none !important;
                 box-shadow: none !important;
                 overflow: visible !important;
+                transition: none !important;
 
                 .icon-chat-bubble {
                     display: block !important;
@@ -966,7 +975,7 @@ body[data-era="flash2012"] {
                     margin: -4px -2px !important;
                     background: url('@/assets/images/eras/flash2012/friendbar/icon_messenger.png') center / auto no-repeat !important;
                     image-rendering: pixelated !important;
-                    transition: transform 0.1s ease, filter 0.1s ease !important;
+                    transition: none !important;
                 }
 
                 &.is-unread {
@@ -982,11 +991,6 @@ body[data-era="flash2012"] {
                     background: transparent !important;
                     background-color: transparent !important;
                     box-shadow: none !important;
-
-                    .icon-chat-bubble {
-                        filter: brightness(1.2) drop-shadow(0 0 2px rgba(255, 255, 255, 0.4)) !important;
-                        transform: scale(1.08) !important;
-                    }
                 }
             }
         }
