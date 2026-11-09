@@ -45,6 +45,10 @@ const useInventoryBadgesState = () =>
 
             SendMessageComposer(composer);
 
+            try {
+                window.dispatchEvent(new CustomEvent('nitro-own-badges-updated', { detail: newValue }));
+            } catch(e) {}
+
             return newValue;
         });
     }

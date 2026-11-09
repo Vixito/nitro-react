@@ -1,4 +1,4 @@
-import { RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
+import { RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, UserCurrentBadgesEvent, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
 import { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useEffect, useState } from 'react';
 import { FaPencilAlt, FaTimes } from 'react-icons/fa';
 import { AvatarInfoUser, CloneObject, GetConfiguration, GetGroupInformation, GetSessionDataManager, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
@@ -62,6 +62,47 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
             return newValue;
         });
     });
+
+    useMessageEvent<UserCurrentBadgesEvent>(UserCurrentBadgesEvent, event =>
+    {
+        const parser = event.getParser();
+
+        if(!avatarInfo || (avatarInfo.webID !== parser.userId)) return;
+
+        setAvatarInfo(prevValue =>
+        {
+            if(!prevValue) return null;
+
+            const newValue = CloneObject(prevValue);
+
+            newValue.badges = parser.badges;
+
+            return newValue;
+        });
+    });
+
+    useEffect(() =>
+    {
+        const handleOwnBadges = (event: CustomEvent<string[]>) =>
+        {
+            if(!avatarInfo || ((avatarInfo.type !== AvatarInfoUser.OWN_USER) && (avatarInfo.webID !== GetSessionDataManager().userId))) return;
+
+            setAvatarInfo(prevValue =>
+            {
+                if(!prevValue) return null;
+
+                const newValue = CloneObject(prevValue);
+
+                newValue.badges = event.detail;
+
+                return newValue;
+            });
+        };
+
+        window.addEventListener('nitro-own-badges-updated', handleOwnBadges as EventListener);
+
+        return () => window.removeEventListener('nitro-own-badges-updated', handleOwnBadges as EventListener);
+    }, [ avatarInfo, setAvatarInfo ]);
 
     useRoomSessionManagerEvent<RoomSessionUserFigureUpdateEvent>(RoomSessionUserFigureUpdateEvent.USER_FIGURE, event =>
     {

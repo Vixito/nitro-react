@@ -988,9 +988,12 @@ body[data-era="flash2012"] {
                 }
 
                 &:hover {
-                    background: transparent !important;
-                    background-color: transparent !important;
+                    background-color: rgba(255, 255, 255, 0.12) !important;
                     box-shadow: none !important;
+
+                    .icon-chat-bubble {
+                        filter: brightness(1.2) !important;
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-import { AvatarAction, AvatarExpressionEnum, GroupInformationComposer, GroupInformationEvent, RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, RoomUnitStatusEvent, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, TradingOpenComposer, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
+import { AvatarAction, AvatarExpressionEnum, GroupInformationComposer, GroupInformationEvent, RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, RoomUnitStatusEvent, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, TradingOpenComposer, UserCurrentBadgesEvent, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
 import { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaChevronDown, FaChevronUp, FaCog, FaExchangeAlt, FaHandPaper, FaInfoCircle, FaMusic, FaPencilAlt, FaRedo, FaTimes, FaTrash, FaUserCheck, FaUserPlus, FaUserSlash } from 'react-icons/fa';
 import { AvatarInfoFurni, AvatarInfoPet, AvatarInfoRentableBot, AvatarInfoUser, CloneObject, CreateLinkEvent, DispatchUiEvent, GetCanStandUp, GetConfiguration, GetGroupInformation, GetNitroInstance, GetOwnPosture, GetRoomEngine, GetSessionDataManager, GetUserProfile, HasHabboVip, LocalizeText, PostureTypeEnum, RoomWidgetUpdateChatInputContentEvent, SendMessageComposer } from '../../../../../api';
@@ -91,6 +91,42 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
             return updated;
         });
     });
+
+    useMessageEvent<UserCurrentBadgesEvent>(UserCurrentBadgesEvent, event =>
+    {
+        const parser = event.getParser();
+        if(!avatarInfo || (avatarInfo.type !== AvatarInfoUser.OWN_USER && avatarInfo.type !== AvatarInfoUser.PEER)) return;
+        const userInfo = avatarInfo as AvatarInfoUser;
+        if(userInfo.webID !== parser.userId) return;
+
+        setAvatarInfo(prev =>
+        {
+            if(!prev) return null;
+            const updated = CloneObject(prev);
+            updated.badges = parser.badges;
+            return updated;
+        });
+    });
+
+    useEffect(() =>
+    {
+        const handleOwnBadges = (event: CustomEvent<string[]>) =>
+        {
+            if(!avatarInfo || (avatarInfo.type !== AvatarInfoUser.OWN_USER && (avatarInfo as any)?.webID !== GetSessionDataManager().userId)) return;
+
+            setAvatarInfo(prev =>
+            {
+                if(!prev) return null;
+                const updated = CloneObject(prev);
+                updated.badges = event.detail;
+                return updated;
+            });
+        };
+
+        window.addEventListener('nitro-own-badges-updated', handleOwnBadges as EventListener);
+
+        return () => window.removeEventListener('nitro-own-badges-updated', handleOwnBadges as EventListener);
+    }, [ avatarInfo, setAvatarInfo ]);
 
     useRoomSessionManagerEvent<RoomSessionUserFigureUpdateEvent>(RoomSessionUserFigureUpdateEvent.USER_FIGURE, event =>
     {
