@@ -3733,6 +3733,14 @@ body[data-era="flash2012"] {
         box-shadow: inset 0 0 0 2px #3b3834 !important;
         color: #ffffff !important;
 
+        &::after,
+        &:after,
+        &::before,
+        &:before {
+            display: none !important;
+            content: none !important;
+        }
+
         .header,
         [class*="header"] {
             background: transparent !important;
