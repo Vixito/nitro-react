@@ -9,7 +9,13 @@ import { AchievementsCategoryListView } from './views/category-list/Achievements
 export const AchievementsView: FC<{}> = props =>
 {
     const [ isVisible, setIsVisible ] = useState(false);
-    const { achievementCategories = [], selectedCategoryCode = null, setSelectedCategoryCode = null, achievementScore = 0, getProgress = 0, getMaxProgress = 0, selectedCategory = null } = useAchievements();
+    const { achievementCategories = [], selectedCategoryCode = null, setSelectedCategoryCode = null, setCategorySeen = null, achievementScore = 0, getProgress = 0, getMaxProgress = 0, selectedCategory = null } = useAchievements();
+
+    const handleBackFromCategory = () =>
+    {
+        if(selectedCategoryCode && setCategorySeen) setCategorySeen(selectedCategoryCode);
+        setSelectedCategoryCode(null);
+    };
 
     useEffect(() =>
     {
@@ -52,8 +58,8 @@ export const AchievementsView: FC<{}> = props =>
         <NitroCardView uniqueKey="achievements" className="nitro-achievements" theme="primary-slim">
             <NitroCardHeaderView headerText={ LocalizeText('inventory.achievements') } onCloseClick={ event => { if(selectedCategoryCode) setSelectedCategoryCode(null); setIsVisible(false); } } />
             { selectedCategory &&
-                <NitroCardSubHeaderView position="relative" className="justify-content-center align-items-center cursor-pointer" gap={ 3 }>
-                    <Base onClick={ event => setSelectedCategoryCode(null) } className="nitro-achievements-back-arrow" />
+                <NitroCardSubHeaderView position="relative" className="justify-content-center align-items-center" gap={ 3 }>
+                    <Base pointer onClick={ handleBackFromCategory } className="nitro-achievements-back-arrow" />
                     <Column grow gap={ 0 }>
                         <Text fontSize={ 4 } fontWeight="bold" className="text-small">{ LocalizeText(`quests.${ selectedCategory.code }.name`) }</Text>
                         <Text>{ LocalizeText('achievements.details.categoryprogress', [ 'progress', 'limit' ], [ selectedCategory.getProgress().toString(), selectedCategory.getMaxProgress().toString() ]) }</Text>

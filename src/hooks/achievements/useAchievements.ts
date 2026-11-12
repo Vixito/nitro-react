@@ -110,13 +110,10 @@ const useAchievementsState = () =>
 
     const setSelectedCategoryCode = useCallback((code: string) =>
     {
-        setSelectedCategoryCodeState(prevCode =>
-        {
-            if(prevCode) setCategorySeen(prevCode);
-            if(code) setCategorySeen(code);
-            return code;
-        });
-    }, [ setCategorySeen ]);
+        setSelectedCategoryCodeState(code);
+
+        if(code === null) setSelectedAchievementId(-1);
+    }, []);
 
     useMessageEvent<AchievementEvent>(AchievementEvent, event =>
     {
@@ -210,14 +207,7 @@ const useAchievementsState = () =>
         setNeedsUpdate(false);
     }, [ needsUpdate ]);
 
-    useEffect(() =>
-    {
-        if(!selectedCategoryCode || (selectedAchievementId === -1)) return;
-
-        setAchievementSeen(selectedCategoryCode, selectedAchievementId);
-    }, [ selectedCategoryCode, selectedAchievementId, setAchievementSeen ]);
-
-    return { achievementCategories, selectedCategoryCode, setSelectedCategoryCode, selectedAchievementId, setSelectedAchievementId, achievementScore, getTotalUnseen, getProgress, getMaxProgress, scaledProgressPercent, selectedCategory, selectedAchievement, setAchievementSeen };
+    return { achievementCategories, selectedCategoryCode, setSelectedCategoryCode, selectedAchievementId, setSelectedAchievementId, achievementScore, getTotalUnseen, getProgress, getMaxProgress, scaledProgressPercent, selectedCategory, selectedAchievement, setAchievementSeen, setCategorySeen };
 }
 
 export const useAchievements = () => useBetween(useAchievementsState);

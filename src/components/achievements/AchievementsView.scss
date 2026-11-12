@@ -7,6 +7,15 @@
     background: url('@/assets/images/achievements/back-arrow.png') no-repeat center;
     width: 33px;
     height: 34px;
+    cursor: pointer;
+
+    &:hover {
+        filter: brightness(1.1);
+    }
+
+    &:active {
+        filter: brightness(0.9);
+    }
 }
 
 .nitro-achievements-badge-image {
