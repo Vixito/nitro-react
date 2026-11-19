@@ -4,8 +4,13 @@ import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from 
 import { useGameCenter } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 
-// Authentic widescreen (1120x484) Habbo Rooftop Rumble Pool backdrop
+// Authentic widescreen (1120x484) Habbo Rooftop Rumble Pool backdrop + Shockwave pixel-art FX bursts
 import wsRooftopWideImg from '../../../assets/images/gamecenter/wobblesquabble/ws_rooftop_wide.png';
+import wsFxWhackImg from '../../../assets/images/gamecenter/wobblesquabble/ws_fx_whack.png';
+import wsFxZzzapImg from '../../../assets/images/gamecenter/wobblesquabble/ws_fx_zzzap.png';
+import wsFxClunkImg from '../../../assets/images/gamecenter/wobblesquabble/ws_fx_clunk.png';
+import wsFxSwoooshImg from '../../../assets/images/gamecenter/wobblesquabble/ws_fx_swooosh.png';
+import wsFxSplashImg from '../../../assets/images/gamecenter/wobblesquabble/ws_fx_splash.png';
 
 // Authentic Shockwave 2006 HUD icons (shared with Battle Ball / Habbten 2006)
 import hudSfxIconImg from '../../../assets/images/gamecenter/battleball/hud_sfx_icon.png';
@@ -574,6 +579,7 @@ export const WobbleSquabbleGameView: FC = () =>
     const audioRef = useRef<WobbleAudio>(new WobbleAudio());
     const backdropImgRef = useRef<HTMLImageElement | null>(null);
     const arrowImgRef = useRef<HTMLImageElement | null>(null);
+    const fxImgsRef = useRef<Partial<Record<ComicKind, HTMLImageElement>>>({});
     const avatarCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
     const avatarReadyRef = useRef<Set<string>>(new Set());
     const keysDownRef = useRef<Set<string>>(new Set());
@@ -602,7 +608,7 @@ export const WobbleSquabbleGameView: FC = () =>
         viewOffsetY: number;
     } | null>(null);
 
-    // Load widescreen Rooftop Rumble backdrop + official 2006 Shockwave avatar arrow
+    // Load widescreen Rooftop Rumble backdrop + official 2006 Shockwave avatar arrow + pixel-art FX sprites
     useEffect(() =>
     {
         const img = new Image();
@@ -612,6 +618,20 @@ export const WobbleSquabbleGameView: FC = () =>
         const arrow = new Image();
         arrow.src = shockwaveArrowOrangeImg;
         arrow.onload = () => { arrowImgRef.current = arrow; };
+
+        const fxEntries: Array<[ ComicKind, string ]> = [
+            [ 'WHACK!', wsFxWhackImg ],
+            [ 'ZZZAP!', wsFxZzzapImg ],
+            [ 'CLUNK!', wsFxClunkImg ],
+            [ 'SWOOOSH!', wsFxSwoooshImg ],
+            [ '¡AL AGUA!', wsFxSplashImg ]
+        ];
+        for (const [ kind, src ] of fxEntries)
+        {
+            const fImg = new Image();
+            fImg.src = src;
+            fImg.onload = () => { fxImgsRef.current[kind] = fImg; };
+        }
     }, []);
 
     // Fetch daily games status
@@ -1467,18 +1487,31 @@ export const WobbleSquabbleGameView: FC = () =>
             }
         };
 
-        // Helper to draw authentic Habbo jagged comic-book starburst (WHACK! / ZZZAP! / CLUNK! / SWOOOSH!)
+        // Helper to draw authentic Sulake Shockwave pixel-art FX sprites (WHACK, ZZZAP, CLUNK, SWOOOSH, SPLASH)
         const drawComicBurst = (
             c: CanvasRenderingContext2D,
             x: number,
             y: number,
-            text: string,
+            text: ComicKind,
             bg: string,
             fg: string,
             scale: number,
             alpha: number
         ) =>
         {
+            const sprite = fxImgsRef.current[text];
+            if (sprite && sprite.naturalWidth > 0)
+            {
+                const dw = Math.round(sprite.naturalWidth * scale);
+                const dh = Math.round(sprite.naturalHeight * scale);
+                c.save();
+                c.globalAlpha = alpha;
+                c.imageSmoothingEnabled = false;
+                c.drawImage(sprite, Math.round(x - dw / 2), Math.round(y - dh / 2), dw, dh);
+                c.restore();
+                return;
+            }
+
             c.save();
             c.globalAlpha = alpha;
             c.translate(x, y);
