@@ -2,6 +2,9 @@ import { FurnitureListComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { attemptItemPlacement, GroupItem, SendMessageComposer } from '../../../api';
 import { useInventoryFurni } from '../../../hooks';
+import roomHand1 from '../../../assets/images/eras/shockwave_v14/room_hand_1.png';
+import roomHand2 from '../../../assets/images/eras/shockwave_v14/room_hand_2.png';
+import roomHand3 from '../../../assets/images/eras/shockwave_v14/room_hand_3.png';
 
 interface HabboHandShockwaveViewProps {
     isClosing?: boolean;
@@ -26,6 +29,41 @@ export const HabboHandShockwaveView: FC<HabboHandShockwaveViewProps> = ({ isClos
     const { groupItems = [], selectedItem = null, setSelectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
     const [pageIndex, setPageIndex] = useState(0);
     const [hoveredItem, setHoveredItem] = useState<GroupItem | null>(null);
+    const [handFrame, setHandFrame] = useState<1 | 2 | 3>(1);
+    const [isRetracting, setIsRetracting] = useState(false);
+
+    // Preload all 3 Shockwave v14 hand frames so open/close finger animation has zero flicker
+    useEffect(() => {
+        [roomHand1, roomHand2, roomHand3].forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+    }, []);
+
+    // Authentic Shockwave v14 open & close sequence:
+    // Open:  closed fist slides in (frame-1) -> fingers half-open (frame-2) -> open palm (frame-3)
+    // Close: fingers curl (frame-2) -> fist snaps closed (frame-1) -> closed fist retracts off-screen
+    useEffect(() => {
+        if (isClosing) {
+            setHandFrame(2);
+            setIsRetracting(false);
+            const tFist = setTimeout(() => setHandFrame(1), 90);
+            const tRetract = setTimeout(() => setIsRetracting(true), 185);
+            return () => {
+                clearTimeout(tFist);
+                clearTimeout(tRetract);
+            };
+        }
+
+        setIsRetracting(false);
+        setHandFrame(1);
+        const tHalf = setTimeout(() => setHandFrame(2), 145);
+        const tOpen = setTimeout(() => setHandFrame(3), 230);
+        return () => {
+            clearTimeout(tHalf);
+            clearTimeout(tOpen);
+        };
+    }, [isClosing]);
 
     useEffect(() => {
         const id = activate ? activate() : null;
@@ -50,15 +88,16 @@ export const HabboHandShockwaveView: FC<HabboHandShockwaveViewProps> = ({ isClos
     };
 
     const handleItemClick = (item: GroupItem) => {
-        if (isClosing) return;
+        if (isClosing || handFrame !== 3) return;
         setSelectedItem(item);
         attemptItemPlacement(item);
     };
 
-    const activeHoverItem = !isClosing ? (hoveredItem || selectedItem) : null;
+    const isPalmOpen = !isClosing && handFrame === 3;
+    const activeHoverItem = isPalmOpen ? (hoveredItem || selectedItem) : null;
 
     return (
-        <div className={`habbo-hand-shockwave-container ${isClosing ? 'closing' : ''}`}>
+        <div className={`habbo-hand-shockwave-container ${isClosing ? 'closing' : ''} ${isRetracting ? 'retracting' : ''}`}>
             { /* Tooltip de información del ítem encima de la mano cuando hay hover o selección */}
             {activeHoverItem && (
                 <div className="habbo-hand-tooltip">
@@ -69,10 +108,10 @@ export const HabboHandShockwaveView: FC<HabboHandShockwaveViewProps> = ({ isClos
                 </div>
             )}
 
-            { /* Ilustración auténtica de La Mano Shockwave v14 (room_hand_3.png) */}
-            <div className="habbo-hand-graphic">
+            { /* Ilustración auténtica de La Mano Shockwave v14 (room_hand_1 -> 2 -> 3) */}
+            <div className={`habbo-hand-graphic frame-${handFrame}`}>
                 { /* Botón Cerrar [x] en la esquina superior */}
-                {!isClosing && (
+                {isPalmOpen && (
                     <button
                         type="button"
                         className="habbo-hand-close-btn"
@@ -82,14 +121,14 @@ export const HabboHandShockwaveView: FC<HabboHandShockwaveViewProps> = ({ isClos
                 )}
 
                 { /* Mensaje auténtico en el centro de la palma si no hay ítems */}
-                {groupItems.length === 0 && (
+                {isPalmOpen && groupItems.length === 0 && (
                     <div className="habbo-hand-empty-notice">
                         La mano está vacía
                     </div>
                 )}
 
                 { /* Slots para los 9 ítems sobre la palma */}
-                {visibleItems.map((item, index) => {
+                {isPalmOpen && visibleItems.map((item, index) => {
                     const pos = HAND_SLOTS[index];
                     if (!pos) return null;
 
@@ -123,7 +162,7 @@ export const HabboHandShockwaveView: FC<HabboHandShockwaveViewProps> = ({ isClos
                 })}
 
                 { /* Botón "More stuff >" auténtico si hay más de 9 ítems */ }
-                { (!isClosing && totalPages > 1) && (
+                { (isPalmOpen && totalPages > 1) && (
                     <button
                         type="button"
                         className="habbo-hand-next-btn"

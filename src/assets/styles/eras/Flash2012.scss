@@ -118,7 +118,7 @@ body[data-era="flash2012"] {
         .btn-shiny-2012,
         .nitro-card:not([class*="nitro-mod-tools"]) :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success),
         .btn:not(.btn-danger)
-    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn)) {
+    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn):not(.btn-play-game)) {
         background: linear-gradient(180deg, #f3f3f3 0%, #f3f3f3 52%, #d9d9d9 52%, #d9d9d9 100%) !important;
         border: 1px solid #000000 !important;
         border-bottom-width: 2px !important;

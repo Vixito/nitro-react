@@ -3258,10 +3258,10 @@ body[data-era="shockwave2006"] {
         z-index: 450 !important;
         pointer-events: none !important;
         user-select: none !important;
-        animation: shockwaveHandEnter 0.25s ease-out !important;
+        animation: shockwaveHandEnter 0.16s ease-out both !important;
 
-        &.closing {
-            animation: shockwaveHandExit 0.25s ease-in forwards !important;
+        &.retracting {
+            animation: shockwaveHandExit 0.2s ease-in forwards !important;
         }
 
         .habbo-hand-empty-notice {
@@ -3402,36 +3402,6 @@ body[data-era="shockwave2006"] {
             &:hover {
                 background-image: url('@/assets/images/eras/shockwave_v14/room_hand_next_hi.png') !important;
             }
-        }
-    }
-
-    @keyframes shockwaveHandEnter {
-        0% {
-            transform: translate(380px, -200px);
-            opacity: 0;
-        }
-        50% {
-            transform: translate(140px, -70px);
-            opacity: 0.9;
-        }
-        100% {
-            transform: translate(0, 0);
-            opacity: 1;
-        }
-    }
-
-    @keyframes shockwaveHandExit {
-        0% {
-            transform: translate(0, 0);
-            opacity: 1;
-        }
-        50% {
-            transform: translate(140px, -70px);
-            opacity: 0.9;
-        }
-        100% {
-            transform: translate(380px, -200px);
-            opacity: 0;
         }
     }
 
@@ -8693,6 +8663,37 @@ body[data-era="shockwave2006"] {
         }
     }
 }
+
+@keyframes shockwaveHandEnter {
+    0% {
+        transform: translate(380px, -200px);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(140px, -70px);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+}
+
+@keyframes shockwaveHandExit {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(140px, -70px);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(380px, -200px);
+        opacity: 0;
+    }
+}
+
 
 
 

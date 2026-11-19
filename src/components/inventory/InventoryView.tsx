@@ -31,33 +31,57 @@ export const InventoryView: FC<{}> = props =>
     const [ isClosingHand, setIsClosingHand ] = useState(false);
     const isVisibleRef = useRef(isVisible);
     const isClosingHandRef = useRef(isClosingHand);
+    const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => { isVisibleRef.current = isVisible; }, [ isVisible ]);
     useEffect(() => { isClosingHandRef.current = isClosingHand; }, [ isClosingHand ]);
+
+    const cancelCloseTimer = useCallback(() =>
+    {
+        if(closeTimerRef.current)
+        {
+            clearTimeout(closeTimerRef.current);
+            closeTimerRef.current = null;
+        }
+    }, []);
 
     const handleClose = useCallback(() =>
     {
         if(isTrading)
         {
+            cancelCloseTimer();
             stopTrading();
+            setIsClosingHand(false);
             setIsVisible(false);
             return;
         }
 
-        if(currentEra === 'shockwave2006')
+        const isShockwave = currentEra === 'shockwave2006' || document.body.getAttribute('data-era') === 'shockwave2006';
+
+        if(isShockwave && isVisibleRef.current)
         {
             if(isClosingHandRef.current) return;
+            cancelCloseTimer();
+            isClosingHandRef.current = true;
             setIsClosingHand(true);
-            setTimeout(() =>
+            closeTimerRef.current = setTimeout(() =>
             {
+                closeTimerRef.current = null;
+                isClosingHandRef.current = false;
                 setIsVisible(false);
                 setIsClosingHand(false);
-            }, 250);
+            }, 390);
             return;
         }
 
+        cancelCloseTimer();
+        setIsClosingHand(false);
         setIsVisible(false);
-    }, [ isTrading, stopTrading, currentEra ]);
+    }, [ isTrading, stopTrading, currentEra, cancelCloseTimer ]);
+
+    const handleCloseRef = useRef(handleClose);
+    useEffect(() => { handleCloseRef.current = handleClose; }, [ handleClose ]);
+    useEffect(() => () => cancelCloseTimer(), [ cancelCloseTimer ]);
 
     const onClose = handleClose;
 
@@ -106,19 +130,23 @@ export const InventoryView: FC<{}> = props =>
                 switch(parts[1])
                 {
                     case 'show':
+                        cancelCloseTimer();
+                        isClosingHandRef.current = false;
                         setIsClosingHand(false);
                         setIsVisible(true);
                         return;
                     case 'hide':
-                        handleClose();
+                        handleCloseRef.current();
                         return;
                     case 'toggle':
-                        if(isVisibleRef.current)
+                        if(isVisibleRef.current && !isClosingHandRef.current)
                         {
-                            handleClose();
+                            handleCloseRef.current();
                         }
                         else
                         {
+                            cancelCloseTimer();
+                            isClosingHandRef.current = false;
                             setIsClosingHand(false);
                             setIsVisible(true);
                         }

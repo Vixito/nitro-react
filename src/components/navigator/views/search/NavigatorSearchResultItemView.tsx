@@ -24,12 +24,15 @@ export const NavigatorSearchResultItemView: FC<NavigatorSearchResultItemViewProp
         if(roomSession && roomSession.roomId === roomData.roomId)
         {
             const rawUsers = (roomSession.userDataManager as any)?._userDataByRoomIndex;
-            let activeCount = 0;
+            const uniqueUserIds = new Set<number>();
             if(rawUsers)
             {
-                rawUsers.forEach((u: any) => { if(u && u.type === RoomObjectType.USER) activeCount++; });
+                rawUsers.forEach((u: any) =>
+                {
+                    if(u && u.type === RoomObjectType.USER && u.webID > 0) uniqueUserIds.add(u.webID);
+                });
             }
-            return Math.max(roomData.userCount, activeCount);
+            return uniqueUserIds.size > 0 ? uniqueUserIds.size : roomData.userCount;
         }
         return roomData.userCount;
     }, [ roomData, roomSession ]);
