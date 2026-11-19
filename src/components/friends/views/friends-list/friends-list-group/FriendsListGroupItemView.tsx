@@ -1,13 +1,15 @@
 import { FC, MouseEvent, useState } from 'react';
 import { LocalizeText, MessengerFriend, OpenMessengerChat } from '../../../../../api';
 import { Base, Flex, NitroCardAccordionItemView, UserProfileIconView } from '../../../../../common';
-import { useFriends } from '../../../../../hooks';
+import { useFriends, useGamePresence } from '../../../../../hooks';
 
 export const FriendsListGroupItemView: FC<{ friend: MessengerFriend, selected: boolean, selectFriend: (userId: number) => void }> = props =>
 {
     const { friend = null, selected = false, selectFriend = null } = props;
     const [ isRelationshipOpen, setIsRelationshipOpen ] = useState<boolean>(false);
     const { followFriend = null, updateRelationship = null } = useFriends();
+    const { activePlayers } = useGamePresence();
+    const activeGame = friend && friend.id > 0 ? activePlayers[friend.id] : null;
 
     const clickFollowFriend = (event: MouseEvent<HTMLDivElement>) =>
     {
@@ -61,6 +63,24 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend, selected: b
                     <UserProfileIconView userId={ friend.id } />
                 </Base>
                 <div>{ friend.name }</div>
+                { activeGame && (
+                    <span
+                        title={ `Está jugando un juego: ${ activeGame.label }` }
+                        style={{
+                            fontSize: '9px',
+                            fontWeight: 800,
+                            background: '#0ea5e9',
+                            color: '#ffffff',
+                            padding: '1px 5px',
+                            borderRadius: '3px',
+                            marginLeft: '4px',
+                            letterSpacing: '0.3px',
+                            textTransform: 'uppercase'
+                        }}
+                    >
+                        { activeGame.label }
+                    </span>
+                ) }
             </Flex>
             <Flex alignItems="center" gap={ 1 }>
                 { !isRelationshipOpen &&

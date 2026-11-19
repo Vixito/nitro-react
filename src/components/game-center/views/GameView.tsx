@@ -6,9 +6,11 @@ import { useGameCenter } from '../../../hooks';
 
 const GAME_CONTROLS: { [ gameNameId: string ]: { action: string; keys: string }[] } = {
     snowwar: [
-        { action: 'Mover personaje', keys: 'W A S D / Flechas' },
-        { action: 'Lanzar bola de nieve', keys: 'Clic del ratón' },
-        { action: 'Recargar bolas', keys: 'Espacio' }
+        { action: 'Mover personaje', keys: 'Clic en el suelo / WASD' },
+        { action: 'Lanzar bola directa', keys: 'Clic en rival / SHIFT + Clic' },
+        { action: 'Tiro alto (sobre obstáculos)', keys: 'Clic derecho / ALT + Clic' },
+        { action: 'Hacer bolas de nieve', keys: 'Espacio / Guante verde' },
+        { action: 'Chat de equipo', keys: 'Enter' }
     ],
     basejump: [
         { action: 'Esquivar obstáculos', keys: 'A / D o Flechas Izq/Der' },

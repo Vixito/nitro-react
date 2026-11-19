@@ -135,6 +135,7 @@ export const ChatInputView: FC<{}> = props =>
 
     const onKeyDownEvent = useCallback((event: KeyboardEvent) =>
     {
+        if(document.querySelector('.snowstorm-game-root, .game-center-stage, .game-stage-container')) return;
         if(floodBlocked || !inputRef.current || anotherInputHasFocus()) return;
 
         if(document.activeElement !== inputRef.current) setInputFocus();

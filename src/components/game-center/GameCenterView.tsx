@@ -6,11 +6,12 @@ import { useGameCenter } from '../../hooks';
 import { GameListView } from './views/GameListView';
 import { GameStageView } from './views/GameStageView';
 import { GameView } from './views/GameView';
+import { SnowStormGameView } from './views/SnowStormGameView';
 import { SnowStormLobbyView } from './views/SnowStormLobbyView';
 
 export const GameCenterView = () => 
 {
-    const{ isVisible, setIsVisible, isSnowStormLobbyVisible, games, accountStatus } = useGameCenter();
+    const{ isVisible, setIsVisible, isSnowStormLobbyVisible, isSnowStormPlaying, games, accountStatus } = useGameCenter();
 
     useEffect(() => {
         const checkEnabled = (e?: any) => {
@@ -84,6 +85,7 @@ export const GameCenterView = () =>
                 </Flex>
             )}
             { isSnowStormLobbyVisible && <SnowStormLobbyView /> }
+            { isSnowStormPlaying && <SnowStormGameView /> }
             <GameStageView />
         </>
     );

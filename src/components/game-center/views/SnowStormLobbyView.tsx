@@ -1,47 +1,153 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Game2GetAccountGameStatusMessageComposer, JoinQueueMessageComposer } from '@nitrots/nitro-renderer';
-import { FaTimes } from 'react-icons/fa';
 import { CreateLinkEvent, LocalizeText, SendMessageComposer } from '../../../api';
 import { Button, Column, DraggableWindow, DraggableWindowPosition, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
+import { HabboHeadImg } from './SnowStormAvatar';
 import SnowStormLobbyImg from '../../../assets/images/gamecenter/snowstorm_lobby.png';
+import SnowStormLogoImg from '../../../assets/images/gamecenter/snowstorm/thumbnails_Snowstorm_Logo.png';
 import CloseUbuntuNormalImg from '../../../assets/images/eras/flash2012/skins/close_ubuntu_normal.png';
 import CloseUbuntuHoverImg from '../../../assets/images/eras/flash2012/skins/close_ubuntu_hover.png';
 import CloseUbuntuPressedImg from '../../../assets/images/eras/flash2012/skins/close_ubuntu_pressed.png';
 
+interface LeaderboardEntry {
+    rank: number;
+    userId: number;
+    username: string;
+    figure: string;
+    score: number;
+    wins: number;
+    gamesPlayed: number;
+    hits: number;
+    kos: number;
+}
+
+interface MatchHistoryItem {
+    id: number;
+    match_id: number;
+    map_name: string;
+    winner_team: string;
+    blue_score: number;
+    red_score: number;
+    team: string;
+    hits: number;
+    kos: number;
+    score: number;
+    is_mvp_ko: number;
+    is_mvp_hits: number;
+    reward_credits: number;
+    reward_duckets: number;
+    created_at: number;
+}
+
+interface PlayerStatsSummary {
+    total_score: number;
+    weekly_score: number;
+    games_played: number;
+    wins: number;
+    losses: number;
+    total_hits: number;
+    total_kos: number;
+    total_throws: number;
+}
+
 export const SnowStormLobbyView: FC<{}> = () => {
-    const { isSnowStormLobbyVisible, setIsSnowStormLobbyVisible, setIsVisible, selectedGame, accountStatus, setGameURL } = useGameCenter();
-    const [remainingGames, setRemainingGames] = useState<number>(() => {
-        const saved = sessionStorage.getItem('snowstorm_games_left');
-        return saved !== null ? parseInt(saved, 10) : 30;
-    });
+    const {
+        isSnowStormLobbyVisible,
+        setIsSnowStormLobbyVisible,
+        setIsVisible,
+        setIsSnowStormPlaying,
+        selectedGame,
+        accountStatus
+    } = useGameCenter();
+
+    const [remainingGames, setRemainingGames] = useState<number>(5);
+    const [hasUnlimited, setHasUnlimited] = useState<boolean>(false);
+    const [penaltySeconds, setPenaltySeconds] = useState<number>(0);
+    const [playerStats, setPlayerStats] = useState<PlayerStatsSummary | null>(null);
+    const [userCredits, setUserCredits] = useState<number | null>(null);
+    const [isStarting, setIsStarting] = useState<boolean>(false);
 
     const [selectedPack, setSelectedPack] = useState<10 | 100 | 300 | null>(null);
     const [isBuyConfirmOpen, setIsBuyConfirmOpen] = useState<boolean>(false);
+    const [isBuying, setIsBuying] = useState<boolean>(false);
     const [isHowToPlayOpen, setIsHowToPlayOpen] = useState<boolean>(false);
     const [isLeaderboardOpen, setIsLeaderboardOpen] = useState<boolean>(false);
+    const [lbTab, setLbTab] = useState<'week' | 'all' | 'friends' | 'history'>('week');
+    const [lbEntries, setLbEntries] = useState<LeaderboardEntry[]>([]);
+    const [historyMatches, setHistoryMatches] = useState<MatchHistoryItem[]>([]);
+    const [lbLoading, setLbLoading] = useState<boolean>(false);
     const [toastMsg, setToastMsg] = useState<string | null>(null);
+    const [toastError, setToastError] = useState<boolean>(false);
 
-    const showToast = (msg: string) => {
+    const showToast = (msg: string, isError = false) => {
+        setToastError(isError);
         setToastMsg(msg);
-        setTimeout(() => setToastMsg(null), 2500);
+        setTimeout(() => setToastMsg(null), 3200);
     };
+
+    const fetchStatus = useCallback(async () => {
+        try {
+            const res = await fetch('/api/games/snowstorm/status', { credentials: 'include' });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data && data.success) {
+                setRemainingGames(data.games_left ?? 5);
+                setHasUnlimited(!!data.has_unlimited);
+                setPenaltySeconds(data.leave_penalty_seconds ?? 0);
+                setPlayerStats(data.stats || null);
+                if (data.user && typeof data.user.credits === 'number') {
+                    setUserCredits(data.user.credits);
+                }
+            }
+        } catch {
+            // Keep defaults on transient error
+        }
+    }, []);
+
+    const fetchLeaderboard = useCallback(async (tab: 'week' | 'all' | 'friends' | 'history') => {
+        setLbLoading(true);
+        try {
+            if (tab === 'history') {
+                const res = await fetch('/api/games/snowstorm/history', { credentials: 'include' });
+                const data = await res.json();
+                setHistoryMatches(data?.matches || []);
+            } else {
+                const period = tab === 'all' ? 'all' : 'week';
+                const scope = tab === 'friends' ? 'friends' : 'global';
+                const res = await fetch(`/api/games/snowstorm/leaderboard?period=${period}&scope=${scope}`, { credentials: 'include' });
+                const data = await res.json();
+                setLbEntries(data?.entries || []);
+            }
+        } catch {
+            setLbEntries([]);
+            setHistoryMatches([]);
+        } finally {
+            setLbLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
         if (isSnowStormLobbyVisible) {
             const gameId = selectedGame ? selectedGame.gameId : 0;
             SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(gameId));
+            fetchStatus();
         }
-    }, [isSnowStormLobbyVisible, selectedGame]);
+    }, [isSnowStormLobbyVisible, selectedGame, fetchStatus]);
 
     useEffect(() => {
-        if (!accountStatus) return;
+        if (penaltySeconds <= 0) return;
+        const timer = setInterval(() => {
+            setPenaltySeconds(prev => (prev > 1 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [penaltySeconds]);
 
-        if (!accountStatus.hasUnlimitedGames && accountStatus.freeGamesLeft !== undefined && accountStatus.freeGamesLeft !== null && accountStatus.freeGamesLeft >= 0) {
-            setRemainingGames(accountStatus.freeGamesLeft);
-            sessionStorage.setItem('snowstorm_games_left', accountStatus.freeGamesLeft.toString());
+    useEffect(() => {
+        if (isLeaderboardOpen) {
+            fetchLeaderboard(lbTab);
         }
-    }, [accountStatus]);
+    }, [isLeaderboardOpen, lbTab, fetchLeaderboard]);
 
     if (!isSnowStormLobbyVisible) return null;
 
@@ -49,26 +155,50 @@ export const SnowStormLobbyView: FC<{}> = () => {
         setIsSnowStormLobbyVisible(false);
     };
 
-    const onPlayNow = () => {
-        setRemainingGames(prev => {
-            const next = Math.max(0, prev - 1);
-            sessionStorage.setItem('snowstorm_games_left', next.toString());
-            return next;
-        });
+    const onPlayNow = async () => {
+        if (isStarting) return;
+        if (penaltySeconds > 0) {
+            const mins = Math.floor(penaltySeconds / 60);
+            const secs = String(penaltySeconds % 60).padStart(2, '0');
+            showToast(`Penalización activa: espera ${mins}:${secs} para volver a jugar.`, true);
+            return;
+        }
 
-        const gameId = selectedGame ? selectedGame.gameId : 0;
-        SendMessageComposer(new JoinQueueMessageComposer(gameId));
+        setIsStarting(true);
+        try {
+            const res = await fetch('/api/games/snowstorm/start', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success) {
+                if (data.penalty_seconds) setPenaltySeconds(data.penalty_seconds);
+                showToast(data.error || 'No se pudo iniciar SnowStorm.', true);
+                setIsStarting(false);
+                return;
+            }
 
-        setIsSnowStormLobbyVisible(false);
-        setIsVisible(false);
-        setGameURL('/games/snowstorm/index.html');
+            if (typeof data.games_left === 'number') setRemainingGames(data.games_left);
+
+            const gameId = selectedGame ? selectedGame.gameId : 0;
+            SendMessageComposer(new JoinQueueMessageComposer(gameId));
+
+            setIsSnowStormLobbyVisible(false);
+            setIsVisible(false);
+            setIsSnowStormPlaying(true);
+        } catch {
+            showToast('Error de conexión con el servidor de SnowStorm.', true);
+        } finally {
+            setIsStarting(false);
+        }
     };
 
-    const onHowToPlay = () => {
-        setIsHowToPlayOpen(true);
-    };
+    const onHowToPlay = () => setIsHowToPlayOpen(true);
 
     const onLeaderboard = () => {
+        setLbTab('week');
         setIsLeaderboardOpen(true);
     };
 
@@ -82,25 +212,44 @@ export const SnowStormLobbyView: FC<{}> = () => {
         setIsBuyConfirmOpen(true);
     };
 
-    const onConfirmBuy = () => {
-        if (!selectedPack) return;
-
-        setRemainingGames(prev => {
-            const next = prev + selectedPack;
-            sessionStorage.setItem('snowstorm_games_left', next.toString());
-            return next;
-        });
-
-        showToast(`✓ ¡Has adquirido +${selectedPack} partidas!`);
-        setIsBuyConfirmOpen(false);
+    const onConfirmBuy = async () => {
+        if (!selectedPack || isBuying) return;
+        setIsBuying(true);
+        try {
+            const res = await fetch('/api/games/snowstorm/buy-pack', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pack: selectedPack })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success) {
+                showToast(data.error || 'Créditos insuficientes.', true);
+            } else {
+                setRemainingGames(data.games_left);
+                if (typeof data.credits === 'number') setUserCredits(data.credits);
+                showToast(`✓ ¡Has adquirido +${selectedPack} partidas!`);
+            }
+        } catch {
+            showToast('Error al procesar la compra.', true);
+        } finally {
+            setIsBuying(false);
+            setIsBuyConfirmOpen(false);
+        }
     };
 
-    const displayGames = (accountStatus && accountStatus.hasUnlimitedGames) ? '∞' : remainingGames;
+    const displayGames = (hasUnlimited || (accountStatus && accountStatus.hasUnlimitedGames)) ? '∞' : remainingGames;
 
     const packPrices: Record<number, number> = {
         10: 5,
         100: 30,
         300: 70
+    };
+
+    const formatTime = (sec: number) => {
+        const m = Math.floor(sec / 60);
+        const s = String(sec % 60).padStart(2, '0');
+        return `${m}:${s}`;
     };
 
     return (
@@ -127,7 +276,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         cursor: 'default'
                     }}
                 >
-                    {/* Barra superior de arrastre exclusiva (28px de alto) */}
+                    {/* Barra superior de arrastre */}
                     <div
                         className="drag-handler"
                         style={{
@@ -141,7 +290,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         }}
                     />
 
-                    {/* Botón cerrar X superior derecho: sprite original de 2012 (19x20) */}
+                    {/* Botón cerrar X superior derecho */}
                     <div
                         className="snowstorm-lobby-close-btn"
                         onClick={onClose}
@@ -165,29 +314,57 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         onMouseUp={e => (e.currentTarget.style.backgroundImage = `url(${CloseUbuntuHoverImg})`)}
                     />
 
-                    {/* Toast de confirmación dentro del lobby */}
+                    {/* Toast dentro del lobby */}
                     {toastMsg && (
                         <div
                             style={{
                                 position: 'absolute',
-                                top: '40px',
+                                top: '38px',
                                 left: '50%',
                                 transform: 'translateX(-50%)',
-                                background: '#00d9cb',
-                                color: '#000000',
+                                background: toastError ? '#dc2626' : '#00d9cb',
+                                color: toastError ? '#ffffff' : '#000000',
                                 fontWeight: 'bold',
-                                padding: '4px 14px',
+                                padding: '5px 14px',
                                 borderRadius: '4px',
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
                                 zIndex: 40,
-                                fontSize: '12px'
+                                fontSize: '11.5px',
+                                whiteSpace: 'nowrap',
+                                maxWidth: '380px',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
                             }}
                         >
                             {toastMsg}
                         </div>
                     )}
 
-                    {/* Subtítulo dinámico con 'Habbtens' */}
+                    {/* Aviso oficial de penalización de 2 minutos por abandonar partida */}
+                    {penaltySeconds > 0 && (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '42px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                background: 'rgba(185, 28, 28, 0.94)',
+                                color: '#ffffff',
+                                border: '1px solid #fecaca',
+                                borderRadius: '5px',
+                                padding: '4px 12px',
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                zIndex: 35,
+                                whiteSpace: 'nowrap',
+                                boxShadow: '0 3px 10px rgba(0,0,0,0.45)'
+                            }}
+                        >
+                            ⏱ Espera {formatTime(penaltySeconds)} (penalización por abandono)
+                        </div>
+                    )}
+
+                    {/* Subtítulo dinámico */}
                     <div
                         style={{
                             position: 'absolute',
@@ -195,7 +372,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                             left: '0px',
                             width: '410px',
                             textAlign: 'center',
-                            fontFamily: '\'Ubuntu2012\', \'Ubuntu\', Tahoma, sans-serif',
+                            fontFamily: "'Ubuntu2012', 'Ubuntu', Tahoma, sans-serif",
                             fontSize: '12px',
                             color: '#14729f',
                             lineHeight: '1.28',
@@ -207,7 +384,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         épicas batallas de bolas de nieve!
                     </div>
 
-                    {/* Enlace Cómo jugar: ubicado exactamente sobre el texto (y=316..334) con hover retro sutil */}
+                    {/* Enlace Cómo jugar */}
                     <div
                         onClick={onHowToPlay}
                         title="Cómo jugar a SnowStorm"
@@ -222,18 +399,14 @@ export const SnowStormLobbyView: FC<{}> = () => {
                             borderRadius: '3px',
                             transition: 'background-color 0.12s ease'
                         }}
-                        onMouseEnter={e => {
-                            e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.16)';
-                        }}
-                        onMouseLeave={e => {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.16)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                     />
 
-                    {/* Enlace Clasificación: ubicado exactamente sobre el texto (y=351..368) con hover retro sutil */}
+                    {/* Enlace Clasificación */}
                     <div
                         onClick={onLeaderboard}
-                        title="Ver Clasificación de SnowStorm"
+                        title="Ver Clasificación e Historial de SnowStorm"
                         style={{
                             position: 'absolute',
                             top: '351px',
@@ -245,15 +418,11 @@ export const SnowStormLobbyView: FC<{}> = () => {
                             borderRadius: '3px',
                             transition: 'background-color 0.12s ease'
                         }}
-                        onMouseEnter={e => {
-                            e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.16)';
-                        }}
-                        onMouseLeave={e => {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
+                        onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(0, 168, 255, 0.16)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                     />
 
-                    {/* Contador numérico de partidas restantes: exactamente a 153px para 1 espacio natural tras el ':' (x=145) */}
+                    {/* Contador real de partidas restantes */}
                     <div
                         style={{
                             position: 'absolute',
@@ -263,7 +432,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                             lineHeight: '1',
                             display: 'flex',
                             alignItems: 'center',
-                            fontFamily: '\'Ubuntu2012\', \'Ubuntu\', Tahoma, sans-serif',
+                            fontFamily: "'Ubuntu2012', 'Ubuntu', Tahoma, sans-serif",
                             fontSize: '14px',
                             fontWeight: 'bold',
                             color: '#ffffff',
@@ -277,10 +446,10 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         {displayGames}
                     </div>
 
-                    {/* Enlace Logra juegos extras con HC */}
+                    {/* Enlace Club HC */}
                     <div
                         onClick={onGetHc}
-                        title="Obtener más partidas con el Club HC"
+                        title="Obtener partidas ilimitadas con el Club HC"
                         style={{
                             position: 'absolute',
                             top: '404px',
@@ -298,7 +467,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
-                    {/* Botón comprar +10: alineación exacta al píxel (y=451..512, x=13..64) */}
+                    {/* Botón comprar +10 */}
                     <div
                         onClick={() => onSelectPack(10)}
                         title="Comprar +10 partidas (5 créditos)"
@@ -320,7 +489,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
-                    {/* Botón comprar +100: alineación exacta al píxel (y=451..512, x=73..124) */}
+                    {/* Botón comprar +100 */}
                     <div
                         onClick={() => onSelectPack(100)}
                         title="Comprar +100 partidas (30 créditos)"
@@ -342,7 +511,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
-                    {/* Botón comprar +300: alineación exacta al píxel (y=451..512, x=133..184) */}
+                    {/* Botón comprar +300 */}
                     <div
                         onClick={() => onSelectPack(300)}
                         title="Comprar +300 partidas (70 créditos)"
@@ -364,47 +533,49 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
 
-                    {/* Gran botón verde: ¡Jugar ahora! (y=464..512, x=206..395) */}
+                    {/* Gran botón verde: ¡Jugar ahora! */}
                     <div
                         onClick={onPlayNow}
-                        title="¡Entrar en la batalla de SnowStorm!"
+                        title={penaltySeconds > 0 ? `Espera ${formatTime(penaltySeconds)}` : '¡Entrar en la batalla de SnowStorm!'}
                         style={{
                             position: 'absolute',
                             top: '464px',
                             left: '206px',
                             width: '189px',
                             height: '48px',
-                            cursor: 'pointer',
+                            cursor: penaltySeconds > 0 || isStarting ? 'not-allowed' : 'pointer',
                             zIndex: 8,
                             borderRadius: '6px',
+                            backgroundColor: penaltySeconds > 0 ? 'rgba(0, 0, 0, 0.35)' : 'transparent',
                             transition: 'filter 0.1s ease, transform 0.05s ease'
                         }}
-                        onMouseEnter={e => (e.currentTarget.style.filter = 'brightness(1.12)')}
+                        onMouseEnter={e => { if (penaltySeconds <= 0) e.currentTarget.style.filter = 'brightness(1.12)'; }}
                         onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
-                        onMouseDown={e => { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.filter = 'brightness(0.85)'; }}
+                        onMouseDown={e => { if (penaltySeconds <= 0) { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.filter = 'brightness(0.85)'; } }}
                         onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
                 </div>
             </DraggableWindow>
 
-            {/* Ventana Habbten Retro Illumina: Confirmación de compra de partidas */}
+            {/* Confirmación de compra real de partidas */}
             {isBuyConfirmOpen && selectedPack && (
-                <NitroCardView uniqueKey="snowstorm-buy-games" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '330px', zIndex: 1100 }}>
+                <NitroCardView uniqueKey="snowstorm-buy-games" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '340px', zIndex: 1100 }}>
                     <NitroCardHeaderView headerText={LocalizeText('snowwar.buy_more_games') || 'Compra más partidas'} onCloseClick={() => setIsBuyConfirmOpen(false)} />
                     <NitroCardContentView className="p-3">
                         <Column gap={2} alignItems="center">
                             <Text bold center style={{ fontSize: '13px' }}>
-                                Pack de +{selectedPack} partidas
+                                Pack de +{selectedPack} partidas de SnowStorm
                             </Text>
-                            <Text center style={{ fontSize: '13px', color: '#1e293b' }}>
-                                ¿Deseas adquirir este paquete de partidas por <strong className="text-dark">{packPrices[selectedPack]} créditos</strong>?
+                            <Text center style={{ fontSize: '12.5px', color: '#1e293b' }}>
+                                ¿Deseas adquirir este paquete por <strong className="text-dark">{packPrices[selectedPack]} créditos</strong>?
+                                {userCredits !== null && <><br /><span style={{ color: '#475569' }}>Tu saldo actual: {userCredits} créditos</span></>}
                             </Text>
                             <hr className="w-100 my-1 bg-secondary" />
                             <Flex gap={2} fullWidth justifyContent="center">
-                                <Button fullWidth variant="success" onClick={onConfirmBuy}>
-                                    {LocalizeText('catalog.purchase_confirmation.buy') || 'Comprar'}
+                                <Button fullWidth variant="success" disabled={isBuying} onClick={onConfirmBuy}>
+                                    {isBuying ? 'Comprando...' : (LocalizeText('catalog.purchase_confirmation.buy') || 'Comprar')}
                                 </Button>
-                                <Button fullWidth variant="secondary" onClick={() => setIsBuyConfirmOpen(false)}>
+                                <Button fullWidth variant="secondary" disabled={isBuying} onClick={() => setIsBuyConfirmOpen(false)}>
                                     {LocalizeText('cancel') || 'Cancelar'}
                                 </Button>
                             </Flex>
@@ -413,21 +584,22 @@ export const SnowStormLobbyView: FC<{}> = () => {
                 </NitroCardView>
             )}
 
-            {/* Ventana Habbten Retro Illumina: Cómo jugar a SnowStorm con textos oficiales */}
+            {/* Cómo jugar a SnowStorm */}
             {isHowToPlayOpen && (
-                <NitroCardView uniqueKey="snowstorm-howto" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '390px', zIndex: 1100 }}>
+                <NitroCardView uniqueKey="snowstorm-howto" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '410px', zIndex: 1100 }}>
                     <NitroCardHeaderView headerText={LocalizeText('snowwar.instructions.link') || 'Cómo jugar a SnowStorm'} onCloseClick={() => setIsHowToPlayOpen(false)} />
                     <NitroCardContentView className="p-3">
                         <Column gap={2}>
                             <Text bold>{LocalizeText('gamecenter.snowwar.description_title') || '¡Ataca o te atacarán!'}</Text>
-                            <Text small>{LocalizeText('gamecenter.snowwar.description_content') || 'Juega rápido y mantén la cabeza fría: ataca o te atacarán. Cuando empiecen a volar las bolas de nieve, ¡solo un equipo ganará!'}</Text>
+                            <Text small>{LocalizeText('gamecenter.snowwar.description_content') || 'Juega rápido y mantén la cabeza fría: lanza bolas de nieve al equipo rival, consigue K.O.s y gana recompensas y placas oficiales.'}</Text>
                             <hr className="my-1 bg-secondary" />
                             <Column gap={1}>
-                                <Text small>• {LocalizeText('snowwar.instructions.1') || 'Haz clic en las casillas vacías para moverte hacia ellas.'}</Text>
-                                <Text small>• {LocalizeText('snowwar.instructions.2') || 'Haz clic sobre un rival para lanzarle una bola de nieve.'}</Text>
-                                <Text small>• {LocalizeText('snowwar.instructions.3') || "Mantén pulsado 'SHIFT' para lanzar una bola a una casilla vacía."}</Text>
-                                <Text small>• {LocalizeText('snowwar.instructions.4') || "Mantén pulsado 'ALT' para lanzar una bola por encima de obstáculos."}</Text>
-                                <Text small>• {LocalizeText('snowwar.instructions.5') || 'Cuentas con limitadas bolas de nieve. Crea nuevas con el botón verde.'}</Text>
+                                <Text small>• <b>Clic en el suelo</b> (o W A S D / Flechas): moverte por la arena.</Text>
+                                <Text small>• <b>Clic sobre un rival</b>: lanzarle una bola de nieve directa.</Text>
+                                <Text small>• <b>SHIFT + Clic</b>: lanzar una bola a una casilla vacía (tiro adelantado).</Text>
+                                <Text small>• <b>ALT + Clic</b> (o clic derecho): lanzamiento alto por encima de árboles y muros.</Text>
+                                <Text small>• <b>Espacio / Botón verde</b>: agacharte para fabricar bolas (máx. 5) o acércate a la <b>Máquina de Nieve</b> central para recargar al instante.</Text>
+                                <Text small>• <b>Puntuación oficial:</b> +1 punto por impacto, +5 puntos extra por K.O. (5 golpes). ¡Cada partida otorga Duckets, Créditos y progreso de logros!</Text>
                             </Column>
                             <Button fullWidth variant="primary" className="mt-2" onClick={() => setIsHowToPlayOpen(false)}>
                                 {LocalizeText('snowwar.instructions.back') || 'Atrás'}
@@ -437,87 +609,170 @@ export const SnowStormLobbyView: FC<{}> = () => {
                 </NitroCardView>
             )}
 
-            {/* Ventana Habbten Retro Illumina: Clasificación de SnowStorm */}
+            {/* Clasificación Real & Historial de SnowStorm (Estilo Habbo Official Leaderboard) */}
             {isLeaderboardOpen && (
-                <NitroCardView uniqueKey="snowstorm-leaderboard" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '380px', zIndex: 1100 }}>
+                <NitroCardView uniqueKey="snowstorm-leaderboard" theme="primary-slim" windowPosition={DraggableWindowPosition.CENTER} style={{ width: '440px', zIndex: 1100 }}>
                     <NitroCardHeaderView headerText={LocalizeText('snowwar.leaderboards.link') || 'Clasificación de SnowStorm'} onCloseClick={() => setIsLeaderboardOpen(false)} />
-                    <NitroCardContentView className="p-3">
+                    <NitroCardContentView className="p-3" style={{ background: 'linear-gradient(180deg, #e7f5fc 0%, #d4eefb 100%)' }}>
                         <Column gap={2}>
-                            <Flex alignItems="center" justifyContent="between">
-                                <Text bold style={{ fontSize: '14px', color: '#1a567c' }}>
-                                    {LocalizeText('snowwar.leaderboard.this_week') || 'Esta semana'}
-                                </Text>
-                                <Text small bold className="text-secondary">Top Jugadores de Habbten</Text>
+                            {/* Tabs oficiales */}
+                            <Flex gap={1} fullWidth>
+                                {([
+                                    ['week', 'Esta semana'],
+                                    ['all', 'Histórico'],
+                                    ['friends', 'Amigos'],
+                                    ['history', 'Mis partidas']
+                                ] as const).map(([key, label]) => (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => setLbTab(key)}
+                                        style={{
+                                            flex: 1,
+                                            padding: '5px 6px',
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            borderRadius: '4px',
+                                            border: '1px solid #0e4a69',
+                                            cursor: 'pointer',
+                                            background: lbTab === key ? '#ffffff' : '#2d3748',
+                                            color: lbTab === key ? '#0b4a6f' : '#ffffff',
+                                            boxShadow: lbTab === key ? 'inset 0 2px 0 #bfe7fb' : 'none'
+                                        }}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
                             </Flex>
-                            <div className="table-responsive" style={{ border: '1px solid #c7d2d9', borderRadius: '4px', overflow: 'hidden' }}>
-                                <table className="table table-sm table-striped m-0" style={{ fontSize: '12px', fontFamily: '\'Ubuntu2012\', \'Ubuntu\', Tahoma, sans-serif' }}>
-                                    <thead style={{ background: '#e2ebf0', borderBottom: '2px solid #b1c6d3' }}>
-                                        <tr>
-                                            <th style={{ width: '42px', padding: '6px 10px', textAlign: 'center' }}>#</th>
-                                            <th style={{ padding: '6px 10px' }}>Habbten</th>
-                                            <th className="text-end" style={{ padding: '6px 10px', width: '85px' }}>Puntos</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                <strong style={{ color: '#b45309' }}>1.</strong>
-                                            </td>
-                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                <strong>Vixis</strong>
-                                            </td>
-                                            <td className="text-end fw-bold text-success" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                1.480
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                <strong style={{ color: '#475569' }}>2.</strong>
-                                            </td>
-                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                <strong>SnowMaster</strong>
-                                            </td>
-                                            <td className="text-end fw-bold" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                1.210
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                <strong style={{ color: '#92400e' }}>3.</strong>
-                                            </td>
-                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                <strong>Frosty</strong>
-                                            </td>
-                                            <td className="text-end fw-bold" style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                970
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                <span className="fw-bold" style={{ color: '#64748b' }}>4.</span>
-                                            </td>
-                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                Blizzard
-                                            </td>
-                                            <td className="text-end fw-semibold" style={{ padding: '6px 10px', verticalAlign: 'middle', color: '#64748b' }}>
-                                                840
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style={{ padding: '6px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
-                                                <span className="fw-bold" style={{ color: '#64748b' }}>5.</span>
-                                            </td>
-                                            <td style={{ padding: '6px 10px', verticalAlign: 'middle' }}>
-                                                IceKing
-                                            </td>
-                                            <td className="text-end fw-semibold" style={{ padding: '6px 10px', verticalAlign: 'middle', color: '#64748b' }}>
-                                                720
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+
+                            {/* Resumen personal */}
+                            {playerStats && (
+                                <Flex justifyContent="between" alignItems="center" style={{ background: 'rgba(255,255,255,0.85)', border: '1px solid #a6cde0', borderRadius: '5px', padding: '5px 10px', fontSize: '11px', color: '#0f4c6e' }}>
+                                    <span><b>Semana:</b> {playerStats.weekly_score} pts</span>
+                                    <span><b>Victorias:</b> {playerStats.wins}/{playerStats.games_played}</span>
+                                    <span><b>Impactos:</b> {playerStats.total_hits}</span>
+                                    <span><b>K.O.s:</b> {playerStats.total_kos}</span>
+                                </Flex>
+                            )}
+
+                            {/* Tabla con marca de agua oficial de SnowStorm */}
+                            <div
+                                style={{
+                                    position: 'relative',
+                                    background: 'rgba(255, 255, 255, 0.9)',
+                                    border: '1px solid #9dc8df',
+                                    borderRadius: '6px',
+                                    minHeight: '250px',
+                                    maxHeight: '300px',
+                                    overflowY: 'auto'
+                                }}
+                            >
+                                <img
+                                    src={SnowStormLogoImg}
+                                    alt=""
+                                    style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: '260px',
+                                        height: 'auto',
+                                        maxWidth: '84%',
+                                        objectFit: 'contain',
+                                        imageRendering: 'pixelated',
+                                        opacity: 0.12,
+                                        pointerEvents: 'none'
+                                    }}
+                                />
+
+                                {lbLoading ? (
+                                    <div style={{ padding: '48px 16px', textAlign: 'center', fontSize: '12px', color: '#475569' }}>
+                                        Cargando registros de SnowStorm...
+                                    </div>
+                                ) : lbTab === 'history' ? (
+                                    historyMatches.length === 0 ? (
+                                        <div style={{ padding: '48px 16px', textAlign: 'center', fontSize: '12px', color: '#475569' }}>
+                                            Aún no has completado partidas de SnowStorm. ¡Juega una para registrar tus récords y recompensas!
+                                        </div>
+                                    ) : (
+                                        <table className="table table-sm m-0" style={{ fontSize: '11.5px', position: 'relative', zIndex: 2 }}>
+                                            <thead style={{ background: '#d7eef9', color: '#0c4a6e' }}>
+                                                <tr>
+                                                    <th style={{ padding: '5px 8px' }}>Arena</th>
+                                                    <th style={{ padding: '5px 6px', textAlign: 'center' }}>Resultado</th>
+                                                    <th style={{ padding: '5px 6px', textAlign: 'center' }}>Pts</th>
+                                                    <th style={{ padding: '5px 8px', textAlign: 'right' }}>Recompensa</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {historyMatches.map(m => {
+                                                    const won = m.winner_team === m.team;
+                                                    const draw = m.winner_team === 'draw';
+                                                    return (
+                                                        <tr key={m.id}>
+                                                            <td style={{ padding: '5px 8px' }}>
+                                                                <b>{m.map_name}</b>
+                                                                <div style={{ fontSize: '10px', color: '#64748b' }}>
+                                                                    {m.hits} imp · {m.kos} K.O.
+                                                                </div>
+                                                            </td>
+                                                            <td style={{ padding: '5px 6px', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                                <span style={{
+                                                                    fontWeight: 800,
+                                                                    fontSize: '10.5px',
+                                                                    color: won ? '#15803d' : (draw ? '#b45309' : '#b91c1c')
+                                                                }}>
+                                                                    {won ? 'VICTORIA' : (draw ? 'EMPATE' : 'DERROTA')} ({m.blue_score}-{m.red_score})
+                                                                </span>
+                                                            </td>
+                                                            <td style={{ padding: '5px 6px', textAlign: 'center', verticalAlign: 'middle', fontWeight: 800, color: '#0284c7' }}>
+                                                                {m.score}
+                                                            </td>
+                                                            <td style={{ padding: '5px 8px', textAlign: 'right', verticalAlign: 'middle', fontSize: '10.5px', fontWeight: 700, color: '#0f766e' }}>
+                                                                +{m.reward_duckets}D{m.reward_credits > 0 ? ` +${m.reward_credits}C` : ''}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    )
+                                ) : lbEntries.length === 0 ? (
+                                    <div style={{ padding: '48px 16px', textAlign: 'center', fontSize: '12px', color: '#475569' }}>
+                                        {lbTab === 'friends'
+                                            ? 'Ninguno de tus amigos ha jugado esta semana todavía.'
+                                            : '¡Sé el primero en marcar un récord en SnowStorm esta semana!'}
+                                    </div>
+                                ) : (
+                                    <table className="table table-sm m-0" style={{ fontSize: '12px', position: 'relative', zIndex: 2 }}>
+                                        <tbody>
+                                            {lbEntries.map(entry => (
+                                                <tr key={entry.userId} style={{ borderBottom: '1px solid #e2f0f8' }}>
+                                                    <td style={{ width: '34px', textAlign: 'center', verticalAlign: 'middle', fontWeight: 800, color: entry.rank === 1 ? '#d97706' : '#0369a1' }}>
+                                                        {entry.rank}
+                                                    </td>
+                                                    <td style={{ width: '42px', padding: '3px 4px', verticalAlign: 'middle' }}>
+                                                        <div style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                            <HabboHeadImg figure={entry.figure} direction={2} size={34} />
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ verticalAlign: 'middle' }}>
+                                                        <div style={{ fontWeight: 700, color: '#0c4a6e' }}>{entry.username}</div>
+                                                        <div style={{ fontSize: '10px', color: '#64748b' }}>
+                                                            {entry.wins} victorias · {entry.hits} impactos · {entry.kos} K.O.s
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ width: '78px', textAlign: 'right', verticalAlign: 'middle', paddingRight: '10px', fontWeight: 900, fontSize: '13.5px', color: '#0284c7' }}>
+                                                        {entry.score.toLocaleString('es-ES')}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                )}
                             </div>
-                            <Button fullWidth variant="secondary" className="mt-2" onClick={() => setIsLeaderboardOpen(false)}>
+
+                            <Button fullWidth variant="secondary" onClick={() => setIsLeaderboardOpen(false)}>
                                 {LocalizeText('generic.close') || 'Cerrar'}
                             </Button>
                         </Column>

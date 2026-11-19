@@ -1037,6 +1037,50 @@ body[data-era="flash2012"] {
                                 max-width: 225px !important;
                                 gap: 6px !important;
                                 justify-content: space-between !important;
+
+                                &.friend-bar-playing-game {
+                                    height: auto !important;
+                                    flex-direction: column !important;
+                                    align-items: stretch !important;
+                                    justify-content: flex-start !important;
+                                    padding: 6px 10px 6px 10px !important;
+                                    margin-bottom: 66px !important;
+                                    min-width: 176px !important;
+                                    max-width: 210px !important;
+
+                                    > .text-truncate {
+                                        padding-left: 34px !important;
+                                        text-align: center !important;
+                                    }
+
+                                    .friend-bar-playing-band {
+                                        margin: 4px -10px 4px -10px !important;
+                                        padding: 4px 10px !important;
+                                        background: #485420 !important;
+                                        border-top: 1px solid #353f16 !important;
+                                        border-bottom: 1px solid #353f16 !important;
+
+                                        .friend-bar-playing-sub {
+                                            font-style: italic !important;
+                                            font-weight: 400 !important;
+                                            font-size: 11px !important;
+                                            color: #eef5d8 !important;
+                                            text-shadow: none !important;
+                                        }
+
+                                        .friend-bar-playing-title {
+                                            font-weight: 800 !important;
+                                            font-size: 12px !important;
+                                            color: #ffffff !important;
+                                            letter-spacing: 0.4px !important;
+                                        }
+                                    }
+
+                                    .friend-bar-actions-row {
+                                        justify-content: space-around !important;
+                                        padding-top: 2px !important;
+                                    }
+                                }
                             }
 
                             // 2012 Friend Action Icons (Chat, Follow, Profile)
