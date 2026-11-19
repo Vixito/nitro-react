@@ -8,6 +8,10 @@ import creditIconImg from '../../../assets/images/eras/flash2012/purse/credit_ic
 import ducketIconImg from '../../../assets/images/eras/flash2012/purse/ducket_icon.png';
 import swCloseBtnImg from '../../../assets/images/eras/shockwave_v14/close_button_up.png';
 import clubClipboardImg from '../../../assets/images/eras/shockwave_v14/club_clipboard.png';
+import bbArena0WideImg from '../../../assets/images/gamecenter/battleball/bb_arena_0_wide.png';
+import bbArena2WideImg from '../../../assets/images/gamecenter/battleball/bb_arena_2_wide.png';
+import bbArena3WideImg from '../../../assets/images/gamecenter/battleball/bb_arena_3_wide.png';
+import bbArena4WideImg from '../../../assets/images/gamecenter/battleball/bb_arena_4_wide.png';
 import bbArenaBackdropImg from '../../../assets/images/gamecenter/battleball/bb_arena_backdrop_wide.png';
 import hudExitHotelImg from '../../../assets/images/gamecenter/battleball/hud_exit_hotel.png';
 import hudHelpIconImg from '../../../assets/images/gamecenter/battleball/hud_help_icon.png';
@@ -159,60 +163,236 @@ interface FinishResp
 }
 
 // =============================================================================
-// PIXEL-EXACT OFFICIAL HABBO BATTLE BALL MOUNTAIN ARENA (Widescreen 1360x484)
-// Measured directly from bb_arena_backdrop_wide.png (PAD_L=200) with 0.0px error!
+// 5 PIXEL-EXACT OFFICIAL HABBO BATTLE BALL ARENAS (Widescreen 1120x484)
+// Measured directly from the 5 official Habbo Battle Ball screenshots (Bb.a.0..4)
 // =============================================================================
-const BG_W = 1360;
+const BG_W = 1120;
 const BG_H = 484;
 const TILE_W = 32;
 const TILE_H = 16;
-const ORIGIN_X = 589; // 389 + 200px seamless left wing
-const ORIGIN_Y = 88;
-const ARENA_CENTER_X = 592; // Visual center of the playable mountain cross!
 const MATCH_DURATION = 120; // 2:00 classic Battle Ball round
 const PRE_MATCH_SECONDS = 4;
 const YT_VIDEO_ID = 'hNqAvTN2B3s'; // Official Battle Ball track requested by user
 
+interface ArenaConfig
+{
+    id: number;
+    name: string;
+    backdropImg: string;
+    bgColor: string;
+    originX: number;
+    originY: number;
+    centerX: number;
+    rows: string[];
+    spawns: Record<Team, Array<[ number, number ]>>;
+}
+
+// Tile codes:
 // '.' = void, '0' = mid floor (z=0), '+' = upper plateau (z=+2), '-' = lower plateau (z=-2)
-// 'a' = stair z=+0.67, 'b' = stair z=+1.33, 'c' = stair z=-0.67, 'd' = stair z=-1.33
-const MOUNTAIN_ARENA_ROWS: string[] = [
-    '.............++++++......',
-    '.............++++++......',
-    '..00000000...++++++......',
-    '..00000000...++++++......',
-    '..00000000...bbbbbb......',
-    '..00000000...aaaaaa......',
-    '..000000000000000000.....',
-    '..000000000000000000cd---',
-    '..000000000000000000cd---',
-    '..000000000000000000cd---',
-    '......00000000000000cd---',
-    '......00000000000000cd---',
-    '......00000000000000cd---',
-    '++++ba00000000000000.....',
-    '++++ba00000000000000.....',
-    '++++ba00000000000000.....',
-    '++++ba000000000000000000.',
-    '++++ba000000000000000000.',
-    '++++ba000000000000000000.',
-    '......000000000000000000.',
-    '.......cccccc...00000000.',
-    '.......dddddd...00000000.',
-    '.......------...00000000.',
-    '.......------...00000000.',
-    '.......------............',
-    '.......------............'
+// '1' = raised floor (z=+1), 'n' = lowered floor (z=-1)
+// 's' = flat bridge/stairs (z=0), 'a' = stair z=+0.67, 'm' = stair z=+1.0, 'b' = stair z=+1.33,
+// 'c' = stair z=-0.67, 'd' = stair z=-1.33
+const ARENAS: ArenaConfig[] = [
+    {
+        id: 1,
+        name: 'Escenario Clásico',
+        backdropImg: bbArena0WideImg,
+        bgColor: '#000000',
+        originX: 560,
+        originY: 121,
+        centerX: 560,
+        rows: [
+            '....000000000000000....',
+            '....000000000000000....',
+            '....000000000000000....',
+            '....000000000000000....',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '00000000000000000000000',
+            '....000000000000000....',
+            '....000000000000000....',
+            '....000000000000000....',
+            '....000000000000000....'
+        ],
+        spawns: {
+            red: [ [ 1, 10 ], [ 2, 12 ] ],
+            blue: [ [ 10, 1 ], [ 12, 2 ] ],
+            green: [ [ 10, 20 ], [ 12, 21 ] ],
+            yellow: [ [ 20, 10 ], [ 21, 12 ] ]
+        }
+    },
+    {
+        id: 2,
+        name: 'En la cima de la montaña',
+        backdropImg: bbArenaBackdropImg,
+        bgColor: '#6faeca',
+        originX: 469,
+        originY: 88,
+        centerX: 472,
+        rows: [
+            '.............++++++......',
+            '.............++++++......',
+            '..00000000...++++++......',
+            '..00000000...++++++......',
+            '..00000000...bbbbbb......',
+            '..00000000...aaaaaa......',
+            '..000000000000000000.....',
+            '..000000000000000000cd---',
+            '..000000000000000000cd---',
+            '..000000000000000000cd---',
+            '......00000000000000cd---',
+            '......00000000000000cd---',
+            '......00000000000000cd---',
+            '++++ba00000000000000.....',
+            '++++ba00000000000000.....',
+            '++++ba00000000000000.....',
+            '++++ba000000000000000000.',
+            '++++ba000000000000000000.',
+            '++++ba000000000000000000.',
+            '......000000000000000000.',
+            '.......cccccc...00000000.',
+            '.......dddddd...00000000.',
+            '.......------...00000000.',
+            '.......------...00000000.',
+            '.......------............',
+            '.......------............'
+        ],
+        spawns: {
+            red: [ [ 1, 14 ], [ 2, 16 ] ],
+            blue: [ [ 15, 1 ], [ 17, 2 ] ],
+            green: [ [ 9, 23 ], [ 11, 24 ] ],
+            yellow: [ [ 22, 9 ], [ 23, 11 ] ]
+        }
+    },
+    {
+        id: 3,
+        name: 'Costa Soleada',
+        backdropImg: bbArena2WideImg,
+        bgColor: '#3782c4',
+        originX: 363,
+        originY: 110,
+        centerX: 465,
+        rows: [
+            '.......00000000...00000000......',
+            '.......00000000...00000000......',
+            '.......00000000...00000000......',
+            '.......00000000...00000000......',
+            '.......00000000sss00000000......',
+            '.......00000000sss00000000......',
+            '.......00000000...00000000aa1111',
+            '++++...00000000...00000000aa1111',
+            '++++...00000000...00000000aa1111',
+            '++++bma00000000...00000000..1111',
+            '++++bma00000000...00000000..1111',
+            '++++bma00000000...00000000..1111',
+            '++++...00000000...00000000......',
+            '.......00000000...00000000......',
+            '.......00000000sss00000000......',
+            '.......00000000sss00000000......',
+            '.......00000000...00000000......',
+            '.......00000000...00000000......',
+            '.......00000000...00000000......',
+            '.......00000000...00000000......'
+        ],
+        spawns: {
+            red: [ [ 1, 9 ], [ 2, 11 ] ],
+            blue: [ [ 10, 2 ], [ 12, 2 ] ],
+            green: [ [ 20, 17 ], [ 22, 17 ] ],
+            yellow: [ [ 29, 8 ], [ 30, 10 ] ]
+        }
+    },
+    {
+        id: 4,
+        name: 'Laberinto del Parque',
+        backdropImg: bbArena3WideImg,
+        bgColor: '#4a7a2c',
+        originX: 474,
+        originY: 78,
+        centerX: 485,
+        rows: [
+            '............0000.....',
+            '............0000.....',
+            '............0000.....',
+            '............0000.....',
+            '............ssss.....',
+            '............ssss.....',
+            '......0000000s0000000',
+            '......0000000s0000000',
+            '......0000000s0000000',
+            '......0000000s0000000',
+            '......0000..sss..0000',
+            '......0000saaaaas0000',
+            '0000ss0000sa111as0000',
+            '0000sssssssa111asssss',
+            '0000ss0000sa111as0000',
+            '0000ss0000saaaaas0000',
+            '......0000..sss..0000',
+            '......0000000s0000000',
+            '......0000000s0000000',
+            '......0000000s0000000',
+            '......0000000s0000000'
+        ],
+        spawns: {
+            red: [ [ 1, 13 ], [ 2, 14 ] ],
+            blue: [ [ 13, 1 ], [ 14, 2 ] ],
+            green: [ [ 8, 19 ], [ 10, 19 ] ],
+            yellow: [ [ 18, 18 ], [ 19, 19 ] ]
+        }
+    },
+    {
+        id: 5,
+        name: 'Biblioteca Gótica',
+        backdropImg: bbArena4WideImg,
+        bgColor: '#2c3034',
+        originX: 447,
+        originY: 99,
+        centerX: 485,
+        rows: [
+            '........000000000000..........',
+            '........000000000000..........',
+            '........000000000000..........',
+            '........000000000000..........',
+            '.....000000000000000..........',
+            '.....000000000000000..........',
+            '.ssss000000000000000ssss0000..',
+            '.ssss000000000000000ssss0000..',
+            '.ssss000000000000000ssss0000..',
+            '.ssss000000000000000ssss0000..',
+            '.sss0000000000000000...sssss..',
+            '00sss000000000000000...sssss..',
+            '0000.000000000000000...sssss..',
+            '0000.000000000000000...0000000',
+            '0000.000000000000000...0000000',
+            '0000.000000000000000...0000000',
+            '0000.000000000000000...0000000',
+            '0000..........................',
+            '0000..........................',
+            '0000..........................',
+            '00000000000000000000000.......',
+            '.0000000000000000000000.......',
+            '..000000000000000000000.......',
+            '...00000000000000000000.......'
+        ],
+        spawns: {
+            red: [ [ 1, 15 ], [ 2, 18 ] ],
+            blue: [ [ 12, 2 ], [ 15, 2 ] ],
+            green: [ [ 10, 21 ], [ 14, 22 ] ],
+            yellow: [ [ 25, 14 ], [ 27, 15 ] ]
+        }
+    }
 ];
-
-const GRID_W = MOUNTAIN_ARENA_ROWS[0].length; // 25
-const GRID_H = MOUNTAIN_ARENA_ROWS.length;    // 26
-
-const TEAM_SPAWNS: Record<Team, Array<[ number, number ]>> = {
-    red: [ [ 1, 14 ], [ 2, 16 ] ],       // Top-Left raised plateau
-    blue: [ [ 15, 1 ], [ 17, 2 ] ],      // Top-Right raised plateau
-    green: [ [ 9, 23 ], [ 11, 24 ] ],    // Bottom-Left lower plateau
-    yellow: [ [ 22, 9 ], [ 23, 11 ] ]    // Bottom-Right lower plateau
-};
 
 const TEAM_META: Record<Team, {
     label: string;
@@ -528,23 +708,29 @@ class BattleBallAudio
     }
 }
 
-function buildMountainTiles(): { tiles: TileState[][]; totalColorable: number }
+function buildArenaTiles(arena: ArenaConfig): { tiles: TileState[][]; totalColorable: number; gridW: number; gridH: number }
 {
     let totalColorable = 0;
+    const gridH = arena.rows.length;
+    const gridW = arena.rows[0].length;
     const tiles: TileState[][] = [];
-    for (let y = 0; y < GRID_H; y++)
+    for (let y = 0; y < gridH; y++)
     {
         const row: TileState[] = [];
-        for (let x = 0; x < GRID_W; x++)
+        for (let x = 0; x < gridW; x++)
         {
-            const ch = MOUNTAIN_ARENA_ROWS[y][x];
+            const ch = arena.rows[y][x];
             let walkable = false;
             let colorable = false;
             let z = 0;
             if (ch === '0') { walkable = true; colorable = true; z = 0; }
             else if (ch === '+') { walkable = true; colorable = true; z = 2; }
             else if (ch === '-') { walkable = true; colorable = true; z = -2; }
+            else if (ch === '1') { walkable = true; colorable = true; z = 1; }
+            else if (ch === 'n') { walkable = true; colorable = true; z = -1; }
+            else if (ch === 's') { walkable = true; colorable = false; z = 0; }
             else if (ch === 'a') { walkable = true; colorable = false; z = 0.67; }
+            else if (ch === 'm') { walkable = true; colorable = false; z = 1.0; }
             else if (ch === 'b') { walkable = true; colorable = false; z = 1.33; }
             else if (ch === 'c') { walkable = true; colorable = false; z = -0.67; }
             else if (ch === 'd') { walkable = true; colorable = false; z = -1.33; }
@@ -553,7 +739,7 @@ function buildMountainTiles(): { tiles: TileState[][]; totalColorable: number }
         }
         tiles.push(row);
     }
-    return { tiles, totalColorable };
+    return { tiles, totalColorable, gridW, gridH };
 }
 
 function findPathBFS(
@@ -564,11 +750,13 @@ function findPathBFS(
     ty: number
 ): Array<[ number, number ]>
 {
+    const gridH = tiles.length;
+    const gridW = tiles[0]?.length || 0;
     if (sx === tx && sy === ty) return [];
-    if (tx < 0 || ty < 0 || tx >= GRID_W || ty >= GRID_H || !tiles[ty][tx].walkable) return [];
+    if (tx < 0 || ty < 0 || tx >= gridW || ty >= gridH || !tiles[ty][tx].walkable) return [];
 
-    const visited: boolean[][] = Array.from({ length: GRID_H }, () => Array(GRID_W).fill(false));
-    const parent: Array<Array<[ number, number ] | null>> = Array.from({ length: GRID_H }, () => Array(GRID_W).fill(null));
+    const visited: boolean[][] = Array.from({ length: gridH }, () => Array(gridW).fill(false));
+    const parent: Array<Array<[ number, number ] | null>> = Array.from({ length: gridH }, () => Array(gridW).fill(null));
     const q: Array<[ number, number ]> = [ [ sx, sy ] ];
     visited[sy][sx] = true;
 
@@ -584,7 +772,7 @@ function findPathBFS(
         {
             const nx = cx + dx;
             const ny = cy + dy;
-            if (nx < 0 || ny < 0 || nx >= GRID_W || ny >= GRID_H || visited[ny][nx]) continue;
+            if (nx < 0 || ny < 0 || nx >= gridW || ny >= gridH || visited[ny][nx]) continue;
             const nt = tiles[ny][nx];
             if (!nt.walkable) continue;
             // Cannot jump straight off a 2-unit cliff; must use stairs (|dz| <= 1.0)
@@ -616,6 +804,7 @@ export const BattleBallGameView: FC = () =>
     const myFigure = session?.figure || 'hr-115-42.hd-195-19.ch-3030-82.lg-275-1408.sh-295-1321';
 
     const [ stage, setStage ] = useState<Stage>('lobby');
+    const [ arenaId, setArenaId ] = useState<number>(() => Math.floor(Math.random() * ARENAS.length) + 1);
     const [ preProgress, setPreProgress ] = useState<number>(0);
     const [ musicMuted, setMusicMuted ] = useState<boolean>(false);
     const [ sfxMuted, setSfxMuted ] = useState<boolean>(false);
@@ -660,6 +849,8 @@ export const BattleBallGameView: FC = () =>
         stunLeft: 0
     });
 
+    const activeArena = useMemo(() => ARENAS.find(a => a.id === arenaId) || ARENAS[0], [ arenaId ]);
+
     const roster: RosterMember[] = useMemo(() => ([
         { id: 'human', name: myUsername, figure: myFigure, team: 'red', isHuman: true },
         ...BOT_MEMBERS
@@ -671,14 +862,17 @@ export const BattleBallGameView: FC = () =>
     const audioRef = useRef<BattleBallAudio>(new BattleBallAudio());
     const keysRef = useRef<Set<string>>(new Set());
 
-    // Preloaded assets: official arena backdrop, power-ups, and full-body Habbo avatars (dir 2 & dir 4)
-    const backdropImgRef = useRef<HTMLImageElement | null>(null);
+    // Preloaded assets: all 5 official arena backdrops, power-ups, and seated Habbo avatars
+    const backdropImgsRef = useRef<Record<number, HTMLImageElement>>({});
     const puSpritesRef = useRef<Partial<Record<PowerUpKind, HTMLImageElement>>>({});
     const bodyCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 
     const engineRef = useRef<{
         running: boolean;
         finished: boolean;
+        arena: ArenaConfig;
+        gridW: number;
+        gridH: number;
         tiles: TileState[][];
         totalColorable: number;
         timeLeft: number;
@@ -689,7 +883,6 @@ export const BattleBallGameView: FC = () =>
         nextPuId: number;
         nextChatId: number;
         puSpawnTimer: number;
-        // Viewport transform mapping BG_W x BG_H -> CSS canvas pixels
         viewOffsetX: number;
         viewOffsetY: number;
         viewScale: number;
@@ -716,12 +909,15 @@ export const BattleBallGameView: FC = () =>
         return () => setMyGamePresence(null);
     }, [ setMyGamePresence ]);
 
-    // Preload official Battle_Ball.png mountain backdrop & power-up sprites
+    // Preload all 5 official Battle Ball arena backdrops & power-up sprites
     useEffect(() =>
     {
-        const bg = new Image();
-        bg.src = bbArenaBackdropImg;
-        bg.onload = () => { backdropImgRef.current = bg; };
+        ARENAS.forEach(a =>
+        {
+            const bg = new Image();
+            bg.src = a.backdropImg;
+            bg.onload = () => { backdropImgsRef.current[a.id] = bg; };
+        });
 
         POWERUP_KINDS.forEach(k =>
         {
@@ -884,15 +1080,16 @@ export const BattleBallGameView: FC = () =>
     }, [ setIsBattleBallPlaying, setIsVisible, setMyGamePresence ]);
 
     // Initialize a fresh arena board + 8 players (used immediately on mount AND rematch!)
-    const initArenaEngine = useCallback((startImmediately: boolean) =>
+    const initArenaEngine = useCallback((startImmediately: boolean, customArena?: ArenaConfig) =>
     {
-        const { tiles, totalColorable } = buildMountainTiles();
+        const targetArena = customArena || activeArena;
+        const { tiles, totalColorable, gridW, gridH } = buildArenaTiles(targetArena);
         const players: HopperPlayer[] = [];
         const teamIdx: Record<Team, number> = { red: 0, blue: 0, green: 0, yellow: 0 };
 
         for (const r of roster)
         {
-            const spawns = TEAM_SPAWNS[r.team];
+            const spawns = targetArena.spawns[r.team];
             const [ sx, sy ] = spawns[teamIdx[r.team] % spawns.length];
             teamIdx[r.team]++;
             players.push({
@@ -928,6 +1125,9 @@ export const BattleBallGameView: FC = () =>
         engineRef.current = {
             running: startImmediately,
             finished: false,
+            arena: targetArena,
+            gridW,
+            gridH,
             tiles,
             totalColorable,
             timeLeft: MATCH_DURATION,
@@ -955,9 +1155,9 @@ export const BattleBallGameView: FC = () =>
             springLeft: 0,
             stunLeft: 0
         });
-    }, [ roster ]);
+    }, [ roster, activeArena ]);
 
-    // Spawn initial board as soon as component mounts so the real mountain arena is visible behind "El juego va a empezar"!
+    // Spawn initial board as soon as component mounts so the real arena is visible behind "El juego va a empezar"!
     useEffect(() =>
     {
         if (!engineRef.current) initArenaEngine(false);
@@ -1021,8 +1221,8 @@ export const BattleBallGameView: FC = () =>
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    arenaId: 1,
-                    arenaName: 'En la cima de la montaña',
+                    arenaId: eng.arena.id,
+                    arenaName: eng.arena.name,
                     myTeam: 'red',
                     tilesLocked: me?.tilesLocked || 0,
                     tilesStolen: me?.tilesStolen || 0,
@@ -1069,7 +1269,10 @@ export const BattleBallGameView: FC = () =>
                 setRematchBusy(false);
                 return;
             }
-            initArenaEngine(false);
+            const others = ARENAS.filter(a => a.id !== arenaId);
+            const nextArena = others[Math.floor(Math.random() * others.length)] || ARENAS[0];
+            setArenaId(nextArena.id);
+            initArenaEngine(false, nextArena);
             setStage('lobby');
         }
         catch
@@ -1080,14 +1283,15 @@ export const BattleBallGameView: FC = () =>
         {
             setRematchBusy(false);
         }
-    }, [ initArenaEngine ]);
+    }, [ arenaId, initArenaEngine ]);
 
     // =========================================================================
     // BATTLE BALL CORE MECHANICS (3-Bounce Lock, BFS Fast-Lock, 7 Power-Ups)
     // =========================================================================
     const tryFastLock = (eng: NonNullable<typeof engineRef.current>, actor: HopperPlayer) =>
     {
-        const visited: boolean[][] = Array.from({ length: GRID_H }, () => Array(GRID_W).fill(false));
+        const { gridW, gridH } = eng;
+        const visited: boolean[][] = Array.from({ length: gridH }, () => Array(gridW).fill(false));
         const q: Array<[ number, number ]> = [];
 
         const isWall = (x: number, y: number) =>
@@ -1096,9 +1300,9 @@ export const BattleBallGameView: FC = () =>
             return t.colorable && t.team === actor.team && t.level === 3;
         };
 
-        for (let y = 0; y < GRID_H; y++)
+        for (let y = 0; y < gridH; y++)
         {
-            for (let x = 0; x < GRID_W; x++)
+            for (let x = 0; x < gridW; x++)
             {
                 const t = eng.tiles[y][x];
                 if (!t.colorable)
@@ -1106,7 +1310,7 @@ export const BattleBallGameView: FC = () =>
                     visited[y][x] = true;
                     q.push([ x, y ]);
                 }
-                else if (x === 0 || y === 0 || x === GRID_W - 1 || y === GRID_H - 1)
+                else if (x === 0 || y === 0 || x === gridW - 1 || y === gridH - 1)
                 {
                     if (!isWall(x, y))
                     {
@@ -1125,7 +1329,7 @@ export const BattleBallGameView: FC = () =>
             {
                 const nx = cx + dx;
                 const ny = cy + dy;
-                if (nx < 0 || ny < 0 || nx >= GRID_W || ny >= GRID_H || visited[ny][nx]) continue;
+                if (nx < 0 || ny < 0 || nx >= gridW || ny >= gridH || visited[ny][nx]) continue;
                 if (!isWall(nx, ny))
                 {
                     visited[ny][nx] = true;
@@ -1135,9 +1339,9 @@ export const BattleBallGameView: FC = () =>
         }
 
         let filled = 0;
-        for (let y = 0; y < GRID_H; y++)
+        for (let y = 0; y < gridH; y++)
         {
-            for (let x = 0; x < GRID_W; x++)
+            for (let x = 0; x < gridW; x++)
             {
                 const t = eng.tiles[y][x];
                 if (t.colorable && !visited[y][x] && !(t.team === actor.team && t.level === 3))
@@ -1187,7 +1391,7 @@ export const BattleBallGameView: FC = () =>
         instantLock = false
     ) =>
     {
-        if (x < 0 || y < 0 || x >= GRID_W || y >= GRID_H) return;
+        if (x < 0 || y < 0 || x >= eng.gridW || y >= eng.gridH) return;
         const t = eng.tiles[y][x];
         if (!t.walkable) return;
 
@@ -1296,7 +1500,7 @@ export const BattleBallGameView: FC = () =>
             {
                 const nx = cx + dx * step;
                 const ny = cy + dy * step;
-                if (nx < 0 || ny < 0 || nx >= GRID_W || ny >= GRID_H || !eng.tiles[ny][nx].walkable) break;
+                if (nx < 0 || ny < 0 || nx >= eng.gridW || ny >= eng.gridH || !eng.tiles[ny][nx].walkable) break;
                 applyTileBounce(eng, actor, nx, ny, true);
             }
             eng.popups.push({ x: cx, y: cy, z: cz, text: '¡LINTERNA!', color: '#90e0ff', life: 1.2, maxLife: 1.2 });
@@ -1310,7 +1514,7 @@ export const BattleBallGameView: FC = () =>
                 {
                     const nx = cx + dx;
                     const ny = cy + dy;
-                    if (nx >= 0 && ny >= 0 && nx < GRID_W && ny < GRID_H && eng.tiles[ny][nx].colorable)
+                    if (nx >= 0 && ny >= 0 && nx < eng.gridW && ny < eng.gridH && eng.tiles[ny][nx].colorable)
                     {
                         eng.tiles[ny][nx].team = null;
                         eng.tiles[ny][nx].level = 0;
@@ -1347,7 +1551,7 @@ export const BattleBallGameView: FC = () =>
                     if (dx === 0 && dy === 0) continue;
                     const nx = cx + dx;
                     const ny = cy + dy;
-                    if (nx >= 0 && ny >= 0 && nx < GRID_W && ny < GRID_H && eng.tiles[ny][nx].walkable && !eng.tiles[ny][nx].pinTeam)
+                    if (nx >= 0 && ny >= 0 && nx < eng.gridW && ny < eng.gridH && eng.tiles[ny][nx].walkable && !eng.tiles[ny][nx].pinTeam)
                     {
                         eng.tiles[ny][nx].pinTeam = actor.team;
                         eng.tiles[ny][nx].pinColor = pinPalette[placed % pinPalette.length];
@@ -1367,7 +1571,7 @@ export const BattleBallGameView: FC = () =>
                 {
                     const nx = cx + dx;
                     const ny = cy + dy;
-                    if (nx >= 0 && ny >= 0 && nx < GRID_W && ny < GRID_H)
+                    if (nx >= 0 && ny >= 0 && nx < eng.gridW && ny < eng.gridH)
                     {
                         const t = eng.tiles[ny][nx];
                         if (t.colorable && t.team && t.team !== actor.team)
@@ -1408,7 +1612,7 @@ export const BattleBallGameView: FC = () =>
     ) =>
     {
         const z = eng.tiles[speaker.gy]?.[speaker.gx]?.z || 0;
-        const bgY = ORIGIN_Y + (speaker.gx + speaker.gy) * (TILE_H / 2) - z * 16;
+        const bgY = eng.arena.originY + (speaker.gx + speaker.gy) * (TILE_H / 2) - z * 16;
         const spawnY = Math.max(58, Math.min(240, Math.round(eng.viewOffsetY + bgY * eng.viewScale - 56 * eng.viewScale)));
         // Push existing bubbles smoothly upward so nothing overlaps (exact Habbo chat scroll!)
         for (const ch of eng.chats) ch.y -= 24;
@@ -1444,7 +1648,7 @@ export const BattleBallGameView: FC = () =>
     }, [ chatText, chatMode, pushChatBubble ]);
 
     // =========================================================================
-    // MAIN 60 FPS ENGINE & OFFICIAL PIXEL-ALIGNED BATTLE_BALL.PNG RENDERER
+    // MAIN 60 FPS ENGINE & OFFICIAL PIXEL-ALIGNED 5-ARENA RENDERER
     // (Stays live across lobby, playing & results so the arena is ALWAYS real!)
     // =========================================================================
     useEffect(() =>
@@ -1454,12 +1658,11 @@ export const BattleBallGameView: FC = () =>
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Convert logical tile (gx, gy, z) -> canvas CSS coordinates aligned pixel-for-pixel to bb_arena_backdrop.png!
+        // Convert logical tile (gx, gy, z) -> canvas CSS coordinates aligned pixel-for-pixel to the active arena backdrop!
         const tileToCanvas = (gx: number, gy: number, z: number, eng: NonNullable<typeof engineRef.current>) =>
         {
-            // Top diamond vertex in 960x484 backdrop coordinates:
-            const bgX = ORIGIN_X + (gx - gy) * (TILE_W / 2);
-            const bgY = ORIGIN_Y + (gx + gy) * (TILE_H / 2) - z * 16;
+            const bgX = eng.arena.originX + (gx - gy) * (TILE_W / 2);
+            const bgY = eng.arena.originY + (gx + gy) * (TILE_H / 2) - z * 16;
             return {
                 sx: eng.viewOffsetX + bgX * eng.viewScale,
                 sy: eng.viewOffsetY + bgY * eng.viewScale
@@ -1473,18 +1676,17 @@ export const BattleBallGameView: FC = () =>
             const by = (my - eng.viewOffsetY) / eng.viewScale;
 
             let best: { x: number; y: number; score: number } | null = null;
-            for (let y = 0; y < GRID_H; y++)
+            for (let y = 0; y < eng.gridH; y++)
             {
-                for (let x = 0; x < GRID_W; x++)
+                for (let x = 0; x < eng.gridW; x++)
                 {
                     const t = eng.tiles[y][x];
                     if (!t.walkable) continue;
-                    const cx = ORIGIN_X + (x - y) * 16;
-                    const cy = ORIGIN_Y + (x + y) * 8 + 8 - t.z * 16;
+                    const cx = eng.arena.originX + (x - y) * 16;
+                    const cy = eng.arena.originY + (x + y) * 8 + 8 - t.z * 16;
                     const norm = Math.abs(bx - cx) / 16 + Math.abs(by - cy) / 8;
                     if (norm <= 1.08)
                     {
-                        // Prefer front-most / higher-elevation tile when visually overlapping
                         const depthScore = (x + y) * 0.01 + t.z * 0.2 - norm;
                         if (!best || depthScore > best.score) best = { x, y, score: depthScore };
                     }
@@ -1500,7 +1702,7 @@ export const BattleBallGameView: FC = () =>
             ny: number
         ): boolean =>
         {
-            if (nx < 0 || ny < 0 || nx >= GRID_W || ny >= GRID_H) return false;
+            if (nx < 0 || ny < 0 || nx >= eng.gridW || ny >= eng.gridH) return false;
             const target = eng.tiles[ny][nx];
             const cur = eng.tiles[p.gy][p.gx];
             if (!target.walkable) return false;
@@ -1590,26 +1792,27 @@ export const BattleBallGameView: FC = () =>
         {
             const eng = engineRef.current;
             if (!eng || !eng.running) return;
+            const { gridW, gridH } = eng;
 
             eng.timeLeft = Math.max(0, eng.timeLeft - dt);
 
-            for (let y = 0; y < GRID_H; y++)
+            for (let y = 0; y < gridH; y++)
             {
-                for (let x = 0; x < GRID_W; x++)
+                for (let x = 0; x < gridW; x++)
                 {
                     if (eng.tiles[y][x].flash > 0) eng.tiles[y][x].flash = Math.max(0, eng.tiles[y][x].flash - dt * 2.2);
                 }
             }
 
-            // Spawn official power-ups across colorable tiles (up to 6 on this large 382-tile mountain!)
+            // Spawn official power-ups across colorable tiles (up to 6 on the arena!)
             eng.puSpawnTimer -= dt;
             if (eng.puSpawnTimer <= 0 && eng.powerups.length < 6)
             {
                 eng.puSpawnTimer = 4.2 + Math.random() * 2.4;
                 const candidates: Array<[ number, number ]> = [];
-                for (let y = 0; y < GRID_H; y++)
+                for (let y = 0; y < gridH; y++)
                 {
-                    for (let x = 0; x < GRID_W; x++)
+                    for (let x = 0; x < gridW; x++)
                     {
                         if (eng.tiles[y][x].colorable && !eng.powerups.some(pu => pu.x === x && pu.y === y))
                         {
@@ -1741,7 +1944,7 @@ export const BattleBallGameView: FC = () =>
                     {
                         const nx = p.gx + dx;
                         const ny = p.gy + dy;
-                        if (nx < 0 || ny < 0 || nx >= GRID_W || ny >= GRID_H) continue;
+                        if (nx < 0 || ny < 0 || nx >= gridW || ny >= gridH) continue;
                         const t = eng.tiles[ny][nx];
                         const cur = eng.tiles[p.gy][p.gx];
                         if (!t.walkable || Math.abs(t.z - cur.z) > 1.05) continue;
@@ -1768,8 +1971,8 @@ export const BattleBallGameView: FC = () =>
                     {
                         for (let attempt = 0; attempt < 8; attempt++)
                         {
-                            const rx = Math.floor(Math.random() * GRID_W);
-                            const ry = Math.floor(Math.random() * GRID_H);
+                            const rx = Math.floor(Math.random() * gridW);
+                            const ry = Math.floor(Math.random() * gridH);
                             const rt = eng.tiles[ry][rx];
                             if (rt.colorable && rt.level < 3)
                             {
@@ -1791,9 +1994,9 @@ export const BattleBallGameView: FC = () =>
 
             // Check 100% board lockdown or 0:00 timeout
             let lockedCount = 0;
-            for (let y = 0; y < GRID_H; y++)
+            for (let y = 0; y < gridH; y++)
             {
-                for (let x = 0; x < GRID_W; x++)
+                for (let x = 0; x < gridW; x++)
                 {
                     if (eng.tiles[y][x].colorable && eng.tiles[y][x].level === 3) lockedCount++;
                 }
@@ -1851,14 +2054,12 @@ export const BattleBallGameView: FC = () =>
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.imageSmoothingEnabled = false;
 
-            // Full-bleed widescreen scaling using seamless 1360x484 backdrop (ZERO solid blue side strips!)
-            // On narrow windows, ensure the playable mountain (~760px wide) always fits; on 16:9+ fill 100% height & width!
+            // Full-bleed widescreen scaling using seamless 1120x484 backdrop (ZERO solid side strips!)
             const rawSc = Math.max(cssH / BG_H, cssW / BG_W);
             const sc = (cssW / rawSc) < 760 ? (cssW / 760) : rawSc;
             const drawW = BG_W * sc;
             const drawH = BG_H * sc;
-            // Center horizontally on the playable mountain cross (ARENA_CENTER_X = 592), clamped cleanly inside backdrop bounds!
-            const desiredOx = Math.round(cssW / 2 - ARENA_CENTER_X * sc);
+            const desiredOx = Math.round(cssW / 2 - eng.arena.centerX * sc);
             const ox = drawW >= cssW
                 ? Math.min(0, Math.max(Math.round(cssW - drawW), desiredOx))
                 : Math.floor((cssW - drawW) / 2);
@@ -1867,26 +2068,24 @@ export const BattleBallGameView: FC = () =>
             eng.viewOffsetX = ox;
             eng.viewOffsetY = oy;
 
-            // 1. Seamless matching two-tone Habbo sky fallback (only visible on ultra-tall windows)
-            const splitX = ox + Math.round(544 * sc);
-            ctx.fillStyle = '#6faeca';
-            ctx.fillRect(0, 0, Math.max(0, splitX), cssH);
-            ctx.fillStyle = '#89d1eb';
-            ctx.fillRect(Math.max(0, splitX), 0, cssW - Math.max(0, splitX), cssH);
+            // 1. Arena background fill fallback (only visible on ultra-tall windows)
+            ctx.fillStyle = eng.arena.bgColor;
+            ctx.fillRect(0, 0, cssW, cssH);
 
-            // 2. ACTUAL OFFICIAL HABBO BATTLE BALL MOUNTAIN ARENA ARTWORK (seamless 1360x484!)
-            if (backdropImgRef.current)
+            // 2. ACTUAL OFFICIAL HABBO BATTLE BALL ARENA ARTWORK (seamless 1120x484!)
+            const bgImg = backdropImgsRef.current[eng.arena.id];
+            if (bgImg)
             {
-                ctx.drawImage(backdropImgRef.current, ox, oy, drawW, drawH);
+                ctx.drawImage(bgImg, ox, oy, drawW, drawH);
             }
 
             // 3. Draw ONLY Colored / Locked Tiles + Chinchetas cleanly snapped onto the exact 32x16 tiles!
             const hw = (TILE_W / 2) * sc;
             const hh = (TILE_H / 2) * sc;
 
-            for (let y = 0; y < GRID_H; y++)
+            for (let y = 0; y < eng.gridH; y++)
             {
-                for (let x = 0; x < GRID_W; x++)
+                for (let x = 0; x < eng.gridW; x++)
                 {
                     const t = eng.tiles[y][x];
                     if (!t.colorable) continue;
@@ -1959,9 +2158,9 @@ export const BattleBallGameView: FC = () =>
                 cyan: { base: '#2596e8', rim: '#7ad3ff', dark: '#11588f' },
                 yellow: { base: '#e5be12', rim: '#fff280', dark: '#947404' }
             };
-            for (let y = 0; y < GRID_H; y++)
+            for (let y = 0; y < eng.gridH; y++)
             {
-                for (let x = 0; x < GRID_W; x++)
+                for (let x = 0; x < eng.gridW; x++)
                 {
                     const t = eng.tiles[y][x];
                     if (!t.pinTeam) continue;
@@ -2305,7 +2504,7 @@ export const BattleBallGameView: FC = () =>
                                 }) }
                             </div>
                             <div className="bb-sw-lock-foot">
-                                <span>En la cima de la montaña</span>
+                                <span>{ activeArena.name }</span>
                                 <span>{ hud.lockPct }% sellado</span>
                             </div>
                         </div>
@@ -2354,7 +2553,7 @@ export const BattleBallGameView: FC = () =>
                                         { gamesLeftInfo.hasUnlimited ? '∞ HC' : `${ String(gamesLeftInfo.gamesLeft).padStart(3, '0') }` }
                                     </span>
                                     <span className="bb-starting-pill is-wide">
-                                        Equipo Rojo · En la cima
+                                        Equipo Rojo · { activeArena.name }
                                     </span>
                                 </div>
                             </div>
