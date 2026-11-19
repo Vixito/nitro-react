@@ -3,6 +3,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { AddEventLinkTracker, CreateLinkEvent, GetRoomSession, ISelectedUser, RemoveLinkEventTracker } from '../../api';
 import { Base, Button, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
 import { useModTools, useObjectSelectedEvent, useRoomEngineEvent } from '../../hooks';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { ModToolsChatlogView } from './views/room/ModToolsChatlogView';
 import { ModToolsRoomView } from './views/room/ModToolsRoomView';
 import { ModToolsTicketsView } from './views/tickets/ModToolsTicketsView';
@@ -11,6 +12,7 @@ import { ModToolsUserView } from './views/user/ModToolsUserView';
 
 export const ModToolsView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ currentRoomId, setCurrentRoomId ] = useState<number>(-1);
     const [ selectedUser, setSelectedUser ] = useState<ISelectedUser>(null);
@@ -121,7 +123,7 @@ export const ModToolsView: FC<{}> = props =>
         <>
             { isVisible &&
                 <NitroCardView uniqueKey="mod-tools" className="nitro-mod-tools" windowPosition={ DraggableWindowPosition.TOP_LEFT } theme="primary-slim" >
-                    <NitroCardHeaderView headerText={ 'Herramientas de Moderación' } onCloseClick={ event => setIsVisible(false) } />
+                    <NitroCardHeaderView headerText={ currentEra === 'flash2012' ? 'Mod Tools' : 'Herramientas de Moderación' } onCloseClick={ event => setIsVisible(false) } />
                     <NitroCardContentView className="text-black" gap={ 1 }>
                         <Button justifyContent="start" gap={ 2 } onClick={ event => CreateLinkEvent(`mod-tools/toggle-room-info/${ currentRoomId }`) } disabled={ (currentRoomId <= 0) } className="ps-2">
                             <Base className="icon icon-small-room flex-shrink-0"/>

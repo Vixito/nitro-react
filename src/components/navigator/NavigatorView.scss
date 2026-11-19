@@ -1,6 +1,15 @@
 .nitro-navigator {
-    width: $navigator-width;
+    width: 452px;
+    min-width: 452px;
     height: $navigator-height;
+
+    .nitro-card-tabs {
+        .nav-item {
+            padding: 0.25rem 0.7rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+    }
 
     .navigator-grid {
 
@@ -60,6 +69,11 @@
     }
 }
 
+.navigator-room-info-popover {
+    max-width: 345px !important;
+}
+
 .room-info {
-    width: 275px;
+    width: 328px;
+    max-width: 328px;
 }

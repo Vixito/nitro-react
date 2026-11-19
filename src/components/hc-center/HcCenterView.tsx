@@ -210,8 +210,8 @@ export const HcCenterView: FC<{}> = props => {
                             <div className="btn btn-link text-white p-0 mt-auto align-self-baseline text-decoration-underline fw-bold" style={{ zIndex: 4, cursor: 'pointer' }} onClick={() => CreateLinkEvent('habbopages/' + GetConfiguration('hc.center')['payday.habbopage'])}>{LocalizeText('hccenter.special.infolink')}</div>
                         </Column>
                         <div className="payday flex-shrink-0 p-2">
-                            <h5 className="mb-2 ms-2">{LocalizeText('hccenter.special.time.title')}</h5>
-                            <div className="d-flex flex-row mb-2">
+                            <h5 className="mb-1 ms-2">{LocalizeText('hccenter.special.time.title')}</h5>
+                            <div className="d-flex flex-row mb-1">
                                 <div className="clock me-2" />
                                 <h6 className="mb-0 align-self-center">{getHcPaydayTime()}</h6>
                             </div>
@@ -221,7 +221,7 @@ export const HcCenterView: FC<{}> = props => {
                                     <div className="d-flex flex-column">
                                         <div className="w-100 text-center ms-4n">{getHcPaydayAmount()}</div>
                                         <OverlayTrigger trigger="click" rootClose placement="left" overlay={popover}>
-                                            <div className="btn btn-link align-self-end text-primary fw-bold text-decoration-underline p-0 mt-3" style={{ cursor: 'pointer' }}>
+                                            <div className="btn btn-link align-self-end text-primary fw-bold text-decoration-underline p-0 mt-1" style={{ cursor: 'pointer', lineHeight: '1.15' }}>
                                                 {LocalizeText('hccenter.breakdown.infolink')}
                                             </div>
                                         </OverlayTrigger>

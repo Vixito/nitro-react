@@ -57,7 +57,12 @@ body[data-era="flash2012"] {
     -moz-osx-font-smoothing: grayscale !important;
 
     // Tables, rankings and text inside windows must use authentic Habbo 2012 font
-    table, th, td, tr, .table, .table * {
+    table,
+    th,
+    td,
+    tr,
+    .table,
+    .table * {
         font-family: 'Ubuntu2012', 'Ubuntu', Tahoma, sans-serif !important;
     }
 
@@ -73,6 +78,7 @@ body[data-era="flash2012"] {
     .form-select {
         color: #111111;
         -webkit-text-fill-color: #111111;
+
         &::placeholder {
             color: #777777;
             -webkit-text-fill-color: #777777;
@@ -106,10 +112,13 @@ body[data-era="flash2012"] {
         overflow: visible !important;
     }
 
-    // Authentic 2012 Two-Tone Stepped Button inside Windows (no smooth modern gradients, 1px solid #000000)
-    .btn-shiny-2012,
-    .nitro-card :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link),
-    .btn:not(.btn-danger):not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link) {
+    // Authentic 2012 Two-Tone Stepped Button everywhere (inside windows, Infostand, HotelView)
+    // Wrapped in :where() so specificity stays (0,1,1) and component-specific rules like ModTools override cleanly
+    :where(
+        .btn-shiny-2012,
+        .nitro-card:not([class*="nitro-mod-tools"]) :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success),
+        .btn:not(.btn-danger)
+    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn)) {
         background: linear-gradient(180deg, #f3f3f3 0%, #f3f3f3 52%, #d9d9d9 52%, #d9d9d9 100%) !important;
         border: 1px solid #000000 !important;
         border-bottom-width: 2px !important;
@@ -165,26 +174,30 @@ body[data-era="flash2012"] {
         }
     }
 
-    // Compact 2012 Danger / Report Action Button (crisp 1px black border + inner stepped fill)
-    .btn-danger,
-    .nitro-card .btn-danger {
-        background: linear-gradient(180deg, #f9e2e2 0%, #f9e2e2 52%, #e4bcbc 52%, #e4bcbc 100%) !important;
+    // Authentic 2012 Crimson Danger / Report Action Button (crisp 1px black border + two-tone Habbo red + bold white text)
+    :where(.btn-danger, .nitro-card:not([class*="nitro-mod-tools"]) .btn-danger) {
+        background: linear-gradient(180deg, #df443b 0%, #df443b 52%, #c12a22 52%, #c12a22 100%) !important;
         border: 1px solid #000000 !important;
         border-bottom-width: 2px !important;
         border-radius: 3px !important;
-        color: #6b0f0b !important;
+        color: #ffffff !important;
         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
         font-weight: 700 !important;
         font-size: 11px !important;
         line-height: 1.15 !important;
         min-height: 23px !important;
         padding: 3px 10px !important;
-        text-shadow: none !important;
-        box-shadow: inset 0 0 0 1px #ffffff !important;
+        text-shadow: 0 1px 0 #70120d !important;
+        box-shadow: inset 0 0 0 1px #ee6d66, inset 0 1px 0 #f7928d !important;
 
         &:hover:not(:disabled) {
-            background: linear-gradient(180deg, #fff0f0 0%, #fff0f0 52%, #edd0d0 52%, #edd0d0 100%) !important;
-            color: #4d0805 !important;
+            background: linear-gradient(180deg, #ed5249 0%, #ed5249 52%, #cf352c 52%, #cf352c 100%) !important;
+            color: #ffffff !important;
+        }
+
+        &:active:not(:disabled) {
+            background: #ad221b !important;
+            box-shadow: inset 0 0 0 1px #8c1913 !important;
         }
     }
 
@@ -217,90 +230,147 @@ body[data-era="flash2012"] {
         padding: 4px 6px !important;
     }
 
-    // All ModTools 2012 windows (main panel + room/chatlog/user/tickets sub-windows):
-    // never covered by the 68px left toolbar, crisp legible text in sunken boxes & tables, and properly aligned button icons
+    // All ModTools 2012 windows (authentic Volter Blue frame + flat crisp white buttons, not heavily beveled):
+    // never covered by the 68px left toolbar
     .nitro-card[class*="nitro-mod-tools"] {
         margin-left: 78px !important;
 
+        // Authentic Habbo 2012 Mod Tools flat/minimally-beveled crisp white buttons (matches original Habbo 2012 Mod Tools)
+        button.btn,
+        .btn,
+        .btn-primary,
+        .btn-secondary,
+        .btn-light,
+        .btn-success,
+        .btn-danger {
+            background: #f8f8f6 !important;
+            background-image: none !important;
+            border: 1px solid #163344 !important;
+            border-bottom-width: 1px !important;
+            border-radius: 3px !important;
+            color: #111111 !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-weight: 400 !important;
+            font-size: 11px !important;
+            line-height: 1.2 !important;
+            min-height: 24px !important;
+            padding: 3px 8px !important;
+            text-shadow: none !important;
+            box-shadow: inset 0 -1px 0 #d6d8d7 !important;
+
+            &:hover:not(:disabled) {
+                background: #ffffff !important;
+                background-image: none !important;
+                border-color: #0b1c26 !important;
+                color: #000000 !important;
+                box-shadow: inset 0 -1px 0 #c8ccce !important;
+            }
+
+            &:active:not(:disabled) {
+                background: #e6ebee !important;
+                background-image: none !important;
+                box-shadow: inset 0 1px 0 #c4cbd0 !important;
+            }
+
+            &:disabled {
+                background: #e9eff2 !important;
+                background-image: none !important;
+                color: #4b5c66 !important;
+                opacity: 0.8 !important;
+                cursor: default !important;
+            }
+        }
+
         .nitro-card-content {
-            color: #f3f2ee !important;
+            color: #111111 !important;
         }
 
         .text-black,
         .text-dark {
-            color: #f3f2ee !important;
+            color: #111111 !important;
         }
 
         .border-bottom {
-            border-bottom: 1px solid #1a1917 !important;
+            border-bottom: 1px solid #cbd7df !important;
         }
 
         .log-entry {
-            border-bottom: 1px solid #2d2b27 !important;
-            color: #f3f2ee !important;
+            border-bottom: 1px solid #dde6ec !important;
+            color: #111111 !important;
 
             * {
-                color: #f3f2ee !important;
+                color: #111111 !important;
             }
 
             .g-col-2 {
-                color: #a8a59f !important;
+                color: #55636c !important;
             }
 
             .g-col-3 {
-                color: #6db3d8 !important;
+                color: #1d5d82 !important;
             }
         }
 
         .bg-muted,
         .bg-light,
         .bg-secondary {
-            background-color: #292724 !important;
-            border: 1px solid #000000 !important;
+            background-color: #eef3f6 !important;
+            border: 1px solid #a9c0ce !important;
             border-radius: 3px !important;
-            box-shadow: inset 0 0 0 1px #1f1e1b !important;
-            color: #f3f2ee !important;
+            box-shadow: none !important;
+            color: #111111 !important;
 
             * {
-                color: #f3f2ee !important;
+                color: #111111 !important;
             }
         }
 
         .table {
-            --bs-table-color: #f3f2ee !important;
-            --bs-table-striped-color: #f3f2ee !important;
-            --bs-table-bg: #292724 !important;
-            --bs-table-striped-bg: #32302c !important;
-            color: #f3f2ee !important;
-            border-color: #191816 !important;
+            --bs-table-color: #111111 !important;
+            --bs-table-striped-color: #111111 !important;
+            --bs-table-bg: #ffffff !important;
+            --bs-table-striped-bg: #eef3f6 !important;
+            color: #111111 !important;
+            border-color: #c4d3dc !important;
 
             th,
             td,
             tr {
-                color: #f3f2ee !important;
-                border-color: #191816 !important;
+                color: #111111 !important;
+                border-color: #c4d3dc !important;
                 background-color: transparent !important;
             }
 
             tbody tr:nth-of-type(odd) {
-                background-color: #292724 !important;
+                background-color: #ffffff !important;
             }
 
             tbody tr:nth-of-type(even) {
-                background-color: #33302c !important;
+                background-color: #eef3f6 !important;
             }
         }
     }
 
+    // Main Mod Tools compact blue floating panel (buttons directly on the Volter Blue frame, centered crisp labels)
     .nitro-card.nitro-mod-tools {
-        width: 260px !important;
-        min-width: 260px !important;
+        width: 214px !important;
+        min-width: 214px !important;
+        background-color: #3d84ab !important;
+        border: 1px solid #000000 !important;
+        border-radius: 6px !important;
+        box-shadow: inset 0 0 0 1px #3d84ab, inset 0 0 0 2px #58a6cd !important;
+        padding: 0 6px 6px 6px !important;
 
-        .nitro-card-header-inner {
-            padding: 0 24px 0 6px !important;
+        .nitro-card-header {
+            min-height: 24px !important;
+            height: 24px !important;
 
-            .shockwave-header-dots {
-                min-width: 6px !important;
+            .nitro-card-header-inner {
+                padding: 0 20px 0 4px !important;
+
+                .shockwave-header-dots {
+                    min-width: 14px !important;
+                }
             }
         }
 
@@ -308,19 +378,18 @@ body[data-era="flash2012"] {
         .btn {
             display: flex !important;
             align-items: center !important;
-            justify-content: flex-start !important;
-            text-align: left !important;
+            justify-content: center !important;
+            text-align: center !important;
             padding: 3px 8px !important;
-            gap: 8px !important;
+            gap: 0 !important;
+            width: 100% !important;
 
             .icon {
-                position: static !important;
-                flex-shrink: 0 !important;
-                transform: none !important;
+                display: none !important;
             }
 
             span {
-                flex: 1 1 auto !important;
+                flex: 0 1 auto !important;
                 white-space: nowrap !important;
                 overflow: hidden !important;
                 text-overflow: ellipsis !important;
@@ -338,7 +407,7 @@ body[data-era="flash2012"] {
         bottom: auto !important;
         width: 68px !important;
         height: auto !important;
-        max-height: calc(100vh - 54px) !important;
+        max-height: calc(100vh - 58px) !important;
         z-index: 1020 !important;
         background: transparent !important;
         border: none !important;
@@ -511,7 +580,7 @@ body[data-era="flash2012"] {
                 display: block !important;
                 font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 10px !important;
-                font-weight: 500 !important;
+                font-weight: 700 !important;
                 color: #f3f2ee !important;
                 text-align: center !important;
                 margin-top: 2px !important;
@@ -586,7 +655,7 @@ body[data-era="flash2012"] {
     .nitro-toolbar-me.flash2012-me-menu {
         position: fixed !important;
         top: auto !important;
-        bottom: 46px !important;
+        bottom: 50px !important;
         left: 80px !important;
         background-color: #36342f !important;
         border: 1px solid #000000 !important;
@@ -704,24 +773,30 @@ body[data-era="flash2012"] {
     }
 
     // =========================================================================
-    // 3. BARRA INFERIOR DE AMIGOS (HABBOFRIENDBARCOM 2012 — CENTRADA EXACTO BAJO EL CHAT)
+    // 3. BARRA INFERIOR DE AMIGOS (HABBOFRIENDBARCOM 2012 — FONDO FULL-WIDTH + CONSOLA IZQUIERDA)
     // =========================================================================
     .nitro-bottom-bar-2012 {
         position: fixed !important;
-        bottom: 4px !important;
+        bottom: 0 !important;
         left: 0 !important;
         right: 0 !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        height: 32px !important;
+        height: 42px !important;
         z-index: 1015 !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        display: block !important;
-        padding: 0 !important;
+        background-color: #25211b !important;
+        background-image: url('@/assets/images/eras/illumina/toolbar/toolbar-bg.png') !important;
+        background-repeat: repeat-x !important;
+        background-position: top left !important;
+        background-size: 1px 100% !important;
+        border-top: 1px solid #000000 !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 14px !important;
         user-select: none !important;
-        pointer-events: none !important;
+        pointer-events: auto !important;
 
         // Disabling any transition so hover states trigger instantaneously (0s / no animation)
         &,
@@ -731,11 +806,67 @@ body[data-era="flash2012"] {
             transition: none !important;
         }
 
-        // Dead-center on 50% axis directly beneath #toolbar-chat-input-container
+        // Far-left Console / Messenger chat bubble icon
+        .bottom-bar-console-left {
+            position: relative !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            flex: 0 0 auto !important;
+            height: 100% !important;
+            z-index: 1017 !important;
+
+            .btn-messenger {
+                width: 36px !important;
+                height: 36px !important;
+                min-width: 36px !important;
+                min-height: 36px !important;
+                flex-shrink: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                border-radius: 4px !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                overflow: visible !important;
+
+                .icon-chat-bubble {
+                    display: block !important;
+                    width: 29px !important;
+                    height: 35px !important;
+                    background: url('@/assets/images/eras/flash2012/friendbar/icon_messenger.png') center / contain no-repeat !important;
+                    image-rendering: pixelated !important;
+                }
+
+                &.is-unread {
+                    border: none !important;
+                    box-shadow: none !important;
+
+                    .icon-chat-bubble {
+                        background-image: url('@/assets/images/eras/flash2012/friendbar/icon_messenger_notify.png') !important;
+                    }
+                }
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.1) !important;
+
+                    .icon-chat-bubble {
+                        filter: brightness(1.18) !important;
+                    }
+                }
+            }
+        }
+
+        // Dead-center Friend Bar directly beneath #toolbar-chat-input-container
         .bottom-bar-left {
-            position: fixed !important;
+            position: absolute !important;
             left: 50% !important;
-            bottom: 4px !important;
+            top: 0 !important;
+            bottom: 0 !important;
             transform: translateX(-50%) !important;
             width: auto !important;
             max-width: calc(100vw - 260px) !important;
@@ -743,7 +874,7 @@ body[data-era="flash2012"] {
             align-items: center !important;
             justify-content: center !important;
             overflow: visible !important;
-            height: 32px !important;
+            height: 42px !important;
             pointer-events: none !important;
             z-index: 1016 !important;
 
@@ -758,12 +889,12 @@ body[data-era="flash2012"] {
                 .friend-bar {
                     display: flex !important;
                     align-items: center !important;
-                    gap: 4px !important;
+                    gap: 5px !important;
                     height: 100% !important;
 
                     .friend-bar-button {
-                        width: 20px !important;
-                        height: 26px !important;
+                        width: 22px !important;
+                        height: 30px !important;
                         flex-shrink: 0 !important;
                         background-color: #47453f !important;
                         border: 1px solid #000000 !important;
@@ -787,40 +918,52 @@ body[data-era="flash2012"] {
                         }
 
                         .fa-icon {
-                            width: 9px !important;
-                            height: 9px !important;
+                            width: 10px !important;
+                            height: 10px !important;
                         }
                     }
 
                     .friend-bar-item {
-                        height: 28px !important;
-                        min-width: 118px !important;
-                        max-width: 150px !important;
-                        border-radius: 3px !important;
-                        padding: 2px 8px 2px 34px !important;
+                        height: 32px !important;
+                        min-width: 134px !important;
+                        max-width: 170px !important;
+                        border-radius: 4px !important;
+                        padding: 2px 10px 2px 38px !important;
                         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-                        font-size: 10px !important;
+                        font-size: 12px !important;
                         font-weight: 700 !important;
-                        line-height: 1.05 !important;
+                        line-height: 1.1 !important;
                         border: 1px solid #000000 !important;
                         display: flex !important;
                         align-items: center !important;
                         position: relative !important;
                         cursor: pointer !important;
                         color: #ffffff !important;
-                        text-shadow: 0 1px 0 #000000 !important;
+                        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85) !important;
 
-                        // "Find new friends" / "Encuentra amig@s": borde claro #7d7a72, fondo oscuro #585650, icono cabeza gris + cruz verde (31x34)
+                        .text-truncate,
+                        .text-nowrap,
+                        div,
+                        span {
+                            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                            font-size: 12px !important;
+                            font-weight: 700 !important;
+                            color: #ffffff !important;
+                            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.85) !important;
+                            letter-spacing: 0.1px !important;
+                        }
+
+                        // "Find new friends" / "Buscamig@s": borde claro #76726a, fondo oscuro #4f4d48, icono cabeza gris + cruz verde (31x34)
                         &.friend-bar-search {
-                            background-color: #585650 !important;
-                            box-shadow: inset 0 0 0 2px #7d7a72 !important;
+                            background-color: #4f4d48 !important;
+                            box-shadow: inset 0 0 0 2px #76726a !important;
 
                             .friend-bar-item-head {
                                 position: absolute !important;
                                 width: 31px !important;
                                 height: 34px !important;
-                                left: 1px !important;
-                                top: calc(50% - 2px) !important;
+                                left: 2px !important;
+                                top: calc(50% - 3px) !important;
                                 transform: translateY(-50%) !important;
                                 background-image: url('@/assets/images/eras/flash2012/friendbar/find_friends_icon.png') !important;
                                 background-repeat: no-repeat !important;
@@ -830,8 +973,8 @@ body[data-era="flash2012"] {
                             }
 
                             &:hover {
-                                background-color: #6b6861 !important;
-                                box-shadow: inset 0 0 0 2px #959188 !important;
+                                background-color: #636059 !important;
+                                box-shadow: inset 0 0 0 2px #8e8a80 !important;
 
                                 .text-nowrap {
                                     text-decoration: underline !important;
@@ -839,15 +982,15 @@ body[data-era="flash2012"] {
                             }
                         }
 
-                        // Online friend / Staff Chat pill: borde más claro #8fa947, fondo interior más oscuro #6f8730
+                        // Online friend / Staff Chat pill: borde claro #91a648, fondo verde oliva #728237
                         &:not(.friend-bar-search) {
-                            background-color: #6f8730 !important;
-                            box-shadow: inset 0 0 0 2px #8fa947 !important;
+                            background-color: #728237 !important;
+                            box-shadow: inset 0 0 0 2px #91a648 !important;
 
                             .friend-bar-item-head.avatar {
                                 position: absolute !important;
-                                left: -27px !important;
-                                top: -31px !important;
+                                left: -25px !important;
+                                top: -29px !important;
                                 width: auto !important;
                                 height: auto !important;
                                 transform: none !important;
@@ -860,10 +1003,10 @@ body[data-era="flash2012"] {
 
                             .friend-bar-item-head.group {
                                 position: absolute !important;
-                                left: 3px !important;
+                                left: 4px !important;
                                 top: 50% !important;
-                                width: 26px !important;
-                                height: 26px !important;
+                                width: 28px !important;
+                                height: 28px !important;
                                 transform: translateY(-50%) !important;
                                 display: flex !important;
                                 align-items: center !important;
@@ -872,14 +1015,14 @@ body[data-era="flash2012"] {
                                 image-rendering: pixelated !important;
 
                                 .badge-image {
-                                    width: 26px !important;
-                                    height: 26px !important;
+                                    width: 28px !important;
+                                    height: 28px !important;
                                     background-size: auto !important;
                                     image-rendering: pixelated !important;
                                 }
                             }
 
-                            // Hover: verde más claro + nombre subrayado (como el usuario "C" en la captura original de 2012)
+                            // Hover: verde más claro + nombre subrayado
                             &:hover {
                                 background-color: #8ea844 !important;
                                 box-shadow: inset 0 0 0 2px #b8d162 !important;
@@ -890,8 +1033,8 @@ body[data-era="flash2012"] {
                             }
 
                             &.friend-bar-item-active {
-                                min-width: 170px !important;
-                                max-width: 210px !important;
+                                min-width: 185px !important;
+                                max-width: 225px !important;
                                 gap: 6px !important;
                                 justify-content: space-between !important;
                             }
@@ -923,107 +1066,67 @@ body[data-era="flash2012"] {
             }
         }
 
+        // Far-right underlined link "Ver todos los amigos" directly on the dark bar
         .bottom-bar-right {
-            position: fixed !important;
-            right: 8px !important;
-            bottom: 4px !important;
-            height: 32px !important;
+            position: relative !important;
+            height: 100% !important;
             display: flex !important;
             align-items: center !important;
             flex: 0 0 auto !important;
-            gap: 5px !important;
+            gap: 6px !important;
             pointer-events: auto !important;
-            z-index: 1016 !important;
+            z-index: 1017 !important;
 
             .btn-all-friends {
-                height: 28px !important;
-                padding: 0 9px 0 7px !important;
-                background-color: #4e4c47 !important;
-                border: 1px solid #000000 !important;
+                height: 30px !important;
+                padding: 0 6px !important;
+                background: transparent !important;
+                background-color: transparent !important;
+                border: none !important;
                 border-radius: 3px !important;
-                box-shadow: inset 0 0 0 2px #74716a !important;
-                display: flex !important;
+                box-shadow: none !important;
+                display: inline-flex !important;
                 align-items: center !important;
-                gap: 4px !important;
+                gap: 6px !important;
                 cursor: pointer !important;
                 position: relative !important;
                 flex-shrink: 0 !important;
                 overflow: visible !important;
 
-                .icon-friends-list {
-                    display: block !important;
-                    width: 32px !important;
-                    height: 42px !important;
-                    margin: -8px -3px !important;
-                    background: url('@/assets/images/eras/flash2012/friendbar/icon_friendlist.png') center / auto no-repeat !important;
-                    image-rendering: pixelated !important;
-                }
-
                 .btn-label {
                     font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-                    font-size: 11px !important;
-                    font-weight: 700 !important;
-                    color: #ffffff !important;
+                    font-size: 12px !important;
+                    font-weight: 400 !important;
+                    color: #e6e4df !important;
+                    text-decoration: underline !important;
                     text-shadow: 0 1px 0 #000000 !important;
                     white-space: nowrap !important;
                 }
 
                 &:hover {
-                    background-color: #5e5b54 !important;
-                    box-shadow: inset 0 0 0 2px #87847c !important;
+                    background: transparent !important;
 
                     .btn-label {
+                        color: #ffffff !important;
                         text-decoration: underline !important;
                     }
-
-                    .icon-friends-list {
-                        background-image: url('@/assets/images/eras/flash2012/friendbar/icon_friendlist_hover.png') !important;
-                    }
-                }
-            }
-
-            .btn-messenger {
-                width: 32px !important;
-                height: 28px !important;
-                flex-shrink: 0 !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                cursor: pointer !important;
-                border-radius: 0 !important;
-                background: transparent !important;
-                background-color: transparent !important;
-                border: none !important;
-                box-shadow: none !important;
-                overflow: visible !important;
-                transition: none !important;
-
-                .icon-chat-bubble {
-                    display: block !important;
-                    width: 27px !important;
-                    height: 33px !important;
-                    margin: -4px -2px !important;
-                    background: url('@/assets/images/eras/flash2012/friendbar/icon_messenger.png') center / auto no-repeat !important;
-                    image-rendering: pixelated !important;
-                    transition: none !important;
                 }
 
-                &.is-unread {
-                    border: none !important;
-                    box-shadow: none !important;
-
-                    .icon-chat-bubble {
-                        background-image: url('@/assets/images/eras/flash2012/friendbar/icon_messenger_notify.png') !important;
-                    }
-                }
-
-                &:hover {
-                    background-color: rgba(255, 255, 255, 0.12) !important;
-                    box-shadow: none !important;
-
-                    .icon-chat-bubble {
-                        filter: brightness(1.2) !important;
-                    }
+                .nitro-item-count,
+                .layout-item-count {
+                    position: static !important;
+                    background-color: #cc2929 !important;
+                    color: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 3px !important;
+                    font-size: 10px !important;
+                    font-weight: 700 !important;
+                    padding: 0 4px !important;
+                    min-width: 15px !important;
+                    height: 15px !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
                 }
             }
         }
@@ -1190,18 +1293,21 @@ body[data-era="flash2012"] {
                 gap: 7px !important;
                 width: 204px !important;
                 height: 25px !important;
-                background-color: #36342f !important;
+                background-color: #1d1b17 !important;
+                background-image: none !important;
                 border: 1px solid #000000 !important;
+                border-image: none !important;
                 border-radius: 3px !important;
                 padding: 3px 8px !important;
-                box-shadow: inset 0 0 0 2px #57544d !important;
+                box-shadow: inset 0 0 0 2px #36332d !important;
 
                 .action-link {
                     font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                     font-size: 10px !important;
                     font-weight: 700 !important;
-                    color: #e5e3de !important;
+                    color: #f0eee9 !important;
                     text-decoration: underline !important;
+                    text-shadow: 0 1px 0 #000000 !important;
                     cursor: pointer !important;
 
                     &:hover {
@@ -1211,7 +1317,7 @@ body[data-era="flash2012"] {
                 }
 
                 .action-sep {
-                    color: #78756e !important;
+                    color: #6b675f !important;
                     font-size: 10px !important;
                 }
             }
@@ -1275,98 +1381,202 @@ body[data-era="flash2012"] {
     }
 
     // =========================================================================
-    // 5. CHAT EN SALA Y HERRAMIENTAS DE SALA (HABBOROOMUICOM 2012 — MÁS GRANDE Y CON MARCO OSCURO)
+    // 5. CHAT EN SALA Y HERRAMIENTAS DE SALA (HABBOROOMUICOM 2012 — MÁS ALTO + BOTÓN "DECIR")
     // =========================================================================
     .chat-container-flash2012,
     #toolbar-chat-input-container {
         position: fixed !important;
-        bottom: 52px !important;
+        bottom: 55px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
-        width: 470px !important;
+        width: 496px !important;
         max-width: calc(100vw - 180px) !important;
         z-index: 1012 !important;
 
-        .nitro-chat-input-container {
+        .nitro-chat-input-container,
+        .nitro-chat-input-container.nitro-chat-input-2012 {
+            position: relative !important;
+            bottom: auto !important;
+            left: auto !important;
+            width: 100% !important;
             display: flex !important;
             align-items: center !important;
-            background-color: #ffffff !important;
-            border: 2px solid #000000 !important;
-            border-radius: 5px !important;
-            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85), inset 0 0 0 1px #c8c8c8 !important;
-            height: 35px !important;
-            padding: 0 10px 0 8px !important;
-            gap: 7px !important;
+            justify-content: center !important;
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            height: 38px !important;
+            padding: 0 !important;
+            gap: 6px !important;
+            overflow: visible !important;
 
             &::before,
             &::after {
                 display: none !important;
+                content: none !important;
             }
 
-            // Left-aligned 2012 Chat Addons (burbujas -> emoji -> gif)
-            .chat-addons {
+            .chat-input-box-2012 {
+                flex: 1 1 auto !important;
+                min-width: 0 !important;
+                height: 38px !important;
                 display: flex !important;
                 align-items: center !important;
-                gap: 5px !important;
-                padding: 0 6px 0 0 !important;
-                border-right: 1px solid #cccccc !important;
-                height: 22px !important;
-                flex-shrink: 0 !important;
+                background-color: #f8f8f8 !important;
+                border: 1px solid #000000 !important;
+                border-radius: 5px !important;
+                box-shadow: inset 0 1px 0 #c9c9c9, 0 0 0 1px rgba(0, 0, 0, 0.55) !important;
+                padding: 0 10px 0 8px !important;
+                gap: 7px !important;
 
-                .icon {
-                    image-rendering: pixelated !important;
-                    background-size: auto !important;
+                // Left-aligned 2012 Chat Addons (burbujas -> emoji -> gif)
+                .chat-addons {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 5px !important;
+                    padding: 0 6px 0 0 !important;
+                    border-right: 1px solid #d0d0d0 !important;
+                    height: 24px !important;
+                    flex-shrink: 0 !important;
+
+                    .icon {
+                        image-rendering: pixelated !important;
+                        background-size: auto !important;
+                    }
+                }
+
+                .input-sizer {
+                    flex: 1 1 auto !important;
+                    min-width: 0 !important;
+                    height: 100% !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    padding: 0 !important;
+
+                    &::after {
+                        display: none !important;
+                    }
+
+                    input.chat-input {
+                        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                        font-size: 14px !important;
+                        font-weight: 400 !important;
+                        color: #111111 !important;
+                        -webkit-text-fill-color: #111111 !important;
+                        border: none !important;
+                        background: transparent !important;
+                        box-shadow: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        line-height: 36px !important;
+
+                        &::placeholder {
+                            color: #777777 !important;
+                            -webkit-text-fill-color: #777777 !important;
+                        }
+
+                        &:focus {
+                            outline: none !important;
+                        }
+                    }
                 }
             }
 
-            .input-sizer {
-                flex: 1 !important;
-                display: flex !important;
+            // Authentic 2012 Flash "Decir" / "Gritar" Shiny Button with inset white gloss (side padding inside gray bezel)
+            .chat-say-btn-2012 {
+                position: relative !important;
+                flex: 0 0 auto !important;
+                height: 38px !important;
+                min-width: 82px !important;
+                padding: 0 14px !important;
+                display: inline-flex !important;
                 align-items: center !important;
-                padding: 0 !important;
+                justify-content: center !important;
+                border: 1px solid #000000 !important;
+                border-radius: 5px !important;
+                background: #c8c8c8 !important;
+                box-shadow: inset 0 0 0 1px #d6d6d6, 0 0 0 1px rgba(0, 0, 0, 0.55) !important;
+                color: #000000 !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                line-height: 1 !important;
+                text-shadow: none !important;
+                cursor: pointer !important;
+                user-select: none !important;
+                overflow: hidden !important;
 
-                input.chat-input {
-                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-                    font-size: 13px !important;
-                    color: #111111 !important;
-                    border: none !important;
-                    background: transparent !important;
-                    box-shadow: none !important;
-                    padding: 0 !important;
-                    width: 100% !important;
+                &::before {
+                    content: '' !important;
+                    position: absolute !important;
+                    top: 2px !important;
+                    left: 3px !important;
+                    right: 3px !important;
+                    height: 46% !important;
+                    background: linear-gradient(180deg, #fafafa 0%, #f6f6f6 82%, #e8e8e8 100%) !important;
+                    border-radius: 2px 2px 0 0 !important;
+                    pointer-events: none !important;
+                    z-index: 0 !important;
+                }
 
-                    &::placeholder {
-                        color: #777777 !important;
+                .chat-say-btn-label {
+                    position: relative !important;
+                    z-index: 1 !important;
+                }
+
+                &:hover {
+                    background: #d4d4d4 !important;
+                    color: #000000 !important;
+
+                    &::before {
+                        background: linear-gradient(180deg, #ffffff 0%, #fcfcfc 82%, #efefef 100%) !important;
                     }
+                }
 
-                    &:focus {
-                        outline: none !important;
+                &:active {
+                    background: #bababa !important;
+                    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.55) !important;
+
+                    &::before {
+                        background: linear-gradient(180deg, #dcdcdc 0%, #d4d4d4 100%) !important;
                     }
                 }
             }
         }
     }
 
+    // 2012 Hotel View fills full viewport height (its internal clouds sit at bottom: 36px, flush above the 42px bottom bar)
+    .nitro-hotel-view,
+    .nitro-hotel-view.flash2012-hotel-view {
+        top: 0 !important;
+        bottom: 0 !important;
+        height: 100% !important;
+    }
+
     .nitro-room-tools-container {
         position: fixed !important;
-        bottom: 42px !important;
+        bottom: 55px !important;
         left: 8px !important;
         z-index: 1005 !important;
 
         .nitro-room-tools {
-            background-color: #36342f !important;
+            background-color: #1d1b17 !important;
             border: 1px solid #000000 !important;
             border-radius: 4px !important;
             padding: 4px !important;
             gap: 3px !important;
-            box-shadow: inset 0 0 0 2px #57544d !important;
+            box-shadow: inset 0 0 0 2px #36332d !important;
         }
 
         .nitro-room-tools-info {
-            background-color: #36342f !important;
+            background-color: #1d1b17 !important;
             border: 1px solid #000000 !important;
             border-radius: 4px !important;
-            box-shadow: inset 0 0 0 2px #57544d !important;
+            box-shadow: inset 0 0 0 2px #36332d !important;
             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
         }
     }
@@ -1425,7 +1635,7 @@ body[data-era="flash2012"] {
             content: none !important;
         }
 
-        &:not(.no-resize):not([data-skin-2012="illumina-light"]):not(.nitro-alert):not(.nitro-confirm):not(.nitro-help):not(.user-profile) {
+        &:not(.no-resize):not(.nitro-mod-tools):not([data-skin-2012="illumina-light"]):not(.nitro-alert):not(.nitro-confirm):not(.nitro-help):not(.user-profile) {
             &::after {
                 content: '' !important;
                 display: block !important;
@@ -1663,13 +1873,39 @@ body[data-era="flash2012"] {
         }
 
         // When a volter-blue window has no tabs (e.g. Información de Sala, Filtro de Sala, Comandos), keep top border crisp
-        &:not(:has(.nitro-card-tabs)) {
+        &:not(:has(.nitro-card-tabs)):not(.nitro-mod-tools) {
 
             .content-area,
             .nitro-card-content,
             .nitro-card-body {
                 border-top: 1px solid #1e4d63 !important;
                 border-radius: 4px !important;
+            }
+        }
+
+        // Main Mod Tools panel uses the authentic 9-slice frame_volter_blue.png directly with NO white inner box
+        &.nitro-mod-tools {
+            background: transparent !important;
+            background-color: transparent !important;
+            border: 6px solid transparent !important;
+            border-image-source: url('@/assets/images/eras/flash2012/skins/frame_volter_blue.png') !important;
+            border-image-slice: 6 fill !important;
+            border-image-width: 6px !important;
+            border-image-repeat: stretch !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            image-rendering: pixelated !important;
+
+            .content-area,
+            .nitro-card-content,
+            .nitro-card-body {
+                background: transparent !important;
+                background-color: transparent !important;
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 3px 1px 1px 1px !important;
+                gap: 4px !important;
             }
         }
     }
@@ -2258,6 +2494,7 @@ body[data-era="flash2012"] {
     .commands-alert,
     .nitro-card[data-window-key="commands-alert"] {
         .nitro-card-header {
+
             .nitro-card-header-inner .nitro-card-header-text,
             .nitro-card-header-text {
                 font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
@@ -3984,9 +4221,19 @@ body[data-era="flash2012"] {
             border: none !important;
             box-shadow: none !important;
             color: #f3f2ee !important;
+            -webkit-text-fill-color: #f3f2ee !important;
+            caret-color: #ffffff !important;
             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
             font-size: 11px !important;
             line-height: 1.25 !important;
+            outline: none !important;
+        }
+
+        .motto-input {
+            width: 100% !important;
+            background: rgba(0, 0, 0, 0.35) !important;
+            border-radius: 2px !important;
+            padding: 1px 4px !important;
         }
     }
 

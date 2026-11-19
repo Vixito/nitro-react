@@ -76,7 +76,7 @@ export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewPr
                 </Column>
             </Column>
             { canPickup &&
-                <Flex justifyContent="end">
+                <Flex gap={ 1 } justifyContent="end" className="button-container mt-2">
                     <Button variant="dark" onClick={ pickupBot }>{ LocalizeText('infostand.button.pickup') }</Button>
                 </Flex> }
         </Column>

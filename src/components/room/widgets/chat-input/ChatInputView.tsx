@@ -303,18 +303,65 @@ export const ChatInputView: FC<{}> = props =>
         const updateTarget = () =>
         {
             const el = document.getElementById('toolbar-chat-input-container');
-            if(el) setPortalTarget(el);
+            if(el && el.isConnected) setPortalTarget(el);
         };
 
         updateTarget();
-        const timer = setTimeout(updateTarget, 100);
-        return () => clearTimeout(timer);
+        const raf = requestAnimationFrame(updateTarget);
+        const timer = setTimeout(updateTarget, 80);
+        return () =>
+        {
+            cancelAnimationFrame(raf);
+            clearTimeout(timer);
+        };
     }, [ currentEra, roomSession ]);
 
     if(!roomSession || roomSession.isSpectator) return null;
 
-    const target = portalTarget || (typeof document !== 'undefined' ? document.getElementById('toolbar-chat-input-container') : null);
-    if(!target) return null;
+    const target = (portalTarget && portalTarget.isConnected)
+        ? portalTarget
+        : (typeof document !== 'undefined' ? document.getElementById('toolbar-chat-input-container') : null);
+    if(!target || !target.isConnected) return null;
+
+    if(currentEra === 'flash2012')
+    {
+        const handleSayButtonClick = () =>
+        {
+            if(chatValue && chatValue.trim().length > 0)
+            {
+                sendChatValue(chatValue, false);
+            }
+            if(inputRef.current) setInputFocus();
+        };
+
+        return (
+            createPortal(
+                <div className="nitro-chat-input-container nitro-chat-input-2012">
+                    <div className="chat-input-box-2012">
+                        <div className="chat-addons chat-addons-2012-left">
+                            <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
+                            <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                            <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                        </div>
+                        <div className="input-sizer align-items-center">
+                            { !floodBlocked &&
+                            <input ref={ inputRef } type="text" className="chat-input" placeholder={ LocalizeText('widgets.chatinput.default') } value={ chatValue } maxLength={ maxChatLength } onChange={ event => updateChatInput(event.target.value) } onMouseDown={ event => setInputFocus() } /> }
+                            { floodBlocked &&
+                            <Text variant="danger">{ LocalizeText('chat.input.alert.flood', [ 'time' ], [ floodBlockedSeconds.toString() ]) } </Text> }
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        className="chat-say-btn-2012"
+                        title="Decir"
+                        aria-label="Decir"
+                        onClick={ handleSayButtonClick }
+                    >
+                        <span className="chat-say-btn-label">Decir</span>
+                    </button>
+                </div>, target)
+        );
+    }
 
     return (
         createPortal(
@@ -336,26 +383,17 @@ export const ChatInputView: FC<{}> = props =>
                         )}
                     </div>
                 )}
-                { currentEra === 'flash2012' && (
-                    <div className="chat-addons chat-addons-2012-left">
-                        <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
-                        <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
-                        <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
-                    </div>
-                ) }
                 <div className="input-sizer align-items-center">
                     { !floodBlocked &&
                     <input ref={ inputRef } type="text" className="chat-input" placeholder={ currentEra === 'shockwave2006' ? '' : LocalizeText('widgets.chatinput.default') } value={ chatValue } maxLength={ maxChatLength } onChange={ event => updateChatInput(event.target.value) } onMouseDown={ event => setInputFocus() } /> }
                     { floodBlocked &&
                     <Text variant="danger">{ LocalizeText('chat.input.alert.flood', [ 'time' ], [ floodBlockedSeconds.toString() ]) } </Text> }
                 </div>
-                { currentEra !== 'flash2012' && (
-                    <div className="chat-addons">
-                        <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
-                        <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
-                        <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
-                    </div>
-                ) }
+                <div className="chat-addons">
+                    <ChatInputEmojiPickerView onSelectEmoji={ onSelectEmoji } forceOpen={ isEmojiPickerOpen } onClose={ () => setEmojiPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                    <ChatInputGifPickerView onSelectGif={ onSelectGif } forceOpen={ isGifPickerOpen } onClose={ () => setGifPickerOpen(false) } customTarget={ modeSelectorRef.current } />
+                    <ChatInputStyleSelectorView chatStyleId={ chatStyleId } chatStyleIds={ chatStyleIds } selectChatStyleId={ updateChatStyleId } />
+                </div>
             </div>, target)
     );
 }

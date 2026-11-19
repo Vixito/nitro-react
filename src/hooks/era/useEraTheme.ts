@@ -45,6 +45,7 @@ export const ERAS_CONFIG: EraInfo[] = [
 
 const STORAGE_KEY = 'habbten_theme_era';
 let activeEraMemory: EraType | null = null;
+const eraSubscribers = new Set<(era: EraType) => void>();
 
 const isValidEra = (val: any): val is EraType =>
     val === 'flash2012' || val === 'shockwave2006' || val === 'modern';
@@ -127,21 +128,34 @@ export const useEraTheme = () =>
 
     useEffect(() =>
     {
-        applyEraToDOM(currentEra);
+        const latest = resolveCurrentEra();
+        applyEraToDOM(latest);
+        setCurrentEraState(prev => (prev !== latest ? latest : prev));
+
+        const subscriber = (nextEra: EraType) =>
+        {
+            setCurrentEraState(nextEra);
+        };
 
         const handleEraChange = (e: CustomEvent<EraType>) =>
         {
             if(e.detail && isValidEra(e.detail))
             {
                 activeEraMemory = e.detail;
-                setCurrentEraState(e.detail);
                 applyEraToDOM(e.detail);
+                setCurrentEraState(e.detail);
             }
         };
 
+        eraSubscribers.add(subscriber);
         window.addEventListener('nitro-era-changed' as any, handleEraChange);
-        return () => window.removeEventListener('nitro-era-changed' as any, handleEraChange);
-    }, [ currentEra ]);
+
+        return () =>
+        {
+            eraSubscribers.delete(subscriber);
+            window.removeEventListener('nitro-era-changed' as any, handleEraChange);
+        };
+    }, []);
 
     const setEra = useCallback((era: EraType) =>
     {
@@ -180,8 +194,8 @@ export const useEraTheme = () =>
             window.parent?.postMessage({ type: 'nitro-era-changed', era }, '*');
         }
         catch(e) {}
-        setCurrentEraState(era);
         applyEraToDOM(era);
+        eraSubscribers.forEach(fn => fn(era));
         window.dispatchEvent(new CustomEvent('nitro-era-changed', { detail: era }));
     }, []);
 

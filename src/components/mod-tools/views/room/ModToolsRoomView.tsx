@@ -107,9 +107,9 @@ export const ModToolsRoomView: FC<ModToolsRoomViewProps> = props =>
                     </Flex>
                 </Column>
                 <textarea className="form-control" placeholder="Escribe un mensaje obligatorio para los usuarios en este cuadro..." value={ message } onChange={ event => setMessage(event.target.value) }></textarea>
-                <Flex justifyContent="between">
-                    <Button variant="danger" onClick={ event => handleClick('send_message') }>Enviar Advertencia</Button>
-                    <Button onClick={ event => handleClick('alert_only') }>Enviar sólo Alerta</Button>
+                <Flex justifyContent="between" gap={ 2 }>
+                    <Button fullWidth variant="danger" onClick={ event => handleClick('send_message') }>Enviar Advertencia</Button>
+                    <Button fullWidth onClick={ event => handleClick('alert_only') }>Enviar sólo Alerta</Button>
                 </Flex>
             </NitroCardContentView>
         </NitroCardView>

@@ -3,6 +3,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { AddEventLinkTracker, GetUserProfile, LocalizeText, MessengerFriend, RemoveLinkEventTracker, SendMessageComposer } from '../../../../api';
 import { Button, Flex, NitroCardAccordionSetView, NitroCardAccordionView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
 import { useFriends } from '../../../../hooks';
+import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 import { FriendsListGroupView } from './friends-list-group/FriendsListGroupView';
 import { FriendsListRequestView } from './friends-list-request/FriendsListRequestView';
 import { FriendsRemoveConfirmationView } from './FriendsListRemoveConfirmationView';
@@ -11,6 +12,7 @@ import { FriendsSearchView } from './FriendsListSearchView';
 
 export const FriendsListView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ isSearchMode, setIsSearchMode ] = useState(false);
     const [ searchTrigger, setSearchTrigger ] = useState(0);
@@ -150,40 +152,41 @@ export const FriendsListView: FC<{}> = props =>
                         </NitroCardAccordionSetView>
                         { (requests.length > 0) &&
                             <FriendsListRequestView headerText={ `Peticiones (${ requests.length })` } isExpanded={ true } /> }
-                        <Flex className="friends-action-bar-2012" justifyContent="between" alignItems="center">
-                            <Flex gap={ 1 } alignItems="center">
+                        { currentEra === 'flash2012' &&
+                            <Flex className="friends-action-bar-2012" justifyContent="between" alignItems="center">
+                                <Flex gap={ 1 } alignItems="center">
+                                    <button
+                                        type="button"
+                                        className="friends-2012-action-btn btn-follow-2012"
+                                        title={ LocalizeText('friendlist.tip.follow') || 'Seguir / Invitar' }
+                                        disabled={ !selectedFriendsIds || (selectedFriendsIds.length === 0) }
+                                        onClick={ () => {
+                                            if(!selectedFriendsIds || !selectedFriendsIds.length) return;
+                                            const friend = onlineFriends.find(f => f.id === selectedFriendsIds[0]);
+                                            if(friend && friend.followingAllowed && followFriend) followFriend(friend);
+                                            else setShowRoomInvite(true);
+                                        } }
+                                    />
+                                    <button
+                                        type="button"
+                                        className="friends-2012-action-btn btn-profile-2012"
+                                        title={ LocalizeText('friendlist.tip.home') || 'Ver perfil' }
+                                        disabled={ !selectedFriendsIds || (selectedFriendsIds.length === 0) }
+                                        onClick={ () => {
+                                            if(selectedFriendsIds && selectedFriendsIds.length > 0) GetUserProfile(selectedFriendsIds[0]);
+                                        } }
+                                    />
+                                </Flex>
                                 <button
                                     type="button"
-                                    className="friends-2012-action-btn btn-follow-2012"
-                                    title={ LocalizeText('friendlist.tip.follow') || 'Seguir / Invitar' }
+                                    className="friends-2012-action-btn btn-remove-2012"
+                                    title={ LocalizeText('generic.delete') || 'Eliminar amig@' }
                                     disabled={ !selectedFriendsIds || (selectedFriendsIds.length === 0) }
                                     onClick={ () => {
-                                        if(!selectedFriendsIds || !selectedFriendsIds.length) return;
-                                        const friend = onlineFriends.find(f => f.id === selectedFriendsIds[0]);
-                                        if(friend && friend.followingAllowed && followFriend) followFriend(friend);
-                                        else setShowRoomInvite(true);
+                                        if(selectedFriendsIds && selectedFriendsIds.length > 0) setShowRemoveFriendsConfirmation(true);
                                     } }
                                 />
-                                <button
-                                    type="button"
-                                    className="friends-2012-action-btn btn-profile-2012"
-                                    title={ LocalizeText('friendlist.tip.home') || 'Ver perfil' }
-                                    disabled={ !selectedFriendsIds || (selectedFriendsIds.length === 0) }
-                                    onClick={ () => {
-                                        if(selectedFriendsIds && selectedFriendsIds.length > 0) GetUserProfile(selectedFriendsIds[0]);
-                                    } }
-                                />
-                            </Flex>
-                            <button
-                                type="button"
-                                className="friends-2012-action-btn btn-remove-2012"
-                                title={ LocalizeText('generic.delete') || 'Eliminar amig@' }
-                                disabled={ !selectedFriendsIds || (selectedFriendsIds.length === 0) }
-                                onClick={ () => {
-                                    if(selectedFriendsIds && selectedFriendsIds.length > 0) setShowRemoveFriendsConfirmation(true);
-                                } }
-                            />
-                        </Flex>
+                            </Flex> }
                         <FriendsSearchView classNames={ [ 'friends-search-set' ] } headerText={ searchHeader } isExpanded={ isSearchMode } expandTrigger={ searchTrigger } />
                     </NitroCardAccordionView>
                     { selectedFriendsIds && selectedFriendsIds.length > 0 &&

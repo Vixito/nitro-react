@@ -461,7 +461,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                     </Column>
                 </Column>
             </Column>
-            <Flex gap={ 1 } justifyContent="end">
+            <Flex gap={ 1 } justifyContent="end" className="button-container mt-2">
                 { canMove &&
                     <Button variant="dark" onClick={ event => processButtonAction('move') }>
                         { LocalizeText('infostand.button.move') }

@@ -194,12 +194,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     {
         return (
             <>
-                <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 200 }>
+                <TransitionAnimation key="me-2012" type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 200 }>
                     <ToolbarMeView useGuideTool={ useGuideTool } unseenAchievementCount={ getTotalUnseen } setMeExpanded={ setMeExpanded } isInRoom={ isInRoom } />
                 </TransitionAnimation>
 
                 {/* Auténtica Barra Lateral Vertical Izquierda Marzo 2012 (HabboToolbarCom) */}
-                <div className="nitro-toolbar toolbar-flash2012">
+                <div key="toolbar-flash2012" className="nitro-toolbar toolbar-flash2012">
                     <div className="toolbar-capsule">
                         { isInRoom ? (
                             <div className="navigation-item item-hotel icon-hotel" title="Recepción / Vista del Hotel" onClick={ () => VisitDesktop() }>
@@ -266,35 +266,39 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     </div>
                 </div>
 
-                {/* Auténtica Barra Inferior 2012 Flash (Friend Bar Stream + Amigos + Messenger) */}
-                <div className="nitro-bottom-bar-2012">
+                {/* Auténtica Barra Inferior 2012 Flash (Full-Width Dark Bar: Consola Izquierda + Friend Bar Centro + Ver todos los amigos Derecha) */}
+                <div key="bottom-bar-flash2012" className="nitro-bottom-bar-2012" role="toolbar" aria-label="Barra de consola y amigos">
+                    <div className="bottom-bar-console-left">
+                        <button
+                            type="button"
+                            className={ `bottom-bar-btn btn-messenger ${ (iconState === MessengerIconState.UNREAD) ? 'is-unread pulse-animation' : '' }` }
+                            title="Consola / Mensajes"
+                            aria-label="Consola / Mensajes"
+                            onClick={ () => OpenMessengerChat() }
+                        >
+                            <i className="icon icon-chat-bubble" aria-hidden="true" />
+                        </button>
+                    </div>
+
                     <div className="bottom-bar-left">
-                        <div id="toolbar-friend-bar-container" className="friend-bar-stream-container" />
+                        <div key="friendbar-target-2012" id="toolbar-friend-bar-container" className="friend-bar-stream-container" />
                     </div>
 
                     <div className="bottom-bar-right">
-                        <div
+                        <button
+                            type="button"
                             className="bottom-bar-btn btn-all-friends"
-                            title="Lista de Amig@s"
+                            title="Ver todos los amigos"
                             onClick={ () => CreateLinkEvent('friends/toggle') }
                         >
-                            <i className="icon icon-friends-list" />
-                            <span className="btn-label">Amig@s</span>
+                            <span className="btn-label">Ver todos los amigos</span>
                             { (requests.length > 0) && <LayoutItemCountView count={ requests.length } /> }
-                        </div>
-
-                        <div
-                            className={ `bottom-bar-btn btn-messenger ${ (iconState === MessengerIconState.UNREAD) ? 'is-unread pulse-animation' : '' }` }
-                            title="Consola / Mensajes"
-                            onClick={ () => OpenMessengerChat() }
-                        >
-                            <i className="icon icon-chat-bubble" />
-                        </div>
+                        </button>
                     </div>
                 </div>
 
                 {/* Entrada de Chat Flotante en Sala (2012 Flash) */}
-                <div id="toolbar-chat-input-container" className="chat-container-flash2012" />
+                <div key="chat-input-target-2012" id="toolbar-chat-input-container" className="chat-container-flash2012" />
             </>
         );
     }
@@ -303,12 +307,12 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     {
         return (
             <>
-                <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 300 }>
+                <TransitionAnimation key="me-2006" type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 300 }>
                     <ToolbarMeView useGuideTool={ useGuideTool } unseenAchievementCount={ getTotalUnseen } setMeExpanded={ setMeExpanded } />
                 </TransitionAnimation>
 
                 {/* Auténtica Barra Inferior Shockwave 2006 (Habbten v14 / Origins) */}
-                <div className="nitro-toolbar toolbar-shockwave2006">
+                <div key="toolbar-shockwave2006" className="nitro-toolbar toolbar-shockwave2006">
                     <div className="toolbar-inner">
                         {/* GRUPO IZQUIERDO: Avatar + Barra de Chat */}
                         <div className="toolbar-left-group">
@@ -412,17 +416,17 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                     </div>
                 </div>
 
-                <div id="toolbar-friend-bar-container" className="d-none" />
+                <div key="friendbar-placeholder-2006" id="toolbar-friend-bar-container" className="d-none" />
             </>
         );
     }
 
     return (
         <>
-            <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 300 }>
+            <TransitionAnimation key="me-modern" type={ TransitionAnimationTypes.FADE_IN } inProp={ isMeExpanded } timeout={ 300 }>
                 <ToolbarMeView useGuideTool={ useGuideTool } unseenAchievementCount={ getTotalUnseen } setMeExpanded={ setMeExpanded } />
             </TransitionAnimation>
-            <Flex alignItems="center" justifyContent="between" gap={ 2 } className="nitro-toolbar py-1 px-3">
+            <Flex key="toolbar-modern" alignItems="center" justifyContent="between" gap={ 2 } className="nitro-toolbar py-1 px-3">
                 <Flex gap={ 2 } alignItems="center">
                     <Flex alignItems="center" gap={ 2 }>
                         <Flex center pointer title="Mi Personaje" className={ 'navigation-item item-avatar ' + (isMeExpanded ? 'active ' : '') } onClick={ event => setMeExpanded(!isMeExpanded) }>
