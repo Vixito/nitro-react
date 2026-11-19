@@ -25,7 +25,9 @@ const GAME_CONTROLS: { [ gameNameId: string ]: { action: string; keys: string }[
         { action: 'Acelerar', keys: 'Espacio / Flecha Arriba / W' }
     ],
     battleball: [
-        { action: 'Mover tu bola', keys: 'W A S D / Flechas' }
+        { action: 'Mover saltador y colorear baldosas', keys: 'Clic en el suelo / WASD / Flechas' },
+        { action: 'Activar poder especial recogido', keys: 'Espacio / Clic en la casilla de poder' },
+        { action: 'Chat de equipo', keys: 'Enter' }
     ]
 };
 
@@ -57,10 +59,13 @@ const GAME_DESCRIPTIONS: { [ gameNameId: string ]: { title: string; desc: string
 };
 
 export const GameView = () => {
-    const { isVisible, selectedGame, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible, isSnowStormLobbyVisible, isSnowStormPlaying } = useGameCenter();
+    const { isVisible, selectedGame, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, setIsBattleBallPlaying } = useGameCenter();
     const [ realStatus, setRealStatus ] = useState<{ games_left: number; has_unlimited: boolean } | null>(null);
+    const [ launchError, setLaunchError ] = useState<string | null>(null);
+    const [ launching, setLaunching ] = useState<boolean>(false);
 
     useEffect(() => {
+        setLaunchError(null);
         if (selectedGame) {
             SendMessageComposer(new GetGameStatusMessageComposer(selectedGame.gameId));
             SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(selectedGame.gameId));
@@ -71,7 +76,10 @@ export const GameView = () => {
     useEffect(() => {
         if (!isVisible) return;
         let cancelled = false;
-        fetch('/api/games/snowstorm/status', { credentials: 'include' })
+        const statusEndpoint = selectedGame?.gameNameId === 'battleball'
+            ? '/api/games/battleball/status'
+            : '/api/games/snowstorm/status';
+        fetch(statusEndpoint, { credentials: 'include' })
             .then(r => r.ok ? r.json() : null)
             .then(data => {
                 if (!cancelled && data && data.success) {
@@ -83,7 +91,7 @@ export const GameView = () => {
             })
             .catch(() => {});
         return () => { cancelled = true; };
-    }, [ isVisible, selectedGame, isSnowStormLobbyVisible, isSnowStormPlaying ]);
+    }, [ isVisible, selectedGame, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying ]);
 
     const controls = useMemo(() => (selectedGame && GAME_CONTROLS[ selectedGame.gameNameId ]) || DEFAULT_CONTROLS, [ selectedGame ]);
 
@@ -97,12 +105,37 @@ export const GameView = () => {
         return `url(${selectedGame.assetUrl}${selectedGame.gameNameId}_theme.png?v=5)`;
     };
 
-    const onPlay = () => {
-        if (gameOffline) return;
+    const onPlay = async () => {
+        if (gameOffline || launching) return;
+        setLaunchError(null);
         
         if (selectedGame && (selectedGame.gameNameId === 'snowwar' || selectedGame.gameNameId === 'snowstorm')) {
             setIsVisible(false);
             setIsSnowStormLobbyVisible(true);
+            return;
+        }
+
+        if (selectedGame && selectedGame.gameNameId === 'battleball') {
+            setLaunching(true);
+            try {
+                const res = await fetch('/api/games/battleball/start', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    setLaunchError(data.error || 'Has agotado tus partidas gratuitas de hoy. ¡Hazte Habbten Club para partidas ilimitadas!');
+                    setLaunching(false);
+                    return;
+                }
+                setIsVisible(false);
+                setIsBattleBallPlaying(true);
+            } catch {
+                setLaunchError('Error de conexión con el servidor de Battle Ball.');
+            } finally {
+                setLaunching(false);
+            }
             return;
         }
 
@@ -111,7 +144,6 @@ export const GameView = () => {
         const gameUrls: { [name: string]: string } = {
             basejump: '/games/basejump/index.html',
             wobblesquabble: '/games/wobblesquabble/index.html',
-            battleball: '/games/battleball/index.html',
             slotcar: '/games/slotcar/index.html'
         };
 
@@ -190,13 +222,18 @@ export const GameView = () => {
             </Flex>
 
             <Flex column alignItems="center" justifyContent="center" gap={ 1 } className="game-view-cta-row pb-2">
+                { launchError && (
+                    <Text variant="white" small bold className="text-center px-3 py-1 mb-1 rounded" style={{ backgroundColor: 'rgba(185, 28, 28, 0.9)', border: '1px solid #fca5a5' }}>
+                        { launchError }
+                    </Text>
+                ) }
                 <Button 
                     variant={ gameOffline ? 'secondary' : 'success' } 
-                    disabled={ gameOffline }
+                    disabled={ gameOffline || launching }
                     className="btn-play-game px-5 py-2" 
                     onClick={ onPlay }
                 >
-                    { gameOffline ? 'En Mantenimiento' : '¡JUGAR AHORA!' }
+                    { gameOffline ? 'En Mantenimiento' : (launching ? 'Conectando...' : '¡JUGAR AHORA!') }
                 </Button>
 
                 <Flex column alignItems="center" gap={ 0 } className="mt-1">

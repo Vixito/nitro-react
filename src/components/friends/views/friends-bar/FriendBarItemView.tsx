@@ -4,6 +4,7 @@ import { CreateLinkEvent, GetUserProfile, LocalizeText, MessengerFriend, OpenMes
 import { Base, LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
 import { useFriends, useGamePresence } from '../../../../hooks';
 import SnowballIconImg from '../../../../assets/images/gamecenter/snowstorm/thumbnails_Extra_ss_snowball.png';
+import BattleBallIconImg from '../../../../assets/images/gamecenter/battleball/pu_spring.png';
 
 export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
 {
@@ -67,7 +68,7 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
             </div>
             { activeGame && (
                 <img
-                    src={ SnowballIconImg }
+                    src={ activeGame.game === 'battleball' ? BattleBallIconImg : SnowballIconImg }
                     alt={ activeGame.label }
                     title={ `${ friend.name } está jugando a ${ activeGame.label }` }
                     className="friend-bar-game-snowball"

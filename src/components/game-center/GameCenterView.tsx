@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { AddEventLinkTracker, RemoveLinkEventTracker } from '../../api';
 import { Base, Flex, Text } from '../../common';
 import { useGameCenter } from '../../hooks';
+import { BattleBallGameView } from './views/BattleBallGameView';
 import { GameListView } from './views/GameListView';
 import { GameStageView } from './views/GameStageView';
 import { GameView } from './views/GameView';
@@ -11,7 +12,7 @@ import { SnowStormLobbyView } from './views/SnowStormLobbyView';
 
 export const GameCenterView = () => 
 {
-    const{ isVisible, setIsVisible, isSnowStormLobbyVisible, isSnowStormPlaying, games, accountStatus } = useGameCenter();
+    const{ isVisible, setIsVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, games, accountStatus } = useGameCenter();
 
     useEffect(() => {
         const checkEnabled = (e?: any) => {
@@ -86,6 +87,7 @@ export const GameCenterView = () =>
             )}
             { isSnowStormLobbyVisible && <SnowStormLobbyView /> }
             { isSnowStormPlaying && <SnowStormGameView /> }
+            { isBattleBallPlaying && <BattleBallGameView /> }
             <GameStageView />
         </>
     );

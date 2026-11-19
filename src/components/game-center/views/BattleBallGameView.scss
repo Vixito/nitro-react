@@ -1,0 +1,1300 @@
+// =============================================================================
+// Habbten Battle Ball — 100% Authentic Habbo Shockwave 2006 / Origins Styling
+// Matches Battle_Ball.png, "El juego va a empezar", "Resultados finales / El mejor jugador",
+// and top-right power-up pill references pixel-for-pixel.
+// =============================================================================
+
+@mixin bb-outline-sm($color: #102a43) {
+    text-shadow:
+        -1px -1px 0 $color,
+         1px -1px 0 $color,
+        -1px  1px 0 $color,
+         1px  1px 0 $color !important;
+}
+
+.battleball-game-root {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Volter (Goldfish)', 'Volter Goldfish', 'Volter', 'Ubuntu', Tahoma, Arial, sans-serif;
+    user-select: none;
+    background: #6db6d1;
+    color: #111111;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    // Override Nitro global `img { object-fit: none; }`
+    img {
+        object-fit: contain !important;
+        image-rendering: pixelated;
+    }
+
+    // Hidden YouTube soundtrack iframe
+    .bb-yt-hidden {
+        position: fixed;
+        width: 2px;
+        height: 2px;
+        opacity: 0.001;
+        pointer-events: none;
+        bottom: 0;
+        left: 0;
+        border: 0;
+        z-index: -1;
+    }
+
+    // =========================================================================
+    // MAIN ARENA SHELL (ALWAYS VISIBLE ACROSS LOBBY, PLAYING & RESULTS!)
+    // =========================================================================
+    .bb-arena-layout {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .bb-canvas-area {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+        overflow: hidden;
+        cursor: pointer;
+
+        canvas.bb-arena-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+    }
+
+    // =========================================================================
+    // TOP-LEFT HABBO ORIGINS / SHOCKWAVE 2006 SCOREBOARD & TIMER
+    // =========================================================================
+    .bb-sw-scoreboard {
+        position: absolute;
+        top: 14px;
+        left: 16px;
+        z-index: 10;
+        width: 224px;
+        padding: 7px 8px 8px;
+        background: #9aa2a4;
+        border: 1px solid #000000;
+        border-radius: 6px;
+        box-shadow:
+            inset 1px 1px 0 #cdd5d7,
+            inset -1px -1px 0 #62696b,
+            2px 3px 0 rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        pointer-events: none;
+    }
+
+    .bb-sw-timer-pill {
+        width: 100%;
+        height: 22px;
+        border-radius: 999px;
+        background: #5e6567;
+        border: 1px solid #1d2021;
+        box-shadow: inset 0 1px 0 #798184;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.25px;
+        @include bb-outline-sm(#1a1e20);
+
+        &.is-urgent {
+            background: #9e2219;
+            color: #ffeb85;
+            animation: bb-pulse 0.65s infinite alternate;
+        }
+    }
+
+    .bb-sw-bars-well {
+        background: #4b5052;
+        border: 1px solid #1e2122;
+        border-radius: 2px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+    }
+
+    .bb-sw-team-bar-row {
+        position: relative;
+        height: 11px;
+        background: #5d6366;
+        border: 1px solid #1f2224;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+
+        &.is-mine {
+            border-color: #ffffff;
+        }
+
+        .bb-sw-team-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            transition: width 0.16s linear;
+
+            &.red {
+                background: #e53935;
+                box-shadow: inset 0 1px 0 #ff857d;
+            }
+            &.blue {
+                background: #2575e6;
+                box-shadow: inset 0 1px 0 #7cb8ff;
+            }
+            &.green {
+                background: #27a83c;
+                box-shadow: inset 0 1px 0 #7ef08f;
+            }
+            &.yellow {
+                background: #e3a709;
+                box-shadow: inset 0 1px 0 #fff08c;
+            }
+        }
+
+        .bb-sw-team-bar-label {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            padding: 0 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 9px;
+            line-height: 1;
+            font-weight: 800;
+            color: #ffffff;
+            @include bb-outline-sm(#0d1114);
+        }
+    }
+
+    .bb-sw-lock-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 9.5px;
+        font-weight: 700;
+        color: #1c2224;
+        padding: 0 2px;
+    }
+
+    // =========================================================================
+    // TOP-RIGHT AUTHENTIC HABBO BATTLE BALL POWER-UP TOAST (matches Bomba ref!)
+    // =========================================================================
+    .bb-sw-pu-toast {
+        position: absolute;
+        top: 14px;
+        right: 20px;
+        z-index: 12;
+        display: flex;
+        align-items: center;
+        pointer-events: none;
+        animation: bb-toast-in 0.18s ease-out;
+
+        .bb-sw-pu-toast-orb {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #d86767;
+            border: 1px solid #000000;
+            box-shadow: inset 0 1px 0 #f29d9d, 0 2px 0 rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+
+            .bb-sw-pu-toast-inner {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: #2b1e1e;
+                border: 1px solid #000000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                    width: 26px;
+                    height: 26px;
+                    transform: translateY(-2px);
+                }
+            }
+        }
+
+        .bb-sw-pu-toast-pill {
+            margin-left: -12px;
+            padding: 3px;
+            background: #d86767;
+            border: 1px solid #000000;
+            border-left: none;
+            border-radius: 0 999px 999px 0;
+            box-shadow: inset 0 1px 0 #f29d9d, 0 2px 0 rgba(0, 0, 0, 0.35);
+
+            span {
+                display: block;
+                padding: 2px 18px 2px 18px;
+                background: #000000;
+                border-radius: 0 999px 999px 0;
+                color: #ffffff;
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 0.2px;
+                white-space: nowrap;
+            }
+        }
+    }
+
+    .bb-effect-banner {
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        z-index: 10;
+        background: #3a1f16;
+        border: 1px solid #000000;
+        box-shadow: inset 0 1px 0 #a35a38, 0 2px 0 rgba(0, 0, 0, 0.35);
+        border-radius: 4px;
+        padding: 3px 10px;
+        color: #ffe270;
+        font-size: 11px;
+        font-weight: 800;
+        pointer-events: none;
+        @include bb-outline-sm(#000000);
+    }
+
+    // =========================================================================
+    // AUTHENTIC PRE-MATCH BOX: "El juego va a empezar" (OVER LIVE ARENA!)
+    // =========================================================================
+    .bb-overlay-center {
+        position: absolute;
+        inset: 0;
+        z-index: 25;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(12, 22, 30, 0.18);
+    }
+
+    .bb-starting-box {
+        width: 288px;
+        background: #9ca3a5;
+        border: 2px solid #161819;
+        border-radius: 8px;
+        box-shadow:
+            inset 1px 1px 0 #cfd6d8,
+            inset -1px -1px 0 #687072,
+            0 6px 0 rgba(0, 0, 0, 0.35);
+        padding: 8px 10px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+
+        .bb-starting-title-pill {
+            width: 88%;
+            height: 24px;
+            background: #515b5d;
+            border: 1px solid #161819;
+            border-radius: 999px;
+            box-shadow: inset 0 1px 0 #6f7c7e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            @include bb-outline-sm(#1e2324);
+        }
+
+        .bb-starting-well {
+            width: 100%;
+            background: #4e5e60;
+            border: 1px solid #15191a;
+            border-radius: 2px;
+            padding: 8px 9px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bb-starting-bar-track {
+            width: 100%;
+            height: 22px;
+            background: #777777;
+            border: 1px solid #15191a;
+            position: relative;
+            overflow: hidden;
+
+            .bb-starting-bar-fill {
+                height: 100%;
+                background: #e55b52;
+                border-right: 1px solid #8a241d;
+                box-shadow: inset 0 2px 0 #ff8d85;
+                transition: width 0.25s linear;
+            }
+        }
+
+        .bb-starting-divider {
+            width: 100%;
+            height: 1px;
+            background: #232b2c;
+            box-shadow: 0 1px 0 #66787a;
+            margin: -2px 0;
+        }
+
+        .bb-starting-footer-pills {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+
+            .bb-starting-pill {
+                height: 22px;
+                padding: 0 10px;
+                background: #5a6466;
+                border: 1px solid #1a1e20;
+                border-radius: 999px;
+                box-shadow: inset 0 1px 0 #7a8688;
+                color: #e6ecee;
+                font-size: 10.5px;
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+
+                &.is-wide {
+                    flex: 1;
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // AUTHENTIC POST-MATCH WINDOW: "Battle Ball" — Resultados finales + El mejor jugador
+    // (Matches screenshot #2 pixel-for-pixel, floating directly over finished arena!)
+    // =========================================================================
+    .bb-results-window {
+        width: 100%;
+        max-width: 650px;
+        background: #9ca3a5;
+        border: 2px solid #161819;
+        border-radius: 8px;
+        box-shadow:
+            inset 1px 1px 0 #cfd6d8,
+            inset -1px -1px 0 #687072,
+            0 8px 0 rgba(0, 0, 0, 0.38);
+        padding: 7px 10px 9px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .bb-results-top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        .bb-results-title-pill {
+            min-width: 210px;
+            height: 22px;
+            padding: 0 18px;
+            background: #535d5f;
+            border: 1px solid #181c1d;
+            border-radius: 999px;
+            box-shadow: inset 0 1px 0 #728082;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            @include bb-outline-sm(#1a2021);
+        }
+    }
+
+    .bb-results-columns {
+        display: grid;
+        grid-template-columns: 1.28fr 1fr;
+        gap: 6px;
+        background: #475355;
+        border: 1px solid #161819;
+        padding: 4px;
+    }
+
+    .bb-results-col-left {
+        background: #f5f6f7;
+        border: 1px solid #181c1d;
+        padding: 8px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+
+        .bb-results-heading {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 900;
+            color: #000000;
+            margin-bottom: 1px;
+        }
+    }
+
+    .bb-res-team-row {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+
+        .bb-res-team-badge {
+            width: 56px;
+            flex-shrink: 0;
+            background: #dedede;
+            border: 1px solid #181c1d;
+            border-right: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 5px;
+
+            .bb-res-hopper-dot {
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                border: 1.5px solid #000000;
+                position: relative;
+                box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.25), inset 3px 3px 0 rgba(255, 255, 255, 0.35);
+
+                &::before, &::after {
+                    content: '';
+                    position: absolute;
+                    top: -4px;
+                    width: 4px;
+                    height: 5px;
+                    border-radius: 2px;
+                    border: 1px solid #000000;
+                    background: inherit;
+                }
+                &::before { left: 4px; transform: rotate(-18deg); }
+                &::after { right: 4px; transform: rotate(18deg); }
+
+                &.red { background: #e52d27; }
+                &.blue { background: #1e73e8; }
+                &.green { background: #26b83c; }
+                &.yellow { background: #f2b705; }
+            }
+
+            .bb-res-team-total {
+                width: 100%;
+                margin-top: 5px;
+                padding: 2px 2px;
+                background: #a5a5a5;
+                border-top: 1px solid #595959;
+                text-align: center;
+                font-size: 10.5px;
+                font-weight: 900;
+                color: #111111;
+            }
+        }
+
+        .bb-res-team-players {
+            flex: 1;
+            background: #e5e5e5;
+            border: 1px solid #181c1d;
+            padding: 4px 8px 4px 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            .bb-res-rank-icon {
+                width: 22px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                align-self: flex-start;
+                padding-top: 1px;
+            }
+
+            .bb-res-player-list {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .bb-res-player-line {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 11px;
+                font-weight: 700;
+                color: #111111;
+                padding: 1px 3px;
+                border-radius: 2px;
+
+                &.is-me {
+                    background: #fff3b0;
+                    outline: 1px solid #c98600;
+                }
+
+                .bb-res-pname {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .bb-res-me-tag {
+                    font-size: 8.5px;
+                    font-weight: 900;
+                    background: #e09f00;
+                    color: #000000;
+                    border: 1px solid #6b4600;
+                    padding: 0 3px;
+                    border-radius: 2px;
+                }
+
+                .bb-res-pscore {
+                    font-weight: 900;
+                    color: #000000;
+                }
+            }
+        }
+    }
+
+    // Right Column: "El mejor jugador ha sido:" + Starburst MVP + Next Game
+    .bb-results-col-right {
+        background: #f5f6f7;
+        border: 1px solid #181c1d;
+        display: flex;
+        flex-direction: column;
+
+        .bb-mvp-section {
+            padding: 8px 10px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: #f5f6f7;
+
+            .bb-results-heading {
+                font-size: 12px;
+                font-weight: 900;
+                color: #000000;
+            }
+        }
+
+        .bb-mvp-starburst-wrap {
+            position: relative;
+            width: 118px;
+            height: 114px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+
+            .bb-mvp-starburst-svg {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .bb-mvp-avatar-img {
+                position: relative;
+                z-index: 2;
+                max-height: 92px;
+                width: auto;
+                image-rendering: pixelated;
+                filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25));
+            }
+        }
+
+        .bb-mvp-name-bar {
+            width: 100%;
+            background: #dfdfdf;
+            border-top: 1px solid #181c1d;
+            border-bottom: 1px solid #181c1d;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 900;
+            color: #000000;
+
+            .bb-mvp-name-left {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+        }
+
+        .bb-next-game-section {
+            padding: 8px 10px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: #f5f6f7;
+
+            .bb-next-title {
+                font-size: 12px;
+                font-weight: 900;
+                color: #000000;
+            }
+
+            .bb-next-timer-bar {
+                width: 100%;
+                background: #dadada;
+                border: 1px solid #8a8a8a;
+                padding: 4px 6px;
+                text-align: center;
+                font-size: 11px;
+                font-weight: 700;
+                color: #111111;
+            }
+
+            .bb-next-progress-track {
+                width: 100%;
+                height: 15px;
+                background: #9fa4a6;
+                border: 1px solid #3c4244;
+                position: relative;
+                display: flex;
+                align-items: center;
+                padding: 0 4px;
+                overflow: hidden;
+
+                .bb-next-progress-fill {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    background: #6799ad;
+                    transition: width 0.5s linear;
+                }
+
+                .bb-next-star {
+                    position: relative;
+                    z-index: 1;
+                    font-size: 10px;
+                    color: #2e3436;
+                }
+            }
+        }
+
+        .bb-next-actions-box {
+            flex: 1;
+            background: #9eb9bf;
+            border-top: 1px solid #3c4d52;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+    }
+
+    // Classic Shockwave Rounded Pill Buttons ("Juega otra vez", "Abandonar")
+    .bb-sw-pill-btn {
+        min-width: 140px;
+        height: 26px;
+        padding: 0 16px;
+        border-radius: 999px;
+        border: 1.5px solid #141819;
+        background: linear-gradient(180deg, #dce5e7 0%, #aebcc0 60%, #98a8ad 100%);
+        box-shadow: inset 0 1px 0 #ffffff, 0 1px 0 rgba(0, 0, 0, 0.25);
+        color: #000000;
+        font-size: 11.5px;
+        font-weight: 900;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not(:disabled) {
+            background: linear-gradient(180deg, #eff5f6 0%, #c4d1d5 60%, #b0bfc4 100%);
+        }
+
+        &:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+    }
+
+    // Bottom bar of Results Window (Real Habbten Rewards + Badges)
+    .bb-results-rewards-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 5px 8px;
+        background: #848e91;
+        border: 1px solid #1d2122;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 0 #aab4b7;
+
+        .bb-rewards-currencies {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bb-reward-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11.5px;
+            font-weight: 800;
+            color: #ffffff;
+            @include bb-outline-sm(#1a2326);
+
+            img {
+                width: 16px;
+                height: 16px;
+            }
+
+            &.is-duckets { color: #f3d6ff; }
+            &.is-credits { color: #ffe98a; }
+        }
+
+        .bb-badges-unlocked {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+
+            .bb-badge-unlock-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                background: #ffffff;
+                border: 1px solid #000000;
+                border-radius: 3px;
+                padding: 2px 7px 2px 3px;
+
+                img {
+                    width: 26px;
+                    height: 26px;
+                }
+
+                .bb-badge-kicker {
+                    display: block;
+                    font-size: 8px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    color: #15803d;
+                }
+
+                .bb-badge-name {
+                    display: block;
+                    font-size: 10.5px;
+                    font-weight: 800;
+                    color: #111111;
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // AUTHENTIC TERRACOTTA SHOCKWAVE 2006 BATTLE BALL BOTTOM BAR
+    // =========================================================================
+    .bb-bottom-hud {
+        position: relative;
+        height: 54px;
+        flex-shrink: 0;
+        background: #c05341;
+        border-top: 2px solid #873a2d;
+        display: flex;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 0;
+        z-index: 30;
+
+        .bb-hud-marquee {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background-repeat: repeat-x;
+            background-position: left top;
+            image-rendering: pixelated;
+            pointer-events: none;
+        }
+    }
+
+    .bb-hud-zone-avatar {
+        width: 68px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid #7d3326;
+        box-shadow: inset -1px 0 0 #d67665;
+    }
+
+    // Authentic Habbten Shockwave 2006 Client Chat Bar (1:1 single continuous rounded white pill + hover label!)
+    .bb-hud-zone-chat {
+        position: relative;
+        flex: 1;
+        min-width: 260px;
+        max-width: 520px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 12px 6px;
+        border-right: 1px solid #7d3326;
+        box-shadow: inset -1px 0 0 #d67665;
+    }
+
+    .bb-sw2006-chat-pill {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 26px;
+        background: #ffffff;
+        border: 1px solid #000000;
+        border-radius: 13px;
+        position: relative;
+        overflow: visible;
+    }
+
+    .bb-sw2006-mode-btn {
+        display: inline-flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 8px 0 10px;
+        border: none;
+        border-right: 1px solid #000000;
+        border-radius: 12px;
+        background: #ffffff;
+        cursor: pointer;
+        position: relative;
+        flex-shrink: 0;
+
+        &:hover {
+            background: #f4f4f4;
+        }
+
+        .bb-mode-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #000000;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .bb-mode-divider {
+            width: 0;
+            height: 14px;
+            border-left: 1px dotted #888888;
+            margin: 0 6px;
+            flex-shrink: 0;
+        }
+
+        .bb-mode-arrow {
+            font-size: 7px;
+            line-height: 1;
+            color: #000000;
+            transform: scale(1.1, 0.8);
+            margin-right: 2px;
+        }
+    }
+
+    .bb-sw2006-mode-menu {
+        position: absolute;
+        bottom: 29px;
+        left: 0;
+        background: #ebebe8;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        z-index: 60;
+        min-width: 102px;
+        display: flex;
+        flex-direction: column;
+        padding: 3px;
+
+        .bb-sw2006-mode-item {
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #000000;
+            cursor: pointer;
+            border-radius: 2px;
+            text-align: left;
+            background: transparent;
+            border: none;
+
+            &:hover,
+            &.is-active {
+                background: #5b90a4;
+                color: #ffffff;
+            }
+        }
+    }
+
+    .bb-sw-chat-form {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+
+        input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            font-size: 11px;
+            font-weight: 400;
+            color: #000000;
+            outline: none;
+        }
+    }
+
+    .bb-sw2006-hover-label {
+        position: absolute;
+        bottom: 2px;
+        left: 18px;
+        font-size: 9px;
+        line-height: 10px;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 1px 1px 0 #000000 !important;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+
+    .bb-hud-zone-powerup {
+        width: 124px;
+        flex-shrink: 0;
+        background: #c66353;
+        border-right: 1px solid #7d3326;
+        box-shadow: inset -1px 0 0 #d67665;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 0 8px;
+    }
+
+    .bb-pu-preview-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 7px;
+        background: #d28378;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        .bb-pu-preview-timer {
+            font-size: 11px;
+            font-weight: 900;
+            color: #ffffff;
+            @include bb-outline-sm(#5c2017);
+        }
+
+        img {
+            width: 26px;
+            height: 26px;
+            opacity: 0.72;
+        }
+    }
+
+    .bb-pu-arrow {
+        width: 0;
+        height: 0;
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        border-left: 6px solid #d98c80;
+        flex-shrink: 0;
+    }
+
+    .bb-pu-trigger-btn {
+        width: 47px;
+        height: 42px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        cursor: default;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        .bb-pu-empty-img {
+            width: 47px;
+            height: 42px;
+        }
+
+        &.has-powerup {
+            cursor: pointer;
+            background: #9c7858;
+            border: 2px solid #2b1d12;
+            border-radius: 8px;
+            box-shadow:
+                inset 0 2px 0 #c9a684,
+                inset 0 -2px 0 #6b4e35,
+                0 0 8px rgba(255, 224, 102, 0.75);
+            animation: bb-pu-glow 0.85s infinite alternate;
+
+            &:hover {
+                filter: brightness(1.12);
+                transform: scale(1.03);
+            }
+
+            &:active {
+                transform: scale(0.96);
+            }
+
+            img {
+                width: 30px;
+                height: 30px;
+                filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.6));
+            }
+        }
+    }
+
+    .bb-hud-zone-icons {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        padding: 0 18px;
+    }
+
+    .bb-sw-icon-btn {
+        position: relative;
+        background: transparent;
+        border: none;
+        padding: 2px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.08s ease, filter 0.1s ease;
+
+        &:hover {
+            transform: translateY(-1px) scale(1.06);
+            filter: brightness(1.12);
+        }
+
+        &:active {
+            transform: translateY(1px) scale(0.96);
+        }
+
+        &.is-muted {
+            opacity: 0.45;
+            filter: grayscale(0.7);
+
+            &::after {
+                content: '';
+                position: absolute;
+                width: 28px;
+                height: 3px;
+                background: #ff2b2b;
+                border: 1px solid #000000;
+                transform: rotate(-35deg);
+                pointer-events: none;
+            }
+        }
+
+        img.bb-ico-audio { height: 20px; width: auto; }
+        img.bb-ico-rank { height: 30px; width: auto; }
+        img.bb-ico-hotel { height: 36px; width: auto; }
+        img.bb-ico-help { height: 32px; width: auto; }
+    }
+
+    // =========================================================================
+    // SHOCKWAVE 2006 MODALS (EXIT, HELP, RANKING)
+    // =========================================================================
+    .bb-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(8, 16, 24, 0.55);
+        z-index: 45;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .bb-sw-window {
+        width: 100%;
+        background: #8a9599;
+        border: 1px solid #000000;
+        border-radius: 7px;
+        box-shadow:
+            inset 1px 1px 0 #c7d1d4,
+            inset -1px -1px 0 #5b6468,
+            0 6px 0 rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+
+        &.is-compact { max-width: 390px; }
+        &.is-wide { max-width: 560px; }
+    }
+
+    .bb-sw-header {
+        height: 26px;
+        background: #6596a8;
+        border-bottom: 1px solid #000000;
+        box-shadow: inset 0 1px 0 #95c2d1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 7px;
+        gap: 10px;
+
+        .bb-sw-dots {
+            flex: 1;
+            height: 9px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23b8d8e6'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 2px 2px;
+            image-rendering: pixelated;
+        }
+
+        .bb-sw-title {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+            @include bb-outline-sm(#1c3b47);
+        }
+
+        .bb-sw-close {
+            width: 15px;
+            height: 15px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            img { width: 13px; height: 13px; }
+        }
+    }
+
+    .bb-sw-body {
+        padding: 10px 12px 12px;
+        background: #d7dcde;
+        border-top: 1px solid #f0f4f5;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .bb-sw-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+
+        &.is-center { justify-content: center; }
+    }
+
+    .bb-sw-btn {
+        height: 26px;
+        padding: 0 13px;
+        border-radius: 4px;
+        border: 1px solid #000000;
+        background: linear-gradient(180deg, #ffffff 0%, #e1e5e8 55%, #cdd3d7 100%);
+        box-shadow: inset 0 1px 0 #ffffff, 0 1px 0 rgba(0, 0, 0, 0.25);
+        color: #000000;
+        font-size: 11px;
+        font-weight: 800;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover { background: linear-gradient(180deg, #ffffff 0%, #eef2f5 55%, #dbe1e6 100%); }
+        &.is-active { background: #6596a8; color: #ffffff; @include bb-outline-sm(#1a3a47); }
+        &.is-danger {
+            background: linear-gradient(180deg, #e05246 0%, #c03126 55%, #9e2219 100%);
+            color: #ffffff;
+            @include bb-outline-sm(#590f0a);
+        }
+        &.is-primary {
+            background: linear-gradient(180deg, #52b832 0%, #37921d 55%, #2a7813 100%);
+            color: #ffffff;
+            @include bb-outline-sm(#154009);
+        }
+    }
+
+    .bb-sw-list-box {
+        max-height: 240px;
+        overflow-y: auto;
+        background: #ffffff;
+        border: 1px solid #2a3136;
+        border-radius: 3px;
+        padding: 4px;
+    }
+
+    .bb-sw-list-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 6px;
+        border-bottom: 1px solid #dfe5e8;
+        font-size: 11.5px;
+
+        &:nth-child(even) { background: #f4f7f8; }
+        &:last-child { border-bottom: none; }
+    }
+}
+
+@keyframes bb-pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.03); }
+}
+
+@keyframes bb-pu-glow {
+    from { box-shadow: inset 0 2px 0 #c9a684, inset 0 -2px 0 #6b4e35, 0 0 4px rgba(255, 224, 102, 0.55); }
+    to { box-shadow: inset 0 2px 0 #e6c6a5, inset 0 -2px 0 #6b4e35, 0 0 12px rgba(255, 232, 120, 0.95); }
+}
+
+@keyframes bb-toast-in {
+    from { opacity: 0; transform: translateX(18px); }
+    to { opacity: 1; transform: translateX(0); }
+}

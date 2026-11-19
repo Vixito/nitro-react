@@ -69,7 +69,7 @@ export const FriendsListGroupItemView: FC<{ friend: MessengerFriend, selected: b
                         style={{
                             fontSize: '9px',
                             fontWeight: 800,
-                            background: '#0ea5e9',
+                            background: activeGame.game === 'battleball' ? '#d97706' : '#0ea5e9',
                             color: '#ffffff',
                             padding: '1px 5px',
                             borderRadius: '3px',
