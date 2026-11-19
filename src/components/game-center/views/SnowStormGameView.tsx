@@ -1,15 +1,18 @@
 import { AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetSessionDataManager } from '../../../api';
+import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from '../../../api';
 import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, SnowStormParkaAvatar, trimTransparentImage } from './SnowStormAvatar';
 
+import creditIconImg from '../../../assets/images/eras/flash2012/purse/credit_icon.png';
+import ducketIconImg from '../../../assets/images/eras/flash2012/purse/ducket_icon.png';
+import closeUbuntuImg from '../../../assets/images/eras/flash2012/skins/close_ubuntu_normal.png';
 import room1Img from '../../../assets/images/gamecenter/snowstorm/Room_snowstorm_1.png';
 import room2Img from '../../../assets/images/gamecenter/snowstorm/Room_snowstorm_2.png';
 import room3Img from '../../../assets/images/gamecenter/snowstorm/Room_snowstorm_3.png';
 import room4Img from '../../../assets/images/gamecenter/snowstorm/Room_snowstorm_4.png';
 import room5Img from '../../../assets/images/gamecenter/snowstorm/Room_snowstorm_5.png';
-import posesSheetImg from '../../../assets/images/gamecenter/snowstorm/Snowstorm_poses.png';
+import posesGridImg from '../../../assets/images/gamecenter/snowstorm/Snowstorm_poses_grid.png';
 import hudBtnLeaveImg from '../../../assets/images/gamecenter/snowstorm/hud_btn_leave.png';
 import hudBtnReloadImg from '../../../assets/images/gamecenter/snowstorm/hud_btn_reload.png';
 import hudMittenBlueImg from '../../../assets/images/gamecenter/snowstorm/hud_mitten_blue.png';
@@ -341,7 +344,7 @@ const ARENAS: ArenaDef[] = [
     }
 ];
 
-function isWalkable(grid: TileType[][], gx: number, gy: number): boolean
+function isTileWalkable(grid: TileType[][], gx: number, gy: number): boolean
 {
     const ix = Math.floor(gx);
     const iy = Math.floor(gy);
@@ -350,13 +353,41 @@ function isWalkable(grid: TileType[][], gx: number, gy: number): boolean
     return t === 0 || t === 2;
 }
 
+// Solid circular collision radius so fighters NEVER clip into trees, fences, bunkers, or moat!
+function isWalkable(grid: TileType[][], gx: number, gy: number, radius = 0.34): boolean
+{
+    if (!isTileWalkable(grid, gx, gy)) return false;
+    if (radius <= 0) return true;
+    return (
+        isTileWalkable(grid, gx - radius, gy - radius) &&
+        isTileWalkable(grid, gx + radius, gy - radius) &&
+        isTileWalkable(grid, gx - radius, gy + radius) &&
+        isTileWalkable(grid, gx + radius, gy + radius)
+    );
+}
+
+function findSafeSpawn(grid: TileType[][], team: Team): { x: number; y: number }
+{
+    for (let attempt = 0; attempt < 25; attempt++)
+    {
+        const bx = team === 'blue' ? 0.8 + Math.random() * 2.8 : 12.4 + Math.random() * 2.8;
+        const by = team === 'blue' ? 0.8 + Math.random() * 2.8 : 12.4 + Math.random() * 2.8;
+        if (isWalkable(grid, bx, by, 0.38)) return { x: bx, y: by };
+    }
+    return team === 'blue' ? { x: 0.6, y: 0.6 } : { x: 15.4, y: 15.4 };
+}
+
 function blocksDirectShot(grid: TileType[][], gx: number, gy: number): boolean
 {
     const ix = Math.floor(gx);
     const iy = Math.floor(gy);
     if (ix < 0 || iy < 0 || ix >= GRID_SIZE || iy >= GRID_SIZE) return true;
     const t = grid[iy][ix];
-    return t === 3 || t === 4 || t === 5 || t === 6;
+    if (t !== 3 && t !== 4 && t !== 5 && t !== 6) return false;
+    // Tight inner core so players peeking beside a tree/bunker can still be hit fairly!
+    const fx = gx - ix;
+    const fy = gy - iy;
+    return fx >= 0.18 && fx <= 0.82 && fy >= 0.18 && fy <= 0.82;
 }
 
 function findMachineTile(grid: TileType[][]): { x: number; y: number }
@@ -485,8 +516,8 @@ export const SnowStormGameView: FC = () =>
     const myFigure = session?.figure || 'hr-115-42.hd-195-19.ch-3030-82.lg-275-1408.sh-295-1321';
 
     const [ stage, setStage ] = useState<Stage>('lobby');
-    const [ selectedArenaId, setSelectedArenaId ] = useState<number>(1);
-    const [ lobbyCountdown, setLobbyCountdown ] = useState<number>(6);
+    const [ selectedArenaId, setSelectedArenaId ] = useState<number>(() => Math.floor(Math.random() * ARENAS.length) + 1);
+    const [ lobbyCountdown, setLobbyCountdown ] = useState<number>(5);
     const [ showLeaveModal, setShowLeaveModal ] = useState<boolean>(false);
     const [ muted, setMuted ] = useState<boolean>(false);
     const [ chatOpen, setChatOpen ] = useState<boolean>(false);
@@ -584,7 +615,7 @@ export const SnowStormGameView: FC = () =>
             img.src = src;
             img.onload = () => { spritesRef.current[key] = img; };
         };
-        load(posesSheetImg, 'poses');
+        load(posesGridImg, 'poses');
         load(machineImg, 'machine');
         load(iceCubeBigImg, 'iceCube');
         load(snowballSmallImg, 'snowball');
@@ -665,44 +696,48 @@ export const SnowStormGameView: FC = () =>
     const spawnMatch = useCallback((arena: ArenaDef) =>
     {
         const blueSpawns = [
-            { x: 1.5, y: 1.5 }, { x: 2.5, y: 1.5 }, { x: 1.5, y: 2.5 }, { x: 3.5, y: 1.5 }
+            { x: 0.6, y: 1.5 }, { x: 1.5, y: 0.6 }, { x: 0.6, y: 2.5 }, { x: 2.5, y: 0.6 }
         ];
         const redSpawns = [
-            { x: 14.5, y: 14.5 }, { x: 13.5, y: 14.5 }, { x: 14.5, y: 13.5 }, { x: 12.5, y: 14.5 }
+            { x: 15.4, y: 14.5 }, { x: 14.5, y: 15.4 }, { x: 15.4, y: 13.5 }, { x: 13.5, y: 15.4 }
         ];
 
-        const makeFighter = (bot: RosterBot, sp: { x: number; y: number }): Fighter => ({
-            id: bot.id,
-            name: bot.name,
-            figure: bot.figure,
-            team: bot.team,
-            isHuman: !!bot.isHuman,
-            x: sp.x,
-            y: sp.y,
-            vx: 0,
-            vy: 0,
-            targetX: null,
-            targetY: null,
-            facingX: bot.team === 'blue' ? 1 : -1,
-            facingY: bot.team === 'blue' ? 1 : -1,
-            hp: 5,
-            snowballs: 5,
-            reloading: false,
-            reloadTimer: 0,
-            koTimer: 0,
-            invulnTimer: 1.5,
-            throwAnimTimer: 0,
-            hitAnimTimer: 0,
-            throwCooldown: 0,
-            walkPhase: 0,
-            hits: 0,
-            kos: 0,
-            throws: 0,
-            score: 0,
-            aiThinkTimer: 0.4 + Math.random() * 0.6,
-            aiGoalX: sp.x,
-            aiGoalY: sp.y
-        });
+        const makeFighter = (bot: RosterBot, rawSp: { x: number; y: number }): Fighter =>
+        {
+            const sp = isWalkable(arena.grid, rawSp.x, rawSp.y, 0.36) ? rawSp : findSafeSpawn(arena.grid, bot.team);
+            return ({
+                id: bot.id,
+                name: bot.name,
+                figure: bot.figure,
+                team: bot.team,
+                isHuman: !!bot.isHuman,
+                x: sp.x,
+                y: sp.y,
+                vx: 0,
+                vy: 0,
+                targetX: null,
+                targetY: null,
+                facingX: bot.team === 'blue' ? 1 : -1,
+                facingY: bot.team === 'blue' ? 1 : -1,
+                hp: 5,
+                snowballs: 5,
+                reloading: false,
+                reloadTimer: 0,
+                koTimer: 0,
+                invulnTimer: 1.5,
+                throwAnimTimer: 0,
+                hitAnimTimer: 0,
+                throwCooldown: 0,
+                walkPhase: 0,
+                hits: 0,
+                kos: 0,
+                throws: 0,
+                score: 0,
+                aiThinkTimer: 0.4 + Math.random() * 0.6,
+                aiGoalX: sp.x,
+                aiGoalY: sp.y
+            });
+        };
 
         const fighters: Fighter[] = [
             ...rosterBlue.map((b, i) => makeFighter(b, blueSpawns[i])),
@@ -864,9 +899,10 @@ export const SnowStormGameView: FC = () =>
                 setRematchBusy(false);
                 return;
             }
-            // Cycle to next arena for variety!
-            const nextId = (selectedArenaId % ARENAS.length) + 1;
-            setSelectedArenaId(nextId);
+            // Pick a different random arena for the rematch automatically
+            const otherArenas = ARENAS.filter(a => a.id !== selectedArenaId);
+            const randomArena = otherArenas[Math.floor(Math.random() * otherArenas.length)] || ARENAS[0];
+            setSelectedArenaId(randomArena.id);
             setLobbyCountdown(5);
             setStage('lobby');
         }
@@ -1055,7 +1091,7 @@ export const SnowStormGameView: FC = () =>
             const { gx, gy } = screenToIso(mx, my, eng);
 
             const isRightClick = e.button === 2;
-            const isLob = isRightClick || e.altKey;
+            const isLob = isRightClick || e.ctrlKey || e.metaKey;
             const isForceThrow = e.shiftKey || isLob;
 
             // Check if clicked directly on an enemy fighter
@@ -1248,10 +1284,10 @@ export const SnowStormGameView: FC = () =>
                         f.snowballs = 5;
                         f.invulnTimer = 2.0;
                         f.reloading = false;
-                        // Respawn near team base
-                        const bx = f.team === 'blue' ? 1.5 + Math.random() * 2.2 : 12.2 + Math.random() * 2.2;
-                        const by = f.team === 'blue' ? 1.5 + Math.random() * 2.2 : 12.2 + Math.random() * 2.2;
-                        if (isWalkable(grid, bx, by)) { f.x = bx; f.y = by; }
+                        // Respawn cleanly on guaranteed obstacle-free base tile
+                        const safe = findSafeSpawn(grid, f.team);
+                        f.x = safe.x;
+                        f.y = safe.y;
                     }
                     continue;
                 }
@@ -1416,17 +1452,10 @@ export const SnowStormGameView: FC = () =>
 
                 let remove = false;
 
-                // Direct shots stop on solid obstacles (lobs fly over!)
-                if (!p.isLob && t > 0.08 && t < 0.96 && blocksDirectShot(grid, cx, cy))
+                // 1. Check fighter hit FIRST (so enemies peeking beside trees/bunkers take hits fairly!)
+                if (!p.isLob || t >= 0.85)
                 {
-                    spawnSplash(eng, cx, cy, 8, '#dff5ff');
-                    remove = true;
-                }
-
-                // Check fighter hit
-                if (!remove && (!p.isLob || t >= 0.85))
-                {
-                    const hitRadius = p.isLob ? 0.85 : 0.62;
+                    const hitRadius = p.isLob ? 0.90 : 0.68;
                     for (const target of eng.fighters)
                     {
                         if (target.team === p.team || target.koTimer > 0 || target.invulnTimer > 0) continue;
@@ -1480,6 +1509,13 @@ export const SnowStormGameView: FC = () =>
                             break;
                         }
                     }
+                }
+
+                // 2. Direct shots stop on solid obstacle cores (high-arc lobs fly right over!)
+                if (!remove && !p.isLob && t > 0.08 && t < 0.96 && blocksDirectShot(grid, cx, cy))
+                {
+                    spawnSplash(eng, cx, cy, 8, '#dff5ff');
+                    remove = true;
                 }
 
                 if (p.progress >= 1 && !remove)
@@ -1869,49 +1905,53 @@ export const SnowStormGameView: FC = () =>
                             ctx.stroke();
                         }
 
+                        // Authentic 3/4-diagonal body + smooth grounded 4-step Habbo walking (ZERO jumping/bobbing!)
                         const poses = spritesRef.current.poses;
-                        const teamRects = POSE_RECTS[f.team];
-                        const isMoving = Math.hypot(f.vx, f.vy) > 0.2;
-                        let pose = teamRects.idle;
-                        if (f.koTimer > 0) pose = teamRects.ko;
-                        else if (f.hitAnimTimer > 0) pose = teamRects.hit;
-                        else if (f.throwAnimTimer > 0) pose = teamRects.throw;
-                        else if (f.reloading) pose = teamRects.crouch;
-                        else if (isMoving) pose = (Math.floor(f.walkPhase) % 2 === 0) ? teamRects.walk : teamRects.idle;
-                        else if (f.facingY < 0) pose = teamRects.back;
+                        const isMoving = Math.hypot(f.vx, f.vy) > 0.18;
+                        const walkFrames = [ 1, 0, 2, 0 ];
+                        let colIdx = 0; // 0 = 3/4 standing idle
+                        if (f.koTimer > 0) colIdx = 6;
+                        else if (f.hitAnimTimer > 0) colIdx = 5;
+                        else if (f.throwAnimTimer > 0) colIdx = 4;
+                        else if (f.reloading) colIdx = 3;
+                        else if (isMoving) colIdx = walkFrames[Math.floor(f.walkPhase) % 4];
+                        else if (f.facingY < 0) colIdx = 7;
 
-                        const spriteScale = 1.25 * sc;
-                        const dw = pose.w * spriteScale;
-                        const dh = pose.h * spriteScale;
-                        const bobY = (isMoving && f.koTimer <= 0) ? Math.abs(Math.sin(f.walkPhase)) * 2.5 * sc : 0;
+                        const cellW = 60;
+                        const cellH = 44;
+                        const rowY = f.team === 'blue' ? 0 : 44;
+                        const spriteScale = 1.2 * sc;
+                        const dw = cellW * spriteScale;
+                        const dh = cellH * spriteScale;
 
                         if (poses)
                         {
                             ctx.save();
-                            ctx.translate(p.sx, p.sy + 3 * sc - bobY);
+                            ctx.translate(p.sx, p.sy + 3 * sc);
                             if (f.facingX < 0 && f.koTimer <= 0) ctx.scale(-1, 1);
                             ctx.drawImage(
                                 poses,
-                                pose.x, pose.y, pose.w, pose.h,
+                                colIdx * cellW, rowY, cellW, cellH,
                                 -dw / 2, -dh, dw, dh
                             );
                             ctx.restore();
                         }
 
-                        // Tightly-trimmed real Habbo head anchored snugly into the parka hood!
+                        // Tightly-trimmed real Habbo head anchored by CHIN BOTTOM snugly inside the parka fur collar
                         const headEntry = headCacheRef.current.get(f.figure);
-                        const headImg = (f.facingY < 0 && f.koTimer <= 0) ? headEntry?.back : headEntry?.front;
+                        const headImg = (f.facingY < 0 && !isMoving && f.koTimer <= 0 && !f.reloading && f.throwAnimTimer <= 0)
+                            ? headEntry?.back
+                            : headEntry?.front;
                         if (headImg && headImg.complete && headImg.naturalWidth > 0 && f.koTimer <= 0)
                         {
-                            const hScale = 0.86 * sc;
+                            const hScale = 0.66 * spriteScale;
                             const hw = headImg.naturalWidth * hScale;
                             const hh = headImg.naturalHeight * hScale;
-                            const headAnchorX = f.reloading ? (4 * sc) : 0;
-                            const headAnchorY = f.reloading
-                                ? (-dh - hh * 0.46 + 9 * sc)
-                                : (-dh - hh * 0.72 + 4 * sc);
+                            const chinFromFeet = f.reloading ? 17.5 : 20.5;
+                            const headAnchorX = f.reloading ? (3 * spriteScale) : (1 * spriteScale);
+                            const headAnchorY = -chinFromFeet * spriteScale - hh;
                             ctx.save();
-                            ctx.translate(p.sx, p.sy + 3 * sc - bobY);
+                            ctx.translate(p.sx, p.sy + 3 * sc);
                             if (f.facingX < 0) ctx.scale(-1, 1);
                             ctx.drawImage(headImg, -hw / 2 + headAnchorX, headAnchorY, hw, hh);
                             ctx.restore();
@@ -2180,32 +2220,12 @@ export const SnowStormGameView: FC = () =>
                                 )) }
                             </div>
 
-                            {/* Center Arena Selector */}
+                            {/* Center Random Arena Preview (authentic Snowstom_second_lobby.png) */}
                             <div className="ss-arena-picker">
                                 <div className="ss-arena-preview">
                                     <img src={ selectedArena.preview } alt={ selectedArena.name } />
                                 </div>
                                 <div className="ss-arena-name">{ selectedArena.name }</div>
-                                <div className="ss-arena-dots">
-                                    { ARENAS.map(a => (
-                                        <button
-                                            key={ a.id }
-                                            type="button"
-                                            className={ `ss-arena-chip ${ a.id === selectedArenaId ? 'active' : '' }` }
-                                            onClick={ () => { setSelectedArenaId(a.id); setLobbyCountdown(6); } }
-                                        >
-                                            Arena { a.id }
-                                        </button>
-                                    )) }
-                                </div>
-                                <button
-                                    type="button"
-                                    className="ss-green-cta"
-                                    style={{ minWidth: '170px', padding: '7px 16px', fontSize: '13px', marginTop: '4px' }}
-                                    onClick={ () => spawnMatch(selectedArena) }
-                                >
-                                    ¡Entrar ahora!
-                                </button>
                             </div>
 
                             {/* Red Team */}
@@ -2213,7 +2233,7 @@ export const SnowStormGameView: FC = () =>
                                 { rosterRed.map(p => (
                                     <div key={ p.id } className="ss-roster-card is-red">
                                         <div className="ss-avatar-box is-red">
-                                            <SnowStormParkaAvatar figure={ p.figure } team="red" scale={ 0.92 } />
+                                            <SnowStormParkaAvatar figure={ p.figure } team="red" facing="left" scale={ 0.92 } />
                                         </div>
                                         <div className="ss-player-plate is-red">
                                             <div className="ss-plate-name">
@@ -2228,7 +2248,7 @@ export const SnowStormGameView: FC = () =>
                         </div>
 
                         <div className="ss-controls-tip">
-                            <b>Controles:</b> Clic en el suelo o <b>WASD</b> para moverte • <b>Clic en un rival</b> para lanzar • <b>SHIFT + Clic</b> tiro predictivo • <b>Clic derecho / ALT + Clic</b> lanzamiento alto sobre obstáculos • <b>Espacio</b> o guante verde para recargar • <b>Enter</b> para chatear.
+                            <b>Controles:</b> Clic en el suelo o <b>WASD</b> para moverte • <b>Clic en un rival</b> para lanzar • <b>SHIFT + Clic</b> tiro predictivo • <b>Clic derecho / CTRL + Clic</b> lanzamiento alto sobre obstáculos • <b>Espacio</b> o guante verde para recargar • <b>Enter</b> para chatear.
                         </div>
 
                         <button type="button" className="ss-text-link" onClick={ () => exitToLobby(false) }>
@@ -2351,18 +2371,33 @@ export const SnowStormGameView: FC = () =>
                             { hud.myKo
                                 ? '❄ ¡K.O.! Volverás a la batalla en un momento...'
                                 : hud.myReloading
-                                    ? '🧤 Fabricando bolas de nieve...'
-                                    : 'Clic / WASD: Mover • Clic rival: Tirar • Clic der./ALT: Tiro alto • Espacio: Recargar • Enter: Chat' }
+                                    ? 'Fabricando bolas de nieve...'
+                                    : 'Clic / WASD: Mover • Clic rival: Tirar • Clic der./CTRL: Tiro alto • Espacio: Recargar • Enter: Chat' }
                         </div>
                     </div>
 
-                    {/* Leave Match Confirmation Modal */}
+                    {/* Authentic Habbo Flash 2012 Leave Match Confirmation Dialog */}
                     { showLeaveModal && (
                         <div className="ss-modal-backdrop">
                             <div className="ss-leave-modal">
-                                <div className="ss-leave-header">¿Salir de la partida?</div>
+                                <div className="ss-leave-header">
+                                    <span className="ss-leave-lines" />
+                                    <span className="ss-leave-title">¿Salir de la partida?</span>
+                                    <span className="ss-leave-lines" />
+                                    <button
+                                        type="button"
+                                        className="ss-leave-close"
+                                        title="Cerrar"
+                                        onClick={ () => setShowLeaveModal(false) }
+                                    >
+                                        <img src={ closeUbuntuImg } alt="Cerrar" />
+                                    </button>
+                                </div>
                                 <div className="ss-leave-body">
-                                    Si abandonas la partida de <b>SnowStorm</b> ahora, perderás los puntos acumulados y tendrás una penalización de <b>2 minutos</b> antes de poder entrar en otra batalla.
+                                    <img src={ hudBtnLeaveImg } alt="" className="ss-leave-flag-icon" />
+                                    <div>
+                                        Si abandonas la partida de <b>SnowStorm</b> ahora, perderás los puntos acumulados y tendrás una penalización de <b>2 minutos</b> antes de poder entrar en otra batalla.
+                                    </div>
                                 </div>
                                 <div className="ss-leave-actions">
                                     <button
@@ -2377,7 +2412,7 @@ export const SnowStormGameView: FC = () =>
                                         className="ss-btn-danger"
                                         onClick={ () => exitToLobby(true) }
                                     >
-                                        Abandonar partida
+                                        Abandonar
                                     </button>
                                 </div>
                             </div>
@@ -2450,7 +2485,7 @@ export const SnowStormGameView: FC = () =>
                                         <div className="ss-mvp-box">
                                             <div className="ss-mvp-label">Más K.O.s</div>
                                             <div className={ `ss-mvp-avatar ${ mvpKo.team === 'blue' ? 'is-blue' : '' }` }>
-                                                <SnowStormParkaAvatar figure={ mvpKo.figure } team={ mvpKo.team } scale={ 1.04 } />
+                                                <SnowStormParkaAvatar figure={ mvpKo.figure } team={ mvpKo.team } facing="right" scale={ 1.04 } />
                                             </div>
                                             <div className={ `ss-mvp-user ${ mvpKo.team === 'blue' ? 'is-blue' : '' }` }>
                                                 { mvpKo.name } ({ mvpKo.kos })
@@ -2461,7 +2496,7 @@ export const SnowStormGameView: FC = () =>
                                         <div className="ss-mvp-box">
                                             <div className="ss-mvp-label">Más Impactos</div>
                                             <div className={ `ss-mvp-avatar ${ mvpHits.team === 'blue' ? 'is-blue' : '' }` }>
-                                                <SnowStormParkaAvatar figure={ mvpHits.figure } team={ mvpHits.team } scale={ 1.04 } />
+                                                <SnowStormParkaAvatar figure={ mvpHits.figure } team={ mvpHits.team } facing="left" scale={ 1.04 } />
                                             </div>
                                             <div className={ `ss-mvp-user ${ mvpHits.team === 'blue' ? 'is-blue' : '' }` }>
                                                 { mvpHits.name } ({ mvpHits.hits })
@@ -2479,7 +2514,7 @@ export const SnowStormGameView: FC = () =>
                                     .map(p => (
                                         <div key={ p.id } className="ss-roster-card is-red">
                                             <div className="ss-avatar-box is-red">
-                                                <SnowStormParkaAvatar figure={ p.figure } team="red" scale={ 0.92 } />
+                                                <SnowStormParkaAvatar figure={ p.figure } team="red" facing="left" scale={ 0.92 } />
                                             </div>
                                             <div className="ss-player-plate is-red">
                                                 <div className="ss-plate-name">
@@ -2498,26 +2533,52 @@ export const SnowStormGameView: FC = () =>
                             </div>
                         </div>
 
-                        {/* Real Habbten Rewards & Achievements Earned */}
-                        <div className="ss-rewards-card">
-                            <div className="ss-rewards-title">Recompensas registradas en Habbten</div>
-                            { finishData?.rewards ? (
-                                <div className="ss-rewards-pills">
-                                    <span className="ss-reward-pill pts">+{ finishData.rewards.score } pts Ranking</span>
-                                    <span className="ss-reward-pill duckets">+{ finishData.rewards.duckets } Duckets</span>
+                        {/* Authentic Habbo Inline Rewards & Real Pixel-Art Badges */}
+                        { finishData?.rewards ? (
+                            <div className="ss-rewards-strip">
+                                <div className="ss-rewards-currencies">
+                                    <span className="ss-reward-stat">
+                                        <img src={ snowballSmallImg } alt="Puntos" className="ss-reward-icon" />
+                                        <span className="ss-reward-val">+{ finishData.rewards.score }</span>
+                                        <span>pts</span>
+                                    </span>
+                                    <span className="ss-reward-stat is-duckets">
+                                        <img src={ ducketIconImg } alt="Duckets" className="ss-reward-icon" />
+                                        <span className="ss-reward-val">+{ finishData.rewards.duckets }</span>
+                                        <span>Duckets</span>
+                                    </span>
                                     { finishData.rewards.credits > 0 && (
-                                        <span className="ss-reward-pill credits">+{ finishData.rewards.credits } Créditos</span>
-                                    ) }
-                                    { (finishData.unlocked_achievements || []).map(a => (
-                                        <span key={ a.badge } className="ss-reward-pill ach">
-                                            🏆 { a.title } ({ a.badge })
+                                        <span className="ss-reward-stat is-credits">
+                                            <img src={ creditIconImg } alt="Créditos" className="ss-reward-icon" />
+                                            <span className="ss-reward-val">+{ finishData.rewards.credits }</span>
+                                            <span>Créditos</span>
                                         </span>
-                                    )) }
+                                    ) }
                                 </div>
-                            ) : (
-                                <div style={{ fontSize: '12px', color: '#456a82' }}>Guardando estadísticas y recompensas...</div>
-                            ) }
-                        </div>
+                                { (finishData.unlocked_achievements && finishData.unlocked_achievements.length > 0) && (
+                                    <div className="ss-badges-unlocked">
+                                        { finishData.unlocked_achievements.map(a =>
+                                        {
+                                            const badgeTemplate = GetConfiguration<string>('badge.asset.url', '/game/swf/c_images/album1584/%badgename%.gif');
+                                            const badgeSrc = badgeTemplate.replace('%badgename%', a.badge);
+                                            return (
+                                                <div key={ a.badge } className="ss-badge-unlock-item" title={ a.title }>
+                                                    <div className="ss-badge-icon-frame">
+                                                        <img src={ badgeSrc } alt={ a.title } />
+                                                    </div>
+                                                    <div className="ss-badge-info">
+                                                        <span className="ss-badge-kicker">¡Placa desbloqueada!</span>
+                                                        <span className="ss-badge-name">{ a.title }</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }) }
+                                    </div>
+                                ) }
+                            </div>
+                        ) : (
+                            <div style={{ fontSize: '12px', color: '#456a82', fontWeight: 700 }}>Registrando resultados...</div>
+                        ) }
 
                         <div className="ss-games-left-row">
                             <span>Partidas restantes hoy:</span>

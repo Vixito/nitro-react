@@ -1,18 +1,25 @@
 import { AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
 import { GetAvatarRenderManager } from '../../../api';
-import posesSheetImg from '../../../assets/images/gamecenter/snowstorm/Snowstorm_poses.png';
+import posesGridImg from '../../../assets/images/gamecenter/snowstorm/Snowstorm_poses_grid.png';
 
-const trimmedHeadCache = new Map<string, string>();
+export interface TrimmedHeadInfo
+{
+    url: string;
+    w: number;
+    h: number;
+}
+
+const trimmedHeadCache = new Map<string, TrimmedHeadInfo>();
 
 /**
- * Nitro's getCroppedImage(AvatarSetType.HEAD) still includes transparent avatar-canvas padding.
- * This trims the image tightly to the visible non-transparent head pixels so heads render
- * crisp and full-size in Leaderboard rows, HUD cards, Parka avatars, and Chat bubbles.
+ * Nitro's getCroppedImage(AvatarSetType.HEAD) includes transparent avatar-canvas padding.
+ * This trims the image tightly to the visible non-transparent head pixels (keeping natural
+ * w x h dimensions so chin-bottom anchoring works identically regardless of hair/hat height).
  */
 export function trimTransparentImage(
     rawSrc: string,
-    onDone: (trimmedDataUrl: string, trimmedImg: HTMLImageElement) => void
+    onDone: (trimmedDataUrl: string, trimmedImg: HTMLImageElement, w: number, h: number) => void
 ): void
 {
     const img = new Image();
@@ -54,7 +61,7 @@ export function trimTransparentImage(
 
         if (maxX < minX || maxY < minY)
         {
-            onDone(rawSrc, img);
+            onDone(rawSrc, img, w, h);
             return;
         }
 
@@ -69,16 +76,16 @@ export function trimTransparentImage(
         octx.drawImage(c, minX, minY, tw, th, 0, 0, tw, th);
         const dataUrl = out.toDataURL('image/png');
         const trimmed = new Image();
-        trimmed.onload = () => onDone(dataUrl, trimmed);
+        trimmed.onload = () => onDone(dataUrl, trimmed, tw, th);
         trimmed.src = dataUrl;
     };
     img.src = rawSrc;
 }
 
-export function useCroppedHabboHead(figure: string, direction = 2): string | null
+export function useCroppedHabboHead(figure: string, direction = 2): TrimmedHeadInfo | null
 {
     const cacheKey = `${ figure }__${ direction }`;
-    const [ src, setSrc ] = useState<string | null>(() => trimmedHeadCache.get(cacheKey) || null);
+    const [ info, setInfo ] = useState<TrimmedHeadInfo | null>(() => trimmedHeadCache.get(cacheKey) || null);
     const [ reloadTick, setReloadTick ] = useState<number>(0);
 
     useEffect(() =>
@@ -89,7 +96,7 @@ export function useCroppedHabboHead(figure: string, direction = 2): string | nul
         const cached = trimmedHeadCache.get(cacheKey);
         if (cached)
         {
-            setSrc(cached);
+            setInfo(cached);
             return;
         }
 
@@ -117,11 +124,12 @@ export function useCroppedHabboHead(figure: string, direction = 2): string | nul
         const cropped = avatarImg.getCroppedImage(AvatarSetType.HEAD);
         if (cropped && cropped.src && !disposed)
         {
-            trimTransparentImage(cropped.src, trimmedUrl =>
+            trimTransparentImage(cropped.src, (trimmedUrl, _img, tw, th) =>
             {
                 if (disposed) return;
-                trimmedHeadCache.set(cacheKey, trimmedUrl);
-                setSrc(trimmedUrl);
+                const entry: TrimmedHeadInfo = { url: trimmedUrl, w: tw, h: th };
+                trimmedHeadCache.set(cacheKey, entry);
+                setInfo(entry);
             });
         }
 
@@ -133,7 +141,7 @@ export function useCroppedHabboHead(figure: string, direction = 2): string | nul
         };
     }, [ figure, direction, cacheKey, reloadTick ]);
 
-    return src;
+    return info;
 }
 
 export const HabboHeadImg: FC<{
@@ -144,12 +152,12 @@ export const HabboHeadImg: FC<{
     style?: CSSProperties;
 }> = ({ figure, direction = 2, size = 36, className, style }) =>
 {
-    const src = useCroppedHabboHead(figure, direction);
-    if (!src) return null;
+    const info = useCroppedHabboHead(figure, direction);
+    if (!info) return null;
 
     return (
         <img
-            src={ src }
+            src={ info.url }
             alt=""
             className={ className }
             style={{
@@ -164,66 +172,77 @@ export const HabboHeadImg: FC<{
     );
 };
 
-// Exact standing idle parka crop from Snowstorm_poses.png (416 x 101)
-const PARKA_RECT = {
-    blue: { x: 76, y: 8, w: 21, h: 32 },
-    red: { x: 83, y: 55, w: 21, h: 32 }
-} as const;
-
+// Cell 0 of Snowstorm_poses_grid.png (60x44 per cell): 3/4 diagonal standing parka facing SE (right)
+// Measured collar fur chin opening = 20.5px from boots bottom (y=23.5 inside 44px cell).
+// Locking the trimmed head's BOTTOM edge (chin) right into the fur collar matches official Habbo!
 export const SnowStormParkaAvatar: FC<{
     figure: string;
     team: 'blue' | 'red';
+    facing?: 'right' | 'left';
     scale?: number;
-}> = ({ figure, team, scale = 1 }) =>
+}> = ({ figure, team, facing, scale = 1 }) =>
 {
-    const direction = team === 'red' ? 4 : 2;
-    const headSrc = useCroppedHabboHead(figure, direction);
-    const rect = PARKA_RECT[team];
+    const resolvedFacing = facing || (team === 'red' ? 'left' : 'right');
+    const flipBody = resolvedFacing === 'left';
+    const direction = resolvedFacing === 'left' ? 4 : 2;
+    const headInfo = useCroppedHabboHead(figure, direction);
 
-    const bodyScale = 1.02 * scale;
-    const bodyH = Math.round(rect.h * bodyScale);
-    const headBox = Math.round(28 * scale);
+    const cellW = 60;
+    const cellH = 44;
+    const rowY = team === 'blue' ? 0 : 44;
+    const bodyScale = 1.0 * scale;
+    const marginBot = Math.round(2 * scale);
+
+    // Proportional 1:1 Habbo head-to-parka ratio (so chin sits inside fur collar regardless of hair height!)
+    const headPixelScale = 0.66 * bodyScale;
+    const headW = headInfo ? Math.round(headInfo.w * headPixelScale) : 0;
+    const headH = headInfo ? Math.round(headInfo.h * headPixelScale) : 0;
+    // Exact chin bottom seated snugly into collar opening (20.5px above boots bottom)
+    const chinBottom = Math.round(marginBot + 20.5 * bodyScale);
 
     return (
         <div
             style={{
                 position: 'relative',
-                width: `${ Math.round(44 * scale) }px`,
-                height: `${ Math.round(56 * scale) }px`,
+                width: `${ Math.round(50 * scale) }px`,
+                height: `${ Math.round(58 * scale) }px`,
                 display: 'flex',
                 alignItems: 'flex-end',
                 justifyContent: 'center',
                 pointerEvents: 'none'
             }}
         >
-            {/* Official SnowStorm Blue/Red Winter Parka Body */}
+            {/* Official 3/4-Diagonal SnowStorm Parka Body facing the exact same direction as the head */}
             <div
                 style={{
-                    width: `${ rect.w }px`,
-                    height: `${ rect.h }px`,
-                    backgroundImage: `url(${ posesSheetImg })`,
-                    backgroundPosition: `-${ rect.x }px -${ rect.y }px`,
+                    width: `${ cellW }px`,
+                    height: `${ cellH }px`,
+                    flexShrink: 0,
+                    backgroundImage: `url(${ posesGridImg })`,
+                    backgroundPosition: `0px -${ rowY }px`,
                     backgroundRepeat: 'no-repeat',
                     imageRendering: 'pixelated',
-                    transform: `scale(${ bodyScale.toFixed(3) })`,
+                    transform: `scale(${ (flipBody ? -bodyScale : bodyScale).toFixed(3) }, ${ bodyScale.toFixed(3) })`,
                     transformOrigin: 'center bottom',
-                    marginBottom: `${ Math.round(2 * scale) }px`
+                    marginBottom: `${ marginBot }px`
                 }}
             />
 
-            {/* Tightly-trimmed Real Habbo Head perched snugly inside the parka hood */}
-            { headSrc && (
+            {/* Tightly-trimmed Real Habbo Head anchored by CHIN BOTTOM snugly inside the fur collar */}
+            { headInfo && (
                 <img
-                    src={ headSrc }
+                    src={ headInfo.url }
                     alt=""
                     style={{
                         position: 'absolute',
-                        bottom: `${ Math.round(bodyH - 7 * scale) }px`,
+                        bottom: `${ chinBottom }px`,
                         left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: `${ headBox }px`,
-                        height: `${ headBox }px`,
-                        objectFit: 'contain',
+                        transform: `translateX(${ flipBody ? '-53%' : '-47%' })`,
+                        width: `${ headW }px`,
+                        height: `${ headH }px`,
+                        maxWidth: 'none',
+                        maxHeight: 'none',
+                        objectFit: 'fill',
                         imageRendering: 'pixelated',
                         pointerEvents: 'none'
                     }}

@@ -1,6 +1,6 @@
 import { Game2GetAccountGameStatusMessageComposer, GetGameStatusMessageComposer, JoinQueueMessageComposer } from '@nitrots/nitro-renderer';
-import { useEffect, useMemo } from 'react';
-import { ColorUtils, LocalizeText, SendMessageComposer } from '../../../api';
+import { useEffect, useMemo, useState } from 'react';
+import { ColorUtils, GetClubMemberLevel, SendMessageComposer } from '../../../api';
 import { Base, Button, Flex, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
 
@@ -8,7 +8,7 @@ const GAME_CONTROLS: { [ gameNameId: string ]: { action: string; keys: string }[
     snowwar: [
         { action: 'Mover personaje', keys: 'Clic en el suelo / WASD' },
         { action: 'Lanzar bola directa', keys: 'Clic en rival / SHIFT + Clic' },
-        { action: 'Tiro alto (sobre obstáculos)', keys: 'Clic derecho / ALT + Clic' },
+        { action: 'Tiro alto (sobre obstáculos)', keys: 'Clic derecho / CTRL + Clic' },
         { action: 'Hacer bolas de nieve', keys: 'Espacio / Guante verde' },
         { action: 'Chat de equipo', keys: 'Enter' }
     ],
@@ -57,7 +57,8 @@ const GAME_DESCRIPTIONS: { [ gameNameId: string ]: { title: string; desc: string
 };
 
 export const GameView = () => {
-    const { selectedGame, accountStatus, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible } = useGameCenter();
+    const { isVisible, selectedGame, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible, isSnowStormLobbyVisible, isSnowStormPlaying } = useGameCenter();
+    const [ realStatus, setRealStatus ] = useState<{ games_left: number; has_unlimited: boolean } | null>(null);
 
     useEffect(() => {
         if (selectedGame) {
@@ -65,6 +66,24 @@ export const GameView = () => {
             SendMessageComposer(new Game2GetAccountGameStatusMessageComposer(selectedGame.gameId));
         }
     }, [selectedGame]);
+
+    // Sync real remaining games & HC unlimited status from Habbten backend (never Arcturus dummy 100)
+    useEffect(() => {
+        if (!isVisible) return;
+        let cancelled = false;
+        fetch('/api/games/snowstorm/status', { credentials: 'include' })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (!cancelled && data && data.success) {
+                    setRealStatus({
+                        games_left: typeof data.games_left === 'number' ? data.games_left : 5,
+                        has_unlimited: !!data.has_unlimited
+                    });
+                }
+            })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, [ isVisible, selectedGame, isSnowStormLobbyVisible, isSnowStormPlaying ]);
 
     const controls = useMemo(() => (selectedGame && GAME_CONTROLS[ selectedGame.gameNameId ]) || DEFAULT_CONTROLS, [ selectedGame ]);
 
@@ -102,8 +121,9 @@ export const GameView = () => {
         }
     };
 
-    const hasUnlimited = accountStatus ? accountStatus.hasUnlimitedGames : true;
-    const freeGamesLeft = accountStatus ? accountStatus.freeGamesLeft : 5;
+    const isHcActive = (realStatus?.has_unlimited ?? false) || (GetClubMemberLevel() > 0);
+    const hasUnlimited = isHcActive;
+    const freeGamesLeft = realStatus ? realStatus.games_left : 5;
 
     const gameDesc = GAME_DESCRIPTIONS[ selectedGame.gameNameId ] || {
         title: '¡Prepárate para la acción!',
@@ -181,7 +201,11 @@ export const GameView = () => {
 
                 <Flex column alignItems="center" gap={ 0 } className="mt-1">
                     <Text variant="white" bold className="game-status-label text-center">
-                        { hasUnlimited ? 'Partidas ilimitadas activas (Club HC)' : `${ freeGamesLeft } partidas gratuitas restantes hoy` }
+                        { hasUnlimited
+                            ? 'Partidas ilimitadas activas (Habbten Club)'
+                            : (freeGamesLeft === 1
+                                ? '1 partida gratuita restante hoy'
+                                : `${ freeGamesLeft } partidas gratuitas restantes hoy`) }
                     </Text>
                     <Text variant="white" small className="game-server-status text-center">
                         { gameOffline ? 'Servidor temporalmente pausado' : 'Servidor en línea' }

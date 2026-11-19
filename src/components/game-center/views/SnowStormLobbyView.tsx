@@ -597,7 +597,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                                 <Text small>• <b>Clic en el suelo</b> (o W A S D / Flechas): moverte por la arena.</Text>
                                 <Text small>• <b>Clic sobre un rival</b>: lanzarle una bola de nieve directa.</Text>
                                 <Text small>• <b>SHIFT + Clic</b>: lanzar una bola a una casilla vacía (tiro adelantado).</Text>
-                                <Text small>• <b>ALT + Clic</b> (o clic derecho): lanzamiento alto por encima de árboles y muros.</Text>
+                                <Text small>• <b>CTRL + Clic</b> (o clic derecho): lanzamiento alto por encima de árboles y muros.</Text>
                                 <Text small>• <b>Espacio / Botón verde</b>: agacharte para fabricar bolas (máx. 5) o acércate a la <b>Máquina de Nieve</b> central para recargar al instante.</Text>
                                 <Text small>• <b>Puntuación oficial:</b> +1 punto por impacto, +5 puntos extra por K.O. (5 golpes). ¡Cada partida otorga Duckets, Créditos y progreso de logros!</Text>
                             </Column>
