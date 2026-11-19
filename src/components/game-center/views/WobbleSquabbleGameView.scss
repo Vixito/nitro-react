@@ -1,0 +1,1169 @@
+// =============================================================================
+// Habbten Wobble Squabble — Authentic Habbo Shockwave 2002-2006 / Origins Style
+// Matches Rooftop.png, Wobblesquabble.gif, Wobble_controls_main.png & Origins!
+// =============================================================================
+
+@mixin ws-outline-sm($color: #102a43) {
+    text-shadow:
+        -1px -1px 0 $color,
+         1px -1px 0 $color,
+        -1px  1px 0 $color,
+         1px  1px 0 $color !important;
+}
+
+.wobble-game-root {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Volter (Goldfish)', 'Volter Goldfish', 'Volter', 'Ubuntu', Tahoma, Arial, sans-serif;
+    user-select: none;
+    background: #9cceff;
+    color: #111111;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    img {
+        object-fit: contain !important;
+        image-rendering: pixelated;
+    }
+
+    .ws-layout {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .ws-canvas-area {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        width: 100%;
+        overflow: hidden;
+
+        canvas.ws-arena-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+    }
+
+    // =========================================================================
+    // TOP-LEFT SHOCKWAVE SCOREBOARD (BEST OF 3 ROUNDS + TIMER + OPPONENT GAUGE)
+    // =========================================================================
+    .ws-scoreboard {
+        position: absolute;
+        top: 14px;
+        left: 16px;
+        z-index: 15;
+        min-width: 248px;
+        width: max-content;
+        max-width: 310px;
+        padding: 7px 9px 8px;
+        background: #9aa2a4;
+        border: 1px solid #000000;
+        border-radius: 6px;
+        box-shadow:
+            inset 1px 1px 0 #cdd5d7,
+            inset -1px -1px 0 #62696b,
+            2px 3px 0 rgba(0, 0, 0, 0.32);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        pointer-events: none;
+    }
+
+    .ws-timer-pill {
+        width: 100%;
+        min-height: 22px;
+        padding: 3px 12px;
+        border-radius: 999px;
+        background: #5e6567;
+        border: 1px solid #1d2021;
+        box-shadow: inset 0 1px 0 #798184;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #ffffff;
+        font-size: 11px;
+        line-height: 1.25;
+        font-weight: 800;
+        white-space: nowrap;
+        @include ws-outline-sm(#1a1e20);
+
+        &.is-urgent {
+            background: #9e2219;
+            color: #ffeb85;
+            animation: ws-pulse 0.6s infinite alternate;
+        }
+    }
+
+    .ws-match-well {
+        background: #4b5052;
+        border: 1px solid #1e2122;
+        border-radius: 2px;
+        padding: 5px 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+    }
+
+    .ws-fighter-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 10.5px;
+        line-height: 1.2;
+        font-weight: 800;
+        color: #ffffff;
+        @include ws-outline-sm(#0d1114);
+
+        .ws-fighter-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .ws-side-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1px solid #000000;
+            flex-shrink: 0;
+            &.is-player { background: #ffd13b; }
+            &.is-rival { background: #ff5b45; }
+        }
+
+        .ws-round-pips {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+
+            .ws-pip {
+                width: 11px;
+                height: 11px;
+                border-radius: 50%;
+                background: #2f3335;
+                border: 1px solid #000000;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+                &.is-won {
+                    background: #ffcc00;
+                    box-shadow: inset 0 1px 0 #fff3a6, 0 0 4px rgba(255, 204, 0, 0.65);
+                }
+
+                &.is-rival-won {
+                    background: #ef4444;
+                    box-shadow: inset 0 1px 0 #fca5a5, 0 0 4px rgba(239, 68, 68, 0.65);
+                }
+            }
+        }
+    }
+
+    .ws-rival-bal-bar {
+        position: relative;
+        height: 8px;
+        width: 100%;
+        background: linear-gradient(90deg, #1b9b3e 0%, #2a3438 45%, #2a3438 55%, #ea580c 100%);
+        border: 1px solid #000000;
+        border-radius: 2px;
+        overflow: hidden;
+
+        .ws-rival-bal-center {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.55);
+        }
+
+        .ws-rival-bal-marker {
+            position: absolute;
+            top: -1px;
+            bottom: -1px;
+            width: 5px;
+            margin-left: -2.5px;
+            background: #ffffff;
+            border: 1px solid #000000;
+            transition: left 0.06s linear;
+        }
+    }
+
+    .ws-score-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 9.5px;
+        line-height: 1.25;
+        font-weight: 700;
+        color: #1c2224;
+        padding: 0 2px;
+        white-space: nowrap;
+    }
+
+    // =========================================================================
+    // AUTHENTIC HABBO SHOCKWAVE YELLOW CONTROL WINDOW (Wobble_controls_main.png!)
+    // Bottom-left above toolbar, 1:1 Q/E, A/D, N/M, SPACE + Metal Balance Gauge
+    // =========================================================================
+    .ws-control-panel {
+        position: absolute;
+        left: 16px;
+        bottom: 14px;
+        z-index: 20;
+        width: 274px;
+        background: #ffcc00;
+        border: 2px solid #000000;
+        border-radius: 7px;
+        box-shadow:
+            inset 1px 1px 0 #ffe666,
+            inset -1px -1px 0 #cc9900,
+            3px 4px 0 rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+        transition: transform 0.1s ease;
+
+        &.is-danger {
+            border-color: #b91c1c;
+            box-shadow:
+                inset 1px 1px 0 #ffe666,
+                0 0 12px rgba(239, 68, 68, 0.85),
+                3px 4px 0 rgba(0, 0, 0, 0.35);
+        }
+
+        .ws-ctrl-header {
+            height: 22px;
+            background: #cc6600;
+            border-bottom: 1px solid #8a4400;
+            box-shadow: inset 0 1px 0 #e68a1a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 9px;
+            color: #ffffff;
+            font-size: 10.5px;
+            font-weight: 800;
+            @include ws-outline-sm(#5c2b00);
+        }
+
+        .ws-ctrl-body {
+            padding: 9px 10px 11px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .ws-ctrl-keys-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ws-key-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .ws-key-label {
+                font-size: 10px;
+                line-height: 1.15;
+                font-weight: 700;
+                color: #3a2300;
+            }
+
+            .ws-key-row {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+            }
+        }
+
+        // Authentic Shockwave yellow bevelled keycap (Q, E, A, D, N, M)
+        .ws-keycap {
+            width: 34px;
+            height: 31px;
+            padding: 2px;
+            border-radius: 5px;
+            border: 1.5px solid #000000;
+            background: linear-gradient(180deg, #f3f4f6 0%, #c8cfd4 100%);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.05s ease, filter 0.05s ease;
+
+            .ws-keycap-inner {
+                width: 100%;
+                height: 100%;
+                border-radius: 3px;
+                border: 1px solid #000000;
+                background: linear-gradient(180deg, #ffea61 0%, #ffb700 72%, #e69500 100%);
+                box-shadow: inset 1px 1px 0 #fff7b2, inset -1px -1px 0 #c97a00;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 15px;
+                font-weight: 900;
+                color: #000000;
+                line-height: 1;
+            }
+
+            &:hover .ws-keycap-inner {
+                filter: brightness(1.08);
+            }
+
+            &:active,
+            &.is-pressed {
+                transform: translateY(1px);
+
+                .ws-keycap-inner {
+                    background: linear-gradient(180deg, #fff5a8 0%, #ff9900 100%);
+                    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.35);
+                }
+            }
+        }
+
+        // Authentic green SPACE button (Stabilise)
+        .ws-space-btn {
+            position: relative;
+            width: 75px;
+            height: 28px;
+            padding: 2px;
+            border-radius: 5px;
+            border: 1.5px solid #000000;
+            background: linear-gradient(180deg, #f3f4f6 0%, #c8cfd4 100%);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            .ws-space-inner {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                border-radius: 3px;
+                border: 1px solid #000000;
+                background: linear-gradient(180deg, #25d639 0%, #099e1a 75%, #067a13 100%);
+                box-shadow: inset 1px 1px 0 #89f595, inset -1px -1px 0 #04590d;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                font-weight: 900;
+                letter-spacing: 0.5px;
+                color: #042b08;
+                overflow: hidden;
+            }
+
+            .ws-space-cd-mask {
+                position: absolute;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.48);
+                transform-origin: left center;
+                pointer-events: none;
+            }
+
+            &.is-cooldown {
+                cursor: default;
+                opacity: 0.85;
+            }
+
+            &:active:not(.is-cooldown),
+            &.is-pressed {
+                transform: translateY(1px);
+            }
+        }
+
+        // Authentic Brushed Metal Analog Balance Meter Plate (Right side of control box!)
+        .ws-metal-meter {
+            position: relative;
+            width: 122px;
+            height: 158px;
+            margin-top: 8px;
+            background: linear-gradient(180deg, #d8dcdc 0%, #c4c9c9 100%);
+            border: 1.5px solid #000000;
+            border-radius: 6px;
+            box-shadow:
+                inset 1px 1px 0 #f2f5f5,
+                inset -1px -1px 0 #8d9494,
+                1px 2px 0 rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 6px 10px;
+            gap: 8px;
+
+            .ws-screw {
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #dce0e0;
+                border: 1px solid #444a4a;
+                &::after {
+                    content: '';
+                    position: absolute;
+                    left: 1px;
+                    right: 1px;
+                    top: 3px;
+                    height: 1px;
+                    background: #444a4a;
+                    transform: rotate(-35deg);
+                }
+                &.tl { top: 5px; left: 5px; }
+                &.tr { top: 5px; right: 5px; }
+                &.bl { bottom: 5px; left: 5px; }
+                &.br { bottom: 5px; right: 5px; }
+            }
+
+            .ws-meter-title {
+                font-size: 11px;
+                font-weight: 800;
+                color: #1f2426;
+                line-height: 1;
+            }
+
+            .ws-meter-svg {
+                width: 106px;
+                height: 68px;
+                display: block;
+            }
+
+            .ws-meter-hint {
+                font-size: 9px;
+                font-weight: 800;
+                text-align: center;
+                color: #2f3638;
+                line-height: 1.15;
+
+                &.is-left { color: #15803d; }
+                &.is-right { color: #c2410c; }
+                &.is-danger { color: #b91c1c; }
+            }
+        }
+    }
+
+    // =========================================================================
+    // CENTER ROUND BANNER ("Ronda 1 — ¡LUCHA!" / "¡AL AGUA!")
+    // =========================================================================
+    .ws-round-banner {
+        position: absolute;
+        top: 18%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 22;
+        pointer-events: none;
+        background: #ffcc00;
+        border: 2px solid #000000;
+        border-radius: 8px;
+        padding: 7px 20px;
+        box-shadow:
+            inset 1px 1px 0 #fff29c,
+            inset -1px -1px 0 #c78b00,
+            0 5px 0 rgba(0, 0, 0, 0.35);
+        text-align: center;
+        animation: ws-pop-in 0.22s ease-out;
+
+        .ws-banner-kicker {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: #7c2d12;
+            letter-spacing: 0.4px;
+        }
+
+        .ws-banner-main {
+            font-size: 18px;
+            font-weight: 900;
+            color: #ffffff;
+            white-space: nowrap;
+            @include ws-outline-sm(#000000);
+        }
+    }
+
+    // =========================================================================
+    // OVERLAYS: PRE-MATCH "El juego va a empezar" & POST-MATCH RESULTS WINDOW
+    // =========================================================================
+    .ws-overlay-center {
+        position: absolute;
+        inset: 0;
+        z-index: 26;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(10, 22, 34, 0.28);
+    }
+
+    .ws-starting-box {
+        min-width: 316px;
+        width: max-content;
+        max-width: 92vw;
+        background: #9ca3a5;
+        border: 2px solid #161819;
+        border-radius: 8px;
+        box-shadow:
+            inset 1px 1px 0 #cfd6d8,
+            inset -1px -1px 0 #687072,
+            0 6px 0 rgba(0, 0, 0, 0.35);
+        padding: 8px 12px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+
+        .ws-starting-title-pill {
+            width: 88%;
+            min-height: 24px;
+            padding: 3px 16px;
+            background: #515b5d;
+            border: 1px solid #161819;
+            border-radius: 999px;
+            box-shadow: inset 0 1px 0 #6f7c7e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 12px;
+            line-height: 1.25;
+            font-weight: 800;
+            white-space: nowrap;
+            @include ws-outline-sm(#1e2324);
+        }
+
+        .ws-starting-well {
+            width: 100%;
+            background: #4e5e60;
+            border: 1px solid #15191a;
+            border-radius: 2px;
+            padding: 9px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .ws-vs-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 900;
+            @include ws-outline-sm(#000000);
+
+            .ws-vs-card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                background: #677d80;
+                border: 1px solid #1a2224;
+                border-radius: 4px;
+                padding: 4px 10px;
+                min-width: 96px;
+            }
+
+            .ws-vs-badge {
+                font-size: 14px;
+                color: #ffd13b;
+            }
+        }
+
+        .ws-starting-bar-track {
+            width: 100%;
+            height: 20px;
+            background: #777777;
+            border: 1px solid #15191a;
+            overflow: hidden;
+
+            .ws-starting-bar-fill {
+                height: 100%;
+                background: #f59e0b;
+                border-right: 1px solid #92400e;
+                box-shadow: inset 0 2px 0 #fde68a;
+                transition: width 0.2s linear;
+            }
+        }
+
+        .ws-starting-footer-pills {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+
+            .ws-starting-pill {
+                min-height: 23px;
+                padding: 3px 12px;
+                background: #5a6466;
+                border: 1px solid #1a1e20;
+                border-radius: 999px;
+                box-shadow: inset 0 1px 0 #7a8688;
+                color: #e6ecee;
+                font-size: 10.5px;
+                line-height: 1.25;
+                font-weight: 700;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                white-space: nowrap;
+
+                &.is-wide { flex: 1; }
+            }
+        }
+    }
+
+    // Post-Match Results Window
+    .ws-results-window {
+        width: 100%;
+        max-width: 540px;
+        background: #9ca3a5;
+        border: 2px solid #161819;
+        border-radius: 8px;
+        box-shadow:
+            inset 1px 1px 0 #cfd6d8,
+            inset -1px -1px 0 #687072,
+            0 8px 0 rgba(0, 0, 0, 0.38);
+        padding: 8px 10px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .ws-results-title-pill {
+        align-self: center;
+        min-width: 220px;
+        min-height: 24px;
+        padding: 3px 18px;
+        background: #535d5f;
+        border: 1px solid #181c1d;
+        border-radius: 999px;
+        box-shadow: inset 0 1px 0 #728082;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 12px;
+        line-height: 1.25;
+        font-weight: 800;
+        white-space: nowrap;
+        @include ws-outline-sm(#1a2021);
+    }
+
+    .ws-results-card {
+        background: #f5f6f7;
+        border: 1px solid #161819;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ws-results-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        gap: 12px;
+        background: #e6ebed;
+        border: 1px solid #8a9498;
+        border-radius: 4px;
+        padding: 10px;
+
+        .ws-res-fighter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            min-width: 110px;
+
+            .ws-res-name {
+                font-size: 12px;
+                font-weight: 900;
+                color: #111827;
+            }
+
+            .ws-res-rounds {
+                font-size: 20px;
+                font-weight: 900;
+                color: #b45309;
+            }
+        }
+
+        .ws-res-verdict {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-align: center;
+
+            .ws-verdict-title {
+                font-size: 15px;
+                font-weight: 900;
+                &.is-win { color: #15803d; }
+                &.is-lose { color: #b91c1c; }
+            }
+
+            .ws-verdict-sub {
+                font-size: 11px;
+                font-weight: 700;
+                color: #374151;
+            }
+        }
+    }
+
+    .ws-results-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+
+        .ws-stat-box {
+            background: #ffffff;
+            border: 1px solid #9aa4a8;
+            border-radius: 3px;
+            padding: 6px 8px;
+            text-align: center;
+
+            .ws-stat-val {
+                font-size: 14px;
+                font-weight: 900;
+                color: #0e7490;
+            }
+
+            .ws-stat-lbl {
+                font-size: 9.5px;
+                font-weight: 700;
+                color: #4b5563;
+            }
+        }
+    }
+
+    .ws-results-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .ws-results-rewards-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 6px 9px;
+        background: #848e91;
+        border: 1px solid #1d2122;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 0 #aab4b7;
+
+        .ws-rewards-currencies {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ws-reward-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11.5px;
+            font-weight: 800;
+            color: #ffffff;
+            @include ws-outline-sm(#1a2326);
+
+            img { width: 16px; height: 16px; }
+            &.is-duckets { color: #f3d6ff; }
+            &.is-credits { color: #ffe98a; }
+        }
+
+        .ws-badges-unlocked {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+
+            .ws-badge-unlock-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                background: #ffffff;
+                border: 1px solid #000000;
+                border-radius: 3px;
+                padding: 2px 7px 2px 3px;
+
+                img { width: 26px; height: 26px; }
+                .ws-badge-kicker { display: block; font-size: 8px; font-weight: 900; text-transform: uppercase; color: #15803d; }
+                .ws-badge-name { display: block; font-size: 10.5px; font-weight: 800; color: #111111; }
+            }
+        }
+    }
+
+    .ws-sw-pill-btn {
+        min-width: 140px;
+        min-height: 26px;
+        padding: 4px 16px;
+        border-radius: 999px;
+        border: 1.5px solid #141819;
+        background: linear-gradient(180deg, #dce5e7 0%, #aebcc0 60%, #98a8ad 100%);
+        box-shadow: inset 0 1px 0 #ffffff, 0 1px 0 rgba(0, 0, 0, 0.25);
+        color: #000000;
+        font-size: 11.5px;
+        line-height: 1.25;
+        font-weight: 900;
+        white-space: nowrap;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover:not(:disabled) {
+            background: linear-gradient(180deg, #eff5f6 0%, #c4d1d5 60%, #b0bfc4 100%);
+        }
+        &:active:not(:disabled) { transform: translateY(1px); }
+        &:disabled { opacity: 0.6; cursor: default; }
+    }
+
+    // =========================================================================
+    // AUTHENTIC SHOCKWAVE 2006 BOTTOM BAR (DARK SLATE / HABBO ROOFTOP TOOLBAR!)
+    // =========================================================================
+    .ws-bottom-hud {
+        position: relative;
+        height: 52px;
+        flex-shrink: 0;
+        background: linear-gradient(180deg, #626c70 0%, #4b5458 100%);
+        border-top: 2px solid #000000;
+        box-shadow: inset 0 1px 0 #8a959a;
+        display: flex;
+        align-items: stretch;
+        justify-content: flex-start;
+        padding: 0;
+        z-index: 30;
+    }
+
+    .ws-hud-zone-avatar {
+        width: 66px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid #2b3133;
+        box-shadow: inset -1px 0 0 #798488;
+    }
+
+    .ws-hud-zone-chat {
+        position: relative;
+        flex: 1;
+        min-width: 240px;
+        max-width: 520px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 12px 6px;
+        border-right: 1px solid #2b3133;
+        box-shadow: inset -1px 0 0 #798488;
+    }
+
+    .ws-sw2006-chat-pill {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 26px;
+        background: #ffffff;
+        border: 1px solid #000000;
+        border-radius: 13px;
+        position: relative;
+    }
+
+    .ws-sw2006-mode-btn {
+        display: inline-flex;
+        align-items: center;
+        height: 100%;
+        padding: 0 8px 0 10px;
+        border: none;
+        border-right: 1px solid #000000;
+        border-radius: 12px;
+        background: #ffffff;
+        cursor: pointer;
+        flex-shrink: 0;
+
+        &:hover { background: #f4f4f4; }
+        .ws-mode-label { font-size: 11px; font-weight: 700; color: #000000; white-space: nowrap; }
+        .ws-mode-divider { width: 0; height: 14px; border-left: 1px dotted #888888; margin: 0 6px; }
+        .ws-mode-arrow { font-size: 7px; color: #000000; transform: scale(1.1, 0.8); }
+    }
+
+    .ws-sw2006-mode-menu {
+        position: absolute;
+        bottom: 29px;
+        left: 0;
+        background: #ebebe8;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        z-index: 60;
+        min-width: 102px;
+        display: flex;
+        flex-direction: column;
+        padding: 3px;
+
+        .ws-sw2006-mode-item {
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #000000;
+            cursor: pointer;
+            border-radius: 2px;
+            text-align: left;
+            background: transparent;
+            border: none;
+
+            &:hover, &.is-active { background: #5b90a4; color: #ffffff; }
+        }
+    }
+
+    .ws-sw-chat-form {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+
+        input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            font-size: 11px;
+            color: #000000;
+            outline: none;
+        }
+    }
+
+    .ws-sw2006-hover-label {
+        position: absolute;
+        bottom: 2px;
+        left: 18px;
+        font-size: 9px;
+        line-height: 10px;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 1px 1px 0 #000000 !important;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+
+    .ws-hud-zone-icons {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        padding: 0 18px;
+    }
+
+    .ws-sw-icon-btn {
+        position: relative;
+        background: transparent;
+        border: none;
+        padding: 2px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.08s ease, filter 0.1s ease;
+
+        &:hover { transform: translateY(-1px) scale(1.06); filter: brightness(1.12); }
+        &:active { transform: translateY(1px) scale(0.96); }
+
+        &.is-muted {
+            opacity: 0.45;
+            filter: grayscale(0.7);
+
+            &::after {
+                content: '';
+                position: absolute;
+                width: 28px;
+                height: 3px;
+                background: #ff2b2b;
+                border: 1px solid #000000;
+                transform: rotate(-35deg);
+                pointer-events: none;
+            }
+        }
+
+        img.ws-ico-audio { height: 20px; width: auto; }
+        img.ws-ico-rank { height: 30px; width: auto; }
+        img.ws-ico-hotel { height: 36px; width: auto; }
+        img.ws-ico-help { height: 32px; width: auto; }
+    }
+
+    // =========================================================================
+    // SHOCKWAVE 2006 MODALS (EXIT, HELP, RANKING)
+    // =========================================================================
+    .ws-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(8, 16, 24, 0.55);
+        z-index: 45;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .ws-sw-window {
+        width: 100%;
+        background: #8a9599;
+        border: 1px solid #000000;
+        border-radius: 7px;
+        box-shadow:
+            inset 1px 1px 0 #c7d1d4,
+            inset -1px -1px 0 #5b6468,
+            0 6px 0 rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+
+        &.is-compact { max-width: 390px; }
+        &.is-wide { max-width: 560px; }
+    }
+
+    .ws-sw-header {
+        min-height: 26px;
+        background: #6596a8;
+        border-bottom: 1px solid #000000;
+        box-shadow: inset 0 1px 0 #95c2d1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 3px 7px;
+        gap: 10px;
+
+        .ws-sw-dots {
+            flex: 1;
+            height: 9px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23b8d8e6'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 2px 2px;
+            image-rendering: pixelated;
+        }
+
+        .ws-sw-title {
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+            @include ws-outline-sm(#1c3b47);
+        }
+
+        .ws-sw-close {
+            width: 15px;
+            height: 15px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            img { width: 13px; height: 13px; }
+        }
+    }
+
+    .ws-sw-body {
+        padding: 10px 12px 12px;
+        background: #d7dcde;
+        border-top: 1px solid #f0f4f5;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ws-sw-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        &.is-center { justify-content: center; }
+    }
+
+    .ws-sw-btn {
+        min-height: 26px;
+        padding: 4px 13px;
+        border-radius: 4px;
+        border: 1px solid #000000;
+        background: linear-gradient(180deg, #ffffff 0%, #e1e5e8 55%, #cdd3d7 100%);
+        box-shadow: inset 0 1px 0 #ffffff, 0 1px 0 rgba(0, 0, 0, 0.25);
+        color: #000000;
+        font-size: 11px;
+        line-height: 1.25;
+        font-weight: 800;
+        white-space: nowrap;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover { background: linear-gradient(180deg, #ffffff 0%, #eef2f5 55%, #dbe1e6 100%); }
+        &.is-active { background: #6596a8; color: #ffffff; @include ws-outline-sm(#1a3a47); }
+        &.is-danger {
+            background: linear-gradient(180deg, #e05246 0%, #c03126 55%, #9e2219 100%);
+            color: #ffffff;
+            @include ws-outline-sm(#590f0a);
+        }
+        &.is-primary {
+            background: linear-gradient(180deg, #52b832 0%, #37921d 55%, #2a7813 100%);
+            color: #ffffff;
+            @include ws-outline-sm(#154009);
+        }
+    }
+
+    .ws-sw-list-box {
+        max-height: 240px;
+        overflow-y: auto;
+        background: #ffffff;
+        border: 1px solid #2a3136;
+        border-radius: 3px;
+        padding: 4px;
+    }
+
+    .ws-sw-list-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 6px;
+        border-bottom: 1px solid #dfe5e8;
+        font-size: 11.5px;
+
+        &:nth-child(even) { background: #f4f7f8; }
+        &:last-child { border-bottom: none; }
+    }
+}
+
+@keyframes ws-pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.03); }
+}
+
+@keyframes ws-pop-in {
+    from { opacity: 0; transform: translate(-50%, -10px) scale(0.92); }
+    to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+

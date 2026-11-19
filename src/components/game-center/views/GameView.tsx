@@ -17,9 +17,10 @@ const GAME_CONTROLS: { [ gameNameId: string ]: { action: string; keys: string }[
         { action: 'Abrir / cerrar paracaídas', keys: 'Espacio' }
     ],
     wobblesquabble: [
-        { action: 'Mantener equilibrio', keys: 'A / D o Flechas Izq/Der' },
-        { action: 'Empujar oponente', keys: 'Espacio / Clic' },
-        { action: 'Agacharse / Esquivar', keys: 'S / Flecha Abajo' }
+        { action: 'Mantener equilibrio', keys: 'Q / E' },
+        { action: 'Empujar al rival', keys: 'A / D' },
+        { action: 'Moverse por los flotadores', keys: 'N / M o Flechas Izq/Der' },
+        { action: 'Estabilizar al centro', keys: 'Espacio' }
     ],
     slotcar: [
         { action: 'Acelerar', keys: 'Espacio / Flecha Arriba / W' }
@@ -59,7 +60,7 @@ const GAME_DESCRIPTIONS: { [ gameNameId: string ]: { title: string; desc: string
 };
 
 export const GameView = () => {
-    const { isVisible, selectedGame, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, setIsBattleBallPlaying } = useGameCenter();
+    const { isVisible, selectedGame, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, setIsBattleBallPlaying, isWobbleSquabblePlaying, setIsWobbleSquabblePlaying } = useGameCenter();
     const [ realStatus, setRealStatus ] = useState<{ games_left: number; has_unlimited: boolean } | null>(null);
     const [ launchError, setLaunchError ] = useState<string | null>(null);
     const [ launching, setLaunching ] = useState<boolean>(false);
@@ -78,7 +79,9 @@ export const GameView = () => {
         let cancelled = false;
         const statusEndpoint = selectedGame?.gameNameId === 'battleball'
             ? '/api/games/battleball/status'
-            : '/api/games/snowstorm/status';
+            : (selectedGame?.gameNameId === 'wobblesquabble'
+                ? '/api/games/wobblesquabble/status'
+                : '/api/games/snowstorm/status');
         fetch(statusEndpoint, { credentials: 'include' })
             .then(r => r.ok ? r.json() : null)
             .then(data => {
@@ -91,7 +94,7 @@ export const GameView = () => {
             })
             .catch(() => {});
         return () => { cancelled = true; };
-    }, [ isVisible, selectedGame, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying ]);
+    }, [ isVisible, selectedGame, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, isWobbleSquabblePlaying ]);
 
     const controls = useMemo(() => (selectedGame && GAME_CONTROLS[ selectedGame.gameNameId ]) || DEFAULT_CONTROLS, [ selectedGame ]);
 
@@ -133,6 +136,30 @@ export const GameView = () => {
                 setIsBattleBallPlaying(true);
             } catch {
                 setLaunchError('Error de conexión con el servidor de Battle Ball.');
+            } finally {
+                setLaunching(false);
+            }
+            return;
+        }
+
+        if (selectedGame && selectedGame.gameNameId === 'wobblesquabble') {
+            setLaunching(true);
+            try {
+                const res = await fetch('/api/games/wobblesquabble/start', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    setLaunchError(data.error || 'Has agotado tus partidas gratuitas de hoy. ¡Hazte Habbten Club para partidas ilimitadas!');
+                    setLaunching(false);
+                    return;
+                }
+                setIsVisible(false);
+                setIsWobbleSquabblePlaying(true);
+            } catch {
+                setLaunchError('Error de conexión con el servidor de Wobble Squabble.');
             } finally {
                 setLaunching(false);
             }
