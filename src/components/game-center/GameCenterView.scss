@@ -153,30 +153,33 @@
             z-index: 10;
 
             .btn-play-game {
-                background: #15803d !important;
-                background-color: #15803d !important;
-                border: 1px solid #166534 !important;
+                background-color: transparent !important;
+                    background-image:
+                        url('@/assets/images/eras/habborator/button-20-left.png'),
+                        url('@/assets/images/eras/habborator/button-20-right.png'),
+                        url('@/assets/images/eras/habborator/button-20-mid.png');
+                    background-position: left top, right top, 4px top;
+                    background-repeat: no-repeat, no-repeat, no-repeat;
+                    background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100%;
+                    image-rendering: pixelated;
+                    border: none;
+                    border-radius: 0;
+                    box-shadow: none;
+                height: 25px;
                 color: #ffffff !important;
-                font-size: 16px !important;
-                font-weight: 800 !important;
-                letter-spacing: 0.5px;
-                padding: 12px 48px !important;
-                border-radius: 8px !important;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                letter-spacing: 0;
+                padding: 3px 48px 4px !important;
                 cursor: pointer;
-                transition: background-color 0.15s ease, transform 0.15s ease;
 
                 &:hover:not(:disabled) {
-                    background: #16a34a !important;
-                    background-color: #16a34a !important;
-                    border-color: #15803d !important;
-                    transform: translateY(-1px);
+                    filter: brightness(1.08);
                 }
 
                 &:active:not(:disabled) {
-                    background: #14532d !important;
-                    background-color: #14532d !important;
-                    transform: translateY(1px);
+                    filter: brightness(0.94);
                 }
             }
 

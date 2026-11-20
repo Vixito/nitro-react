@@ -553,24 +553,33 @@
 
 .ss-green-cta {
     min-width: 196px;
-    padding: 10px 26px;
-    border-radius: 6px;
-    border: 2px solid #163d04;
-    background: linear-gradient(180deg, #5cc61a 0%, #3aa305 55%, #2f8902 100%);
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), 0 3px 6px rgba(0, 0, 0, 0.22);
+    height: 25px;
+    padding: 3px 26px 4px;
+    background-color: transparent;
+        background-image:
+            url('@/assets/images/eras/habborator/button-20-left.png'),
+            url('@/assets/images/eras/habborator/button-20-right.png'),
+            url('@/assets/images/eras/habborator/button-20-mid.png');
+        background-position: left top, right top, 4px top;
+        background-repeat: no-repeat, no-repeat, no-repeat;
+        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100%;
+        image-rendering: pixelated;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
     color: #fff;
-    font-size: 14px;
-    font-weight: 900;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: none;
     cursor: pointer;
-    transition: transform 0.08s ease, filter 0.12s ease;
 
     &:hover:not(:disabled) {
         filter: brightness(1.08);
     }
 
     &:active:not(:disabled) {
-        transform: translateY(1px);
+        filter: brightness(0.94);
     }
 
     &:disabled {
@@ -994,16 +1003,16 @@
         height: 20px;
         padding: 0;
         border: none;
-        background: transparent;
+        background: transparent url('@/assets/images/eras/flash2012/skins/close_ubuntu_normal.png') center no-repeat;
+        image-rendering: pixelated;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
 
-        img {
-            width: 19px;
-            height: 20px;
-            image-rendering: pixelated;
+        &:hover {
+            background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_hover.png');
+        }
+
+        &:active {
+            background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_pressed.png');
         }
     }
 }
@@ -1037,23 +1046,32 @@
 
 .ss-btn-secondary {
     flex: 1;
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: 1px solid #000000;
-    border-bottom-width: 2px;
-    background: linear-gradient(180deg, #f5f5f5 0%, #f5f5f5 50%, #dcdcdc 50%, #dcdcdc 100%);
-    box-shadow: inset 0 1px 0 #ffffff;
+    height: 25px;
+    padding: 3px 12px 4px;
+    background-color: transparent;
+        background-image:
+            url('@/assets/images/eras/habborator/button-18-left.png'),
+            url('@/assets/images/eras/habborator/button-18-right.png'),
+            url('@/assets/images/eras/habborator/button-18-mid.png');
+        background-position: left top, right top, 4px top;
+        background-repeat: no-repeat, no-repeat, no-repeat;
+        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100%;
+        image-rendering: pixelated;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
     color: #141414;
+    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
     font-size: 11.5px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
 
     &:hover {
-        background: linear-gradient(180deg, #ffffff 0%, #ffffff 50%, #e8e8e8 50%, #e8e8e8 100%);
+        filter: brightness(1.05);
     }
 
     &:active {
-        background: #cccccc;
+        filter: brightness(0.92);
     }
 }
 

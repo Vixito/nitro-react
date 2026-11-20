@@ -119,32 +119,36 @@ body[data-era="flash2012"] {
         .nitro-card:not([class*="nitro-mod-tools"]) :is(.btn, .btn-primary, .btn-secondary, .btn-light),
         .btn:not(.btn-danger):not(.btn-success)
     ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.nitro-catalog-gift-button):not(.gift-color-swatch):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn):not(.btn-play-game):not(.btn-success)) {
-        background: linear-gradient(180deg, #f3f3f3 0%, #f3f3f3 52%, #d9d9d9 52%, #d9d9d9 100%) !important;
-        border: 1px solid #000000 !important;
-        border-bottom-width: 2px !important;
-        border-radius: 3px !important;
+        border: none !important;
+        background-color: transparent !important;
+        background-image:
+            url('@/assets/images/eras/habborator/button-18-left.png'),
+            url('@/assets/images/eras/habborator/button-18-right.png'),
+            url('@/assets/images/eras/habborator/button-18-mid.png') !important;
+        background-position: left top, right top, 4px top !important;
+        background-repeat: no-repeat, no-repeat, no-repeat !important;
+        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100% !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
         color: #141414 !important;
         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
         font-weight: 700 !important;
         font-size: 11px !important;
         line-height: 1.15 !important;
-        min-height: 23px !important;
+        min-height: 25px !important;
         text-shadow: none !important;
-        box-shadow: inset 0 0 0 1px #d9d9d9, inset 0 1px 0 #ffffff !important;
-        padding: 3px 10px !important;
+        padding: 3px 10px 4px !important;
+        image-rendering: pixelated !important;
         cursor: pointer !important;
         user-select: none !important;
 
         &:hover:not(:disabled) {
-            background: linear-gradient(180deg, #ffffff 0%, #ffffff 52%, #e6e6e6 52%, #e6e6e6 100%) !important;
-            border-color: #000000 !important;
             color: #000000 !important;
-            filter: none !important;
+            filter: brightness(1.05) !important;
         }
 
         &:active:not(:disabled) {
-            background: #cccccc !important;
-            box-shadow: inset 0 0 0 1px #b5b5b5 !important;
+            filter: brightness(0.92) !important;
         }
 
         &:disabled {

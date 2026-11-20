@@ -2390,7 +2390,7 @@ export const SnowStormGameView: FC = () =>
                                         title="Cerrar"
                                         onClick={ () => setShowLeaveModal(false) }
                                     >
-                                        <img src={ closeUbuntuImg } alt="Cerrar" />
+                                        
                                     </button>
                                 </div>
                                 <div className="ss-leave-body">

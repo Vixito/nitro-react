@@ -2097,7 +2097,7 @@ export const FastFoodGameView: FC = () =>
                     <div className="ff-modal-box" onClick={ e => e.stopPropagation() }>
                         <div className="ff-modal-header">
                             <span>Clasificación de FastFood</span>
-                            <button type="button" onClick={ () => setShowLeaderboard(false) }>✕</button>
+                            <button type="button" title="Cerrar" aria-label="Cerrar" onClick={ () => setShowLeaderboard(false) }>✕</button>
                         </div>
                         <div className="ff-modal-body">
                             <div className="ff-lb-tabs">

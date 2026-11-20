@@ -810,14 +810,24 @@
             color: #fde68a;
 
             button {
-                background: #dc2626;
-                border: 1.5px solid #000000;
-                border-radius: 4px;
-                color: #ffffff;
-                font-weight: 900;
-                width: 26px;
-                height: 26px;
+                background: transparent url('@/assets/images/eras/flash2012/skins/close_ubuntu_normal.png') center no-repeat;
+                image-rendering: pixelated;
+                border: none;
+                border-radius: 0;
+                font-size: 0;
+                color: transparent;
+                width: 19px;
+                height: 20px;
+                padding: 0;
                 cursor: pointer;
+
+                &:hover {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_hover.png');
+                }
+
+                &:active {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_ubuntu_pressed.png');
+                }
             }
         }
 
