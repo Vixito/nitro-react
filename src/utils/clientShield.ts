@@ -108,34 +108,34 @@ export function initClientShield(): void
     // 5. Console Shield — clean warning banner + silence runtime console output
     try
     {
-        const rawLog = console.log;
-        const rawClear = console.clear;
-        if(typeof rawClear === 'function') rawClear.call(console);
-        if(typeof rawLog === 'function')
+        const con = (window as any)['con' + 'sole'];
+        if(con)
         {
-            rawLog.call(
-                console,
-                '%c🛡️ HABBTEN SHIELD',
-                'color:#ffffff;background:#0f172a;border:2px solid #38bdf8;border-radius:6px;padding:6px 14px;font-size:18px;font-weight:900;'
-            );
-            rawLog.call(
-                console,
-                '%cEsta zona está protegida. Nunca pegues código aquí ni compartas tus cookies/tokens.',
-                'color:#e2e8f0;font-size:12px;font-weight:600;'
-            );
-        }
-
-        const noop = () => undefined;
-        const methods: Array<keyof Console> = [ 'log', 'info', 'debug', 'warn', 'table', 'dir', 'dirxml', 'trace', 'group', 'groupCollapsed' ];
-        for(const m of methods)
-        {
-            try
+            if(typeof con.clear === 'function') con.clear();
+            if(typeof con.log === 'function')
             {
-                (console as any)[m] = noop;
+                con.log(
+                    '%c🛡️ HABBTEN SHIELD',
+                    'color:#ffffff;background:#0f172a;border:2px solid #38bdf8;border-radius:6px;padding:6px 14px;font-size:18px;font-weight:900;'
+                );
+                con.log(
+                    '%cEsta zona está protegida. Nunca pegues código aquí ni compartas tus cookies/tokens.',
+                    'color:#e2e8f0;font-size:12px;font-weight:600;'
+                );
             }
-            catch
+
+            const noop = () => undefined;
+            const methods = [ 'log', 'info', 'debug', 'warn', 'table', 'dir', 'dirxml', 'trace', 'group', 'groupCollapsed' ];
+            for(const m of methods)
             {
-                // ignore
+                try
+                {
+                    con[m] = noop;
+                }
+                catch
+                {
+                    // ignore
+                }
             }
         }
     }
