@@ -1235,13 +1235,17 @@
             height: 15px;
             padding: 0;
             border: none;
-            background: transparent;
+            background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') center no-repeat;
+            image-rendering: pixelated;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
 
-            img { width: 13px; height: 13px; }
+            &:hover {
+                background-image: url('@/assets/images/eras/shockwave_v14/close_button_up.png');
+            }
+
+            &:active {
+                background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png');
+            }
         }
     }
 

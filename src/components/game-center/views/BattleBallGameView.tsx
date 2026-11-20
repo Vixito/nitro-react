@@ -6,7 +6,6 @@ import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 
 import creditIconImg from '../../../assets/images/eras/flash2012/purse/credit_icon.png';
 import ducketIconImg from '../../../assets/images/eras/flash2012/purse/ducket_icon.png';
-import swCloseBtnImg from '../../../assets/images/eras/shockwave_v14/close_button_up.png';
 import clubClipboardImg from '../../../assets/images/eras/shockwave_v14/club_clipboard.png';
 import bbArena0WideImg from '../../../assets/images/gamecenter/battleball/bb_arena_0_wide.png';
 import bbArena2WideImg from '../../../assets/images/gamecenter/battleball/bb_arena_2_wide.png';
@@ -2891,8 +2890,7 @@ export const BattleBallGameView: FC = () =>
                                 <span className="bb-sw-dots" />
                                 <span className="bb-sw-title">¿Salir de Battle Ball?</span>
                                 <span className="bb-sw-dots" />
-                                <button type="button" className="bb-sw-close" onClick={ () => setShowLeaveModal(false) }>
-                                    <img src={ swCloseBtnImg } alt="Cerrar" />
+                                <button type="button" className="bb-sw-close" title="Cerrar" aria-label="Cerrar" onClick={ () => setShowLeaveModal(false) }>
                                 </button>
                             </div>
                             <div className="bb-sw-body">
@@ -2920,8 +2918,7 @@ export const BattleBallGameView: FC = () =>
                                 <span className="bb-sw-dots" />
                                 <span className="bb-sw-title">Cómo jugar a Battle Ball</span>
                                 <span className="bb-sw-dots" />
-                                <button type="button" className="bb-sw-close" onClick={ () => setShowHelpModal(false) }>
-                                    <img src={ swCloseBtnImg } alt="Cerrar" />
+                                <button type="button" className="bb-sw-close" title="Cerrar" aria-label="Cerrar" onClick={ () => setShowHelpModal(false) }>
                                 </button>
                             </div>
                             <div className="bb-sw-body">
@@ -2957,8 +2954,7 @@ export const BattleBallGameView: FC = () =>
                                 <span className="bb-sw-dots" />
                                 <span className="bb-sw-title">Clasificación de Battle Ball</span>
                                 <span className="bb-sw-dots" />
-                                <button type="button" className="bb-sw-close" onClick={ () => setShowLeaderboardModal(false) }>
-                                    <img src={ swCloseBtnImg } alt="Cerrar" />
+                                <button type="button" className="bb-sw-close" title="Cerrar" aria-label="Cerrar" onClick={ () => setShowLeaderboardModal(false) }>
                                 </button>
                             </div>
                             <div className="bb-sw-body">

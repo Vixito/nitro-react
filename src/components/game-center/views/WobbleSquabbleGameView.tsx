@@ -16,7 +16,6 @@ import wsFxSplashImg from '../../../assets/images/gamecenter/wobblesquabble/ws_f
 import hudSfxIconImg from '../../../assets/images/gamecenter/battleball/hud_sfx_icon.png';
 import hudExitHotelImg from '../../../assets/images/gamecenter/battleball/hud_exit_hotel.png';
 import hudHelpIconImg from '../../../assets/images/gamecenter/battleball/hud_help_icon.png';
-import swCloseBtnImg from '../../../assets/images/eras/shockwave_v14/close_button_up.png';
 import clubClipboardImg from '../../../assets/images/eras/shockwave_v14/club_clipboard.png';
 import shockwaveArrowOrangeImg from '../../../assets/images/eras/shockwave_v14/shockwave_arrow_orange.png';
 import creditIconImg from '../../../assets/images/eras/flash2012/purse/credit_icon.png';
@@ -2357,8 +2356,7 @@ export const WobbleSquabbleGameView: FC = () =>
                                 <span className="ws-sw-dots" />
                                 <span className="ws-sw-title">¿Salir de Wobble Squabble?</span>
                                 <span className="ws-sw-dots" />
-                                <button type="button" className="ws-sw-close" onClick={ () => setShowLeaveModal(false) }>
-                                    <img src={ swCloseBtnImg } alt="Cerrar" />
+                                <button type="button" className="ws-sw-close" title="Cerrar" aria-label="Cerrar" onClick={ () => setShowLeaveModal(false) }>
                                 </button>
                             </div>
                             <div className="ws-sw-body">
@@ -2386,8 +2384,7 @@ export const WobbleSquabbleGameView: FC = () =>
                                 <span className="ws-sw-dots" />
                                 <span className="ws-sw-title">Cómo jugar a Wobble Squabble</span>
                                 <span className="ws-sw-dots" />
-                                <button type="button" className="ws-sw-close" onClick={ () => setShowHelpModal(false) }>
-                                    <img src={ swCloseBtnImg } alt="Cerrar" />
+                                <button type="button" className="ws-sw-close" title="Cerrar" aria-label="Cerrar" onClick={ () => setShowHelpModal(false) }>
                                 </button>
                             </div>
                             <div className="ws-sw-body">
@@ -2417,8 +2414,7 @@ export const WobbleSquabbleGameView: FC = () =>
                                 <span className="ws-sw-dots" />
                                 <span className="ws-sw-title">Clasificación de Wobble Squabble</span>
                                 <span className="ws-sw-dots" />
-                                <button type="button" className="ws-sw-close" onClick={ () => setShowLeaderboardModal(false) }>
-                                    <img src={ swCloseBtnImg } alt="Cerrar" />
+                                <button type="button" className="ws-sw-close" title="Cerrar" aria-label="Cerrar" onClick={ () => setShowLeaderboardModal(false) }>
                                 </button>
                             </div>
                             <div className="ws-sw-body">
