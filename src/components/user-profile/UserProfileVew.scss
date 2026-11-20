@@ -1,6 +1,8 @@
 .user-profile {
     width: $user-profile-width;
-    height: $user-profile-height;
+    min-height: $user-profile-height;
+    height: auto;
+    max-height: 90vh;
 
     .user-container {
         border-right: 1px solid gray;
@@ -25,7 +27,7 @@
 
             .avatar-image {
                 top: 20px;
-                right: -8pxpx;
+                right: -8px;
             }
         }
     }
