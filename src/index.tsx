@@ -1,3 +1,7 @@
+import { initClientShield } from './utils/clientShield';
+
+initClientShield();
+
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import { ErrorBoundary } from './common';

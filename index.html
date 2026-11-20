@@ -20,39 +20,6 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Habbten Hotel</title>
-    <script>
-      window.addEventListener('error', function (e) {
-        try {
-          fetch('/api/debug-client-log', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              step: 'EARLY_WINDOW_ERROR',
-              message: e.message,
-              filename: e.filename,
-              lineno: e.lineno,
-              colno: e.colno,
-              stack: e.error ? e.error.stack : null,
-              time: new Date().toISOString()
-            })
-          });
-        } catch (err) {}
-      });
-      window.addEventListener('unhandledrejection', function (e) {
-        try {
-          fetch('/api/debug-client-log', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              step: 'EARLY_PROMISE_REJECTION',
-              reason: String(e.reason),
-              stack: e.reason ? e.reason.stack : null,
-              time: new Date().toISOString()
-            })
-          });
-        } catch (err) {}
-      });
-    </script>
   </head>
   <body>
     <noscript>Necesitas habilitar JavaScript para jugar en Habbten.</noscript>
@@ -107,7 +74,13 @@
           cfg['furnidata.url'] = root + '/assets/gamedata/FurnitureData.json?v=20260821_v14';
           cfg['productdata.url'] = root + '/assets/gamedata/ProductData.json?v=20260821_v14';
         }
-        window.NitroConfig = cfg;
+        Object.defineProperty(window, 'NitroConfig', {
+          value: cfg,
+          writable: false,
+          enumerable: false,
+          configurable: true
+        });
+        if (document.currentScript) document.currentScript.remove();
       })();
     </script>
     <script type="module" src="./src/index.tsx"></script>

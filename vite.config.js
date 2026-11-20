@@ -18,18 +18,26 @@ export default defineConfig({
             '~': resolve(__dirname, 'node_modules')
         }
     },
+    esbuild: {
+        drop: [ 'console', 'debugger' ],
+        legalComments: 'none'
+    },
     build: {
+        sourcemap: false,
+        minify: 'esbuild',
         assetsInlineLimit: 102400,
         rollupOptions: {
             output: {
-                assetFileNames: 'src/assets/[name].[ext]',
+                entryFileNames: 'static/[hash].js',
+                chunkFileNames: 'static/[hash].js',
+                assetFileNames: 'static/[hash].[ext]',
                 manualChunks: id =>
                 {
                     if(id.includes('node_modules'))
                     {
-                        if(id.includes('@nitrots/nitro-renderer')) return 'nitro-renderer';
+                        if(id.includes('@nitrots/nitro-renderer')) return 'r';
 
-                        return 'vendor';
+                        return 'v';
                     }
                 }
             }
