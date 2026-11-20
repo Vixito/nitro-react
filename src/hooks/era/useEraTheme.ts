@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { detectIsMobileViewport } from '../mobile/useIsMobile';
 
 export type EraType = 'modern' | 'flash2012' | 'shockwave2006';
 
@@ -55,8 +56,17 @@ const applyEraToDOM = (era: EraType) =>
     if(typeof document === 'undefined') return;
 
     activeEraMemory = era;
-    document.body.dataset.era = era;
     document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006');
+
+    if(detectIsMobileViewport())
+    {
+        document.body.dataset.era = 'mobile';
+        document.body.classList.add('is-mobile-ui');
+        return;
+    }
+
+    document.body.classList.remove('is-mobile-ui');
+    document.body.dataset.era = era;
 
     if(era === 'flash2012')
     {

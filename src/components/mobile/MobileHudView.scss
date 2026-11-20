@@ -60,23 +60,26 @@
 .hmob-help-fab {
     width: 44px;
     height: 44px;
+    padding: 0;
     border-radius: 50%;
-    border: 2.5px solid #ffffff;
-    background: linear-gradient(180deg, #e1326e 0%, #c11e56 58%, #a61648 100%);
-    color: #ffffff;
-    font-size: 23px;
-    font-weight: 900;
-    line-height: 1;
+    border: none;
+    background: transparent;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.42);
     cursor: pointer;
     transition: transform 0.12s ease;
 
+    .hmob-help-sprite {
+        width: 44px;
+        height: 44px;
+        object-fit: contain;
+        filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+    }
+
     &:active,
     &.open {
-        transform: scale(0.94);
+        transform: scale(0.92);
     }
 }
 
@@ -161,6 +164,22 @@
         &:active {
             background: rgba(82, 200, 230, 0.35);
         }
+    }
+}
+
+.hmob-menu-ico {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        max-width: 20px;
+        max-height: 20px;
+        object-fit: contain;
+        image-rendering: pixelated;
     }
 }
 
@@ -346,8 +365,8 @@
 
 .hmob-dock-btn {
     position: relative;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     flex-shrink: 0;
     padding: 0;
     border: none;
@@ -362,22 +381,21 @@
         transform: scale(0.88);
     }
 
-    .hmob-dock-icon {
-        max-width: 38px;
-        max-height: 38px;
-        object-fit: contain;
-        image-rendering: pixelated;
-        filter:
-            drop-shadow(1px 0 0 #ffffff)
-            drop-shadow(-1px 0 0 #ffffff)
-            drop-shadow(0 1px 0 #ffffff)
-            drop-shadow(0 -1px 0 #ffffff)
-            drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+    &.is-pulsing .hmob-dock-sprite {
+        animation: hmobPulse 1.1s ease-in-out infinite;
     }
 
-    .hmob-door-svg {
-        filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45));
+    .hmob-dock-sprite {
+        max-width: 46px;
+        max-height: 46px;
+        object-fit: contain;
+        filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.45));
     }
+}
+
+@keyframes hmobPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
 }
 
 .hmob-count-badge {
@@ -400,8 +418,8 @@
 
 .hmob-avatar-btn {
     position: relative;
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
     flex-shrink: 0;
     padding: 0;
     border: none;
@@ -409,8 +427,8 @@
     cursor: pointer;
 
     .hmob-avatar-ring {
-        width: 44px;
-        height: 44px;
+        width: 46px;
+        height: 46px;
         border-radius: 50%;
         border: 2.5px solid #ffffff;
         background: radial-gradient(circle at 50% 35%, #238cb0 0%, #105570 100%);
@@ -420,8 +438,8 @@
         justify-content: center;
         box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
 
-        .avatar-image {
-            transform: scale(0.92) translateY(3px);
+        img {
+            display: block;
             image-rendering: pixelated;
         }
     }
@@ -432,55 +450,34 @@
     }
 }
 
-// Icono burbuja blanca con 3 puntos "..." (idéntico a la captura)
-.hmob-chat-bubble-btn {
+.hmob-chat-sprite-btn {
     position: relative;
-    width: 48px;
-    height: 38px;
+    width: 54px;
+    height: 48px;
     margin-left: 6px;
     flex-shrink: 0;
-    border-radius: 8px;
-    border: 2px solid rgba(11, 59, 86, 0.65);
-    background: linear-gradient(180deg, #ffffff 0%, #e4f2f7 100%);
+    padding: 0;
+    border: none;
+    background: transparent;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.42);
     cursor: pointer;
     transition: transform 0.1s ease;
 
-    &::after {
-        content: '';
-        position: absolute;
-        bottom: -7px;
-        left: 50%;
-        transform: translateX(-50%);
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 7px solid #e4f2f7;
+    .hmob-chat-sprite {
+        max-width: 52px;
+        max-height: 46px;
+        object-fit: contain;
+        filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.45));
     }
 
     &:active {
-        transform: scale(0.92);
+        transform: scale(0.9);
     }
 
-    &.active {
-        background: #b7f1ff;
-        border-color: #ffffff;
-    }
-
-    .hmob-chat-dots {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-
-        i {
-            display: block;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #237496;
-        }
+    &.active .hmob-chat-sprite {
+        filter: drop-shadow(0 0 8px rgba(111, 231, 255, 0.85)) drop-shadow(0 3px 5px rgba(0, 0, 0, 0.45));
     }
 }
 
@@ -525,12 +522,12 @@
     }
 
     .hmob-dock-btn {
-        width: 38px;
-        height: 38px;
+        width: 40px;
+        height: 40px;
 
-        .hmob-dock-icon {
-            max-width: 32px;
-            max-height: 32px;
+        .hmob-dock-sprite {
+            max-width: 38px;
+            max-height: 38px;
         }
     }
 
@@ -544,10 +541,15 @@
         }
     }
 
-    .hmob-chat-bubble-btn {
-        width: 42px;
-        height: 34px;
+    .hmob-chat-sprite-btn {
+        width: 44px;
+        height: 40px;
         margin-left: 3px;
+
+        .hmob-chat-sprite {
+            max-width: 42px;
+            max-height: 38px;
+        }
     }
 
     .hmob-touch-switch .hmob-switch-btn {
@@ -561,3 +563,4 @@
         font-size: 11px;
     }
 }
+

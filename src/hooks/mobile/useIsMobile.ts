@@ -68,7 +68,16 @@ export function useIsMobile(): boolean
         {
             const next = detectIsMobileViewport();
             setIsMobile(next);
-            document.body.classList.toggle('is-mobile-ui', next);
+            if(next)
+            {
+                document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006');
+                document.body.classList.add('is-mobile-ui');
+                document.body.dataset.era = 'mobile';
+            }
+            else
+            {
+                document.body.classList.remove('is-mobile-ui');
+            }
         };
 
         update();
@@ -102,3 +111,4 @@ export function useMobileTouchMode(): [ MobileTouchMode, (mode: MobileTouchMode)
 
     return [ mode, setMobileTouchMode ];
 }
+

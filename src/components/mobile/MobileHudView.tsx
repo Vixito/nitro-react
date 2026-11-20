@@ -1,15 +1,32 @@
 import { NitroSettingsEvent, UserSettingsEvent, UserSettingsSoundComposer } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { ChatMessageTypeEnum, CreateLinkEvent, DispatchMainEvent, GetRoomEngine, GetSessionDataManager, MessengerIconState, OpenMessengerChat, SendMessageComposer, VisitDesktop } from '../../api';
-import catalogIconImg from '../../assets/images/toolbar/icons/catalog.png';
-import friendsIconImg from '../../assets/images/toolbar/icons/friend_all.png';
-import inventoryIconImg from '../../assets/images/toolbar/icons/inventory.png';
-import messageIconImg from '../../assets/images/toolbar/icons/message.png';
-import messageUnseenIconImg from '../../assets/images/toolbar/icons/message_unsee.gif';
-import roomsIconImg from '../../assets/images/toolbar/icons/rooms.png';
-import { LayoutAvatarImageView, LayoutCurrencyIcon } from '../../common';
+import iconAchievements from '../../assets/images/eras/flash2012/memenu/achievements_color.png';
+import iconClothes from '../../assets/images/eras/flash2012/memenu/clothes_color.png';
+import iconProfile from '../../assets/images/eras/flash2012/memenu/profile_color.png';
+import iconRooms from '../../assets/images/eras/flash2012/memenu/rooms_color.png';
+import iconSettings from '../../assets/images/eras/flash2012/memenu/settings_color.png';
+import iconSoundOff from '../../assets/images/eras/flash2012/memenu/sound_off_color.png';
+import iconSoundOn from '../../assets/images/eras/flash2012/memenu/sound_on_color.png';
+import iconTalents from '../../assets/images/eras/flash2012/memenu/talents_color.png';
+import mobChatBubbleImg from '../../assets/images/mobile/mob_chat_bubble.png';
+import mobExitImg from '../../assets/images/mobile/mob_exit.png';
+import mobFriendsImg from '../../assets/images/mobile/mob_friends.png';
+import mobHelpImg from '../../assets/images/mobile/mob_help.png';
+import mobInventoryImg from '../../assets/images/mobile/mob_inventory.png';
+import mobMessengerImg from '../../assets/images/mobile/mob_messenger.png';
+import mobNavigatorImg from '../../assets/images/mobile/mob_navigator.png';
+import mobShopImg from '../../assets/images/mobile/mob_shop.png';
+import iconCamera from '../../assets/images/toolbar/icons/camera.png';
+import iconGame from '../../assets/images/toolbar/icons/game.png';
+import iconHabboClub from '../../assets/images/toolbar/icons/habbo.png';
+import iconChatHistory from '../../assets/images/toolbar/icons/me-menu/chat-history.png';
+import iconHelp from '../../assets/images/toolbar/icons/me-menu/helper-tool.png';
+import iconModTools from '../../assets/images/toolbar/icons/modtools.png';
+import { LayoutCurrencyIcon } from '../../common';
 import { useAchievements, useChatInputWidget, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, usePurse, useRoom, useSessionInfo } from '../../hooks';
 import { useMobileTouchMode } from '../../hooks/mobile/useIsMobile';
+import { HabboHeadImg } from '../game-center/views/SnowStormAvatar';
 import './MobileHudView.scss';
 
 interface MobileHudViewProps
@@ -157,7 +174,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
 
     return (
         <div className="hmob-hud">
-            {/* BARRA SUPERIOR COMPACTA: MONEDERO + BOTÓN MAGENTA "?" */}
+            {/* BARRA SUPERIOR DERECHA: MONEDERO COMPACTO + BOTÓN ORIGINAL "?" */}
             <div className="hmob-top-right">
                 <button
                     type="button"
@@ -191,37 +208,47 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                     aria-label="Ayuda y opciones"
                     title="Ayuda y opciones"
                 >
-                    <span>?</span>
+                    <img src={ mobHelpImg } alt="?" className="hmob-help-sprite" />
                 </button>
             </div>
 
-            {/* MENÚ DESPLEGABLE DEL BOTÓN "?" */}
+            {/* MENÚ DESPLEGABLE DEL BOTÓN "?" (SIN EMOJIS — ÍCONOS PIXEL-ART OFICIALES) */}
             { isHelpMenuOpen && (
                 <div className="hmob-popover hmob-help-popover">
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('help/show'); } }>
-                        <span>🛟</span> Ayuda y Seguridad
+                        <span className="hmob-menu-ico"><img src={ iconHelp } alt="" /></span>
+                        <span>Ayuda y Seguridad</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('user-settings/toggle'); } }>
-                        <span>⚙️</span> Ajustes del Cliente
+                        <span className="hmob-menu-ico"><img src={ iconSettings } alt="" /></span>
+                        <span>Ajustes del Cliente</span>
                     </button>
                     <button type="button" onClick={ toggleSound }>
-                        <span>{ isSoundActive ? '🔊' : '🔇' }</span> { isSoundActive ? 'Silenciar Sonido' : 'Activar Sonido' }
+                        <span className="hmob-menu-ico"><img src={ isSoundActive ? iconSoundOn : iconSoundOff } alt="" /></span>
+                        <span>{ isSoundActive ? 'Silenciar Sonido' : 'Activar Sonido' }</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); toggleFullscreen(); } }>
-                        <span>⛶</span> Pantalla Completa
+                        <span className="hmob-menu-ico">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M2 6V2H6M10 2H14V6M14 10V14H10M6 14H2V10" stroke="#7dd3fc" strokeWidth="2" strokeLinecap="square" />
+                            </svg>
+                        </span>
+                        <span>Pantalla Completa</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('games/toggle'); } }>
-                        <span>🎮</span> Game Center
+                        <span className="hmob-menu-ico"><img src={ iconGame } alt="" /></span>
+                        <span>Game Center</span>
                     </button>
                     { isMod && (
                         <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('mod-tools/toggle'); } }>
-                            <span>🛡️</span> Mod Tools
+                            <span className="hmob-menu-ico"><img src={ iconModTools } alt="" /></span>
+                            <span>Mod Tools</span>
                         </button>
                     ) }
                 </div>
             ) }
 
-            {/* BOTÓN LATERAL IZQUIERDO ">" (EXACTO A LA CAPTURA DE HABBO MOBILE) */}
+            {/* BOTÓN LATERAL IZQUIERDO ">" (EXACTO A HABBO MOBILE, SIN SOLAPARSE CON ROOM TOOLS) */}
             { isInRoom && (
                 <div className={ `hmob-side-tab-wrap ${ isSideDrawerOpen ? 'expanded' : '' }` }>
                     { isSideDrawerOpen && (
@@ -232,16 +259,20 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                                 <button type="button" onClick={ () => handleZoomDelta(0.25) } title="Acercar">+</button>
                             </div>
                             <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('navigator/toggle-room-info'); } }>
-                                🏠 Info de Sala
+                                <span className="hmob-menu-ico"><img src={ iconRooms } alt="" /></span>
+                                <span>Info de Sala</span>
                             </button>
                             <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('chat-history/toggle'); } }>
-                                💬 Historial
+                                <span className="hmob-menu-ico"><img src={ iconChatHistory } alt="" /></span>
+                                <span>Historial</span>
                             </button>
                             <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('camera/toggle'); } }>
-                                📷 Cámara
+                                <span className="hmob-menu-ico"><img src={ iconCamera } alt="" /></span>
+                                <span>Cámara</span>
                             </button>
                             <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('games/toggle'); } }>
-                                🎮 Game Center
+                                <span className="hmob-menu-ico"><img src={ iconGame } alt="" /></span>
+                                <span>Game Center</span>
                             </button>
                         </div>
                     ) }
@@ -266,7 +297,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                 <div className="hmob-mode-toast">{ modeToast }</div>
             ) }
 
-            {/* BARRA FLOTANTE DE CHAT TÁCTIL (AL PULSAR LA BURBUJA "...") */}
+            {/* BARRA FLOTANTE DE CHAT TÁCTIL */}
             { isInRoom && isChatBarOpen && (
                 <form className="hmob-chat-bar" onSubmit={ handleSendChat }>
                     <button
@@ -304,32 +335,38 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                 </form>
             ) }
 
-            {/* MENÚ FLOTANTE DEL AVATAR ("YO") */}
+            {/* MENÚ FLOTANTE DEL AVATAR ("YO" — SIN EMOJIS, SOLO ÍCONOS HABBO REALES) */}
             { isMeMenuOpen && (
                 <div className="hmob-popover hmob-me-popover">
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('profile/open'); } }>
-                        <span>🪪</span> Mi Perfil
+                        <span className="hmob-menu-ico"><img src={ iconProfile } alt="" /></span>
+                        <span>Mi Perfil</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('avatar-editor/toggle'); } }>
-                        <span>👕</span> Cambiar Look
+                        <span className="hmob-menu-ico"><img src={ iconClothes } alt="" /></span>
+                        <span>Cambiar Look</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('achievements/toggle'); } }>
-                        <span>🏆</span> Recompensas
+                        <span className="hmob-menu-ico"><img src={ iconAchievements } alt="" /></span>
+                        <span>Recompensas</span>
                         { getTotalUnseen > 0 && <em className="hmob-mini-badge">{ getTotalUnseen }</em> }
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('games/toggle'); } }>
-                        <span>🎮</span> Game Center
+                        <span className="hmob-menu-ico"><img src={ iconGame } alt="" /></span>
+                        <span>Game Center</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('battlepass/toggle'); } }>
-                        <span>⭐</span> Pase de Batalla
+                        <span className="hmob-menu-ico"><img src={ iconTalents } alt="" /></span>
+                        <span>Pase de Batalla</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('habboUI/open/hccenter'); } }>
-                        <span>👑</span> Habbten Club
+                        <span className="hmob-menu-ico"><img src={ iconHabboClub } alt="" /></span>
+                        <span>Habbten Club</span>
                     </button>
                 </div>
             ) }
 
-            {/* DOCK INFERIOR FLOTANTE ESTILO HABBO MOBILE / AIR */}
+            {/* DOCK INFERIOR FLOTANTE CON LOS SPRITES ORIGINALES DE HABBO MOBILE */}
             <div className="hmob-bottom-bar">
                 <div className="hmob-dock-left">
                     {/* 1. Puerta de Salida / Vista Hotel */}
@@ -344,15 +381,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                         } }
                         title={ isInRoom ? 'Salir a la Vista del Hotel' : 'Explorar Salas' }
                     >
-                        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" className="hmob-door-svg">
-                            <rect x="6" y="4" width="17" height="26" rx="2" fill="#8b4d22" stroke="#ffffff" strokeWidth="2.2" />
-                            <rect x="8.5" y="6.5" width="12" height="21" fill="#c97b38" stroke="#3c1d0a" strokeWidth="1.2" />
-                            <rect x="10.5" y="9" width="8" height="7" fill="#a85e24" />
-                            <rect x="10.5" y="18" width="8" height="7" fill="#a85e24" />
-                            <circle cx="11" cy="17" r="1.3" fill="#ffe169" />
-                            <path d="M29 17H19M19 17L23.5 12.5M19 17L23.5 21.5" stroke="#ffffff" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M29 17H19M19 17L23.5 12.5M19 17L23.5 21.5" stroke="#e12d68" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <img src={ mobExitImg } alt="Salir" className="hmob-dock-sprite" />
                     </button>
 
                     {/* 2. Navegador de Salas */}
@@ -362,7 +391,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                         onClick={ () => { closePopovers(); CreateLinkEvent('navigator/toggle'); } }
                         title="Salas"
                     >
-                        <img src={ roomsIconImg } alt="Salas" className="hmob-dock-icon" />
+                        <img src={ mobNavigatorImg } alt="Salas" className="hmob-dock-sprite" />
                     </button>
 
                     {/* 3. Catálogo / Tienda */}
@@ -372,7 +401,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                         onClick={ () => { closePopovers(); CreateLinkEvent('catalog/toggle'); } }
                         title="Tienda"
                     >
-                        <img src={ catalogIconImg } alt="Tienda" className="hmob-dock-icon" />
+                        <img src={ mobShopImg } alt="Tienda" className="hmob-dock-sprite" />
                     </button>
 
                     {/* 4. Inventario */}
@@ -382,7 +411,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                         onClick={ () => { closePopovers(); CreateLinkEvent('inventory/toggle'); } }
                         title="Inventario"
                     >
-                        <img src={ inventoryIconImg } alt="Inventario" className="hmob-dock-icon" />
+                        <img src={ mobInventoryImg } alt="Inventario" className="hmob-dock-sprite" />
                         { getFullCount > 0 && <span className="hmob-count-badge">{ getFullCount > 99 ? '99+' : getFullCount }</span> }
                     </button>
 
@@ -393,21 +422,22 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                         onClick={ () => { closePopovers(); CreateLinkEvent('friends/toggle'); } }
                         title="Amigos"
                     >
-                        <img src={ friendsIconImg } alt="Amigos" className="hmob-dock-icon" />
+                        <img src={ mobFriendsImg } alt="Amigos" className="hmob-dock-sprite" />
                         { requests.length > 0 && <span className="hmob-count-badge">{ requests.length }</span> }
                     </button>
 
                     {/* 6. Mensajes */}
                     <button
                         type="button"
-                        className="hmob-dock-btn"
+                        className={ `hmob-dock-btn ${ hasUnreadMessenger ? 'is-pulsing' : '' }` }
                         onClick={ () => { closePopovers(); OpenMessengerChat(); } }
                         title="Mensajes"
                     >
-                        <img src={ hasUnreadMessenger ? messageUnseenIconImg : messageIconImg } alt="Mensajes" className="hmob-dock-icon" />
+                        <img src={ mobMessengerImg } alt="Mensajes" className="hmob-dock-sprite" />
+                        { hasUnreadMessenger && <span className="hmob-count-badge">!</span> }
                     </button>
 
-                    {/* 7. Avatar Circular (Menú "Yo") */}
+                    {/* 7. Avatar Circular (Cabeza recortada y centrada) */}
                     <button
                         type="button"
                         className={ `hmob-avatar-btn ${ isMeMenuOpen ? 'active' : '' }` }
@@ -421,17 +451,17 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                     >
                         <div className="hmob-avatar-ring">
                             { userFigure && (
-                                <LayoutAvatarImageView figure={ userFigure } direction={ 2 } headOnly={ true } />
+                                <HabboHeadImg figure={ userFigure } size={ 34 } />
                             ) }
                         </div>
                         { getTotalUnseen > 0 && <span className="hmob-count-badge">{ getTotalUnseen }</span> }
                     </button>
 
-                    {/* 8. Burbuja de Chat ("...") */}
+                    {/* 8. Burbuja de Chat ("...") original */}
                     { isInRoom && (
                         <button
                             type="button"
-                            className={ `hmob-chat-bubble-btn ${ isChatBarOpen ? 'active' : '' }` }
+                            className={ `hmob-chat-sprite-btn ${ isChatBarOpen ? 'active' : '' }` }
                             onClick={ () =>
                             {
                                 closePopovers();
@@ -440,9 +470,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                             title="Abrir chat"
                             aria-label="Abrir chat"
                         >
-                            <span className="hmob-chat-dots">
-                                <i /><i /><i />
-                            </span>
+                            <img src={ mobChatBubbleImg } alt="Chat" className="hmob-chat-sprite" />
                         </button>
                     ) }
                 </div>

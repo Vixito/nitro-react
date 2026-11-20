@@ -3,6 +3,7 @@ import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { AddEventLinkTracker, RemoveLinkEventTracker } from '../../api';
 import { Button, Column, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
 import { EraType, useEraTheme } from '../../hooks/era/useEraTheme';
+import { useIsMobile } from '../../hooks/mobile/useIsMobile';
 import './EraSelectorModalView.scss';
 
 import shockwaveThumb from '../../assets/images/eras/era_shockwave_2006.png';
@@ -11,6 +12,7 @@ import modernThumb from '../../assets/images/eras/era_modern_2016.png';
 
 export const EraSelectorModalView: FC<{}> = () =>
 {
+    const isMobile = useIsMobile();
     const { currentEra, setEra, eras } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ selectedEra, setSelectedEra ] = useState<EraType>(currentEra);
@@ -50,7 +52,7 @@ export const EraSelectorModalView: FC<{}> = () =>
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
-    if(!isVisible) return null;
+    if(isMobile || !isVisible) return null;
 
     const getThumbnail = (id: EraType) =>
     {

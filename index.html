@@ -27,19 +27,35 @@
     <script>
       (function () {
         var params = new URLSearchParams(window.location.search);
-        var eraParam = params.get('era');
-        var eraStorage = null;
-        try { eraStorage = localStorage.getItem('habbten_theme_era'); } catch (e) {}
-        var eraCookieMatch = document.cookie.match(/(?:^|; )habbten_era=([^;]*)/);
-        var eraCookie = eraCookieMatch ? decodeURIComponent(eraCookieMatch[1]) : null;
-        var chosenEra = eraParam || eraCookie || eraStorage || 'modern';
-        if (chosenEra === 'shockwave2006' || chosenEra === 'flash2012' || chosenEra === 'modern') {
-          try { localStorage.setItem('habbten_theme_era', chosenEra); } catch (e) {}
-          document.body.dataset.era = chosenEra;
+        var mobParam = params.get('mobile');
+        var forceMob = false;
+        try {
+          if (mobParam === '1' || mobParam === 'true') { sessionStorage.setItem('habbten_force_mobile', '1'); forceMob = true; }
+          else if (mobParam === '0' || mobParam === 'false') { sessionStorage.removeItem('habbten_force_mobile'); forceMob = false; }
+          else if (sessionStorage.getItem('habbten_force_mobile') === '1') { forceMob = true; }
+        } catch (e) {}
+        var isCoarseMob = window.matchMedia && window.matchMedia('(pointer: coarse)').matches && window.innerWidth <= 1024;
+        var isMobileBoot = forceMob || (mobParam !== '0' && (window.innerWidth <= 860 || isCoarseMob));
+
+        if (isMobileBoot) {
+          document.body.dataset.era = 'mobile';
           document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006');
-          if (chosenEra === 'shockwave2006') document.body.classList.add('era-shockwave-2006');
-          else if (chosenEra === 'flash2012') document.body.classList.add('era-flash-2012');
-          else document.body.classList.add('era-modern');
+          document.body.classList.add('is-mobile-ui');
+        } else {
+          var eraParam = params.get('era');
+          var eraStorage = null;
+          try { eraStorage = localStorage.getItem('habbten_theme_era'); } catch (e) {}
+          var eraCookieMatch = document.cookie.match(/(?:^|; )habbten_era=([^;]*)/);
+          var eraCookie = eraCookieMatch ? decodeURIComponent(eraCookieMatch[1]) : null;
+          var chosenEra = eraParam || eraCookie || eraStorage || 'modern';
+          if (chosenEra === 'shockwave2006' || chosenEra === 'flash2012' || chosenEra === 'modern') {
+            try { localStorage.setItem('habbten_theme_era', chosenEra); } catch (e) {}
+            document.body.dataset.era = chosenEra;
+            document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006', 'is-mobile-ui');
+            if (chosenEra === 'shockwave2006') document.body.classList.add('era-shockwave-2006');
+            else if (chosenEra === 'flash2012') document.body.classList.add('era-flash-2012');
+            else document.body.classList.add('era-modern');
+          }
         }
 
         var fromQuery = params.get('sso');

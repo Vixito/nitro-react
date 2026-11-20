@@ -3,9 +3,11 @@ import { FC, useEffect, useState } from 'react';
 import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, LocalizeText, SendMessageComposer } from '../../../../api';
 import { Base, classNames, Column, Flex, Text, TransitionAnimation, TransitionAnimationTypes } from '../../../../common';
 import { useMessageEvent, useNavigator, useRoom, useRoomEngineEvent } from '../../../../hooks';
+import { useIsMobile } from '../../../../hooks/mobile/useIsMobile';
 
 export const RoomToolsWidgetView: FC<{}> = props =>
 {
+    const isMobile = useIsMobile();
     const [ isZoomedIn, setIsZoomedIn ] = useState<boolean>(false);
     const [ roomName, setRoomName ] = useState<string>(null);
     const [ roomOwner, setRoomOwner ] = useState<string>(null);
@@ -83,6 +85,8 @@ export const RoomToolsWidgetView: FC<{}> = props =>
 
         return () => clearTimeout(timeout);
     }, [ roomName, roomOwner, roomTags ]);
+
+    if(isMobile) return null;
 
     return (
         <Flex className="nitro-room-tools-container" gap={ 2 }>
