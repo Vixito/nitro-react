@@ -153,13 +153,20 @@ body[data-era="flash2012"] {
         }
     }
 
-    // Authentic 2012 Green Action Button everywhere (Habborator button-20 sprite)
+    // Authentic 2012 Green Action Button everywhere (Habborator button-20 3-slice sprite)
     :where(
         .nitro-card:not([class*="nitro-mod-tools"]) .btn-success,
         .btn.btn-success
     ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.gift-color-swatch):not(.tab-btn):not(.bottom-bar-btn)) {
         border: none !important;
-        background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
+        background-color: transparent !important;
+        background-image:
+            url('@/assets/images/eras/habborator/button-20-left.png'),
+            url('@/assets/images/eras/habborator/button-20-right.png'),
+            url('@/assets/images/eras/habborator/button-20-mid.png') !important;
+        background-position: left top, right top, 4px top !important;
+        background-repeat: no-repeat, no-repeat, no-repeat !important;
+        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100% !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         color: #ffffff !important;
@@ -175,13 +182,11 @@ body[data-era="flash2012"] {
         user-select: none !important;
 
         &:hover:not(:disabled) {
-            background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
             color: #ffffff !important;
             filter: brightness(1.08) !important;
         }
 
         &:active:not(:disabled) {
-            background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
             filter: brightness(0.95) !important;
         }
 
@@ -3177,7 +3182,7 @@ body[data-era="flash2012"] {
             }
         }
 
-        // Botón verde clásico 2012 "Comprar" (Sprite original Habborator button-20)
+        // Botón verde clásico 2012 "Comprar" (Sprite original Habborator button-20 en 3-slice)
         button.btn-success,
         .purchase-button,
         .nitro-catalog-purchase-button {
@@ -3185,7 +3190,14 @@ body[data-era="flash2012"] {
             min-height: 25px !important;
             padding: 3px 12px 4px !important;
             border: none !important;
-            background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
+            background-color: transparent !important;
+            background-image:
+                url('@/assets/images/eras/habborator/button-20-left.png'),
+                url('@/assets/images/eras/habborator/button-20-right.png'),
+                url('@/assets/images/eras/habborator/button-20-mid.png') !important;
+            background-position: left top, right top, 4px top !important;
+            background-repeat: no-repeat, no-repeat, no-repeat !important;
+            background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100% !important;
             border-radius: 0 !important;
             box-shadow: none !important;
             color: #ffffff !important;
@@ -3197,13 +3209,11 @@ body[data-era="flash2012"] {
             cursor: pointer !important;
 
             &:hover:not(:disabled) {
-                background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
                 color: #ffffff !important;
                 filter: brightness(1.08) !important;
             }
 
             &:active:not(:disabled) {
-                background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
                 box-shadow: none !important;
                 filter: brightness(0.95) !important;
             }
