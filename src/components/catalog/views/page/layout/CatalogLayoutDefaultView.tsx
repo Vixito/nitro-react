@@ -3,6 +3,7 @@ import { GetConfiguration, ProductTypeEnum } from '../../../../../api';
 import { Column, Flex, Grid, LayoutCurrencyIcon, LayoutImage, Text } from '../../../../../common';
 import { useCatalog, usePurse } from '../../../../../hooks';
 import { useEraTheme } from '../../../../../hooks/era/useEraTheme';
+import { useIsMobile } from '../../../../../hooks/mobile/useIsMobile';
 import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
@@ -28,8 +29,9 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
     const { currentOffer = null, currentPage = null } = useCatalog();
     const { getCurrencyAmount = null } = usePurse();
     const { currentEra } = useEraTheme();
+    const isMobile = useIsMobile();
 
-    if(currentEra === 'flash2012')
+    if(currentEra === 'flash2012' && !isMobile)
     {
         const balanceCurrencyType = (currentOffer && currentOffer.priceInCredits <= 0 && currentOffer.priceInActivityPoints > 0)
             ? currentOffer.activityPointType

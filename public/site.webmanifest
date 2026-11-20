@@ -1,7 +1,9 @@
 {
-    "start_url": "/",
-    "name": "Nitro",
-    "short_name": "Nitro",
+    "start_url": "/client",
+    "scope": "/",
+    "name": "Habbten Hotel",
+    "short_name": "Habbten",
+    "description": "Habbten Hotel — Comunidad virtual, salas, rares y minijuegos clásicos.",
     "icons": [
         {
             "src": "android-chrome-192x192.png",
@@ -14,7 +16,8 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
-    "display": "standalone"
+    "theme_color": "#0e4d6c",
+    "background_color": "#0e4d6c",
+    "display": "standalone",
+    "orientation": "any"
 }

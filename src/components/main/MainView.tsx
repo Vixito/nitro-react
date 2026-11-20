@@ -3,6 +3,8 @@ import { FC, useEffect, useState } from 'react';
 import { AddEventLinkTracker, GetCommunication, RemoveLinkEventTracker } from '../../api';
 import { Base, TransitionAnimation, TransitionAnimationTypes } from '../../common';
 import { useRoomSessionManagerEvent } from '../../hooks';
+import { useIsMobile } from '../../hooks/mobile/useIsMobile';
+import { MobileHudView } from '../mobile/MobileHudView';
 import { AchievementsView } from '../achievements/AchievementsView';
 import { AvatarEditorView } from '../avatar-editor/AvatarEditorView';
 import { BattlePassView } from '../battle-pass/BattlePassView';
@@ -34,6 +36,7 @@ export const MainView: FC<{}> = props =>
 {
     const [ isReady, setIsReady ] = useState(false);
     const [ landingViewVisible, setLandingViewVisible ] = useState(true);
+    const isMobile = useIsMobile();
 
     useRoomSessionManagerEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, event => setLandingViewVisible(false));
     useRoomSessionManagerEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, event =>
@@ -90,7 +93,9 @@ export const MainView: FC<{}> = props =>
             <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ landingViewVisible } timeout={ 300 }>
                 <HotelView />
             </TransitionAnimation>
-            <ToolbarView isInRoom={ !landingViewVisible } />
+            { isMobile
+                ? <MobileHudView isInRoom={ !landingViewVisible } />
+                : <ToolbarView isInRoom={ !landingViewVisible } /> }
             <ModToolsView />
             <RoomView />
             <ChatHistoryView />

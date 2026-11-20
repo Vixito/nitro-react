@@ -240,7 +240,7 @@ const useRoomState = () =>
         const filter = new AdjustmentFilter();
         const master = (canvas.master as NitroContainer);
 
-        background.tint = 0;
+        background.tint = document.body.classList.contains('is-mobile-ui') ? 0x0e4d6c : 0;
         background.width = width;
         background.height = height;
 

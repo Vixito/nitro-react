@@ -1,0 +1,174 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// HABBTEN MOBILE / AIR — VERSIÓN MÓVIL ÚNICA UNIFICADA (body.is-mobile-ui)
+// Aislada 100% a dispositivos móviles / ?mobile=1 — cero impacto en escritorio
+// ═══════════════════════════════════════════════════════════════════════════
+
+body.is-mobile-ui {
+    background-color: #0e4d6c !important;
+    overscroll-behavior: none !important;
+    touch-action: manipulation;
+
+    // Room canvas: gestos nativos (caminar / mover cámara / pinch-zoom) sin pull-to-refresh
+    canvas {
+        touch-action: none !important;
+    }
+
+    // Ocultar barras exclusivas de escritorio (reemplazadas por MobileHudView)
+    .nitro-toolbar,
+    .nitro-toolbar-me,
+    .shockwave-toolbar,
+    .nitro-chat-input-container,
+    .nitro-purse-container,
+    .nitro-friend-bar,
+    .shockwave-bottom-bar {
+        display: none !important;
+    }
+
+    // Mantener notificaciones arriba al centro sin chocar con el monedero ni "?"
+    .nitro-right-side {
+        top: calc(56px + env(safe-area-inset-top)) !important;
+        right: 8px !important;
+        max-width: min(300px, calc(100vw - 16px)) !important;
+        z-index: 110 !important;
+    }
+
+    // ── VENTANAS ADAPTADAS A PANTALLA MÓVIL (UNIFICADAS EN ESTILO HABBO MOBILE) ──
+    .draggable-window {
+        max-width: calc(100vw - 12px) !important;
+        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+    }
+
+    .nitro-card {
+        max-width: calc(100vw - 12px) !important;
+        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        resize: none !important;
+        border: 2px solid #0b3952 !important;
+        border-radius: 10px !important;
+        background: #eef3f6 !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
+        overflow: hidden !important;
+
+        .nitro-card-header {
+            min-height: 38px !important;
+            height: 38px !important;
+            background: linear-gradient(180deg, #1d7099 0%, #145475 100%) !important;
+            border-bottom: 1.5px solid #0b3952 !important;
+            padding: 0 12px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+
+            .nitro-card-header-text {
+                color: #ffffff !important;
+                font-family: 'Ubuntu', -apple-system, sans-serif !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+            }
+
+            .nitro-card-header-close {
+                width: 28px !important;
+                height: 28px !important;
+                border-radius: 6px !important;
+                background: #c9245e !important;
+                border: 1.5px solid #ffffff !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+
+                svg,
+                .fa-icon {
+                    color: #ffffff !important;
+                    font-size: 14px !important;
+                }
+            }
+        }
+
+        .nitro-card-tabs {
+            background: #d8e5ed !important;
+            border-bottom: 1px solid #a8c1d1 !important;
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            .nav-item,
+            .nitro-card-tabs-item {
+                flex-shrink: 0 !important;
+                padding: 6px 12px !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #16445c !important;
+                border-radius: 6px 6px 0 0 !important;
+
+                &.active {
+                    background: #eef3f6 !important;
+                    color: #0b2c3d !important;
+                }
+            }
+        }
+
+        .content-area,
+        .nitro-card-content {
+            background: #eef3f6 !important;
+            color: #142633 !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+    }
+
+    // Ventanas principales ajustadas a ancho móvil limpio
+    .nitro-navigator,
+    .nitro-catalog,
+    .nitro-inventory,
+    .nitro-avatar-editor,
+    .nitro-achievements,
+    .nitro-friends,
+    .nitro-messenger,
+    .user-profile,
+    .nitro-battle-pass {
+        width: min(620px, calc(100vw - 12px)) !important;
+        height: min(460px, calc(100dvh - 82px - env(safe-area-inset-bottom))) !important;
+    }
+
+    // Perfil de usuario: scrollable en pantallas pequeñas
+    .user-profile {
+        width: min(470px, calc(100vw - 12px)) !important;
+        height: min(500px, calc(100dvh - 82px - env(safe-area-inset-bottom))) !important;
+
+        .content-area {
+            overflow-y: auto !important;
+        }
+    }
+
+    // Inputs amigables al tacto (evitar zoom forzado en iOS)
+    input[type='text'],
+    input[type='search'],
+    input[type='number'],
+    textarea,
+    select {
+        font-size: 14px !important;
+    }
+
+    // Infostand (tarjeta al tocar otro avatar o furni): posicionar sobre el dock inferior
+    .nitro-infostand-container {
+        bottom: calc(64px + env(safe-area-inset-bottom)) !important;
+        right: 8px !important;
+        max-width: min(230px, calc(100vw - 16px)) !important;
+    }
+
+    // Chat bubbles de sala más legibles en móvil
+    .bubble-container {
+        max-width: calc(100vw - 24px) !important;
+    }
+
+    // Game Center ocupa pantalla completa responsiva en móvil
+    .nitro-game-center {
+        width: 100vw !important;
+        height: 100dvh !important;
+        max-width: 100vw !important;
+        max-height: 100dvh !important;
+    }
+}

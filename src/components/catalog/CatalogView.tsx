@@ -12,6 +12,7 @@ import catalogTabRightDisabledImg from '../../assets/images/eras/shockwave_v14/c
 import { Column, DraggableWindow, DraggableWindowPosition, Flex, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, ShockwaveDropdown } from '../../common';
 import { useCatalog } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
+import { useIsMobile } from '../../hooks/mobile/useIsMobile';
 import { CatalogIconView } from './views/catalog-icon/CatalogIconView';
 import { CatalogGiftView } from './views/gift/CatalogGiftView';
 import { Catalog2012SidebarView } from './views/navigation/Catalog2012SidebarView';
@@ -47,6 +48,7 @@ export const CatalogView: FC<{}> = props =>
 {
     const { isVisible = false, setIsVisible = null, rootNode = null, currentPage = null, navigationHidden = false, setNavigationHidden = null, activeNodes = [], searchResult = null, setSearchResult = null, openPageByName = null, openPageByOfferId = null, openPageByFurniName = null, openSearchByName = null, activateNode = null } = useCatalog();
     const { currentEra } = useEraTheme();
+    const isMobile = useIsMobile();
 
     const [ tabStartIndex, setTabStartIndex ] = useState<number>(0);
     const [ failedHeadlineUrl, setFailedHeadlineUrl ] = useState<string>('');
@@ -266,7 +268,7 @@ export const CatalogView: FC<{}> = props =>
 
     return (
         <>
-            { isVisible && (currentEra === 'shockwave2006' ? (
+            { isVisible && (!isMobile && currentEra === 'shockwave2006' ? (
                 <DraggableWindow
                     uniqueKey="catalog-shockwave-2006"
                     handleSelector=".shockwave-catalog-drag-handle"
@@ -391,7 +393,7 @@ export const CatalogView: FC<{}> = props =>
                         </div>
                     </div>
                 </DraggableWindow>
-            ) : currentEra === 'flash2012' ? (
+            ) : (!isMobile && currentEra === 'flash2012') ? (
                 <DraggableWindow
                     uniqueKey="catalog-flash-2012"
                     handleSelector=".flash2012-catalog-drag-handle"
