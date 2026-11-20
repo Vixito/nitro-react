@@ -13,8 +13,10 @@ const GAME_CONTROLS: { [ gameNameId: string ]: { action: string; keys: string }[
         { action: 'Chat de equipo', keys: 'Enter' }
     ],
     basejump: [
-        { action: 'Esquivar obstáculos', keys: 'A / D o Flechas Izq/Der' },
-        { action: 'Abrir / cerrar paracaídas', keys: 'Espacio' }
+        { action: 'Soltar plato / Abrir paracaídas', keys: 'Espacio / Clic' },
+        { action: 'Paracaídas grande (freno rápido)', keys: 'Tecla 1 / Q' },
+        { action: 'Lanzar Misil a un rival', keys: 'Tecla 2 / W' },
+        { action: 'Activar Escudo protector', keys: 'Tecla 3 / E' }
     ],
     wobblesquabble: [
         { action: 'Mantener equilibrio', keys: 'Q / E' },
@@ -42,8 +44,8 @@ const GAME_DESCRIPTIONS: { [ gameNameId: string ]: { title: string; desc: string
         desc: 'Lanza bolas de nieve, crea muros protectores y derrota al equipo contrario en épicas batallas multijugador.'
     },
     basejump: {
-        title: '¡Caída libre en paracaídas!',
-        desc: 'Planea por los aires, esquiva todos los obstáculos y sé el primero en aterrizar a salvo en el objetivo.'
+        title: '¡Sirve los platos en paracaídas!',
+        desc: 'Lanza 6 platos en paracaídas hasta la mesa de tus clientes antes que los otros dos camareros, usando misiles, paracaídas grandes y escudos.'
     },
     wobblesquabble: {
         title: '¡Duelo acuático en la piscina Lido!',
@@ -60,7 +62,7 @@ const GAME_DESCRIPTIONS: { [ gameNameId: string ]: { title: string; desc: string
 };
 
 export const GameView = () => {
-    const { isVisible, selectedGame, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, setIsBattleBallPlaying, isWobbleSquabblePlaying, setIsWobbleSquabblePlaying } = useGameCenter();
+    const { isVisible, selectedGame, gameOffline, setGameURL, setIsVisible, setIsSnowStormLobbyVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, setIsBattleBallPlaying, isWobbleSquabblePlaying, setIsWobbleSquabblePlaying, isFastFoodPlaying, setIsFastFoodPlaying } = useGameCenter();
     const [ realStatus, setRealStatus ] = useState<{ games_left: number; has_unlimited: boolean } | null>(null);
     const [ launchError, setLaunchError ] = useState<string | null>(null);
     const [ launching, setLaunching ] = useState<boolean>(false);
@@ -81,7 +83,9 @@ export const GameView = () => {
             ? '/api/games/battleball/status'
             : (selectedGame?.gameNameId === 'wobblesquabble'
                 ? '/api/games/wobblesquabble/status'
-                : '/api/games/snowstorm/status');
+                : ((selectedGame?.gameNameId === 'basejump' || selectedGame?.gameNameId === 'fastfood')
+                    ? '/api/games/fastfood/status'
+                    : '/api/games/snowstorm/status'));
         fetch(statusEndpoint, { credentials: 'include' })
             .then(r => r.ok ? r.json() : null)
             .then(data => {
@@ -94,7 +98,7 @@ export const GameView = () => {
             })
             .catch(() => {});
         return () => { cancelled = true; };
-    }, [ isVisible, selectedGame, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, isWobbleSquabblePlaying ]);
+    }, [ isVisible, selectedGame, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, isWobbleSquabblePlaying, isFastFoodPlaying ]);
 
     const controls = useMemo(() => (selectedGame && GAME_CONTROLS[ selectedGame.gameNameId ]) || DEFAULT_CONTROLS, [ selectedGame ]);
 
@@ -163,6 +167,12 @@ export const GameView = () => {
             } finally {
                 setLaunching(false);
             }
+            return;
+        }
+
+        if (selectedGame && (selectedGame.gameNameId === 'basejump' || selectedGame.gameNameId === 'fastfood')) {
+            setIsVisible(false);
+            setIsFastFoodPlaying(true);
             return;
         }
 

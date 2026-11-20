@@ -1,0 +1,890 @@
+// =============================================================================
+// Habbten Fast Food (BaseJump) — 100% Authentic 2012 Sulake FastFood Styling
+// Matches Lobby (dark wood + powers + chalk rules), 3-Lane Luxury Restaurant,
+// 4-Button Circular Action HUD, and Maroon Winner Clipboard!
+// =============================================================================
+
+.fastfood-game-root {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Ubuntu', Tahoma, Arial, sans-serif;
+    user-select: none;
+    background: #140802;
+    color: #ffffff;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    img {
+        object-fit: contain !important;
+    }
+
+    // =========================================================================
+    // TOP CORNER FLOATING CONTROLS (RED EXIT + GOLDEN AUDIO + RANKING)
+    // =========================================================================
+    .ff-top-left-bar {
+        position: absolute;
+        top: 14px;
+        left: 16px;
+        z-index: 35;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .ff-exit-btn {
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 5px;
+        border: 2px solid #000000;
+        background: linear-gradient(180deg, #ff5630 0%, #e02814 55%, #b31909 100%);
+        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 3px 0 rgba(0, 0, 0, 0.45);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        text-shadow: 0 1px 0 #5a0b04;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        &:active { transform: translateY(1px); }
+    }
+
+    .ff-top-right-bar {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        z-index: 35;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .ff-gold-circle-btn {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
+        transition: transform 0.08s ease, filter 0.1s ease;
+
+        .ff-btn-sprite {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+        }
+
+        .ff-gold-inner {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: 3px solid #000000;
+            box-shadow: inset 0 0 0 4px #d4942a, inset 0 0 0 6px #000000;
+            background: radial-gradient(circle at 35% 30%, #1c587a 0%, #0f364d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        &:hover { transform: scale(1.06); filter: brightness(1.08) drop-shadow(0 5px 10px rgba(0, 0, 0, 0.6)); }
+        &:active { transform: scale(0.96); }
+
+        &.is-muted::after {
+            content: '';
+            position: absolute;
+            width: 48px;
+            height: 5px;
+            background: #ef4444;
+            border: 1.5px solid #000000;
+            transform: rotate(-38deg);
+            pointer-events: none;
+        }
+    }
+
+    // =========================================================================
+    // STAGE 1: AUTHENTIC FAST FOOD LOBBY (MATCHES USER SCREENSHOT #1 1:1!)
+    // =========================================================================
+    .ff-lobby-shell {
+        position: relative;
+        flex: 1;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(ellipse at 50% 35%, #3d1c09 0%, #240e04 58%, #120601 100%);
+        overflow-y: auto;
+        padding: 20px 68px;
+
+        // Decorative side Greek marble columns
+        &::before,
+        &::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 58px;
+            background: repeating-linear-gradient(
+                90deg,
+                #8f867b 0px,
+                #c4bcb2 8px,
+                #ded8cf 14px,
+                #a39a8e 22px
+            );
+            border-right: 3px solid #2b1d12;
+            border-left: 3px solid #2b1d12;
+            box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55);
+            pointer-events: none;
+            z-index: 2;
+        }
+        &::before { left: 0; }
+        &::after { right: 0; }
+    }
+
+    .ff-lobby-grid {
+        position: relative;
+        z-index: 5;
+        width: 100%;
+        max-width: 1080px;
+        display: grid;
+        grid-template-columns: 1.05fr 1fr 1.05fr;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .ff-lobby-col-title {
+        text-align: center;
+        font-size: 16px;
+        font-weight: 800;
+        color: #f3e5d0;
+        margin-bottom: 10px;
+        text-shadow: 0 2px 3px rgba(0, 0, 0, 0.7);
+    }
+
+    // Left Column: "Tus poderes:"
+    .ff-powers-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ff-power-card {
+        border: 1px solid rgba(255, 224, 185, 0.25);
+        background: rgba(18, 7, 2, 0.45);
+        border-radius: 5px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .ff-power-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .ff-power-desc {
+            font-size: 11px;
+            line-height: 1.35;
+            color: #d6c5b3;
+        }
+
+        .ff-power-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .ff-power-icon-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .ff-power-qty {
+                min-width: 48px;
+                padding: 3px 8px;
+                border-radius: 4px;
+                background: #100804;
+                border: 1px solid rgba(255, 255, 255, 0.35);
+                font-size: 12px;
+                font-weight: 800;
+                color: #ffffff;
+                text-align: center;
+            }
+        }
+
+        .ff-buy-btn {
+            min-height: 30px;
+            padding: 5px 14px;
+            border-radius: 5px;
+            border: 1.5px solid #224a05;
+            background: linear-gradient(180deg, #b3f22b 0%, #86cf0f 55%, #6aa808 100%);
+            box-shadow: inset 0 1px 0 #e4ff96, 0 2px 0 rgba(0, 0, 0, 0.45);
+            color: #162e03;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            white-space: nowrap;
+
+            &:hover:not(:disabled) { filter: brightness(1.08); }
+            &:active:not(:disabled) { transform: translateY(1px); }
+            &:disabled { opacity: 0.55; cursor: default; }
+        }
+    }
+
+    .ff-shop-feedback {
+        margin-top: 4px;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-align: center;
+        background: rgba(16, 185, 129, 0.18);
+        border: 1px solid rgba(52, 211, 153, 0.5);
+        color: #a7f3d0;
+
+        &.is-err {
+            background: rgba(239, 68, 68, 0.22);
+            border-color: rgba(248, 113, 113, 0.55);
+            color: #fecaca;
+        }
+    }
+
+    // Center Column: Logo + Arched Night Window Vignette + Big Green "Jugar"
+    .ff-center-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+
+        .ff-logo-img {
+            width: 268px;
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.65));
+        }
+
+        .ff-vignette-window {
+            position: relative;
+            width: 186px;
+            height: 224px;
+            border-radius: 92px 92px 6px 6px;
+            border: 4px solid #0e1824;
+            background: linear-gradient(180deg, #1b4f6e 0%, #10324a 60%, #091d2d 100%);
+            box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.55), 0 6px 18px rgba(0, 0, 0, 0.55);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0 12px;
+
+            // Arched window panes
+            &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background:
+                    linear-gradient(90deg, transparent 48%, rgba(8, 18, 28, 0.72) 48%, rgba(8, 18, 28, 0.72) 52%, transparent 52%),
+                    linear-gradient(180deg, transparent 42%, rgba(8, 18, 28, 0.72) 42%, rgba(8, 18, 28, 0.72) 45%, transparent 45%),
+                    linear-gradient(180deg, transparent 74%, rgba(8, 18, 28, 0.72) 74%, rgba(8, 18, 28, 0.72) 77%, transparent 77%);
+                pointer-events: none;
+            }
+
+            .ff-vig-chute {
+                position: relative;
+                z-index: 2;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                animation: ff-float 2.4s ease-in-out infinite;
+
+                img { width: 36px; height: auto; margin-top: -2px; }
+            }
+
+            .ff-vig-table {
+                position: relative;
+                z-index: 2;
+                width: 78px;
+                height: 36px;
+                border-radius: 50%;
+                background: radial-gradient(circle at 40% 35%, #ffffff 0%, #e5e7eb 70%, #cbd5e1 100%);
+                border: 2px solid #9ca3af;
+                box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .ff-play-btn {
+            width: 224px;
+            height: 54px;
+            border-radius: 7px;
+            border: 2px solid #1f4704;
+            background: linear-gradient(180deg, #b8f536 0%, #86cf0f 55%, #65a305 100%);
+            box-shadow: inset 0 2px 0 #ebffb0, 0 5px 0 #2b4f06, 0 8px 18px rgba(0, 0, 0, 0.55);
+            color: #162e03;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+            transition: transform 0.08s ease, filter 0.1s ease;
+
+            &:hover:not(:disabled) { filter: brightness(1.07); transform: translateY(-1px); }
+            &:active:not(:disabled) { transform: translateY(2px); }
+            &:disabled { opacity: 0.6; cursor: default; }
+        }
+
+        .ff-lobby-meta {
+            font-size: 11.5px;
+            color: #d6c5b3;
+            text-align: center;
+            line-height: 1.45;
+
+            b { color: #fde68a; }
+        }
+    }
+
+    // Right Column: Chalk-blue illustrated rules ("¡Sé veloz! ¡El más rápido ganará!")
+    .ff-rules-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .ff-rule-card {
+        border: 1px solid rgba(255, 224, 185, 0.25);
+        background: rgba(18, 7, 2, 0.45);
+        border-radius: 5px;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .ff-rule-text {
+            font-size: 11.5px;
+            line-height: 1.38;
+            color: #f3d9a4;
+        }
+
+        .ff-rule-sketch {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 4px 0;
+        }
+    }
+
+    // =========================================================================
+    // STAGE 2: LIVE 3-LANE RESTAURANT GAMEPLAY CANVAS + 4 CIRCULAR HUD BUTTONS
+    // =========================================================================
+    .ff-arena-stage {
+        position: relative;
+        flex: 1;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #0a0604;
+
+        canvas.ff-game-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    // Left Floating 4-Button Circular Action HUD (Exact 2012 Sulake Proportions!)
+    .ff-action-hud {
+        position: absolute;
+        left: 16px;
+        top: 86px;
+        z-index: 30;
+        width: 244px;
+        height: 270px;
+        pointer-events: none;
+
+        button {
+            pointer-events: auto;
+        }
+    }
+
+    // Main Giant Circle Button (118px — Official Sulake Green Arrow / Red Parachute!)
+    .ff-main-action-btn {
+        position: absolute;
+        top: 12px;
+        left: 0;
+        width: 118px;
+        height: 118px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+        transition: transform 0.06s ease, filter 0.08s ease;
+
+        .ff-btn-sprite {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+        }
+
+        .ff-main-cd-ring {
+            width: 108px;
+            height: 108px;
+            border-radius: 50%;
+            border: 4px solid #000000;
+            box-shadow: inset 0 0 0 5px #d4942a, inset 0 0 0 7px #000000;
+            background: radial-gradient(circle at 35% 28%, #52525b 0%, #1f1f23 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 900;
+            color: #fde047;
+        }
+
+        &.is-parachute {
+            animation: ff-urgent-pulse 0.45s infinite alternate;
+        }
+
+        &.is-cooldown {
+            cursor: default;
+            opacity: 0.9;
+        }
+
+        .ff-hotkey-tag {
+            position: absolute;
+            bottom: -4px;
+            font-size: 10px;
+            font-weight: 900;
+            color: #111827;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 1px 6px;
+            border-radius: 4px;
+            border: 1.5px solid #000000;
+        }
+
+        &:hover:not(:disabled) { transform: scale(1.05); }
+        &:active:not(:disabled) { transform: scale(0.95); }
+    }
+
+    // 3 Satellite Power-Up Circular Buttons (88px — Official Sulake Parachute, Missile, Shield!)
+    .ff-pu-circle-btn {
+        position: absolute;
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.6));
+        transition: transform 0.06s ease, filter 0.08s ease;
+
+        &.pos-parachute { top: -4px; left: 122px; }
+        &.pos-missile { top: 92px; left: 104px; }
+        &.pos-shield { top: 138px; left: 14px; }
+
+        .ff-btn-sprite {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: none;
+        }
+
+        // Exact Sulake dark charcoal count circle with gold border overlapping bottom-right!
+        .ff-pu-count {
+            position: absolute;
+            right: -4px;
+            bottom: -2px;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: #27272a;
+            border: 2.5px solid #d4942a;
+            box-shadow: 0 0 0 1.5px #000000, inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ff-pu-key {
+            position: absolute;
+            left: -2px;
+            top: -2px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #fef08a;
+            border: 1.5px solid #000000;
+            color: #000000;
+            font-size: 11px;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        &:hover:not(:disabled) { transform: scale(1.06); filter: brightness(1.08) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.65)); }
+        &:active:not(:disabled) { transform: scale(0.95); }
+        &:disabled {
+            opacity: 0.48;
+            filter: grayscale(0.75) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+            cursor: default;
+        }
+    }
+
+    // Countdown Overlay ("3", "2", "1", "¡A SERVIR!")
+    .ff-countdown-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 32;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+
+        .ff-countdown-num {
+            font-size: 92px;
+            font-weight: 900;
+            color: #fde047;
+            text-shadow:
+                -4px -4px 0 #000000,
+                 4px -4px 0 #000000,
+                -4px  4px 0 #000000,
+                 4px  4px 0 #000000,
+                 0 10px 24px rgba(0, 0, 0, 0.75);
+            animation: ff-count-pop 0.55s ease-out;
+        }
+    }
+
+    // =========================================================================
+    // STAGE 3: AUTHENTIC MAROON WAITER CLIPBOARD RESULTS (Fastfoodwinner.png!)
+    // =========================================================================
+    .ff-results-backdrop {
+        position: absolute;
+        inset: 0;
+        z-index: 38;
+        background: rgba(10, 6, 4, 0.58);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .ff-clipboard {
+        position: relative;
+        width: 100%;
+        max-width: 460px;
+        background: #4e1515;
+        border: 3px solid #1f0606;
+        border-radius: 14px;
+        padding: 20px 18px 16px;
+        box-shadow: inset 0 2px 0 #7a2929, 0 14px 36px rgba(0, 0, 0, 0.75);
+
+        .ff-clip-metal {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 84px;
+            height: 26px;
+            border-radius: 6px 6px 8px 8px;
+            border: 2px solid #1f2937;
+            background: linear-gradient(180deg, #f3f4f6 0%, #9ca3af 55%, #6b7280 100%);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.45);
+        }
+
+        .ff-paper {
+            background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+            border: 1.5px solid #9ca3af;
+            border-radius: 4px;
+            padding: 16px 18px 14px;
+            color: #111827;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+
+            .ff-paper-logo {
+                width: 150px;
+                opacity: 0.42;
+            }
+
+            .ff-paper-verdict {
+                font-size: 26px;
+                font-weight: 900;
+                letter-spacing: 0.5px;
+                margin-top: -6px;
+                &.is-win { color: #15803d; }
+                &.is-lose { color: #991b1b; }
+            }
+
+            .ff-paper-stars {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 24px;
+                color: #f59e0b;
+                text-shadow: 0 1px 0 #78350f;
+            }
+
+            .ff-paper-standings {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                margin-top: 2px;
+
+                .ff-stand-row {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 5px 9px;
+                    border-radius: 4px;
+                    background: #e5e7eb;
+                    border: 1px solid #cbd5e1;
+                    font-size: 12.5px;
+                    font-weight: 800;
+
+                    &.is-me {
+                        background: #fef3c7;
+                        border-color: #d97706;
+                    }
+                }
+            }
+
+            .ff-paper-rewards {
+                width: 100%;
+                background: #1e293b;
+                color: #ffffff;
+                border-radius: 6px;
+                padding: 8px 10px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+
+                .ff-rew-line {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-wrap: wrap;
+                    gap: 12px;
+                    font-size: 12px;
+                    font-weight: 800;
+
+                    span { display: inline-flex; align-items: center; gap: 4px; }
+                    img { width: 16px; height: 16px; }
+                }
+
+                .ff-rew-bonus {
+                    text-align: center;
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #fde68a;
+                }
+
+                .ff-rew-badges {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 6px;
+
+                    .ff-rew-badge {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        background: #ffffff;
+                        color: #111827;
+                        border: 1.5px solid #cbd5e1;
+                        border-radius: 6px;
+                        padding: 4px 10px 4px 6px;
+                        font-size: 11.5px;
+                        font-weight: 800;
+
+                        img {
+                            width: 40px;
+                            height: 40px;
+                            flex-shrink: 0;
+                            image-rendering: pixelated !important;
+                        }
+                    }
+                }
+            }
+
+            .ff-paper-actions {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                width: 100%;
+                margin-top: 2px;
+
+                .ff-clip-btn {
+                    flex: 1;
+                    min-height: 36px;
+                    padding: 6px 14px;
+                    border-radius: 6px;
+                    border: 2px solid #000000;
+                    font-size: 13px;
+                    font-weight: 900;
+                    cursor: pointer;
+
+                    &.is-green {
+                        background: linear-gradient(180deg, #b3f22b 0%, #7ec70c 100%);
+                        color: #162e03;
+                    }
+                    &.is-gray {
+                        background: linear-gradient(180deg, #f3f4f6 0%, #cbd5e1 100%);
+                        color: #111827;
+                    }
+                    &:hover:not(:disabled) { filter: brightness(1.07); }
+                    &:disabled { opacity: 0.6; cursor: default; }
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // LEADERBOARD MODAL (DARK WOOD / GOLD FASTFOOD STYLE)
+    // =========================================================================
+    .ff-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: rgba(8, 4, 2, 0.68);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+    }
+
+    .ff-modal-box {
+        width: 100%;
+        max-width: 540px;
+        background: #2b1206;
+        border: 3px solid #d4942a;
+        border-radius: 10px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.75);
+        overflow: hidden;
+
+        .ff-modal-header {
+            padding: 10px 14px;
+            background: linear-gradient(180deg, #4f220c 0%, #331507 100%);
+            border-bottom: 2px solid #d4942a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 15px;
+            font-weight: 900;
+            color: #fde68a;
+
+            button {
+                background: #dc2626;
+                border: 1.5px solid #000000;
+                border-radius: 4px;
+                color: #ffffff;
+                font-weight: 900;
+                width: 26px;
+                height: 26px;
+                cursor: pointer;
+            }
+        }
+
+        .ff-modal-body {
+            padding: 12px 14px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ff-lb-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+
+            button {
+                padding: 5px 12px;
+                border-radius: 5px;
+                border: 1.5px solid #78350f;
+                background: #1a0b04;
+                color: #e5d0b3;
+                font-size: 12px;
+                font-weight: 800;
+                cursor: pointer;
+
+                &.is-active {
+                    background: #d4942a;
+                    color: #140802;
+                    border-color: #fef08a;
+                }
+            }
+        }
+
+        .ff-lb-list {
+            max-height: 280px;
+            overflow-y: auto;
+            background: #160903;
+            border: 1px solid #6b3410;
+            border-radius: 6px;
+            padding: 4px;
+
+            .ff-lb-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 6px 8px;
+                border-bottom: 1px solid rgba(255, 224, 185, 0.12);
+                font-size: 12.5px;
+
+                &:last-child { border-bottom: none; }
+            }
+        }
+    }
+}
+
+@keyframes ff-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
+
+@keyframes ff-urgent-pulse {
+    from { box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.25), 0 0 6px rgba(239, 68, 68, 0.6); }
+    to { box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.55), 0 0 18px rgba(239, 68, 68, 0.95); }
+}
+
+@keyframes ff-count-pop {
+    from { transform: scale(1.6); opacity: 0.2; }
+    to { transform: scale(1); opacity: 1; }
+}
+

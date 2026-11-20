@@ -10,10 +10,11 @@ import { GameView } from './views/GameView';
 import { SnowStormGameView } from './views/SnowStormGameView';
 import { SnowStormLobbyView } from './views/SnowStormLobbyView';
 import { WobbleSquabbleGameView } from './views/WobbleSquabbleGameView';
+import { FastFoodGameView } from './views/FastFoodGameView';
 
 export const GameCenterView = () => 
 {
-    const{ isVisible, setIsVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, isWobbleSquabblePlaying, games, accountStatus } = useGameCenter();
+    const{ isVisible, setIsVisible, isSnowStormLobbyVisible, isSnowStormPlaying, isBattleBallPlaying, isWobbleSquabblePlaying, isFastFoodPlaying, games, accountStatus } = useGameCenter();
 
     useEffect(() => {
         const checkEnabled = (e?: any) => {
@@ -90,6 +91,7 @@ export const GameCenterView = () =>
             { isSnowStormPlaying && <SnowStormGameView /> }
             { isBattleBallPlaying && <BattleBallGameView /> }
             { isWobbleSquabblePlaying && <WobbleSquabbleGameView /> }
+            { isFastFoodPlaying && <FastFoodGameView /> }
             <GameStageView />
         </>
     );

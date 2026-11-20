@@ -11,6 +11,7 @@ const useGameCenterState = () =>
     const [ isSnowStormPlaying, setIsSnowStormPlaying ] = useState<boolean>(false);
     const [ isBattleBallPlaying, setIsBattleBallPlaying ] = useState<boolean>(false);
     const [ isWobbleSquabblePlaying, setIsWobbleSquabblePlaying ] = useState<boolean>(false);
+    const [ isFastFoodPlaying, setIsFastFoodPlaying ] = useState<boolean>(false);
     const [ games, setGames ] = useState<GameConfigurationData[]>(null);
     const [ selectedGame, setSelectedGame ] = useState<GameConfigurationData>(null);
     const [ accountStatus, setAccountStatus ] = useState<Game2AccountGameStatusMessageParser>(null);
@@ -78,7 +79,11 @@ const useGameCenterState = () =>
             setIsWobbleSquabblePlaying(true);
             return;
         }
-        else if (urlLower.includes('basejump') || urlLower.includes('fastfood')) targetUrl = '/games/basejump/index.html';
+        else if (urlLower.includes('basejump') || urlLower.includes('fastfood'))
+        {
+            setIsFastFoodPlaying(true);
+            return;
+        }
         else if (urlLower.includes('slotcar')) targetUrl = '/games/slotcar/index.html';
         else if (targetUrl.startsWith('/game/games/')) targetUrl = targetUrl.replace('/game/games/', '/games/');
 
@@ -107,6 +112,7 @@ const useGameCenterState = () =>
         isSnowStormPlaying, setIsSnowStormPlaying,
         isBattleBallPlaying, setIsBattleBallPlaying,
         isWobbleSquabblePlaying, setIsWobbleSquabblePlaying,
+        isFastFoodPlaying, setIsFastFoodPlaying,
         games,
         accountStatus,
         selectedGame, setSelectedGame: selectGame,
