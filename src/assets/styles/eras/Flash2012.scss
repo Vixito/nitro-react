@@ -153,15 +153,13 @@ body[data-era="flash2012"] {
         }
     }
 
-    // Authentic 2012 Green Action Button everywhere (Habborator button-3 / button-20 sprite)
+    // Authentic 2012 Green Action Button everywhere (Habborator button-20 sprite)
     :where(
         .nitro-card:not([class*="nitro-mod-tools"]) .btn-success,
         .btn.btn-success
     ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.gift-color-swatch):not(.tab-btn):not(.bottom-bar-btn)) {
-        border-style: solid !important;
-        border-width: 6px !important;
-        border-image: url('@/assets/images/eras/habborator/button-3.png') 6 6 6 6 fill stretch !important;
-        background: none !important;
+        border: none !important;
+        background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         color: #ffffff !important;
@@ -171,21 +169,20 @@ body[data-era="flash2012"] {
         line-height: 1.15 !important;
         min-height: 25px !important;
         text-shadow: none !important;
-        padding: 1px 10px 3px !important;
+        padding: 3px 12px 4px !important;
         image-rendering: pixelated !important;
         cursor: pointer !important;
         user-select: none !important;
 
         &:hover:not(:disabled) {
-            border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
-            background: none !important;
+            background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
             color: #ffffff !important;
-            filter: none !important;
+            filter: brightness(1.08) !important;
         }
 
         &:active:not(:disabled) {
-            border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
-            background: none !important;
+            background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
+            filter: brightness(0.95) !important;
         }
 
         &:disabled {
@@ -3180,17 +3177,15 @@ body[data-era="flash2012"] {
             }
         }
 
-        // Botón verde clásico 2012 "Comprar" (Sprite original Habborator button-3 / button-20)
+        // Botón verde clásico 2012 "Comprar" (Sprite original Habborator button-20)
         button.btn-success,
         .purchase-button,
         .nitro-catalog-purchase-button {
             width: 100% !important;
             min-height: 25px !important;
-            padding: 1px 10px 3px !important;
-            border-style: solid !important;
-            border-width: 6px !important;
-            border-image: url('@/assets/images/eras/habborator/button-3.png') 6 6 6 6 fill stretch !important;
-            background: none !important;
+            padding: 3px 12px 4px !important;
+            border: none !important;
+            background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
             border-radius: 0 !important;
             box-shadow: none !important;
             color: #ffffff !important;
@@ -3202,15 +3197,15 @@ body[data-era="flash2012"] {
             cursor: pointer !important;
 
             &:hover:not(:disabled) {
-                border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
-                background: none !important;
+                background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
                 color: #ffffff !important;
+                filter: brightness(1.08) !important;
             }
 
             &:active:not(:disabled) {
-                border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
-                background: none !important;
+                background: transparent url('@/assets/images/eras/habborator/button-20.png') no-repeat center / 100% 100% !important;
                 box-shadow: none !important;
+                filter: brightness(0.95) !important;
             }
 
             &.is-confirm {
