@@ -118,7 +118,7 @@ body[data-era="flash2012"] {
         .btn-shiny-2012,
         .nitro-card:not([class*="nitro-mod-tools"]) :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success),
         .btn:not(.btn-danger)
-    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn):not(.btn-play-game)) {
+    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.nitro-catalog-gift-button):not(.gift-color-swatch):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn):not(.btn-play-game)) {
         background: linear-gradient(180deg, #f3f3f3 0%, #f3f3f3 52%, #d9d9d9 52%, #d9d9d9 100%) !important;
         border: 1px solid #000000 !important;
         border-bottom-width: 2px !important;
@@ -2748,120 +2748,725 @@ body[data-era="flash2012"] {
         }
     }
 
-    // 7D. CATÁLOGO / TIENDA 2012 (Pestañas superiores arqueadas 2012 fieles a habbo_skin_ubuntu + Categorías limpias)
-    .nitro-catalog.catalog-flash2012 {
+    // Selector de color en "Customiza tu regalo" (sin sobrescribir el color real del envoltorio)
+    .nitro-catalog-gift .gift-color-swatch {
+        min-height: 22px !important;
+        padding: 0 !important;
+        border: 1px solid #1a1a1a !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
 
-        .nitro-card-tabs {
-            background-color: #d1d1cb !important;
-            border-bottom: 1px solid #000000 !important;
-            padding: 5px 8px 0 8px !important;
-            gap: 3px !important;
-            justify-content: flex-start !important;
+        &.active {
+            border: 2px solid #000000 !important;
+            box-shadow: inset 0 0 0 2px #ffffff !important;
+            z-index: 2;
+        }
+    }
 
-            .nav-item,
-            .nitro-card-tabs-item {
-                background-color: #c9c8c1 !important;
-                border: 1px solid #000000 !important;
-                border-bottom: none !important;
-                border-radius: 5px 5px 0 0 !important;
-                box-shadow: inset 0 1px 0 #dfded9 !important;
-                color: #222220 !important;
-                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-                font-size: 11px !important;
-                font-weight: 400 !important;
-                padding: 4px 12px !important;
-                margin-bottom: 0 !important;
+    // 7D. CATÁLOGO / TIENDA 2012 (Cuaderno de Espiral Clásico + Cajón Azul Lateral "Tienda")
+    .flash2012-catalog-draggable {
+        z-index: 40;
+    }
 
-                &:hover {
-                    background-color: #f0f0ec !important;
-                    color: #000000 !important;
-                }
+    .flash2012-catalog-shell.nitro-catalog.catalog-flash2012 {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        width: 690px !important;
+        height: 548px !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        color: #1a1a1a !important;
+        user-select: none;
 
-                &.active {
-                    background-color: #e6e6e1 !important;
-                    border-top: 2px solid #000000 !important;
-                    border-left: 2px solid #000000 !important;
-                    border-right: 2px solid #000000 !important;
-                    border-bottom: 1px solid #e6e6e1 !important;
-                    border-radius: 6px 6px 0 0 !important;
-                    color: #000000 !important;
-                    font-weight: 700 !important;
-                    margin-bottom: -1px !important;
-                    padding: 4px 12px 5px 12px !important;
-                    box-shadow: inset 0 2px 0 #ffffff, inset 1px 0 0 #ffffff, inset -1px 0 0 #ffffff !important;
-                    z-index: 3 !important;
-                }
+        // ── IZQUIERDA: CUADERNO DE ESPIRAL 2012 ──
+        .flash2012-catalog-notebook {
+            width: 472px;
+            height: 548px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 3;
+            flex-shrink: 0;
+        }
+
+        .flash2012-catalog-spiral-top {
+            position: relative;
+            width: 464px;
+            height: 28px;
+            flex-shrink: 0;
+            background-repeat: repeat-x;
+            background-position: 8px 0;
+            background-size: 12px 28px;
+            image-rendering: pixelated;
+            cursor: move;
+
+            // Tapa izquierda del borde del papel (desde y=10px hacia abajo)
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 10px;
+                bottom: 0;
+                width: 8px;
+                background: #f1f1f1;
+                border-top: 1px solid #2b2b2b;
+                border-left: 1px solid #2b2b2b;
+                box-shadow: inset 1px 1px 0 #ffffff;
+            }
+
+            // Tapa derecha + inicio del lomo apilado
+            &::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                top: 10px;
+                bottom: 0;
+                width: 7px;
+                background: #f1f1f1;
+                border-top: 1px solid #2b2b2b;
+                border-right: 1px solid #6b6b6b;
+                box-shadow: inset -1px 1px 0 #ffffff;
             }
         }
 
-        .content-area,
-        .nitro-card-content {
-            background-color: #e6e6e1 !important;
-            color: #1e1e1c !important;
+        .flash2012-catalog-paper {
+            width: 464px;
+            flex: 1;
+            min-height: 0;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            background-color: #f1f1f1;
+            border-left: 1px solid #2b2b2b;
+            border-right: 1px solid #6b6b6b;
+            border-bottom: 1px solid #404041;
+            box-shadow:
+                inset 1px 0 0 #ffffff,
+                inset -1px 0 0 #ffffff,
+                inset 0 -1px 0 #e6e6e5,
+                1px 1px 0 #9c9c9c,
+                2px 2px 0 #585858,
+                3px 3px 0 #7b7b7b,
+                4px 4px 0 #5e5e60,
+                5px 5px 0 #787878,
+                6px 6px 0 #48484a,
+                7px 7px 0 #262626,
+                9px 10px 14px rgba(0, 0, 0, 0.32);
+            padding: 4px 12px 10px 12px;
+            overflow: hidden;
         }
 
-        // Left category tree: clean white/light panel, NO grey bordered button boxes around category items
-        .nitro-catalog-navigation-grid-container {
-            background-color: #f5f5f2 !important;
-            border: 1px solid #8a8a84 !important;
-            border-radius: 3px !important;
-            box-shadow: inset 0 0 0 1px #ffffff !important;
-            padding: 3px !important;
+        .flash2012-catalog-page-header {
+            flex-shrink: 0;
+            margin-bottom: 8px;
 
-            .layout-grid-item {
-                background: transparent !important;
-                border: none !important;
-                border-radius: 2px !important;
-                box-shadow: none !important;
-                padding: 2px 6px !important;
-                min-height: 21px !important;
+            .f12-headline-img-wrap {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 46px;
+                max-height: 62px;
+                margin-bottom: 6px;
+                overflow: hidden;
 
-                &:hover {
-                    background-color: #e2ecf2 !important;
+                .f12-headline-img {
+                    max-width: 100%;
+                    max-height: 60px;
+                    object-fit: contain;
+                    image-rendering: pixelated;
+                }
+            }
+
+            .f12-headline-fallback {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 42px;
+                margin-bottom: 6px;
+                background: linear-gradient(180deg, #5ba4c7 0%, #3d83a6 100%);
+                border: 2px solid #234d63;
+                border-radius: 4px;
+                box-shadow: inset 0 1px 0 #8fd0ed;
+                padding: 0 12px;
+
+                span {
+                    color: #ffffff;
+                    font-size: 16px;
+                    font-weight: 700;
+                    letter-spacing: 0.4px;
+                    text-shadow: 0 1px 0 #1b3d4f, 0 2px 3px rgba(0, 0, 0, 0.35);
+                    text-transform: uppercase;
+                }
+            }
+
+            .f12-page-intro-text {
+                font-size: 11px;
+                line-height: 1.32;
+                color: #1f1f1f;
+                padding: 0 2px;
+                max-height: 46px;
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+            }
+        }
+
+        .flash2012-catalog-page-body {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        // ── LAYOUT DEFAULT 2012 ("Elige un Furni" + Balance + Preview + Pill + Comprar/Regalar) ──
+        .f12-default-layout {
+            display: grid;
+            grid-template-columns: 178px 1fr;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+            height: 100%;
+        }
+
+        .f12-default-left {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+
+            .f12-choose-label {
+                font-size: 11px;
+                font-weight: 700;
+                color: #111111;
+                margin-bottom: 5px;
+                padding-left: 2px;
+                flex-shrink: 0;
+            }
+
+            .f12-grid-wrap {
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 2px 4px 2px 2px;
+            }
+
+            .f12-furni-grid {
+                gap: 5px !important;
+            }
+        }
+
+        .f12-default-right {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+
+            .f12-empty-preview {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 10px;
+                text-align: center;
+            }
+
+            .f12-balance-bar {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background: #e3e3e3;
+                border-radius: 6px 6px 0 0;
+                padding: 5px 8px;
+                font-size: 11px;
+                color: #222222;
+                flex-shrink: 0;
+
+                .layout-currency-icon,
+                img {
+                    image-rendering: pixelated;
                 }
 
-                &.active {
-                    background-color: #5da0bc !important;
-                    color: #ffffff !important;
+                .f12-balance-text {
+                    line-height: 1.1;
 
-                    * {
-                        color: #ffffff !important;
+                    strong {
+                        font-weight: 700;
+                        color: #000000;
                     }
                 }
             }
-        }
 
-        // Only apply 2012 grid cell borders to actual furni offer cells (not category navigation rows)
-        .layout-grid-item:not(.nitro-catalog-navigation-grid-container .layout-grid-item) {
-            background-color: #dcdcd6 !important;
-            background-repeat: no-repeat !important;
-            background-position: center !important;
-            border: 1px solid #000000 !important;
-            border-radius: 3px !important;
-            box-shadow: inset 0 0 0 2px #f2f2ee !important;
+            .f12-preview-box {
+                position: relative;
+                height: 162px;
+                flex-shrink: 0;
+                background: #9a9896;
+                border-radius: 0 0 2px 2px;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
-            &.active {
-                background-color: #ffffff !important;
-                border: 2px solid #000000 !important;
+                .room-preview-container {
+                    width: 100% !important;
+                    height: 100% !important;
+                    border: none !important;
+                    border-radius: 0 !important;
+                }
+
+                .f12-price-pill {
+                    position: absolute;
+                    top: 7px;
+                    right: 7px;
+                    z-index: 12;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 0 5px;
+                    min-height: 25px;
+                    background: transparent;
+                    border-style: solid;
+                    border-width: 5px 5px 6px 5px;
+                    border-image-source: url('@/assets/images/eras/flash2012/skins/catalog_2012_price_teal.png');
+                    border-image-slice: 5 5 6 5 fill;
+                    border-image-repeat: stretch;
+                    image-rendering: pixelated;
+
+                    &.is-credits {
+                        border-image-source: url('@/assets/images/eras/flash2012/skins/catalog_2012_price_credits.png');
+                    }
+
+                    &.is-duckets {
+                        border-image-source: url('@/assets/images/eras/flash2012/skins/catalog_2012_price_duckets.png');
+                    }
+
+                    &.is-diamonds {
+                        border-image-source: url('@/assets/images/eras/flash2012/skins/catalog_2012_price_teal.png');
+                    }
+
+                    .text-black,
+                    span,
+                    p,
+                    div {
+                        color: #000000 !important;
+                        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                        font-size: 12px !important;
+                        font-weight: 700 !important;
+                        line-height: 1 !important;
+                    }
+
+                    img,
+                    .layout-currency-icon {
+                        image-rendering: pixelated !important;
+                    }
+                }
+            }
+
+            .f12-offer-meta {
+                flex: 1;
+                min-height: 0;
+                padding: 8px 2px 6px 2px;
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                overflow: hidden;
+
+                .f12-offer-title {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #000000;
+                    line-height: 1.2;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .f12-offer-desc {
+                    font-size: 11px;
+                    color: #333333;
+                    line-height: 1.25;
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                }
+
+                .f12-spinner-row {
+                    margin-top: 2px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 11px;
+                }
+            }
+
+            .f12-purchase-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                flex-shrink: 0;
+                padding-top: 2px;
             }
         }
 
+        // Celdas de furni planas y limpias 2012 (sin bisel)
+        .layout-grid-item {
+            background-color: #ffffff !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            border: 1px solid #e8e8e8 !important;
+            border-radius: 5px !important;
+            box-shadow: none !important;
+            min-height: 46px !important;
+
+            &:hover {
+                border-color: #b5b5b5 !important;
+                background-color: #ffffff !important;
+                box-shadow: none !important;
+            }
+
+            &.active {
+                background-color: #ffffff !important;
+                border: 1px solid #2b2b2b !important;
+                box-shadow: none !important;
+            }
+        }
+
+        // Botón verde clásico 2012 "Comprar"
         button.btn-success,
         .purchase-button,
         .nitro-catalog-purchase-button {
-            background-color: #f2b705 !important;
-            border: 1px solid #000000 !important;
-            border-bottom-width: 2px !important;
-            border-radius: 3px !important;
-            box-shadow: inset 0 0 0 2px #ffe047 !important;
-            color: #1a1100 !important;
+            width: 100% !important;
+            min-height: 27px !important;
+            padding: 4px 10px !important;
+            background: linear-gradient(180deg, #00b800 0%, #008f00 52%, #007500 100%) !important;
+            border: 2px solid #000000 !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 0 #5be85b !important;
+            color: #ffffff !important;
             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
             font-size: 12px !important;
             font-weight: 700 !important;
-            text-shadow: 0 1px 0 #ffffff !important;
+            text-shadow: 0 -1px 0 rgba(0, 60, 0, 0.55) !important;
+            cursor: pointer !important;
+
+            &:hover:not(:disabled) {
+                background: linear-gradient(180deg, #00cc00 0%, #00a300 52%, #008500 100%) !important;
+                color: #ffffff !important;
+            }
+
+            &:active:not(:disabled) {
+                background: linear-gradient(180deg, #007a00 0%, #006600 100%) !important;
+                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+            }
+
+            &.is-confirm {
+                background: linear-gradient(180deg, #f5b800 0%, #d99400 100%) !important;
+                box-shadow: inset 0 1px 0 #ffe46b !important;
+                color: #1a1100 !important;
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+            }
+
+            &.is-error,
+            &:disabled {
+                background: linear-gradient(180deg, #c94747 0%, #a32c2c 100%) !important;
+                border-color: #4a1212 !important;
+                box-shadow: inset 0 1px 0 #e67c7c !important;
+                color: #ffffff !important;
+                opacity: 0.88 !important;
+                cursor: default !important;
+            }
+        }
+
+        // Botón gris claro clásico 2012 "Regalar"
+        .nitro-catalog-gift-button {
+            width: 100% !important;
+            min-height: 26px !important;
+            padding: 3px 10px !important;
+            background: linear-gradient(180deg, #ebebeb 0%, #d6d6d6 100%) !important;
+            border: 1px solid #9c9c9c !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 0 #ffffff !important;
+            color: #333333 !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            text-shadow: none !important;
+            cursor: pointer !important;
+
+            &:hover:not(:disabled) {
+                background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%) !important;
+                border-color: #666666 !important;
+                color: #111111 !important;
+            }
+
+            &:disabled {
+                background: #e2e2e2 !important;
+                border-color: #c6c6c6 !important;
+                box-shadow: inset 0 1px 0 #f0f0f0 !important;
+                color: #8f8f8f !important;
+                opacity: 1 !important;
+                cursor: default !important;
+            }
+        }
+
+        // Scrollbars clásicos 2012 dentro del cuaderno
+        .f12-grid-wrap::-webkit-scrollbar,
+        .flash2012-catalog-sidebar-list::-webkit-scrollbar {
+            width: 15px;
+        }
+
+        .f12-grid-wrap::-webkit-scrollbar-track,
+        .flash2012-catalog-sidebar-list::-webkit-scrollbar-track {
+            background: #e6e6e6;
+            border-left: 1px solid #b8b8b8;
+        }
+
+        .f12-grid-wrap::-webkit-scrollbar-thumb,
+        .flash2012-catalog-sidebar-list::-webkit-scrollbar-thumb {
+            background: #c8c8c8;
+            border: 1px solid #7c7c7c;
+            box-shadow: inset 1px 1px 0 #ececec;
+            min-height: 26px;
 
             &:hover {
-                background-color: #ffc414 !important;
+                background: #b8b8b8;
+            }
+        }
+
+        // ── DERECHA: CAJÓN AZUL LATERAL "TIENDA" 2012 ──
+        .flash2012-catalog-sidebar {
+            width: 220px;
+            height: 472px;
+            margin-top: 22px;
+            margin-left: -2px;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #4b94b6 0%, #3d84a6 100%);
+            border: 1px solid #163647;
+            border-left: none;
+            border-radius: 0 7px 7px 0;
+            box-shadow:
+                inset 0 1px 0 #7ec0dc,
+                inset -1px 0 0 #5aa4c4,
+                inset 0 -1px 0 #2a637e,
+                2px 4px 10px rgba(0, 0, 0, 0.35);
+            padding: 0 7px 7px 4px;
+            flex-shrink: 0;
+        }
+
+        .flash2012-catalog-sidebar-header {
+            height: 30px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            position: relative;
+            padding: 0 24px 0 6px;
+            cursor: move;
+
+            .f12-sidebar-grip {
+                flex: 1;
+                height: 15px;
+                background: repeating-linear-gradient(
+                    180deg,
+                    rgba(255, 255, 255, 0.14) 0px,
+                    rgba(255, 255, 255, 0.14) 1px,
+                    rgba(0, 0, 0, 0.08) 1px,
+                    rgba(0, 0, 0, 0.08) 2px
+                );
+                border-radius: 2px;
+            }
+
+            .f12-sidebar-title {
+                color: #ffffff;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.2px;
+                text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+                white-space: nowrap;
+            }
+
+            .f12-sidebar-close-btn {
+                position: absolute;
+                right: 3px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 15px;
+                height: 15px;
+                padding: 0;
+                border: none;
+                background: url('@/assets/images/eras/flash2012/skins/close_volter_white_0.png') center / 15px 15px no-repeat !important;
+                box-shadow: none !important;
+                image-rendering: pixelated;
+                cursor: pointer;
+
+                &:hover {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_volter_white_1.png') !important;
+                }
+
+                &:active {
+                    background-image: url('@/assets/images/eras/flash2012/skins/close_volter_blue_pressed.png') !important;
+                }
+            }
+        }
+
+        .flash2012-catalog-sidebar-body {
+            flex: 1;
+            min-height: 0;
+            background: #ffffff;
+            border: 1px solid #1e4254;
+            box-shadow: inset 0 1px 0 #d5d5d5;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flash2012-catalog-sidebar-list {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #ffffff;
+        }
+
+        .f12-nav-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .f12-nav-row {
+            width: 100%;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 7px 0 0;
+            border: none;
+            border-bottom: 1px solid #969696;
+            border-radius: 0 !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            color: #1c1c1c;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            line-height: 1;
+            text-align: left;
+            cursor: pointer;
+
+            &:hover:not(.active) {
+                background: #eef8fa !important;
+                box-shadow: none !important;
+            }
+
+            &.sub-row {
+                height: 22px;
+                background: #f5f9fb !important;
+                border-bottom-color: #c5d4dc;
+                font-size: 10.5px;
+
+                .f12-nav-icon-box {
+                    width: 22px;
+                    height: 21px;
+                    background: #e1eaef !important;
+                    border-right-color: #b7c8d1;
+                    box-shadow: none !important;
+                }
+
+                &:hover:not(.active) {
+                    background: #e5f3f7 !important;
+                    box-shadow: none !important;
+                }
+            }
+
+            &.active {
+                background: #76dde8 !important;
+                box-shadow: none !important;
+                color: #0b2429;
+                font-weight: 700;
+
+                .f12-nav-icon-box {
+                    background: #8bb83b !important;
+                    border-right-color: #5b7d20;
+                    box-shadow: none !important;
+                }
+            }
+
+            .f12-nav-icon-box {
+                width: 26px;
+                height: 23px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #d4d4d4 !important;
+                border-right: 1px solid #8a8a8a;
+                box-shadow: none !important;
+
+                img,
+                .layout-catalog-icon {
+                    max-width: 20px;
+                    max-height: 20px;
+                    image-rendering: pixelated;
+                }
+            }
+
+            .f12-nav-label {
+                flex: 1;
+                min-width: 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .f12-nav-caret {
+                width: 0;
+                height: 0;
+                flex-shrink: 0;
+                border-top: 4px solid transparent;
+                border-bottom: 4px solid transparent;
+                border-left: 5px solid #1a1a1a;
+                transition: transform 0.12s ease;
+
+                &.expanded {
+                    transform: rotate(90deg);
+                }
+            }
+        }
+
+        .flash2012-catalog-sidebar-footer {
+            margin-top: 6px;
+            flex-shrink: 0;
+
+            input.form-control {
+                height: 23px !important;
+                min-height: 23px !important;
+                font-size: 11px !important;
+                padding: 2px 6px !important;
+                background: #ffffff !important;
+                border: 1px solid #1d4457 !important;
+                border-radius: 3px !important;
+                color: #1a1a1a !important;
+            }
+
+            .catalog-search-button {
+                min-width: 26px !important;
+                width: 26px !important;
+                min-height: 23px !important;
+                height: 23px !important;
+                padding: 0 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
             }
         }
     }

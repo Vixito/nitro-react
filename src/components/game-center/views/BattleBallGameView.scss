@@ -809,8 +809,9 @@
             @include bb-outline-sm(#1a2326);
 
             img {
-                width: 16px;
-                height: 16px;
+                width: 23px;
+                height: 22px;
+                image-rendering: pixelated !important;
             }
 
             &.is-duckets { color: #f3d6ff; }
@@ -833,8 +834,9 @@
                 padding: 2px 7px 2px 3px;
 
                 img {
-                    width: 26px;
-                    height: 26px;
+                    width: 40px;
+                    height: 40px;
+                    image-rendering: pixelated !important;
                 }
 
                 .bb-badge-kicker {

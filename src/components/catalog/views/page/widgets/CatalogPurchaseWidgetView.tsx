@@ -130,27 +130,27 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = pro
         const priceCredits = (currentOffer.priceInCredits * purchaseOptions.quantity);
         const pricePoints = (currentOffer.priceInActivityPoints * purchaseOptions.quantity);
 
-        if(GetClubMemberLevel() < currentOffer.clubLevel) return <Button variant="danger" disabled>{ LocalizeText('catalog.alert.hc.required') }</Button>;
+        if(GetClubMemberLevel() < currentOffer.clubLevel) return <Button variant="danger" className="nitro-catalog-purchase-button is-error" disabled>{ LocalizeText('catalog.alert.hc.required') }</Button>;
 
-        if(isLimitedSoldOut) return <Button variant="danger" disabled>{ LocalizeText('catalog.alert.limited_edition_sold_out.title') }</Button>;
+        if(isLimitedSoldOut) return <Button variant="danger" className="nitro-catalog-purchase-button is-error" disabled>{ LocalizeText('catalog.alert.limited_edition_sold_out.title') }</Button>;
 
-        if(priceCredits > getCurrencyAmount(-1)) return <Button variant="danger" disabled>{ LocalizeText('catalog.alert.notenough.title') }</Button>;
+        if(priceCredits > getCurrencyAmount(-1)) return <Button variant="danger" className="nitro-catalog-purchase-button is-error" disabled>{ LocalizeText('catalog.alert.notenough.title') }</Button>;
 
-        if(pricePoints > getCurrencyAmount(currentOffer.activityPointType)) return <Button variant="danger" disabled>{ LocalizeText('catalog.alert.notenough.activitypoints.title.' + currentOffer.activityPointType) }</Button>;
+        if(pricePoints > getCurrencyAmount(currentOffer.activityPointType)) return <Button variant="danger" className="nitro-catalog-purchase-button is-error" disabled>{ LocalizeText('catalog.alert.notenough.activitypoints.title.' + currentOffer.activityPointType) }</Button>;
 
         switch(purchaseState)
         {
             case CatalogPurchaseState.CONFIRM:
-                return <Button variant="warning" onClick={ event => purchase() }>{ LocalizeText('catalog.purchase_confirmation.title') }</Button>;
+                return <Button variant="warning" className="nitro-catalog-purchase-button is-confirm" onClick={ event => purchase() }>{ LocalizeText('catalog.purchase_confirmation.title') }</Button>;
             case CatalogPurchaseState.PURCHASE:
-                return <Button disabled><LayoutLoadingSpinnerView /></Button>;
+                return <Button className="nitro-catalog-purchase-button" disabled><LayoutLoadingSpinnerView /></Button>;
             case CatalogPurchaseState.FAILED:
-                return <Button variant="danger">{ LocalizeText('generic.failed') }</Button>;
+                return <Button variant="danger" className="nitro-catalog-purchase-button is-error">{ LocalizeText('generic.failed') }</Button>;
             case CatalogPurchaseState.SOLD_OUT:
-                return <Button variant="danger">{ LocalizeText('generic.failed') + ' - ' + LocalizeText('catalog.alert.limited_edition_sold_out.title') }</Button>;
+                return <Button variant="danger" className="nitro-catalog-purchase-button is-error">{ LocalizeText('generic.failed') + ' - ' + LocalizeText('catalog.alert.limited_edition_sold_out.title') }</Button>;
             case CatalogPurchaseState.NONE:
             default:
-                return <Button disabled={ (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length)) } onClick={ event => catalogSkipPurchaseConfirmation ? purchase() : setPurchaseState(CatalogPurchaseState.CONFIRM) }>{ LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy')) }</Button>;
+                return <Button className="nitro-catalog-purchase-button" disabled={ (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length)) } onClick={ event => catalogSkipPurchaseConfirmation ? purchase() : setPurchaseState(CatalogPurchaseState.CONFIRM) }>{ LocalizeText('catalog.purchase_confirmation.' + (currentOffer.isRentOffer ? 'rent' : 'buy')) }</Button>;
         }
     }
 
@@ -158,7 +158,7 @@ export const CatalogPurchaseWidgetView: FC<CatalogPurchaseWidgetViewProps> = pro
         <>
             <PurchaseButton />
             { (!noGiftOption && !currentOffer.isRentOffer && !isLimitedSoldOut && !currentOffer.product?.isUniqueLimitedItem && currentPage?.pageId !== 761) &&
-                <Button disabled={ ((purchaseOptions.quantity > 1) || !currentOffer.giftable || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))) } onClick={ event => purchase(true) }>
+                <Button className="nitro-catalog-gift-button" disabled={ ((purchaseOptions.quantity > 1) || !currentOffer.giftable || (purchaseOptions.extraParamRequired && (!purchaseOptions.extraData || !purchaseOptions.extraData.length))) } onClick={ event => purchase(true) }>
                     { LocalizeText('catalog.purchase_confirmation.gift') }
                 </Button> }
         </>

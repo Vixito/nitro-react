@@ -365,14 +365,14 @@ const ARENAS: ArenaConfig[] = [
             '.....000000000000000..........',
             '.....000000000000000..........',
             '.....000000000000000..........',
-            '.....000000000000000..........',
-            '.ssss000000000000000ssss0000..',
-            '.ssss000000000000000ssss0000..',
-            '.ssss000000000000000ssss0000..',
-            '.ssss000000000000000ssss0000..',
-            '.ssss000000000000000....ssss..',
-            '0000.000000000000000....ssss..',
-            '0000.000000000000000....ssss..',
+            '....s000000000000000..........',
+            '...ss000000000000000ssss0000..',
+            'sssss000000000000000ssss0000..',
+            'sssss000000000000000ssss0000..',
+            'sss..000000000000000....0000..',
+            'ss...000000000000000.....sss..',
+            '00...000000000000000.....sss..',
+            '000..000000000000000.....sss..',
             '0000.000000000000000...0000000',
             '0000.000000000000000...0000000',
             '0000.000000000000000...0000000',
@@ -380,7 +380,7 @@ const ARENAS: ArenaConfig[] = [
             '0000..........................',
             '00000.........................',
             '000000........................',
-            '.000000..00..00..000000.......',
+            '.0000000000000000000000.......',
             '..000000000000000000000.......',
             '...00000000000000000000.......',
             '....0000000000000000000.......'
@@ -1669,11 +1669,27 @@ export const BattleBallGameView: FC = () =>
             };
         };
 
-        // Pick the exact walkable tile under mouse click (testing elevated plateaus first so clicks on high ground win!)
+        // Pick the exact walkable tile under mouse click (priority to power-up sprites & elevated plateaus!)
         const canvasToTile = (mx: number, my: number, eng: NonNullable<typeof engineRef.current>): { x: number; y: number } | null =>
         {
             const bx = (mx - eng.viewOffsetX) / eng.viewScale;
             const by = (my - eng.viewOffsetY) / eng.viewScale;
+
+            // Clicking directly on a floating power-up sprite always targets its exact tile
+            let bestPu: { x: number; y: number; dist: number } | null = null;
+            for (const pu of eng.powerups)
+            {
+                const t = eng.tiles[pu.y]?.[pu.x];
+                if (!t || !t.walkable) continue;
+                const px = eng.arena.originX + (pu.x - pu.y) * 16;
+                const py = eng.arena.originY + (pu.x + pu.y) * 8 + 8 - t.z * 16;
+                if (Math.abs(bx - px) <= 13 && by >= py - 22 && by <= py + 6)
+                {
+                    const dist = Math.hypot(bx - px, by - (py - 9));
+                    if (!bestPu || dist < bestPu.dist) bestPu = { x: pu.x, y: pu.y, dist };
+                }
+            }
+            if (bestPu) return { x: bestPu.x, y: bestPu.y };
 
             let best: { x: number; y: number; score: number } | null = null;
             for (let y = 0; y < eng.gridH; y++)
@@ -1850,6 +1866,21 @@ export const BattleBallGameView: FC = () =>
                     continue;
                 }
 
+                const tryPickupPowerUp = () =>
+                {
+                    const puIdx = eng.powerups.findIndex(pu => pu.x === p.gx && pu.y === p.gy);
+                    if (puIdx < 0) return;
+                    if (!p.isHuman && p.heldPowerUp) return;
+
+                    const picked = eng.powerups.splice(puIdx, 1)[0];
+                    p.heldPowerUp = picked.kind;
+                    if (p.isHuman)
+                    {
+                        audioRef.current.playPowerUp();
+                        showPowerUpToast(picked.kind);
+                    }
+                };
+
                 if (p.hopping)
                 {
                     const hopSpeed = p.cannonSteps > 0 ? 7.8 : (p.isHuman ? 4.3 : 3.5);
@@ -1861,18 +1892,7 @@ export const BattleBallGameView: FC = () =>
                         p.gx = p.toX;
                         p.gy = p.toY;
                         applyTileBounce(eng, p, p.gx, p.gy, p.cannonSteps > 0);
-
-                        const puIdx = eng.powerups.findIndex(pu => pu.x === p.gx && pu.y === p.gy);
-                        if (puIdx >= 0 && !p.heldPowerUp)
-                        {
-                            const picked = eng.powerups.splice(puIdx, 1)[0];
-                            p.heldPowerUp = picked.kind;
-                            if (p.isHuman)
-                            {
-                                audioRef.current.playPowerUp();
-                                showPowerUpToast(picked.kind);
-                            }
-                        }
+                        tryPickupPowerUp();
 
                         if (p.cannonSteps > 0)
                         {
@@ -1882,6 +1902,8 @@ export const BattleBallGameView: FC = () =>
                     }
                     continue;
                 }
+
+                tryPickupPowerUp();
 
                 if (p.isHuman)
                 {

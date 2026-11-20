@@ -272,7 +272,7 @@ export const CatalogGiftView: FC<{}> = props =>
                         { LocalizeText('catalog.gift_wrapping.pick_color') }
                     </Text>
                     <ButtonGroup fullWidth>
-                        { colors.map(color => <Button key={ color.id } variant="dark" active={ (color.id === selectedColorId) } disabled={ !isColorable } style={ { backgroundColor: color.color } } onClick={ () => setSelectedColorId(color.id) } />) }
+                        { colors.map(color => <Button key={ color.id } variant="dark" className="gift-color-swatch" active={ (color.id === selectedColorId) } disabled={ !isColorable } style={ { backgroundColor: color.color } } onClick={ () => setSelectedColorId(color.id) } />) }
                     </ButtonGroup>
                 </Column>
                 <Flex justifyContent="between" alignItems="center">

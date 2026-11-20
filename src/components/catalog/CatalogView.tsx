@@ -1,6 +1,8 @@
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { AddEventLinkTracker, GetConfiguration, ICatalogNode, LocalizeText, RemoveLinkEventTracker } from '../../api';
+import catalog2012SpiralRingImg from '../../assets/images/eras/flash2012/skins/catalog_2012_spiral_ring.png';
+import catalogHabbtenExchangeBanner from '../../assets/images/eras/flash2012/skins/catalog_habbten_exchange_banner.png';
 import catalogIconFrontpage from '../../assets/images/eras/shockwave_v14/catalog_icon_frontpage.png';
 import catalogSpineImg from '../../assets/images/eras/shockwave_v14/catalog_spine.png';
 import catalogTabLeftImg from '../../assets/images/eras/shockwave_v14/catalog_tab_left.png';
@@ -12,6 +14,7 @@ import { useCatalog } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
 import { CatalogIconView } from './views/catalog-icon/CatalogIconView';
 import { CatalogGiftView } from './views/gift/CatalogGiftView';
+import { Catalog2012SidebarView } from './views/navigation/Catalog2012SidebarView';
 import { CatalogNavigationView } from './views/navigation/CatalogNavigationView';
 import { GetCatalogLayout } from './views/page/layout/GetCatalogLayout';
 import { MarketplacePostOfferView } from './views/page/layout/marketplace/MarketplacePostOfferView';
@@ -46,6 +49,7 @@ export const CatalogView: FC<{}> = props =>
     const { currentEra } = useEraTheme();
 
     const [ tabStartIndex, setTabStartIndex ] = useState<number>(0);
+    const [ failedHeadlineUrl, setFailedHeadlineUrl ] = useState<string>('');
     const VISIBLE_TABS_COUNT = 8;
 
     useEffect(() =>
@@ -237,6 +241,29 @@ export const CatalogView: FC<{}> = props =>
     const canScrollRight = (tabStartIndex + VISIBLE_TABS_COUNT) < shockwaveTabs.length;
     const visibleShockwaveTabs = shockwaveTabs.slice(tabStartIndex, tabStartIndex + VISIBLE_TABS_COUNT);
 
+    const f12LayoutCode = currentPage?.layoutCode || '';
+    const f12ShowPageBanner = Boolean(
+        currentPage
+        && ![ 'frontpage', 'frontpage4', 'soundmachine', 'habbten_vip_buy', 'habbten_vip_bubbles', 'habbten_vip_colours', 'habbten_vip_prefix', 'habbten_vip_badges', 'marketplace', 'marketplace_own_items' ].includes(f12LayoutCode)
+    );
+    const f12ShowIntroText = Boolean(
+        f12ShowPageBanner
+        && currentPage?.localization?.getText(0)
+        && ![ 'guild_frontpage', 'info_loyalty', 'pets2', 'pets3', 'vip_buy', 'club_gift', 'club_gifts', 'roomads', 'single_bundle', 'room_bundle' ].includes(f12LayoutCode)
+    );
+    const f12HeadlineUrl = useMemo(() =>
+    {
+        if(!currentPage?.localization) return '';
+        const raw = currentPage.localization.getImage(0);
+        if(!raw || !raw.length) return '';
+        const low = raw.toLowerCase();
+        if(low.includes('catalog_bank_headline') || low.includes('exchange')) return catalogHabbtenExchangeBanner;
+        if(raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('/')) return raw;
+        const tpl = GetConfiguration<string>('catalog.asset.image.url', '/game/swf/c_images/catalogue/%name%.gif');
+        return tpl.replace('%name%', raw);
+    }, [ currentPage ]);
+    const f12ActiveTitle = sanitizeCatalogTitle(activeLeafNode?.localization || currentPage?.localization?.getText(2) || LocalizeText('catalog.title'));
+
     return (
         <>
             { isVisible && (currentEra === 'shockwave2006' ? (
@@ -364,8 +391,58 @@ export const CatalogView: FC<{}> = props =>
                         </div>
                     </div>
                 </DraggableWindow>
+            ) : currentEra === 'flash2012' ? (
+                <DraggableWindow
+                    uniqueKey="catalog-flash-2012"
+                    handleSelector=".flash2012-catalog-drag-handle"
+                    windowPosition={ DraggableWindowPosition.CENTER }
+                    className="flash2012-catalog-draggable"
+                >
+                    <div className="flash2012-catalog-shell nitro-catalog catalog-flash2012">
+                        {/* IZQUIERDA: CUADERNO DE ESPIRAL 2012 */}
+                        <div className="flash2012-catalog-notebook">
+                            <div
+                                className="flash2012-catalog-spiral-top flash2012-catalog-drag-handle"
+                                style={ { backgroundImage: `url(${ catalog2012SpiralRingImg })` } }
+                                title="Arrastrar Tienda"
+                            />
+                            <div className="flash2012-catalog-paper">
+                                { f12ShowPageBanner && (
+                                    <div className="flash2012-catalog-page-header">
+                                        { f12HeadlineUrl && failedHeadlineUrl !== f12HeadlineUrl ? (
+                                            <div className="f12-headline-img-wrap">
+                                                <img
+                                                    src={ f12HeadlineUrl }
+                                                    alt={ f12ActiveTitle }
+                                                    className="f12-headline-img"
+                                                    onError={ () => setFailedHeadlineUrl(f12HeadlineUrl) }
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="f12-headline-fallback">
+                                                <span>{ f12ActiveTitle }</span>
+                                            </div>
+                                        ) }
+                                        { f12ShowIntroText && (
+                                            <div
+                                                className="f12-page-intro-text"
+                                                dangerouslySetInnerHTML={ { __html: sanitizeCatalogTitle(currentPage.localization.getText(0)) } }
+                                            />
+                                        ) }
+                                    </div>
+                                ) }
+                                <div className="flash2012-catalog-page-body">
+                                    { currentPage && GetCatalogLayout(currentPage, () => {}) }
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* DERECHA: CAJÓN AZUL "TIENDA" 2012 */}
+                        <Catalog2012SidebarView onCloseClick={ () => setIsVisible(false) } />
+                    </div>
+                </DraggableWindow>
             ) : (
-                <NitroCardView uniqueKey="catalog" className={ `nitro-catalog ${ currentEra === 'flash2012' ? 'catalog-flash2012' : '' }` } style={ GetConfiguration('catalog.headers') ? { width: 710 } : {} }>
+                <NitroCardView uniqueKey="catalog" className="nitro-catalog" style={ GetConfiguration('catalog.headers') ? { width: 710 } : {} }>
                     <NitroCardHeaderView headerText={ LocalizeText('catalog.title') } onCloseClick={ event => setIsVisible(false) } />
                     <NitroCardTabsView>
                         { rootNode && (rootNode.children.length > 0) && rootNode.children.map(child =>
