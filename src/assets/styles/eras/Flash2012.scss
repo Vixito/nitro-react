@@ -4645,13 +4645,14 @@ body[data-era="flash2012"] {
         }
     }
 
-    // Center Game Center vertically above bottom bar & chat input in 2012
-    .game-center-root {
+    // Center Game Center vertically above the 42px bottom bar (.nitro-bottom-bar-2012) in 2012
+    .game-center-root,
+    .game-center-root.bottom-0 {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        bottom: 36px !important;
+        bottom: 42px !important;
         z-index: 1018 !important;
         display: flex !important;
         align-items: center !important;
@@ -4659,8 +4660,8 @@ body[data-era="flash2012"] {
         padding: 14px 20px 14px 82px !important;
 
         .game-center-main {
-            height: min(82vh, calc(100vh - 64px)) !important;
-            max-height: calc(100vh - 64px) !important;
+            height: min(82vh, calc(100vh - 70px)) !important;
+            max-height: calc(100vh - 70px) !important;
             margin: auto !important;
         }
     }
