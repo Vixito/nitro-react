@@ -1,8 +1,6 @@
 .user-profile {
     width: $user-profile-width;
-    min-height: $user-profile-height;
-    height: auto;
-    max-height: 90vh;
+    height: $user-profile-height;
 
     .user-container {
         border-right: 1px solid gray;
@@ -66,4 +64,12 @@
             background-position: -205px -3px;
         }
     }    
+}
+
+body.era-modern .user-profile {
+    height: 500px;
+
+    .content-area {
+        flex: 1 1 auto;
+    }
 }
