@@ -116,9 +116,9 @@ body[data-era="flash2012"] {
     // Wrapped in :where() so specificity stays (0,1,1) and component-specific rules like ModTools override cleanly
     :where(
         .btn-shiny-2012,
-        .nitro-card:not([class*="nitro-mod-tools"]) :is(.btn, .btn-primary, .btn-secondary, .btn-light, .btn-success),
-        .btn:not(.btn-danger)
-    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.nitro-catalog-gift-button):not(.gift-color-swatch):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn):not(.btn-play-game)) {
+        .nitro-card:not([class*="nitro-mod-tools"]) :is(.btn, .btn-primary, .btn-secondary, .btn-light),
+        .btn:not(.btn-danger):not(.btn-success)
+    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.nitro-catalog-gift-button):not(.gift-color-swatch):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn):not(.btn-play-game):not(.btn-success)) {
         background: linear-gradient(180deg, #f3f3f3 0%, #f3f3f3 52%, #d9d9d9 52%, #d9d9d9 100%) !important;
         border: 1px solid #000000 !important;
         border-bottom-width: 2px !important;
@@ -145,6 +145,47 @@ body[data-era="flash2012"] {
         &:active:not(:disabled) {
             background: #cccccc !important;
             box-shadow: inset 0 0 0 1px #b5b5b5 !important;
+        }
+
+        &:disabled {
+            opacity: 0.55 !important;
+            cursor: default !important;
+        }
+    }
+
+    // Authentic 2012 Green Action Button everywhere (Habborator button-3 / button-20 sprite)
+    :where(
+        .nitro-card:not([class*="nitro-mod-tools"]) .btn-success,
+        .btn.btn-success
+    ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.gift-color-swatch):not(.tab-btn):not(.bottom-bar-btn)) {
+        border-style: solid !important;
+        border-width: 6px !important;
+        border-image: url('@/assets/images/eras/habborator/button-3.png') 6 6 6 6 fill stretch !important;
+        background: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        color: #ffffff !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 11px !important;
+        line-height: 1.15 !important;
+        min-height: 25px !important;
+        text-shadow: none !important;
+        padding: 1px 10px 3px !important;
+        image-rendering: pixelated !important;
+        cursor: pointer !important;
+        user-select: none !important;
+
+        &:hover:not(:disabled) {
+            border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
+            background: none !important;
+            color: #ffffff !important;
+            filter: none !important;
+        }
+
+        &:active:not(:disabled) {
+            border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
+            background: none !important;
         }
 
         &:disabled {
@@ -3139,32 +3180,37 @@ body[data-era="flash2012"] {
             }
         }
 
-        // Botón verde clásico 2012 "Comprar"
+        // Botón verde clásico 2012 "Comprar" (Sprite original Habborator button-3 / button-20)
         button.btn-success,
         .purchase-button,
         .nitro-catalog-purchase-button {
             width: 100% !important;
-            min-height: 27px !important;
-            padding: 4px 10px !important;
-            background: linear-gradient(180deg, #00b800 0%, #008f00 52%, #007500 100%) !important;
-            border: 2px solid #000000 !important;
-            border-radius: 5px !important;
-            box-shadow: inset 0 1px 0 #5be85b !important;
+            min-height: 25px !important;
+            padding: 1px 10px 3px !important;
+            border-style: solid !important;
+            border-width: 6px !important;
+            border-image: url('@/assets/images/eras/habborator/button-3.png') 6 6 6 6 fill stretch !important;
+            background: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
             color: #ffffff !important;
             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
             font-size: 12px !important;
             font-weight: 700 !important;
-            text-shadow: 0 -1px 0 rgba(0, 60, 0, 0.55) !important;
+            text-shadow: none !important;
+            image-rendering: pixelated !important;
             cursor: pointer !important;
 
             &:hover:not(:disabled) {
-                background: linear-gradient(180deg, #00cc00 0%, #00a300 52%, #008500 100%) !important;
+                border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
+                background: none !important;
                 color: #ffffff !important;
             }
 
             &:active:not(:disabled) {
-                background: linear-gradient(180deg, #007a00 0%, #006600 100%) !important;
-                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35) !important;
+                border-image-source: url('@/assets/images/eras/habborator/button-20.png') !important;
+                background: none !important;
+                box-shadow: none !important;
             }
 
             &.is-confirm {
