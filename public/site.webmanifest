@@ -1,5 +1,5 @@
 {
-    "start_url": "/app",
+    "start_url": "/client",
     "scope": "/",
     "name": "Habbten Hotel",
     "short_name": "Habbten",

@@ -246,6 +246,11 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                             closePopovers();
                             try
                             {
+                                if((window as any).HabbtenNative && typeof (window as any).HabbtenNative.returnToAccountPicker === 'function')
+                                {
+                                    (window as any).HabbtenNative.returnToAccountPicker();
+                                    return;
+                                }
                                 if(window.parent && window.parent !== window)
                                 {
                                     window.parent.postMessage({ type: 'habbten-mobile-exit-to-app' }, '*');
@@ -256,11 +261,11 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                             {
                                 // ignore
                             }
-                            window.location.href = '/app';
+                            window.location.href = '/logout';
                         } }
                     >
                         <span className="hmob-menu-ico"><img src={ mobExitImg } alt="" /></span>
-                        <span>Menú Principal</span>
+                        <span>Cambiar Cuenta / Salir</span>
                     </button>
                     { isMod && (
                         <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('mod-tools/toggle'); } }>

@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" crossorigin="use-credentials" href="/app/manifest.webmanifest">
+    <link rel="manifest" crossorigin="use-credentials" href="/site.webmanifest">
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000">
     <meta name="apple-mobile-web-app-title" content="Habbten">
     <meta name="application-name" content="Habbten">
@@ -28,7 +28,7 @@
       (function () {
         var params = new URLSearchParams(window.location.search);
         var pathLower = (window.location.pathname || '').toLowerCase();
-        var isAppClientPath = pathLower.indexOf('/game/mobile') === 0 || pathLower.indexOf('/mobile') === 0;
+        var isAppClientPath = pathLower.indexOf('/game/mobile') === 0 || pathLower.indexOf('/mobile') === 0 || typeof window.HabbtenNative !== 'undefined' || /HabbtenMobileApp/i.test(navigator.userAgent || '');
         if (!isAppClientPath) {
           try {
             if (window.parent && window.parent !== window && (window.parent.location.pathname || '').toLowerCase().indexOf('/app') === 0) {

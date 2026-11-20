@@ -1,14 +1,19 @@
 import { NitroConfiguration, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { GetConfiguration } from '../../api';
+import { CreateLinkEvent, GetConfiguration } from '../../api';
 import shockwaveEntryAuGif from '../../assets/images/eras/shockwave_v14/hh_entry_au.gif';
 import receptionHorizon2012 from '../../assets/images/eras/flash2012/reception/backdrop_horizon.png';
 import receptionLeft2012 from '../../assets/images/eras/flash2012/reception/backdrop_left.png';
 import receptionRight2012 from '../../assets/images/eras/flash2012/reception/backdrop_right.png';
 import receptionStretch2012 from '../../assets/images/eras/flash2012/reception/backdrop_stretch.png';
 import receptionTopStretch2012 from '../../assets/images/eras/flash2012/reception/hotel_top_stretch.png';
+import mobileHotelExterior from '../../assets/images/mobile/hotel_exterior.png';
+import mobNavigatorImg from '../../assets/images/mobile/mob_navigator.png';
+import mobShopImg from '../../assets/images/mobile/mob_shop.png';
+import iconGame from '../../assets/images/toolbar/icons/game.png';
 import { LayoutAvatarImageView } from '../../common';
 import { useEraTheme, useRoomSessionManagerEvent, useSessionInfo } from '../../hooks';
+import { useIsMobile } from '../../hooks/mobile/useIsMobile';
 import { WidgetSlotView } from './views/widgets/WidgetSlotView';
 
 const widgetSlotCount = 7;
@@ -18,6 +23,7 @@ const CANVAS_H = 768;
 export const HotelView: FC<{}> = props =>
 {
     const [ isVisible, setIsVisible ] = useState(true);
+    const isMobile = useIsMobile();
     const { currentEra } = useEraTheme();
     const { userFigure = null, userInfo = null } = useSessionInfo();
     const [ onlineUsers, setOnlineUsers ] = useState(0);
@@ -57,6 +63,139 @@ export const HotelView: FC<{}> = props =>
     }, [isVisible]);
 
     if(!isVisible) return null;
+
+    if(isMobile)
+    {
+        const displayName = userInfo?.username || 'Habbten';
+        return (
+            <div
+                className="nitro-hotel-view hmob-hotel-view"
+                style={ {
+                    background: 'repeating-linear-gradient(180deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 2px, rgba(0,0,0,0.035) 2px, rgba(0,0,0,0.035) 4px), linear-gradient(180deg, #0d69a8 0%, #0a4d7c 58%, #072d4d 100%)',
+                    position: 'fixed',
+                    inset: 0,
+                    overflow: 'hidden',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                } }
+            >
+                <img
+                    src={ mobileHotelExterior }
+                    alt=""
+                    style={ {
+                        position: 'absolute',
+                        left: '-4%',
+                        bottom: '44px',
+                        height: '78%',
+                        maxWidth: '52%',
+                        objectFit: 'contain',
+                        objectPosition: 'left bottom',
+                        imageRendering: 'pixelated',
+                        pointerEvents: 'none',
+                        opacity: 0.96,
+                        filter: 'drop-shadow(0 10px 22px rgba(0,0,0,0.45))'
+                    } }
+                />
+                <div
+                    style={ {
+                        position: 'relative',
+                        zIndex: 2,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '12px',
+                        padding: '16px 24px 64px',
+                        width: '100%',
+                        maxWidth: '340px'
+                    } }
+                >
+                    <h1
+                        style={ {
+                            margin: '0 0 8px',
+                            fontSize: '28px',
+                            fontWeight: 400,
+                            color: '#ffffff',
+                            textAlign: 'center',
+                            textShadow: '0 2px 6px rgba(0,0,0,0.4)',
+                            fontFamily: "'Ubuntu', sans-serif"
+                        } }
+                    >
+                        ¿Qué hay, { displayName }?
+                    </h1>
+                    <button
+                        type="button"
+                        onClick={ () => CreateLinkEvent('navigator/toggle') }
+                        style={ {
+                            width: '100%',
+                            padding: '12px 18px',
+                            borderRadius: '10px',
+                            border: '1.5px solid rgba(255,255,255,0.28)',
+                            background: 'rgba(255,255,255,0.2)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#ffffff',
+                            fontSize: '17px',
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            cursor: 'pointer',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.35)'
+                        } }
+                    >
+                        <img src={ mobNavigatorImg } alt="" style={ { width: '24px', height: '24px', imageRendering: 'pixelated' } } />
+                        <span>Buscar una sala</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={ () => CreateLinkEvent('games/toggle') }
+                        style={ {
+                            width: '100%',
+                            padding: '12px 18px',
+                            borderRadius: '10px',
+                            border: '1.5px solid rgba(255,255,255,0.28)',
+                            background: 'rgba(255,255,255,0.2)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#ffffff',
+                            fontSize: '17px',
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            cursor: 'pointer',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.35)'
+                        } }
+                    >
+                        <img src={ iconGame } alt="" style={ { width: '24px', height: '24px', imageRendering: 'pixelated' } } />
+                        <span>Game Center</span>
+                    </button>
+                    <button
+                        type="button"
+                        onClick={ () => CreateLinkEvent('catalog/toggle') }
+                        style={ {
+                            width: '100%',
+                            padding: '12px 18px',
+                            borderRadius: '10px',
+                            border: '1.5px solid rgba(255,255,255,0.28)',
+                            background: 'rgba(255,255,255,0.2)',
+                            backdropFilter: 'blur(4px)',
+                            color: '#ffffff',
+                            fontSize: '17px',
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            cursor: 'pointer',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.35)'
+                        } }
+                    >
+                        <img src={ mobShopImg } alt="" style={ { width: '24px', height: '24px', imageRendering: 'pixelated' } } />
+                        <span>Ir de compras</span>
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     let habbtenConfig: any = null;
     try

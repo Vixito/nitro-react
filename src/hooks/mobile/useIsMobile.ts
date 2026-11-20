@@ -27,6 +27,8 @@ export function detectIsMobileViewport(): boolean
 
     const path = (window.location.pathname || '').toLowerCase();
     if(path.indexOf('/game/mobile') === 0 || path.indexOf('/mobile') === 0) return true;
+    if(typeof (window as any).HabbtenNative !== 'undefined') return true;
+    if(/HabbtenMobileApp/i.test(navigator.userAgent || '')) return true;
 
     try
     {
