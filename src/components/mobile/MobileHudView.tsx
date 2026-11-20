@@ -239,6 +239,29 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                         <span className="hmob-menu-ico"><img src={ iconGame } alt="" /></span>
                         <span>Game Center</span>
                     </button>
+                    <button
+                        type="button"
+                        onClick={ () =>
+                        {
+                            closePopovers();
+                            try
+                            {
+                                if(window.parent && window.parent !== window)
+                                {
+                                    window.parent.postMessage({ type: 'habbten-mobile-exit-to-app' }, '*');
+                                    return;
+                                }
+                            }
+                            catch
+                            {
+                                // ignore
+                            }
+                            window.location.href = '/app';
+                        } }
+                    >
+                        <span className="hmob-menu-ico"><img src={ mobExitImg } alt="" /></span>
+                        <span>Menú Principal</span>
+                    </button>
                     { isMod && (
                         <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('mod-tools/toggle'); } }>
                             <span className="hmob-menu-ico"><img src={ iconModTools } alt="" /></span>

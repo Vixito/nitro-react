@@ -7,7 +7,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" crossorigin="use-credentials" href="/site.webmanifest">
+    <link rel="manifest" crossorigin="use-credentials" href="/app/manifest.webmanifest">
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000">
     <meta name="apple-mobile-web-app-title" content="Habbten">
     <meta name="application-name" content="Habbten">
@@ -27,15 +27,19 @@
     <script>
       (function () {
         var params = new URLSearchParams(window.location.search);
-        var mobParam = params.get('mobile');
-        var forceMob = false;
-        try {
-          if (mobParam === '1' || mobParam === 'true') { sessionStorage.setItem('habbten_force_mobile', '1'); forceMob = true; }
-          else if (mobParam === '0' || mobParam === 'false') { sessionStorage.removeItem('habbten_force_mobile'); forceMob = false; }
-          else if (sessionStorage.getItem('habbten_force_mobile') === '1') { forceMob = true; }
-        } catch (e) {}
+        var pathLower = (window.location.pathname || '').toLowerCase();
+        var isAppClientPath = pathLower.indexOf('/game/mobile') === 0 || pathLower.indexOf('/mobile') === 0;
+        if (!isAppClientPath) {
+          try {
+            if (window.parent && window.parent !== window && (window.parent.location.pathname || '').toLowerCase().indexOf('/app') === 0) {
+              isAppClientPath = true;
+            }
+          } catch (e) {}
+        }
+        var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
         var isCoarseMob = window.matchMedia && window.matchMedia('(pointer: coarse)').matches && window.innerWidth <= 1024;
-        var isMobileBoot = forceMob || (mobParam !== '0' && (window.innerWidth <= 860 || isCoarseMob));
+        var isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+        var isMobileBoot = isAppClientPath || isStandalone || window.innerWidth <= 860 || ((isCoarseMob || isMobileUA) && (window.innerWidth <= 1024 || window.innerHeight <= 560));
 
         if (isMobileBoot) {
           document.body.dataset.era = 'mobile';

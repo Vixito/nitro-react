@@ -25,26 +25,25 @@ export function detectIsMobileViewport(): boolean
 {
     if(typeof window === 'undefined') return false;
 
+    const path = (window.location.pathname || '').toLowerCase();
+    if(path.indexOf('/game/mobile') === 0 || path.indexOf('/mobile') === 0) return true;
+
     try
     {
-        const params = new URLSearchParams(window.location.search);
-        const param = params.get('mobile');
-        if(param === '1' || param === 'true')
+        if(window.parent && window.parent !== window)
         {
-            sessionStorage.setItem('habbten_force_mobile', '1');
-            return true;
+            const parentPath = (window.parent.location.pathname || '').toLowerCase();
+            if(parentPath.indexOf('/app') === 0) return true;
         }
-        if(param === '0' || param === 'false')
-        {
-            sessionStorage.removeItem('habbten_force_mobile');
-            return false;
-        }
-        if(sessionStorage.getItem('habbten_force_mobile') === '1') return true;
     }
     catch
     {
-        // ignore storage restrictions
+        // ignore cross-origin restrictions
     }
+
+    const isStandalone = (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches)
+        || (window.navigator as any).standalone === true;
+    if(isStandalone) return true;
 
     const width = window.innerWidth;
     const height = window.innerHeight;

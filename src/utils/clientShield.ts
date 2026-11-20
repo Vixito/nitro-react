@@ -4,26 +4,6 @@ export function initClientShield(): void
 {
     if(typeof window === 'undefined') return;
 
-    // Optional owner-only dev bypass via ?shield=0 or localStorage
-    try
-    {
-        const params = new URLSearchParams(window.location.search);
-        if(params.get('shield') === '0')
-        {
-            localStorage.setItem('habbten_shield_off', '1');
-            return;
-        }
-        if(params.get('shield') === '1')
-        {
-            localStorage.removeItem('habbten_shield_off');
-        }
-        if(localStorage.getItem('habbten_shield_off') === '1') return;
-    }
-    catch
-    {
-        // ignore storage errors
-    }
-
     // 1. Neuter React DevTools hook so component tree, props & hooks cannot be inspected
     try
     {
@@ -115,7 +95,7 @@ export function initClientShield(): void
             if(typeof con.log === 'function')
             {
                 con.log(
-                    '%c🛡️ HABBTEN SHIELD',
+                    '%cHABBTEN SHIELD',
                     'color:#ffffff;background:#0f172a;border:2px solid #38bdf8;border-radius:6px;padding:6px 14px;font-size:18px;font-weight:900;'
                 );
                 con.log(
