@@ -423,6 +423,9 @@ export const UserSettingsView: FC<{}> = props => {
                         <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => CreateLinkEvent('era-selector/open')}>
                             <Text bold variant="white">Selector de Versión Visual</Text>
                         </Button>
+                        <Button variant="secondary" className="d-flex align-items-center justify-content-center mb-2 py-2" onClick={() => { setIsVisible(false); CreateLinkEvent('tutorial/start'); }}>
+                            <Text bold variant="white">Ver tutorial del cliente</Text>
+                        </Button>
                         <HorizontalRule />
                         <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => setShowDiscordModal(true)}>
                             <Text bold variant="white">Conectar a Discord</Text>
