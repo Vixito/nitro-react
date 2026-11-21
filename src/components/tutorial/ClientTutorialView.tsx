@@ -12,32 +12,32 @@ interface TutorialStep
 const TUTORIAL_STEPS: TutorialStep[] = [
     {
         id: 'rooms',
-        selectors: [ '.nitro-toolbar .item-rooms', '.nitro-toolbar .icon-rooms' ],
+        selectors: [ '.toolbar-flash2012 .item-rooms', '.toolbar-shockwave2006 .item-rooms', '.nitro-toolbar .icon-rooms' ],
         text: 'Aquí podrás explorar salas públicas, juegos y las salas creadas por otros usuarios'
     },
     {
         id: 'games',
-        selectors: [ '.nitro-toolbar .item-games', '.nitro-toolbar .icon-games' ],
+        selectors: [ '.toolbar-flash2012 .item-games', '.nitro-toolbar .icon-game', '.nitro-toolbar .icon-games' ],
         text: 'Entra al Centro de Juegos para competir en Battle Ball, SnowStorm, FastFood y ganar placas'
     },
     {
         id: 'catalog',
-        selectors: [ '.nitro-toolbar .item-catalog', '.nitro-toolbar .icon-catalog' ],
+        selectors: [ '.toolbar-flash2012 .item-catalog', '.toolbar-shockwave2006 .item-credits', '.nitro-toolbar .icon-catalog' ],
         text: 'Aquí podrás comprar furnis y todo lo que desees para decorar tus salas'
     },
     {
         id: 'inventory',
-        selectors: [ '.nitro-toolbar .item-inventory', '.nitro-toolbar .icon-inventory' ],
+        selectors: [ '.toolbar-flash2012 .item-inventory', '.toolbar-shockwave2006 .item-inventory', '.nitro-toolbar .icon-inventory' ],
         text: 'En Mis cosas encontrarás todos tus furnis, mascotas y placas coleccionadas'
     },
     {
         id: 'me',
-        selectors: [ '.nitro-toolbar .item-avatar', '.nitro-toolbar .navigation-item.item-avatar' ],
+        selectors: [ '.toolbar-flash2012 .item-avatar', '.toolbar-shockwave2006 .item-avatar', '.nitro-toolbar .item-avatar' ],
         text: 'Haz clic en tu avatar para abrir tu perfil, cambiar tu ropa, ver tus logros y el Tablón de Anuncios'
     },
     {
         id: 'friends',
-        selectors: [ '.nitro-toolbar .item-friends', '.nitro-toolbar .icon-friendall', '.nitro-toolbar .icon-friends' ],
+        selectors: [ '.nitro-bottom-bar-2012 .btn-all-friends', '.toolbar-shockwave2006 .item-console', '.nitro-toolbar .icon-friendall', '.nitro-toolbar .item-friends' ],
         text: 'Desde aquí podrás gestionar tu lista de amig@s, chatear y seguirlos a sus salas'
     }
 ];
@@ -204,7 +204,10 @@ export const ClientTutorialView: FC<{}> = () =>
     if(!isVisible) return null;
 
     const currentStep = TUTORIAL_STEPS[stepIndex] || TUTORIAL_STEPS[0];
-    const isLast = stepIndex >= TUTORIAL_STEPS.length - 1;
+    const activeStepIndices = TUTORIAL_STEPS.map((_, idx) => idx).filter(idx => Boolean(findTargetRect(idx)));
+    const activePos = Math.max(0, activeStepIndices.indexOf(stepIndex));
+    const totalVisibleSteps = activeStepIndices.length || TUTORIAL_STEPS.length;
+    const isLast = activePos >= totalVisibleSteps - 1;
 
     // Position white speech balloon right next to the target toolbar button
     let balloonStyle: React.CSSProperties = {
@@ -214,7 +217,7 @@ export const ClientTutorialView: FC<{}> = () =>
     };
     let arrowDir: 'left' | 'bottom' | 'none' = 'none';
 
-    const balloonWidth = 268;
+    const balloonWidth = 248;
     if(targetRect)
     {
         if(targetRect.isVerticalBar)
@@ -232,7 +235,7 @@ export const ClientTutorialView: FC<{}> = () =>
         else
         {
             const centerX = targetRect.left + (targetRect.width / 2);
-            const clampedLeft = Math.max(12, Math.min(window.innerWidth - balloonWidth - 12, Math.round(centerX - (balloonWidth / 2))));
+            const clampedLeft = Math.max(8, Math.min(window.innerWidth - balloonWidth - 8, Math.round(centerX - (balloonWidth / 2))));
             const arrowX = Math.max(18, Math.min(balloonWidth - 18, Math.round(centerX - clampedLeft)));
             balloonStyle = {
                 left: `${ clampedLeft }px`,
@@ -271,7 +274,7 @@ export const ClientTutorialView: FC<{}> = () =>
                     </button>
                 </div>
                 <div className="tutorial-balloon-footer">
-                    <span className="tutorial-step-counter">{ stepIndex + 1 }/{ TUTORIAL_STEPS.length }</span>
+                    <span className="tutorial-step-counter">{ activePos + 1 }/{ totalVisibleSteps }</span>
                     <button type="button" className="tutorial-skip-link" onClick={ markTutorialDone }>
                         Omitir tutorial
                     </button>

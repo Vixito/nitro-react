@@ -300,6 +300,13 @@ export const UserSettingsView: FC<{}> = props => {
                                     Discord
                                 </button>
                             </div>
+                            <button
+                                type="button"
+                                className="btn-shiny-2012 w-100 mt-2"
+                                onClick={ () => { setIsVisible(false); CreateLinkEvent('tutorial/start'); } }
+                            >
+                                Ver tutorial del cliente
+                            </button>
                         </div>
 
                         <div className="settings-2012-footer">

@@ -7175,10 +7175,11 @@ body[data-era="flash2012"] {
     .habbten-tutorial-balloon {
         pointer-events: auto !important;
         position: fixed !important;
-        width: 268px !important;
+        width: 248px !important;
         background-color: #ffffff !important;
         border-radius: 8px !important;
-        padding: 16px 18px 12px !important;
+        padding: 16px 16px 12px !important;
+        box-sizing: border-box !important;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
         color: #000000 !important;
@@ -7219,22 +7220,32 @@ body[data-era="flash2012"] {
         }
 
         .tutorial-balloon-actions {
+            width: 100% !important;
             display: flex !important;
+            align-items: center !important;
             justify-content: center !important;
-            margin-bottom: 10px !important;
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
 
             .tutorial-btn-vale {
                 min-width: 84px !important;
                 height: 34px !important;
+                margin: 0 auto !important;
                 padding: 0 20px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
                 background: #009c00 !important;
+                background-image: none !important;
                 border: 2px solid #000000 !important;
                 border-radius: 4px !important;
-                box-shadow: inset 0 2px 0 #33c433, inset 0 -2px 0 #007800 !important;
+                box-shadow: none !important;
                 color: #ffffff !important;
                 font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 15px !important;
                 font-weight: 700 !important;
+                line-height: 1 !important;
+                text-align: center !important;
                 cursor: pointer !important;
 
                 &:hover {
