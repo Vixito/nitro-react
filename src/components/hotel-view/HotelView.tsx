@@ -650,12 +650,11 @@ export const HotelView: FC<{}> = props =>
         <div
             className="nitro-hotel-view nitro-hotel-view-xmas"
             style={{
-                backgroundColor: '#f0fdfe',
+                backgroundColor: '#0c2a4d',
                 backgroundImage: `url(${ modernHotelXmasBg })`,
                 backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'left bottom',
-                backgroundSize: 'cover',
-                imageRendering: 'pixelated'
+                backgroundPosition: 'right bottom',
+                backgroundSize: 'cover'
             }}
         >
             <div className="container h-100 py-3 overflow-hidden landing-widgets" style={{ zIndex: 1 }}>

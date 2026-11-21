@@ -1,8 +1,10 @@
 import { BotRemoveComposer } from '@nitrots/nitro-renderer';
 import { FC, useMemo } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
 import { AvatarInfoRentableBot, BotSkillsEnum, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Button, Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserProfileIconView } from '../../../../../common';
+import { useEraTheme } from '../../../../../hooks';
 
 interface InfoStandWidgetRentableBotViewProps
 {
@@ -13,6 +15,8 @@ interface InfoStandWidgetRentableBotViewProps
 export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewProps> = props =>
 {
     const { avatarInfo = null, onClose = null } = props;
+    const { currentEra } = useEraTheme();
+    const isFlash2012 = currentEra === 'flash2012';
 
     const canPickup = useMemo(() =>
     {
@@ -34,7 +38,9 @@ export const InfoStandWidgetRentableBotView: FC<InfoStandWidgetRentableBotViewPr
                     <Column gap={ 1 }>
                         <Flex alignItems="center" justifyContent="between" gap={ 1 }>
                             <Text variant="white" small wrap>{ avatarInfo.name }</Text>
-                            <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } />
+                            { isFlash2012
+                                ? <img src={ close2012Img } alt="Cerrar" className="cursor-pointer infostand-close-2012" onClick={ onClose } />
+                                : <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } /> }
                         </Flex>
                         <hr className="m-0" />
                     </Column>

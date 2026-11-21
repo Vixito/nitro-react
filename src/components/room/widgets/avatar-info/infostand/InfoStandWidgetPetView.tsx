@@ -1,9 +1,10 @@
 import { PetRespectComposer, PetType } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
 import { AvatarInfoPet, ConvertSeconds, CreateLinkEvent, GetConfiguration, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Base, Button, Column, Flex, LayoutCounterTimeView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
-import { useRoom, useSessionInfo } from '../../../../../hooks';
+import { useEraTheme, useRoom, useSessionInfo } from '../../../../../hooks';
 
 interface InfoStandWidgetPetViewProps
 {
@@ -18,6 +19,8 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = props =>
     const [ remainingTimeToLive, setRemainingTimeToLive ] = useState(0);
     const { roomSession = null } = useRoom();
     const { petRespectRemaining = 0, respectPet = null } = useSessionInfo();
+    const { currentEra } = useEraTheme();
+    const isFlash2012 = currentEra === 'flash2012';
 
     useEffect(() =>
     {
@@ -80,7 +83,9 @@ export const InfoStandWidgetPetView: FC<InfoStandWidgetPetViewProps> = props =>
                     <Column gap={ 1 }>
                         <Flex alignItems="center" justifyContent="between" gap={ 1 }>
                             <Text variant="white" small wrap>{ avatarInfo.name }</Text>
-                            <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } />
+                            { isFlash2012
+                                ? <img src={ close2012Img } alt="Cerrar" className="cursor-pointer infostand-close-2012" onClick={ onClose } />
+                                : <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } /> }
                         </Flex>
                         <Text variant="white" small wrap>{ LocalizeText(`pet.breed.${ avatarInfo.petType }.${ avatarInfo.petBreed }`) }</Text>
                         <hr className="m-0" />

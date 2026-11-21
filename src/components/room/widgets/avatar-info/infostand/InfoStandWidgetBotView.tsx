@@ -1,7 +1,9 @@
 import { FC } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
 import { AvatarInfoUser, LocalizeText } from '../../../../../api';
 import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text } from '../../../../../common';
+import { useEraTheme } from '../../../../../hooks';
 
 interface InfoStandWidgetBotViewProps
 {
@@ -12,6 +14,8 @@ interface InfoStandWidgetBotViewProps
 export const InfoStandWidgetBotView: FC<InfoStandWidgetBotViewProps> = props =>
 {
     const { avatarInfo = null, onClose = null } = props;
+    const { currentEra } = useEraTheme();
+    const isFlash2012 = currentEra === 'flash2012';
 
     if(!avatarInfo) return null;
 
@@ -21,7 +25,9 @@ export const InfoStandWidgetBotView: FC<InfoStandWidgetBotViewProps> = props =>
                 <Column gap={ 1 }>
                     <Flex alignItems="center" justifyContent="between" gap={ 1 }>
                         <Text variant="white" small wrap>{ avatarInfo.name }</Text>
-                        <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } />
+                        { isFlash2012
+                            ? <img src={ close2012Img } alt="Cerrar" className="cursor-pointer infostand-close-2012" onClick={ onClose } />
+                            : <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } /> }
                     </Flex>
                     <hr className="m-0" />
                 </Column>

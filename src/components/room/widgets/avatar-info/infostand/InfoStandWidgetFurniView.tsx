@@ -1,9 +1,10 @@
 import { CrackableDataType, GroupInformationComposer, GroupInformationEvent, NowPlayingEvent, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, SetObjectDataMessageComposer, SongInfoReceivedEvent, StringDataType } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
+import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
 import { AvatarInfoFurni, CreateLinkEvent, GetFurnitureDataForRoomObject, GetGroupInformation, GetNitroInstance, GetRoomEngine, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Base, Button, Column, Flex, LayoutBadgeImageView, LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
-import { useMessageEvent, useRoom, useSoundEvent } from '../../../../../hooks';
+import { useEraTheme, useMessageEvent, useRoom, useSoundEvent } from '../../../../../hooks';
 
 interface InfoStandWidgetFurniViewProps
 {
@@ -19,6 +20,8 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
 {
     const { avatarInfo = null, onClose = null } = props;
     const { roomSession = null } = useRoom();
+    const { currentEra } = useEraTheme();
+    const isFlash2012 = currentEra === 'flash2012';
     
     const [ pickupMode, setPickupMode ] = useState(0);
     const [ canMove, setCanMove ] = useState(false);
@@ -351,7 +354,9 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                     <Column gap={ 1 }>
                         <Flex alignItems="center" justifyContent="between" gap={ 1 }>
                             <Text variant="white" small wrap>{ avatarInfo.name }</Text>
-                            <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } />
+                            { isFlash2012
+                                ? <img src={ close2012Img } alt="Cerrar" className="cursor-pointer infostand-close-2012" onClick={ onClose } />
+                                : <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } /> }
                         </Flex>
                         <hr className="m-0" />
                     </Column>

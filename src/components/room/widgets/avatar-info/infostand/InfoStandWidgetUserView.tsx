@@ -1,9 +1,11 @@
 import { RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, UserCurrentBadgesEvent, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
 import { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useEffect, useState } from 'react';
 import { FaPencilAlt, FaTimes } from 'react-icons/fa';
+import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
+import pencilIconImg from '../../../../../assets/images/infostand/pencil-icon.png';
 import { AvatarInfoUser, CloneObject, GetConfiguration, GetGroupInformation, GetSessionDataManager, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserProfileIconView } from '../../../../../common';
-import { useMessageEvent, useRoom, useRoomSessionManagerEvent } from '../../../../../hooks';
+import { useEraTheme, useMessageEvent, useRoom, useRoomSessionManagerEvent } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
 
@@ -21,6 +23,8 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
     const [ isEditingMotto, setIsEditingMotto ] = useState(false);
     const [ relationships, setRelationships ] = useState<RelationshipStatusInfoMessageParser>(null);
     const { roomSession = null } = useRoom();
+    const { currentEra } = useEraTheme();
+    const isFlash2012 = currentEra === 'flash2012';
 
     const saveMotto = (motto: string) =>
     {
@@ -172,7 +176,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                             <UserProfileIconView userId={ avatarInfo.webID } />
                             <Text bold variant="white" small wrap className="infostand-name fw-bold"><b>{ avatarInfo.name }</b></Text>
                         </Flex>
-                        <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } />
+                        { isFlash2012
+                            ? <img src={ close2012Img } alt="Cerrar" className="cursor-pointer infostand-close-2012" onClick={ onClose } />
+                            : <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } /> }
                     </Flex>
                     <hr className="m-0" />
                 </Column>
@@ -219,7 +225,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                             </Flex> }
                         { avatarInfo.type === AvatarInfoUser.OWN_USER &&
                             <Flex grow alignItems="center" gap={ 2 }>
-                                <FaPencilAlt className="small fa-icon" />
+                                { isFlash2012
+                                    ? <img src={ pencilIconImg } alt="Editar misión" className="infostand-pencil-2012 cursor-pointer" onClick={ () => setIsEditingMotto(true) } />
+                                    : <FaPencilAlt className="small fa-icon" /> }
                                 <Flex grow alignItems="center" className="motto-content">
                                     { !isEditingMotto &&
                                         <Text fullWidth pointer wrap textBreak small variant="white" onClick={ event => setIsEditingMotto(true) }>{ motto }&nbsp;</Text> }
