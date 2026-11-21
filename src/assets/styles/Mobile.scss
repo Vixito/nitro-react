@@ -351,23 +351,84 @@ body.is-mobile-ui {
     // ── CÁMARA MÓVIL: EDITOR Y CHECKOUT ADAPTADOS AL TAMAÑO DEL DISPOSITIVO ──
     .nitro-card.nitro-camera-editor {
         width: min(600px, calc(100vw - 12px)) !important;
-        height: min(440px, calc(100dvh - 76px - env(safe-area-inset-bottom))) !important;
+        height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
         min-width: 0 !important;
         min-height: 0 !important;
 
         > .content-area,
         > .nitro-card-content {
+            display: flex !important;
+            flex-direction: column !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
             -webkit-overflow-scrolling: touch !important;
             touch-action: pan-y !important;
+            padding: 8px !important;
+
+            > .grid {
+                flex: 1 1 auto !important;
+                min-height: 0 !important;
+                height: 100% !important;
+                gap: 8px !important;
+
+                // Columna izquierda (lista de efectos): scroll interno fluido
+                > .d-flex.flex-column:first-child {
+                    min-height: 0 !important;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    touch-action: pan-y !important;
+                }
+
+                // Columna derecha (vista previa + slider + botones Cancelar / Vista previa): nunca recortar botones
+                > .d-flex.flex-column:last-child {
+                    min-height: 0 !important;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    touch-action: pan-y !important;
+                    gap: 6px !important;
+
+                    > * {
+                        flex-shrink: 0 !important;
+                    }
+
+                    // Barra inferior de acciones (limpiar / descargar / zoom / cancelar / vista previa)
+                    > .d-flex:last-child {
+                        flex-wrap: wrap !important;
+                        gap: 6px !important;
+                        align-items: center !important;
+                        width: 100% !important;
+                    }
+                }
+            }
 
             .picture-preview {
-                width: min(220px, 100%) !important;
-                height: auto !important;
+                width: min(148px, 100%) !important;
+                height: min(148px, 34dvh) !important;
                 aspect-ratio: 1 / 1 !important;
-                max-height: 210px !important;
                 object-fit: contain !important;
+                flex-shrink: 0 !important;
+            }
+        }
+
+        @media (max-width: 500px) {
+            > .content-area > .grid,
+            > .nitro-card-content > .grid {
+                display: flex !important;
+                flex-direction: column-reverse !important;
+                height: auto !important;
+
+                > .d-flex.flex-column {
+                    width: 100% !important;
+                    grid-column: auto !important;
+                    overflow: visible !important;
+                }
+
+                > .d-flex.flex-column:first-child {
+                    max-height: 160px !important;
+                    overflow-y: auto !important;
+                }
             }
         }
     }
@@ -380,15 +441,28 @@ body.is-mobile-ui {
 
         > .content-area,
         > .nitro-card-content {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 8px !important;
             overflow-y: auto !important;
             overflow-x: hidden !important;
             -webkit-overflow-scrolling: touch !important;
             touch-action: pan-y !important;
+            padding: 10px !important;
+
+            > * {
+                flex-shrink: 0 !important;
+            }
+
+            .bg-muted {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
 
             .picture-preview {
-                width: min(220px, 100%) !important;
+                width: min(170px, 100%) !important;
                 height: auto !important;
-                max-height: 200px !important;
+                max-height: 170px !important;
                 object-fit: contain !important;
             }
         }
