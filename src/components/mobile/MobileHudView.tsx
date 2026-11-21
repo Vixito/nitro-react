@@ -604,7 +604,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                     >
                         <div className="hmob-avatar-ring">
                             { userFigure && (
-                                <HabboHeadImg figure={ userFigure } size={ 34 } smallScale={ false } />
+                                <HabboHeadImg figure={ userFigure } size={ 34 } />
                             ) }
                         </div>
                         { getTotalUnseen > 0 && <span className="hmob-count-badge">{ getTotalUnseen }</span> }

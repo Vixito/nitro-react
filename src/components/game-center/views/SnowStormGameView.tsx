@@ -646,7 +646,7 @@ export const SnowStormGameView: FC = () =>
             const buildDir = (dir: number, onReady: (img: HTMLImageElement) => void, attempt = 0) =>
             {
                 if (!alive) return;
-                const avatarImg = renderManager.createAvatarImage(figure, AvatarScaleType.SMALL, 'M', {
+                const avatarImg = renderManager.createAvatarImage(figure, AvatarScaleType.LARGE, 'M', {
                     resetFigure: () => { if (alive) buildDir(dir, onReady, attempt + 1); },
                     dispose: () => {},
                     disposed: false
@@ -1975,7 +1975,7 @@ export const SnowStormGameView: FC = () =>
                             : headEntry?.front;
                         if (headImg && headImg.complete && headImg.naturalWidth > 0 && f.koTimer <= 0)
                         {
-                            const hScale = 1.25 * spriteScale;
+                            const hScale = 0.66 * spriteScale;
                             const hw = headImg.naturalWidth * hScale;
                             const hh = headImg.naturalHeight * hScale;
                             const chinFromFeet = f.reloading ? 17.5 : 20.5;

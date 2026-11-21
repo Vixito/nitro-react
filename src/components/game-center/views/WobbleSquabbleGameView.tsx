@@ -667,7 +667,7 @@ export const WobbleSquabbleGameView: FC = () =>
                     dispose: () => {},
                     disposed: false
                 };
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.SMALL, null, listener);
+                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, listener);
                 if (!avatar) return;
                 avatar.initActionAppends();
                 if (posture === 'sit') avatar.appendAction(AvatarAction.POSTURE, AvatarAction.POSTURE_SIT);

@@ -82,10 +82,9 @@ export function trimTransparentImage(
     img.src = rawSrc;
 }
 
-export function useCroppedHabboHead(figure: string, direction = 2, smallScale = true): TrimmedHeadInfo | null
+export function useCroppedHabboHead(figure: string, direction = 2): TrimmedHeadInfo | null
 {
-    const scaleType = smallScale ? AvatarScaleType.SMALL : AvatarScaleType.LARGE;
-    const cacheKey = `${ scaleType }__${ figure }__${ direction }`;
+    const cacheKey = `${ figure }__${ direction }`;
     const [ info, setInfo ] = useState<TrimmedHeadInfo | null>(() => trimmedHeadCache.get(cacheKey) || null);
     const [ reloadTick, setReloadTick ] = useState<number>(0);
 
@@ -105,7 +104,7 @@ export function useCroppedHabboHead(figure: string, direction = 2, smallScale = 
         const manager = GetAvatarRenderManager();
         if (!manager) return;
 
-        const avatarImg = manager.createAvatarImage(figure, scaleType, 'M', {
+        const avatarImg = manager.createAvatarImage(figure, AvatarScaleType.LARGE, 'M', {
             resetFigure: () =>
             {
                 if (!disposed)
@@ -151,7 +150,7 @@ export function useCroppedHabboHead(figure: string, direction = 2, smallScale = 
             disposed = true;
             if (retryTimer) window.clearTimeout(retryTimer);
         };
-    }, [ figure, direction, scaleType, cacheKey, reloadTick ]);
+    }, [ figure, direction, cacheKey, reloadTick ]);
 
     return info;
 }
@@ -160,12 +159,11 @@ export const HabboHeadImg: FC<{
     figure: string;
     direction?: number;
     size?: number;
-    smallScale?: boolean;
     className?: string;
     style?: CSSProperties;
-}> = ({ figure, direction = 2, size = 36, smallScale = true, className, style }) =>
+}> = ({ figure, direction = 2, size = 36, className, style }) =>
 {
-    const info = useCroppedHabboHead(figure, direction, smallScale);
+    const info = useCroppedHabboHead(figure, direction);
     if (!info) return null;
 
     return (
@@ -206,8 +204,8 @@ export const SnowStormParkaAvatar: FC<{
     const bodyScale = 1.0 * scale;
     const marginBot = Math.round(2 * scale);
 
-    // Proportional 1:1 classic SMALL (sh_) Habbo head-to-parka ratio (so chin sits inside fur collar!)
-    const headPixelScale = 1.25 * bodyScale;
+    // Proportional 1:1 Habbo head-to-parka ratio (so chin sits inside fur collar regardless of hair height!)
+    const headPixelScale = 0.66 * bodyScale;
     const headW = headInfo ? Math.round(headInfo.w * headPixelScale) : 0;
     const headH = headInfo ? Math.round(headInfo.h * headPixelScale) : 0;
     // Exact chin bottom seated snugly into collar opening (20.5px above boots bottom)

@@ -549,7 +549,7 @@ const HabboFullAvatarImg: FC<{ figure: string; direction?: number; className?: s
             {
                 const mgr = GetAvatarRenderManager();
                 if (!mgr) return;
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.SMALL, null, {
+                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
                     resetFigure: () => { if (alive) load(); },
                     dispose: () => {},
                     disposed: false
@@ -946,7 +946,7 @@ export const BattleBallGameView: FC = () =>
             {
                 const mgr = GetAvatarRenderManager();
                 if (!mgr) return;
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.SMALL, null, {
+                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
                     resetFigure: () =>
                     {
                         if (alive) loadFigureDir(figure, dir, attempt + 1);
