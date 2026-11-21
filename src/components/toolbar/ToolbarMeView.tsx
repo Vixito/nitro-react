@@ -99,6 +99,10 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
                     <i className="me-icon-2012 icon-2012-rooms" />
                     <span className="me-label-2012">Mis Salas</span>
                 </div>
+                <div className="me-item-2012" title="Tablón de Anuncios" onClick={ () => handle2012Action(() => CreateLinkEvent('bulletin/toggle')) }>
+                    <i className="me-icon-2012 icon-2012-announcements" />
+                    <span className="me-label-2012">Anuncios</span>
+                </div>
                 <div className="me-item-2012" title="Cambiar Look" onClick={ () => handle2012Action(() => CreateLinkEvent('avatar-editor/toggle')) }>
                     <i className="me-icon-2012 icon-2012-clothes" />
                     <span className="me-label-2012">Ropa</span>
@@ -154,6 +158,13 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
                         <span className="shockwave-menu-arrow">▶</span>
                     </div>
 
+                    {/* 3B. Anuncios */}
+                    <div className="shockwave-menu-row" onClick={ () => handleAction(() => CreateLinkEvent('bulletin/toggle')) }>
+                        <i className="shockwave-menu-icon icon-achievements" />
+                        <span className="shockwave-menu-label">Anuncios</span>
+                        <span className="shockwave-menu-arrow">▶</span>
+                    </div>
+
                     {/* 4. Mi Perfil */}
                     <div className="shockwave-menu-row" onClick={ () => handleAction(() => GetUserProfile(GetSessionDataManager().userId)) }>
                         <i className="shockwave-menu-icon icon-profile" />
@@ -205,6 +216,7 @@ export const ToolbarMeView: FC<PropsWithChildren<ToolbarMeViewProps>> = props =>
             </Base>
             <Base pointer title="Mi Perfil" className="navigation-item icon icon-me-profile" onClick={ event => GetUserProfile(GetSessionDataManager().userId) } />
             <Base pointer title="Mis Salas" className="navigation-item icon icon-me-rooms" onClick={ event => CreateLinkEvent('navigator/search/myworld_view') } />
+            <Base pointer title="Tablón de Anuncios" className="navigation-item icon icon-me-announcements" onClick={ event => CreateLinkEvent('bulletin/toggle') } />
             <Base pointer title="Editor de Ropa" className="navigation-item icon icon-me-clothing" onClick={ event => CreateLinkEvent('avatar-editor/toggle') } />
             <Base pointer title="Ajustes" className="navigation-item icon icon-me-settings" onClick={ event => CreateLinkEvent('user-settings/toggle') } />
             { children }

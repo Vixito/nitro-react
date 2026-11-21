@@ -3,6 +3,9 @@ import { CatalogLayoutProps } from './CatalogLayout.types';
 import { CatalogLayoutBadgeDisplayView } from './CatalogLayoutBadgeDisplayView';
 import { CatalogLayoutColorGroupingView } from './CatalogLayoutColorGroupingView';
 import { CatalogLayoutDefaultView } from './CatalogLayoutDefaultView';
+import { CatalogLayoutEcotronInfoView } from './CatalogLayoutEcotronInfoView';
+import { CatalogLayoutEcotronMachineView } from './CatalogLayoutEcotronMachineView';
+import { CatalogLayoutEcotronPrizesView } from './CatalogLayoutEcotronPrizesView';
 import { CatalogLayouGuildCustomFurniView } from './CatalogLayoutGuildCustomFurniView';
 import { CatalogLayouGuildForumView } from './CatalogLayoutGuildForumView';
 import { CatalogLayouGuildFrontpageView } from './CatalogLayoutGuildFrontpageView';
@@ -89,6 +92,12 @@ export const GetCatalogLayout = (page: ICatalogPage, hideNavigation: () => void)
             return <CatalogLayoutColorGroupingView { ...layoutProps } />;
         case 'soundmachine':
             return <CatalogLayoutSoundMachineView { ...layoutProps } />;
+        case 'ecotron_machine':
+            return <CatalogLayoutEcotronMachineView { ...layoutProps } />;
+        case 'ecotron_prizes':
+            return <CatalogLayoutEcotronPrizesView { ...layoutProps } />;
+        case 'ecotron_info':
+            return <CatalogLayoutEcotronInfoView { ...layoutProps } />;
         case 'bots':
         case 'default_3x3':
         default:

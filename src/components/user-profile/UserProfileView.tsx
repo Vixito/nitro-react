@@ -176,7 +176,7 @@ export const UserProfileView: FC<{}> = props =>
                     </div>
                     <div className="up-stat-cell" onClick={ () => CreateLinkEvent(`streak/open/${ userProfile.id }`) }>
                         <img src={ iconStreak2012Img } alt="" width={ 17 } height={ 22 } className="up-stat-ico" />
-                        <span className="up-stat-label"><u>Rachas</u> { userStreak }</span>
+                        <span className="up-stat-label"><u>Racha</u> { userStreak }</span>
                     </div>
                 </div>
                 <GroupsContainerView fullWidth itsMe={ userProfile.id === GetSessionDataManager().userId } groups={ userProfile.groups } onLeaveGroup={ onLeaveGroup } />
