@@ -3,6 +3,7 @@ import { Game2GetAccountGameStatusMessageComposer, JoinQueueMessageComposer } fr
 import { CreateLinkEvent, LocalizeText, SendMessageComposer } from '../../../api';
 import { Button, Column, DraggableWindow, DraggableWindowPosition, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
 import { useGameCenter } from '../../../hooks';
+import { useIsMobile } from '../../../hooks/mobile/useIsMobile';
 import { HabboHeadImg } from './SnowStormAvatar';
 import SnowStormLobbyImg from '../../../assets/images/gamecenter/snowstorm_lobby.png';
 import SnowStormLogoImg from '../../../assets/images/gamecenter/snowstorm/thumbnails_Snowstorm_Logo.png';
@@ -67,6 +68,17 @@ export const SnowStormLobbyView: FC<{}> = () => {
     const [playerStats, setPlayerStats] = useState<PlayerStatsSummary | null>(null);
     const [userCredits, setUserCredits] = useState<number | null>(null);
     const [isStarting, setIsStarting] = useState<boolean>(false);
+    const isMobile = useIsMobile();
+    const [viewport, setViewport] = useState<{ w: number; h: number }>(() => ({
+        w: typeof window !== 'undefined' ? window.innerWidth : 1280,
+        h: typeof window !== 'undefined' ? window.innerHeight : 720
+    }));
+
+    useEffect(() => {
+        const onResize = () => setViewport({ w: window.innerWidth, h: window.innerHeight });
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
 
     const [selectedPack, setSelectedPack] = useState<10 | 100 | 300 | null>(null);
     const [isBuyConfirmOpen, setIsBuyConfirmOpen] = useState<boolean>(false);
@@ -252,6 +264,10 @@ export const SnowStormLobbyView: FC<{}> = () => {
         return `${m}:${s}`;
     };
 
+    const maxLobbyW = Math.max(240, viewport.w - 16);
+    const maxLobbyH = Math.max(220, viewport.h - (isMobile ? 76 : 24));
+    const lobbyScale = Math.min(1, maxLobbyW / 410, maxLobbyH / 527);
+
     return (
         <>
             <DraggableWindow
@@ -259,6 +275,17 @@ export const SnowStormLobbyView: FC<{}> = () => {
                 handleSelector=".drag-handler"
                 windowPosition={DraggableWindowPosition.CENTER}
             >
+                <div
+                    className="snowstorm-lobby-scale-wrap"
+                    style={{
+                        width: `${Math.round(410 * lobbyScale)}px`,
+                        height: `${Math.round(527 * lobbyScale)}px`,
+                        position: 'relative',
+                        borderRadius: '6px',
+                        boxShadow: '0 12px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.4)',
+                        overflow: 'hidden'
+                    }}
+                >
                 <div
                     className="snowstorm-lobby-window"
                     style={{
@@ -269,11 +296,12 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         backgroundRepeat: 'no-repeat',
                         position: 'relative',
                         borderRadius: '6px',
-                        boxShadow: '0 12px 35px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 0, 0, 0.4)',
                         imageRendering: 'pixelated',
                         userSelect: 'none',
                         overflow: 'hidden',
-                        cursor: 'default'
+                        cursor: 'default',
+                        transform: lobbyScale < 1 ? `scale(${lobbyScale})` : undefined,
+                        transformOrigin: 'top left'
                     }}
                 >
                     {/* Barra superior de arrastre */}
@@ -554,6 +582,7 @@ export const SnowStormLobbyView: FC<{}> = () => {
                         onMouseDown={e => { if (penaltySeconds <= 0) { e.currentTarget.style.transform = 'translateY(2px)'; e.currentTarget.style.filter = 'brightness(0.85)'; } }}
                         onMouseUp={e => (e.currentTarget.style.transform = 'none')}
                     />
+                </div>
                 </div>
             </DraggableWindow>
 

@@ -404,63 +404,182 @@ class FastFoodSfx
 }
 
 // =============================================================================
-// CRISP VECTOR POWER-UP & BUTTON ICONS (MATCHES FASTFOOD 2012 ARTWORK!)
+// AUTHENTIC 2012 HABBO FAST FOOD (BASEJUMP) VECTOR ARTWORK & UNIFORM GOLD HUD BUTTONS
 // =============================================================================
 const MissileIconSvg: FC<{ size?: number }> = ({ size = 40 }) => (
-    <svg width={ size } height={ size } viewBox="0 0 48 48">
-        <g transform="rotate(35 24 24)">
-            <path d="M24 5 C29 12 31 20 31 30 L17 30 C17 20 19 12 24 5 Z" fill="#f3f4f6" stroke="#111827" strokeWidth="2.2" />
-            <path d="M24 5 C28 10 30 15 30.5 18 L17.5 18 C18 15 20 10 24 5 Z" fill="#ef4444" stroke="#111827" strokeWidth="2" />
-            <path d="M17 25 L10 33 L17 33 Z" fill="#dc2626" stroke="#111827" strokeWidth="2" />
-            <path d="M31 25 L38 33 L31 33 Z" fill="#dc2626" stroke="#111827" strokeWidth="2" />
-            <rect x="20" y="30" width="8" height="4" fill="#374151" stroke="#111827" strokeWidth="1.8" />
-            <path d="M21 34 L24 43 L27 34 Z" fill="#fbbf24" />
-            <circle cx="24" cy="23" r="3" fill="#38bdf8" stroke="#111827" strokeWidth="1.6" />
+    <svg width={ size } height={ size } viewBox="0 0 64 64">
+        <defs>
+            <linearGradient id="ff-rock-body" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#d8dee9" />
+                <stop offset="45%" stopColor="#ffffff" />
+                <stop offset="100%" stopColor="#9aa5b8" />
+            </linearGradient>
+            <linearGradient id="ff-rock-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fb923c" />
+                <stop offset="55%" stopColor="#ea580c" />
+                <stop offset="100%" stopColor="#9a3412" />
+            </linearGradient>
+        </defs>
+        <g transform="rotate(36 32 32)">
+            {/* Left & Right chunky rounded orange tail fins (original Sulake FastFood rocket!) */}
+            <path d="M22 33 C14 37 11 45 14 51 C17 53 22 49 24 44 Z" fill="url(#ff-rock-orange)" stroke="#1f1208" strokeWidth="2.6" strokeLinejoin="round" />
+            <path d="M42 33 C50 37 53 45 50 51 C47 53 42 49 40 44 Z" fill="url(#ff-rock-orange)" stroke="#1f1208" strokeWidth="2.6" strokeLinejoin="round" />
+            {/* Metallic silver-white fuselage */}
+            <path d="M32 7 C40 14 43 24 42 44 L22 44 C21 24 24 14 32 7 Z" fill="url(#ff-rock-body)" stroke="#1f1208" strokeWidth="2.6" strokeLinejoin="round" />
+            {/* Chunky rounded orange nosecone */}
+            <path d="M32 7 C38 12 41 18 41.8 23.5 L22.2 23.5 C23 18 26 12 32 7 Z" fill="url(#ff-rock-orange)" stroke="#1f1208" strokeWidth="2.5" strokeLinejoin="round" />
+            <path d="M28 13 C30 10.5 33 10.5 34.5 13 C32 13 29.5 14 28 17 Z" fill="#fed7aa" opacity="0.7" />
+            {/* Center front orange tail fin */}
+            <path d="M32 35 C36 39 36.5 47 34.5 53 C33 55 31 55 29.5 53 C27.5 47 28 39 32 35 Z" fill="url(#ff-rock-orange)" stroke="#1f1208" strokeWidth="2.5" strokeLinejoin="round" />
+            <path d="M31 39 C32 42 32 47 31 50" stroke="#fed7aa" strokeWidth="1.6" strokeLinecap="round" opacity="0.7" />
         </g>
     </svg>
 );
 
 const BigParachuteIconSvg: FC<{ size?: number }> = ({ size = 40 }) => (
-    <svg width={ size } height={ size } viewBox="0 0 48 48">
-        <path d="M5 24 C5 12 13 6 24 6 C35 6 43 12 43 24 C39 21 35 21 31 24 C27 21 21 21 17 24 C13 21 9 21 5 24 Z" fill="#16a34a" stroke="#111827" strokeWidth="2.2" />
-        <path d="M13 10 C18 7 30 7 35 10 C32 14 16 14 13 10 Z" fill="#dcfce7" />
-        <path d="M8 17 C16 14 32 14 40 17 C38 20 10 20 8 17 Z" fill="#bbf7d0" />
-        <line x1="7" y1="24" x2="24" y2="40" stroke="#f8fafc" strokeWidth="1.6" />
-        <line x1="17" y1="24" x2="24" y2="40" stroke="#f8fafc" strokeWidth="1.6" />
-        <line x1="31" y1="24" x2="24" y2="40" stroke="#f8fafc" strokeWidth="1.6" />
-        <line x1="41" y1="24" x2="24" y2="40" stroke="#f8fafc" strokeWidth="1.6" />
-        <circle cx="24" cy="40" r="3.5" fill="#fbbf24" stroke="#111827" strokeWidth="1.6" />
+    <svg width={ size } height={ size } viewBox="0 0 64 64">
+        <defs>
+            <radialGradient id="ff-bigchute-green" cx="45%" cy="22%" r="72%">
+                <stop offset="0%" stopColor="#4ade80" />
+                <stop offset="55%" stopColor="#16a34a" />
+                <stop offset="100%" stopColor="#14532d" />
+            </radialGradient>
+        </defs>
+        {/* Crisp converging cords */}
+        <line x1="11" y1="33" x2="32" y2="51" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+        <line x1="21" y1="35" x2="32" y2="51" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+        <line x1="32" y1="35" x2="32" y2="55" stroke="#e2e8f0" strokeWidth="2.2" strokeLinecap="round" />
+        <line x1="43" y1="35" x2="32" y2="51" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+        <line x1="53" y1="33" x2="32" y2="51" stroke="#e2e8f0" strokeWidth="2" strokeLinecap="round" />
+        {/* Original Fast Food Green & Mint-White concentric striped umbrella canopy */}
+        <path
+            d="M7 33 C7 16 17 8 32 8 C47 8 57 16 57 33 C52 30 48 31 44 35 C39 31 35 31 32 35 C29 31 25 31 20 35 C16 31 12 30 7 33 Z"
+            fill="url(#ff-bigchute-green)"
+            stroke="#0f2918"
+            strokeWidth="2.6"
+            strokeLinejoin="round"
+        />
+        {/* Concentric mint-white bands matching original Sulake Fast Food Big Parachute */}
+        <path d="M13 24 C21 19 43 19 51 24 C53 26.5 53.5 28 53 29.5 C44 25 20 25 11 29.5 C10.5 28 11 26.5 13 24 Z" fill="#dcfce7" opacity="0.92" />
+        <path d="M19 15.5 C25 12 39 12 45 15.5 C47 17 47.5 18 46.5 19 C39 16 25 16 17.5 19 C16.5 18 17 17 19 15.5 Z" fill="#dcfce7" opacity="0.92" />
+        <ellipse cx="32" cy="11.8" rx="6.5" ry="2.2" fill="#bbf7d0" />
     </svg>
 );
 
 const RedParachuteIconSvg: FC<{ size?: number }> = ({ size = 48 }) => (
-    <svg width={ size } height={ size } viewBox="0 0 48 48">
-        <path d="M6 24 C6 12 14 6 24 6 C34 6 42 12 42 24 C38 21 34 21 30 24 C26 21 22 21 18 24 C14 21 10 21 6 24 Z" fill="#ffffff" stroke="#111827" strokeWidth="2.2" />
-        <path d="M16 7 C19 6 29 6 32 7 L30 23 C26 21 22 21 18 23 Z" fill="#fee2e2" />
-        <line x1="8" y1="24" x2="24" y2="41" stroke="#ffffff" strokeWidth="2" />
-        <line x1="18" y1="24" x2="24" y2="41" stroke="#ffffff" strokeWidth="2" />
-        <line x1="30" y1="24" x2="24" y2="41" stroke="#ffffff" strokeWidth="2" />
-        <line x1="40" y1="24" x2="24" y2="41" stroke="#ffffff" strokeWidth="2" />
-        <ellipse cx="24" cy="41" rx="7" ry="3" fill="#ffffff" stroke="#111827" strokeWidth="1.6" />
+    <svg width={ size } height={ size } viewBox="0 0 64 64">
+        {/* Crisp white cords converging to classic white dish */}
+        <line x1="12" y1="31" x2="32" y2="49" stroke="#ffffff" strokeWidth="2.4" strokeLinecap="round" />
+        <line x1="22" y1="32" x2="32" y2="49" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+        <line x1="32" y1="32" x2="32" y2="49" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+        <line x1="42" y1="32" x2="32" y2="49" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+        <line x1="52" y1="31" x2="32" y2="49" stroke="#ffffff" strokeWidth="2.4" strokeLinecap="round" />
+        {/* Original Fast Food domed white canopy with scalloped arches */}
+        <path
+            d="M10 31 C10 15 19 9 32 9 C45 9 54 15 54 31 C50 28 46 28 43 31 C39 28 35 28 32 31 C29 28 25 28 21 31 C18 28 14 28 10 31 Z"
+            fill="#ffffff"
+            stroke="#5c0b0b"
+            strokeWidth="2.4"
+            strokeLinejoin="round"
+        />
+        <path d="M22 10.5 C26 9.5 38 9.5 42 10.5 L40 28 C36 26.5 28 26.5 24 28 Z" fill="#fee2e2" opacity="0.55" />
+        {/* White dish beneath cords */}
+        <ellipse cx="32" cy="51" rx="9" ry="3.8" fill="#ffffff" stroke="#5c0b0b" strokeWidth="2.2" />
     </svg>
 );
 
 const ShieldIconSvg: FC<{ size?: number }> = ({ size = 40 }) => (
-    <svg width={ size } height={ size } viewBox="0 0 48 48">
-        <path d="M24 5 L40 11 L38 27 C37 35 31 41 24 44 C17 41 11 35 10 27 L8 11 Z" fill="#2dd4bf" stroke="#111827" strokeWidth="2.4" />
-        <path d="M24 9 L36 14 L34 26 C33 32 29 37 24 39 C19 37 15 32 14 26 L12 14 Z" fill="#67e8f9" stroke="#0e7490" strokeWidth="1.5" />
-        <circle cx="24" cy="23" r="7" fill="#0891b2" stroke="#ecfeff" strokeWidth="1.8" />
-        <circle cx="22" cy="21" r="2.2" fill="#ffffff" />
+    <svg width={ size } height={ size } viewBox="0 0 64 64">
+        <defs>
+            <linearGradient id="ff-sh-steel" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#94a3b8" />
+                <stop offset="50%" stopColor="#cbd5e1" />
+                <stop offset="50.1%" stopColor="#64748b" />
+                <stop offset="100%" stopColor="#475569" />
+            </linearGradient>
+            <radialGradient id="ff-sh-orb" cx="38%" cy="34%" r="62%">
+                <stop offset="0%" stopColor="#e0f2fe" />
+                <stop offset="45%" stopColor="#38bdf8" />
+                <stop offset="100%" stopColor="#0e7490" />
+            </radialGradient>
+        </defs>
+        {/* Original Sulake steel-grey shield with emerald green double border */}
+        <path d="M32 7 L51 14 L49 34 C48 45 40 53 32 57 C24 53 16 45 15 34 L13 14 Z" fill="url(#ff-sh-steel)" stroke="#15803d" strokeWidth="3.2" strokeLinejoin="round" />
+        <path d="M32 11 L47 16.8 L45.4 33.5 C44.5 42.5 38.2 49.2 32 52.6 C25.8 49.2 19.5 42.5 18.6 33.5 L17 16.8 Z" fill="none" stroke="#22c55e" strokeWidth="1.6" strokeLinejoin="round" />
+        {/* Glowing cyan core orb */}
+        <circle cx="32" cy="31" r="10.5" fill="url(#ff-sh-orb)" stroke="#083344" strokeWidth="2.4" />
+        <circle cx="35.5" cy="27.5" r="2.8" fill="#ffffff" />
     </svg>
 );
 
 const GreenDropArrowSvg: FC<{ size?: number }> = ({ size = 50 }) => (
-    <svg width={ size } height={ size } viewBox="0 0 48 48">
-        <rect x="17" y="6" width="14" height="5" rx="1.5" fill="#84cc16" stroke="#1a2e05" strokeWidth="2" />
-        <path d="M17 14 L31 14 L31 25 L39 25 L24 42 L9 25 L17 25 Z" fill="#84cc16" stroke="#1a2e05" strokeWidth="2.4" />
-        <path d="M20 16 L24 16 L24 34 L16 26 L20 26 Z" fill="#bef264" />
+    <svg width={ size } height={ size } viewBox="0 0 64 64">
+        <defs>
+            <linearGradient id="ff-drop-lime" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#bef264" />
+                <stop offset="55%" stopColor="#84cc16" />
+                <stop offset="100%" stopColor="#4d7c0f" />
+            </linearGradient>
+        </defs>
+        <rect x="21" y="9" width="22" height="8" rx="2.5" fill="url(#ff-drop-lime)" stroke="#1a2e05" strokeWidth="2.6" />
+        <path d="M21 21 L43 21 L43 34 L53 34 L32 55 L11 34 L21 34 Z" fill="url(#ff-drop-lime)" stroke="#1a2e05" strokeWidth="2.8" strokeLinejoin="round" />
+        <path d="M25 24 L31 24 L31 44 L21 35 L25 35 Z" fill="#ecfccb" opacity="0.55" />
     </svg>
 );
+
+// Uniform perfectly-circular Gold-Bezel HUD button matching 2012 Habbo Fast Food!
+const FastFoodHudCircle: FC<{ variant: 'drop' | 'open_chute' | 'parachute' | 'missile' | 'shield' }> = ({ variant }) =>
+{
+    const faceFill = variant === 'drop'
+        ? 'url(#ff-face-white)'
+        : variant === 'open_chute'
+            ? 'url(#ff-face-red)'
+            : 'url(#ff-face-dark)';
+
+    return (
+        <svg className="ff-btn-sprite" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+                <linearGradient id="ff-bezel-gold" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#fef08a" />
+                    <stop offset="30%" stopColor="#eab308" />
+                    <stop offset="72%" stopColor="#b45309" />
+                    <stop offset="100%" stopColor="#fde047" />
+                </linearGradient>
+                <radialGradient id="ff-face-white" cx="42%" cy="32%" r="68%">
+                    <stop offset="0%" stopColor="#ffffff" />
+                    <stop offset="70%" stopColor="#f1f5f9" />
+                    <stop offset="100%" stopColor="#cbd5e1" />
+                </radialGradient>
+                <radialGradient id="ff-face-red" cx="42%" cy="32%" r="68%">
+                    <stop offset="0%" stopColor="#ef4444" />
+                    <stop offset="65%" stopColor="#dc2626" />
+                    <stop offset="100%" stopColor="#7f1d1d" />
+                </radialGradient>
+                <radialGradient id="ff-face-dark" cx="42%" cy="30%" r="70%">
+                    <stop offset="0%" stopColor="#3f3f46" />
+                    <stop offset="65%" stopColor="#27272a" />
+                    <stop offset="100%" stopColor="#18181b" />
+                </radialGradient>
+            </defs>
+            {/* Outer black ring */}
+            <circle cx="50" cy="50" r="48" fill="#000000" />
+            {/* Metallic gold bezel ring */}
+            <circle cx="50" cy="50" r="44.5" fill="url(#ff-bezel-gold)" />
+            {/* Inner black ring */}
+            <circle cx="50" cy="50" r="39" fill="#000000" />
+            {/* Button face */}
+            <circle cx="50" cy="50" r="36.5" fill={ faceFill } />
+            {/* Centered icon artwork */}
+            <g transform="translate(18, 18)">
+                { variant === 'drop' && <GreenDropArrowSvg size={ 64 } /> }
+                { variant === 'open_chute' && <RedParachuteIconSvg size={ 64 } /> }
+                { variant === 'parachute' && <BigParachuteIconSvg size={ 64 } /> }
+                { variant === 'missile' && <MissileIconSvg size={ 64 } /> }
+                { variant === 'shield' && <ShieldIconSvg size={ 64 } /> }
+            </g>
+        </svg>
+    );
+};
 
 const SpeakerIconSvg: FC<{ size?: number }> = ({ size = 28 }) => (
     <svg width={ size } height={ size } viewBox="0 0 32 32">
@@ -1387,8 +1506,11 @@ export const FastFoodGameView: FC = () =>
             ctx.fillStyle = '#0d0603';
             ctx.fillRect(0, 0, cssW, cssH);
 
-            // Cover-fit scaling centered on the 3-lane restaurant
-            const sc = Math.max(cssW / BG_W, cssH / BG_H);
+            // Adaptive fit: keep all 3 waiter lanes 100% visible on mobile/narrow viewports, cover-fit on wide desktop
+            const aspect = cssW / Math.max(1, cssH);
+            const sc = (aspect < 1.82 || cssW < 960 || cssH < 540)
+                ? Math.min(cssW / BG_W, cssH / BG_H)
+                : Math.max(cssW / BG_W, cssH / BG_H);
             const drawW = BG_W * sc;
             const drawH = BG_H * sc;
             const ox = Math.floor((cssW - drawW) / 2);
@@ -1944,20 +2066,20 @@ export const FastFoodGameView: FC = () =>
                         </div>
                     ) }
 
-                    {/* LEFT 4-BUTTON CIRCULAR ACTION HUD (100% Original 2012 Sulake Button Artwork!) */}
+                    {/* LEFT 4-BUTTON CIRCULAR ACTION HUD (Uniform Authentic 2012 Sulake Gold-Bezel Artwork!) */}
                     { stage === 'playing' && (
                         <div className="ff-action-hud">
                             <button
                                 type="button"
                                 className={ `ff-main-action-btn ${ actionHud.phase === 'falling' && actionHud.chute === 'none' ? 'is-parachute' : '' } ${ actionHud.phase === 'prepping' || actionHud.phase === 'landed' || (actionHud.phase === 'falling' && actionHud.chute !== 'none') ? 'is-cooldown' : '' }` }
                                 disabled={ actionHud.phase === 'prepping' || actionHud.phase === 'landed' || (actionHud.phase === 'falling' && actionHud.chute !== 'none') }
-                                onMouseDown={ () => triggerMainAction(0) }
+                                onPointerDown={ e => { e.preventDefault(); triggerMainAction(0); } }
                                 title="Soltar plato / Abrir paracaídas (Espacio)"
                             >
                                 { actionHud.phase === 'ready' ? (
-                                    <img src={ ffBtnDropImg } alt="Soltar plato" className="ff-btn-sprite" />
+                                    <FastFoodHudCircle variant="drop" />
                                 ) : actionHud.phase === 'falling' && actionHud.chute === 'none' ? (
-                                    <img src={ ffBtnOpenChuteImg } alt="Abrir paracaídas" className="ff-btn-sprite" />
+                                    <FastFoodHudCircle variant="open_chute" />
                                 ) : (
                                     <span className="ff-main-cd-ring">
                                         { actionHud.phase === 'prepping' ? `${ actionHud.prepPct }%` : 'OK' }
@@ -1970,10 +2092,10 @@ export const FastFoodGameView: FC = () =>
                                 type="button"
                                 className="ff-pu-circle-btn pos-parachute"
                                 disabled={ actionHud.parachutesLeft <= 0 || actionHud.phase !== 'falling' || actionHud.chute === 'big' }
-                                onMouseDown={ () => triggerBigParachute(0) }
+                                onPointerDown={ e => { e.preventDefault(); triggerBigParachute(0); } }
                                 title="Paracaídas grande — freno instantáneo (Tecla 1)"
                             >
-                                <img src={ ffBtnParachuteImg } alt="Paracaídas grande" className="ff-btn-sprite" />
+                                <FastFoodHudCircle variant="parachute" />
                                 <span className="ff-pu-key">1</span>
                                 <span className="ff-pu-count">{ actionHud.parachutesLeft }</span>
                             </button>
@@ -1982,10 +2104,10 @@ export const FastFoodGameView: FC = () =>
                                 type="button"
                                 className="ff-pu-circle-btn pos-missile"
                                 disabled={ !actionHud.canFireMissile }
-                                onMouseDown={ () => triggerMissile(0) }
+                                onPointerDown={ e => { e.preventDefault(); triggerMissile(0); } }
                                 title="Misil — destruye el plato rival en el aire (Tecla 2)"
                             >
-                                <img src={ ffBtnMissileImg } alt="Misil" className="ff-btn-sprite" />
+                                <FastFoodHudCircle variant="missile" />
                                 <span className="ff-pu-key">2</span>
                                 <span className="ff-pu-count">{ actionHud.missilesLeft }</span>
                             </button>
@@ -1994,10 +2116,10 @@ export const FastFoodGameView: FC = () =>
                                 type="button"
                                 className="ff-pu-circle-btn pos-shield"
                                 disabled={ actionHud.shieldsLeft <= 0 || actionHud.phase !== 'falling' || actionHud.shielded }
-                                onMouseDown={ () => triggerShield(0) }
+                                onPointerDown={ e => { e.preventDefault(); triggerShield(0); } }
                                 title="Escudo — protege contra misiles y golpes (Tecla 3)"
                             >
-                                <img src={ ffBtnShieldImg } alt="Escudo" className="ff-btn-sprite" />
+                                <FastFoodHudCircle variant="shield" />
                                 <span className="ff-pu-key">3</span>
                                 <span className="ff-pu-count">{ actionHud.shieldsLeft }</span>
                             </button>

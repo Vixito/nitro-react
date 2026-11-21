@@ -1,8 +1,8 @@
-import { AdjustmentFilter, ColorConverter, IRoomSession, NitroContainer, NitroSprite, NitroTexture, RoomBackgroundColorEvent, RoomEngineEvent, RoomEngineObjectEvent, RoomGeometry, RoomId, RoomObjectCategory, RoomObjectHSLColorEnabledEvent, RoomObjectOperationType, RoomSessionEvent, RoomVariableEnum, Vector3d } from '@nitrots/nitro-renderer';
-import { useEffect, useState } from 'react';
+import { AdjustmentFilter, ColorConverter, IRoomSession, NitroContainer, NitroSprite, NitroTexture, RoomBackgroundColorEvent, RoomEngineEvent, RoomEngineObjectEvent, RoomGeometry, RoomId, RoomObjectCategory, RoomObjectHSLColorEnabledEvent, RoomObjectOperationType, RoomSessionEvent, RoomVariableEnum, RoomVisualizationSettingsEvent, Vector3d } from '@nitrots/nitro-renderer';
+import { useEffect, useRef, useState } from 'react';
 import { useBetween } from 'use-between';
 import { CanManipulateFurniture, DispatchUiEvent, GetNitroInstance, GetRoomEngine, GetRoomSession, InitializeRoomInstanceRenderingCanvas, IsFurnitureSelectionDisabled, ProcessRoomObjectOperation, RoomWidgetUpdateBackgroundColorPreviewEvent, RoomWidgetUpdateRoomObjectEvent, SetActiveRoomId, StartRoomSession } from '../../api';
-import { useRoomEngineEvent, useRoomSessionManagerEvent, useUiEvent } from '../events';
+import { useMessageEvent, useRoomEngineEvent, useRoomSessionManagerEvent, useUiEvent } from '../events';
 
 const useRoomState = () =>
 {
@@ -10,6 +10,39 @@ const useRoomState = () =>
     const [ roomBackground, setRoomBackground ] = useState<NitroSprite>(null);
     const [ roomFilter, setRoomFilter ] = useState<AdjustmentFilter>(null);
     const [ originalRoomBackgroundColor, setOriginalRoomBackgroundColor ] = useState(0);
+    const visualizationSettingsRef = useRef<{ hideWalls: boolean, thicknessWall: number, thicknessFloor: number }>(null);
+
+    const applySavedVisualization = (targetRoomId: number) =>
+    {
+        const vis = visualizationSettingsRef.current;
+        if(!vis || targetRoomId <= 0) return;
+
+        const roomEngine = GetRoomEngine();
+        if(!roomEngine) return;
+
+        const appliedVis = roomEngine.updateRoomInstancePlaneVisibility(targetRoomId, !vis.hideWalls, true);
+        roomEngine.updateRoomInstancePlaneThickness(targetRoomId, vis.thicknessWall, vis.thicknessFloor);
+
+        if(appliedVis)
+        {
+            try { GetNitroInstance()?.application?.render(); } catch {}
+        }
+    };
+
+    useMessageEvent<RoomVisualizationSettingsEvent>(RoomVisualizationSettingsEvent, event =>
+    {
+        const parser = event.getParser();
+        if(!parser) return;
+
+        visualizationSettingsRef.current = {
+            hideWalls: Boolean(parser.hideWalls),
+            thicknessWall: parser.thicknessWall,
+            thicknessFloor: parser.thicknessFloor
+        };
+
+        const activeRoomId = GetRoomSession()?.roomId || GetRoomEngine()?.activeRoomId || -1;
+        if(activeRoomId > 0) applySavedVisualization(activeRoomId);
+    });
 
     const updateRoomBackgroundColor = (hue: number, saturation: number, lightness: number, original: boolean = false) =>
     {
@@ -91,8 +124,10 @@ const useRoomState = () =>
             case RoomEngineEvent.INITIALIZED:
                 SetActiveRoomId(event.roomId);
                 setRoomSession(session);
+                applySavedVisualization(event.roomId);
                 return;
             case RoomEngineEvent.DISPOSED:
+                visualizationSettingsRef.current = null;
                 setRoomSession(null);
                 return;
         }
@@ -279,6 +314,9 @@ const useRoomState = () =>
         stage.addChild(displayObject);
 
         SetActiveRoomId(roomSession.roomId);
+        applySavedVisualization(roomId);
+        const visTimer1 = setTimeout(() => applySavedVisualization(roomId), 150);
+        const visTimer2 = setTimeout(() => applySavedVisualization(roomId), 450);
 
         const resize = (event: UIEvent) =>
         {
@@ -303,6 +341,8 @@ const useRoomState = () =>
         return () =>
         {
             clearTimeout(scaleTimer);
+            clearTimeout(visTimer1);
+            clearTimeout(visTimer2);
             setRoomBackground(null);
             setRoomFilter(null);
             setOriginalRoomBackgroundColor(0);

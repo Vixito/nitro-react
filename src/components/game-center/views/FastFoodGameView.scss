@@ -881,6 +881,163 @@
             }
         }
     }
+
+    // =========================================================================
+    // RESPONSIVE / MOBILE ADAPTATION (LANDSCAPE & PORTRAIT PHONES + TABLETS)
+    // =========================================================================
+    @media (max-width: 980px), (max-height: 580px) {
+        .ff-top-left-bar {
+            top: max(8px, env(safe-area-inset-top));
+            left: max(8px, env(safe-area-inset-left));
+        }
+
+        .ff-exit-btn {
+            height: 30px;
+            padding: 0 10px;
+            font-size: 13px;
+        }
+
+        .ff-top-right-bar {
+            top: max(8px, env(safe-area-inset-top));
+            right: max(8px, env(safe-area-inset-right));
+            gap: 6px;
+        }
+
+        .ff-gold-circle-btn {
+            width: 46px;
+            height: 46px;
+        }
+
+        .ff-lobby-shell {
+            align-items: flex-start;
+            padding: 56px 14px 20px;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+
+            &::before,
+            &::after {
+                display: none;
+            }
+        }
+
+        .ff-lobby-grid {
+            gap: 12px;
+            align-items: start;
+        }
+
+        .ff-lobby-col-title {
+            font-size: 13.5px;
+            margin-bottom: 6px;
+        }
+
+        .ff-power-card,
+        .ff-rule-card {
+            padding: 8px 10px;
+            gap: 5px;
+        }
+
+        .ff-power-card .ff-power-bottom {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .ff-power-card .ff-buy-btn {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        .ff-center-col {
+            gap: 8px;
+
+            .ff-logo-img {
+                width: 175px;
+            }
+
+            .ff-vignette-window {
+                width: 128px;
+                height: 146px;
+                padding: 10px 0 8px;
+            }
+
+            .ff-play-btn {
+                width: 176px;
+                height: 44px;
+                font-size: 18px;
+            }
+        }
+
+        .ff-action-hud {
+            left: max(8px, env(safe-area-inset-left));
+            top: 48px;
+            transform: scale(0.68);
+            transform-origin: top left;
+        }
+
+        .ff-countdown-overlay .ff-countdown-num {
+            font-size: 62px;
+        }
+
+        .ff-results-backdrop {
+            padding: 10px;
+            align-items: flex-start;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .ff-clipboard {
+            max-width: min(440px, calc(100vw - 20px));
+            margin: auto;
+            padding: 16px 12px 12px;
+
+            .ff-paper {
+                padding: 12px;
+                gap: 8px;
+
+                .ff-paper-logo {
+                    width: 110px;
+                }
+
+                .ff-paper-verdict {
+                    font-size: 20px;
+                }
+            }
+        }
+
+        .ff-modal-box {
+            max-height: calc(100dvh - 24px);
+            display: flex;
+            flex-direction: column;
+
+            .ff-modal-body {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    }
+
+    @media (max-width: 720px) {
+        .ff-lobby-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .ff-center-col {
+            order: -1;
+        }
+
+        .ff-action-hud {
+            transform: scale(0.6);
+            top: 46px;
+        }
+    }
+}
+
+body.is-mobile-ui .fastfood-game-root {
+    z-index: 1300;
+
+    .ff-hotkey-tag,
+    .ff-pu-key {
+        display: none;
+    }
 }
 
 @keyframes ff-float {
