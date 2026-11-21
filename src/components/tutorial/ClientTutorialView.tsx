@@ -214,25 +214,30 @@ export const ClientTutorialView: FC<{}> = () =>
     };
     let arrowDir: 'left' | 'bottom' | 'none' = 'none';
 
+    const balloonWidth = 268;
     if(targetRect)
     {
         if(targetRect.isVerticalBar)
         {
             const centerY = targetRect.top + (targetRect.height / 2);
-            const clampedTop = Math.max(20, Math.min(window.innerHeight - 210, centerY - 70));
+            const clampedTop = Math.max(16, Math.min(window.innerHeight - 210, Math.round(centerY - 72)));
+            const arrowY = Math.max(18, Math.min(150, Math.round(centerY - clampedTop)));
             balloonStyle = {
-                left: `${ targetRect.left + targetRect.width + 18 }px`,
-                top: `${ clampedTop }px`
+                left: `${ Math.round(targetRect.left + targetRect.width + 16) }px`,
+                top: `${ clampedTop }px`,
+                ['--arrow-y' as any]: `${ arrowY }px`
             };
             arrowDir = 'left';
         }
         else
         {
             const centerX = targetRect.left + (targetRect.width / 2);
-            const clampedLeft = Math.max(16, Math.min(window.innerWidth - 285, centerX - 135));
+            const clampedLeft = Math.max(12, Math.min(window.innerWidth - balloonWidth - 12, Math.round(centerX - (balloonWidth / 2))));
+            const arrowX = Math.max(18, Math.min(balloonWidth - 18, Math.round(centerX - clampedLeft)));
             balloonStyle = {
                 left: `${ clampedLeft }px`,
-                bottom: `${ Math.max(70, window.innerHeight - targetRect.top + 16) }px`
+                bottom: `${ Math.max(66, Math.round(window.innerHeight - targetRect.top + 14)) }px`,
+                ['--arrow-x' as any]: `${ arrowX }px`
             };
             arrowDir = 'bottom';
         }

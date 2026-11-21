@@ -7187,7 +7187,7 @@ body[data-era="flash2012"] {
         &.arrow-bottom::after {
             content: '' !important;
             position: absolute !important;
-            left: 50% !important;
+            left: var(--arrow-x, 50%) !important;
             bottom: -10px !important;
             transform: translateX(-50%) !important;
             width: 0 !important;
@@ -7201,7 +7201,8 @@ body[data-era="flash2012"] {
             content: '' !important;
             position: absolute !important;
             left: -10px !important;
-            top: 56px !important;
+            top: var(--arrow-y, 56px) !important;
+            transform: translateY(-50%) !important;
             width: 0 !important;
             height: 0 !important;
             border-top: 10px solid transparent !important;
