@@ -14,6 +14,19 @@
     }
 }
 
+.nitro-notification-bubbles-overlay {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    width: 220px;
+    z-index: 10050;
+    pointer-events: none;
+
+    .nitro-notification-bubble {
+        pointer-events: auto;
+    }
+}
+
 .nitro-alert-backdrop {
     position: fixed;
     top: 0;

@@ -2,7 +2,7 @@ import { FC, ReactNode, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { NotificationAlertType, NotificationBubbleType } from '../../api';
 import { Column } from '../../common';
-import { useNotification } from '../../hooks';
+import { useGameCenter, useNotification } from '../../hooks';
 import { GetAlertLayout } from './views/alert-layouts/GetAlertLayout';
 import { GetBubbleLayout } from './views/bubble-layouts/GetBubbleLayout';
 import { GetConfirmLayout } from './views/confirm-layouts/GetConfirmLayout';
@@ -10,6 +10,8 @@ import { GetConfirmLayout } from './views/confirm-layouts/GetConfirmLayout';
 export const NotificationCenterView: FC<{}> = props =>
 {
     const { alerts = [], bubbleAlerts = [], confirms = [], closeAlert = null, closeBubbleAlert = null, closeConfirm = null } = useNotification();
+    const { isVisible: isGameCenterVisible, isSnowStormPlaying, isBattleBallPlaying, isWobbleSquabblePlaying, isFastFoodPlaying } = useGameCenter();
+    const isGameCenterOverlayOpen = isGameCenterVisible || isSnowStormPlaying || isBattleBallPlaying || isWobbleSquabblePlaying || isFastFoodPlaying;
 
     const getAlerts = useMemo(() =>
     {
@@ -81,15 +83,26 @@ export const NotificationCenterView: FC<{}> = props =>
 
     const container = typeof document !== 'undefined' ? (document.getElementById('draggable-windows-container') || document.body) : null;
 
+    const bubbleLayer = (
+        <Column gap={ 1 }>
+            { getBubbleAlerts }
+        </Column>
+    );
+
     return (
         <>
             { (hasModal && container) && createPortal(
                 <div className="nitro-alert-backdrop" />,
                 container
             ) }
-            <Column gap={ 1 }>
-                { getBubbleAlerts }
-            </Column>
+            { (isGameCenterOverlayOpen && typeof document !== 'undefined')
+                ? createPortal(
+                    <div className="nitro-notification-bubbles-overlay">
+                        { bubbleLayer }
+                    </div>,
+                    document.body
+                )
+                : bubbleLayer }
             { getConfirms }
             { getAlerts }
         </>
