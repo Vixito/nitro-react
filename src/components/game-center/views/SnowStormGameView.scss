@@ -969,6 +969,13 @@
 }
 
 @media (max-width: 960px), (max-height: 540px) {
+    .ss-hud-top-left {
+        top: 4px;
+        left: 6px;
+        transform: scale(0.82);
+        transform-origin: top left;
+    }
+
     .ss-hud-top-right {
         top: 4px;
         right: 6px;
@@ -978,7 +985,8 @@
 
     .ss-hud-snowballs {
         left: 4px;
-        transform: translateY(-50%) scale(0.78);
+        top: 46%;
+        transform: translateY(-50%) scale(0.74);
         transform-origin: left center;
     }
 
@@ -990,10 +998,11 @@
     }
 
     .ss-hud-bottom-center {
-        bottom: 6px;
+        top: 6px;
+        bottom: auto;
 
         .ss-chat-form input {
-            width: 140px;
+            width: 120px;
         }
 
         .ss-controls-bar {
@@ -1077,6 +1086,7 @@
 
 .ss-leave-actions {
     display: flex;
+    align-items: stretch;
     justify-content: space-between;
     gap: 10px;
     padding: 4px 16px 14px;
@@ -1087,22 +1097,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
-    height: 25px;
-    padding: 0 12px 1px;
+    flex: 1 1 0;
+    width: 0;
+    height: 32px;
+    min-height: 32px;
+    padding: 0 12px;
     line-height: 1;
-    background-color: transparent;
-        background-image:
-            url('@/assets/images/eras/habborator/button-18-left.png'),
-            url('@/assets/images/eras/habborator/button-18-right.png'),
-            url('@/assets/images/eras/habborator/button-18-mid.png');
-        background-position: left top, right top, 4px top;
-        background-repeat: no-repeat, no-repeat, no-repeat;
-        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100%;
-        image-rendering: pixelated;
-        border: none;
-        border-radius: 0;
-        box-shadow: none;
+    white-space: nowrap;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid #000000;
+    border-bottom-width: 2px;
+    background: #e4e4e4;
+    box-shadow: inset 0 1px 0 #ffffff;
     color: #141414;
     font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
     font-size: 11.5px;
@@ -1110,7 +1117,7 @@
     cursor: pointer;
 
     &:hover {
-        filter: brightness(1.05);
+        filter: brightness(1.04);
     }
 
     &:active {
@@ -1119,14 +1126,24 @@
 }
 
 .ss-btn-danger {
-    flex: 1;
-    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    width: 0;
+    height: 32px;
+    min-height: 32px;
+    padding: 0 12px;
+    line-height: 1;
+    white-space: nowrap;
+    box-sizing: border-box;
     border-radius: 4px;
     border: 1px solid #000000;
     border-bottom-width: 2px;
-    background: linear-gradient(180deg, #eb6c2e 0%, #eb6c2e 50%, #cc4f16 50%, #cc4f16 100%);
-    box-shadow: inset 0 1px 0 rgba(255, 224, 196, 0.7);
+    background: #d9521e;
+    box-shadow: none;
     color: #ffffff;
+    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
     font-size: 11.5px;
     font-weight: 800;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45) !important;

@@ -862,6 +862,7 @@ export const BattleBallGameView: FC = () =>
     const audioRef = useRef<BattleBallAudio>(new BattleBallAudio());
     const keysRef = useRef<Set<string>>(new Set());
     const joyVecRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const joyPendingTapRef = useRef<{ x: number; y: number } | null>(null);
 
     // Preloaded assets: all 5 official arena backdrops, power-ups, and seated Habbo avatars
     const backdropImgsRef = useRef<Record<number, HTMLImageElement>>({});
@@ -1917,8 +1918,14 @@ export const BattleBallGameView: FC = () =>
                     else if (k.has('KeyD') || k.has('ArrowRight')) kdx = 1;
                     else
                     {
-                        const jx = joyVecRef.current.x;
-                        const jy = joyVecRef.current.y;
+                        let jx = joyVecRef.current.x;
+                        let jy = joyVecRef.current.y;
+                        if (Math.hypot(jx, jy) <= 0.18 && joyPendingTapRef.current)
+                        {
+                            jx = joyPendingTapRef.current.x;
+                            jy = joyPendingTapRef.current.y;
+                            joyPendingTapRef.current = null;
+                        }
                         if (Math.hypot(jx, jy) > 0.18)
                         {
                             const isoX = jx * 0.5 + jy;
@@ -2553,7 +2560,23 @@ export const BattleBallGameView: FC = () =>
                     { stage === 'playing' && (
                         <MobileJoystick
                             className="is-battleball"
-                            onVectorChange={ (vx, vy) => { joyVecRef.current = { x: vx, y: vy }; } }
+                            onVectorChange={ (vx, vy, phase) =>
+                            {
+                                if (phase === 'end')
+                                {
+                                    joyVecRef.current = { x: 0, y: 0 };
+                                    return;
+                                }
+                                joyVecRef.current = { x: vx, y: vy };
+                                if (phase === 'start' && Math.hypot(vx, vy) > 0.18)
+                                {
+                                    joyPendingTapRef.current = { x: vx, y: vy };
+                                }
+                                else if (phase === 'move')
+                                {
+                                    joyPendingTapRef.current = null;
+                                }
+                            } }
                         />
                     ) }
                     { stage === 'playing' && puToast && (

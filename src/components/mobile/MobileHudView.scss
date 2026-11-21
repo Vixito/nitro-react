@@ -617,12 +617,23 @@
     }
 
     &.is-snowstorm {
-        bottom: calc(14px + env(safe-area-inset-bottom));
+        width: 96px;
+        height: 96px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
         z-index: 10020;
 
+        .hmob-joy-knob {
+            width: 38px;
+            height: 38px;
+        }
+
+        &.is-right {
+            right: max(10px, env(safe-area-inset-right));
+        }
+
         &.is-left {
-            left: max(10px, env(safe-area-inset-left));
-            bottom: calc(74px + env(safe-area-inset-bottom));
+            left: calc(122px + env(safe-area-inset-left));
+            bottom: calc(8px + env(safe-area-inset-bottom));
         }
     }
 

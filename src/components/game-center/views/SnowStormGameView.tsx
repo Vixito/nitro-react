@@ -557,6 +557,12 @@ export const SnowStormGameView: FC = () =>
     const audioRef = useRef<SnowStormAudio>(new SnowStormAudio());
     const keysRef = useRef<Set<string>>(new Set());
     const joyVecRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+    const joySessionRef = useRef<{ startedAt: number; moved: boolean; startVx: number; startVy: number }>({
+        startedAt: 0,
+        moved: false,
+        startVx: 0,
+        startVy: 0
+    });
     const chatInputRef = useRef<HTMLInputElement | null>(null);
 
     // Loaded sprite images
@@ -2350,7 +2356,63 @@ export const SnowStormGameView: FC = () =>
                     {/* Bottom-Left Player Head + Green HP Bar + Score Circle */}
                     <MobileJoystick
                         className="is-snowstorm"
-                        onVectorChange={ (vx, vy) => { joyVecRef.current = { x: vx, y: vy }; } }
+                        onVectorChange={ (vx, vy, phase) =>
+                        {
+                            const eng = engineRef.current;
+                            const me = eng?.fighters.find(f => f.isHuman);
+
+                            if (phase === 'start')
+                            {
+                                joySessionRef.current = {
+                                    startedAt: Date.now(),
+                                    moved: false,
+                                    startVx: vx,
+                                    startVy: vy
+                                };
+                                joyVecRef.current = { x: vx, y: vy };
+                                if (me)
+                                {
+                                    me.targetX = null;
+                                    me.targetY = null;
+                                }
+                                return;
+                            }
+
+                            if (phase === 'move')
+                            {
+                                joySessionRef.current.moved = true;
+                                joyVecRef.current = { x: vx, y: vy };
+                                return;
+                            }
+
+                            // phase === 'end'
+                            joyVecRef.current = { x: 0, y: 0 };
+                            const sess = joySessionRef.current;
+                            const elapsed = Date.now() - sess.startedAt;
+                            const isQuickTap = !sess.moved && elapsed < 210 && Math.hypot(sess.startVx, sess.startVy) > 0.18;
+
+                            if (me && eng && eng.running && me.koTimer <= 0)
+                            {
+                                if (isQuickTap)
+                                {
+                                    // Quick tap on an arrow -> walk cleanly 1 tile in that direction and stop
+                                    const gxDir = sess.startVx + sess.startVy;
+                                    const gyDir = sess.startVy - sess.startVx;
+                                    const len = Math.hypot(gxDir, gyDir) || 1;
+                                    me.reloading = false;
+                                    me.targetX = Math.max(0.3, Math.min(GRID_SIZE - 0.3, me.x + (gxDir / len) * 0.95));
+                                    me.targetY = Math.max(0.3, Math.min(GRID_SIZE - 0.3, me.y + (gyDir / len) * 0.95));
+                                }
+                                else
+                                {
+                                    // Released after holding/dragging -> immediate full stop
+                                    me.targetX = null;
+                                    me.targetY = null;
+                                    me.vx = 0;
+                                    me.vy = 0;
+                                }
+                            }
+                        } }
                     />
                     <div className="ss-hud-bottom-left">
                         <div className="ss-hud-my-head">

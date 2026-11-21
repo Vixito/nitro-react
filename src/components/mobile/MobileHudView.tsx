@@ -27,7 +27,7 @@ import { LayoutCurrencyIcon } from '../../common';
 import { useAchievements, useChatInputWidget, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useNavigator, usePurse, useRoom, useSessionInfo } from '../../hooks';
 import { useMobileTouchMode } from '../../hooks/mobile/useIsMobile';
 import { HabboHeadImg } from '../game-center/views/SnowStormAvatar';
-import { MobileJoystick } from './MobileJoystick';
+import { MobileJoystick, JoystickPhase } from './MobileJoystick';
 import './MobileHudView.scss';
 
 interface MobileHudViewProps
@@ -98,7 +98,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         return { x: Math.round(loc.x), y: Math.round(loc.y), roomId };
     }, [ roomSession ]);
 
-    const sendContinuousWalk = useCallback((dx: number, dy: number, force = false) =>
+    const sendContinuousWalk = useCallback((dx: number, dy: number, maxSteps: number) =>
     {
         const pos = getMyAvatarTile();
         if(!pos) return;
@@ -108,13 +108,12 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         let targetX = pos.x + dx;
         let targetY = pos.y + dy;
 
-        // Look ahead up to 4 open walkable floor tiles along the ray so Arcturus walks continuously with ZERO pauses
-        if(hmap && typeof hmap.validateLocation === 'function')
+        if(maxSteps > 1 && hmap && typeof hmap.validateLocation === 'function')
         {
             const baseH = hmap.getTileHeight(pos.x, pos.y);
             let bestK = 0;
 
-            for(let k = 1; k <= 4; k++)
+            for(let k = 1; k <= maxSteps; k++)
             {
                 const tx = pos.x + dx * k;
                 const ty = pos.y + dy * k;
@@ -128,30 +127,21 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                 targetX = pos.x + dx * bestK;
                 targetY = pos.y + dy * bestK;
             }
-            else
-            {
-                targetX = pos.x + dx;
-                targetY = pos.y + dy;
-            }
         }
-        else
+        else if(maxSteps > 1)
         {
-            targetX = Math.max(0, pos.x + dx * 3);
-            targetY = Math.max(0, pos.y + dy * 3);
+            targetX = Math.max(0, pos.x + dx * maxSteps);
+            targetY = Math.max(0, pos.y + dy * maxSteps);
         }
 
         if(targetX < 0 || targetY < 0) return;
 
-        const now = Date.now();
-        const last = joyLastSentRef.current;
-        if(!force && last.x === targetX && last.y === targetY && (now - last.at) < 420) return;
-
-        joyLastSentRef.current = { x: targetX, y: targetY, at: now };
+        joyLastSentRef.current = { x: targetX, y: targetY, at: Date.now() };
         joyWasMovingRef.current = true;
         SendMessageComposer(new RoomUnitWalkComposer(targetX, targetY));
     }, [ getMyAvatarTile ]);
 
-    const stopJoystickWalk = useCallback((haltAvatar = false) =>
+    const stopJoystickWalk = useCallback(() =>
     {
         if(joyIntervalRef.current)
         {
@@ -159,24 +149,14 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
             joyIntervalRef.current = null;
         }
         joyDirRef.current = null;
+        joyWasMovingRef.current = false;
+    }, []);
 
-        if(haltAvatar && joyWasMovingRef.current)
-        {
-            joyWasMovingRef.current = false;
-            const pos = getMyAvatarTile();
-            if(pos)
-            {
-                joyLastSentRef.current = { x: pos.x, y: pos.y, at: Date.now() };
-                SendMessageComposer(new RoomUnitWalkComposer(pos.x, pos.y));
-            }
-        }
-    }, [ getMyAvatarTile ]);
-
-    const handleRoomJoystickVector = useCallback((nx: number, ny: number) =>
+    const handleRoomJoystickVector = useCallback((nx: number, ny: number, phase: JoystickPhase) =>
     {
-        if(nx === 0 && ny === 0)
+        if(phase === 'end' || (nx === 0 && ny === 0))
         {
-            stopJoystickWalk(true);
+            stopJoystickWalk();
             return;
         }
 
@@ -197,18 +177,24 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         const dirChanged = !prev || prev.dx !== dx || prev.dy !== dy;
         joyDirRef.current = { dx, dy };
 
-        if(dirChanged)
+        // Quick tap -> exactly 1 tile so user can step 1-by-1 cleanly AND stops immediately when released
+        if(phase === 'start')
         {
-            sendContinuousWalk(dx, dy, true);
+            sendContinuousWalk(dx, dy, 1);
+        }
+        else if(dirChanged && (Date.now() - joyLastSentRef.current.at) >= 510)
+        {
+            sendContinuousWalk(dx, dy, 2);
         }
 
+        // While held/dragged -> refresh 2 tiles ahead every 520ms (matches Arcturus 500ms walk rate limit for zero pauses & instant stop on release!)
         if(!joyIntervalRef.current)
         {
             joyIntervalRef.current = window.setInterval(() =>
             {
                 const cur = joyDirRef.current;
-                if(cur) sendContinuousWalk(cur.dx, cur.dy, false);
-            }, 260);
+                if(cur) sendContinuousWalk(cur.dx, cur.dy, 2);
+            }, 520);
         }
     }, [ sendContinuousWalk, stopJoystickWalk ]);
 
@@ -216,11 +202,11 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     {
         if(!isInRoom)
         {
-            stopJoystickWalk(false);
+            stopJoystickWalk();
             setChatBarOpen(false);
             setSideDrawerOpen(false);
         }
-        return () => stopJoystickWalk(false);
+        return () => stopJoystickWalk();
     }, [ isInRoom, stopJoystickWalk ]);
 
     useEffect(() =>
