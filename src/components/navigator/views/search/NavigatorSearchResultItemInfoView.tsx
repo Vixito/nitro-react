@@ -151,7 +151,7 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
             <Overlay show={ isVisible } target={ elementRef.current } placement="right" rootClose={ !isModern } onHide={ () => setIsVisible(false) }>
                 <Popover
                     className={ `navigator-room-info-popover ${ isFlash2012 ? 'navigator-room-info-popover-2012' : '' }` }
-                    style={ { zIndex: 1085 } }
+                    style={ isFlash2012 ? { zIndex: 1085, width: '382px', minWidth: '382px', maxWidth: '382px' } : { zIndex: 1085 } }
                     onMouseEnter={ handleMouseEnter }
                     onMouseLeave={ handleMouseLeave }
                     onClick={ event => event.stopPropagation() }
