@@ -391,6 +391,10 @@ body.is-mobile-ui {
                 overflow-x: hidden !important;
                 -webkit-overflow-scrolling: touch !important;
                 touch-action: pan-y !important;
+
+                .bp-level-row {
+                    flex-shrink: 0 !important;
+                }
             }
         }
 
@@ -402,6 +406,12 @@ body.is-mobile-ui {
             > .d-flex:first-child {
                 flex-wrap: wrap !important;
                 gap: 8px !important;
+
+                .position-relative {
+                    width: auto !important;
+                    flex: 1 1 130px !important;
+                    max-width: 200px !important;
+                }
             }
 
             .row {
@@ -428,17 +438,34 @@ body.is-mobile-ui {
                 }
             }
 
-            .bp-mission-row {
-                flex-wrap: wrap !important;
-                gap: 8px !important;
-                padding: 10px !important;
-                overflow: hidden !important;
+            // En vista de categoría de retos: sin caja anidada que aplaste filas; el contenedor principal scrollea todo
+            .overflow-auto {
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+                padding-right: 0 !important;
             }
 
-            .overflow-auto {
-                max-height: 300px !important;
-                -webkit-overflow-scrolling: touch !important;
-                touch-action: pan-y !important;
+            .bp-mission-row {
+                flex-shrink: 0 !important;
+                flex-wrap: wrap !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+                padding: 10px 12px !important;
+                height: auto !important;
+                overflow: hidden !important;
+
+                .flex-grow-1 {
+                    flex: 1 1 160px !important;
+                    min-width: 0 !important;
+                }
+
+                .text-truncate {
+                    white-space: normal !important;
+                    overflow: visible !important;
+                    text-overflow: unset !important;
+                    word-break: break-word !important;
+                }
             }
         }
 
@@ -455,6 +482,297 @@ body.is-mobile-ui {
             max-height: calc(100dvh - 24px) !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch !important;
+        }
+    }
+
+    // ── VISTA DEL HOTEL EN MÓVIL (NITIDEZ + ÍCONOS COMPLETOS SIN RECORTES) ──
+    .hmob-hotel-view {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+        background:
+            repeating-linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.025) 0px,
+                rgba(255, 255, 255, 0.025) 2px,
+                rgba(0, 0, 0, 0.035) 2px,
+                rgba(0, 0, 0, 0.035) 4px
+            ),
+            linear-gradient(180deg, #0d69a8 0%, #0a4d7c 58%, #072d4d 100%) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        .hmob-hv-stage {
+            width: 100%;
+            height: 100%;
+            max-width: 900px;
+            padding: calc(48px + env(safe-area-inset-top)) 20px calc(66px + env(safe-area-inset-bottom));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            box-sizing: border-box;
+        }
+
+        .hmob-hv-art-wrap {
+            flex: 1 1 46%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            pointer-events: none;
+        }
+
+        .hmob-hv-art {
+            display: block;
+            width: auto !important;
+            height: auto !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            object-fit: contain !important;
+            image-rendering: auto !important;
+            filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.42));
+        }
+
+        .hmob-hv-actions {
+            flex: 0 1 320px;
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            z-index: 2;
+        }
+
+        .hmob-hv-title {
+            margin: 0 0 6px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+            font-family: 'Ubuntu', -apple-system, sans-serif;
+            line-height: 1.2;
+        }
+
+        .hmob-hv-btn {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1.5px solid rgba(165, 224, 250, 0.45);
+            background: rgba(11, 56, 84, 0.72);
+            color: #ffffff;
+            font-family: 'Ubuntu', -apple-system, sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.12s ease, transform 0.08s ease;
+
+            &:active {
+                background: rgba(20, 92, 134, 0.88);
+                transform: translateY(1px);
+            }
+        }
+
+        .hmob-hv-btn-ico {
+            width: 34px;
+            height: 30px;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+
+            img {
+                display: block;
+                width: auto !important;
+                height: auto !important;
+                max-width: 100% !important;
+                max-height: 100% !important;
+                object-fit: contain !important;
+                image-rendering: pixelated;
+            }
+        }
+
+        @media (orientation: portrait) and (max-width: 600px) {
+            .hmob-hv-stage {
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .hmob-hv-art-wrap {
+                flex: 0 1 36%;
+                max-height: 220px;
+                width: 100%;
+            }
+        }
+    }
+
+    // ── TIENDA / CATÁLOGO EN MÓVIL: SCROLL FLUIDO EN INICIO (VOUCHER) Y CATEGORÍAS ──
+    .nitro-catalog {
+        width: min(720px, calc(100vw - 12px)) !important;
+        height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+
+        > .content-area {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+
+            > .grid {
+                height: auto !important;
+                min-height: 100% !important;
+                align-items: start !important;
+            }
+
+            > .grid > .g-col-3 {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                max-height: calc(100dvh - 150px) !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+
+            > .grid > .g-col-9,
+            > .grid > .g-col-12 {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 0 !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+
+                // Desbloquear h-100 y overflow-hidden internos (Inicio con voucher + descripciones de categorías)
+                .grid {
+                    height: auto !important;
+                    min-height: 0 !important;
+                }
+
+                .h-100 {
+                    height: auto !important;
+                }
+
+                > .grid > .g-col-5,
+                > .grid > .g-col-7 {
+                    height: auto !important;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    justify-content: flex-start !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    touch-action: pan-y !important;
+                    padding-bottom: 10px !important;
+                }
+
+                // Banner izquierdo de Inicio más compacto en móvil para dejar el voucher accesible al hacer scroll
+                .g-col-5 > div[style*='345px'] {
+                    min-height: 170px !important;
+                    height: 170px !important;
+                }
+
+                img {
+                    max-width: 100%;
+                    object-fit: contain;
+                }
+            }
+        }
+    }
+
+    // ── CAMBIAR DE LOOK (AVATAR EDITOR) EN MÓVIL: AVATAR COMPLETO + SCROLL ──
+    .nitro-avatar-editor {
+        width: min(700px, calc(100vw - 12px)) !important;
+        height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+
+        > .content-area {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+
+            > .grid {
+                height: auto !important;
+                min-height: 100% !important;
+                align-items: start !important;
+            }
+
+            > .grid > .g-col-9 {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                max-height: calc(100dvh - 150px) !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+
+            > .grid > .g-col-3 {
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                height: auto !important;
+                min-height: 0 !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+                padding-bottom: 6px !important;
+            }
+        }
+
+        .figure-preview-container {
+            min-height: 185px !important;
+            height: 185px !important;
+            flex: 0 0 185px !important;
+            overflow: hidden !important;
+
+            .avatar-image {
+                bottom: 16px !important;
+                transform: scale(0.76) !important;
+                transform-origin: center bottom !important;
+            }
+
+            .avatar-shadow {
+                bottom: 12px !important;
+            }
+
+            .arrow-container {
+                bottom: 6px !important;
+                padding: 0 6px !important;
+            }
+        }
+    }
+
+    // ── POPOVER DE INFO DE SALA DEL NAVEGADOR EN MÓVIL: SIN RECORTES ──
+    .navigator-room-info-popover,
+    .navigator-room-info-popover-mobile {
+        width: min(330px, calc(100vw - 20px)) !important;
+        max-width: min(330px, calc(100vw - 20px)) !important;
+        max-height: calc(100dvh - 84px) !important;
+        overflow: hidden !important;
+        z-index: 1200 !important;
+
+        .room-info {
+            max-height: calc(100dvh - 96px) !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+            padding: 10px !important;
+
+            > .d-flex {
+                overflow: visible !important;
+                align-items: flex-start !important;
+            }
+
+            .room-thumbnail {
+                width: 84px !important;
+                min-width: 84px !important;
+                height: 84px !important;
+                background-size: cover !important;
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 import { NitroSettingsEvent, UserSettingsEvent, UserSettingsSoundComposer } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import { ChatMessageTypeEnum, CreateLinkEvent, DispatchMainEvent, GetRoomEngine, GetSessionDataManager, MessengerIconState, OpenMessengerChat, SendMessageComposer, VisitDesktop } from '../../api';
+import { ChatMessageTypeEnum, CreateLinkEvent, DispatchMainEvent, GetRoomEngine, GetSessionDataManager, MessengerIconState, OpenMessengerChat, SendMessageComposer, TryVisitRoom, VisitDesktop } from '../../api';
 import iconAchievements from '../../assets/images/eras/flash2012/memenu/achievements_color.png';
 import iconClothes from '../../assets/images/eras/flash2012/memenu/clothes_color.png';
 import iconProfile from '../../assets/images/eras/flash2012/memenu/profile_color.png';
@@ -24,7 +24,7 @@ import iconChatHistory from '../../assets/images/toolbar/icons/me-menu/chat-hist
 import iconHelp from '../../assets/images/toolbar/icons/me-menu/helper-tool.png';
 import iconModTools from '../../assets/images/toolbar/icons/modtools.png';
 import { LayoutCurrencyIcon } from '../../common';
-import { useAchievements, useChatInputWidget, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, usePurse, useRoom, useSessionInfo } from '../../hooks';
+import { useAchievements, useChatInputWidget, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useNavigator, usePurse, useRoom, useSessionInfo } from '../../hooks';
 import { useMobileTouchMode } from '../../hooks/mobile/useIsMobile';
 import { HabboHeadImg } from '../game-center/views/SnowStormAvatar';
 import './MobileHudView.scss';
@@ -43,6 +43,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     const { getCurrencyAmount = null } = usePurse();
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
+    const { navigatorData = null } = useNavigator();
     const { roomSession = null } = useRoom();
     const { sendChat = null, setIsTyping = null, setIsIdle = null } = useChatInputWidget();
     const [ touchMode, setTouchMode ] = useMobileTouchMode();
@@ -136,19 +137,6 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         }
     };
 
-    const toggleFullscreen = () =>
-    {
-        try
-        {
-            if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-            else document.exitFullscreen?.();
-        }
-        catch
-        {
-            // ignore
-        }
-    };
-
     const handleSendChat = (e: FormEvent) =>
     {
         e.preventDefault();
@@ -226,14 +214,6 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                     <button type="button" onClick={ toggleSound }>
                         <span className="hmob-menu-ico"><img src={ isSoundActive ? iconSoundOn : iconSoundOff } alt="" /></span>
                         <span>{ isSoundActive ? 'Silenciar Sonido' : 'Activar Sonido' }</span>
-                    </button>
-                    <button type="button" onClick={ () => { closePopovers(); toggleFullscreen(); } }>
-                        <span className="hmob-menu-ico">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M2 6V2H6M10 2H14V6M14 10V14H10M6 14H2V10" stroke="#7dd3fc" strokeWidth="2" strokeLinecap="square" />
-                            </svg>
-                        </span>
-                        <span>Pantalla Completa</span>
                     </button>
                     <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('games/toggle'); } }>
                         <span className="hmob-menu-ico"><img src={ iconGame } alt="" /></span>
@@ -397,19 +377,29 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
             {/* DOCK INFERIOR FLOTANTE CON LOS SPRITES ORIGINALES DE HABBO MOBILE */}
             <div className="hmob-bottom-bar">
                 <div className="hmob-dock-left">
-                    {/* 1. Puerta de Salida / Vista Hotel */}
+                    {/* 1. Puerta de Salida (en sala) / Ir a mi Sala Recibidor (en vista del hotel) */}
                     <button
                         type="button"
                         className="hmob-dock-btn"
                         onClick={ () =>
                         {
                             closePopovers();
-                            if(isInRoom) VisitDesktop();
-                            else CreateLinkEvent('navigator/toggle');
+                            if(isInRoom)
+                            {
+                                VisitDesktop();
+                            }
+                            else if(navigatorData && navigatorData.homeRoomId > 0)
+                            {
+                                TryVisitRoom(navigatorData.homeRoomId);
+                            }
+                            else
+                            {
+                                CreateLinkEvent('navigator/toggle');
+                            }
                         } }
-                        title={ isInRoom ? 'Salir a la Vista del Hotel' : 'Explorar Salas' }
+                        title={ isInRoom ? 'Salir a la Vista del Hotel' : 'Ir a mi sala principal' }
                     >
-                        <img src={ mobExitImg } alt="Salir" className="hmob-dock-sprite" />
+                        <img src={ mobExitImg } alt={ isInRoom ? 'Salir' : 'Mi sala' } className="hmob-dock-sprite" />
                     </button>
 
                     {/* 2. Navegador de Salas */}

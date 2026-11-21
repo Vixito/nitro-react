@@ -6,6 +6,7 @@ import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer } from '.
 import { Base, Column, Flex, LayoutBadgeImageView, LayoutRoomThumbnailView, NitroCardContentView, Text, UserProfileIconView } from '../../../../common';
 import { useHelp, useNavigator } from '../../../../hooks';
 import { useEraTheme } from '../../../../hooks/era/useEraTheme';
+import { useIsMobile } from '../../../../hooks/mobile/useIsMobile';
 import iconHeartOutlineImg from '../../../../assets/images/eras/flash2012/navigator/icon_heart_outline.png';
 import iconHeartFilledImg from '../../../../assets/images/eras/flash2012/navigator/icon_heart_filled.png';
 import iconHomeOutlineImg from '../../../../assets/images/eras/flash2012/navigator/icon_home_outline.png';
@@ -22,8 +23,9 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
 {
     const { roomData = null } = props;
     const { currentEra } = useEraTheme();
-    const isModern = currentEra === 'modern';
-    const isFlash2012 = currentEra === 'flash2012';
+    const isMobile = useIsMobile();
+    const isModern = currentEra === 'modern' && !isMobile;
+    const isFlash2012 = currentEra === 'flash2012' && !isMobile;
     const { navigatorData = null } = useNavigator();
     const { report = null } = useHelp();
     const [ isVisible, setIsVisible ] = useState(false);
@@ -152,9 +154,9 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
                 } }
                 onMouseDown={ event => event.stopPropagation() }
             />
-            <Overlay show={ isVisible } target={ elementRef.current } placement="right" rootClose={ !isModern } onHide={ () => setIsVisible(false) }>
+            <Overlay show={ isVisible } target={ elementRef.current } placement={ isMobile ? 'auto' : 'right' } rootClose={ !isModern } onHide={ () => setIsVisible(false) }>
                 <Popover
-                    className={ `navigator-room-info-popover ${ isFlash2012 ? 'navigator-room-info-popover-2012' : '' }` }
+                    className={ `navigator-room-info-popover ${ isFlash2012 ? 'navigator-room-info-popover-2012' : '' } ${ isMobile ? 'navigator-room-info-popover-mobile' : '' }` }
                     style={ isFlash2012 ? { zIndex: 1085, width: '382px', minWidth: '382px', maxWidth: '382px' } : { zIndex: 1085 } }
                     onMouseEnter={ handleMouseEnter }
                     onMouseLeave={ handleMouseLeave }
