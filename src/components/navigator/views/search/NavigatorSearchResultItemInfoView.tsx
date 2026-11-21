@@ -1,9 +1,10 @@
-import { RoomDataParser } from '@nitrots/nitro-renderer';
+import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer, RoomDataParser, UpdateHomeRoomMessageComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { Overlay, Popover } from 'react-bootstrap';
-import { FaUser } from 'react-icons/fa';
-import { LocalizeText } from '../../../../api';
+import { FaFlag, FaHeart, FaHome, FaRegHeart, FaUser } from 'react-icons/fa';
+import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer } from '../../../../api';
 import { Base, Column, Flex, LayoutBadgeImageView, LayoutRoomThumbnailView, NitroCardContentView, Text, UserProfileIconView } from '../../../../common';
+import { useHelp, useNavigator } from '../../../../hooks';
 import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 
 interface NavigatorSearchResultItemInfoViewProps
@@ -18,10 +19,49 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
     const { roomData = null } = props;
     const { currentEra } = useEraTheme();
     const isModern = currentEra === 'modern';
+    const isFlash2012 = currentEra === 'flash2012';
+    const { navigatorData = null } = useNavigator();
+    const { report = null } = useHelp();
     const [ isVisible, setIsVisible ] = useState(false);
+    const [ isFavLocal, setIsFavLocal ] = useState<boolean>(false);
     const elementRef = useRef<HTMLDivElement>();
     const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const roomId = roomData?.roomId ?? -1;
+
+    const getTradeLabel = (mode: number) =>
+    {
+        if(mode === 2) return LocalizeText('navigator.roomsettings.trade_allowed') || 'Permitido';
+        if(mode === 1) return LocalizeText('navigator.roomsettings.trade_not_with_Controller') || 'Con derechos';
+        return LocalizeText('navigator.roomsettings.trade_not_allowed') || 'No permitido';
+    };
+
+    const toggleFavorite = () =>
+    {
+        if(roomId <= 0) return;
+        if(isFavLocal)
+        {
+            SendMessageComposer(new DeleteFavouriteRoomMessageComposer(roomId));
+            setIsFavLocal(false);
+        }
+        else
+        {
+            SendMessageComposer(new AddFavouriteRoomMessageComposer(roomId));
+            setIsFavLocal(true);
+        }
+    };
+
+    const setAsHomeRoom = () =>
+    {
+        if(roomId <= 0) return;
+        SendMessageComposer(new UpdateHomeRoomMessageComposer(roomId));
+    };
+
+    const reportRoom = () =>
+    {
+        if(roomId <= 0 || !report) return;
+        report(ReportType.ROOM, { roomId, roomName: roomData.roomName });
+        setIsVisible(false);
+    };
 
     const clearHideTimer = () =>
     {
@@ -110,44 +150,100 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
             />
             <Overlay show={ isVisible } target={ elementRef.current } placement="right" rootClose={ !isModern } onHide={ () => setIsVisible(false) }>
                 <Popover
-                    className="navigator-room-info-popover"
+                    className={ `navigator-room-info-popover ${ isFlash2012 ? 'navigator-room-info-popover-2012' : '' }` }
                     style={ { zIndex: 1085 } }
                     onMouseEnter={ handleMouseEnter }
                     onMouseLeave={ handleMouseLeave }
                     onClick={ event => event.stopPropagation() }
                 >
-                    <NitroCardContentView overflow="hidden" className="room-info image-rendering-pixelated bg-transparent">
-                        <Flex gap={ 2 } overflow="hidden">
-                            <LayoutRoomThumbnailView roomId={ roomData.roomId } customUrl={ roomData.officialRoomPicRef } className="d-flex flex-column align-items-center justify-content-end mb-1 flex-shrink-0">
-                                { roomData.habboGroupId > 0 && (
-                                    <LayoutBadgeImageView badgeCode={ roomData.groupBadgeCode } isGroup={ true } className={ 'position-absolute top-0 start-0 m-1 ' }/>) }
-                                { roomData.doorMode !== RoomDataParser.OPEN_STATE && (
-                                    <i className={ 'position-absolute end-0 mb-1 me-1 icon icon-navigator-room-' + (roomData.doorMode === RoomDataParser.DOORBELL_STATE ? 'locked' : roomData.doorMode === RoomDataParser.PASSWORD_STATE ? 'password' : roomData.doorMode === RoomDataParser.INVISIBLE_STATE ? 'invisible' : '') }/> ) }
-                            </LayoutRoomThumbnailView>
-                            <Column gap={ 1 } className="flex-grow-1" style={ { minWidth: 0 } }>
-                                <Text bold className="w-100" style={ { wordBreak: 'break-word', lineHeight: '1.2' } }>
-                                    { roomData.roomName }
-                                </Text>
-                                { (roomData.ownerName && roomData.ownerName.length > 0) &&
-                                    <Flex gap={ 1 } alignItems="center" className="flex-wrap">
-                                        <Text italics variant="muted">
-                                            { LocalizeText('navigator.roomownercaption') }
-                                        </Text>
-                                        <Flex alignItems="center" gap={ 1 } style={ { minWidth: 0 } }>
-                                            <UserProfileIconView userId={ roomData.ownerId } />
-                                            <Text italics truncate>{ roomData.ownerName }</Text>
-                                        </Flex>
-                                    </Flex> }
-                                <Text className="flex-grow-1" style={ { wordBreak: 'break-word', overflowWrap: 'anywhere', paddingBottom: '22px', lineHeight: '1.3' } }>
-                                    { roomData.description }
-                                </Text>
-                                <Flex className={ 'badge p-1 position-absolute m-1 bottom-0 end-0 m-2 ' + getUserCounterColor() } gap={ 1 }>
-                                    <FaUser className="fa-icon" />
-                                    { roomData.userCount }
-                                </Flex>
-                            </Column>
-                        </Flex>
-                    </NitroCardContentView>
+                    { isFlash2012 ? (
+                        <div className="room-info-2012-bubble">
+                            <div className="room-info-2012-top-card">
+                                <LayoutRoomThumbnailView
+                                    roomId={ roomData.roomId }
+                                    customUrl={ roomData.officialRoomPicRef }
+                                    className="room-info-2012-thumb flex-shrink-0"
+                                >
+                                    { roomData.habboGroupId > 0 && (
+                                        <LayoutBadgeImageView badgeCode={ roomData.groupBadgeCode } isGroup={ true } className="position-absolute top-0 start-0 m-1" />
+                                    ) }
+                                    { roomData.doorMode !== RoomDataParser.OPEN_STATE && (
+                                        <i className={ 'position-absolute end-0 bottom-0 mb-1 me-1 icon icon-navigator-room-' + (roomData.doorMode === RoomDataParser.DOORBELL_STATE ? 'locked' : roomData.doorMode === RoomDataParser.PASSWORD_STATE ? 'password' : roomData.doorMode === RoomDataParser.INVISIBLE_STATE ? 'invisible' : '') } />
+                                    ) }
+                                </LayoutRoomThumbnailView>
+                                <div className="room-info-2012-head">
+                                    <div className="room-info-2012-title">{ roomData.roomName }</div>
+                                    <div className="room-info-2012-desc">{ roomData.description }</div>
+                                </div>
+                            </div>
+
+                            { (roomData.ownerName && roomData.ownerName.length > 0) && (
+                                <div className="room-info-2012-owner" onClick={ () => GetUserProfile(roomData.ownerId) }>
+                                    <UserProfileIconView userId={ roomData.ownerId } />
+                                    <span>{ roomData.ownerName }</span>
+                                </div>
+                            ) }
+
+                            <div className="room-info-2012-bottom">
+                                <div className="room-info-2012-stats">
+                                    <span className="ri2012-k">Tradear</span>
+                                    <span className="ri2012-v">{ getTradeLabel(roomData.tradeMode) }</span>
+                                    <span className="ri2012-k">Aforo</span>
+                                    <span className="ri2012-v">{ roomData.maxUserCount }</span>
+                                    <span className="ri2012-k">Me gusta</span>
+                                    <span className="ri2012-v">{ roomData.score }</span>
+                                </div>
+
+                                <div className="room-info-2012-actions">
+                                    <button type="button" className="ri2012-act" onClick={ toggleFavorite }>
+                                        { isFavLocal ? <FaHeart className="ri2012-ico is-active" /> : <FaRegHeart className="ri2012-ico" /> }
+                                        <span>Favorito</span>
+                                    </button>
+                                    <button type="button" className="ri2012-act" onClick={ setAsHomeRoom }>
+                                        <FaHome className={ `ri2012-ico ${ navigatorData?.homeRoomId === roomId ? 'is-active' : '' }` } />
+                                        <span>Sala principal</span>
+                                    </button>
+                                    <button type="button" className="ri2012-act" onClick={ reportRoom }>
+                                        <FaFlag className="ri2012-ico" />
+                                        <span>Reportar sala</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <NitroCardContentView overflow="hidden" className="room-info image-rendering-pixelated bg-transparent">
+                            <Flex gap={ 2 } overflow="hidden">
+                                <LayoutRoomThumbnailView roomId={ roomData.roomId } customUrl={ roomData.officialRoomPicRef } className="d-flex flex-column align-items-center justify-content-end mb-1 flex-shrink-0">
+                                    { roomData.habboGroupId > 0 && (
+                                        <LayoutBadgeImageView badgeCode={ roomData.groupBadgeCode } isGroup={ true } className={ 'position-absolute top-0 start-0 m-1 ' }/>) }
+                                    { roomData.doorMode !== RoomDataParser.OPEN_STATE && (
+                                        <i className={ 'position-absolute end-0 mb-1 me-1 icon icon-navigator-room-' + (roomData.doorMode === RoomDataParser.DOORBELL_STATE ? 'locked' : roomData.doorMode === RoomDataParser.PASSWORD_STATE ? 'password' : roomData.doorMode === RoomDataParser.INVISIBLE_STATE ? 'invisible' : '') }/> ) }
+                                </LayoutRoomThumbnailView>
+                                <Column gap={ 1 } className="flex-grow-1" style={ { minWidth: 0 } }>
+                                    <Text bold className="w-100" style={ { wordBreak: 'break-word', lineHeight: '1.2' } }>
+                                        { roomData.roomName }
+                                    </Text>
+                                    { (roomData.ownerName && roomData.ownerName.length > 0) &&
+                                        <Flex gap={ 1 } alignItems="center" className="flex-wrap">
+                                            <Text italics variant="muted">
+                                                { LocalizeText('navigator.roomownercaption') }
+                                            </Text>
+                                            <Flex alignItems="center" gap={ 1 } style={ { minWidth: 0 } }>
+                                                <UserProfileIconView userId={ roomData.ownerId } />
+                                                <Text italics truncate>{ roomData.ownerName }</Text>
+                                            </Flex>
+                                        </Flex> }
+                                    <Text className="flex-grow-1" style={ { wordBreak: 'break-word', overflowWrap: 'anywhere', paddingBottom: '22px', lineHeight: '1.3' } }>
+                                        { roomData.description }
+                                    </Text>
+                                    <Flex className={ 'badge p-1 position-absolute m-1 bottom-0 end-0 m-2 ' + getUserCounterColor() } gap={ 1 }>
+                                        <FaUser className="fa-icon" />
+                                        { roomData.userCount }
+                                    </Flex>
+                                </Column>
+                            </Flex>
+                        </NitroCardContentView>
+                    ) }
                 </Popover>
             </Overlay>
         </>

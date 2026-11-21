@@ -1,22 +1,36 @@
 import { GetGuestRoomResultEvent, NavigatorSearchComposer, RateFlatMessageComposer, RoomEngineEvent } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
-import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, LocalizeText, SendMessageComposer } from '../../../../api';
+import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api';
 import { Base, classNames, Column, Flex, Text, TransitionAnimation, TransitionAnimationTypes } from '../../../../common';
-import { useMessageEvent, useNavigator, useRoom, useRoomEngineEvent } from '../../../../hooks';
+import { useEraTheme, useMessageEvent, useNavigator, useRoom, useRoomEngineEvent } from '../../../../hooks';
 import { useIsMobile } from '../../../../hooks/mobile/useIsMobile';
+import rtIconSettings from '../../../../assets/images/eras/flash2012/roomtools/icon_settings.png';
+import rtIconZoom from '../../../../assets/images/eras/flash2012/roomtools/icon_zoom.png';
+import rtIconChatHistory from '../../../../assets/images/eras/flash2012/roomtools/icon_chathistory.png';
+import rtIconLike from '../../../../assets/images/eras/flash2012/roomtools/icon_like.png';
+import rtIconLink from '../../../../assets/images/eras/flash2012/roomtools/icon_link.png';
+import rtBtnBack from '../../../../assets/images/eras/flash2012/roomtools/btn_back.png';
+import rtBtnHistory from '../../../../assets/images/eras/flash2012/roomtools/btn_history.png';
+import rtBtnForward from '../../../../assets/images/eras/flash2012/roomtools/btn_forward.png';
+import rtBtnChat from '../../../../assets/images/eras/flash2012/roomtools/btn_chat.png';
 
 export const RoomToolsWidgetView: FC<{}> = props =>
 {
     const isMobile = useIsMobile();
+    const { currentEra } = useEraTheme();
     const [ isZoomedIn, setIsZoomedIn ] = useState<boolean>(false);
     const [ roomName, setRoomName ] = useState<string>(null);
     const [ roomOwner, setRoomOwner ] = useState<string>(null);
     const [ roomTags, setRoomTags ] = useState<string[]>(null);
     const [ isOpen, setIsOpen ] = useState<boolean>(false);
+    const [ isCollapsed2012, setIsCollapsed2012 ] = useState<boolean>(false);
+    const [ roomHistory, setRoomHistory ] = useState<number[]>([]);
+    const [ historyIdx, setHistoryIdx ] = useState<number>(-1);
     const { navigatorData = null } = useNavigator();
     const { roomSession = null } = useRoom();
 
     const isOwner = (roomOwner && GetSessionDataManager().userName && roomOwner.toLowerCase() === GetSessionDataManager().userName.toLowerCase()) || (roomSession && roomSession.isRoomOwner);
+    const canLike = Boolean(navigatorData?.canRate && !isOwner);
 
     useEffect(() =>
     {
@@ -24,6 +38,18 @@ export const RoomToolsWidgetView: FC<{}> = props =>
 
         const currentScale = GetRoomEngine().getRoomInstanceRenderingCanvasScale(roomSession.roomId, 1);
         setIsZoomedIn(currentScale < 1);
+
+        const rid = roomSession.roomId;
+        if(rid > 0)
+        {
+            setRoomHistory(prev =>
+            {
+                if(prev[historyIdx] === rid) return prev;
+                const next = [ ...prev.slice(0, historyIdx + 1), rid ].slice(-20);
+                setHistoryIdx(next.length - 1);
+                return next;
+            });
+        }
     }, [ roomSession ]);
 
     useRoomEngineEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, event =>
@@ -87,6 +113,109 @@ export const RoomToolsWidgetView: FC<{}> = props =>
     }, [ roomName, roomOwner, roomTags ]);
 
     if(isMobile) return null;
+
+    if(currentEra === 'flash2012')
+    {
+        const canGoBack = historyIdx > 0;
+        const canGoForward = historyIdx >= 0 && historyIdx < roomHistory.length - 1;
+
+        const goHistory = (dir: -1 | 1) =>
+        {
+            const targetIdx = historyIdx + dir;
+            if(targetIdx < 0 || targetIdx >= roomHistory.length) return;
+            setHistoryIdx(targetIdx);
+            TryVisitRoom(roomHistory[targetIdx]);
+        };
+
+        return (
+            <div className="nitro-room-tools-container room-tools-2012-root">
+                <div className={ `room-tools-2012-panel ${ isCollapsed2012 ? 'is-collapsed' : '' }` }>
+                    <button
+                        type="button"
+                        className="room-tools-2012-handle"
+                        title={ isCollapsed2012 ? 'Mostrar herramientas de sala' : 'Ocultar herramientas de sala' }
+                        onClick={ () => setIsCollapsed2012(prev => !prev) }
+                    >
+                        <span>{ isCollapsed2012 ? '›' : '‹' }</span>
+                    </button>
+
+                    { !isCollapsed2012 && (
+                        <div className="room-tools-2012-body">
+                            <button type="button" className="room-tools-2012-row" onClick={ () => handleToolClick('settings') }>
+                                <span className="rt2012-ico"><img src={ rtIconSettings } alt="" /></span>
+                                <span className="rt2012-lbl">Ajustes</span>
+                            </button>
+                            <button type="button" className="room-tools-2012-row" onClick={ () => handleToolClick('zoom') }>
+                                <span className="rt2012-ico"><img src={ rtIconZoom } alt="" /></span>
+                                <span className="rt2012-lbl">Zoom</span>
+                            </button>
+                            <button type="button" className="room-tools-2012-row" onClick={ () => handleToolClick('chat_history') }>
+                                <span className="rt2012-ico"><img src={ rtIconChatHistory } alt="" /></span>
+                                <span className="rt2012-lbl">Historial del chat</span>
+                            </button>
+                            <button
+                                type="button"
+                                className={ `room-tools-2012-row ${ !canLike ? 'is-disabled' : '' }` }
+                                disabled={ !canLike }
+                                onClick={ () => handleToolClick('like_room') }
+                            >
+                                <span className="rt2012-ico"><img src={ rtIconLike } alt="" /></span>
+                                <span className="rt2012-lbl">Me gusta</span>
+                            </button>
+                            <button type="button" className="room-tools-2012-row" onClick={ () => handleToolClick('toggle_room_link') }>
+                                <span className="rt2012-ico"><img src={ rtIconLink } alt="" /></span>
+                                <span className="rt2012-lbl">Link a esta Sala</span>
+                            </button>
+
+                            <div className="room-tools-2012-actions">
+                                <button
+                                    type="button"
+                                    className={ `rt2012-sq-btn ${ !canGoBack ? 'is-dim' : '' }` }
+                                    disabled={ !canGoBack }
+                                    title="Sala anterior"
+                                    onClick={ () => goHistory(-1) }
+                                >
+                                    <img src={ rtBtnBack } alt="Anterior" />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rt2012-sq-btn"
+                                    title="Historial de salas"
+                                    onClick={ () => CreateLinkEvent('navigator/show/myworld_view') }
+                                >
+                                    <img src={ rtBtnHistory } alt="Salas" />
+                                </button>
+                                <button
+                                    type="button"
+                                    className={ `rt2012-sq-btn ${ !canGoForward ? 'is-dim' : '' }` }
+                                    disabled={ !canGoForward }
+                                    title="Sala siguiente"
+                                    onClick={ () => goHistory(1) }
+                                >
+                                    <img src={ rtBtnForward } alt="Siguiente" />
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rt2012-sq-btn"
+                                    title="Historial del chat"
+                                    onClick={ () => handleToolClick('chat_history') }
+                                >
+                                    <img src={ rtBtnChat } alt="Chat" />
+                                </button>
+                            </div>
+                        </div>
+                    ) }
+                </div>
+
+                <TransitionAnimation type={ TransitionAnimationTypes.SLIDE_LEFT } inProp={ isOpen } timeout={ 300 }>
+                    <div className="room-tools-2012-toast">
+                        <div className="rt2012-toast-name">{ roomName }</div>
+                        <div className="rt2012-toast-owner">{ roomOwner }</div>
+                    </div>
+                </TransitionAnimation>
+            </div>
+        );
+    }
 
     return (
         <Flex className="nitro-room-tools-container" gap={ 2 }>

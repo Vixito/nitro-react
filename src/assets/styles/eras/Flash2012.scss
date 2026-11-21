@@ -1654,27 +1654,168 @@ body[data-era="flash2012"] {
         height: 100% !important;
     }
 
-    .nitro-room-tools-container {
+    .nitro-room-tools-container.room-tools-2012-root {
         position: fixed !important;
-        bottom: 55px !important;
-        left: 8px !important;
+        bottom: 50px !important;
+        left: 0 !important;
         z-index: 1005 !important;
+        display: flex !important;
+        align-items: flex-end !important;
+        gap: 10px !important;
+        pointer-events: none !important;
 
-        .nitro-room-tools {
-            background-color: #1d1b17 !important;
-            border: 1px solid #000000 !important;
-            border-radius: 4px !important;
-            padding: 4px !important;
-            gap: 3px !important;
-            box-shadow: inset 0 0 0 2px #36332d !important;
+        .room-tools-2012-panel {
+            display: flex !important;
+            align-items: stretch !important;
+            background-color: rgba(37, 36, 36, 0.93) !important;
+            border-radius: 0 6px 6px 0 !important;
+            overflow: hidden !important;
+            pointer-events: auto !important;
+            box-shadow: none !important;
+            border: none !important;
+
+            .room-tools-2012-handle {
+                width: 15px !important;
+                min-width: 15px !important;
+                background-color: #3a3832 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                color: #d6d4ce !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                cursor: pointer !important;
+
+                &:hover {
+                    background-color: #4a4740 !important;
+                    color: #ffffff !important;
+                }
+            }
+
+            &.is-collapsed {
+                .room-tools-2012-handle {
+                    height: 60px !important;
+                }
+            }
+
+            .room-tools-2012-body {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 7px !important;
+                padding: 10px 14px 10px 10px !important;
+                min-width: 162px !important;
+
+                .room-tools-2012-row {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 8px !important;
+                    background: transparent !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    padding: 1px 0 !important;
+                    margin: 0 !important;
+                    cursor: pointer !important;
+                    text-align: left !important;
+
+                    .rt2012-ico {
+                        width: 22px !important;
+                        height: 21px !important;
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        flex-shrink: 0 !important;
+
+                        img {
+                            image-rendering: pixelated !important;
+                            display: block !important;
+                        }
+                    }
+
+                    .rt2012-lbl {
+                        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                        font-size: 12px !important;
+                        font-weight: 400 !important;
+                        color: #8b959e !important;
+                        text-decoration: underline !important;
+                        white-space: nowrap !important;
+                    }
+
+                    &:hover:not(:disabled) .rt2012-lbl {
+                        color: #ffffff !important;
+                    }
+
+                    &.is-disabled,
+                    &:disabled {
+                        opacity: 0.45 !important;
+                        cursor: default !important;
+                    }
+                }
+
+                .room-tools-2012-actions {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 4px !important;
+                    margin-top: 4px !important;
+
+                    .rt2012-sq-btn {
+                        background: transparent !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        cursor: pointer !important;
+
+                        img {
+                            image-rendering: pixelated !important;
+                            display: block !important;
+                        }
+
+                        &:hover:not(:disabled) {
+                            filter: brightness(1.12) !important;
+                        }
+
+                        &.is-dim,
+                        &:disabled {
+                            opacity: 0.45 !important;
+                            cursor: default !important;
+                        }
+                    }
+                }
+            }
         }
 
-        .nitro-room-tools-info {
-            background-color: #1d1b17 !important;
-            border: 1px solid #000000 !important;
-            border-radius: 4px !important;
-            box-shadow: inset 0 0 0 2px #36332d !important;
-            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        .room-tools-2012-toast {
+            background-color: rgba(37, 36, 36, 0.84) !important;
+            border: none !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+            padding: 10px 14px !important;
+            max-width: 280px !important;
+            pointer-events: auto !important;
+
+            .rt2012-toast-name {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+                line-height: 1.3 !important;
+            }
+
+            .rt2012-toast-owner {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                color: #82827e !important;
+                margin-top: 2px !important;
+            }
         }
     }
 
@@ -2579,10 +2720,378 @@ body[data-era="flash2012"] {
     // 7. COMPONENTES ESPECÍFICOS DE CADA VENTANA 2012
     // =========================================================================
 
-    // 7A. NAVEGADOR DE SALAS Y GUÍA DE COMANDOS NITROPEDIA 2012 (Volter 9px Bold + Popup Info)
+    // 7A-1. NAVEGADOR DE SALAS 2012 (Ubuntu Blue Skin + 4 Tabs + Accordions + Illustrated Bottom Buttons)
     .navigator-flash2012,
-    .nitro-navigator,
-    .nitro-card[data-window-key="navigator"],
+    .nitro-card[data-window-key="navigator"] {
+        width: 425px !important;
+        min-width: 425px !important;
+
+        .nitro-card-header .nitro-card-header-text {
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+        }
+
+        .nitro-card-tabs {
+            background-color: #e6e6e1 !important;
+            border-bottom: 1px solid #000000 !important;
+            padding: 6px 8px 0 8px !important;
+            gap: 2px !important;
+
+            .nav-item,
+            .nitro-card-tabs-item {
+                background-color: #d6d5cf !important;
+                border: 1px solid #000000 !important;
+                border-bottom: none !important;
+                border-radius: 5px 5px 0 0 !important;
+                color: #1f1f1f !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 400 !important;
+                padding: 4px 10px 5px !important;
+                box-shadow: none !important;
+
+                &.active {
+                    background-color: #efefe9 !important;
+                    color: #000000 !important;
+                    font-weight: 700 !important;
+                    margin-bottom: -1px !important;
+                    padding-bottom: 6px !important;
+                }
+            }
+        }
+
+        .navigator-2012-content {
+            background-color: #efefe9 !important;
+            padding: 8px 8px 10px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+        }
+
+        .nav2012-search-bar {
+            gap: 6px !important;
+
+            .nav2012-filter-select {
+                height: 24px !important;
+                min-width: 92px !important;
+                background-color: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 3px !important;
+                color: #111111 !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                padding: 0 6px !important;
+                box-shadow: none !important;
+            }
+
+            .nav2012-search-input-wrap {
+                position: relative !important;
+                flex: 1 !important;
+                display: flex !important;
+                align-items: center !important;
+
+                .nav2012-search-input {
+                    width: 100% !important;
+                    height: 24px !important;
+                    background-color: #ffffff !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 5px !important;
+                    color: #111111 !important;
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                    font-size: 11.5px !important;
+                    padding: 0 26px 0 8px !important;
+                    outline: none !important;
+                    box-shadow: none !important;
+
+                    &::placeholder {
+                        color: #777777 !important;
+                        font-style: italic !important;
+                    }
+                }
+
+                .nav2012-search-pencil-btn {
+                    position: absolute !important;
+                    right: 4px !important;
+                    top: 50% !important;
+                    transform: translateY(-50%) !important;
+                    width: 18px !important;
+                    height: 18px !important;
+                    padding: 0 !important;
+                    border: none !important;
+                    background: transparent !important;
+                    box-shadow: none !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    cursor: pointer !important;
+
+                    img {
+                        width: 15px !important;
+                        height: 15px !important;
+                        image-rendering: pixelated !important;
+                    }
+                }
+            }
+        }
+
+        .navigator-2012-list {
+            gap: 5px !important;
+
+            > .bg-white {
+                background-color: #ffffff !important;
+                border: none !important;
+                border-radius: 4px !important;
+                box-shadow: none !important;
+                padding: 2px 4px 4px !important;
+
+                > .d-flex:first-child {
+                    padding: 4px 6px !important;
+
+                    .text-secondary,
+                    .fa-icon {
+                        color: #266b90 !important;
+                        font-size: 11px !important;
+                    }
+
+                    .nitro-text,
+                    div {
+                        color: #266b90 !important;
+                        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                        font-size: 12.5px !important;
+                        font-weight: 400 !important;
+                    }
+                }
+            }
+        }
+
+        .navigator-grid {
+            gap: 1px !important;
+        }
+
+        .navigator-item {
+            border-radius: 2px !important;
+            padding: 3px 6px !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11.5px !important;
+            color: #111111 !important;
+            background-color: #ffffff !important;
+
+            &:nth-child(odd) {
+                background-color: #d6eef9 !important;
+            }
+
+            &:hover {
+                background-color: #bfe4f6 !important;
+            }
+
+            // Flat 2012 population pill (exact 12-22-15 green/grey/orange/red without black outline)
+            .badge {
+                min-width: 38px !important;
+                height: 17px !important;
+                border-radius: 3px !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 10.5px !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+                padding: 0 5px !important;
+                border: none !important;
+                box-shadow: none !important;
+
+                &.bg-primary {
+                    background-color: #b5b5b5 !important;
+                }
+
+                &.bg-success {
+                    background-color: #62b043 !important;
+                }
+
+                &.bg-warning {
+                    background-color: #e09822 !important;
+                }
+
+                &.bg-danger {
+                    background-color: #d9483b !important;
+                }
+
+                .fa-icon {
+                    width: 9px !important;
+                    height: 9px !important;
+                }
+            }
+        }
+
+        .navigator-2012-bottom-actions {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            padding-top: 6px !important;
+            flex-shrink: 0 !important;
+
+            .nav2012-big-btn {
+                flex: 1 !important;
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                cursor: pointer !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+
+                img {
+                    width: 100% !important;
+                    max-width: 196px !important;
+                    height: auto !important;
+                    image-rendering: pixelated !important;
+                    display: block !important;
+                }
+
+                &:hover {
+                    filter: brightness(1.06) !important;
+                }
+
+                &:active {
+                    filter: brightness(0.94) !important;
+                }
+            }
+        }
+    }
+
+    // 7A-2. CREAR UNA SALA 2012 (Separate Floating Window — exact 12-22-15 layout)
+    .navigator-room-creator-2012,
+    .nitro-card[data-window-key="navigator-room-creator"] {
+        width: 530px !important;
+        min-width: 530px !important;
+        max-height: 410px !important;
+
+        .creator-2012-grid {
+            display: grid !important;
+            grid-template-columns: 205px 1fr !important;
+            gap: 10px !important;
+            height: 345px !important;
+        }
+
+        .creator-2012-left {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+
+            .creator-2012-field {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 2px !important;
+
+                &.is-grow {
+                    flex: 1 !important;
+                }
+
+                label {
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    color: #111111 !important;
+                    margin: 0 !important;
+                }
+            }
+
+            .creator-2012-input,
+            .creator-2012-textarea,
+            .creator-2012-select {
+                width: 100% !important;
+                background-color: #ffffff !important;
+                border: 1px solid #7c7c77 !important;
+                border-radius: 3px !important;
+                color: #111111 !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                padding: 3px 6px !important;
+                box-shadow: none !important;
+            }
+
+            .creator-2012-textarea {
+                flex: 1 !important;
+                min-height: 76px !important;
+                resize: none !important;
+            }
+
+            .creator-2012-select {
+                border-color: #000000 !important;
+                height: 24px !important;
+                padding: 0 5px !important;
+            }
+
+            .creator-2012-buttons {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 6px !important;
+                margin-top: 4px !important;
+            }
+        }
+
+        .creator-2012-models {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 7px !important;
+            overflow-y: auto !important;
+            padding-right: 4px !important;
+            align-content: start !important;
+
+            .creator-2012-model-card {
+                position: relative !important;
+                height: 98px !important;
+                background-color: #cccccc !important;
+                border: 1px solid #8a8a86 !important;
+                border-radius: 5px !important;
+                padding: 6px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                cursor: pointer !important;
+                overflow: hidden !important;
+
+                .creator-2012-model-img {
+                    flex: 1 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    overflow: hidden !important;
+
+                    img {
+                        max-height: 72px !important;
+                        max-width: 100% !important;
+                        image-rendering: pixelated !important;
+                    }
+                }
+
+                .creator-2012-model-tiles {
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                    font-size: 10.5px !important;
+                    font-weight: 400 !important;
+                    color: #111111 !important;
+                }
+
+                &.is-selected {
+                    background-color: #7c868e !important;
+                    border-color: #4b555c !important;
+
+                    .creator-2012-model-tiles {
+                        color: #ffffff !important;
+                        font-weight: 700 !important;
+                    }
+                }
+
+                &.is-locked {
+                    opacity: 0.55 !important;
+                    cursor: default !important;
+                }
+            }
+        }
+    }
+
+    // 7A-3. GUÍA DE COMANDOS NITROPEDIA E INVENTARIO 2012 (Volter 9px Bold)
     .nitropedia,
     .nitro-card[data-window-key="nitropedia"],
     .inventory-flash2012,
@@ -2610,112 +3119,158 @@ body[data-era="flash2012"] {
                 white-space: nowrap !important;
             }
         }
-
-        .navigator-grid {
-            gap: 1px !important;
-        }
-
-        .navigator-item {
-            border-radius: 2px !important;
-            padding: 3px 6px !important;
-            font-family: 'Volter2012', 'Volter', sans-serif !important;
-            font-size: 9px !important;
-            -webkit-font-smoothing: none !important;
-            color: #111111 !important;
-
-            &:nth-child(even) {
-                background-color: #edf4f8 !important;
-            }
-
-            &:hover {
-                background-color: #d6eaf5 !important;
-            }
-
-            // 2012 Population Pill on right/left
-            .badge {
-                min-width: 34px !important;
-                height: 15px !important;
-                border-radius: 3px !important;
-                font-family: 'Volter2012', 'Volter', monospace, sans-serif !important;
-                font-size: 9px !important;
-                font-weight: 700 !important;
-                color: #ffffff !important;
-                padding: 0 5px !important;
-                border: 1px solid #000000 !important;
-
-                &.bg-primary {
-                    background-color: #9ba5ad !important;
-                    box-shadow: inset 0 0 0 1px #b8c2ca !important;
-                }
-
-                &.bg-success {
-                    background-color: #53a642 !important;
-                    box-shadow: inset 0 0 0 1px #74c763 !important;
-                }
-
-                &.bg-warning {
-                    background-color: #e08b12 !important;
-                    box-shadow: inset 0 0 0 1px #f7ab3e !important;
-                }
-
-                &.bg-danger {
-                    background-color: #c93030 !important;
-                    box-shadow: inset 0 0 0 1px #e35454 !important;
-                }
-
-                .fa-icon {
-                    width: 8px !important;
-                    height: 8px !important;
-                }
-            }
-        }
     }
 
-    // Popup de información de sala al hacer clic en el icono (i) del navegador (marco azul completo en los 4 lados)
-    .navigator-room-info-popover.popover {
-        background-color: #4591b2 !important;
+    // Popup de información de sala al hacer clic en el icono (i) del navegador 2012 (Globo gris claro exacto 12-27-30)
+    .navigator-room-info-popover.navigator-room-info-popover-2012.popover {
+        background-color: #e9e9e5 !important;
         border: 1px solid #000000 !important;
-        border-radius: 5px !important;
-        box-shadow: inset 0 0 0 1px #4591b2, inset 0 0 0 2px #6cc0e2 !important;
-        padding: 5px !important;
-        width: 285px !important;
-        min-width: 285px !important;
-        max-width: 285px !important;
+        border-radius: 6px !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+        padding: 0 !important;
+        width: 340px !important;
+        min-width: 340px !important;
+        max-width: 340px !important;
         box-sizing: border-box !important;
 
         .popover-body {
-            padding: 0 !important;
+            padding: 8px !important;
         }
 
-        .popover-arrow::before,
-        .popover-arrow::after {
+        .popover-arrow::before {
             border-right-color: #000000 !important;
         }
 
-        .room-info {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            box-sizing: border-box !important;
-            background-color: #ffffff !important;
-            border: 1px solid #1e4d63 !important;
-            border-radius: 3px !important;
-            padding: 6px !important;
-            color: #111111 !important;
-            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-            font-size: 11px !important;
+        .popover-arrow::after {
+            border-right-color: #e9e9e5 !important;
+        }
 
-            * {
-                color: #111111 !important;
-                text-shadow: none !important;
+        .room-info-2012-bubble {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            color: #111111 !important;
+
+            .room-info-2012-top-card {
+                background-color: #ffffff !important;
+                border-radius: 5px !important;
+                padding: 8px !important;
+                display: flex !important;
+                gap: 10px !important;
+                align-items: flex-start !important;
+
+                .room-info-2012-thumb {
+                    width: 108px !important;
+                    height: 108px !important;
+                    min-width: 108px !important;
+                    min-height: 108px !important;
+                    border: 1px solid #000000 !important;
+                    border-radius: 0 !important;
+                    overflow: hidden !important;
+                }
+
+                .room-info-2012-head {
+                    flex: 1 !important;
+                    min-width: 0 !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 4px !important;
+
+                    .room-info-2012-title {
+                        font-size: 13px !important;
+                        font-weight: 700 !important;
+                        color: #000000 !important;
+                        line-height: 1.25 !important;
+                        word-break: break-word !important;
+                    }
+
+                    .room-info-2012-desc {
+                        font-size: 11.5px !important;
+                        font-weight: 400 !important;
+                        color: #222222 !important;
+                        line-height: 1.3 !important;
+                        word-break: break-word !important;
+                    }
+                }
             }
 
-            .badge {
-                color: #ffffff !important;
-                border: 1px solid #000000 !important;
+            .room-info-2012-owner {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 5px !important;
+                padding: 0 2px !important;
+                cursor: pointer !important;
+                width: fit-content !important;
 
-                * {
-                    color: #ffffff !important;
+                span {
+                    font-size: 12px !important;
+                    font-weight: 700 !important;
+                    color: #000000 !important;
+                    text-decoration: underline !important;
+                }
+            }
+
+            .room-info-2012-bottom {
+                display: flex !important;
+                align-items: flex-start !important;
+                justify-content: space-between !important;
+                gap: 12px !important;
+                padding: 0 2px 2px !important;
+
+                .room-info-2012-stats {
+                    display: grid !important;
+                    grid-template-columns: auto auto !important;
+                    column-gap: 18px !important;
+                    row-gap: 4px !important;
+                    font-size: 11.5px !important;
+
+                    .ri2012-k {
+                        font-weight: 700 !important;
+                        color: #000000 !important;
+                    }
+
+                    .ri2012-v {
+                        font-weight: 400 !important;
+                        color: #222222 !important;
+                    }
+                }
+
+                .room-info-2012-actions {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 5px !important;
+
+                    .ri2012-act {
+                        display: inline-flex !important;
+                        align-items: center !important;
+                        gap: 6px !important;
+                        background: transparent !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                        font-size: 11.5px !important;
+                        font-weight: 400 !important;
+                        color: #111111 !important;
+                        cursor: pointer !important;
+                        text-align: left !important;
+
+                        .ri2012-ico {
+                            width: 12px !important;
+                            height: 12px !important;
+                            color: #222222 !important;
+
+                            &.is-active {
+                                color: #d9483b !important;
+                            }
+                        }
+
+                        &:hover span {
+                            text-decoration: underline !important;
+                        }
+                    }
                 }
             }
         }

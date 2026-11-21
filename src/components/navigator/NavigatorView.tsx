@@ -2,9 +2,11 @@ import { ConvertGlobalRoomIdMessageComposer, HabboWebTools, ILinkEventTracker, L
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { AddEventLinkTracker, GetConfiguration, LocalizeText, RemoveLinkEventTracker, SendMessageComposer, TryVisitRoom } from '../../api';
-import { Base, Column, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
+import { Base, Column, DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useNavigator, useRoomSessionManagerEvent } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
+import btnCreateRoom2012 from '../../assets/images/eras/flash2012/navigator/btn_create_room_2012.png';
+import btnRandomRoom2012 from '../../assets/images/eras/flash2012/navigator/btn_random_room_2012.png';
 import { NavigatorDoorStateView } from './views/NavigatorDoorStateView';
 import { NavigatorRoomCreatorView } from './views/NavigatorRoomCreatorView';
 import { NavigatorRoomInfoView } from './views/NavigatorRoomInfoView';
@@ -215,6 +217,20 @@ export const NavigatorView: FC<{}> = props =>
         LegacyExternalInterface.addCallback(HabboWebTools.OPENROOM, (k: string, _arg_2: boolean = false, _arg_3: string = null) => SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(k)));
     }, []);
 
+    const handleVisitRandomRoom = () =>
+    {
+        const allRooms = (searchResult?.results || []).flatMap(r => r.rooms || []);
+        const activeRooms = allRooms.filter(r => r.userCount > 0);
+        const pool = activeRooms.length > 0 ? activeRooms : allRooms;
+        if(pool.length > 0)
+        {
+            const picked = pool[Math.floor(Math.random() * pool.length)];
+            TryVisitRoom(picked.roomId);
+            return;
+        }
+        sendSearch('', 'hotel_view');
+    };
+
     return (
         <>
             { isVisible && (currentEra === 'shockwave2006' ? (
@@ -225,8 +241,45 @@ export const NavigatorView: FC<{}> = props =>
                     setCreatorOpen={ setCreatorOpen }
                     sendSearch={ sendSearch }
                 />
+            ) : currentEra === 'flash2012' ? (
+                <>
+                    <NitroCardView uniqueKey="navigator" className="nitro-navigator navigator-flash2012">
+                        <NitroCardHeaderView headerText={ LocalizeText('navigator.title') } onCloseClick={ event => setIsVisible(false) } />
+                        <NitroCardTabsView>
+                            { topLevelContexts && (topLevelContexts.length > 0) && topLevelContexts.map((context, index) => (
+                                <NitroCardTabsItemView key={ index } isActive={ (topLevelContext === context) } onClick={ event => sendSearch('', context.code) }>
+                                    { LocalizeText(('navigator.toplevelview.' + context.code)) }
+                                </NitroCardTabsItemView>
+                            )) }
+                        </NitroCardTabsView>
+                        <NitroCardContentView position="relative" className="navigator-2012-content">
+                            { isLoading &&
+                                <Base fit position="absolute" className="top-0 start-0 z-index-1 bg-muted opacity-0-5" /> }
+                            <NavigatorSearchView sendSearch={ sendSearch } />
+                            <Column innerRef={ elementRef } overflow="auto" className="navigator-2012-list flex-grow-1">
+                                { (searchResult && searchResult.results.map((result, index) => <NavigatorSearchResultView key={ index } searchResult={ result } />)) }
+                            </Column>
+                            <div className="navigator-2012-bottom-actions">
+                                <button type="button" className="nav2012-big-btn" title="Crear Sala" onClick={ () => setCreatorOpen(true) }>
+                                    <img src={ btnCreateRoom2012 } alt="Crear Sala" />
+                                </button>
+                                <button type="button" className="nav2012-big-btn" title="Ir a un sitio nuevo" onClick={ handleVisitRandomRoom }>
+                                    <img src={ btnRandomRoom2012 } alt="Ir a un sitio nuevo" />
+                                </button>
+                            </div>
+                        </NitroCardContentView>
+                    </NitroCardView>
+                    { isCreatorOpen && (
+                        <NitroCardView uniqueKey="navigator-room-creator" className="navigator-room-creator-2012" windowPosition={ DraggableWindowPosition.CENTER }>
+                            <NitroCardHeaderView headerText={ LocalizeText('navigator.createroom.title') || 'Crear una Sala' } onCloseClick={ () => setCreatorOpen(false) } />
+                            <NitroCardContentView className="p-2">
+                                <NavigatorRoomCreatorView onClose={ () => setCreatorOpen(false) } />
+                            </NitroCardContentView>
+                        </NitroCardView>
+                    ) }
+                </>
             ) : (
-                <NitroCardView uniqueKey="navigator" className={ `nitro-navigator ${ currentEra === 'flash2012' ? 'navigator-flash2012' : '' }` }>
+                <NitroCardView uniqueKey="navigator" className="nitro-navigator">
                     <NitroCardHeaderView headerText={ LocalizeText(isCreatorOpen ? 'navigator.createroom.title' : 'navigator.title') } onCloseClick={ event => setIsVisible(false) } />
                     <NitroCardTabsView>
                         { topLevelContexts && (topLevelContexts.length > 0) && topLevelContexts.map((context, index) =>

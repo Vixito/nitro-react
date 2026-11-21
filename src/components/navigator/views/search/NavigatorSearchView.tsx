@@ -2,7 +2,8 @@ import { FC, KeyboardEvent, useEffect, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { INavigatorSearchFilter, LocalizeText, SearchFilterOptions } from '../../../../api';
 import { Button, Flex } from '../../../../common';
-import { useNavigator } from '../../../../hooks';
+import { useEraTheme, useNavigator } from '../../../../hooks';
+import pencilIconImg from '../../../../assets/images/infostand/pencil-icon.png';
 
 export interface NavigatorSearchViewProps
 {
@@ -15,6 +16,7 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = props =>
     const [ searchFilterIndex, setSearchFilterIndex ] = useState(0);
     const [ searchValue, setSearchValue ] = useState('');
     const { topLevelContext = null, searchResult = null } = useNavigator();
+    const { currentEra } = useEraTheme();
 
     const processSearch = () =>
     {
@@ -62,6 +64,32 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = props =>
         setSearchFilterIndex(SearchFilterOptions.findIndex(option => (option === filter)));
         setSearchValue(value);
     }, [ searchResult ]);
+
+    if(currentEra === 'flash2012')
+    {
+        return (
+            <Flex fullWidth gap={ 1 } alignItems="center" className="nav2012-search-bar">
+                <select className="nav2012-filter-select" value={ searchFilterIndex } onChange={ event => setSearchFilterIndex(parseInt(event.target.value)) }>
+                    { SearchFilterOptions.map((filter, index) => (
+                        <option key={ index } value={ index }>{ LocalizeText('navigator.filter.' + filter.name) }</option>
+                    )) }
+                </select>
+                <div className="nav2012-search-input-wrap">
+                    <input
+                        type="text"
+                        className="nav2012-search-input"
+                        placeholder={ LocalizeText('navigator.filter.input.placeholder') || 'Filtrar salas por...' }
+                        value={ searchValue }
+                        onChange={ event => setSearchValue(event.target.value) }
+                        onKeyDown={ handleKeyDown }
+                    />
+                    <button type="button" className="nav2012-search-pencil-btn" title="Buscar" onClick={ processSearch }>
+                        <img src={ pencilIconImg } alt="Buscar" />
+                    </button>
+                </div>
+            </Flex>
+        );
+    }
 
     return (
         <Flex fullWidth gap={ 1 }>

@@ -6,8 +6,14 @@ import { Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, Shockwa
 import { useNavigator } from '../../../hooks';
 import { useEraTheme } from '../../../hooks/era/useEraTheme';
 
-export const NavigatorRoomCreatorView: FC<{}> = props =>
+export interface NavigatorRoomCreatorViewProps
 {
+    onClose?: () => void;
+}
+
+export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props =>
+{
+    const { onClose = null } = props;
     const [ maxVisitorsList, setMaxVisitorsList ] = useState<number[]>(null);
     const [ name, setName ] = useState<string>('');
     const [ description, setDescription ] = useState<string>('');
@@ -64,6 +70,104 @@ export const NavigatorRoomCreatorView: FC<{}> = props =>
             setSelectedModelName(models[0].name);
         }
     }, []);
+
+    if(currentEra === 'flash2012')
+    {
+        const canCreate = Boolean(name && name.length >= 3);
+
+        return (
+            <div className="creator-2012-grid">
+                <div className="creator-2012-left">
+                    <div className="creator-2012-field">
+                        <label>{ LocalizeText('navigator.createroom.roomnameinfo') || 'Nombre de la Sala' }</label>
+                        <input
+                            type="text"
+                            className="creator-2012-input"
+                            maxLength={ 60 }
+                            value={ name }
+                            onChange={ event => setName(event.target.value) }
+                            placeholder={ LocalizeText('navigator.createroom.roomnameinfo') || 'Nombre de la Sala' }
+                        />
+                    </div>
+                    <div className="creator-2012-field is-grow">
+                        <label>{ LocalizeText('navigator.createroom.roomdescinfo') || 'Descripción de la Sala' }</label>
+                        <textarea
+                            className="creator-2012-textarea"
+                            maxLength={ 255 }
+                            value={ description }
+                            onChange={ event => setDescription(event.target.value) }
+                            placeholder={ LocalizeText('navigator.createroom.roomdescinfo') || 'Descripción de la Sala' }
+                        />
+                    </div>
+                    <div className="creator-2012-field">
+                        <label>{ LocalizeText('navigator.category') || 'Categoría' }</label>
+                        <select className="creator-2012-select" value={ category ?? '' } onChange={ event => setCategory(Number(event.target.value)) }>
+                            { categories && (categories.length > 0) && categories.map(cat => (
+                                <option key={ cat.id } value={ cat.id }>{ LocalizeText(cat.name) }</option>
+                            )) }
+                        </select>
+                    </div>
+                    <div className="creator-2012-field">
+                        <label>{ LocalizeText('navigator.maxvisitors') || 'Número máximo de visitantes' }</label>
+                        <select className="creator-2012-select" value={ visitorsCount ?? 10 } onChange={ event => setVisitorsCount(Number(event.target.value)) }>
+                            { maxVisitorsList && maxVisitorsList.map(value => (
+                                <option key={ value } value={ value }>{ value }</option>
+                            )) }
+                        </select>
+                    </div>
+                    <div className="creator-2012-field">
+                        <label>{ LocalizeText('navigator.tradesettings') || 'Ajustes de Tradeo' }</label>
+                        <select className="creator-2012-select" value={ tradesSetting } onChange={ event => setTradesSetting(Number(event.target.value)) }>
+                            <option value="0">{ LocalizeText('navigator.roomsettings.trade_not_allowed') }</option>
+                            <option value="1">{ LocalizeText('navigator.roomsettings.trade_not_with_Controller') }</option>
+                            <option value="2">{ LocalizeText('navigator.roomsettings.trade_allowed') }</option>
+                        </select>
+                    </div>
+                    <div className="creator-2012-buttons">
+                        <button
+                            type="button"
+                            className={ `btn ${ canCreate ? 'btn-success' : 'btn-secondary' }` }
+                            disabled={ !canCreate }
+                            onClick={ createRoom }
+                        >
+                            { LocalizeText('navigator.createroom.create') || 'Crear Sala' }
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={ () => onClose && onClose() }
+                        >
+                            { LocalizeText('cancel') || 'Cancelar' }
+                        </button>
+                    </div>
+                </div>
+
+                <div className="creator-2012-models">
+                    { roomModels && (roomModels.length > 0) && roomModels.map((model, index) => {
+                        const isSelected = selectedModelName === model.name;
+                        const isLocked = GetClubMemberLevel() < model.clubLevel;
+                        return (
+                            <div
+                                key={ model.name }
+                                className={ `creator-2012-model-card ${ isSelected ? 'is-selected' : '' } ${ isLocked ? 'is-locked' : '' }` }
+                                onClick={ () => selectModel(model, index) }
+                            >
+                                <div className="creator-2012-model-img">
+                                    <img alt="" src={ getRoomModelImage(model.name) } />
+                                </div>
+                                <span className="creator-2012-model-tiles">
+                                    { model.tileSize } { LocalizeText('navigator.createroom.tilesize') || 'Baldosas' }
+                                </span>
+                                { !hcDisabled && model.clubLevel > HabboClubLevelEnum.NO_CLUB && (
+                                    <LayoutCurrencyIcon position="absolute" className="top-1 end-1" type="hc" />
+                                ) }
+                            </div>
+                        );
+                    }) }
+                </div>
+            </div>
+        );
+    }
 
     if(currentEra !== 'shockwave2006')
     {
