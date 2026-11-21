@@ -2821,7 +2821,7 @@ body[data-era="flash2012"] {
             right: 1px !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
-            height: 11px !important;
+            height: 15px !important;
             width: 19px !important;
             pointer-events: none !important;
             display: flex !important;
@@ -3301,25 +3301,26 @@ body[data-era="flash2012"] {
         }
 
         .room-info-2012-bubble {
+            padding: 12px 14px !important;
             display: flex !important;
             flex-direction: column !important;
-            gap: 8px !important;
+            gap: 10px !important;
             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
             color: #111111 !important;
 
             .room-info-2012-top-card {
                 background-color: #ffffff !important;
                 border-radius: 5px !important;
-                padding: 8px !important;
+                padding: 10px !important;
                 display: flex !important;
-                gap: 10px !important;
+                gap: 12px !important;
                 align-items: flex-start !important;
 
                 .room-info-2012-thumb {
-                    width: 108px !important;
-                    height: 108px !important;
-                    min-width: 108px !important;
-                    min-height: 108px !important;
+                    width: 110px !important;
+                    height: 110px !important;
+                    min-width: 110px !important;
+                    min-height: 110px !important;
                     border: 1px solid #000000 !important;
                     border-radius: 0 !important;
                     overflow: hidden !important;
@@ -3330,10 +3331,10 @@ body[data-era="flash2012"] {
                     min-width: 0 !important;
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 4px !important;
+                    gap: 5px !important;
 
                     .room-info-2012-title {
-                        font-size: 13px !important;
+                        font-size: 13.5px !important;
                         font-weight: 700 !important;
                         color: #000000 !important;
                         line-height: 1.25 !important;
@@ -3341,10 +3342,10 @@ body[data-era="flash2012"] {
                     }
 
                     .room-info-2012-desc {
-                        font-size: 11.5px !important;
+                        font-size: 12px !important;
                         font-weight: 400 !important;
                         color: #222222 !important;
-                        line-height: 1.3 !important;
+                        line-height: 1.35 !important;
                         word-break: break-word !important;
                     }
                 }
@@ -3353,13 +3354,13 @@ body[data-era="flash2012"] {
             .room-info-2012-owner {
                 display: inline-flex !important;
                 align-items: center !important;
-                gap: 5px !important;
-                padding: 0 2px !important;
+                gap: 6px !important;
+                padding: 2px 2px 0 !important;
                 cursor: pointer !important;
                 width: fit-content !important;
 
                 span {
-                    font-size: 12px !important;
+                    font-size: 12.5px !important;
                     font-weight: 700 !important;
                     color: #000000 !important;
                     text-decoration: underline !important;
@@ -3370,15 +3371,15 @@ body[data-era="flash2012"] {
                 display: flex !important;
                 align-items: flex-start !important;
                 justify-content: space-between !important;
-                gap: 12px !important;
-                padding: 0 2px 2px !important;
+                gap: 14px !important;
+                padding: 2px 2px 2px !important;
 
                 .room-info-2012-stats {
                     display: grid !important;
                     grid-template-columns: auto auto !important;
-                    column-gap: 18px !important;
-                    row-gap: 4px !important;
-                    font-size: 11.5px !important;
+                    column-gap: 20px !important;
+                    row-gap: 6px !important;
+                    font-size: 12px !important;
 
                     .ri2012-k {
                         font-weight: 700 !important;
@@ -3394,7 +3395,7 @@ body[data-era="flash2012"] {
                 .room-info-2012-actions {
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 5px !important;
+                    gap: 6px !important;
 
                     .ri2012-act {
                         display: inline-flex !important;
@@ -3406,7 +3407,7 @@ body[data-era="flash2012"] {
                         padding: 0 !important;
                         margin: 0 !important;
                         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-                        font-size: 11.5px !important;
+                        font-size: 12px !important;
                         font-weight: 400 !important;
                         color: #111111 !important;
                         cursor: pointer !important;
