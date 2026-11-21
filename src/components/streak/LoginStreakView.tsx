@@ -1,0 +1,302 @@
+import { ILinkEventTracker } from '@nitrots/nitro-renderer';
+import { FC, useCallback, useEffect, useState } from 'react';
+import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
+import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import iconDiamondImg from '../../assets/images/eras/flash2012/streak/icon_diamond_2012.png';
+import iconFlameSmallImg from '../../assets/images/eras/flash2012/streak/icon_flame_small.png';
+import iconPixelImg from '../../assets/images/eras/flash2012/streak/icon_pixel_2012.png';
+import iconStarStreakImg from '../../assets/images/eras/flash2012/streak/icon_star_streak.png';
+import trophyBaseImg from '../../assets/images/eras/flash2012/streak/streak_trophy_base.png';
+import iconCreditImg from '../../assets/images/eras/shockwave_v14/credits_icon.png';
+
+interface StreakMilestone
+{
+    days: number;
+    title: string;
+    rewardType: 'diamonds' | 'pixels' | 'credits' | 'badge';
+    rewardAmount: number;
+    rewardLabel: string;
+    claimed: boolean;
+    reached: boolean;
+    canClaim: boolean;
+}
+
+interface StreakData
+{
+    isSelf: boolean;
+    userId: number;
+    username: string;
+    currentStreak: number;
+    maxStreak: number;
+    completedToday: boolean;
+    secondsUntilReset: number;
+    milestones: StreakMilestone[];
+}
+
+const ITEMS_PER_PAGE = 5;
+
+export const LoginStreakView: FC<{}> = () =>
+{
+    const [ isVisible, setIsVisible ] = useState(false);
+    const [ targetUserId, setTargetUserId ] = useState<number>(0);
+    const [ data, setData ] = useState<StreakData | null>(null);
+    const [ page, setPage ] = useState<number>(1);
+    const [ secondsLeft, setSecondsLeft ] = useState<number>(0);
+    const [ claimingDay, setClaimingDay ] = useState<number | null>(null);
+    const [ statusMsg, setStatusMsg ] = useState<string>('');
+
+    const loadStreak = useCallback(async (uid?: number) =>
+    {
+        const resolvedId = uid && uid > 0 ? uid : (GetSessionDataManager()?.userId || 0);
+        const endpoint = resolvedId > 0 ? `/api/client/streak/${ resolvedId }` : '/api/client/streak/me';
+        try
+        {
+            const res = await fetch(endpoint, { credentials: 'include' });
+            const json = await res.json();
+            if(json && json.success)
+            {
+                setData(json as StreakData);
+                setSecondsLeft(Number(json.secondsUntilReset || 0));
+            }
+        }
+        catch
+        {
+            // Ignore network error
+        }
+    }, []);
+
+    useEffect(() =>
+    {
+        const linkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) =>
+            {
+                const parts = url.split('/');
+                if(parts.length < 2) return;
+
+                switch(parts[1])
+                {
+                    case 'show':
+                    case 'open': {
+                        const uid = parts[2] ? parseInt(parts[2], 10) : 0;
+                        setTargetUserId(Number.isFinite(uid) ? uid : 0);
+                        setPage(1);
+                        setStatusMsg('');
+                        setIsVisible(true);
+                        loadStreak(Number.isFinite(uid) ? uid : 0);
+                        return;
+                    }
+                    case 'hide':
+                        setIsVisible(false);
+                        return;
+                    case 'toggle': {
+                        const uid = parts[2] ? parseInt(parts[2], 10) : 0;
+                        setIsVisible(prev =>
+                        {
+                            const next = !prev;
+                            if(next)
+                            {
+                                setTargetUserId(Number.isFinite(uid) ? uid : 0);
+                                setPage(1);
+                                setStatusMsg('');
+                                loadStreak(Number.isFinite(uid) ? uid : 0);
+                            }
+                            return next;
+                        });
+                        return;
+                    }
+                }
+            },
+            eventUrlPrefix: 'streak/'
+        };
+
+        AddEventLinkTracker(linkTracker);
+        return () => RemoveLinkEventTracker(linkTracker);
+    }, [ loadStreak ]);
+
+    useEffect(() =>
+    {
+        if(!isVisible) return;
+        const timer = setInterval(() =>
+        {
+            setSecondsLeft(prev => (prev > 0 ? prev - 1 : 86400));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [ isVisible ]);
+
+    const handleClaim = async (milestone: StreakMilestone) =>
+    {
+        if(!milestone.canClaim || claimingDay !== null) return;
+        setClaimingDay(milestone.days);
+        setStatusMsg('');
+        try
+        {
+            const res = await fetch('/api/client/streak/claim', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ days: milestone.days })
+            });
+            const json = await res.json();
+            if(json && json.success)
+            {
+                setStatusMsg(`¡Has reclamado ${ json.rewardLabel }!`);
+                await loadStreak(targetUserId);
+            }
+            else if(json?.error)
+            {
+                setStatusMsg(json.error);
+            }
+        }
+        catch
+        {
+            setStatusMsg('No se pudo reclamar la recompensa.');
+        }
+        finally
+        {
+            setClaimingDay(null);
+        }
+    };
+
+    if(!isVisible) return null;
+
+    const hrs = String(Math.floor(secondsLeft / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((secondsLeft % 3600) / 60)).padStart(2, '0');
+    const secs = String(secondsLeft % 60).padStart(2, '0');
+
+    const milestones = data?.milestones || [];
+    const totalPages = Math.max(1, Math.ceil(milestones.length / ITEMS_PER_PAGE));
+    const currentPage = Math.min(page, totalPages);
+    const pageItems = milestones.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+    // Highlight the first claimable or first upcoming unreached milestone (matching Habbo 2012 yellow highlight)
+    const highlightedDays = (milestones.find(m => m.canClaim) || milestones.find(m => !m.claimed))?.days ?? -1;
+
+    const renderRewardIcon = (m: StreakMilestone) =>
+    {
+        if(m.rewardType === 'diamonds')
+        {
+            return <img src={ iconDiamondImg } alt="Diamantes" width={ 22 } height={ 21 } className="streak-pixel-img" />;
+        }
+        if(m.rewardType === 'pixels')
+        {
+            return <img src={ iconPixelImg } alt="Píxeles" width={ 22 } height={ 24 } className="streak-pixel-img" />;
+        }
+        return <img src={ iconCreditImg } alt="Créditos" width={ 20 } height={ 20 } className="streak-pixel-img" />;
+    };
+
+    const currentStreak = data?.currentStreak ?? 0;
+    const maxStreak = data?.maxStreak ?? 0;
+    const completedToday = data?.completedToday ?? false;
+
+    return (
+        <NitroCardView uniqueKey="login-streak" theme="primary-slim" className="login-streak-window no-resize">
+            <NitroCardHeaderView headerText="Racha de conectado" onCloseClick={ () => setIsVisible(false) } />
+            <NitroCardContentView overflow="hidden" className="login-streak-body">
+                <div className="login-streak-summary">
+                    <div className="login-streak-summary-left">
+                        <div className="login-streak-stat-main">
+                            <img src={ iconStarStreakImg } alt="" width={ 11 } height={ 13 } className="streak-pixel-img" />
+                            <span>
+                                Tu racha actual:{ ' ' }
+                                <u className="streak-days-val">{ currentStreak } { currentStreak === 1 ? 'día' : 'días' }</u>
+                            </span>
+                        </div>
+                        <div className="login-streak-stat-sub">
+                            <span className="streak-flame-slot">
+                                <img src={ iconFlameSmallImg } alt="" width={ 7 } height={ 9 } className="streak-pixel-img" />
+                            </span>
+                            <span>Racha más larga: { maxStreak } { maxStreak === 1 ? 'día' : 'días' }</span>
+                        </div>
+                        <div className={ `login-streak-today ${ completedToday ? 'is-done' : 'is-pending' }` }>
+                            { completedToday ? '¡Racha de hoy completada!' : 'Racha de hoy pendiente' }
+                        </div>
+                    </div>
+
+                    <div className="login-streak-timer" title="Tiempo restante para el reinicio diario">
+                        <div className="streak-timer-group">
+                            <div className="streak-timer-box">{ hrs }</div>
+                            <span className="streak-timer-lbl">hrs.</span>
+                        </div>
+                        <span className="streak-timer-colon">:</span>
+                        <div className="streak-timer-group">
+                            <div className="streak-timer-box">{ mins }</div>
+                            <span className="streak-timer-lbl">mins.</span>
+                        </div>
+                        <span className="streak-timer-colon">:</span>
+                        <div className="streak-timer-group">
+                            <div className="streak-timer-box">{ secs }</div>
+                            <span className="streak-timer-lbl">segs.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="login-streak-section-row">
+                    <span className="login-streak-section-title">Metas a conseguir:</span>
+                    { statusMsg && <span className="login-streak-feedback">{ statusMsg }</span> }
+                </div>
+
+                <div className="login-streak-list">
+                    { pageItems.map(m =>
+                    {
+                        const isHighlighted = m.days === highlightedDays;
+                        const isClaiming = claimingDay === m.days;
+
+                        return (
+                            <div key={ m.days } className={ `login-streak-card ${ isHighlighted ? 'is-highlight' : '' }` }>
+                                <div className="streak-trophy-wrap">
+                                    <img src={ trophyBaseImg } alt="" width={ 28 } height={ 34 } className="streak-pixel-img" />
+                                    <span className={ `streak-trophy-num ${ m.days >= 10 ? 'is-two-digit' : '' }` }>{ m.days }</span>
+                                </div>
+
+                                <div className="streak-card-info">
+                                    <div className="streak-card-title">{ m.title }</div>
+                                    <div className="streak-card-reward">
+                                        Recompensa: <u>{ m.rewardLabel }</u>
+                                    </div>
+                                </div>
+
+                                <div className="streak-reward-box" title={ m.rewardLabel }>
+                                    { renderRewardIcon(m) }
+                                </div>
+
+                                <div className="streak-action-wrap">
+                                    { m.claimed ? (
+                                        <button type="button" className="streak-btn is-claimed" disabled>
+                                            Reclamado
+                                        </button>
+                                    ) : m.canClaim ? (
+                                        <button
+                                            type="button"
+                                            className="streak-btn is-claimable"
+                                            disabled={ isClaiming }
+                                            onClick={ () => handleClaim(m) }
+                                        >
+                                            { isClaiming ? '...' : '¡Reclamar!' }
+                                        </button>
+                                    ) : (
+                                        <button type="button" className="streak-btn is-locked" disabled>
+                                            Incompleto
+                                        </button>
+                                    ) }
+                                </div>
+                            </div>
+                        );
+                    }) }
+                </div>
+
+                <div className="login-streak-pagination">
+                    { Array.from({ length: totalPages }, (_, idx) => idx + 1).map(p => (
+                        <button
+                            key={ p }
+                            type="button"
+                            className={ `streak-page-btn ${ p === currentPage ? 'is-active' : '' }` }
+                            onClick={ () => setPage(p) }
+                        >
+                            { p }
+                        </button>
+                    )) }
+                </div>
+            </NitroCardContentView>
+        </NitroCardView>
+    );
+};

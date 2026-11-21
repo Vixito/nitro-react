@@ -7,6 +7,10 @@ import { BadgesContainerView } from './views/BadgesContainerView';
 import { FriendsContainerView } from './views/FriendsContainerView';
 import { GroupsContainerView } from './views/GroupsContainerView';
 import { UserContainerView } from './views/UserContainerView';
+import iconRooms2012Img from '../../assets/images/eras/flash2012/profile/icon_rooms_2012.png';
+import iconLevel2012Img from '../../assets/images/eras/flash2012/profile/icon_level_2012.png';
+import iconBadges2012Img from '../../assets/images/eras/flash2012/profile/icon_badges_2012.png';
+import iconStreak2012Img from '../../assets/images/eras/flash2012/profile/icon_streak_2012.png';
 
 export const UserProfileView: FC<{}> = props =>
 {
@@ -14,6 +18,7 @@ export const UserProfileView: FC<{}> = props =>
     const [ userBadges, setUserBadges ] = useState<string[]>([]);
     const [ userRelationships, setUserRelationships ] = useState<RelationshipStatusInfoMessageParser>(null);
     const [ battlePassLevel, setBattlePassLevel ] = useState<number>(1);
+    const [ userStreak, setUserStreak ] = useState<number>(0);
 
     const onClose = () =>
     {
@@ -116,6 +121,20 @@ export const UserProfileView: FC<{}> = props =>
                     setBattlePassLevel(Math.floor(userProfile.achievementPoints / 100) + 1);
                 }
             });
+        fetch(`/api/client/streak/${ userProfile.id }`, { credentials: 'include' })
+            .then(r => r.json())
+            .then(data =>
+            {
+                if(data && data.success && typeof data.currentStreak === 'number')
+                {
+                    setUserStreak(data.currentStreak);
+                }
+                else
+                {
+                    setUserStreak(0);
+                }
+            })
+            .catch(() => setUserStreak(0));
     }, [ userProfile?.id ]);
 
     if(!userProfile) return null;
@@ -142,29 +161,22 @@ export const UserProfileView: FC<{}> = props =>
                             <FriendsContainerView relationships={ userRelationships } friendsCount={ Math.max(0, userProfile.friendsCount - 1) } /> }
                     </Column>
                 </Grid>
-                <div className="d-flex align-items-center justify-content-between my-2 rounded text-center" style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', height: '42px' }}>
-                    <div className="d-flex align-items-center justify-content-center gap-2.5 flex-fill h-100 cursor-pointer" onClick={ event => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
-                        <i className="icon icon-rooms me-1" />
-                        <span className="fw-bold text-dark text-decoration-underline" style={{ fontSize: '12px' }}>{ LocalizeText('extendedprofile.rooms') }</span>
+                <div className="user-profile-stats-bar-2012">
+                    <div className="up-stat-cell" onClick={ () => CreateLinkEvent(`navigator/search/hotel_view/owner:${ userProfile.username }`) }>
+                        <img src={ iconRooms2012Img } alt="" width={ 30 } height={ 22 } className="up-stat-ico" />
+                        <span className="up-stat-label"><u>{ LocalizeText('extendedprofile.rooms') || 'Salas' }</u></span>
                     </div>
-                    <div className="d-flex align-items-center justify-content-center gap-2.5 flex-fill h-100 border-start border-end cursor-pointer" style={{ borderColor: '#cbd5e1' }} onClick={ () => CreateLinkEvent('achievements/toggle') }>
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="me-1">
-                            <path d="M9 1.5L11.2 6.5L16.5 7.2L12.5 11L13.5 16.5L9 13.8L4.5 16.5L5.5 11L1.5 7.2L6.8 6.5L9 1.5Z" fill="#FFD837" stroke="#1E1E1E" strokeWidth="1.2" strokeLinejoin="round"/>
-                        </svg>
-                        <span className="fw-bold text-dark" style={{ fontSize: '12px' }}>
-                            <span className="text-decoration-underline">Placas</span> { userBadges?.length || 0 }
-                        </span>
+                    <div className="up-stat-cell" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
+                        <img src={ iconLevel2012Img } alt="" width={ 28 } height={ 16 } className="up-stat-ico" />
+                        <span className="up-stat-label"><u>Nivel</u> { battlePassLevel }</span>
                     </div>
-                    <div className="d-flex align-items-center justify-content-center gap-2.5 flex-fill h-100 cursor-pointer" onClick={ () => CreateLinkEvent('battlepass/toggle') }>
-                        <svg width="22" height="14" viewBox="0 0 22 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="me-1">
-                            <path d="M2 1.5L6 7L2 12.5" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M7 1.5L11 7L7 12.5" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M12 1.5L16 7L12 12.5" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M17 1.5L21 7L17 12.5" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        <span className="fw-bold text-dark" style={{ fontSize: '12px' }}>
-                            Nivel { battlePassLevel }
-                        </span>
+                    <div className="up-stat-cell" onClick={ () => CreateLinkEvent('achievements/toggle') }>
+                        <img src={ iconBadges2012Img } alt="" width={ 23 } height={ 23 } className="up-stat-ico" />
+                        <span className="up-stat-label"><u>Placas</u> { userBadges?.length || 0 }</span>
+                    </div>
+                    <div className="up-stat-cell" onClick={ () => CreateLinkEvent(`streak/open/${ userProfile.id }`) }>
+                        <img src={ iconStreak2012Img } alt="" width={ 17 } height={ 22 } className="up-stat-ico" />
+                        <span className="up-stat-label"><u>Rachas</u> { userStreak }</span>
                     </div>
                 </div>
                 <GroupsContainerView fullWidth itsMe={ userProfile.id === GetSessionDataManager().userId } groups={ userProfile.groups } onLeaveGroup={ onLeaveGroup } />

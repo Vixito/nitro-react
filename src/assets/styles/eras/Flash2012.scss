@@ -2374,6 +2374,12 @@ body[data-era="flash2012"] {
                 border-bottom: 1px solid #cccccc !important;
             }
 
+            &.friends-ignored-set>.nitro-card-accordion-set-header {
+                background-color: #ebe8df !important;
+                border-top: 1px solid #d4d0c5 !important;
+                border-bottom: 1px solid #c4bfb2 !important;
+            }
+
             &.friends-search-set>.nitro-card-accordion-set-header,
             &:last-child>.nitro-card-accordion-set-header {
                 background-color: #78756e !important;
@@ -3413,13 +3419,22 @@ body[data-era="flash2012"] {
                         cursor: pointer !important;
                         text-align: left !important;
 
-                        .ri2012-ico {
-                            width: 12px !important;
-                            height: 12px !important;
-                            color: #222222 !important;
+                        .ri2012-ico-slot {
+                            width: 15px !important;
+                            height: 15px !important;
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                            flex-shrink: 0 !important;
+                        }
 
-                            &.is-active {
-                                color: #d9483b !important;
+                        .ri2012-pixel-ico {
+                            display: block !important;
+                            image-rendering: pixelated !important;
+                            flex-shrink: 0 !important;
+
+                            &.is-home-active {
+                                filter: drop-shadow(0 0 1px #0f766e) !important;
                             }
                         }
 
@@ -5728,5 +5743,410 @@ body[data-era="flash2012"] {
 
     [data-skin-2012="illumina-dark"] * {
         scrollbar-color: #8a867e #262522;
+    }
+}
+
+// ==========================================
+// BLOQUE 3: PERFIL 4 COLUMNAS, CAQUITA, IGNORADOS Y RACHA DE CONECTADO (1:1 Habbo 2012)
+// ==========================================
+.icon-poop-2012 {
+    width: 14px !important;
+    height: 14px !important;
+    display: inline-block !important;
+    image-rendering: pixelated !important;
+    vertical-align: middle !important;
+    flex-shrink: 0 !important;
+}
+
+.friends-unignore-btn {
+    background: #f3f3f0 !important;
+    border: 1px solid #6b6b66 !important;
+    border-radius: 3px !important;
+    color: #111111 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    padding: 2px 6px !important;
+    cursor: pointer !important;
+    box-shadow: inset 0 1px 0 #ffffff !important;
+
+    &:hover {
+        background: #ffffff !important;
+        border-color: #111111 !important;
+    }
+}
+
+.user-profile-stats-bar-2012 {
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-height: 44px !important;
+    margin: 8px 0 10px 0 !important;
+    border-top: 1px solid #8f8f88 !important;
+    border-bottom: 1px solid #8f8f88 !important;
+    background: transparent !important;
+
+    .up-stat-cell {
+        flex: 1 1 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 7px !important;
+        padding: 4px 6px !important;
+        cursor: pointer !important;
+        user-select: none !important;
+
+        &:not(:last-child) {
+            border-right: 1px solid #8f8f88 !important;
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.35) !important;
+        }
+
+        .up-stat-ico {
+            display: block !important;
+            image-rendering: pixelated !important;
+            flex-shrink: 0 !important;
+        }
+
+        .up-stat-label {
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            color: #000000 !important;
+            white-space: nowrap !important;
+        }
+    }
+}
+
+.login-streak-window {
+    width: 492px !important;
+    min-width: 492px !important;
+    max-width: 492px !important;
+
+    .login-streak-body {
+        background-color: #ecece6 !important;
+        padding: 12px 14px 10px !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        color: #111111 !important;
+    }
+
+    .streak-pixel-img {
+        display: block !important;
+        image-rendering: pixelated !important;
+        flex-shrink: 0 !important;
+    }
+
+    .login-streak-summary {
+        background-color: #ffffff !important;
+        border-radius: 6px !important;
+        padding: 12px 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+    }
+
+    .login-streak-summary-left {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+    }
+
+    .login-streak-stat-main {
+        display: flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #000000 !important;
+        line-height: 1.2 !important;
+    }
+
+    .login-streak-stat-sub {
+        display: flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        font-size: 11.5px !important;
+        font-weight: 400 !important;
+        color: #222222 !important;
+        line-height: 1.2 !important;
+
+        .streak-flame-slot {
+            width: 11px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+    }
+
+    .login-streak-today {
+        margin-top: 8px !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+
+        &.is-done {
+            color: #008a00 !important;
+        }
+
+        &.is-pending {
+            color: #b45309 !important;
+        }
+    }
+
+    .login-streak-timer {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 4px !important;
+        flex-shrink: 0 !important;
+        padding-top: 6px !important;
+
+        .streak-timer-group {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 3px !important;
+        }
+
+        .streak-timer-box {
+            min-width: 28px !important;
+            height: 24px !important;
+            padding: 0 5px !important;
+            background-color: #242320 !important;
+            border-radius: 5px !important;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+        }
+
+        .streak-timer-lbl {
+            font-size: 10px !important;
+            color: #111111 !important;
+            line-height: 1 !important;
+        }
+
+        .streak-timer-colon {
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            color: #111111 !important;
+            line-height: 24px !important;
+        }
+    }
+
+    .login-streak-section-row {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        margin: 10px 0 6px !important;
+    }
+
+    .login-streak-section-title {
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        color: #111111 !important;
+    }
+
+    .login-streak-feedback {
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        color: #007a00 !important;
+    }
+
+    .login-streak-list {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 7px !important;
+    }
+
+    .login-streak-card {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        background-color: #d9d9cf !important;
+        border: 1px solid #96968f !important;
+        border-radius: 5px !important;
+        padding: 6px 10px 6px 14px !important;
+        min-height: 52px !important;
+
+        &.is-highlight {
+            background-color: #e1e1ab !important;
+            border-color: #9e9e77 !important;
+
+            .streak-reward-box {
+                background-color: #caca99 !important;
+                border-color: #b4b486 !important;
+            }
+        }
+    }
+
+    .streak-trophy-wrap {
+        position: relative !important;
+        width: 28px !important;
+        height: 34px !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        .streak-trophy-num {
+            position: absolute !important;
+            top: 12px !important;
+            left: 0 !important;
+            right: 0 !important;
+            text-align: center !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+            line-height: 1 !important;
+            text-shadow:
+                -1px -1px 0 #000000,
+                 1px -1px 0 #000000,
+                -1px  1px 0 #000000,
+                 1px  1px 0 #000000,
+                 0px  1px 0 #000000,
+                 0px -1px 0 #000000,
+                 1px  0px 0 #000000,
+                -1px  0px 0 #000000 !important;
+            pointer-events: none !important;
+
+            &.is-two-digit {
+                font-size: 11px !important;
+                top: 14px !important;
+            }
+        }
+    }
+
+    .streak-card-info {
+        flex: 1 !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+
+        .streak-card-title {
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+            color: #000000 !important;
+            line-height: 1.2 !important;
+        }
+
+        .streak-card-reward {
+            font-size: 11.5px !important;
+            font-weight: 400 !important;
+            color: #111111 !important;
+            line-height: 1.2 !important;
+        }
+    }
+
+    .streak-reward-box {
+        width: 40px !important;
+        height: 38px !important;
+        background-color: #c2c2b9 !important;
+        border: 1px solid #b0b0a8 !important;
+        border-radius: 4px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+
+    .streak-action-wrap {
+        width: 94px !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    .streak-btn {
+        width: 92px !important;
+        height: 27px !important;
+        border-radius: 3px !important;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 8px !important;
+        cursor: default !important;
+
+        &.is-locked {
+            background: #d3d3ce !important;
+            border: 1px solid #a8a8a3 !important;
+            color: #9e9e99 !important;
+            box-shadow: inset 0 1px 0 #e0e0db !important;
+        }
+
+        &.is-claimed {
+            background: #d2e4cc !important;
+            border: 1px solid #7ca371 !important;
+            color: #35662a !important;
+            box-shadow: inset 0 1px 0 #e5f2e0 !important;
+        }
+
+        &.is-claimable {
+            cursor: pointer !important;
+            border: none !important;
+            border-radius: 0 !important;
+            background-color: transparent !important;
+            background-image:
+                url('@/assets/images/eras/habborator/button-20-left.png'),
+                url('@/assets/images/eras/habborator/button-20-right.png'),
+                url('@/assets/images/eras/habborator/button-20-mid.png') !important;
+            background-position: left top, right top, 4px top !important;
+            background-repeat: no-repeat, no-repeat, no-repeat !important;
+            background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100% !important;
+            color: #ffffff !important;
+            text-shadow: none !important;
+            image-rendering: pixelated !important;
+            padding: 0 10px 2px !important;
+
+            &:hover:not(:disabled) {
+                filter: brightness(1.08) !important;
+            }
+
+            &:active:not(:disabled) {
+                filter: brightness(0.95) !important;
+            }
+        }
+    }
+
+    .login-streak-pagination {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+        margin-top: 8px !important;
+        padding-right: 4px !important;
+
+        .streak-page-btn {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 2px !important;
+            margin: 0 !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            color: #111111 !important;
+            cursor: pointer !important;
+
+            &:hover {
+                text-decoration: underline !important;
+            }
+
+            &.is-active {
+                color: #d63636 !important;
+                font-weight: 700 !important;
+            }
+        }
     }
 }

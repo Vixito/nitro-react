@@ -31,6 +31,7 @@ import { UserProfileView } from '../user-profile/UserProfileView';
 import { UserSettingsView } from '../user-settings/UserSettingsView';
 import { WiredView } from '../wired/WiredView';
 import { EraSelectorModalView } from '../eras/EraSelectorModalView';
+import { LoginStreakView } from '../streak/LoginStreakView';
 
 export const MainView: FC<{}> = props =>
 {
@@ -119,6 +120,7 @@ export const MainView: FC<{}> = props =>
             <GameCenterView />
             <FloorplanEditorView />
             <BattlePassView />
+            <LoginStreakView />
             <EraSelectorModalView />
         </Base>
     );

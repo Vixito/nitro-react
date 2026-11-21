@@ -1,8 +1,8 @@
-import { ILinkEventTracker, RemoveFriendComposer, SendRoomInviteComposer } from '@nitrots/nitro-renderer';
+import { ILinkEventTracker, IgnoreResultEvent, RemoveFriendComposer, SendRoomInviteComposer } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { AddEventLinkTracker, GetUserProfile, LocalizeText, MessengerFriend, RemoveLinkEventTracker, SendMessageComposer } from '../../../../api';
-import { Button, Flex, NitroCardAccordionSetView, NitroCardAccordionView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
-import { useFriends } from '../../../../hooks';
+import { AddEventLinkTracker, GetSessionDataManager, GetUserProfile, LocalizeText, MessengerFriend, RemoveLinkEventTracker, SendMessageComposer } from '../../../../api';
+import { Base, Button, Flex, NitroCardAccordionItemView, NitroCardAccordionSetView, NitroCardAccordionView, NitroCardContentView, NitroCardHeaderView, NitroCardView, UserProfileIconView } from '../../../../common';
+import { useFriends, useMessageEvent } from '../../../../hooks';
 import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 import { FriendsListGroupView } from './friends-list-group/FriendsListGroupView';
 import { FriendsListRequestView } from './friends-list-request/FriendsListRequestView';
@@ -19,7 +19,56 @@ export const FriendsListView: FC<{}> = props =>
     const [ selectedFriendsIds, setSelectedFriendsIds ] = useState<number[]>([]);
     const [ showRoomInvite, setShowRoomInvite ] = useState<boolean>(false);
     const [ showRemoveFriendsConfirmation, setShowRemoveFriendsConfirmation ] = useState<boolean>(false);
+    const [ ignoredUsers, setIgnoredUsers ] = useState<{ id: number; username: string; look: string; online: boolean }[]>([]);
     const { onlineFriends = [], offlineFriends = [], requests = [], requestFriend = null, followFriend = null } = useFriends();
+
+    const loadIgnoredUsers = useCallback(async () =>
+    {
+        try
+        {
+            const res = await fetch('/api/client/ignored', { credentials: 'include' });
+            const data = await res.json();
+            if(data && data.success && Array.isArray(data.ignored))
+            {
+                setIgnoredUsers(data.ignored);
+            }
+        }
+        catch
+        {
+            // Ignore
+        }
+    }, []);
+
+    useEffect(() =>
+    {
+        if(isVisible) loadIgnoredUsers();
+    }, [ isVisible, loadIgnoredUsers ]);
+
+    useMessageEvent<IgnoreResultEvent>(IgnoreResultEvent, () =>
+    {
+        setTimeout(() => loadIgnoredUsers(), 250);
+    });
+
+    const handleUnignore = async (user: { id: number; username: string }) =>
+    {
+        try
+        {
+            GetSessionDataManager().unignoreUser(user.username);
+        }
+        catch
+        {
+            // Fallback to DB removal below
+        }
+        setIgnoredUsers(prev => prev.filter(u => u.id !== user.id));
+        try
+        {
+            await fetch(`/api/client/ignored/${ user.id }`, { method: 'DELETE', credentials: 'include' });
+        }
+        catch
+        {
+            // Ignore
+        }
+    };
 
     const removeFriendsText = useMemo(() =>
     {
@@ -149,6 +198,32 @@ export const FriendsListView: FC<{}> = props =>
                         </NitroCardAccordionSetView>
                         <NitroCardAccordionSetView className="friends-offline-set" headerText={ offlineHeader }>
                             <FriendsListGroupView list={ offlineFriends } selectedFriendsIds={ selectedFriendsIds } selectFriend={ selectFriend } />
+                        </NitroCardAccordionSetView>
+                        <NitroCardAccordionSetView className="friends-ignored-set" headerText={ `Ignorados (${ ignoredUsers.length })` }>
+                            { ignoredUsers.length === 0 ? (
+                                <div className="px-2 py-2 text-muted" style={ { fontSize: '11px', fontStyle: 'italic' } }>
+                                    No tienes usuarios ignorados.
+                                </div>
+                            ) : (
+                                ignoredUsers.map(user => (
+                                    <NitroCardAccordionItemView key={ user.id } justifyContent="between" className="px-2 py-1">
+                                        <Flex alignItems="center" gap={ 1 }>
+                                            <Base onClick={ event => event.stopPropagation() }>
+                                                <UserProfileIconView userId={ user.id } />
+                                            </Base>
+                                            <span>{ user.username }</span>
+                                        </Flex>
+                                        <button
+                                            type="button"
+                                            className="friends-unignore-btn"
+                                            title="Dejar de ignorar"
+                                            onClick={ event => { event.stopPropagation(); handleUnignore(user); } }
+                                        >
+                                            Quitar
+                                        </button>
+                                    </NitroCardAccordionItemView>
+                                ))
+                            ) }
                         </NitroCardAccordionSetView>
                         { (requests.length > 0) &&
                             <FriendsListRequestView headerText={ `Peticiones (${ requests.length })` } isExpanded={ true } /> }

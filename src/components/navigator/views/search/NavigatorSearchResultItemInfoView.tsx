@@ -1,11 +1,15 @@
 import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer, RoomDataParser, UpdateHomeRoomMessageComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { Overlay, Popover } from 'react-bootstrap';
-import { FaFlag, FaHeart, FaHome, FaRegHeart, FaUser } from 'react-icons/fa';
+import { FaUser } from 'react-icons/fa';
 import { GetUserProfile, LocalizeText, ReportType, SendMessageComposer } from '../../../../api';
 import { Base, Column, Flex, LayoutBadgeImageView, LayoutRoomThumbnailView, NitroCardContentView, Text, UserProfileIconView } from '../../../../common';
 import { useHelp, useNavigator } from '../../../../hooks';
 import { useEraTheme } from '../../../../hooks/era/useEraTheme';
+import iconHeartOutlineImg from '../../../../assets/images/eras/flash2012/navigator/icon_heart_outline.png';
+import iconHeartFilledImg from '../../../../assets/images/eras/flash2012/navigator/icon_heart_filled.png';
+import iconHomeOutlineImg from '../../../../assets/images/eras/flash2012/navigator/icon_home_outline.png';
+import iconFlagOutlineImg from '../../../../assets/images/eras/flash2012/navigator/icon_flag_outline.png';
 
 interface NavigatorSearchResultItemInfoViewProps
 {
@@ -196,15 +200,39 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
 
                                 <div className="room-info-2012-actions">
                                     <button type="button" className="ri2012-act" onClick={ toggleFavorite }>
-                                        { isFavLocal ? <FaHeart className="ri2012-ico is-active" /> : <FaRegHeart className="ri2012-ico" /> }
+                                        <span className="ri2012-ico-slot">
+                                            <img
+                                                src={ isFavLocal ? iconHeartFilledImg : iconHeartOutlineImg }
+                                                alt=""
+                                                width={ 13 }
+                                                height={ 11 }
+                                                className="ri2012-pixel-ico"
+                                            />
+                                        </span>
                                         <span>Favorito</span>
                                     </button>
                                     <button type="button" className="ri2012-act" onClick={ setAsHomeRoom }>
-                                        <FaHome className={ `ri2012-ico ${ navigatorData?.homeRoomId === roomId ? 'is-active' : '' }` } />
+                                        <span className="ri2012-ico-slot">
+                                            <img
+                                                src={ iconHomeOutlineImg }
+                                                alt=""
+                                                width={ 11 }
+                                                height={ 11 }
+                                                className={ `ri2012-pixel-ico ${ navigatorData?.homeRoomId === roomId ? 'is-home-active' : '' }` }
+                                            />
+                                        </span>
                                         <span>Sala principal</span>
                                     </button>
                                     <button type="button" className="ri2012-act" onClick={ reportRoom }>
-                                        <FaFlag className="ri2012-ico" />
+                                        <span className="ri2012-ico-slot">
+                                            <img
+                                                src={ iconFlagOutlineImg }
+                                                alt=""
+                                                width={ 12 }
+                                                height={ 15 }
+                                                className="ri2012-pixel-ico"
+                                            />
+                                        </span>
                                         <span>Reportar sala</span>
                                     </button>
                                 </div>
