@@ -552,9 +552,13 @@
 }
 
 .ss-green-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-width: 196px;
     height: 25px;
-    padding: 3px 26px 4px;
+    padding: 0 26px 1px;
+    line-height: 1;
     background-color: transparent;
         background-image:
             url('@/assets/images/eras/habborator/button-20-left.png'),
@@ -1045,9 +1049,13 @@
 }
 
 .ss-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 1;
     height: 25px;
-    padding: 3px 12px 4px;
+    padding: 0 12px 1px;
+    line-height: 1;
     background-color: transparent;
         background-image:
             url('@/assets/images/eras/habborator/button-18-left.png'),
