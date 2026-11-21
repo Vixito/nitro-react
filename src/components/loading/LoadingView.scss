@@ -38,6 +38,34 @@
                 cursor: pointer !important;
                 pointer-events: auto !important;
             }
+
+            button.nitro-reconnect-btn {
+                width: 100%;
+                padding: 10px 16px;
+                min-height: 40px;
+                background: #16a34a;
+                background-color: #16a34a;
+                border: 2px solid #0f5132;
+                border-radius: 6px;
+                color: #ffffff;
+                font-size: 14px;
+                font-weight: 700;
+                line-height: 1.2;
+                box-shadow: none;
+                text-shadow: none;
+                transition: background-color 0.12s ease, transform 0.08s ease;
+
+                &:hover {
+                    background-color: #15803d;
+                    color: #ffffff;
+                }
+
+                &:active {
+                    background-color: #166534;
+                    color: #ffffff;
+                    transform: translateY(1px);
+                }
+            }
         }
     }
 

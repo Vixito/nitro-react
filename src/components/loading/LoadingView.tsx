@@ -43,7 +43,7 @@ export const LoadingView: FC<LoadingViewProps> = props =>
                             </div>
                             <button
                                 type="button"
-                                className="btn w-100 fw-bold py-2 mt-2"
+                                className="btn nitro-reconnect-btn w-100 fw-bold py-2 mt-2"
                                 style={{ cursor: 'pointer', pointerEvents: 'auto' }}
                                 onClick={ reload }
                             >

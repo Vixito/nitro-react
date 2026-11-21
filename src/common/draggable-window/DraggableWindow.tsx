@@ -176,30 +176,79 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
             if(handle) setDragHandler(handle);
         }
 
+        const isMobileUi = document.body.classList.contains('is-mobile-ui');
         let offsetX = 0;
         let offsetY = 0;
 
-        switch(windowPosition)
+        const positionMobileWindow = () =>
         {
-            case DraggableWindowPosition.TOP_CENTER:
-                element.style.top = 50 + offsetTop + 'px';
-                element.style.left = `calc(50vw - ${ (element.offsetWidth / 2 + offsetLeft) }px)`;
-                break;
-            case DraggableWindowPosition.CENTER:
-                element.style.top = `calc(50vh - ${ (element.offsetHeight / 2) + offsetTop }px)`;
-                element.style.left = `calc(50vw - ${ (element.offsetWidth / 2) + offsetLeft }px)`;
-                break;
-            case DraggableWindowPosition.TOP_LEFT:
-                element.style.top = 50 + offsetTop + 'px';
-                element.style.left = 50 + offsetLeft + 'px';
-                break;
+            const vw = window.innerWidth || document.documentElement.clientWidth;
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            const bottomDockReserve = 66;
+            const topPad = 8;
+            const usableH = Math.max(120, vh - topPad - bottomDockReserve);
+            const w = element.offsetWidth;
+            const h = element.offsetHeight;
+            const clampedLeft = Math.max(6, Math.round((vw - w) / 2));
+            const clampedTop = Math.max(topPad, Math.round(topPad + Math.max(0, (usableH - h) / 2)));
+
+            element.style.left = `${ clampedLeft }px`;
+            element.style.top = `${ clampedTop }px`;
+        };
+
+        if(isMobileUi)
+        {
+            positionMobileWindow();
+        }
+        else
+        {
+            switch(windowPosition)
+            {
+                case DraggableWindowPosition.TOP_CENTER:
+                    element.style.top = 50 + offsetTop + 'px';
+                    element.style.left = `calc(50vw - ${ (element.offsetWidth / 2 + offsetLeft) }px)`;
+                    break;
+                case DraggableWindowPosition.CENTER:
+                    element.style.top = `calc(50vh - ${ (element.offsetHeight / 2) + offsetTop }px)`;
+                    element.style.left = `calc(50vw - ${ (element.offsetWidth / 2) + offsetLeft }px)`;
+                    break;
+                case DraggableWindowPosition.TOP_LEFT:
+                    element.style.top = 50 + offsetTop + 'px';
+                    element.style.left = 50 + offsetLeft + 'px';
+                    break;
+            }
         }
 
         setDelta({ x: 0, y: 0 });
         setOffset({ x: offsetX, y: offsetY });
 
+        let resizeObserver: ResizeObserver = null;
+        const onMobileViewportResize = () =>
+        {
+            if(document.body.classList.contains('is-mobile-ui')) positionMobileWindow();
+        };
+
+        if(isMobileUi)
+        {
+            window.addEventListener('resize', onMobileViewportResize);
+            if(typeof ResizeObserver !== 'undefined')
+            {
+                resizeObserver = new ResizeObserver(() =>
+                {
+                    if(document.body.classList.contains('is-mobile-ui')) positionMobileWindow();
+                });
+                resizeObserver.observe(element);
+            }
+        }
+
         return () =>
         {
+            if(isMobileUi)
+            {
+                window.removeEventListener('resize', onMobileViewportResize);
+                if(resizeObserver) resizeObserver.disconnect();
+            }
+
             const index = CURRENT_WINDOWS.indexOf(element);
 
             if(index >= 0) CURRENT_WINDOWS.splice(index, 1);
@@ -252,7 +301,7 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
 
     useEffect(() =>
     {
-        if(!uniqueKey) return;
+        if(!uniqueKey || document.body.classList.contains('is-mobile-ui')) return;
 
         const localStorage = GetLocalStorage<WindowSaveOptions>(`nitro.windows.${ uniqueKey }`);
 

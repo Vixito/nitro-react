@@ -36,18 +36,84 @@ body.is-mobile-ui {
     // ── VENTANAS ADAPTADAS A PANTALLA MÓVIL (UNIFICADAS EN ESTILO HABBO MOBILE) ──
     .draggable-window {
         max-width: calc(100vw - 12px) !important;
-        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        max-height: calc(100dvh - 74px - env(safe-area-inset-bottom)) !important;
+    }
+
+    // Pantalla de desconexión ("Reconectar al Hotel") siempre legible y nítida en móvil
+    .nitro-loading.is-error {
+        .nitro-card.nitro-alert {
+            width: min(360px, calc(100vw - 24px)) !important;
+            max-width: calc(100vw - 24px) !important;
+            max-height: calc(100dvh - 24px) !important;
+            background: #eef3f6 !important;
+            border: 2px solid #0b3952 !important;
+            border-radius: 10px !important;
+            overflow: hidden !important;
+
+            .nitro-card-header {
+                min-height: 36px !important;
+                height: 36px !important;
+                background: #165e82 !important;
+                border-bottom: 1.5px solid #0b3952 !important;
+                box-shadow: none !important;
+            }
+
+            .nitro-card-content {
+                background: #eef3f6 !important;
+                color: #142633 !important;
+                padding: 18px 20px !important;
+                gap: 12px !important;
+
+                .fs-5 {
+                    color: #142633 !important;
+                    font-size: 14px !important;
+                    line-height: 1.4 !important;
+                    margin-bottom: 4px !important;
+                }
+
+                button.btn,
+                button.nitro-reconnect-btn {
+                    width: 100% !important;
+                    min-height: 42px !important;
+                    padding: 10px 16px !important;
+                    background: #16a34a !important;
+                    background-color: #16a34a !important;
+                    border: 2px solid #0f5132 !important;
+                    border-radius: 6px !important;
+                    color: #ffffff !important;
+                    font-size: 14px !important;
+                    font-weight: 700 !important;
+                    box-shadow: none !important;
+                    text-shadow: none !important;
+                    opacity: 1 !important;
+
+                    &:active {
+                        background-color: #15803d !important;
+                        transform: translateY(1px);
+                    }
+                }
+            }
+        }
     }
 
     .nitro-card {
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
         max-width: calc(100vw - 12px) !important;
-        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        max-height: calc(100dvh - 74px - env(safe-area-inset-bottom)) !important;
         resize: none !important;
         border: 2px solid #0b3952 !important;
         border-radius: 10px !important;
         background: #eef3f6 !important;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55) !important;
         overflow: hidden !important;
+
+        > .nitro-card-header,
+        > .nitro-card-tabs {
+            flex-shrink: 0 !important;
+        }
 
         .nitro-card-header {
             min-height: 38px !important;
@@ -90,6 +156,8 @@ body.is-mobile-ui {
             overflow-x: auto !important;
             flex-wrap: nowrap !important;
             scrollbar-width: none;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-x !important;
 
             &::-webkit-scrollbar {
                 display: none;
@@ -111,16 +179,24 @@ body.is-mobile-ui {
             }
         }
 
-        .content-area,
-        .nitro-card-content {
+        > .content-area,
+        > .nitro-card-content,
+        > .content-area.overflow-hidden,
+        > .nitro-card-content.overflow-hidden {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            min-width: 0 !important;
             background: #eef3f6 !important;
             color: #142633 !important;
             overflow-y: auto !important;
+            overflow-x: auto !important;
             -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain !important;
+            touch-action: pan-x pan-y !important;
         }
     }
 
-    // Ventanas principales ajustadas a ancho móvil limpio
+    // Ventanas principales ajustadas a pantalla móvil con desplazamiento fluido y sin min-width/min-height bloqueantes
     .nitro-navigator,
     .nitro-catalog,
     .nitro-inventory,
@@ -128,19 +204,257 @@ body.is-mobile-ui {
     .nitro-achievements,
     .nitro-friends,
     .nitro-messenger,
+    .nitro-wired,
     .user-profile,
-    .nitro-battle-pass {
-        width: min(620px, calc(100vw - 12px)) !important;
-        height: min(460px, calc(100dvh - 82px - env(safe-area-inset-bottom))) !important;
+    .login-streak-window {
+        width: min(640px, calc(100vw - 12px)) !important;
+        height: min(460px, calc(100dvh - 76px - env(safe-area-inset-bottom))) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        max-width: calc(100vw - 12px) !important;
+        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
     }
 
-    // Perfil de usuario: scrollable en pantallas pequeñas
+    // Perfil de usuario: sin min-height de escritorio que lo recorte
     .user-profile {
-        width: min(470px, calc(100vw - 12px)) !important;
-        height: min(500px, calc(100dvh - 82px - env(safe-area-inset-bottom))) !important;
+        width: min(565px, calc(100vw - 12px)) !important;
+        height: min(500px, calc(100dvh - 76px - env(safe-area-inset-bottom))) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
 
         .content-area {
             overflow-y: auto !important;
+            overflow-x: auto !important;
+        }
+    }
+
+    // Tablón de Anuncios adaptado y desplazable en móvil
+    .bulletin-board-window {
+        width: min(708px, calc(100vw - 12px)) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        max-width: calc(100vw - 12px) !important;
+        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+
+        .bulletin-titlebar {
+            flex-shrink: 0 !important;
+        }
+
+        .bulletin-cork-body {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain !important;
+            touch-action: pan-x pan-y !important;
+        }
+    }
+
+    // ── PASE DE BATALLA EN MÓVIL: CONTENCIÓN ESTRICTA Y SCROLL SUAVE ──
+    .nitro-battle-pass {
+        width: min(760px, calc(100vw - 12px)) !important;
+        height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        max-width: calc(100vw - 12px) !important;
+        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+
+        .bp-container {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            min-width: 0 !important;
+            background: var(--bp-bg, #eef3f6) !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior: contain !important;
+            touch-action: pan-y !important;
+            padding: 10px !important;
+            gap: 10px !important;
+
+            > * {
+                flex-shrink: 0 !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+            }
+        }
+
+        // Banner superior: nunca se aplasta ni se corta arriba
+        .bp-season-banner {
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            padding: 8px 12px !important;
+            min-height: auto !important;
+            overflow: hidden !important;
+
+            .bp-banner-title {
+                flex: 1 1 220px !important;
+                min-width: 0 !important;
+                font-size: 12px !important;
+                line-height: 1.35 !important;
+            }
+        }
+
+        // Todas las tarjetas internas contienen estrictamente a sus hijos
+        .bp-card-box {
+            overflow: hidden !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+            padding: 10px 12px !important;
+        }
+
+        // Fila superior (MI EXPERIENCIA y RETOS): apilar a 1 columna de ancho completo para cero desbordes
+        .bp-container > .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            row-gap: 10px !important;
+
+            > [class*='col-'] {
+                flex: 0 0 100% !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                min-width: 0 !important;
+            }
+        }
+
+        // Dentro de MI EXPERIENCIA y RETOS: permitir wrap limpio sin que nada salga de la caja
+        .bp-container > .row .bp-card-box {
+            height: auto !important;
+
+            > .d-flex {
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+
+            > .d-flex > .d-flex:not(.flex-column) {
+                min-width: 0 !important;
+                max-width: 100% !important;
+                flex-wrap: wrap !important;
+
+                > .d-flex {
+                    flex-wrap: wrap !important;
+                    max-width: 100% !important;
+                }
+            }
+
+            > .d-flex > .d-flex.flex-column {
+                min-width: 0 !important;
+                max-width: 100% !important;
+                flex: 1 1 175px !important;
+            }
+
+            .bp-mini-reward {
+                max-width: 100% !important;
+                overflow: hidden !important;
+            }
+
+            .bp-missions-horizontal-track {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-x pan-y !important;
+            }
+
+            .bp-quick-mission-card {
+                width: min(260px, 85vw) !important;
+                min-width: 220px !important;
+                max-width: 100% !important;
+            }
+        }
+
+        // Sección inferior (GRATIS/VIP + Retos): apilar verticalmente para que nada se corte ni se aplaste
+        .bp-bottom-section {
+            flex-direction: column !important;
+            min-height: auto !important;
+            height: auto !important;
+            gap: 10px !important;
+        }
+
+        .bp-rewards-column {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+
+            .bp-rewards-scroll-track {
+                max-height: 270px !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+        }
+
+        .bp-challenges-column {
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+
+            > .d-flex:first-child {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+
+            .row {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                row-gap: 8px !important;
+
+                > .col-6 {
+                    flex: 0 0 100% !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                }
+            }
+
+            .bp-category-card {
+                overflow: hidden !important;
+                padding: 10px 12px !important;
+
+                .d-flex.align-items-center.justify-content-between {
+                    flex-wrap: wrap !important;
+                    gap: 4px !important;
+                }
+            }
+
+            .bp-mission-row {
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+                padding: 10px !important;
+                overflow: hidden !important;
+            }
+
+            .overflow-auto {
+                max-height: 300px !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: pan-y !important;
+            }
+        }
+
+        // Diálogos internos (Ranking / Vista previa de premio) centrados en pantalla y desplazables
+        .bp-modal-backdrop {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 2000 !important;
+            padding: 12px !important;
+        }
+
+        .bp-dialog {
+            max-width: calc(100vw - 24px) !important;
+            max-height: calc(100dvh - 24px) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
         }
     }
 
