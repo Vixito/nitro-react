@@ -7,7 +7,6 @@ import receptionLeft2012 from '../../assets/images/eras/flash2012/reception/back
 import receptionRight2012 from '../../assets/images/eras/flash2012/reception/backdrop_right.png';
 import receptionStretch2012 from '../../assets/images/eras/flash2012/reception/backdrop_stretch.png';
 import receptionTopStretch2012 from '../../assets/images/eras/flash2012/reception/hotel_top_stretch.png';
-import modernHotelXmasBg from '../../assets/images/hotelview/hotelview_xmas_modern.png';
 import mobileHotelExterior from '../../assets/images/mobile/hotel_exterior.png';
 import mobNavigatorImg from '../../assets/images/mobile/mob_navigator.png';
 import mobShopImg from '../../assets/images/mobile/mob_shop.png';
@@ -647,21 +646,7 @@ export const HotelView: FC<{}> = props =>
     }
 
     return (
-        <div
-            className="nitro-hotel-view nitro-hotel-view-xmas"
-            style={
-                customBg
-                    ? { background: customBg }
-                    : {
-                        backgroundColor: '#f0fdfe',
-                        backgroundImage: `url(${ modernHotelXmasBg })`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'left bottom',
-                        backgroundSize: 'cover',
-                        imageRendering: 'pixelated'
-                    }
-            }
-        >
+        <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : (backgroundColor ? { background: backgroundColor } : {}) }>
             <div className="container h-100 py-3 overflow-hidden landing-widgets" style={{ zIndex: 1 }}>
                 <div className="row h-100">
                     <div className="col-9 h-100 d-flex flex-column">
@@ -713,7 +698,7 @@ export const HotelView: FC<{}> = props =>
                     </div>
                 </div>
             </div>
-            { customBg ? backgrounds : null }
+            { backgrounds }
             { customOverlay }
             { (hotelViewConf['show.avatar'] ?? true) && (
                 <div className="avatar-image" style={{ zIndex: 11 }}>
