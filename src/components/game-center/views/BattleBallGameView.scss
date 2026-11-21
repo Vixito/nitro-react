@@ -1336,22 +1336,29 @@
         .bb-sw-scoreboard {
             top: 4px;
             left: 4px;
-            min-width: 120px;
-            max-width: 146px;
+            width: 154px;
+            min-width: 0;
+            max-width: min(158px, calc(100vw - 12px));
             padding: 3px 4px 4px;
             gap: 3px;
-            opacity: 0.9;
+            opacity: 0.92;
+            overflow: hidden;
         }
 
         .bb-sw-timer-pill {
             min-height: 16px;
-            padding: 1px 6px;
-            font-size: 9px;
+            padding: 2px 5px;
+            font-size: 8.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         .bb-sw-bars-well {
             padding: 2px;
             gap: 2px;
+            overflow: hidden;
         }
 
         .bb-sw-team-bar-row {
@@ -1361,12 +1368,28 @@
             .bb-sw-team-bar-label {
                 padding: 0 3px;
                 font-size: 8px;
+                min-width: 0;
+                overflow: hidden;
             }
         }
 
         .bb-sw-lock-foot {
             font-size: 8px;
             gap: 4px;
+            max-width: 100%;
+            overflow: hidden;
+
+            span:first-child {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            span:last-child {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
         }
 
         .bb-sw-pu-toast {
