@@ -649,13 +649,18 @@ export const HotelView: FC<{}> = props =>
     return (
         <div
             className="nitro-hotel-view nitro-hotel-view-xmas"
-            style={{
-                backgroundColor: '#0c2a4d',
-                backgroundImage: `url(${ modernHotelXmasBg })`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right bottom',
-                backgroundSize: 'cover'
-            }}
+            style={
+                customBg
+                    ? { background: customBg }
+                    : {
+                        backgroundColor: '#f0fdfe',
+                        backgroundImage: `url(${ modernHotelXmasBg })`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'left bottom',
+                        backgroundSize: 'cover',
+                        imageRendering: 'pixelated'
+                    }
+            }
         >
             <div className="container h-100 py-3 overflow-hidden landing-widgets" style={{ zIndex: 1 }}>
                 <div className="row h-100">
@@ -708,6 +713,7 @@ export const HotelView: FC<{}> = props =>
                     </div>
                 </div>
             </div>
+            { customBg ? backgrounds : null }
             { customOverlay }
             { (hotelViewConf['show.avatar'] ?? true) && (
                 <div className="avatar-image" style={{ zIndex: 11 }}>

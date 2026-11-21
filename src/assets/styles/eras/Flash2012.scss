@@ -4853,6 +4853,25 @@ body[data-era="flash2012"] {
                 color: #ffffff !important;
                 font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 11px !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            input.motto-input {
+                background: transparent !important;
+                background-color: transparent !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                color: #ffffff !important;
+                -webkit-text-fill-color: #ffffff !important;
+                caret-color: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
             }
 
             .infostand-pencil-2012 {
