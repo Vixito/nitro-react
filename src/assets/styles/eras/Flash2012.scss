@@ -2877,6 +2877,7 @@ body[data-era="flash2012"] {
     .nitro-card[data-window-key="navigator"] {
         width: 425px !important;
         min-width: 425px !important;
+        min-height: 515px !important;
 
         .nitro-card-header {
             background: #367897 !important;
@@ -3000,6 +3001,13 @@ body[data-era="flash2012"] {
                 box-shadow: none !important;
                 padding: 0 !important;
                 overflow: hidden !important;
+                flex-shrink: 0 !important;
+
+                > .mx-2 {
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                    padding: 0 6px 6px 6px !important;
+                }
 
                 > .d-flex:first-child {
                     padding: 6px 8px !important;
@@ -3165,8 +3173,7 @@ body[data-era="flash2012"] {
             }
 
             .creator-2012-input,
-            .creator-2012-textarea,
-            .creator-2012-select {
+            .creator-2012-textarea {
                 width: 100% !important;
                 background-color: #ffffff !important;
                 border: 1px solid #7c7c77 !important;
@@ -3188,9 +3195,26 @@ body[data-era="flash2012"] {
             }
 
             .creator-2012-select {
-                border-color: #000000 !important;
+                width: 100% !important;
+                background-color: #ffffff !important;
+                border: 1px solid #000000 !important;
+                border-radius: 3px !important;
+                color: #111111 !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 400 !important;
+                line-height: 1.2 !important;
                 height: 24px !important;
                 padding: 0 5px !important;
+                box-shadow: none !important;
+
+                option {
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                    font-size: 12px !important;
+                    font-weight: 400 !important;
+                    color: #111111 !important;
+                    background-color: #ffffff !important;
+                }
             }
 
             .creator-2012-buttons {
@@ -6504,18 +6528,8 @@ body[data-era="flash2012"] {
 // ==========================================
 // BLOQUE 4B: TABLÓN DE ANUNCIOS (1:1 12-24-58)
 // ==========================================
-.icon-me-announcements {
-    background-image: url('@/assets/images/eras/flash2012/memenu/announcements_color.png') !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-size: contain !important;
-    image-rendering: pixelated !important;
-    width: 34px !important;
-    height: 34px !important;
-}
-
 .bulletin-board-window {
-    width: 696px !important;
+    width: 708px !important;
     background-color: #e4c792 !important;
     border: 1px solid #000000 !important;
     border-radius: 6px !important;
@@ -6551,24 +6565,35 @@ body[data-era="flash2012"] {
         }
 
         .bulletin-close-btn {
-            width: 18px !important;
-            height: 18px !important;
+            width: 15px !important;
+            height: 15px !important;
+            min-width: 15px !important;
+            min-height: 15px !important;
             background: transparent !important;
-            border: 1px solid #a47a43 !important;
-            border-radius: 2px !important;
-            color: #6b4721 !important;
-            font-size: 13px !important;
-            font-weight: 700 !important;
-            line-height: 1 !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
             padding: 0 !important;
-            display: flex !important;
+            margin: 0 !important;
+            display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             cursor: pointer !important;
+            flex-shrink: 0 !important;
+
+            .bulletin-close-ico {
+                width: 13px !important;
+                height: 13px !important;
+                display: block !important;
+                image-rendering: pixelated !important;
+            }
 
             &:hover {
-                background: #d8b577 !important;
-                color: #111111 !important;
+                filter: brightness(0.92) !important;
+            }
+
+            &:active {
+                transform: translateY(1px) !important;
             }
         }
     }
@@ -6582,7 +6607,7 @@ body[data-era="flash2012"] {
         border-radius: 5px !important;
         padding: 10px !important;
         display: grid !important;
-        grid-template-columns: 1fr 224px !important;
+        grid-template-columns: 1fr 236px !important;
         gap: 10px !important;
     }
 
@@ -6829,11 +6854,13 @@ body[data-era="flash2012"] {
         padding: 0 0 8px 0 !important;
         display: flex !important;
         flex-direction: column !important;
-        overflow: hidden !important;
+        overflow: visible !important;
+        min-width: 0 !important;
 
         .bulletin-cal-header {
             background-color: #d64b13 !important;
             border-bottom: 1px solid #000000 !important;
+            border-radius: 4px 4px 0 0 !important;
             padding: 6px 10px !important;
             display: flex !important;
             align-items: center !important;
@@ -6848,6 +6875,7 @@ body[data-era="flash2012"] {
 
             .bulletin-cal-month {
                 color: #ffffff !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 12px !important;
                 font-weight: 700 !important;
                 font-style: italic !important;
@@ -6860,38 +6888,58 @@ body[data-era="flash2012"] {
             margin: 0 8px 8px 8px !important;
             border: 1px solid #000000 !important;
             border-top: none !important;
-            padding: 4px 5px 5px !important;
+            padding: 4px 4px 5px !important;
+            box-sizing: border-box !important;
 
             .bulletin-cal-weekdays {
                 display: grid !important;
-                grid-template-columns: repeat(7, 1fr) !important;
+                grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
                 text-align: center !important;
-                font-size: 9px !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 8.5px !important;
                 font-weight: 700 !important;
                 color: #222222 !important;
                 margin-bottom: 3px !important;
+
+                span {
+                    min-width: 0 !important;
+                    overflow: hidden !important;
+                }
             }
 
             .bulletin-cal-grid {
                 display: grid !important;
-                grid-template-columns: repeat(7, 1fr) !important;
+                grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
                 border-top: 1px solid #111111 !important;
                 border-left: 1px solid #111111 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
             }
 
             .bulletin-cal-cell {
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
                 height: 25px !important;
+                min-height: 25px !important;
                 background-color: #ffffff !important;
+                background-image: none !important;
                 border: none !important;
+                border-radius: 0 !important;
                 border-right: 1px solid #111111 !important;
                 border-bottom: 1px solid #111111 !important;
-                padding: 1px 2px !important;
+                box-shadow: none !important;
+                padding: 2px 2px 1px !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: flex-end !important;
                 justify-content: space-between !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 cursor: pointer !important;
                 position: relative !important;
+                overflow: hidden !important;
 
                 &.is-muted {
                     background-color: #e8e8e4 !important;
@@ -7055,19 +7103,19 @@ body[data-era="flash2012"] {
 .habbten-tutorial-overlay {
     position: fixed !important;
     inset: 0 !important;
-    background: rgba(0, 0, 0, 0.48) !important;
+    background: transparent !important;
     z-index: 2600 !important;
-    pointer-events: auto !important;
+    pointer-events: none !important;
 
-    .habbten-tutorial-spotlight {
+    .habbten-tutorial-scrim {
         position: fixed !important;
-        border: 2px solid #ffffff !important;
-        border-radius: 6px !important;
-        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.12), 0 0 14px rgba(255, 255, 255, 0.85) !important;
-        pointer-events: none !important;
+        background: rgba(0, 0, 0, 0.54) !important;
+        pointer-events: auto !important;
+        z-index: 2601 !important;
     }
 
     .habbten-tutorial-balloon {
+        pointer-events: auto !important;
         position: fixed !important;
         width: 268px !important;
         background-color: #ffffff !important;

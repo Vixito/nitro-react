@@ -6,6 +6,7 @@ import noteBlueImg from '../../assets/images/eras/flash2012/bulletin/note_blue.p
 import notePinkImg from '../../assets/images/eras/flash2012/bulletin/note_pink.png';
 import noteYellowImg from '../../assets/images/eras/flash2012/bulletin/note_yellow.png';
 import pushpinGreenImg from '../../assets/images/eras/flash2012/bulletin/pushpin_green.png';
+import closeBulletinImg from '../../assets/images/eras/flash2012/bulletin/close_bulletin.png';
 
 interface BulletinArticle
 {
@@ -173,7 +174,7 @@ export const BulletinBoardView: FC<{}> = () =>
                         onMouseDown={ e => e.stopPropagation() }
                         onClick={ () => setIsVisible(false) }
                     >
-                        ×
+                        <img src={ closeBulletinImg } alt="Cerrar" className="bulletin-close-ico" />
                     </button>
                 </div>
 

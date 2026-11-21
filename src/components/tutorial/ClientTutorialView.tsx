@@ -238,18 +238,24 @@ export const ClientTutorialView: FC<{}> = () =>
         }
     }
 
+    const pad = 2;
+    const cutLeft = targetRect ? Math.max(0, Math.round(targetRect.left - pad)) : 0;
+    const cutTop = targetRect ? Math.max(0, Math.round(targetRect.top - pad)) : 0;
+    const cutRight = targetRect ? Math.min(window.innerWidth, Math.round(targetRect.left + targetRect.width + pad)) : 0;
+    const cutBottom = targetRect ? Math.min(window.innerHeight, Math.round(targetRect.top + targetRect.height + pad)) : 0;
+
     return (
         <div className="habbten-tutorial-overlay">
-            { targetRect && (
-                <div
-                    className="habbten-tutorial-spotlight"
-                    style={ {
-                        left: `${ targetRect.left - 4 }px`,
-                        top: `${ targetRect.top - 4 }px`,
-                        width: `${ targetRect.width + 8 }px`,
-                        height: `${ targetRect.height + 8 }px`
-                    } }
-                />
+            { targetRect ? (
+                <>
+                    {/* 4-panel borderless dark scrim leaving the target icon 100% bright & unboxed */}
+                    <div className="habbten-tutorial-scrim" style={ { left: 0, top: 0, width: '100vw', height: `${ cutTop }px` } } />
+                    <div className="habbten-tutorial-scrim" style={ { left: 0, top: `${ cutBottom }px`, width: '100vw', bottom: 0 } } />
+                    <div className="habbten-tutorial-scrim" style={ { left: 0, top: `${ cutTop }px`, width: `${ cutLeft }px`, height: `${ Math.max(0, cutBottom - cutTop) }px` } } />
+                    <div className="habbten-tutorial-scrim" style={ { left: `${ cutRight }px`, top: `${ cutTop }px`, right: 0, height: `${ Math.max(0, cutBottom - cutTop) }px` } } />
+                </>
+            ) : (
+                <div className="habbten-tutorial-scrim" style={ { inset: 0 } } />
             ) }
 
             <div className={ `habbten-tutorial-balloon arrow-${ arrowDir }` } style={ balloonStyle }>

@@ -87,11 +87,27 @@ export const NavigatorSearchResultView: FC<NavigatorSearchResultViewProps> = pro
                     { !isExtended && <FaPlus className="text-secondary fa-icon" /> }
                     <Text>{ LocalizeText(getResultTitle()) }</Text>
                 </Flex>
-                <Flex gap={ 2 }>
-                    { (displayMode === NavigatorSearchResultViewDisplayMode.LIST) && <FaTh className="text-secondary fa-icon" onClick={ toggleDisplayMode } /> }
-                    { (displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS) && <FaBars className="text-secondary fa-icon" onClick={ toggleDisplayMode } /> }
-                    { (searchResult.action > 0) && (searchResult.action === 1) && <FaWindowMaximize className="text-secondary fa-icon" onClick={ showMore } /> }
-                    { (searchResult.action > 0) && (searchResult.action !== 1) && <FaWindowRestore className="text-secondary fa-icon" onClick={ showMore } /> }
+                <Flex gap={ 2 } alignItems="center">
+                    { (displayMode === NavigatorSearchResultViewDisplayMode.LIST) && (
+                        <span className="cursor-pointer d-inline-flex" title="Cambiar a vista de cuadrícula" onClick={ toggleDisplayMode }>
+                            <FaTh className="text-secondary fa-icon" />
+                        </span>
+                    ) }
+                    { (displayMode >= NavigatorSearchResultViewDisplayMode.THUMBNAILS) && (
+                        <span className="cursor-pointer d-inline-flex" title="Cambiar a vista de lista" onClick={ toggleDisplayMode }>
+                            <FaBars className="text-secondary fa-icon" />
+                        </span>
+                    ) }
+                    { (searchResult.action > 0) && (searchResult.action === 1) && (
+                        <span className="cursor-pointer d-inline-flex" title="Ver todas las salas de esta categoría" onClick={ showMore }>
+                            <FaWindowMaximize className="text-secondary fa-icon" />
+                        </span>
+                    ) }
+                    { (searchResult.action > 0) && (searchResult.action !== 1) && (
+                        <span className="cursor-pointer d-inline-flex" title="Volver a la vista general" onClick={ showMore }>
+                            <FaWindowRestore className="text-secondary fa-icon" />
+                        </span>
+                    ) }
                 </Flex>
 
             </Flex> { isExtended && 
