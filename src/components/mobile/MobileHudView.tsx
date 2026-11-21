@@ -48,8 +48,12 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     const { sendChat = null, setIsTyping = null, setIsIdle = null } = useChatInputWidget();
     const [ touchMode, setTouchMode ] = useMobileTouchMode();
     const { enabled: dpadEnabled, side: dpadSide } = useMobileDpadSettings();
-    const [ activeDpadDir, setActiveDpadDir ] = useState<string>('');
-    const dpadIntervalRef = useRef<number | null>(null);
+    const [ joyKnob, setJoyKnob ] = useState<{ x: number; y: number; active: boolean }>({ x: 0, y: 0, active: false });
+    const joyPadRef = useRef<HTMLDivElement>(null);
+    const joyPointerIdRef = useRef<number | null>(null);
+    const joyDirRef = useRef<{ dx: number; dy: number } | null>(null);
+    const joyIntervalRef = useRef<number | null>(null);
+    const joyLastSentRef = useRef<{ x: number; y: number; at: number }>({ x: -999, y: -999, at: 0 });
 
     const [ isMeMenuOpen, setMeMenuOpen ] = useState(false);
     const [ isHelpMenuOpen, setHelpMenuOpen ] = useState(false);
@@ -73,26 +77,30 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         setIsSoundActive(!(parser.volumeSystem === 0 && parser.volumeFurni === 0 && parser.volumeTrax === 0));
     });
 
-    const stopDpadWalk = useCallback(() =>
+    const stopJoystickWalk = useCallback(() =>
     {
-        if(dpadIntervalRef.current)
+        if(joyIntervalRef.current)
         {
-            window.clearInterval(dpadIntervalRef.current);
-            dpadIntervalRef.current = null;
+            window.clearInterval(joyIntervalRef.current);
+            joyIntervalRef.current = null;
         }
-        setActiveDpadDir('');
+        joyPointerIdRef.current = null;
+        joyDirRef.current = null;
+        setJoyKnob({ x: 0, y: 0, active: false });
     }, []);
 
-    const stepAvatarInDirection = useCallback((dx: number, dy: number) =>
+    const stepAvatarInDirection = useCallback((dx: number, dy: number, force = false) =>
     {
-        const session = GetRoomSession();
+        const activeSession = roomSession || GetRoomSession();
         const engine = GetRoomEngine();
         const userSession = GetSessionDataManager();
-        if(!session || !engine || !userSession) return;
+        if(!activeSession || !engine || !userSession) return;
 
-        const roomId = session.roomId;
-        const userData = session.userDataManager?.getUserDataByType(userSession.userId, 1)
-            || session.userDataManager?.getUserDataByName(userSession.userName);
+        const roomId = activeSession.roomId;
+        const udm = activeSession.userDataManager;
+        const userData = udm?.getUserData?.(userSession.userId)
+            || udm?.getDataByType?.(userSession.userId, 1)
+            || udm?.getUserDataByName?.(userSession.userName);
         if(!userData) return;
 
         const unitObj = engine.getRoomObject(roomId, userData.roomIndex, RoomObjectCategory.UNIT);
@@ -101,37 +109,92 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         const loc = unitObj.getLocation();
         if(!loc) return;
 
-        const nextX = Math.round(loc.x) + dx;
-        const nextY = Math.round(loc.y) + dy;
+        const curX = Math.round(loc.x);
+        const curY = Math.round(loc.y);
+        const nextX = curX + dx;
+        const nextY = curY + dy;
         if(nextX < 0 || nextY < 0) return;
 
-        SendMessageComposer(new RoomUnitWalkComposer(nextX, nextY));
-    }, []);
+        const now = Date.now();
+        const last = joyLastSentRef.current;
+        if(!force && last.x === nextX && last.y === nextY && (now - last.at) < 320) return;
 
-    const startDpadWalk = useCallback((dirId: string, dx: number, dy: number) =>
+        joyLastSentRef.current = { x: nextX, y: nextY, at: now };
+        SendMessageComposer(new RoomUnitWalkComposer(nextX, nextY));
+    }, [ roomSession ]);
+
+    const updateJoystickFromPoint = useCallback((clientX: number, clientY: number, isInitial = false) =>
     {
-        stopDpadWalk();
-        setActiveDpadDir(dirId);
-        stepAvatarInDirection(dx, dy);
-        dpadIntervalRef.current = window.setInterval(() =>
+        const pad = joyPadRef.current;
+        if(!pad) return;
+
+        const rect = pad.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const rawX = clientX - cx;
+        const rawY = clientY - cy;
+        const dist = Math.hypot(rawX, rawY);
+        const maxRadius = rect.width * 0.34;
+        const deadZone = 10;
+
+        if(dist < deadZone)
         {
-            stepAvatarInDirection(dx, dy);
-        }, 230);
-    }, [ stepAvatarInDirection, stopDpadWalk ]);
+            joyDirRef.current = null;
+            setJoyKnob({ x: rawX * 0.4, y: rawY * 0.4, active: true });
+            return;
+        }
+
+        const clamped = Math.min(dist, maxRadius);
+        const nx = rawX / dist;
+        const ny = rawY / dist;
+        setJoyKnob({ x: nx * clamped, y: ny * clamped, active: true });
+
+        // Exact 8-sector Habbo isometric screen-angle mapping
+        const deg = (Math.atan2(ny, nx) * 180) / Math.PI;
+        let dx = 0;
+        let dy = 0;
+
+        if(deg >= -22.5 && deg < 22.5) { dx = 1; dy = -1; }           // → Derecha
+        else if(deg >= 22.5 && deg < 67.5) { dx = 1; dy = 0; }        // ↘ Abajo-derecha
+        else if(deg >= 67.5 && deg < 112.5) { dx = 1; dy = 1; }       // ↓ Abajo
+        else if(deg >= 112.5 && deg < 157.5) { dx = 0; dy = 1; }      // ↙ Abajo-izquierda
+        else if(deg >= 157.5 || deg < -157.5) { dx = -1; dy = 1; }    // ← Izquierda
+        else if(deg >= -157.5 && deg < -112.5) { dx = -1; dy = 0; }   // ↖ Arriba-izquierda
+        else if(deg >= -112.5 && deg < -67.5) { dx = -1; dy = -1; }   // ↑ Arriba
+        else { dx = 0; dy = -1; }                                     // ↗ Arriba-derecha
+
+        const prev = joyDirRef.current;
+        const dirChanged = !prev || prev.dx !== dx || prev.dy !== dy;
+        joyDirRef.current = { dx, dy };
+
+        if(isInitial || dirChanged)
+        {
+            stepAvatarInDirection(dx, dy, true);
+        }
+
+        if(!joyIntervalRef.current)
+        {
+            joyIntervalRef.current = window.setInterval(() =>
+            {
+                const cur = joyDirRef.current;
+                if(cur) stepAvatarInDirection(cur.dx, cur.dy, false);
+            }, 180);
+        }
+    }, [ stepAvatarInDirection ]);
 
     useEffect(() =>
     {
         if(!isInRoom || !dpadEnabled)
         {
-            stopDpadWalk();
+            stopJoystickWalk();
         }
         if(!isInRoom)
         {
             setChatBarOpen(false);
             setSideDrawerOpen(false);
         }
-        return () => stopDpadWalk();
-    }, [ isInRoom, dpadEnabled, stopDpadWalk ]);
+        return () => stopJoystickWalk();
+    }, [ isInRoom, dpadEnabled, stopJoystickWalk ]);
 
     useEffect(() =>
     {
@@ -354,104 +417,49 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                 </div>
             ) }
 
-            {/* CRUCETA DIRECCIONAL MÓVIL PARA CAMINAR EN SALA (CONFIGURABLE EN AJUSTES) */}
+            {/* JOYSTICK MÓVIL ANALÓGICO 360° PARA CAMINAR EN SALA (CONFIGURABLE EN AJUSTES) */}
             { isInRoom && dpadEnabled && (
                 <div
-                    className={ `hmob-dpad ${ dpadSide === 'left' ? 'is-left' : 'is-right' }` }
-                    role="group"
-                    aria-label="Cruceta de movimiento"
+                    ref={ joyPadRef }
+                    className={ `hmob-joystick ${ dpadSide === 'left' ? 'is-left' : 'is-right' } ${ joyKnob.active ? 'is-active' : '' }` }
+                    role="application"
+                    aria-label="Joystick de movimiento"
+                    onPointerDown={ e =>
+                    {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        joyPointerIdRef.current = e.pointerId;
+                        try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
+                        updateJoystickFromPoint(e.clientX, e.clientY, true);
+                    } }
+                    onPointerMove={ e =>
+                    {
+                        if(joyPointerIdRef.current !== e.pointerId) return;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        updateJoystickFromPoint(e.clientX, e.clientY, false);
+                    } }
+                    onPointerUp={ e =>
+                    {
+                        if(joyPointerIdRef.current !== e.pointerId) return;
+                        e.preventDefault();
+                        try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
+                        stopJoystickWalk();
+                    } }
+                    onPointerCancel={ e =>
+                    {
+                        if(joyPointerIdRef.current !== e.pointerId) return;
+                        stopJoystickWalk();
+                    } }
                 >
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'nw' ? 'active' : '' }` }
-                        aria-label="Arriba izquierda"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('nw', -1, 0); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ↖
-                    </button>
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 'n' ? 'active' : '' }` }
-                        aria-label="Arriba"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('n', -1, -1); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ▲
-                    </button>
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'ne' ? 'active' : '' }` }
-                        aria-label="Arriba derecha"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('ne', 0, -1); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ↗
-                    </button>
-
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 'w' ? 'active' : '' }` }
-                        aria-label="Izquierda"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('w', -1, 1); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ◀
-                    </button>
-                    <div className="hmob-dpad-center" aria-hidden="true" />
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 'e' ? 'active' : '' }` }
-                        aria-label="Derecha"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('e', 1, -1); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ▶
-                    </button>
-
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'sw' ? 'active' : '' }` }
-                        aria-label="Abajo izquierda"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('sw', 0, 1); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ↙
-                    </button>
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 's' ? 'active' : '' }` }
-                        aria-label="Abajo"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('s', 1, 1); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ▼
-                    </button>
-                    <button
-                        type="button"
-                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'se' ? 'active' : '' }` }
-                        aria-label="Abajo derecha"
-                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('se', 1, 0); } }
-                        onPointerUp={ stopDpadWalk }
-                        onPointerCancel={ stopDpadWalk }
-                        onPointerLeave={ stopDpadWalk }
-                    >
-                        ↘
-                    </button>
+                    <span className="hmob-joy-arrow is-up" aria-hidden="true">▲</span>
+                    <span className="hmob-joy-arrow is-down" aria-hidden="true">▼</span>
+                    <span className="hmob-joy-arrow is-left" aria-hidden="true">◀</span>
+                    <span className="hmob-joy-arrow is-right" aria-hidden="true">▶</span>
+                    <div
+                        className="hmob-joy-knob"
+                        style={ { transform: `translate(${ joyKnob.x }px, ${ joyKnob.y }px)` } }
+                    />
                 </div>
             ) }
 

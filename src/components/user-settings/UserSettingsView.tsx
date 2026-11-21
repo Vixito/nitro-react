@@ -425,11 +425,11 @@ export const UserSettingsView: FC<{}> = props => {
                                         checked={ dpadEnabled }
                                         onChange={ event => setDpadEnabled(event.target.checked) }
                                     />
-                                    <Text>Mostrar flechas de movimiento (cruceta)</Text>
+                                    <Text>Mostrar joystick de movimiento</Text>
                                 </Flex>
                                 { dpadEnabled && (
                                     <Flex alignItems="center" justifyContent="between" gap={2} className="mt-1 mb-1">
-                                        <Text className="small">Posición de la cruceta:</Text>
+                                        <Text className="small">Posición del joystick:</Text>
                                         <Flex gap={1}>
                                             <button
                                                 type="button"
