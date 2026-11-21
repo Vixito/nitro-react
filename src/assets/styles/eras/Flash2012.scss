@@ -4833,7 +4833,7 @@ body[data-era="flash2012"] {
             box-shadow: inset 0 0 0 1px #33312d !important;
         }
 
-        // Authentic Habbo 2012 User Infostand: #686868 avatar frame + #5a5854 motto pill + crisp close [x]
+        // Authentic Habbo 2012 User Infostand: #686868 avatar frame + #686868 motto pill + yellow pencil + crisp 11px [x]
         .body-image:not(.pet) {
             background-color: #686868 !important;
             border: 1px solid #000000 !important;
@@ -4842,10 +4842,11 @@ body[data-era="flash2012"] {
         }
 
         .motto-row {
-            background-color: #5a5854 !important;
-            border: 1px solid #181715 !important;
-            border-radius: 4px !important;
-            padding: 3px 7px !important;
+            background-color: #686868 !important;
+            border: 1px solid #000000 !important;
+            border-radius: 5px !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+            padding: 4px 8px !important;
             min-height: 24px !important;
 
             .motto-content {
@@ -4853,15 +4854,26 @@ body[data-era="flash2012"] {
                 font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                 font-size: 11px !important;
             }
+
+            .fa-icon {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                width: 12px !important;
+                height: 12px !important;
+                color: #f3c42a !important;
+                filter: drop-shadow(0 1px 0 #000000) !important;
+            }
         }
 
-        .fa-icon {
-            border: 1px solid #9c9a95 !important;
-            border-radius: 2px !important;
+        .cursor-pointer.fa-icon {
+            border: 1px solid #d4d4d4 !important;
+            border-radius: 1px !important;
             padding: 1px !important;
-            width: 14px !important;
-            height: 14px !important;
-            background-color: #3a3835 !important;
+            width: 12px !important;
+            height: 12px !important;
+            background-color: transparent !important;
+            color: #ffffff !important;
         }
 
         // Imagen de mascota en infostand (100% visible, sin encogerse en flexbox)
@@ -4887,8 +4899,7 @@ body[data-era="flash2012"] {
             }
         }
 
-        // Motto / misión con fondo oscuro hundido claramente visible y sin doble borde
-        .motto-row,
+        // Bloques oscuros hundidos secundarios (sin pisar .motto-row gris 2012)
         .bg-light-dark:not(:has(.pet-stats)) {
             background-color: #1c1b18 !important;
             border: 1px solid #4a4740 !important;
