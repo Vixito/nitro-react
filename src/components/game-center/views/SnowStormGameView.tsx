@@ -3,6 +3,7 @@ import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from
 import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from '../../../api';
 import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, SnowStormParkaAvatar, trimTransparentImage } from './SnowStormAvatar';
+import { MobileJoystick } from '../../mobile/MobileJoystick';
 
 import creditIconImg from '../../../assets/images/eras/flash2012/purse/credit_icon.png';
 import ducketIconImg from '../../../assets/images/eras/flash2012/purse/ducket_icon.png';
@@ -555,6 +556,7 @@ export const SnowStormGameView: FC = () =>
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const audioRef = useRef<SnowStormAudio>(new SnowStormAudio());
     const keysRef = useRef<Set<string>>(new Set());
+    const joyVecRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
     const chatInputRef = useRef<HTMLInputElement | null>(null);
 
     // Loaded sprite images
@@ -1330,16 +1332,16 @@ export const SnowStormGameView: FC = () =>
 
                 if (f.isHuman)
                 {
-                    // Keyboard movement in isometric screen directions
-                    let screenDx = 0;
-                    let screenDy = 0;
+                    // Keyboard + Mobile 360° Joystick movement in isometric screen directions
+                    let screenDx = joyVecRef.current.x;
+                    let screenDy = joyVecRef.current.y;
                     const keys = keysRef.current;
                     if (keys.has('w') || keys.has('arrowup')) screenDy -= 1;
                     if (keys.has('s') || keys.has('arrowdown')) screenDy += 1;
                     if (keys.has('a') || keys.has('arrowleft')) screenDx -= 1;
                     if (keys.has('d') || keys.has('arrowright')) screenDx += 1;
 
-                    if (screenDx !== 0 || screenDy !== 0)
+                    if (Math.hypot(screenDx, screenDy) > 0.12)
                     {
                         f.targetX = null;
                         f.targetY = null;
@@ -1770,15 +1772,25 @@ export const SnowStormGameView: FC = () =>
                 }
             }
 
-            // Click walk marker for human
+            // Click walk marker for human (authentic Habbo isometric square tile highlight)
             const me = eng.fighters.find(f => f.isHuman);
             if (me && me.targetX !== null && me.targetY !== null)
             {
-                const mp = isoToScreen(me.targetX, me.targetY, eng);
-                ctx.strokeStyle = 'rgba(26, 134, 214, 0.7)';
-                ctx.lineWidth = 2;
+                const tx = Math.floor(me.targetX);
+                const ty = Math.floor(me.targetY);
+                const tp = isoToScreen(tx, ty, eng);
+                const hw = (TILE_W / 2) * sc;
+                const hh = (TILE_H / 2) * sc;
                 ctx.beginPath();
-                ctx.ellipse(mp.sx, mp.sy, 11 * sc, 5.5 * sc, 0, 0, Math.PI * 2);
+                ctx.moveTo(tp.sx, tp.sy);
+                ctx.lineTo(tp.sx + hw, tp.sy + hh);
+                ctx.lineTo(tp.sx, tp.sy + hh * 2);
+                ctx.lineTo(tp.sx - hw, tp.sy + hh);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(26, 134, 214, 0.2)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(26, 134, 214, 0.9)';
+                ctx.lineWidth = Math.max(1.5, 2 * sc);
                 ctx.stroke();
             }
 
@@ -2336,6 +2348,10 @@ export const SnowStormGameView: FC = () =>
                     </div>
 
                     {/* Bottom-Left Player Head + Green HP Bar + Score Circle */}
+                    <MobileJoystick
+                        className="is-snowstorm"
+                        onVectorChange={ (vx, vy) => { joyVecRef.current = { x: vx, y: vy }; } }
+                    />
                     <div className="ss-hud-bottom-left">
                         <div className="ss-hud-my-head">
                             <HabboHeadImg figure={ myFigure } direction={ 2 } size={ 38 } />

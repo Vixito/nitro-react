@@ -25,8 +25,9 @@ import iconHelp from '../../assets/images/toolbar/icons/me-menu/helper-tool.png'
 import iconModTools from '../../assets/images/toolbar/icons/modtools.png';
 import { LayoutCurrencyIcon } from '../../common';
 import { useAchievements, useChatInputWidget, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useNavigator, usePurse, useRoom, useSessionInfo } from '../../hooks';
-import { useMobileDpadSettings, useMobileTouchMode } from '../../hooks/mobile/useIsMobile';
+import { useMobileTouchMode } from '../../hooks/mobile/useIsMobile';
 import { HabboHeadImg } from '../game-center/views/SnowStormAvatar';
+import { MobileJoystick } from './MobileJoystick';
 import './MobileHudView.scss';
 
 interface MobileHudViewProps
@@ -47,13 +48,10 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     const { roomSession = null } = useRoom();
     const { sendChat = null, setIsTyping = null, setIsIdle = null } = useChatInputWidget();
     const [ touchMode, setTouchMode ] = useMobileTouchMode();
-    const { enabled: dpadEnabled, side: dpadSide } = useMobileDpadSettings();
-    const [ joyKnob, setJoyKnob ] = useState<{ x: number; y: number; active: boolean }>({ x: 0, y: 0, active: false });
-    const joyPadRef = useRef<HTMLDivElement>(null);
-    const joyPointerIdRef = useRef<number | null>(null);
     const joyDirRef = useRef<{ dx: number; dy: number } | null>(null);
     const joyIntervalRef = useRef<number | null>(null);
     const joyLastSentRef = useRef<{ x: number; y: number; at: number }>({ x: -999, y: -999, at: 0 });
+    const joyWasMovingRef = useRef<boolean>(false);
 
     const [ isMeMenuOpen, setMeMenuOpen ] = useState(false);
     const [ isHelpMenuOpen, setHelpMenuOpen ] = useState(false);
@@ -77,79 +75,111 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         setIsSoundActive(!(parser.volumeSystem === 0 && parser.volumeFurni === 0 && parser.volumeTrax === 0));
     });
 
-    const stopJoystickWalk = useCallback(() =>
-    {
-        if(joyIntervalRef.current)
-        {
-            window.clearInterval(joyIntervalRef.current);
-            joyIntervalRef.current = null;
-        }
-        joyPointerIdRef.current = null;
-        joyDirRef.current = null;
-        setJoyKnob({ x: 0, y: 0, active: false });
-    }, []);
-
-    const stepAvatarInDirection = useCallback((dx: number, dy: number, force = false) =>
+    const getMyAvatarTile = useCallback((): { x: number; y: number; roomId: number } | null =>
     {
         const activeSession = roomSession || GetRoomSession();
         const engine = GetRoomEngine();
         const userSession = GetSessionDataManager();
-        if(!activeSession || !engine || !userSession) return;
+        if(!activeSession || !engine || !userSession) return null;
 
         const roomId = activeSession.roomId;
         const udm = activeSession.userDataManager;
         const userData = udm?.getUserData?.(userSession.userId)
             || udm?.getDataByType?.(userSession.userId, 1)
             || udm?.getUserDataByName?.(userSession.userName);
-        if(!userData) return;
+        if(!userData) return null;
 
         const unitObj = engine.getRoomObject(roomId, userData.roomIndex, RoomObjectCategory.UNIT);
-        if(!unitObj) return;
+        if(!unitObj) return null;
 
         const loc = unitObj.getLocation();
-        if(!loc) return;
+        if(!loc) return null;
 
-        const curX = Math.round(loc.x);
-        const curY = Math.round(loc.y);
-        const nextX = curX + dx;
-        const nextY = curY + dy;
-        if(nextX < 0 || nextY < 0) return;
+        return { x: Math.round(loc.x), y: Math.round(loc.y), roomId };
+    }, [ roomSession ]);
+
+    const sendContinuousWalk = useCallback((dx: number, dy: number, force = false) =>
+    {
+        const pos = getMyAvatarTile();
+        if(!pos) return;
+
+        const engine = GetRoomEngine();
+        const hmap = engine?.getFurnitureStackingHeightMap?.(pos.roomId);
+        let targetX = pos.x + dx;
+        let targetY = pos.y + dy;
+
+        // Look ahead up to 4 open walkable floor tiles along the ray so Arcturus walks continuously with ZERO pauses
+        if(hmap && typeof hmap.validateLocation === 'function')
+        {
+            const baseH = hmap.getTileHeight(pos.x, pos.y);
+            let bestK = 0;
+
+            for(let k = 1; k <= 4; k++)
+            {
+                const tx = pos.x + dx * k;
+                const ty = pos.y + dy * k;
+                if(tx < 0 || ty < 0 || tx >= hmap.width || ty >= hmap.height) break;
+                if(!hmap.validateLocation(tx, ty, 1, 1, 0, 0, 0, 0, false, baseH)) break;
+                bestK = k;
+            }
+
+            if(bestK > 0)
+            {
+                targetX = pos.x + dx * bestK;
+                targetY = pos.y + dy * bestK;
+            }
+            else
+            {
+                targetX = pos.x + dx;
+                targetY = pos.y + dy;
+            }
+        }
+        else
+        {
+            targetX = Math.max(0, pos.x + dx * 3);
+            targetY = Math.max(0, pos.y + dy * 3);
+        }
+
+        if(targetX < 0 || targetY < 0) return;
 
         const now = Date.now();
         const last = joyLastSentRef.current;
-        if(!force && last.x === nextX && last.y === nextY && (now - last.at) < 320) return;
+        if(!force && last.x === targetX && last.y === targetY && (now - last.at) < 420) return;
 
-        joyLastSentRef.current = { x: nextX, y: nextY, at: now };
-        SendMessageComposer(new RoomUnitWalkComposer(nextX, nextY));
-    }, [ roomSession ]);
+        joyLastSentRef.current = { x: targetX, y: targetY, at: now };
+        joyWasMovingRef.current = true;
+        SendMessageComposer(new RoomUnitWalkComposer(targetX, targetY));
+    }, [ getMyAvatarTile ]);
 
-    const updateJoystickFromPoint = useCallback((clientX: number, clientY: number, isInitial = false) =>
+    const stopJoystickWalk = useCallback((haltAvatar = false) =>
     {
-        const pad = joyPadRef.current;
-        if(!pad) return;
-
-        const rect = pad.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const rawX = clientX - cx;
-        const rawY = clientY - cy;
-        const dist = Math.hypot(rawX, rawY);
-        const maxRadius = rect.width * 0.34;
-        const deadZone = 10;
-
-        if(dist < deadZone)
+        if(joyIntervalRef.current)
         {
-            joyDirRef.current = null;
-            setJoyKnob({ x: rawX * 0.4, y: rawY * 0.4, active: true });
+            window.clearInterval(joyIntervalRef.current);
+            joyIntervalRef.current = null;
+        }
+        joyDirRef.current = null;
+
+        if(haltAvatar && joyWasMovingRef.current)
+        {
+            joyWasMovingRef.current = false;
+            const pos = getMyAvatarTile();
+            if(pos)
+            {
+                joyLastSentRef.current = { x: pos.x, y: pos.y, at: Date.now() };
+                SendMessageComposer(new RoomUnitWalkComposer(pos.x, pos.y));
+            }
+        }
+    }, [ getMyAvatarTile ]);
+
+    const handleRoomJoystickVector = useCallback((nx: number, ny: number) =>
+    {
+        if(nx === 0 && ny === 0)
+        {
+            stopJoystickWalk(true);
             return;
         }
 
-        const clamped = Math.min(dist, maxRadius);
-        const nx = rawX / dist;
-        const ny = rawY / dist;
-        setJoyKnob({ x: nx * clamped, y: ny * clamped, active: true });
-
-        // Exact 8-sector Habbo isometric screen-angle mapping
         const deg = (Math.atan2(ny, nx) * 180) / Math.PI;
         let dx = 0;
         let dy = 0;
@@ -167,9 +197,9 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         const dirChanged = !prev || prev.dx !== dx || prev.dy !== dy;
         joyDirRef.current = { dx, dy };
 
-        if(isInitial || dirChanged)
+        if(dirChanged)
         {
-            stepAvatarInDirection(dx, dy, true);
+            sendContinuousWalk(dx, dy, true);
         }
 
         if(!joyIntervalRef.current)
@@ -177,24 +207,21 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
             joyIntervalRef.current = window.setInterval(() =>
             {
                 const cur = joyDirRef.current;
-                if(cur) stepAvatarInDirection(cur.dx, cur.dy, false);
-            }, 180);
+                if(cur) sendContinuousWalk(cur.dx, cur.dy, false);
+            }, 260);
         }
-    }, [ stepAvatarInDirection ]);
+    }, [ sendContinuousWalk, stopJoystickWalk ]);
 
     useEffect(() =>
     {
-        if(!isInRoom || !dpadEnabled)
-        {
-            stopJoystickWalk();
-        }
         if(!isInRoom)
         {
+            stopJoystickWalk(false);
             setChatBarOpen(false);
             setSideDrawerOpen(false);
         }
-        return () => stopJoystickWalk();
-    }, [ isInRoom, dpadEnabled, stopJoystickWalk ]);
+        return () => stopJoystickWalk(false);
+    }, [ isInRoom, stopJoystickWalk ]);
 
     useEffect(() =>
     {
@@ -418,49 +445,8 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
             ) }
 
             {/* JOYSTICK MÓVIL ANALÓGICO 360° PARA CAMINAR EN SALA (CONFIGURABLE EN AJUSTES) */}
-            { isInRoom && dpadEnabled && (
-                <div
-                    ref={ joyPadRef }
-                    className={ `hmob-joystick ${ dpadSide === 'left' ? 'is-left' : 'is-right' } ${ joyKnob.active ? 'is-active' : '' }` }
-                    role="application"
-                    aria-label="Joystick de movimiento"
-                    onPointerDown={ e =>
-                    {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        joyPointerIdRef.current = e.pointerId;
-                        try { e.currentTarget.setPointerCapture(e.pointerId); } catch {}
-                        updateJoystickFromPoint(e.clientX, e.clientY, true);
-                    } }
-                    onPointerMove={ e =>
-                    {
-                        if(joyPointerIdRef.current !== e.pointerId) return;
-                        e.preventDefault();
-                        e.stopPropagation();
-                        updateJoystickFromPoint(e.clientX, e.clientY, false);
-                    } }
-                    onPointerUp={ e =>
-                    {
-                        if(joyPointerIdRef.current !== e.pointerId) return;
-                        e.preventDefault();
-                        try { e.currentTarget.releasePointerCapture(e.pointerId); } catch {}
-                        stopJoystickWalk();
-                    } }
-                    onPointerCancel={ e =>
-                    {
-                        if(joyPointerIdRef.current !== e.pointerId) return;
-                        stopJoystickWalk();
-                    } }
-                >
-                    <span className="hmob-joy-arrow is-up" aria-hidden="true">▲</span>
-                    <span className="hmob-joy-arrow is-down" aria-hidden="true">▼</span>
-                    <span className="hmob-joy-arrow is-left" aria-hidden="true">◀</span>
-                    <span className="hmob-joy-arrow is-right" aria-hidden="true">▶</span>
-                    <div
-                        className="hmob-joy-knob"
-                        style={ { transform: `translate(${ joyKnob.x }px, ${ joyKnob.y }px)` } }
-                    />
-                </div>
+            { isInRoom && (
+                <MobileJoystick onVectorChange={ handleRoomJoystickVector } />
             ) }
 
             {/* TOAST BREVE AL CAMBIAR MODO CAMINAR / MOVER / ZOOM */}

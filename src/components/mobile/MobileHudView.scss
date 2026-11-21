@@ -607,6 +607,25 @@
         left: calc(64px + env(safe-area-inset-left));
     }
 
+    &.is-battleball {
+        bottom: calc(52px + env(safe-area-inset-bottom));
+        z-index: 1320;
+
+        &.is-left {
+            left: max(10px, env(safe-area-inset-left));
+        }
+    }
+
+    &.is-snowstorm {
+        bottom: calc(14px + env(safe-area-inset-bottom));
+        z-index: 10020;
+
+        &.is-left {
+            left: max(10px, env(safe-area-inset-left));
+            bottom: calc(74px + env(safe-area-inset-bottom));
+        }
+    }
+
     &.is-active {
         background: rgba(9, 44, 66, 0.8);
         border-color: #5cd5ef;

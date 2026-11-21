@@ -3,6 +3,7 @@ import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from
 import { GetAvatarRenderManager, GetClubMemberLevel, GetConfiguration, GetSessionDataManager } from '../../../api';
 import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
+import { MobileJoystick } from '../../mobile/MobileJoystick';
 
 import creditIconImg from '../../../assets/images/eras/flash2012/purse/credit_icon.png';
 import ducketIconImg from '../../../assets/images/eras/flash2012/purse/ducket_icon.png';
@@ -860,6 +861,7 @@ export const BattleBallGameView: FC = () =>
     const chatInputRef = useRef<HTMLInputElement | null>(null);
     const audioRef = useRef<BattleBallAudio>(new BattleBallAudio());
     const keysRef = useRef<Set<string>>(new Set());
+    const joyVecRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
     // Preloaded assets: all 5 official arena backdrops, power-ups, and seated Habbo avatars
     const backdropImgsRef = useRef<Record<number, HTMLImageElement>>({});
@@ -1913,6 +1915,18 @@ export const BattleBallGameView: FC = () =>
                     else if (k.has('KeyS') || k.has('ArrowDown')) kdy = 1;
                     else if (k.has('KeyA') || k.has('ArrowLeft')) kdx = -1;
                     else if (k.has('KeyD') || k.has('ArrowRight')) kdx = 1;
+                    else
+                    {
+                        const jx = joyVecRef.current.x;
+                        const jy = joyVecRef.current.y;
+                        if (Math.hypot(jx, jy) > 0.18)
+                        {
+                            const isoX = jx * 0.5 + jy;
+                            const isoY = jy - jx * 0.5;
+                            if (Math.abs(isoX) >= Math.abs(isoY)) kdx = isoX > 0 ? 1 : -1;
+                            else kdy = isoY > 0 ? 1 : -1;
+                        }
+                    }
 
                     if (kdx !== 0 || kdy !== 0)
                     {
@@ -2536,6 +2550,12 @@ export const BattleBallGameView: FC = () =>
                     ) }
 
                     {/* Top-Right Authentic Habbo Battle Ball Power-Up Toast (matches Bomba ref!) */}
+                    { stage === 'playing' && (
+                        <MobileJoystick
+                            className="is-battleball"
+                            onVectorChange={ (vx, vy) => { joyVecRef.current = { x: vx, y: vy }; } }
+                        />
+                    ) }
                     { stage === 'playing' && puToast && (
                         <div className="bb-sw-pu-toast">
                             <div className="bb-sw-pu-toast-orb">
