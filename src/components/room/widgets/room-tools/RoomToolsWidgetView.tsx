@@ -24,7 +24,8 @@ export const RoomToolsWidgetView: FC<{}> = props =>
     const [ roomTags, setRoomTags ] = useState<string[]>(null);
     const [ isOpen, setIsOpen ] = useState<boolean>(false);
     const [ isCollapsed2012, setIsCollapsed2012 ] = useState<boolean>(false);
-    const [ roomHistory, setRoomHistory ] = useState<number[]>([]);
+    const [ showHistoryMenu, setShowHistoryMenu ] = useState<boolean>(false);
+    const [ roomHistory, setRoomHistory ] = useState<Array<{ id: number; name: string }>>([]);
     const [ historyIdx, setHistoryIdx ] = useState<number>(-1);
     const { navigatorData = null } = useNavigator();
     const { roomSession = null } = useRoom();
@@ -38,14 +39,15 @@ export const RoomToolsWidgetView: FC<{}> = props =>
 
         const currentScale = GetRoomEngine().getRoomInstanceRenderingCanvasScale(roomSession.roomId, 1);
         setIsZoomedIn(currentScale < 1);
+        setShowHistoryMenu(false);
 
         const rid = roomSession.roomId;
         if(rid > 0)
         {
             setRoomHistory(prev =>
             {
-                if(prev[historyIdx] === rid) return prev;
-                const next = [ ...prev.slice(0, historyIdx + 1), rid ].slice(-20);
+                if(prev[historyIdx]?.id === rid) return prev;
+                const next = [ ...prev.slice(0, historyIdx + 1), { id: rid, name: `Sala #${ rid }` } ].slice(-20);
                 setHistoryIdx(next.length - 1);
                 return next;
             });
@@ -101,6 +103,10 @@ export const RoomToolsWidgetView: FC<{}> = props =>
         if(roomName !== parser.data.roomName) setRoomName(parser.data.roomName);
         if(roomOwner !== parser.data.ownerName) setRoomOwner(parser.data.ownerName);
         if(roomTags !== parser.data.tags) setRoomTags(parser.data.tags);
+        if(parser.data.roomId > 0 && parser.data.roomName)
+        {
+            setRoomHistory(prev => prev.map(item => item.id === parser.data.roomId ? { ...item, name: parser.data.roomName } : item));
+        }
     });
 
     useEffect(() =>
@@ -124,7 +130,8 @@ export const RoomToolsWidgetView: FC<{}> = props =>
             const targetIdx = historyIdx + dir;
             if(targetIdx < 0 || targetIdx >= roomHistory.length) return;
             setHistoryIdx(targetIdx);
-            TryVisitRoom(roomHistory[targetIdx]);
+            setShowHistoryMenu(false);
+            TryVisitRoom(roomHistory[targetIdx].id);
         };
 
         return (
@@ -134,12 +141,12 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                         type="button"
                         className="room-tools-2012-handle"
                         title={ isCollapsed2012 ? 'Mostrar herramientas de sala' : 'Ocultar herramientas de sala' }
-                        onClick={ () => setIsCollapsed2012(prev => !prev) }
+                        onClick={ () => { setIsCollapsed2012(prev => !prev); setShowHistoryMenu(false); } }
                     >
                         <span>{ isCollapsed2012 ? '›' : '‹' }</span>
                     </button>
 
-                    { !isCollapsed2012 && (
+                    <div className="room-tools-2012-body-wrap">
                         <div className="room-tools-2012-body">
                             <button type="button" className="room-tools-2012-row" onClick={ () => handleToolClick('settings') }>
                                 <span className="rt2012-ico"><img src={ rtIconSettings } alt="" /></span>
@@ -180,10 +187,10 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                                 <button
                                     type="button"
                                     className="rt2012-sq-btn"
-                                    title="Historial de salas"
-                                    onClick={ () => CreateLinkEvent('navigator/show/myworld_view') }
+                                    title="Historial de salas visitadas"
+                                    onClick={ () => setShowHistoryMenu(prev => !prev) }
                                 >
-                                    <img src={ rtBtnHistory } alt="Salas" />
+                                    <img src={ rtBtnHistory } alt="Historial de salas" />
                                 </button>
                                 <button
                                     type="button"
@@ -204,8 +211,32 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                                 </button>
                             </div>
                         </div>
-                    ) }
+                    </div>
                 </div>
+
+                { showHistoryMenu && !isCollapsed2012 && (
+                    <div className="room-tools-2012-history-popover">
+                        <div className="rt2012-hist-title">Historial de salas</div>
+                        { roomHistory.length === 0 ? (
+                            <div className="rt2012-hist-empty">Sin salas recientes</div>
+                        ) : (
+                            [ ...roomHistory ].reverse().map((entry, i) => {
+                                const realIdx = roomHistory.length - 1 - i;
+                                const isCurrent = realIdx === historyIdx;
+                                return (
+                                    <button
+                                        key={ `${ entry.id }-${ realIdx }` }
+                                        type="button"
+                                        className={ `rt2012-hist-item ${ isCurrent ? 'is-current' : '' }` }
+                                        onClick={ () => { setHistoryIdx(realIdx); setShowHistoryMenu(false); if(!isCurrent) TryVisitRoom(entry.id); } }
+                                    >
+                                        { entry.name }
+                                    </button>
+                                );
+                            })
+                        ) }
+                    </div>
+                ) }
 
                 <TransitionAnimation type={ TransitionAnimationTypes.SLIDE_LEFT } inProp={ isOpen } timeout={ 300 }>
                     <div className="room-tools-2012-toast">

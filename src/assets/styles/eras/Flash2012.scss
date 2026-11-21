@@ -1697,9 +1697,18 @@ body[data-era="flash2012"] {
                 }
             }
 
+            .room-tools-2012-body-wrap {
+                max-width: 210px !important;
+                opacity: 1 !important;
+                overflow: hidden !important;
+                transition: max-width 0.24s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease !important;
+            }
+
             &.is-collapsed {
-                .room-tools-2012-handle {
-                    height: 60px !important;
+                .room-tools-2012-body-wrap {
+                    max-width: 0 !important;
+                    opacity: 0 !important;
+                    pointer-events: none !important;
                 }
             }
 
@@ -1788,6 +1797,68 @@ body[data-era="flash2012"] {
                             cursor: default !important;
                         }
                     }
+                }
+            }
+        }
+
+        .room-tools-2012-history-popover {
+            position: absolute !important;
+            left: 16px !important;
+            bottom: 48px !important;
+            min-width: 195px !important;
+            max-width: 250px !important;
+            max-height: 210px !important;
+            overflow-y: auto !important;
+            background-color: rgba(37, 36, 36, 0.96) !important;
+            border: 1px solid #000000 !important;
+            border-radius: 5px !important;
+            padding: 6px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+            pointer-events: auto !important;
+            z-index: 1020 !important;
+
+            .rt2012-hist-title {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                color: #cccccc !important;
+                padding: 2px 4px 4px !important;
+                border-bottom: 1px solid #44423d !important;
+                margin-bottom: 2px !important;
+            }
+
+            .rt2012-hist-empty {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                color: #888884 !important;
+                padding: 4px !important;
+            }
+
+            .rt2012-hist-item {
+                background: transparent !important;
+                border: none !important;
+                border-radius: 3px !important;
+                box-shadow: none !important;
+                color: #e4e4e0 !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+                padding: 4px 6px !important;
+                text-align: left !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+                cursor: pointer !important;
+
+                &:hover {
+                    background-color: #367897 !important;
+                    color: #ffffff !important;
+                }
+
+                &.is-current {
+                    color: #79d4b4 !important;
+                    font-weight: 700 !important;
                 }
             }
         }
@@ -2720,17 +2791,82 @@ body[data-era="flash2012"] {
     // 7. COMPONENTES ESPECÍFICOS DE CADA VENTANA 2012
     // =========================================================================
 
-    // 7A-1. NAVEGADOR DE SALAS 2012 (Ubuntu Blue Skin + 4 Tabs + Accordions + Illustrated Bottom Buttons)
+    // Shared Habbo 2012 Select Dropdown with vertical dotted divider + sharp black triangle (exact 12-22-15)
+    .habbo2012-select-wrap {
+        position: relative !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        width: 100% !important;
+
+        select {
+            width: 100% !important;
+            height: 24px !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-color: #ffffff !important;
+            background-image: none !important;
+            border: 1px solid #000000 !important;
+            border-radius: 3px !important;
+            color: #111111 !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11px !important;
+            padding: 0 24px 0 6px !important;
+            box-shadow: none !important;
+            cursor: pointer !important;
+        }
+
+        .habbo2012-select-caret {
+            position: absolute !important;
+            right: 1px !important;
+            top: 2px !important;
+            bottom: 2px !important;
+            width: 19px !important;
+            pointer-events: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background-image: linear-gradient(to bottom, #9a9a9a 50%, transparent 50%) !important;
+            background-size: 1px 2px !important;
+            background-repeat: repeat-y !important;
+            background-position: left center !important;
+
+            &::after {
+                content: '' !important;
+                width: 0 !important;
+                height: 0 !important;
+                border-left: 3.5px solid transparent !important;
+                border-right: 3.5px solid transparent !important;
+                border-top: 4.5px solid #000000 !important;
+            }
+        }
+    }
+
+    @keyframes creator2012ArrowBounce {
+        0%, 100% {
+            transform: translate(-50%, 0);
+        }
+        50% {
+            transform: translate(-50%, -6px);
+        }
+    }
+
+    // 7A-1. NAVEGADOR DE SALAS 2012 (Exact #367897/#408caf Header + #2b577b Category Blue + 4 Tabs + Illustrated Bottom Buttons)
     .navigator-flash2012,
     .nitro-card[data-window-key="navigator"] {
         width: 425px !important;
         min-width: 425px !important;
 
-        .nitro-card-header .nitro-card-header-text {
-            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-            font-size: 12px !important;
-            font-weight: 700 !important;
-            color: #ffffff !important;
+        .nitro-card-header {
+            background: #367897 !important;
+            box-shadow: inset 0 0 0 2px #408caf !important;
+
+            .nitro-card-header-text {
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #ffffff !important;
+            }
         }
 
         .nitro-card-tabs {
@@ -2773,17 +2909,10 @@ body[data-era="flash2012"] {
         .nav2012-search-bar {
             gap: 6px !important;
 
-            .nav2012-filter-select {
-                height: 24px !important;
-                min-width: 92px !important;
-                background-color: #ffffff !important;
-                border: 1px solid #000000 !important;
-                border-radius: 3px !important;
-                color: #111111 !important;
-                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-                font-size: 11px !important;
-                padding: 0 6px !important;
-                box-shadow: none !important;
+            .nav2012-filter-wrap {
+                width: 96px !important;
+                min-width: 96px !important;
+                flex-shrink: 0 !important;
             }
 
             .nav2012-search-input-wrap {
@@ -2801,7 +2930,7 @@ body[data-era="flash2012"] {
                     color: #111111 !important;
                     font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                     font-size: 11.5px !important;
-                    padding: 0 26px 0 8px !important;
+                    padding: 0 28px 0 8px !important;
                     outline: none !important;
                     box-shadow: none !important;
 
@@ -2816,21 +2945,26 @@ body[data-era="flash2012"] {
                     right: 4px !important;
                     top: 50% !important;
                     transform: translateY(-50%) !important;
-                    width: 18px !important;
-                    height: 18px !important;
+                    width: 20px !important;
+                    height: 20px !important;
                     padding: 0 !important;
                     border: none !important;
                     background: transparent !important;
                     box-shadow: none !important;
+                    overflow: visible !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
                     cursor: pointer !important;
 
                     img {
-                        width: 15px !important;
-                        height: 15px !important;
+                        width: 16px !important;
+                        height: 16px !important;
+                        max-width: none !important;
+                        max-height: none !important;
+                        object-fit: contain !important;
                         image-rendering: pixelated !important;
+                        display: block !important;
                     }
                 }
             }
@@ -2851,13 +2985,13 @@ body[data-era="flash2012"] {
 
                     .text-secondary,
                     .fa-icon {
-                        color: #266b90 !important;
+                        color: #2b577b !important;
                         font-size: 11px !important;
                     }
 
                     .nitro-text,
                     div {
-                        color: #266b90 !important;
+                        color: #2b577b !important;
                         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                         font-size: 12.5px !important;
                         font-weight: 400 !important;
@@ -2960,18 +3094,24 @@ body[data-era="flash2012"] {
         }
     }
 
-    // 7A-2. CREAR UNA SALA 2012 (Separate Floating Window — exact 12-22-15 layout)
+    // 7A-2. CREAR UNA SALA 2012 (Separate Floating Window — exact 12-22-15 colors & bouncing yellow arrow)
     .navigator-room-creator-2012,
     .nitro-card[data-window-key="navigator-room-creator"] {
-        width: 530px !important;
-        min-width: 530px !important;
-        max-height: 410px !important;
+        width: 545px !important;
+        min-width: 545px !important;
+        height: 405px !important;
+        max-height: 415px !important;
+
+        .nitro-card-header {
+            background: #367897 !important;
+            box-shadow: inset 0 0 0 2px #408caf !important;
+        }
 
         .creator-2012-grid {
             display: grid !important;
             grid-template-columns: 205px 1fr !important;
             gap: 10px !important;
-            height: 345px !important;
+            height: 356px !important;
         }
 
         .creator-2012-left {
@@ -3034,6 +3174,7 @@ body[data-era="flash2012"] {
         .creator-2012-models {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
+            grid-auto-rows: 98px !important;
             gap: 7px !important;
             overflow-y: auto !important;
             padding-right: 4px !important;
@@ -3042,7 +3183,7 @@ body[data-era="flash2012"] {
             .creator-2012-model-card {
                 position: relative !important;
                 height: 98px !important;
-                background-color: #cccccc !important;
+                background-color: #cbcbcc !important;
                 border: 1px solid #8a8a86 !important;
                 border-radius: 5px !important;
                 padding: 6px !important;
@@ -3053,14 +3194,27 @@ body[data-era="flash2012"] {
                 overflow: hidden !important;
 
                 .creator-2012-model-img {
+                    position: relative !important;
                     flex: 1 !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    overflow: hidden !important;
+                    overflow: visible !important;
 
-                    img {
-                        max-height: 72px !important;
+                    .creator-2012-selected-arrow {
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 50% !important;
+                        width: 17px !important;
+                        height: 20px !important;
+                        image-rendering: pixelated !important;
+                        pointer-events: none !important;
+                        z-index: 3 !important;
+                        animation: creator2012ArrowBounce 0.75s ease-in-out infinite !important;
+                    }
+
+                    img:not(.creator-2012-selected-arrow) {
+                        max-height: 70px !important;
                         max-width: 100% !important;
                         image-rendering: pixelated !important;
                     }
@@ -3074,7 +3228,7 @@ body[data-era="flash2012"] {
                 }
 
                 &.is-selected {
-                    background-color: #7c868e !important;
+                    background-color: #77888b !important;
                     border-color: #4b555c !important;
 
                     .creator-2012-model-tiles {
@@ -3128,13 +3282,13 @@ body[data-era="flash2012"] {
         border-radius: 6px !important;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
         padding: 0 !important;
-        width: 340px !important;
-        min-width: 340px !important;
-        max-width: 340px !important;
+        width: 392px !important;
+        min-width: 392px !important;
+        max-width: 392px !important;
         box-sizing: border-box !important;
 
         .popover-body {
-            padding: 8px !important;
+            padding: 10px 12px !important;
         }
 
         .popover-arrow::before {

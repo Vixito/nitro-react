@@ -5,6 +5,7 @@ import { GetClubMemberLevel, GetConfiguration, IRoomModel, LocalizeText, SendMes
 import { Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, ShockwaveDropdown, Text } from '../../../common';
 import { useNavigator } from '../../../hooks';
 import { useEraTheme } from '../../../hooks/era/useEraTheme';
+import arrowSelectedModelImg from '../../../assets/images/eras/flash2012/navigator/arrow_selected_model.png';
 
 export interface NavigatorRoomCreatorViewProps
 {
@@ -101,27 +102,36 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
                     </div>
                     <div className="creator-2012-field">
                         <label>{ LocalizeText('navigator.category') || 'Categoría' }</label>
-                        <select className="creator-2012-select" value={ category ?? '' } onChange={ event => setCategory(Number(event.target.value)) }>
-                            { categories && (categories.length > 0) && categories.map(cat => (
-                                <option key={ cat.id } value={ cat.id }>{ LocalizeText(cat.name) }</option>
-                            )) }
-                        </select>
+                        <div className="habbo2012-select-wrap">
+                            <select className="creator-2012-select" value={ category ?? '' } onChange={ event => setCategory(Number(event.target.value)) }>
+                                { categories && (categories.length > 0) && categories.map(cat => (
+                                    <option key={ cat.id } value={ cat.id }>{ LocalizeText(cat.name) }</option>
+                                )) }
+                            </select>
+                            <span className="habbo2012-select-caret" aria-hidden="true" />
+                        </div>
                     </div>
                     <div className="creator-2012-field">
                         <label>{ LocalizeText('navigator.maxvisitors') || 'Número máximo de visitantes' }</label>
-                        <select className="creator-2012-select" value={ visitorsCount ?? 10 } onChange={ event => setVisitorsCount(Number(event.target.value)) }>
-                            { maxVisitorsList && maxVisitorsList.map(value => (
-                                <option key={ value } value={ value }>{ value }</option>
-                            )) }
-                        </select>
+                        <div className="habbo2012-select-wrap">
+                            <select className="creator-2012-select" value={ visitorsCount ?? 10 } onChange={ event => setVisitorsCount(Number(event.target.value)) }>
+                                { maxVisitorsList && maxVisitorsList.map(value => (
+                                    <option key={ value } value={ value }>{ value }</option>
+                                )) }
+                            </select>
+                            <span className="habbo2012-select-caret" aria-hidden="true" />
+                        </div>
                     </div>
                     <div className="creator-2012-field">
                         <label>{ LocalizeText('navigator.tradesettings') || 'Ajustes de Tradeo' }</label>
-                        <select className="creator-2012-select" value={ tradesSetting } onChange={ event => setTradesSetting(Number(event.target.value)) }>
-                            <option value="0">{ LocalizeText('navigator.roomsettings.trade_not_allowed') }</option>
-                            <option value="1">{ LocalizeText('navigator.roomsettings.trade_not_with_Controller') }</option>
-                            <option value="2">{ LocalizeText('navigator.roomsettings.trade_allowed') }</option>
-                        </select>
+                        <div className="habbo2012-select-wrap">
+                            <select className="creator-2012-select" value={ tradesSetting } onChange={ event => setTradesSetting(Number(event.target.value)) }>
+                                <option value="0">{ LocalizeText('navigator.roomsettings.trade_not_allowed') }</option>
+                                <option value="1">{ LocalizeText('navigator.roomsettings.trade_not_with_Controller') }</option>
+                                <option value="2">{ LocalizeText('navigator.roomsettings.trade_allowed') }</option>
+                            </select>
+                            <span className="habbo2012-select-caret" aria-hidden="true" />
+                        </div>
                     </div>
                     <div className="creator-2012-buttons">
                         <button
@@ -153,6 +163,9 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
                                 onClick={ () => selectModel(model, index) }
                             >
                                 <div className="creator-2012-model-img">
+                                    { isSelected && (
+                                        <img src={ arrowSelectedModelImg } alt="" className="creator-2012-selected-arrow" />
+                                    ) }
                                     <img alt="" src={ getRoomModelImage(model.name) } />
                                 </div>
                                 <span className="creator-2012-model-tiles">

@@ -69,11 +69,14 @@ export const NavigatorSearchView: FC<NavigatorSearchViewProps> = props =>
     {
         return (
             <Flex fullWidth gap={ 1 } alignItems="center" className="nav2012-search-bar">
-                <select className="nav2012-filter-select" value={ searchFilterIndex } onChange={ event => setSearchFilterIndex(parseInt(event.target.value)) }>
-                    { SearchFilterOptions.map((filter, index) => (
-                        <option key={ index } value={ index }>{ LocalizeText('navigator.filter.' + filter.name) }</option>
-                    )) }
-                </select>
+                <div className="habbo2012-select-wrap nav2012-filter-wrap">
+                    <select className="nav2012-filter-select" value={ searchFilterIndex } onChange={ event => setSearchFilterIndex(parseInt(event.target.value)) }>
+                        { SearchFilterOptions.map((filter, index) => (
+                            <option key={ index } value={ index }>{ LocalizeText('navigator.filter.' + filter.name) }</option>
+                        )) }
+                    </select>
+                    <span className="habbo2012-select-caret" aria-hidden="true" />
+                </div>
                 <div className="nav2012-search-input-wrap">
                     <input
                         type="text"
