@@ -228,6 +228,58 @@ body.is-mobile-ui {
         }
     }
 
+    // Modal "Conectar a Discord": conservar fondo oscuro para que TODOS los textos blancos sean 100% legibles
+    .nitro-card.nitro-discord-settings {
+        width: min(430px, calc(100vw - 12px)) !important;
+        max-width: calc(100vw - 12px) !important;
+        background: #2d2847 !important;
+        border-color: #4f4578 !important;
+        color: #ffffff !important;
+
+        > .nitro-card-header {
+            background: #3f385c !important;
+            border-bottom-color: #201a33 !important;
+            box-shadow: none !important;
+        }
+
+        > .content-area,
+        > .nitro-card-content,
+        > .content-area.overflow-hidden,
+        > .nitro-card-content.overflow-hidden {
+            background: #2d2847 !important;
+            color: #ffffff !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+
+        .settings-2012-sunk-box {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-radius: 6px !important;
+            padding: 10px !important;
+            color: #ffffff !important;
+        }
+
+        .settings-2012-box-title {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+
+        .input-group {
+            flex-wrap: nowrap !important;
+        }
+
+        .form-control {
+            background: #1f1b33 !important;
+            color: #ffffff !important;
+            border-color: #5a4f7e !important;
+
+            &::placeholder {
+                color: #9ca3af !important;
+            }
+        }
+    }
+
     // Tablón de Anuncios adaptado y desplazable en móvil
     .bulletin-board-window {
         width: min(708px, calc(100vw - 12px)) !important;

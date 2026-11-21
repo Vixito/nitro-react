@@ -1,6 +1,6 @@
 import { NitroSettingsEvent, RoomObjectCategory, RoomUnitWalkComposer, UserSettingsEvent, UserSettingsSoundComposer } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { ChatMessageTypeEnum, CreateLinkEvent, DispatchMainEvent, GetRoomEngine, GetRoomSession, GetSessionDataManager, MessengerIconState, OpenMessengerChat, SendMessageComposer, TryVisitRoom, VisitDesktop } from '../../api';
+import { ChatMessageTypeEnum, CreateLinkEvent, DispatchMainEvent, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile, MessengerIconState, OpenMessengerChat, SendMessageComposer, TryVisitRoom, VisitDesktop } from '../../api';
 import iconAchievements from '../../assets/images/eras/flash2012/memenu/achievements_color.png';
 import iconClothes from '../../assets/images/eras/flash2012/memenu/clothes_color.png';
 import iconProfile from '../../assets/images/eras/flash2012/memenu/profile_color.png';
@@ -481,7 +481,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
             {/* MENÚ FLOTANTE DEL AVATAR ("YO" — SIN EMOJIS, SOLO ÍCONOS HABBO REALES) */}
             { isMeMenuOpen && (
                 <div className="hmob-popover hmob-me-popover">
-                    <button type="button" onClick={ () => { closePopovers(); CreateLinkEvent('profile/open'); } }>
+                    <button type="button" onClick={ () => { closePopovers(); GetUserProfile(GetSessionDataManager().userId); } }>
                         <span className="hmob-menu-ico"><img src={ iconProfile } alt="" /></span>
                         <span>Mi Perfil</span>
                     </button>
