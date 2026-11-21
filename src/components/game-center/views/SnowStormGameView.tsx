@@ -1,6 +1,6 @@
 import { AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from '../../../api';
+import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager, onShockwaveV9AtlasReady, renderShockwaveV9DataUrl } from '../../../api';
 import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, SnowStormParkaAvatar, trimTransparentImage } from './SnowStormAvatar';
 import { MobileJoystick } from '../../mobile/MobileJoystick';
@@ -632,43 +632,43 @@ export const SnowStormGameView: FC = () =>
         load(fenceImg, 'fence');
     }, []);
 
-    // Pre-render real Habbo heads via Nitro AvatarRenderManager (local, zero external URLs)
+    // Pre-render authentic Shockwave v9 Habbo heads for SnowStorm fighters
     useEffect(() =>
     {
+        let alive = true;
         const allFigures = Array.from(new Set([ ...rosterBlue, ...rosterRed ].map(r => r.figure)));
-        const renderManager = GetAvatarRenderManager();
-        if (!renderManager) return;
 
-        const renderHead = (figure: string) =>
+        const renderAllV9 = () =>
         {
-            const buildDir = (dir: number, onReady: (img: HTMLImageElement) => void) =>
+            if (!alive) return;
+            allFigures.forEach(figure =>
             {
-                const avatarImg = renderManager.createAvatarImage(figure, AvatarScaleType.LARGE, 'M', {
-                    resetFigure: () => { buildDir(dir, onReady); },
-                    dispose: () => {},
-                    disposed: false
-                }, null);
-                if (!avatarImg) return;
-                avatarImg.setDirection(AvatarSetType.FULL, dir);
-                avatarImg.setDirection(AvatarSetType.HEAD, dir);
-                const cropped = avatarImg.getCroppedImage(AvatarSetType.HEAD);
-                if (cropped && cropped.src)
-                {
-                    trimTransparentImage(cropped.src, (_url, trimmedImg) => onReady(trimmedImg));
-                }
-                avatarImg.dispose();
-            };
+                const entry = headCacheRef.current.get(figure) || {
+                    front: new Image(),
+                    back: new Image()
+                };
+                headCacheRef.current.set(figure, entry);
 
-            const entry = headCacheRef.current.get(figure) || {
-                front: new Image(),
-                back: new Image()
-            };
-            headCacheRef.current.set(figure, entry);
-            buildDir(2, img => { entry.front = img; });
-            buildDir(0, img => { entry.back = img; });
+                const frontUrl = renderShockwaveV9DataUrl(figure, { direction: 2, headDirection: 2, headOnly: true });
+                if (frontUrl)
+                {
+                    trimTransparentImage(frontUrl, (_u, trimmedImg) => { if (alive) entry.front = trimmedImg; });
+                }
+
+                const backUrl = renderShockwaveV9DataUrl(figure, { direction: 0, headDirection: 0, headOnly: true });
+                if (backUrl)
+                {
+                    trimTransparentImage(backUrl, (_u, trimmedImg) => { if (alive) entry.back = trimmedImg; });
+                }
+            });
         };
 
-        allFigures.forEach(renderHead);
+        const unsub = onShockwaveV9AtlasReady(renderAllV9);
+        return () =>
+        {
+            alive = false;
+            unsub();
+        };
     }, [ rosterBlue, rosterRed ]);
 
     const toggleMute = useCallback(() =>

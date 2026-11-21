@@ -1,6 +1,6 @@
 import { AvatarAction, AvatarScaleType, AvatarSetType, IAvatarImageListener } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from '../../../api';
+import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager, onShockwaveV9AtlasReady, renderShockwaveV9DataUrl } from '../../../api';
 import { useGameCenter } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 
@@ -651,48 +651,32 @@ export const WobbleSquabbleGameView: FC = () =>
             .catch(() => {});
     }, []);
 
-    // Placeholder-safe real Habbo avatar sprite loader (full body, seated, head-only for swimmers)
+    // Authentic Shockwave v9 Habbo avatar sprite loader (full body, seated, head-only for swimmers)
     const ensureAvatarSprite = useCallback((figure: string, dir: number, posture: 'std' | 'sit' | 'head') =>
     {
         const key = `${ figure }__${ posture }__${ dir }`;
         if (avatarReadyRef.current.has(key)) return;
-        try
-        {
-            const mgr = GetAvatarRenderManager();
-            if (!mgr) return;
-            const load = () =>
-            {
-                const listener: IAvatarImageListener = {
-                    resetFigure: () => { load(); },
-                    dispose: () => {},
-                    disposed: false
-                };
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, listener);
-                if (!avatar) return;
-                avatar.initActionAppends();
-                if (posture === 'sit') avatar.appendAction(AvatarAction.POSTURE, AvatarAction.POSTURE_SIT);
-                else avatar.appendAction(AvatarAction.POSTURE, AvatarAction.POSTURE_STAND);
-                avatar.endActionAppends();
 
-                const setType = posture === 'head' ? AvatarSetType.HEAD : AvatarSetType.FULL;
-                avatar.setDirection(setType, dir);
-                const img = avatar.getCroppedImage(setType);
-                if (img && img.src)
-                {
-                    const ready = !avatar.isPlaceholder();
-                    trimTransparentImage(img.src, (_url, trimmedImg) =>
-                    {
-                        avatarCacheRef.current.set(key, trimmedImg);
-                        if (ready) avatarReadyRef.current.add(key);
-                    });
-                }
-            };
-            load();
-        }
-        catch
+        const renderV9 = () =>
         {
-            // Ignore transient render init
-        }
+            if (avatarReadyRef.current.has(key)) return;
+            const raw = renderShockwaveV9DataUrl(figure, {
+                direction: dir,
+                headDirection: dir,
+                posture: posture === 'sit' ? 'sit' : 'std',
+                headOnly: posture === 'head'
+            });
+            if (raw)
+            {
+                trimTransparentImage(raw, (_url, trimmedImg) =>
+                {
+                    avatarCacheRef.current.set(key, trimmedImg);
+                    avatarReadyRef.current.add(key);
+                });
+            }
+        };
+
+        onShockwaveV9AtlasReady(renderV9);
     }, []);
 
     // Preload fighters + rooftop audience sprites

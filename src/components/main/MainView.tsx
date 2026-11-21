@@ -1,6 +1,6 @@
 import { HabboWebTools, ILinkEventTracker, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
-import { AddEventLinkTracker, GetCommunication, RemoveLinkEventTracker } from '../../api';
+import { AddEventLinkTracker, GetCommunication, installShockwaveV9AvatarPatch, RemoveLinkEventTracker } from '../../api';
 import { Base, TransitionAnimation, TransitionAnimationTypes } from '../../common';
 import { useRoomSessionManagerEvent } from '../../hooks';
 import { useIsMobile } from '../../hooks/mobile/useIsMobile';
@@ -50,6 +50,7 @@ export const MainView: FC<{}> = props =>
 
     useEffect(() =>
     {
+        installShockwaveV9AvatarPatch();
         setIsReady(true);
 
         GetCommunication()?.connection?.onReady();

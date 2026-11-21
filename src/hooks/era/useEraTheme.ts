@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { notifyShockwaveV9EraChanged } from '../../api/avatar/ShockwaveV9AvatarRenderer';
 import { detectIsMobileViewport } from '../mobile/useIsMobile';
 
 export type EraType = 'modern' | 'flash2012' | 'shockwave2006';
@@ -62,6 +63,7 @@ const applyEraToDOM = (era: EraType) =>
     {
         document.body.dataset.era = 'mobile';
         document.body.classList.add('is-mobile-ui');
+        notifyShockwaveV9EraChanged('mobile');
         return;
     }
 
@@ -80,6 +82,8 @@ const applyEraToDOM = (era: EraType) =>
     {
         document.body.classList.add('era-modern');
     }
+
+    notifyShockwaveV9EraChanged(era);
 };
 
 const resolveCurrentEra = (): EraType =>

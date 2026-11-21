@@ -1,6 +1,6 @@
 import { AvatarAction, AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetClubMemberLevel, GetConfiguration, GetSessionDataManager } from '../../../api';
+import { GetAvatarRenderManager, GetClubMemberLevel, GetConfiguration, GetSessionDataManager, onShockwaveV9AtlasReady, renderShockwaveV9DataUrl } from '../../../api';
 import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 import { MobileJoystick } from '../../mobile/MobileJoystick';
@@ -542,43 +542,23 @@ const HabboFullAvatarImg: FC<{ figure: string; direction?: number; className?: s
     useEffect(() =>
     {
         let alive = true;
-        let retryTimer: number | null = null;
-        const load = () =>
+        const renderV9 = () =>
         {
-            try
+            if (!alive) return;
+            const raw = renderShockwaveV9DataUrl(figure, { direction, headDirection: direction, posture: 'std' });
+            if (raw)
             {
-                const mgr = GetAvatarRenderManager();
-                if (!mgr) return;
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
-                    resetFigure: () => { if (alive) load(); },
-                    dispose: () => {},
-                    disposed: false
+                trimTransparentImage(raw, url =>
+                {
+                    if (alive) setSrc(url);
                 });
-                if (!avatar) return;
-                avatar.setDirection(AvatarSetType.FULL, direction);
-                const raw = avatar.getCroppedImage(AvatarSetType.FULL)?.src;
-                if (raw)
-                {
-                    trimTransparentImage(raw, url =>
-                    {
-                        if (alive) setSrc(url);
-                    });
-                }
-                if (avatar.isPlaceholder())
-                {
-                    retryTimer = window.setTimeout(() => { if (alive) load(); }, 450);
-                }
-            }
-            catch
-            {
-                // fallback silently
             }
         };
-        load();
+        const unsub = onShockwaveV9AtlasReady(renderV9);
         return () =>
         {
             alive = false;
-            if (retryTimer) window.clearTimeout(retryTimer);
+            unsub();
         };
     }, [ figure, direction ]);
 
@@ -929,74 +909,37 @@ export const BattleBallGameView: FC = () =>
         });
     }, []);
 
-    // Preload trimmed SEATED/MOUNTED Habbo avatars (AvatarAction.POSTURE_SIT) in all 4 isometric directions (0, 2, 4, 6)!
-    // IMPORTANT: Never lock a placeholder mannequin into cache — always reload on resetFigure & retry!
+    // Preload trimmed authentic Shockwave v9 SEATED/MOUNTED Habbo avatars in all 4 isometric directions (0, 2, 4, 6)!
     useEffect(() =>
     {
         let alive = true;
-        const timers: number[] = [];
-        const readyKeys = new Set<string>();
+        const dirs = [ 0, 2, 4, 6 ];
 
-        const loadFigureDir = (figure: string, dir: number, attempt = 0) =>
+        const renderAllV9 = () =>
         {
             if (!alive) return;
-            const key = `${ figure }__sit__${ dir }`;
-            if (readyKeys.has(key)) return;
-            try
+            roster.forEach(r =>
             {
-                const mgr = GetAvatarRenderManager();
-                if (!mgr) return;
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
-                    resetFigure: () =>
-                    {
-                        if (alive) loadFigureDir(figure, dir, attempt + 1);
-                    },
-                    dispose: () => {},
-                    disposed: false
-                });
-                if (!avatar) return;
-                avatar.initActionAppends();
-                avatar.appendAction(AvatarAction.POSTURE, AvatarAction.POSTURE_SIT);
-                avatar.endActionAppends();
-                avatar.setDirection(AvatarSetType.FULL, dir);
-                const isPh = avatar.isPlaceholder();
-                const raw = avatar.getCroppedImage(AvatarSetType.FULL)?.src;
-                if (raw)
+                dirs.forEach(d =>
                 {
-                    trimTransparentImage(raw, (_url, trimmedImg) =>
+                    const key = `${ r.figure }__sit__${ d }`;
+                    const raw = renderShockwaveV9DataUrl(r.figure, { direction: d, headDirection: d, posture: 'sit' });
+                    if (raw)
                     {
-                        if (!alive) return;
-                        if (!isPh || !bodyCacheRef.current.has(key))
+                        trimTransparentImage(raw, (_url, trimmedImg) =>
                         {
-                            bodyCacheRef.current.set(key, trimmedImg);
-                        }
-                    });
-                }
-                if (!isPh)
-                {
-                    readyKeys.add(key);
-                }
-                else if (attempt < 8)
-                {
-                    const t = window.setTimeout(() => loadFigureDir(figure, dir, attempt + 1), 350 + attempt * 150);
-                    timers.push(t);
-                }
-            }
-            catch
-            {
-                // skip
-            }
+                            if (alive) bodyCacheRef.current.set(key, trimmedImg);
+                        });
+                    }
+                });
+            });
         };
 
-        const dirs = [ 0, 2, 4, 6 ];
-        roster.forEach(r =>
-        {
-            dirs.forEach(d => loadFigureDir(r.figure, d, 0));
-        });
+        const unsub = onShockwaveV9AtlasReady(renderAllV9);
         return () =>
         {
             alive = false;
-            timers.forEach(t => window.clearTimeout(t));
+            unsub();
         };
     }, [ roster ]);
 
