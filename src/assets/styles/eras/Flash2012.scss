@@ -4833,6 +4833,37 @@ body[data-era="flash2012"] {
             box-shadow: inset 0 0 0 1px #33312d !important;
         }
 
+        // Authentic Habbo 2012 User Infostand: #686868 avatar frame + #5a5854 motto pill + crisp close [x]
+        .body-image:not(.pet) {
+            background-color: #686868 !important;
+            border: 1px solid #000000 !important;
+            border-radius: 5px !important;
+            box-shadow: none !important;
+        }
+
+        .motto-row {
+            background-color: #5a5854 !important;
+            border: 1px solid #181715 !important;
+            border-radius: 4px !important;
+            padding: 3px 7px !important;
+            min-height: 24px !important;
+
+            .motto-content {
+                color: #ffffff !important;
+                font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                font-size: 11px !important;
+            }
+        }
+
+        .fa-icon {
+            border: 1px solid #9c9a95 !important;
+            border-radius: 2px !important;
+            padding: 1px !important;
+            width: 14px !important;
+            height: 14px !important;
+            background-color: #3a3835 !important;
+        }
+
         // Imagen de mascota en infostand (100% visible, sin encogerse en flexbox)
         .body-image.pet {
             width: 68px !important;
