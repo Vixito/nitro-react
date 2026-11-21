@@ -562,5 +562,85 @@
         padding: 4px 9px;
         font-size: 11px;
     }
+
+    .hmob-dpad {
+        width: 108px;
+        height: 108px;
+        padding: 5px;
+    }
+}
+
+// ── CRUCETA DIRECCIONAL MÓVIL (8 DIRECCIONES PARA CAMINAR EN SALA) ──
+.hmob-dpad {
+    position: fixed;
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    width: 122px;
+    height: 122px;
+    padding: 6px;
+    border-radius: 50%;
+    background: rgba(9, 34, 50, 0.72);
+    border: 2px solid rgba(128, 198, 232, 0.52);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 3px;
+    z-index: 112;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+
+    &.is-right {
+        right: max(10px, env(safe-area-inset-right));
+    }
+
+    &.is-left {
+        left: calc(64px + env(safe-area-inset-left));
+    }
+
+    .hmob-dpad-btn {
+        border: 1px solid rgba(165, 224, 250, 0.25);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        cursor: pointer;
+        touch-action: none;
+        line-height: 1;
+        transition: background-color 0.08s ease, border-color 0.08s ease, transform 0.06s ease;
+
+        &.is-cardinal {
+            font-size: 14px;
+            font-weight: 800;
+            background: rgba(26, 115, 153, 0.55);
+            border-color: rgba(125, 211, 252, 0.5);
+        }
+
+        &.is-diag {
+            font-size: 11px;
+            color: rgba(224, 242, 254, 0.85);
+            border-radius: 50%;
+        }
+
+        &.active,
+        &:active {
+            background: #1ea4d4;
+            border-color: #ffffff;
+            color: #ffffff;
+            transform: scale(0.93);
+        }
+    }
+
+    .hmob-dpad-center {
+        border-radius: 50%;
+        background: rgba(6, 22, 34, 0.72);
+        border: 1.5px solid rgba(125, 211, 252, 0.32);
+        margin: 5px;
+        pointer-events: none;
+    }
 }
 

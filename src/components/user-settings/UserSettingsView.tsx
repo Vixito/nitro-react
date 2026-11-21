@@ -4,6 +4,7 @@ import { FaVolumeDown, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { AddEventLinkTracker, CreateLinkEvent, DispatchMainEvent, DispatchUiEvent, LocalizeText, RemoveLinkEventTracker, SendMessageComposer } from '../../api';
 import { Button, classNames, Column, Flex, HorizontalRule, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
 import { useCatalogPlaceMultipleItems, useCatalogSkipPurchaseConfirmation, useEraTheme, useMessageEvent } from '../../hooks';
+import { useIsMobile, useMobileDpadSettings } from '../../hooks/mobile/useIsMobile';
 
 export const UserSettingsView: FC<{}> = props => {
     const [isVisible, setIsVisible] = useState(false);
@@ -16,6 +17,8 @@ export const UserSettingsView: FC<{}> = props => {
     const [isDiscordConnected, setIsDiscordConnected] = useState(!!localStorage.getItem('habbten_discord_tag'));
     const [discordStatusMsg, setDiscordStatusMsg] = useState('');
     const { currentEra, setEra, eras } = useEraTheme();
+    const isMobile = useIsMobile();
+    const { enabled: dpadEnabled, side: dpadSide, setEnabled: setDpadEnabled, setSide: setDpadSide } = useMobileDpadSettings();
 
     const loadInfinitePermissions = async () => {
         try {
@@ -160,7 +163,7 @@ export const UserSettingsView: FC<{}> = props => {
 
     if (!isVisible || !userSettings) return null;
 
-    if (currentEra === 'flash2012') {
+    if (!isMobile && currentEra === 'flash2012') {
         const renderVolumeRow2012 = (label: string, id: string, val: number, actionType: string) => {
             const stepIndex = Math.max(0, Math.min(11, Math.round((val / 100) * 11)));
 
@@ -411,28 +414,88 @@ export const UserSettingsView: FC<{}> = props => {
                             <input className="form-check-input" type="checkbox" checked={catalogSkipPurchaseConfirmation} onChange={event => setCatalogSkipPurchaseConfirmation(event.target.checked)} />
                             <Text>{LocalizeText('memenu.settings.other.skip.purchase.confirmation')}</Text>
                         </Flex>
-                        <HorizontalRule />
-                        <Text bold>Versión / Era del Juego</Text>
-                        <div className="d-flex flex-column gap-1 my-1">
-                            { eras.map(era => (
-                                <label key={ era.id } className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                        { isMobile ? (
+                            <>
+                                <HorizontalRule />
+                                <Text bold>Controles móviles</Text>
+                                <Flex alignItems="center" gap={1}>
                                     <input
-                                        type="radio"
-                                        name="era_theme_radio"
                                         className="form-check-input"
-                                        checked={ currentEra === era.id }
-                                        onChange={ () => setEra(era.id) }
+                                        type="checkbox"
+                                        checked={ dpadEnabled }
+                                        onChange={ event => setDpadEnabled(event.target.checked) }
                                     />
-                                    <span className="small"><strong>{ era.name }</strong> - { era.subtitle }</span>
-                                </label>
-                            )) }
-                        </div>
-                        <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => CreateLinkEvent('era-selector/open')}>
-                            <Text bold variant="white">Selector de Versión Visual</Text>
-                        </Button>
-                        <Button variant="secondary" className="d-flex align-items-center justify-content-center mb-2 py-2" onClick={() => { setIsVisible(false); CreateLinkEvent('tutorial/start'); }}>
-                            <Text bold variant="white">Ver tutorial del cliente</Text>
-                        </Button>
+                                    <Text>Mostrar flechas de movimiento (cruceta)</Text>
+                                </Flex>
+                                { dpadEnabled && (
+                                    <Flex alignItems="center" justifyContent="between" gap={2} className="mt-1 mb-1">
+                                        <Text className="small">Posición de la cruceta:</Text>
+                                        <Flex gap={1}>
+                                            <button
+                                                type="button"
+                                                onClick={ () => setDpadSide('left') }
+                                                style={{
+                                                    padding: '4px 12px',
+                                                    borderRadius: '5px',
+                                                    border: '1.5px solid #0b3952',
+                                                    backgroundColor: dpadSide === 'left' ? '#165e82' : '#ffffff',
+                                                    color: dpadSide === 'left' ? '#ffffff' : '#142633',
+                                                    fontSize: '12px',
+                                                    fontWeight: 700,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                Izquierda
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={ () => setDpadSide('right') }
+                                                style={{
+                                                    padding: '4px 12px',
+                                                    borderRadius: '5px',
+                                                    border: '1.5px solid #0b3952',
+                                                    backgroundColor: dpadSide === 'right' ? '#165e82' : '#ffffff',
+                                                    color: dpadSide === 'right' ? '#ffffff' : '#142633',
+                                                    fontSize: '12px',
+                                                    fontWeight: 700,
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                Derecha
+                                            </button>
+                                        </Flex>
+                                    </Flex>
+                                ) }
+                                <Button variant="secondary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => { setIsVisible(false); CreateLinkEvent('tutorial/start'); }}>
+                                    <Text bold variant="white">Ver tutorial del cliente</Text>
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <HorizontalRule />
+                                <Text bold>Versión / Era del Juego</Text>
+                                <div className="d-flex flex-column gap-1 my-1">
+                                    { eras.map(era => (
+                                        <label key={ era.id } className="d-flex align-items-center gap-2 cursor-pointer mb-0">
+                                            <input
+                                                type="radio"
+                                                name="era_theme_radio"
+                                                className="form-check-input"
+                                                checked={ currentEra === era.id }
+                                                onChange={ () => setEra(era.id) }
+                                            />
+                                            <span className="small"><strong>{ era.name }</strong> - { era.subtitle }</span>
+                                        </label>
+                                    )) }
+                                </div>
+                                <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => CreateLinkEvent('era-selector/open')}>
+                                    <Text bold variant="white">Selector de Versión Visual</Text>
+                                </Button>
+                                <Button variant="secondary" className="d-flex align-items-center justify-content-center mb-2 py-2" onClick={() => { setIsVisible(false); CreateLinkEvent('tutorial/start'); }}>
+                                    <Text bold variant="white">Ver tutorial del cliente</Text>
+                                </Button>
+                            </>
+                        ) }
                         <HorizontalRule />
                         <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => setShowDiscordModal(true)}>
                             <Text bold variant="white">Conectar a Discord</Text>

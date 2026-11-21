@@ -2075,15 +2075,19 @@ export const BattleBallGameView: FC = () =>
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.imageSmoothingEnabled = false;
 
-            // Full-bleed widescreen scaling using seamless 1120x484 backdrop (ZERO solid side strips!)
-            const rawSc = Math.max(cssH / BG_H, cssW / BG_W);
-            const sc = (cssW / rawSc) < 760 ? (cssW / 760) : rawSc;
+            // Adaptive arena framing: keep entire diamond arena visible and clear of top-left scoreboard on mobile/compact screens
+            const isCompactViewport = cssW < 960 || cssH < 540;
+            const rawSc = isCompactViewport
+                ? Math.min(cssW / 780, cssH / BG_H)
+                : Math.max(cssH / BG_H, cssW / BG_W);
+            const sc = (!isCompactViewport && (cssW / rawSc) < 760) ? (cssW / 760) : rawSc;
             const drawW = BG_W * sc;
             const drawH = BG_H * sc;
-            const desiredOx = Math.round(cssW / 2 - eng.arena.centerX * sc);
+            const mobileShiftX = isCompactViewport ? Math.min(44, Math.round(cssW * 0.05)) : 0;
+            const desiredOx = Math.round(cssW / 2 - eng.arena.centerX * sc + mobileShiftX);
             const ox = drawW >= cssW
                 ? Math.min(0, Math.max(Math.round(cssW - drawW), desiredOx))
-                : Math.floor((cssW - drawW) / 2);
+                : Math.floor((cssW - drawW) / 2 + mobileShiftX * 0.5);
             const oy = Math.floor((cssH - drawH) / 2);
             eng.viewScale = sc;
             eng.viewOffsetX = ox;

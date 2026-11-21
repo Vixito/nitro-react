@@ -960,11 +960,46 @@
 .ss-leave-modal {
     width: 348px;
     max-width: 92vw;
+    max-height: calc(100dvh - 20px);
+    overflow-y: auto;
     border-radius: 7px;
-    overflow: hidden;
     border: 1px solid #000000;
     background: #ececec;
     box-shadow: inset 0 0 0 1px #ffffff, 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 960px), (max-height: 540px) {
+    .ss-hud-top-right {
+        top: 4px;
+        right: 6px;
+        transform: scale(0.74);
+        transform-origin: top right;
+    }
+
+    .ss-hud-snowballs {
+        left: 4px;
+        transform: translateY(-50%) scale(0.78);
+        transform-origin: left center;
+    }
+
+    .ss-hud-bottom-left {
+        left: 6px;
+        bottom: 6px;
+        transform: scale(0.76);
+        transform-origin: bottom left;
+    }
+
+    .ss-hud-bottom-center {
+        bottom: 6px;
+
+        .ss-chat-form input {
+            width: 140px;
+        }
+
+        .ss-controls-bar {
+            display: none;
+        }
+    }
 }
 
 .ss-leave-header {

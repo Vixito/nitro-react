@@ -1,9 +1,65 @@
 import { useEffect, useState } from 'react';
 
 export type MobileTouchMode = 'walk' | 'pan';
+export type MobileDpadSide = 'right' | 'left';
 
 const MOBILE_MODE_EVENT = 'habbten-mobile-touch-mode-changed';
+const MOBILE_DPAD_EVENT = 'habbten-mobile-dpad-changed';
+const DPAD_ENABLED_KEY = 'habbten_mobile_dpad_enabled';
+const DPAD_SIDE_KEY = 'habbten_mobile_dpad_side';
 let currentTouchMode: MobileTouchMode = 'walk';
+
+export function getMobileDpadEnabled(): boolean
+{
+    if(typeof window === 'undefined') return true;
+    try
+    {
+        const raw = window.localStorage.getItem(DPAD_ENABLED_KEY);
+        if(raw === 'false' || raw === '0') return false;
+        return true;
+    }
+    catch
+    {
+        return true;
+    }
+}
+
+export function setMobileDpadEnabled(enabled: boolean): void
+{
+    if(typeof window === 'undefined') return;
+    try
+    {
+        window.localStorage.setItem(DPAD_ENABLED_KEY, enabled ? 'true' : 'false');
+    }
+    catch {}
+    window.dispatchEvent(new CustomEvent(MOBILE_DPAD_EVENT));
+}
+
+export function getMobileDpadSide(): MobileDpadSide
+{
+    if(typeof window === 'undefined') return 'right';
+    try
+    {
+        const raw = window.localStorage.getItem(DPAD_SIDE_KEY);
+        return raw === 'left' ? 'left' : 'right';
+    }
+    catch
+    {
+        return 'right';
+    }
+}
+
+export function setMobileDpadSide(side: MobileDpadSide): void
+{
+    if(typeof window === 'undefined') return;
+    const clean: MobileDpadSide = side === 'left' ? 'left' : 'right';
+    try
+    {
+        window.localStorage.setItem(DPAD_SIDE_KEY, clean);
+    }
+    catch {}
+    window.dispatchEvent(new CustomEvent(MOBILE_DPAD_EVENT));
+}
 
 export function getMobileTouchMode(): MobileTouchMode
 {
@@ -111,5 +167,34 @@ export function useMobileTouchMode(): [ MobileTouchMode, (mode: MobileTouchMode)
     }, []);
 
     return [ mode, setMobileTouchMode ];
+}
+
+export function useMobileDpadSettings(): {
+    enabled: boolean;
+    side: MobileDpadSide;
+    setEnabled: (enabled: boolean) => void;
+    setSide: (side: MobileDpadSide) => void;
+}
+{
+    const [ enabled, setEnabledState ] = useState<boolean>(() => getMobileDpadEnabled());
+    const [ side, setSideState ] = useState<MobileDpadSide>(() => getMobileDpadSide());
+
+    useEffect(() =>
+    {
+        const sync = () =>
+        {
+            setEnabledState(getMobileDpadEnabled());
+            setSideState(getMobileDpadSide());
+        };
+        window.addEventListener(MOBILE_DPAD_EVENT, sync);
+        return () => window.removeEventListener(MOBILE_DPAD_EVENT, sync);
+    }, []);
+
+    return {
+        enabled,
+        side,
+        setEnabled: setMobileDpadEnabled,
+        setSide: setMobileDpadSide
+    };
 }
 

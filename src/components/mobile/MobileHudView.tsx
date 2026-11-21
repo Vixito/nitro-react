@@ -1,6 +1,6 @@
-import { NitroSettingsEvent, UserSettingsEvent, UserSettingsSoundComposer } from '@nitrots/nitro-renderer';
-import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import { ChatMessageTypeEnum, CreateLinkEvent, DispatchMainEvent, GetRoomEngine, GetSessionDataManager, MessengerIconState, OpenMessengerChat, SendMessageComposer, TryVisitRoom, VisitDesktop } from '../../api';
+import { NitroSettingsEvent, RoomObjectCategory, RoomUnitWalkComposer, UserSettingsEvent, UserSettingsSoundComposer } from '@nitrots/nitro-renderer';
+import { FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { ChatMessageTypeEnum, CreateLinkEvent, DispatchMainEvent, GetRoomEngine, GetRoomSession, GetSessionDataManager, MessengerIconState, OpenMessengerChat, SendMessageComposer, TryVisitRoom, VisitDesktop } from '../../api';
 import iconAchievements from '../../assets/images/eras/flash2012/memenu/achievements_color.png';
 import iconClothes from '../../assets/images/eras/flash2012/memenu/clothes_color.png';
 import iconProfile from '../../assets/images/eras/flash2012/memenu/profile_color.png';
@@ -25,7 +25,7 @@ import iconHelp from '../../assets/images/toolbar/icons/me-menu/helper-tool.png'
 import iconModTools from '../../assets/images/toolbar/icons/modtools.png';
 import { LayoutCurrencyIcon } from '../../common';
 import { useAchievements, useChatInputWidget, useFriends, useInventoryUnseenTracker, useMessageEvent, useMessenger, useNavigator, usePurse, useRoom, useSessionInfo } from '../../hooks';
-import { useMobileTouchMode } from '../../hooks/mobile/useIsMobile';
+import { useMobileDpadSettings, useMobileTouchMode } from '../../hooks/mobile/useIsMobile';
 import { HabboHeadImg } from '../game-center/views/SnowStormAvatar';
 import './MobileHudView.scss';
 
@@ -47,6 +47,9 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     const { roomSession = null } = useRoom();
     const { sendChat = null, setIsTyping = null, setIsIdle = null } = useChatInputWidget();
     const [ touchMode, setTouchMode ] = useMobileTouchMode();
+    const { enabled: dpadEnabled, side: dpadSide } = useMobileDpadSettings();
+    const [ activeDpadDir, setActiveDpadDir ] = useState<string>('');
+    const dpadIntervalRef = useRef<number | null>(null);
 
     const [ isMeMenuOpen, setMeMenuOpen ] = useState(false);
     const [ isHelpMenuOpen, setHelpMenuOpen ] = useState(false);
@@ -70,14 +73,65 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
         setIsSoundActive(!(parser.volumeSystem === 0 && parser.volumeFurni === 0 && parser.volumeTrax === 0));
     });
 
+    const stopDpadWalk = useCallback(() =>
+    {
+        if(dpadIntervalRef.current)
+        {
+            window.clearInterval(dpadIntervalRef.current);
+            dpadIntervalRef.current = null;
+        }
+        setActiveDpadDir('');
+    }, []);
+
+    const stepAvatarInDirection = useCallback((dx: number, dy: number) =>
+    {
+        const session = GetRoomSession();
+        const engine = GetRoomEngine();
+        const userSession = GetSessionDataManager();
+        if(!session || !engine || !userSession) return;
+
+        const roomId = session.roomId;
+        const userData = session.userDataManager?.getUserDataByType(userSession.userId, 1)
+            || session.userDataManager?.getUserDataByName(userSession.userName);
+        if(!userData) return;
+
+        const unitObj = engine.getRoomObject(roomId, userData.roomIndex, RoomObjectCategory.UNIT);
+        if(!unitObj) return;
+
+        const loc = unitObj.getLocation();
+        if(!loc) return;
+
+        const nextX = Math.round(loc.x) + dx;
+        const nextY = Math.round(loc.y) + dy;
+        if(nextX < 0 || nextY < 0) return;
+
+        SendMessageComposer(new RoomUnitWalkComposer(nextX, nextY));
+    }, []);
+
+    const startDpadWalk = useCallback((dirId: string, dx: number, dy: number) =>
+    {
+        stopDpadWalk();
+        setActiveDpadDir(dirId);
+        stepAvatarInDirection(dx, dy);
+        dpadIntervalRef.current = window.setInterval(() =>
+        {
+            stepAvatarInDirection(dx, dy);
+        }, 230);
+    }, [ stepAvatarInDirection, stopDpadWalk ]);
+
     useEffect(() =>
     {
+        if(!isInRoom || !dpadEnabled)
+        {
+            stopDpadWalk();
+        }
         if(!isInRoom)
         {
             setChatBarOpen(false);
             setSideDrawerOpen(false);
         }
-    }, [ isInRoom ]);
+        return () => stopDpadWalk();
+    }, [ isInRoom, dpadEnabled, stopDpadWalk ]);
 
     useEffect(() =>
     {
@@ -296,6 +350,107 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
                         aria-label="Herramientas de sala"
                     >
                         <span className={ `hmob-chevron-icon ${ isSideDrawerOpen ? 'flipped' : '' }` }>›</span>
+                    </button>
+                </div>
+            ) }
+
+            {/* CRUCETA DIRECCIONAL MÓVIL PARA CAMINAR EN SALA (CONFIGURABLE EN AJUSTES) */}
+            { isInRoom && dpadEnabled && (
+                <div
+                    className={ `hmob-dpad ${ dpadSide === 'left' ? 'is-left' : 'is-right' }` }
+                    role="group"
+                    aria-label="Cruceta de movimiento"
+                >
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'nw' ? 'active' : '' }` }
+                        aria-label="Arriba izquierda"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('nw', -1, 0); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ↖
+                    </button>
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 'n' ? 'active' : '' }` }
+                        aria-label="Arriba"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('n', -1, -1); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ▲
+                    </button>
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'ne' ? 'active' : '' }` }
+                        aria-label="Arriba derecha"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('ne', 0, -1); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ↗
+                    </button>
+
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 'w' ? 'active' : '' }` }
+                        aria-label="Izquierda"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('w', -1, 1); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ◀
+                    </button>
+                    <div className="hmob-dpad-center" aria-hidden="true" />
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 'e' ? 'active' : '' }` }
+                        aria-label="Derecha"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('e', 1, -1); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ▶
+                    </button>
+
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'sw' ? 'active' : '' }` }
+                        aria-label="Abajo izquierda"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('sw', 0, 1); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ↙
+                    </button>
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-cardinal ${ activeDpadDir === 's' ? 'active' : '' }` }
+                        aria-label="Abajo"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('s', 1, 1); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ▼
+                    </button>
+                    <button
+                        type="button"
+                        className={ `hmob-dpad-btn is-diag ${ activeDpadDir === 'se' ? 'active' : '' }` }
+                        aria-label="Abajo derecha"
+                        onPointerDown={ e => { e.preventDefault(); startDpadWalk('se', 1, 0); } }
+                        onPointerUp={ stopDpadWalk }
+                        onPointerCancel={ stopDpadWalk }
+                        onPointerLeave={ stopDpadWalk }
+                    >
+                        ↘
                     </button>
                 </div>
             ) }

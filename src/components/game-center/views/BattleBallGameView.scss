@@ -1189,6 +1189,11 @@
 
     .bb-sw-window {
         width: 100%;
+        max-width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+        display: flex;
+        flex-direction: column;
         background: #8a9599;
         border: 1px solid #000000;
         border-radius: 7px;
@@ -1198,11 +1203,12 @@
             0 6px 0 rgba(0, 0, 0, 0.35);
         overflow: hidden;
 
-        &.is-compact { max-width: 390px; }
-        &.is-wide { max-width: 560px; }
+        &.is-compact { max-width: min(390px, calc(100vw - 20px)); }
+        &.is-wide { max-width: min(560px, calc(100vw - 20px)); }
     }
 
     .bb-sw-header {
+        flex-shrink: 0;
         height: 26px;
         background: #6596a8;
         border-bottom: 1px solid #000000;
@@ -1250,6 +1256,12 @@
     }
 
     .bb-sw-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
         padding: 10px 12px 12px;
         background: #d7dcde;
         border-top: 1px solid #f0f4f5;
@@ -1316,6 +1328,155 @@
         &:nth-child(even) { background: #f4f7f8; }
         &:last-child { border-bottom: none; }
     }
+
+    // =========================================================================
+    // RESPONSIVE / MOBILE ADAPTATION (COMPACT SCOREBOARD + SCROLLABLE MODALS)
+    // =========================================================================
+    @media (max-width: 960px), (max-height: 540px) {
+        .bb-sw-scoreboard {
+            top: 4px;
+            left: 4px;
+            min-width: 120px;
+            max-width: 146px;
+            padding: 3px 4px 4px;
+            gap: 3px;
+            opacity: 0.9;
+        }
+
+        .bb-sw-timer-pill {
+            min-height: 16px;
+            padding: 1px 6px;
+            font-size: 9px;
+        }
+
+        .bb-sw-bars-well {
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .bb-sw-team-bar-row {
+            min-height: 11px;
+            padding: 0;
+
+            .bb-sw-team-bar-label {
+                padding: 0 3px;
+                font-size: 8px;
+            }
+        }
+
+        .bb-sw-lock-foot {
+            font-size: 8px;
+            gap: 4px;
+        }
+
+        .bb-sw-pu-toast {
+            top: 6px;
+            right: 6px;
+            transform: scale(0.8);
+            transform-origin: top right;
+        }
+
+        .bb-effect-banner {
+            top: 42px;
+            right: 6px;
+            font-size: 9.5px;
+            padding: 2px 7px;
+        }
+
+        .bb-overlay-center {
+            padding: 8px;
+            align-items: flex-start;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .bb-starting-box {
+            min-width: 0;
+            width: min(320px, calc(100vw - 16px));
+            margin: auto;
+        }
+
+        .bb-results-window {
+            max-width: calc(100vw - 16px);
+            max-height: calc(100dvh - 60px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: auto;
+
+            .bb-results-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bb-bottom-hud {
+            height: 44px;
+        }
+
+        .bb-hud-zone-avatar {
+            width: 44px;
+        }
+
+        .bb-hud-zone-chat {
+            min-width: 96px;
+            padding: 0 6px 3px;
+        }
+
+        .bb-sw2006-hover-label {
+            display: none;
+        }
+
+        .bb-hud-zone-powerup {
+            width: 92px;
+            padding: 0 4px;
+            gap: 3px;
+
+            .bb-pu-preview-box {
+                width: 30px;
+                height: 30px;
+            }
+
+            .bb-pu-trigger-btn {
+                width: 38px;
+                height: 34px;
+
+                .bb-pu-empty-img {
+                    width: 38px;
+                    height: 34px;
+                }
+            }
+        }
+
+        .bb-hud-zone-icons {
+            gap: 8px;
+            padding: 0 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+
+            img.bb-ico-audio { height: 17px; }
+            img.bb-ico-rank { height: 24px; }
+            img.bb-ico-hotel { height: 28px; }
+            img.bb-ico-help { height: 26px; }
+        }
+
+        .bb-modal-backdrop {
+            padding: 8px;
+        }
+
+        .bb-sw-body {
+            padding: 8px 10px 10px;
+            gap: 8px;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .bb-sw-body > div[style*='grid-template-columns: 1fr 1fr'] {
+            grid-template-columns: 1fr !important;
+        }
+    }
+}
+
+body.is-mobile-ui .battleball-game-root {
+    z-index: 1300;
 }
 
 @keyframes bb-pulse {
