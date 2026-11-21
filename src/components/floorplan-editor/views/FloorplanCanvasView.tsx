@@ -72,16 +72,16 @@ export const FloorplanCanvasView: FC<ColumnProps> = props =>
         switch(scrollDirection)
         {
             case 'up':
-                element.scrollBy({ top: -10 });
+                element.scrollBy({ top: -48 });
                 break;
             case 'down':
-                element.scrollBy({ top: 10 });
+                element.scrollBy({ top: 48 });
                 break;
             case 'left':
-                element.scrollBy({ left: -10 });
+                element.scrollBy({ left: -48 });
                 break;
             case 'right':
-                element.scrollBy({ left: 10 });
+                element.scrollBy({ left: 48 });
                 break;
         }
     }

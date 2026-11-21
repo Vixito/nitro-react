@@ -280,6 +280,196 @@ body.is-mobile-ui {
         }
     }
 
+    // ── INFORMACIÓN DE SALA (.nitro-room-info): ADAPTABLE Y DESPLAZABLE SIN RECORTAR TEXTOS ──
+    .nitro-card.nitro-room-info {
+        width: min(380px, calc(100vw - 12px)) !important;
+        max-width: calc(100vw - 12px) !important;
+        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        > .content-area,
+        > .nitro-card-content {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 10px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+            padding: 10px !important;
+
+            > * {
+                flex-shrink: 0 !important;
+                overflow: visible !important;
+            }
+
+            // Bloque superior (miniatura + textos debajo de la casita) sin overflow:hidden que recorte ni max-height de 50px
+            > .d-flex {
+                align-items: flex-start !important;
+                overflow: visible !important;
+                min-width: 0 !important;
+
+                .room-thumbnail {
+                    flex-shrink: 0 !important;
+                }
+
+                > .d-flex.flex-column {
+                    overflow: visible !important;
+                    min-width: 0 !important;
+
+                    .d-flex {
+                        flex-wrap: wrap !important;
+                        min-width: 0 !important;
+                    }
+
+                    // Descripción de sala y textos largos: siempre completos y legibles al hacer scroll
+                    .overflow-auto,
+                    [style*='max-height'] {
+                        max-height: none !important;
+                        overflow: visible !important;
+                        white-space: pre-wrap !important;
+                        word-break: break-word !important;
+                    }
+                }
+            }
+        }
+    }
+
+    // ── CÁMARA MÓVIL: EDITOR Y CHECKOUT ADAPTADOS AL TAMAÑO DEL DISPOSITIVO ──
+    .nitro-card.nitro-camera-editor {
+        width: min(600px, calc(100vw - 12px)) !important;
+        height: min(440px, calc(100dvh - 76px - env(safe-area-inset-bottom))) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        > .content-area,
+        > .nitro-card-content {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+
+            .picture-preview {
+                width: min(220px, 100%) !important;
+                height: auto !important;
+                aspect-ratio: 1 / 1 !important;
+                max-height: 210px !important;
+                object-fit: contain !important;
+            }
+        }
+    }
+
+    .nitro-card.nitro-camera-checkout {
+        width: min(460px, calc(100vw - 12px)) !important;
+        max-height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        > .content-area,
+        > .nitro-card-content {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+
+            .picture-preview {
+                width: min(220px, 100%) !important;
+                height: auto !important;
+                max-height: 200px !important;
+                object-fit: contain !important;
+            }
+        }
+    }
+
+    .nitro-room-thumbnail-camera {
+        max-width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 80px) !important;
+    }
+
+    // ── EDITOR FLOOR (.nitro-floorplan-editor): ADAPTABLE EN MÓVIL + FLECHAS SIEMPRE VISIBLES ──
+    .nitro-card.nitro-floorplan-editor {
+        width: min(640px, calc(100vw - 12px)) !important;
+        height: calc(100dvh - 76px - env(safe-area-inset-bottom)) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+
+        > .content-area,
+        > .nitro-card-content,
+        > .content-area.overflow-hidden,
+        > .nitro-card-content.overflow-hidden {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch !important;
+            touch-action: pan-y !important;
+            padding: 8px !important;
+
+            > * {
+                flex-shrink: 0 !important;
+                min-width: 0 !important;
+            }
+
+            // Panel superior de herramientas: filas adaptables sin aplastar íconos ni sliders
+            > .d-flex.flex-column:first-child {
+                gap: 8px !important;
+
+                > .d-flex {
+                    flex-wrap: wrap !important;
+                    gap: 8px !important;
+
+                    > .d-flex.flex-column {
+                        flex: 1 1 140px !important;
+                        width: auto !important;
+                        max-width: 100% !important;
+                        min-width: 0 !important;
+                    }
+                }
+            }
+
+            // Lienzo del Editor Floor: alto usable garantizado y flechas de desplazamiento siempre visibles en móvil
+            > .d-flex.flex-column:nth-child(2) {
+                min-height: 215px !important;
+                height: 225px !important;
+                overflow: hidden !important;
+
+                > .grid {
+                    height: 100% !important;
+                }
+
+                .d-md-none {
+                    display: flex !important;
+                }
+
+                .overflow-auto {
+                    max-height: 165px !important;
+                    overflow: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    touch-action: pan-x pan-y !important;
+                }
+            }
+
+            // Barra inferior de acciones (Recargar / Importar-Exportar / Guardar)
+            > .d-flex:last-child {
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+
+                .btn-group {
+                    flex-wrap: wrap !important;
+                }
+            }
+        }
+    }
+
+    .nitro-card.floorplan-import-export {
+        width: min(500px, calc(100vw - 12px)) !important;
+        height: min(440px, calc(100dvh - 76px - env(safe-area-inset-bottom))) !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+    }
+
     // Tablón de Anuncios adaptado y desplazable en móvil
     .bulletin-board-window {
         width: min(708px, calc(100vw - 12px)) !important;
