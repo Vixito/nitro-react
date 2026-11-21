@@ -86,16 +86,9 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
     {
         isDisposed.current = false;
 
-        const onEraRefresh = () =>
-        {
-            if(!isDisposed.current) setRandomValue(Math.random());
-        };
-        window.addEventListener('habbten-era-avatar-refresh', onEraRefresh);
-
         return () =>
         {
             isDisposed.current = true;
-            window.removeEventListener('habbten-era-avatar-refresh', onEraRefresh);
         }
     }, []);
         

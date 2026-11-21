@@ -1,6 +1,6 @@
 import { AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
-import { GetAvatarRenderManager, onShockwaveV9AtlasReady, renderShockwaveV9DataUrl } from '../../../api';
+import { GetAvatarRenderManager } from '../../../api';
 import posesGridImg from '../../../assets/images/gamecenter/snowstorm/Snowstorm_poses_grid.png';
 
 export interface TrimmedHeadInfo
@@ -82,16 +82,17 @@ export function trimTransparentImage(
     img.src = rawSrc;
 }
 
-export function useCroppedHabboHead(figure: string, direction = 2, classicV9 = true): TrimmedHeadInfo | null
+export function useCroppedHabboHead(figure: string, direction = 2, smallScale = true): TrimmedHeadInfo | null
 {
-    const cacheKey = `${ classicV9 ? 'v9__' : '' }${ figure }__${ direction }`;
+    const scaleType = smallScale ? AvatarScaleType.SMALL : AvatarScaleType.LARGE;
+    const cacheKey = `${ scaleType }__${ figure }__${ direction }`;
     const [ info, setInfo ] = useState<TrimmedHeadInfo | null>(() => trimmedHeadCache.get(cacheKey) || null);
     const [ reloadTick, setReloadTick ] = useState<number>(0);
 
     useEffect(() =>
     {
         let disposed = false;
-        let unsubV9: (() => void) | null = null;
+        let retryTimer: number | null = null;
         if (!figure) return;
 
         const cached = trimmedHeadCache.get(cacheKey);
@@ -101,39 +102,10 @@ export function useCroppedHabboHead(figure: string, direction = 2, classicV9 = t
             return;
         }
 
-        if (classicV9)
-        {
-            const tryRenderV9 = () =>
-            {
-                const v9Url = renderShockwaveV9DataUrl(figure, { direction, headDirection: direction, headOnly: true });
-                if (!v9Url || disposed) return false;
-                trimTransparentImage(v9Url, (trimmedUrl, _img, tw, th) =>
-                {
-                    if (disposed) return;
-                    const entry: TrimmedHeadInfo = { url: trimmedUrl, w: tw, h: th };
-                    trimmedHeadCache.set(cacheKey, entry);
-                    setInfo(entry);
-                });
-                return true;
-            };
-
-            if (tryRenderV9()) return () => { disposed = true; };
-
-            unsubV9 = onShockwaveV9AtlasReady(() =>
-            {
-                if (!disposed) tryRenderV9();
-            });
-            return () =>
-            {
-                disposed = true;
-                if (unsubV9) unsubV9();
-            };
-        }
-
         const manager = GetAvatarRenderManager();
         if (!manager) return;
 
-        const avatarImg = manager.createAvatarImage(figure, AvatarScaleType.LARGE, 'M', {
+        const avatarImg = manager.createAvatarImage(figure, scaleType, 'M', {
             resetFigure: () =>
             {
                 if (!disposed)
@@ -151,6 +123,7 @@ export function useCroppedHabboHead(figure: string, direction = 2, classicV9 = t
         avatarImg.setDirection(AvatarSetType.FULL, direction);
         avatarImg.setDirection(AvatarSetType.HEAD, direction);
 
+        const isPh = avatarImg.isPlaceholder();
         const cropped = avatarImg.getCroppedImage(AvatarSetType.HEAD);
         if (cropped && cropped.src && !disposed)
         {
@@ -158,9 +131,17 @@ export function useCroppedHabboHead(figure: string, direction = 2, classicV9 = t
             {
                 if (disposed) return;
                 const entry: TrimmedHeadInfo = { url: trimmedUrl, w: tw, h: th };
-                trimmedHeadCache.set(cacheKey, entry);
+                if (!isPh) trimmedHeadCache.set(cacheKey, entry);
                 setInfo(entry);
             });
+        }
+
+        if (isPh)
+        {
+            retryTimer = window.setTimeout(() =>
+            {
+                if (!disposed) setReloadTick(t => t + 1);
+            }, 350);
         }
 
         avatarImg.dispose();
@@ -168,8 +149,9 @@ export function useCroppedHabboHead(figure: string, direction = 2, classicV9 = t
         return () =>
         {
             disposed = true;
+            if (retryTimer) window.clearTimeout(retryTimer);
         };
-    }, [ figure, direction, classicV9, cacheKey, reloadTick ]);
+    }, [ figure, direction, scaleType, cacheKey, reloadTick ]);
 
     return info;
 }
@@ -178,12 +160,12 @@ export const HabboHeadImg: FC<{
     figure: string;
     direction?: number;
     size?: number;
-    classicV9?: boolean;
+    smallScale?: boolean;
     className?: string;
     style?: CSSProperties;
-}> = ({ figure, direction = 2, size = 36, classicV9 = true, className, style }) =>
+}> = ({ figure, direction = 2, size = 36, smallScale = true, className, style }) =>
 {
-    const info = useCroppedHabboHead(figure, direction, classicV9);
+    const info = useCroppedHabboHead(figure, direction, smallScale);
     if (!info) return null;
 
     return (
@@ -224,8 +206,8 @@ export const SnowStormParkaAvatar: FC<{
     const bodyScale = 1.0 * scale;
     const marginBot = Math.round(2 * scale);
 
-    // Proportional 1:1 Habbo head-to-parka ratio (so chin sits inside fur collar regardless of hair height!)
-    const headPixelScale = 0.66 * bodyScale;
+    // Proportional 1:1 classic SMALL (sh_) Habbo head-to-parka ratio (so chin sits inside fur collar!)
+    const headPixelScale = 1.25 * bodyScale;
     const headW = headInfo ? Math.round(headInfo.w * headPixelScale) : 0;
     const headH = headInfo ? Math.round(headInfo.h * headPixelScale) : 0;
     // Exact chin bottom seated snugly into collar opening (20.5px above boots bottom)

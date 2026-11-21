@@ -10,5 +10,4 @@ export * from './FigureGenerator';
 export * from './HeadModel';
 export * from './IAvatarEditorCategoryModel';
 export * from './LegModel';
-export * from './ShockwaveV9AvatarRenderer';
 export * from './TorsoModel';
