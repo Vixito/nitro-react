@@ -81,17 +81,25 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
         setIsDragging(true);
     }, []);
 
+    const isInteractiveTarget = useCallback((target: EventTarget | null) =>
+    {
+        if(!(target instanceof HTMLElement)) return false;
+        return !!target.closest('button, a, input, select, textarea, .camera-button, .header-close, .camera-frame-preview-actions, .nitro-card-header-close');
+    }, []);
+
     const onDragMouseDown = useCallback((event: MouseEvent) =>
     {
+        if(isInteractiveTarget(event.target)) return;
         startDragging(event.clientX, event.clientY);
-    }, [ startDragging ]);
+    }, [ isInteractiveTarget, startDragging ]);
 
     const onTouchDown = useCallback((event: TouchEvent) =>
     {
+        if(isInteractiveTarget(event.target)) return;
         const touch = event.touches[0];
 
         startDragging(touch.clientX, touch.clientY);
-    }, [ startDragging ]);
+    }, [ isInteractiveTarget, startDragging ]);
 
     const onDragMouseMove = useCallback((event: MouseEvent) =>
     {
@@ -112,6 +120,12 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
         let offsetX = (offset.x + delta.x);
         let offsetY = (offset.y + delta.y);
 
+        const elemRect = elementRef.current.getBoundingClientRect();
+        const elemW = elemRect.width || elementRef.current.offsetWidth;
+        const elemH = elemRect.height || elementRef.current.offsetHeight;
+        const handleRect = dragHandler.getBoundingClientRect();
+        const handleH = Math.min(48, handleRect.height || dragHandler.offsetHeight, elemH);
+
         const left = elementRef.current.offsetLeft + offsetX;
         const top = elementRef.current.offsetTop + offsetY;
 
@@ -120,19 +134,19 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
             offsetY = -elementRef.current.offsetTop;
         }
 
-        else if((top + dragHandler.offsetHeight) >= (document.body.offsetHeight - BOUNDS_THRESHOLD_TOP))
+        else if((top + handleH) >= (document.body.offsetHeight - BOUNDS_THRESHOLD_TOP))
         {
-            offsetY = (document.body.offsetHeight - elementRef.current.offsetHeight) - elementRef.current.offsetTop;
+            offsetY = (document.body.offsetHeight - handleH) - elementRef.current.offsetTop;
         }
 
-        if((left + elementRef.current.offsetWidth) < BOUNDS_THRESHOLD_LEFT)
+        if((left + elemW) < (BOUNDS_THRESHOLD_LEFT + 48))
         {
-            offsetX = -elementRef.current.offsetLeft;
+            offsetX = (BOUNDS_THRESHOLD_LEFT + 48 - elemW) - elementRef.current.offsetLeft;
         }
 
-        else if(left >= (document.body.offsetWidth - BOUNDS_THRESHOLD_LEFT))
+        else if(left >= (document.body.offsetWidth - BOUNDS_THRESHOLD_LEFT - 48))
         {
-            offsetX = (document.body.offsetWidth - elementRef.current.offsetWidth) - elementRef.current.offsetLeft;
+            offsetX = (document.body.offsetWidth - BOUNDS_THRESHOLD_LEFT - 48) - elementRef.current.offsetLeft;
         }
 
         setDelta({ x: 0, y: 0 });

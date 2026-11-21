@@ -34,9 +34,9 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = props =
 
     const selectedPicture = ((selectedPictureIndex > -1) ? cameraRoll[selectedPictureIndex] : null);
     const naturalW = 340;
-    const naturalH = (cameraRoll && cameraRoll.length > 0) ? 540 : 462;
+    const naturalH = 536;
     const camScale = isMobile
-        ? Math.max(0.45, Math.min(1, (viewport.h - 86) / naturalH, (viewport.w - 16) / naturalW))
+        ? Math.max(0.45, Math.min(1, (viewport.h - 82) / naturalH, (viewport.w - 16) / naturalW))
         : 1;
 
     const getCameraBounds = () =>
@@ -95,19 +95,34 @@ export const CameraWidgetCaptureView: FC<CameraWidgetCaptureViewProps> = props =
                 >
                     { selectedPicture && <img alt="" className="camera-area" src={ selectedPicture.imageUrl } /> }
                     <div className="camera-canvas drag-handler">
-                        <div className="position-absolute header-close" onClick={ onClose }>
+                        <div
+                            className="position-absolute header-close"
+                            onMouseDown={ e => e.stopPropagation() }
+                            onTouchStart={ e => e.stopPropagation() }
+                            onClick={ onClose }
+                        >
                             <FaTimes className="fa-icon" />
                         </div>
                         { !selectedPicture && <div ref={ elementRef } className="camera-area camera-view-finder" /> }
                         { selectedPicture && 
                             <div className="camera-area camera-frame">
-                                <div className="camera-frame-preview-actions w-100 position-absolute bottom-0 py-2 text-center">
+                                <div
+                                    className="camera-frame-preview-actions w-100 position-absolute bottom-0 py-2 text-center"
+                                    onMouseDown={ e => e.stopPropagation() }
+                                    onTouchStart={ e => e.stopPropagation() }
+                                >
                                     <button className="btn btn-success me-3" title={ LocalizeText('camera.editor.button.tooltip') } onClick={ onEdit }>{ LocalizeText('camera.editor.button.text') }</button>
                                     <button className="btn btn-danger" onClick={ onDelete }>{ LocalizeText('camera.delete.button.text') }</button>
                                 </div>
                             </div> }
                         <div className="d-flex justify-content-center">
-                            <div className="camera-button" title={ LocalizeText('camera.take.photo.button.tooltip') } onClick={ takePicture } />
+                            <div
+                                className="camera-button"
+                                title={ LocalizeText('camera.take.photo.button.tooltip') }
+                                onMouseDown={ e => e.stopPropagation() }
+                                onTouchStart={ e => e.stopPropagation() }
+                                onClick={ takePicture }
+                            />
                         </div>
                     </div>
                     { (cameraRoll.length > 0) &&

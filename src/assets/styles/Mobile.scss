@@ -305,10 +305,11 @@ body.is-mobile-ui {
             }
 
             // Bloque superior (miniatura + textos debajo de la casita) sin overflow:hidden que recorte ni max-height de 50px
-            > .d-flex {
+            > .d-flex:not(.flex-column) {
                 align-items: flex-start !important;
                 overflow: visible !important;
                 min-width: 0 !important;
+                width: 100% !important;
 
                 .room-thumbnail {
                     flex-shrink: 0 !important;
@@ -331,6 +332,17 @@ body.is-mobile-ui {
                         white-space: pre-wrap !important;
                         word-break: break-word !important;
                     }
+                }
+            }
+
+            // Botones inferiores (Reportar, Silenciar, Filtro, Editor Floor): siempre estirados al 100% de ancho uniforme
+            > .d-flex.flex-column {
+                align-items: stretch !important;
+                width: 100% !important;
+
+                > button,
+                > .btn {
+                    width: 100% !important;
                 }
             }
         }
