@@ -1,7 +1,9 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import { GetRoomEngine } from '../../../../../api';
+import { useEraTheme } from '../../../../../hooks/era/useEraTheme';
 import { CatalogLayoutProps } from './CatalogLayout.types';
 import ecotronMachineImg from '../../../../../assets/images/eras/flash2012/ecotron/ecotron_machine.png';
+import iconEcotronHeaderImg from '../../../../../assets/images/eras/flash2012/ecotron/icon_ecotron_header.png';
 
 interface RecyclableItem
 {
@@ -21,6 +23,7 @@ const SLOT_COUNT = 12;
 
 export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
 {
+    const { currentEra } = useEraTheme();
     const [ slots, setSlots ] = useState<(RecyclableItem | null)[]>(() => Array(SLOT_COUNT).fill(null));
     const [ inventory, setInventory ] = useState<RecyclableItem[]>([]);
     const [ activeSlot, setActiveSlot ] = useState<number | null>(null);
@@ -106,27 +109,6 @@ export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
         });
     };
 
-    const handleAutoFill = () =>
-    {
-        setErrorMsg('');
-        setSlots(prev =>
-        {
-            const next = [ ...prev ];
-            const already = new Set(next.filter(Boolean).map(s => s.itemId));
-            const pool = inventory.filter(i => !already.has(i.itemId));
-            let pIdx = 0;
-            for(let i = 0; i < SLOT_COUNT; i++)
-            {
-                if(!next[i] && pIdx < pool.length)
-                {
-                    next[i] = pool[pIdx++];
-                }
-            }
-            return next;
-        });
-        setActiveSlot(null);
-    };
-
     const handleStartRecycle = async () =>
     {
         if(!isReady) return;
@@ -167,6 +149,18 @@ export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
 
     return (
         <div className="ecotron-machine-page">
+            { currentEra !== 'shockwave2006' && (
+                <div className="ecotron-flat-banner">
+                    <img src={ iconEcotronHeaderImg } alt="" width={ 36 } height={ 34 } className="ecotron-banner-ico" />
+                    <div className="ecotron-banner-text">
+                        <div className="ecotron-banner-title">Máquina Ecotrón</div>
+                        <div className="ecotron-banner-desc">
+                            Con esta Máquina Ecotrón podrás transformar tus viejos furnis en algo totalmente nuevo con lo que te podrás llevar una sorpresa. Para mejor explicación revisa la página de Información.
+                        </div>
+                    </div>
+                </div>
+            ) }
+
             <div className="ecotron-machine-art">
                 <img
                     src={ ecotronMachineImg }
@@ -213,11 +207,6 @@ export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
                 >
                     { recycling ? 'Reciclando...' : '¡Empezar!' }
                 </button>
-                { filledCount < SLOT_COUNT && availableItems.length > 0 && (
-                    <button type="button" className="ecotron-helper-link" onClick={ handleAutoFill }>
-                        Autollenar ({ Math.min(SLOT_COUNT, filledCount + availableItems.length) }/12)
-                    </button>
-                ) }
             </div>
 
             { activeSlot !== null && (

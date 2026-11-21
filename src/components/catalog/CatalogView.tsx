@@ -246,7 +246,7 @@ export const CatalogView: FC<{}> = props =>
     const f12LayoutCode = currentPage?.layoutCode || '';
     const f12ShowPageBanner = Boolean(
         currentPage
-        && ![ 'frontpage', 'frontpage4', 'soundmachine', 'habbten_vip_buy', 'habbten_vip_bubbles', 'habbten_vip_colours', 'habbten_vip_prefix', 'habbten_vip_badges', 'marketplace', 'marketplace_own_items' ].includes(f12LayoutCode)
+        && ![ 'frontpage', 'frontpage4', 'soundmachine', 'habbten_vip_buy', 'habbten_vip_bubbles', 'habbten_vip_colours', 'habbten_vip_prefix', 'habbten_vip_badges', 'marketplace', 'marketplace_own_items', 'ecotron_machine', 'ecotron_prizes', 'ecotron_info' ].includes(f12LayoutCode)
     );
     const f12ShowIntroText = Boolean(
         f12ShowPageBanner

@@ -6202,8 +6202,56 @@ body[data-era="flash2012"] {
 }
 
 // ==========================================
-// BLOQUE 4A: MÁQUINA ECOTRÓN (12-15-21, 12-15-26, 12-15-30)
+// BLOQUE 4A: MÁQUINA ECOTRÓN (12-15-21, 12-15-26, 12-15-30 — Plano sin biseles ni degradados)
 // ==========================================
+.ecotron-flat-banner {
+    width: 100% !important;
+    background-color: #0e4258 !important;
+    background-image: none !important;
+    border: none !important;
+    border-radius: 3px !important;
+    box-shadow: none !important;
+    padding: 10px 12px !important;
+    margin-bottom: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-shrink: 0 !important;
+
+    .ecotron-banner-ico {
+        display: block !important;
+        image-rendering: pixelated !important;
+        flex-shrink: 0 !important;
+    }
+
+    .ecotron-banner-text {
+        flex: 1 !important;
+        min-width: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+        text-align: left !important;
+
+        .ecotron-banner-title {
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            line-height: 1.2 !important;
+            text-shadow: none !important;
+        }
+
+        .ecotron-banner-desc {
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 400 !important;
+            color: #e6f2f7 !important;
+            line-height: 1.3 !important;
+            text-shadow: none !important;
+        }
+    }
+}
+
 .ecotron-machine-page {
     display: flex !important;
     flex-direction: column !important;
@@ -6306,7 +6354,6 @@ body[data-era="flash2012"] {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        gap: 5px !important;
         margin-top: 2px !important;
 
         .ecotron-start-btn {
@@ -6314,8 +6361,11 @@ body[data-era="flash2012"] {
             height: 28px !important;
             padding: 0 16px !important;
             background: #d3d3ce !important;
+            background-image: none !important;
             border: 1px solid #a5a5a0 !important;
             border-radius: 4px !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
             color: #9e9e98 !important;
             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
             font-size: 12px !important;
@@ -6324,30 +6374,18 @@ body[data-era="flash2012"] {
 
             &.is-ready {
                 cursor: pointer !important;
-                border: none !important;
-                border-radius: 0 !important;
-                background-color: transparent !important;
-                background-image:
-                    url('@/assets/images/eras/habborator/button-20-left.png'),
-                    url('@/assets/images/eras/habborator/button-20-right.png'),
-                    url('@/assets/images/eras/habborator/button-20-mid.png') !important;
-                background-position: left top, right top, 4px top !important;
-                background-repeat: no-repeat, no-repeat, no-repeat !important;
-                background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100% !important;
+                background: #008a00 !important;
+                background-image: none !important;
+                border: 1px solid #000000 !important;
+                border-radius: 4px !important;
+                box-shadow: none !important;
                 color: #ffffff !important;
-                padding: 0 16px 2px !important;
-                image-rendering: pixelated !important;
-            }
-        }
+                text-shadow: none !important;
 
-        .ecotron-helper-link {
-            background: transparent !important;
-            border: none !important;
-            color: #2b577b !important;
-            font-size: 11px !important;
-            text-decoration: underline !important;
-            cursor: pointer !important;
-            padding: 0 !important;
+                &:hover:not(:disabled) {
+                    background: #009f00 !important;
+                }
+            }
         }
     }
 
@@ -6459,7 +6497,7 @@ body[data-era="flash2012"] {
             background-color: #d6d6d0 !important;
             border: 1px solid #7d7d77 !important;
             border-radius: 6px !important;
-            box-shadow: inset 0 1px 0 #ffffff !important;
+            box-shadow: none !important;
             padding: 8px !important;
             display: flex !important;
             flex-wrap: wrap !important;
@@ -6474,7 +6512,7 @@ body[data-era="flash2012"] {
             background-color: #d4dbe0 !important;
             border: 1px solid #000000 !important;
             border-radius: 5px !important;
-            box-shadow: inset 0 1px 0 #ffffff !important;
+            box-shadow: none !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
@@ -6496,31 +6534,40 @@ body[data-era="flash2012"] {
 
     .ecotron-info-card {
         background-color: #f4b956 !important;
+        border: 1px solid #c68c28 !important;
         border-radius: 6px !important;
+        box-shadow: none !important;
         padding: 16px 18px !important;
-        color: #ffffff !important;
+        color: #1f1505 !important;
         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
         font-size: 12px !important;
         line-height: 1.45 !important;
-        min-height: 100% !important;
 
         .ecotron-info-title {
-            font-size: 17px !important;
-            font-weight: 400 !important;
-            margin-bottom: 12px !important;
-            color: #ffffff !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            margin-bottom: 10px !important;
+            color: #1f1505 !important;
+            text-shadow: none !important;
+        }
+
+        p,
+        b,
+        u {
+            color: #1f1505 !important;
+            text-shadow: none !important;
         }
 
         p {
-            margin: 0 0 11px 0 !important;
-            color: #ffffff !important;
+            margin: 0 0 10px 0 !important;
         }
 
         .ecotron-info-season {
             margin-top: 10px !important;
             font-weight: 700 !important;
-            color: #ffffff !important;
+            color: #1f1505 !important;
             font-size: 12px !important;
+            text-shadow: none !important;
         }
     }
 }

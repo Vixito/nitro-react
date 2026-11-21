@@ -1,10 +1,23 @@
 import { FC } from 'react';
+import { useEraTheme } from '../../../../../hooks/era/useEraTheme';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import iconInfoHeaderImg from '../../../../../assets/images/eras/flash2012/ecotron/icon_info_header.png';
 
 export const CatalogLayoutEcotronInfoView: FC<CatalogLayoutProps> = () =>
 {
+    const { currentEra } = useEraTheme();
+
     return (
         <div className="ecotron-info-page">
+            { currentEra !== 'shockwave2006' && (
+                <div className="ecotron-flat-banner">
+                    <img src={ iconInfoHeaderImg } alt="" width={ 18 } height={ 34 } className="ecotron-banner-ico" />
+                    <div className="ecotron-banner-text">
+                        <div className="ecotron-banner-title">Información</div>
+                        <div className="ecotron-banner-desc">¡Aquí aprenderás a usar la Máquina Ecotrón!</div>
+                    </div>
+                </div>
+            ) }
             <div className="ecotron-info-card">
                 <div className="ecotron-info-title">Instrucciones:</div>
                 <p>1- Introduce en la máquina los 12 ítems posibles de reciclar desde tu inventario.</p>

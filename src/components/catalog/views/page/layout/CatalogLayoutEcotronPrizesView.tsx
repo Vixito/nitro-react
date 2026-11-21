@@ -1,6 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { GetRoomEngine } from '../../../../../api';
+import { useEraTheme } from '../../../../../hooks/era/useEraTheme';
 import { CatalogLayoutProps } from './CatalogLayout.types';
+import iconPrizesHeaderImg from '../../../../../assets/images/eras/flash2012/ecotron/icon_prizes_header.png';
 
 interface EcotronTier
 {
@@ -12,6 +14,7 @@ interface EcotronTier
 
 export const CatalogLayoutEcotronPrizesView: FC<CatalogLayoutProps> = () =>
 {
+    const { currentEra } = useEraTheme();
     const [ tiers, setTiers ] = useState<EcotronTier[]>([]);
 
     useEffect(() =>
@@ -42,6 +45,15 @@ export const CatalogLayoutEcotronPrizesView: FC<CatalogLayoutProps> = () =>
 
     return (
         <div className="ecotron-prizes-page">
+            { currentEra !== 'shockwave2006' && (
+                <div className="ecotron-flat-banner">
+                    <img src={ iconPrizesHeaderImg } alt="" width={ 36 } height={ 36 } className="ecotron-banner-ico" />
+                    <div className="ecotron-banner-text">
+                        <div className="ecotron-banner-title">Premios</div>
+                        <div className="ecotron-banner-desc">Consulta las probabilidades de cada premio disponible en la Máquina Ecotrón.</div>
+                    </div>
+                </div>
+            ) }
             <div className="ecotron-prizes-grid">
                 { tiers.map(tier => (
                     <div key={ tier.id } className="ecotron-prize-group">
