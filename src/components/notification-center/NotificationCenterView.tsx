@@ -10,8 +10,7 @@ import { GetConfirmLayout } from './views/confirm-layouts/GetConfirmLayout';
 export const NotificationCenterView: FC<{}> = props =>
 {
     const { alerts = [], bubbleAlerts = [], confirms = [], closeAlert = null, closeBubbleAlert = null, closeConfirm = null } = useNotification();
-    const { isVisible: isGameCenterVisible, isSnowStormPlaying, isBattleBallPlaying, isWobbleSquabblePlaying, isFastFoodPlaying } = useGameCenter();
-    const isGameCenterOverlayOpen = isGameCenterVisible || isSnowStormPlaying || isBattleBallPlaying || isWobbleSquabblePlaying || isFastFoodPlaying;
+    const { isVisible: isGameCenterVisible } = useGameCenter();
 
     const getAlerts = useMemo(() =>
     {
@@ -95,7 +94,7 @@ export const NotificationCenterView: FC<{}> = props =>
                 <div className="nitro-alert-backdrop" />,
                 container
             ) }
-            { (isGameCenterOverlayOpen && typeof document !== 'undefined')
+            { (isGameCenterVisible && typeof document !== 'undefined')
                 ? createPortal(
                     <div className="nitro-notification-bubbles-overlay">
                         { bubbleLayer }
