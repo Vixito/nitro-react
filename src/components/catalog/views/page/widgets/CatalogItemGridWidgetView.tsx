@@ -59,7 +59,7 @@ export const CatalogItemGridWidgetView: FC<CatalogItemGridWidgetViewProps> = pro
 
     return (
         <AutoGrid innerRef={ elementRef } columnCount={ columnCount } { ...rest }>
-            { currentPage.offers && (currentPage.offers.length > 0) && currentPage.offers.map((offer, index) => <CatalogGridOfferView key={ index } itemActive={ (currentOffer && (currentOffer.offerId === offer.offerId)) } offer={ offer } selectOffer={ selectOffer } />) }
+            { currentPage.offers && (currentPage.offers.length > 0) && currentPage.offers.map((offer, index) => <CatalogGridOfferView key={ index } itemActive={ Boolean(currentOffer && ((currentOffer === offer) || (currentOffer.offerId === offer.offerId) || ((currentPage.pageId === -1) && currentOffer.product && offer.product && (currentOffer.product.productClassId === offer.product.productClassId) && (currentOffer.product.productType === offer.product.productType)))) } offer={ offer } selectOffer={ selectOffer } />) }
             { children }
         </AutoGrid>
     );

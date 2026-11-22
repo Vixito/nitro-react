@@ -9,14 +9,27 @@ export const CatalogViewProductWidgetView: FC<{}> = props =>
     const { currentOffer = null, roomPreviewer = null, purchaseOptions = null } = useCatalog();
     const { previewStuffData = null } = purchaseOptions;
     const prevPreviewIsAvatar = useRef<boolean>(false);
+    const lastPreviewKeyRef = useRef<string>('');
 
     useEffect(() =>
     {
-        if(!currentOffer || (currentOffer.pricingModel === Offer.PRICING_MODEL_BUNDLE) || !roomPreviewer) return;
+        if(!currentOffer || (currentOffer.pricingModel === Offer.PRICING_MODEL_BUNDLE) || !roomPreviewer)
+        {
+            lastPreviewKeyRef.current = '';
+            return;
+        }
 
         const product = currentOffer.product;
 
-        if(!product) return;
+        if(!product)
+        {
+            lastPreviewKeyRef.current = '';
+            return;
+        }
+
+        const previewKey = `${ product.productType }:${ product.productClassId }:${ product.extraParam || '' }:${ product.furnitureData?.specialType || 0 }:${ previewStuffData ? 'stuff' : '' }`;
+        if(lastPreviewKeyRef.current === previewKey) return;
+        lastPreviewKeyRef.current = previewKey;
 
         switch(product.productType)
         {

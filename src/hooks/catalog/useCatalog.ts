@@ -295,22 +295,34 @@ const useCatalogState = () =>
         }
 
         const furnitureDatas = GetSessionDataManager().getAllFurnitureData({ loadFurnitureData: null });
-        if(!furnitureDatas || !furnitureDatas.length) return;
+        if(!furnitureDatas || !furnitureDatas.length || !offersToNodes) return;
 
         const cleanQuery = query.toLowerCase().replace(/_/g, ' ').trim();
-        const search = query.toLowerCase().replace(/ /g, '');
+        const rawTokens = cleanQuery.split(/\s+/).filter(Boolean);
+        const search = rawTokens.join('');
 
         const foundFurniture: IFurnitureData[] = [];
         const foundFurniLines: string[] = [];
 
+        const isFurniAccessible = (furniture: IFurnitureData): boolean =>
+        {
+            if((currentType === CatalogType.BUILDER) && !furniture.availableForBuildersClub) return false;
+            if((currentType === CatalogType.NORMAL) && furniture.excludeDynamic) return false;
+            const searchOfferId = (furniture.rentOfferId > -1) ? furniture.rentOfferId : furniture.purchaseOfferId;
+            if(searchOfferId <= 0) return false;
+            const offerNodes = GetOfferNodes(offersToNodes, searchOfferId);
+            return Boolean(offerNodes && offerNodes.length);
+        };
+
         for(const furniture of furnitureDatas)
         {
-            if((currentType === CatalogType.BUILDER) && !furniture.availableForBuildersClub) continue;
-            if((currentType === CatalogType.NORMAL) && furniture.excludeDynamic) continue;
+            if(!isFurniAccessible(furniture)) continue;
 
-            const searchValues = [ furniture.className, furniture.name, furniture.description ].join(' ').replace(/ /gi, '').toLowerCase();
+            const rawText = [ furniture.className, furniture.name, furniture.description ].join(' ').toLowerCase();
+            const searchValues = rawText.replace(/ /gi, '');
+            const matchesTokens = (rawTokens.length > 1) && rawTokens.every(token => rawText.indexOf(token) >= 0);
 
-            if((searchValues.indexOf(search) >= 0) || (furniture.className.toLowerCase() === query.toLowerCase()))
+            if((searchValues.indexOf(search) >= 0) || matchesTokens || (furniture.className.toLowerCase() === query.toLowerCase()))
             {
                 foundFurniture.push(furniture);
 
@@ -323,7 +335,7 @@ const useCatalogState = () =>
             }
         }
 
-        const exactMatch = furnitureDatas.find(f => f.className.toLowerCase() === query.toLowerCase());
+        const exactMatch = furnitureDatas.find(f => (f.className.toLowerCase() === query.toLowerCase()) && isFurniAccessible(f));
         if(exactMatch && (foundFurniture.indexOf(exactMatch) < 0))
         {
             foundFurniture.unshift(exactMatch);
@@ -355,10 +367,14 @@ const useCatalogState = () =>
 
         if(offers.length > 0)
         {
-            offers[0].activate();
             setCurrentOffer(offers[0]);
+            offers[0].activate();
         }
-    }, [ isVisible, currentType, rootNode, activeNodes ]);
+        else
+        {
+            setCurrentOffer(null);
+        }
+    }, [ isVisible, currentType, rootNode, activeNodes, offersToNodes ]);
 
     const activateNode = useCallback((targetNode: ICatalogNode, offerId: number = -1) =>
     {
@@ -444,7 +460,25 @@ const useCatalogState = () =>
             const target = pendingFurniCandidates.current;
             const searchIds = target ? target.checkIds : (offerId > -1 ? [ offerId ] : []);
 
-            if(searchIds.length)
+            if(target?.targetFurni)
+            {
+                const tf = target.targetFurni;
+                matchedOffer = catalogPage.offers.find(offer =>
+                {
+                    if((tf.purchaseOfferId > 0) && (offer.offerId === tf.purchaseOfferId)) return true;
+                    if((tf.rentOfferId > 0) && (offer.offerId === tf.rentOfferId)) return true;
+                    if(offer.products?.some(p => p.furnitureData && (p.furnitureData.id === tf.id) && (p.furnitureData.type === tf.type))) return true;
+                    return false;
+                });
+            }
+            else if(offerId > -1)
+            {
+                matchedOffer = catalogPage.offers.find(offer => (offer.offerId === offerId))
+                    || catalogPage.offers.find(offer => offer.products?.some(p => (p.furnitureData?.purchaseOfferId === offerId) || (p.furnitureData?.rentOfferId === offerId)))
+                    || catalogPage.offers.find(offer => offer.products?.some(p => (p.productClassId === offerId) || (p.furnitureData?.id === offerId)));
+            }
+
+            if(!matchedOffer && searchIds.length)
             {
                 const idsSet = new Set(searchIds);
                 matchedOffer = catalogPage.offers.find(offer =>
@@ -626,44 +660,67 @@ const useCatalogState = () =>
                    (f.name?.toLowerCase() === cleanClass.toLowerCase());
         }) || [];
 
+        const offerIdsSet = new Set<number>();
         const checkIdsSet = new Set<number>();
         for(const f of matchingFurnis)
         {
+            if(f.purchaseOfferId > 0)
+            {
+                offerIdsSet.add(f.purchaseOfferId);
+                checkIdsSet.add(f.purchaseOfferId);
+            }
+            if(f.rentOfferId > 0)
+            {
+                offerIdsSet.add(f.rentOfferId);
+                checkIdsSet.add(f.rentOfferId);
+            }
             if(f.id > 0) checkIdsSet.add(f.id);
-            if(f.purchaseOfferId > 0) checkIdsSet.add(f.purchaseOfferId);
-            if(f.rentOfferId > 0) checkIdsSet.add(f.rentOfferId);
         }
+        const offerCheckIds = Array.from(offerIdsSet);
         const checkIds = Array.from(checkIdsSet);
 
         const candidateNodesMap = new Map<number, ICatalogNode>();
 
-        if(checkIds.length && offersToNodes)
+        const addMatchingOfferNodes = (idsToLookup: number[], idsSetToMatch: Set<number>) =>
         {
-            for(const id of checkIds)
+            if(idsToLookup.length && offersToNodes)
             {
-                const found = offersToNodes.get(id);
-                if(found)
+                for(const id of idsToLookup)
                 {
-                    for(const node of found)
+                    const found = offersToNodes.get(id);
+                    if(found)
                     {
-                        if(node.pageId > -1) candidateNodesMap.set(node.pageId, node);
+                        for(const node of found)
+                        {
+                            if(node.pageId > -1) candidateNodesMap.set(node.pageId, node);
+                        }
                     }
                 }
             }
+
+            if(rootNode && idsSetToMatch.size)
+            {
+                const traverseTree = (node: ICatalogNode) =>
+                {
+                    if(!node) return;
+                    if(node.offerIds && node.offerIds.some(id => idsSetToMatch.has(id)))
+                    {
+                        if(node.pageId > -1) candidateNodesMap.set(node.pageId, node);
+                    }
+                    if(node.children) for(const child of node.children) traverseTree(child);
+                };
+                traverseTree(rootNode);
+            }
+        };
+
+        if(offerCheckIds.length)
+        {
+            addMatchingOfferNodes(offerCheckIds, offerIdsSet);
         }
 
-        if(rootNode)
+        if(candidateNodesMap.size === 0)
         {
-            const traverseTree = (node: ICatalogNode) =>
-            {
-                if(!node) return;
-                if(node.offerIds && node.offerIds.some(id => checkIdsSet.has(id)))
-                {
-                    if(node.pageId > -1) candidateNodesMap.set(node.pageId, node);
-                }
-                if(node.children) for(const child of node.children) traverseTree(child);
-            };
-            traverseTree(rootNode);
+            addMatchingOfferNodes(checkIds, checkIdsSet);
         }
 
         if((candidateNodesMap.size === 0) && rootNode)
@@ -867,6 +924,18 @@ const useCatalogState = () =>
         const offer = new Offer(offerData.offerId, offerData.localizationId, offerData.rent, offerData.priceCredits, offerData.priceActivityPoints, offerData.priceActivityPointsType, offerData.giftable, offerData.clubLevel, products, offerData.bundlePurchaseAllowed);
 
         if(!((currentType === CatalogType.NORMAL) || ((offer.pricingModel !== Offer.PRICING_MODEL_BUNDLE) && (offer.pricingModel !== Offer.PRICING_MODEL_MULTI)))) return;
+
+        if(currentPage && (currentPage.pageId !== -1))
+        {
+            const existsOnCurrentPage = currentPage.offers?.some(o => (o.offerId === offer.offerId));
+            if(!existsOnCurrentPage) return;
+        }
+        else if(currentPage && (currentPage.pageId === -1) && currentOffer)
+        {
+            const matchesSelectedOffer = (currentOffer.offerId === offer.offerId)
+                || Boolean(currentOffer.product && offer.product && (currentOffer.product.productClassId === offer.product.productClassId) && (currentOffer.product.productType === offer.product.productType));
+            if(!matchesSelectedOffer) return;
+        }
 
         offer.page = currentPage;
 

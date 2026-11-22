@@ -8,11 +8,12 @@ import { useCatalog } from '../../../../../hooks';
 export const CatalogSearchView: FC<{}> = props =>
 {
     const [ searchValue, setSearchValue ] = useState('');
-    const { currentType = null, rootNode = null, offersToNodes = null, searchResult = null, setSearchResult = null, setCurrentPage = null } = useCatalog();
+    const { currentType = null, rootNode = null, offersToNodes = null, searchResult = null, setSearchResult = null, setCurrentPage = null, setCurrentOffer = null } = useCatalog();
 
     const performSearch = (text: string) =>
     {
-        let search = text?.toLocaleLowerCase().replace(' ', '');
+        const rawTokens = text?.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean) || [];
+        const search = rawTokens.join('');
 
         if(!search || !search.length)
         {
@@ -24,7 +25,7 @@ export const CatalogSearchView: FC<{}> = props =>
             loadFurnitureData: null
         });
 
-        if(!furnitureDatas || !furnitureDatas.length) return;
+        if(!furnitureDatas || !furnitureDatas.length || !offersToNodes) return;
 
         const foundFurniture: IFurnitureData[] = [];
         const foundFurniLines: string[] = [];
@@ -34,9 +35,19 @@ export const CatalogSearchView: FC<{}> = props =>
             if((currentType === CatalogType.BUILDER) && !furniture.availableForBuildersClub) continue;
             if((currentType === CatalogType.NORMAL) && furniture.excludeDynamic) continue;
 
-            const searchValues = [ furniture.className, furniture.name, furniture.description ].join(' ').replace(/ /gi, '').toLowerCase();
+            const searchOfferId = (furniture.rentOfferId > -1) ? furniture.rentOfferId : furniture.purchaseOfferId;
+            if(searchOfferId <= 0) continue;
 
-            if(searchValues.indexOf(search) >= 0)
+            const offerNodes = GetOfferNodes(offersToNodes, searchOfferId);
+            if(!offerNodes || !offerNodes.length) continue;
+
+            const rawText = [ furniture.className, furniture.name, furniture.description ].join(' ').toLowerCase();
+            const compactValues = rawText.replace(/ /gi, '');
+
+            const matchesCompact = (compactValues.indexOf(search) >= 0);
+            const matchesTokens = (rawTokens.length > 1) && rawTokens.every(token => rawText.indexOf(token) >= 0);
+
+            if(matchesCompact || matchesTokens)
             {
                 foundFurniture.push(furniture);
 
@@ -60,7 +71,12 @@ export const CatalogSearchView: FC<{}> = props =>
 
         if(offers.length > 0)
         {
+            setCurrentOffer(offers[0]);
             offers[0].activate();
+        }
+        else
+        {
+            setCurrentOffer(null);
         }
     };
 
