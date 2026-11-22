@@ -1,6 +1,9 @@
 import { RoomUnitWalkComposer } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetOwnRoomObject, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl, SendMessageComposer } from '../../../../api';
+import signHeartPng from '../../../../assets/images/icons/sign-heart.png';
+import signSkullPng from '../../../../assets/images/icons/sign-skull.png';
+import iconStarPng from '../../../../assets/images/eras/flash2012/streak/icon_star_streak.png';
 import { useRoom } from '../../../../hooks';
 import { trimTransparentImage } from '../../../game-center/views/SnowStormAvatar';
 import './LidoDivingRoomWidget.scss';
@@ -99,48 +102,12 @@ const PixelIconTrophy: FC = () => (
     </svg>
 );
 
+// Authentic official Habbo pixel-art PNG sign icons (zero generic SVGs!)
 const PixelSymbol: FC<{ kind: 'star' | 'heart' | 'skull' }> = ({ kind }) =>
 {
-    if (kind === 'heart') return (
-        <svg width="16" height="16" viewBox="0 0 16 16" className="lido-px-icon" aria-hidden="true">
-            <path
-                d="M8 14.2C7.6 13.9 2 9.9 2 5.7C2 3.6 3.5 2.2 5.3 2.2C6.5 2.2 7.5 2.9 8 3.9C8.5 2.9 9.5 2.2 10.7 2.2C12.5 2.2 14 3.6 14 5.7C14 9.9 8.4 13.9 8 14.2Z"
-                fill="#ef233c"
-                stroke="#111111"
-                strokeWidth="1.3"
-                strokeLinejoin="round"
-            />
-            <circle cx="5.2" cy="5.1" r="1.15" fill="#ffb3be" />
-        </svg>
-    );
-    if (kind === 'star') return (
-        <svg width="16" height="16" viewBox="0 0 16 16" className="lido-px-icon" aria-hidden="true">
-            <polygon
-                points="8,1.3 10.1,5.6 14.8,6.2 11.4,9.5 12.2,14.2 8,11.9 3.8,14.2 4.6,9.5 1.2,6.2 5.9,5.6"
-                fill="#ffd43b"
-                stroke="#111111"
-                strokeWidth="1.2"
-                strokeLinejoin="round"
-            />
-            <polygon points="8,3.2 9.1,5.8 6.9,5.8" fill="#fff6b8" />
-        </svg>
-    );
-    return (
-        <svg width="16" height="16" viewBox="0 0 16 16" className="lido-px-icon" aria-hidden="true">
-            <path
-                d="M8 1.6C4.6 1.6 2.2 3.9 2.2 7.1C2.2 9.1 3.3 10.7 4.7 11.5V13.8C4.7 14.2 5 14.5 5.4 14.5H10.6C11 14.5 11.3 14.2 11.3 13.8V11.5C12.7 10.7 13.8 9.1 13.8 7.1C13.8 3.9 11.4 1.6 8 1.6Z"
-                fill="#f8fafc"
-                stroke="#111111"
-                strokeWidth="1.3"
-                strokeLinejoin="round"
-            />
-            <circle cx="5.7" cy="7.4" r="1.55" fill="#111111" />
-            <circle cx="10.3" cy="7.4" r="1.55" fill="#111111" />
-            <path d="M8 9.2L7.1 10.7H8.9L8 9.2Z" fill="#111111" />
-            <line x1="6.7" y1="12.1" x2="6.7" y2="14.3" stroke="#111111" strokeWidth="1.1" />
-            <line x1="9.3" y1="12.1" x2="9.3" y2="14.3" stroke="#111111" strokeWidth="1.1" />
-        </svg>
-    );
+    if (kind === 'heart') return <img src={ signHeartPng } alt="Corazón" className="lido-px-icon" style={{ width: 15, height: 13 }} />;
+    if (kind === 'star') return <img src={ iconStarPng } alt="Estrella" className="lido-px-icon" style={{ width: 11, height: 13 }} />;
+    return <img src={ signSkullPng } alt="Calavera" className="lido-px-icon" style={{ width: 12, height: 12 }} />;
 };
 
 interface LidoActiveDive
@@ -770,6 +737,11 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         wlk0?: HTMLImageElement;
         wlk1?: HTMLImageElement;
         front?: HTMLImageElement;
+        armsUp?: HTMLImageElement;
+        armsOut?: HTMLImageElement;
+        punch?: HTMLImageElement;
+        tuck?: HTMLImageElement;
+        dive?: HTMLImageElement;
         head?: HTMLImageElement;
     }>({});
 
@@ -825,6 +797,11 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const wlk0Raw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'wlk', frame: 1 });
             const wlk1Raw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'wlk', frame: 3 });
             const frontRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 3, headDirection: 3, posture: 'std' });
+            const armsUpRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 3, headDirection: 3, posture: 'std', arms: 'wobble1' });
+            const armsOutRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 2, headDirection: 2, posture: 'wlk', arms: 'wobble0', frame: 1 });
+            const punchRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 2, headDirection: 2, posture: 'std', arms: 'push' });
+            const tuckRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'sit', arms: 'push' });
+            const diveRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'lay' });
             const headRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 3, headDirection: 3, headOnly: true });
 
             if (frontRaw) setPreviewUrl(frontRaw);
@@ -832,6 +809,11 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             if (wlk0Raw) trimTransparentImage(wlk0Raw, (_u, img) => { if (alive) spritesRef.current.wlk0 = img; });
             if (wlk1Raw) trimTransparentImage(wlk1Raw, (_u, img) => { if (alive) spritesRef.current.wlk1 = img; });
             if (frontRaw) trimTransparentImage(frontRaw, (_u, img) => { if (alive) spritesRef.current.front = img; });
+            if (armsUpRaw) trimTransparentImage(armsUpRaw, (_u, img) => { if (alive) spritesRef.current.armsUp = img; });
+            if (armsOutRaw) trimTransparentImage(armsOutRaw, (_u, img) => { if (alive) spritesRef.current.armsOut = img; });
+            if (punchRaw) trimTransparentImage(punchRaw, (_u, img) => { if (alive) spritesRef.current.punch = img; });
+            if (tuckRaw) trimTransparentImage(tuckRaw, (_u, img) => { if (alive) spritesRef.current.tuck = img; });
+            if (diveRaw) trimTransparentImage(diveRaw, (_u, img) => { if (alive) spritesRef.current.dive = img; });
             if (headRaw) trimTransparentImage(headRaw, (_u, img) => { if (alive) spritesRef.current.head = img; });
         };
 
@@ -1398,43 +1380,28 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             let sp = sprites.std;
             if (mode === 'head') sp = sprites.head || sprites.std;
             else if (mode === 'wlk') sp = wlkStep % 2 === 0 ? (sprites.wlk0 || sprites.std) : (sprites.wlk1 || sprites.std);
-            else if (trick === 'star' || trick === 'flex') sp = sprites.front || sprites.std;
+            else if (trick === 'star' || trick === 'flex') sp = sprites.armsUp || sprites.front || sprites.std;
+            else if (trick === 'air_guitar') sp = sprites.armsOut || sprites.front || sprites.std;
+            else if (trick === 'air_punch') sp = sprites.punch || sprites.front || sprites.std;
+            else if (trick === 'cannonball' || trick === 'front_flip') sp = sprites.tuck || sprites.std;
+            else if (trick === 'flip_dive') sp = sprites.dive || sprites.std;
 
             ctx.save();
             ctx.translate(Math.round(ax), Math.round(ay));
             if (rotDeg) ctx.rotate((rotDeg * Math.PI) / 180);
 
-            let sx = 1.05;
-            let sy = 1.05;
-            if (trick === 'star') { sx = 1.38; sy = 0.98; }
-            else if (trick === 'cannonball') { sx = 1.05; sy = 0.72; }
-            else if (trick === 'flex') { sx = 1.24; sy = 1.08; }
-            else if (trick === 'flip_dive') { sx = 0.96; sy = 1.2; }
-
+            // Pure authentic Habbo avatar sprites (ZERO fake rectangles/lines drawn on top!)
+            const scale = 1.05;
             if (sp && sp.naturalWidth > 0)
             {
-                const dw = Math.round(sp.naturalWidth * sx);
-                const dh = Math.round(sp.naturalHeight * sy);
+                const dw = Math.round(sp.naturalWidth * scale);
+                const dh = Math.round(sp.naturalHeight * scale);
                 ctx.drawImage(sp, Math.round(-dw / 2), -dh, dw, dh);
             }
             else
             {
                 ctx.fillStyle = '#ffcc99';
                 ctx.fillRect(-7, -28, 14, 28);
-            }
-
-            if (trick === 'air_guitar')
-            {
-                ctx.fillStyle = '#000000';
-                ctx.fillRect(-13, -15, 22, 4);
-                ctx.fillStyle = '#ffcb00';
-                ctx.fillRect(-12, -14, 20, 2);
-            }
-            else if (trick === 'air_punch')
-            {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(-16, -20, 4, 2);
-                ctx.fillRect(12, -18, 4, 2);
             }
             ctx.restore();
         };
