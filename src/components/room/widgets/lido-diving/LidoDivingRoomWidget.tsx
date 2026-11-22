@@ -24,7 +24,6 @@ const QUEUE_TILES: Array<[ number, number ]> = [
 ];
 
 const ELEVATOR_TILE = { x: 11, y: 4 };
-const POOL_EXIT_TILE = { x: 16, y: 11 };
 
 type TrickId = 'star' | 'air_guitar' | 'flex' | 'cannonball' | 'air_punch' | 'front_flip' | 'flip_dive';
 type DivePhase = 'idle' | 'elevator' | 'sprint' | 'airborne' | 'splash' | 'replay';
@@ -882,7 +881,8 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         setStageOpen(false);
         setPhase('idle');
         elevatorCooldownRef.current = Date.now() + 3000;
-        SendMessageComposer(new RoomUnitWalkComposer(POOL_EXIT_TILE.x, POOL_EXIT_TILE.y));
+        // Do NOT walk to pool edge! The Room 101 Wired stack has already teleported the real avatar
+        // into a random deep-water bw_water_2 tile inside the diving pool, submerged & swimming!
         if (typeof scoreNotice === 'number' && !isNaN(scoreNotice))
         {
             flashBanner(`Salto completado: ${ scoreNotice.toFixed(1) } / 10`);
@@ -1091,9 +1091,16 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }
         const ownObj = GetOwnRoomObject();
         const loc = ownObj?.getLocation();
+        if (loc && Math.round(loc.x) === ELEVATOR_TILE.x && Math.round(loc.y) === ELEVATOR_TILE.y)
+        {
+            // Step off and onto (11,4) or start directly if already on the elevator tile
+            startElevatorAndDive();
+            return;
+        }
         if (loc && Math.abs(Math.round(loc.x) - ELEVATOR_TILE.x) <= 1 && Math.abs(Math.round(loc.y) - ELEVATOR_TILE.y) <= 1)
         {
-            startElevatorAndDive();
+            // Physically step onto tile 1729@(11,4) so the Room 101 Wired triggers and teleports the avatar into a random pool water tile!
+            SendMessageComposer(new RoomUnitWalkComposer(ELEVATOR_TILE.x, ELEVATOR_TILE.y));
             return;
         }
         SendMessageComposer(new RoomUnitWalkComposer(QUEUE_TILES[0][0], QUEUE_TILES[0][1]));
