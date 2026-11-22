@@ -1366,3 +1366,8 @@ body.is-mobile-ui {
     }
 }
 
+
+// Notificación de elementos nuevos (logros/recompensas sin ver): celda verde como en el client moderno
+body.is-mobile-ui .nitro-card .layout-grid-item.unseen:not(.active) {
+    background-color: rgba(25, 135, 84, 0.4) !important;
+}

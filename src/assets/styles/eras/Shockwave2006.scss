@@ -8801,3 +8801,9 @@ body[data-era="shockwave2006"] {
 
 
 
+
+// Notificación de elementos nuevos (logros/recompensas sin ver): celda verde como en el client moderno
+body.era-shockwave-2006 .nitro-card .layout-grid-item.unseen:not(.active),
+body[data-era="shockwave2006"] .nitro-card .layout-grid-item.unseen:not(.active) {
+    background-color: #b6e6b0 !important;
+}
