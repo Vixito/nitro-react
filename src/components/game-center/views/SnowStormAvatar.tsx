@@ -192,15 +192,23 @@ export const HabboHeadImg: FC<{
     const info = useCroppedHabboHead(figure, direction, shockwaveSmall);
     if (!info) return null;
 
+    // For pixelated Shockwave SMALL heads, snap to exact integer pixel scaling (1x or 2x) so zero pixel rows/columns deform!
+    const maxDim = Math.max(1, info.w, info.h);
+    const intScale = Math.max(1, Math.round(size / maxDim));
+    const renderW = shockwaveSmall ? (info.w * intScale) : size;
+    const renderH = shockwaveSmall ? (info.h * intScale) : size;
+
     return (
         <img
             src={ info.url }
             alt=""
             className={ className }
             style={{
-                width: `${ size }px`,
-                height: `${ size }px`,
-                objectFit: 'contain',
+                width: `${ renderW }px`,
+                height: `${ renderH }px`,
+                maxWidth: 'none',
+                maxHeight: 'none',
+                objectFit: shockwaveSmall ? 'fill' : 'contain',
                 imageRendering: 'pixelated',
                 display: 'block',
                 ...style

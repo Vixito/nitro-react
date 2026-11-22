@@ -42,6 +42,7 @@ interface ResolvedPart
     setType: string;
     partType: string;
     partId: number;
+    index: number;
     colorable: boolean;
     colorIndex: number;
     colorHex: string | null;
@@ -222,8 +223,10 @@ function downscalePixelArt2xBrowser(
             let rSum = 0;
             let gSum = 0;
             let bSum = 0;
+            let aSum = 0;
             let cnt = 0;
             let totalCells = 0;
+            let darkCnt = 0;
             let minLuma = 999;
             let darkR = 0;
             let darkG = 0;
@@ -243,7 +246,8 @@ function downscalePixelArt2xBrowser(
                     if(px >= fw) continue;
                     totalCells++;
                     const idx = (py * fw + px) * 4;
-                    if(patch[idx + 3] >= 128)
+                    const alpha = patch[idx + 3];
+                    if(alpha >= 24)
                     {
                         const r = patch[idx];
                         const g = patch[idx + 1];
@@ -252,7 +256,9 @@ function downscalePixelArt2xBrowser(
                         rSum += r;
                         gSum += g;
                         bSum += b;
+                        aSum += alpha;
                         cnt++;
+                        if(luma <= 40) darkCnt++;
                         if(luma < minLuma) { minLuma = luma; darkR = r; darkG = g; darkB = b; }
                         if(luma > maxLuma) { maxLuma = luma; brightR = r; brightG = g; brightB = b; }
                     }
@@ -261,15 +267,26 @@ function downscalePixelArt2xBrowser(
 
             if(cnt === 0) continue;
 
+            // Preserve semi-transparency (e.g. tinted sunglasses lenses ea-3170!) while keeping solid parts crisp 255
+            const avgAlpha = Math.round(aSum / cnt);
+            const outAlpha = avgAlpha >= 235 ? 255 : avgAlpha;
+
             // Preserve ALL opaque blocks including thin 1px hair bangs, spiky hair tips, hat brims & eyewear temples
             const isSilhouetteEdge = cnt < totalCells;
 
             let r: number;
             let g: number;
             let b: number;
-            if(isSilhouetteEdge && minLuma <= 42)
+            if(isSilhouetteEdge && minLuma <= 42 && outAlpha >= 200)
             {
-                // Preserve crisp 1px dark Habbo outlines ONLY on outer silhouette boundaries
+                // Preserve crisp 1px dark Habbo outlines ONLY on opaque outer silhouette boundaries
+                r = darkR;
+                g = darkG;
+                b = darkB;
+            }
+            else if(darkCnt >= 2 && minLuma <= 28 && (maxLuma - minLuma) >= 60 && outAlpha >= 200)
+            {
+                // Preserve strong internal dark seams without blotting out facial features
                 r = darkR;
                 g = darkG;
                 b = darkB;
@@ -293,7 +310,7 @@ function downscalePixelArt2xBrowser(
             dst[outIdx] = r;
             dst[outIdx + 1] = g;
             dst[outIdx + 2] = b;
-            dst[outIdx + 3] = 255;
+            dst[outIdx + 3] = outAlpha;
         }
     }
 
@@ -618,6 +635,7 @@ function resolveExactFigureParts(figure: string, parsed: Record<string, ParsedSe
                             setType,
                             partType: String(rp.type),
                             partId: Number(rp.id),
+                            index: Number(rp.index || 0),
                             colorable,
                             colorIndex: cIdx,
                             colorHex,
@@ -641,6 +659,7 @@ function resolveExactFigureParts(figure: string, parsed: Record<string, ParsedSe
                 setType,
                 partType: setType,
                 partId: entry.id,
+                index: 0,
                 colorable: true,
                 colorIndex: 0,
                 colorHex,
@@ -649,6 +668,7 @@ function resolveExactFigureParts(figure: string, parsed: Record<string, ParsedSe
         }
     }
 
+    parts.sort((a, b) => a.index - b.index);
     return { parts, hiddenLayers };
 }
 
@@ -762,9 +782,9 @@ function getTintedSprite(
         for(let i = 0; i < d.length; i += 4)
         {
             if(d[i + 3] === 0) continue;
-            d[i] = (d[i] * tr) >> 8;
-            d[i + 1] = (d[i + 1] * tg) >> 8;
-            d[i + 2] = (d[i + 2] * tb) >> 8;
+            d[i] = Math.round((d[i] * tr) / 255);
+            d[i + 1] = Math.round((d[i + 1] * tg) / 255);
+            d[i + 2] = Math.round((d[i + 2] * tb) / 255);
         }
         ctx.putImageData(imgData, 0, 0);
     }
@@ -852,19 +872,26 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
         ctx.restore();
     };
 
+    const FLIPPED_TYPE: Record<string, string> = { lh: 'rh', rh: 'lh', ls: 'rs', rs: 'ls', lc: 'rc', rc: 'lc' };
+
     // Draw an exact clothing/hair/accessory part (native v9 SMALL first, else exact converted SMALL library)
-    const drawExactParts = (partTypes: string[], action: string, dirMap: { d: number; flipped: boolean }, frm: number, extraY = 0) =>
+    const drawExactParts = (partTypes: string[], action: string, dirMap: { d: number; flipped: boolean }, frm: number, extraY = 0): number =>
     {
+        let drawn = 0;
         for(const p of resolvedParts)
         {
             if(!partTypes.includes(p.partType)) continue;
             if(hiddenLayers.has(p.partType)) continue;
 
+            const lookupType = (dirMap.flipped && FLIPPED_TYPE[p.partType]) ? FLIPPED_TYPE[p.partType] : p.partType;
+
             // 1. Check native authentic v9 hh_people_small sprite for exact numeric ID
-            const v9Exact = lookupV9ExactPartSprite(action, p.partType, p.partId, dirMap.d, frm);
+            const v9Exact = lookupV9ExactPartSprite(action, lookupType, p.partId, dirMap.d, frm)
+                || (lookupType !== p.partType ? lookupV9ExactPartSprite(action, p.partType, p.partId, dirMap.d, frm) : null);
             if(v9Exact && atlasImage)
             {
                 drawV9Base(v9Exact, p.colorable ? p.colorHex : null, dirMap.flipped, extraY);
+                drawn++;
                 continue;
             }
 
@@ -881,12 +908,13 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
             const lib = smallLibCache.get(libId);
             if(!lib) continue;
 
-            const meta = lookupDynamicSmallSprite(lib, action, p.partType, p.partId, dirMap.d, frm);
+            const meta = lookupDynamicSmallSprite(lib, action, lookupType, p.partId, dirMap.d, frm)
+                || (lookupType !== p.partType ? lookupDynamicSmallSprite(lib, action, p.partType, p.partId, dirMap.d, frm) : null);
             if(!meta) continue;
 
             const [ sx, sy, sw, sh, regX, regY ] = meta;
             const tint = p.colorable ? p.colorHex : null;
-            const spCanvas = getTintedSprite(`dyn:${ libId }:${ action }_${ p.partType }_${ p.partId }_${ dirMap.d }_${ frm }`, lib.img, sx, sy, sw, sh, tint);
+            const spCanvas = getTintedSprite(`dyn:${ libId }:${ action }_${ lookupType }_${ p.partId }_${ dirMap.d }_${ frm }`, lib.img, sx, sy, sw, sh, tint);
             if(!spCanvas) continue;
 
             const drawX = ox - regX;
@@ -900,7 +928,9 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
             }
             ctx.drawImage(spCanvas, drawX, drawY, sw, sh);
             ctx.restore();
+            drawn++;
         }
+        return drawn;
     };
 
     const drawHead = (extraY = 0) =>
@@ -908,12 +938,16 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
         const showFace = headMap.d === 1 || headMap.d === 2 || headMap.d === 3;
         const hdAct = opts.panicFace ? 'spk' : 'std';
 
-        // Exact official HabboAvatarGeometry head draw order: hd -> fc -> hr -> hrb (HAIR_BIG) -> fa -> ea -> ha -> he
+        // Exact official HabboAvatarPartSets head draw order:
+        // hd -> fc -> hrb (removes hr when active per removeSetType: 'hr'!) -> fa -> ea -> ha -> he
         drawV9Base(lookupV9BaseSprite(hdAct, 'hd', '002', headMap.d, 0), skinHex, headMap.flipped, extraY);
         if(showFace) drawV9Base(lookupV9BaseSprite(hdAct, 'fc', '001', headMap.d, opts.panicFace ? 1 : 0), skinHex, headMap.flipped, extraY);
 
-        drawExactParts([ 'hr' ], 'std', headMap, 0, extraY);
-        drawExactParts([ 'hrb' ], 'std', headMap, 0, extraY);
+        const drewHrb = drawExactParts([ 'hrb' ], 'std', headMap, 0, extraY);
+        if(!drewHrb)
+        {
+            drawExactParts([ 'hr' ], 'std', headMap, 0, extraY);
+        }
         drawExactParts([ 'fa' ], 'std', headMap, 0, extraY);
         drawExactParts([ 'ea' ], 'std', headMap, 0, extraY);
         drawExactParts([ 'ha' ], 'std', headMap, 0, extraY);
