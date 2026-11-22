@@ -14,6 +14,16 @@ import rtBtnHistory from '../../../../assets/images/eras/flash2012/roomtools/btn
 import rtBtnForward from '../../../../assets/images/eras/flash2012/roomtools/btn_forward.png';
 import rtBtnChat from '../../../../assets/images/eras/flash2012/roomtools/btn_chat.png';
 
+interface RoomHistoryEntry
+{
+    id: number;
+    name: string;
+}
+
+// Module-level room history so visited rooms survive RoomView unmounts/remounts between rooms
+let sharedRoomHistory: RoomHistoryEntry[] = [];
+let sharedHistoryIdx = -1;
+
 export const RoomToolsWidgetView: FC<{}> = props =>
 {
     const isMobile = useIsMobile();
@@ -25,8 +35,8 @@ export const RoomToolsWidgetView: FC<{}> = props =>
     const [ isOpen, setIsOpen ] = useState<boolean>(false);
     const [ isCollapsed2012, setIsCollapsed2012 ] = useState<boolean>(false);
     const [ showHistoryMenu, setShowHistoryMenu ] = useState<boolean>(false);
-    const [ roomHistory, setRoomHistory ] = useState<Array<{ id: number; name: string }>>([]);
-    const [ historyIdx, setHistoryIdx ] = useState<number>(-1);
+    const [ roomHistory, setRoomHistory ] = useState<RoomHistoryEntry[]>(() => [ ...sharedRoomHistory ]);
+    const [ historyIdx, setHistoryIdx ] = useState<number>(() => sharedHistoryIdx);
     const { navigatorData = null } = useNavigator();
     const { roomSession = null } = useRoom();
 
@@ -44,15 +54,48 @@ export const RoomToolsWidgetView: FC<{}> = props =>
         const rid = roomSession.roomId;
         if(rid > 0)
         {
-            setRoomHistory(prev =>
+            const knownName = (navigatorData?.enteredGuestRoom?.roomId === rid && navigatorData.enteredGuestRoom.roomName)
+                ? navigatorData.enteredGuestRoom.roomName
+                : (sharedRoomHistory.find(e => e.id === rid)?.name || `Sala #${ rid }`);
+
+            if(sharedHistoryIdx >= 0 && sharedRoomHistory[sharedHistoryIdx]?.id === rid)
             {
-                if(prev[historyIdx]?.id === rid) return prev;
-                const next = [ ...prev.slice(0, historyIdx + 1), { id: rid, name: `Sala #${ rid }` } ].slice(-20);
-                setHistoryIdx(next.length - 1);
-                return next;
-            });
+                if(knownName && !knownName.startsWith('Sala #'))
+                {
+                    sharedRoomHistory = sharedRoomHistory.map(item => item.id === rid ? { ...item, name: knownName } : item);
+                }
+            }
+            else
+            {
+                const base = sharedHistoryIdx >= 0 ? sharedRoomHistory.slice(0, sharedHistoryIdx + 1) : [];
+                sharedRoomHistory = [ ...base, { id: rid, name: knownName } ].slice(-20);
+                sharedHistoryIdx = sharedRoomHistory.length - 1;
+            }
+
+            setRoomHistory([ ...sharedRoomHistory ]);
+            setHistoryIdx(sharedHistoryIdx);
         }
     }, [ roomSession ]);
+
+    // Keep room names synced in shared history whenever navigatorData loads enteredGuestRoom
+    useEffect(() =>
+    {
+        const entered = navigatorData?.enteredGuestRoom;
+        if(!entered || !entered.roomId || !entered.roomName) return;
+
+        let changed = false;
+        sharedRoomHistory = sharedRoomHistory.map(item =>
+        {
+            if(item.id === entered.roomId && item.name !== entered.roomName)
+            {
+                changed = true;
+                return { ...item, name: entered.roomName };
+            }
+            return item;
+        });
+
+        if(changed) setRoomHistory([ ...sharedRoomHistory ]);
+    }, [ navigatorData?.enteredGuestRoom?.roomId, navigatorData?.enteredGuestRoom?.roomName ]);
 
     useRoomEngineEvent<RoomEngineEvent>(RoomEngineEvent.ROOM_ZOOMED, event =>
     {
@@ -105,7 +148,8 @@ export const RoomToolsWidgetView: FC<{}> = props =>
         if(roomTags !== parser.data.tags) setRoomTags(parser.data.tags);
         if(parser.data.roomId > 0 && parser.data.roomName)
         {
-            setRoomHistory(prev => prev.map(item => item.id === parser.data.roomId ? { ...item, name: parser.data.roomName } : item));
+            sharedRoomHistory = sharedRoomHistory.map(item => item.id === parser.data.roomId ? { ...item, name: parser.data.roomName } : item);
+            setRoomHistory([ ...sharedRoomHistory ]);
         }
     });
 
@@ -127,11 +171,12 @@ export const RoomToolsWidgetView: FC<{}> = props =>
 
         const goHistory = (dir: -1 | 1) =>
         {
-            const targetIdx = historyIdx + dir;
-            if(targetIdx < 0 || targetIdx >= roomHistory.length) return;
+            const targetIdx = sharedHistoryIdx + dir;
+            if(targetIdx < 0 || targetIdx >= sharedRoomHistory.length) return;
+            sharedHistoryIdx = targetIdx;
             setHistoryIdx(targetIdx);
             setShowHistoryMenu(false);
-            TryVisitRoom(roomHistory[targetIdx].id);
+            TryVisitRoom(sharedRoomHistory[targetIdx].id);
         };
 
         return (
@@ -228,7 +273,7 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                                         key={ `${ entry.id }-${ realIdx }` }
                                         type="button"
                                         className={ `rt2012-hist-item ${ isCurrent ? 'is-current' : '' }` }
-                                        onClick={ () => { setHistoryIdx(realIdx); setShowHistoryMenu(false); if(!isCurrent) TryVisitRoom(entry.id); } }
+                                        onClick={ () => { sharedHistoryIdx = realIdx; setHistoryIdx(realIdx); setShowHistoryMenu(false); if(!isCurrent) TryVisitRoom(entry.id); } }
                                     >
                                         { entry.name }
                                     </button>
