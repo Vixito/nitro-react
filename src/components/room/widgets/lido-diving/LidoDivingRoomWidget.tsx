@@ -3,7 +3,7 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetOwnRoomObject, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl, SendMessageComposer } from '../../../../api';
 import signHeartPng from '../../../../assets/images/icons/sign-heart.png';
 import signSkullPng from '../../../../assets/images/icons/sign-skull.png';
-import iconStarPng from '../../../../assets/images/eras/flash2012/streak/icon_star_streak.png';
+import signSmilePng from '../../../../assets/images/icons/sign-smile.png';
 import { useRoom } from '../../../../hooks';
 import { trimTransparentImage } from '../../../game-center/views/SnowStormAvatar';
 import './LidoDivingRoomWidget.scss';
@@ -102,11 +102,11 @@ const PixelIconTrophy: FC = () => (
     </svg>
 );
 
-// Authentic official Habbo pixel-art PNG sign icons (zero generic SVGs!)
-const PixelSymbol: FC<{ kind: 'star' | 'heart' | 'skull' }> = ({ kind }) =>
+// Authentic official Habbo in-game sign PNGs (matching roomSession.sendSignMessage 11, 12, 15!)
+const PixelSymbol: FC<{ kind: 'smile' | 'heart' | 'skull' }> = ({ kind }) =>
 {
     if (kind === 'heart') return <img src={ signHeartPng } alt="Corazón" className="lido-px-icon" style={{ width: 15, height: 13 }} />;
-    if (kind === 'star') return <img src={ iconStarPng } alt="Estrella" className="lido-px-icon" style={{ width: 11, height: 13 }} />;
+    if (kind === 'smile') return <img src={ signSmilePng } alt="Sonrisa" className="lido-px-icon" style={{ width: 7, height: 14 }} />;
     return <img src={ signSkullPng } alt="Calavera" className="lido-px-icon" style={{ width: 12, height: 12 }} />;
 };
 
@@ -801,7 +801,8 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const armsOutRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 2, headDirection: 2, posture: 'wlk', arms: 'wobble0', frame: 1 });
             const punchRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 2, headDirection: 2, posture: 'std', arms: 'push' });
             const tuckRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'sit', arms: 'push' });
-            const diveRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'lay' });
+            // Never use posture:'lay' (v9_small_atlas lay offsets body horizontally away from std head!); use arms-overhead std pose instead
+            const diveRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'std', arms: 'wobble1' });
             const headRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 3, headDirection: 3, headOnly: true });
 
             if (frontRaw) setPreviewUrl(frontRaw);
@@ -1671,9 +1672,19 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         return () => window.cancelAnimationFrame(raf);
     }, [ stageOpen, submitDiveResult, closeStageAndExitPool ]);
 
-    const handleVote = useCallback(async (score: number | null, symbol: string | null) =>
+    const handleVote = useCallback(async (score: number | null, symbol: string | null, signId: number) =>
     {
         if (!activeDive) return;
+        // Raise the REAL Habbo in-game scorecard sign above the player's avatar in Room 101 (NO toast popup!)
+        try
+        {
+            roomSession?.sendSignMessage(signId);
+        }
+        catch
+        {
+            // non-fatal
+        }
+        setShowVoteMenu(false);
         try
         {
             const res = await fetch('/api/lido/vote', {
@@ -1686,16 +1697,14 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             if (data?.success)
             {
                 setMyVotedDiveId(activeDive.id);
-                setShowVoteMenu(false);
                 if (data.dive) setActiveDive(data.dive);
-                flashBanner(score ? `Cartilla de ${ score } puntos enviada.` : 'Cartilla enviada al Jumbotron.');
             }
         }
         catch
         {
             // ignore
         }
-    }, [ activeDive, flashBanner ]);
+    }, [ activeDive, roomSession ]);
 
     if (!isLidoRoom) return null;
 
@@ -1864,17 +1873,17 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     <div className="lido-window-body">
                         <div className="lido-scorecards-row">
                             { [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map(n => (
-                                <button key={ n } type="button" className="lido-card-btn" onClick={ () => handleVote(n, null) }>
+                                <button key={ n } type="button" className="lido-card-btn" onClick={ () => handleVote(n, null, n) }>
                                     { n }
                                 </button>
                             )) }
-                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(10, 'star') } title="Estrella">
-                                <PixelSymbol kind="star" />
+                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(10, 'star', 15) } title="Genial">
+                                <PixelSymbol kind="smile" />
                             </button>
-                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart') } title="Me encantó">
+                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart', 11) } title="Me encantó">
                                 <PixelSymbol kind="heart" />
                             </button>
-                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(2, 'skull') } title="Panzazo">
+                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(2, 'skull', 12) } title="Panzazo">
                                 <PixelSymbol kind="skull" />
                             </button>
                         </div>
