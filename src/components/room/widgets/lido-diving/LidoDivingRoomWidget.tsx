@@ -921,7 +921,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }
         catch
         {
-            flashBanner('Error de conexion con el dispensador.');
+            flashBanner('Error de conexión con el dispensador.');
         }
         finally
         {
@@ -989,7 +989,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             if (!data?.success)
             {
                 if (data?.needsTickets) setShowDispenser(true);
-                flashBanner(data?.error || 'Necesitas 1 ticket para subir al trampolin.');
+                flashBanner(data?.error || 'Necesitas 1 ticket para subir al trampolín.');
                 return;
             }
 
@@ -1040,7 +1040,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }
         catch
         {
-            flashBanner('No se pudo conectar con el ascensor del trampolin.');
+            flashBanner('No se pudo conectar con el ascensor del trampolín.');
         }
     }, [ stageOpen, swimColor, flashBanner ]);
 
@@ -1093,7 +1093,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         if (tickets <= 0)
         {
             setShowDispenser(true);
-            flashBanner('Compra tickets primero (2 creditos = 5 tickets).');
+            flashBanner('Compra tickets primero (2 créditos = 5 tickets).');
             return;
         }
         const ownObj = GetOwnRoomObject();
@@ -1104,7 +1104,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             return;
         }
         SendMessageComposer(new RoomUnitWalkComposer(QUEUE_TILES[0][0], QUEUE_TILES[0][1]));
-        flashBanner('Entrando a la cola del trampolin...');
+        flashBanner('Entrando a la cola del trampolín...');
     }, [ tickets, startElevatorAndDive, flashBanner ]);
 
     const triggerRunKey = useCallback((runKey: 'A' | 'D') =>
@@ -1743,7 +1743,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                         Cabina / Tickets
                     </button>
                     <button type="button" className="lido-btn lido-btn-green" onClick={ joinQueueInRoom }>
-                        { queueActive ? 'En cola...' : 'Trampolin' }
+                        { queueActive ? 'En cola...' : 'Trampolín' }
                     </button>
                     <button type="button" className="lido-btn lido-btn-neutral" onClick={ () => { setShowDispenser(false); setShowLeaderboard(v => !v); } }>
                         <PixelIconTrophy />
@@ -1752,7 +1752,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 </div>
             ) }
 
-            { statusBanner && !stageOpen && (
+            { statusBanner && !stageOpen && !showDispenser && (
                 <div className="lido-toast">{ statusBanner }</div>
             ) }
 
@@ -1766,14 +1766,18 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                         <button type="button" className="lido-close-x" onClick={ () => setShowDispenser(false) } aria-label="Cerrar">X</button>
                     </div>
                     <div className="lido-window-body">
+                        { statusBanner && (
+                            <div className="lido-inline-alert">{ statusBanner }</div>
+                        ) }
+
                         <div className="lido-cabin-top">
                             <div className="lido-cabin-avatar-box">
                                 { previewUrl ? (
-                                    <img src={ previewUrl } alt="Tu avatar en banador" className="lido-cabin-avatar-img" />
+                                    <img src={ previewUrl } alt="Tu avatar en bañador" className="lido-cabin-avatar-img" />
                                 ) : null }
                             </div>
                             <div className="lido-cabin-info">
-                                <div className="lido-swim-label">Color de tu banador:</div>
+                                <div className="lido-swim-label">Color de tu bañador:</div>
                                 <div className="lido-swim-swatches">
                                     { SWIM_COLORS.map(c => (
                                         <span
@@ -1795,8 +1799,8 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                             <div className="lido-ticket-row">
                                 <PixelIconTicket />
                                 <div>
-                                    <div className="lido-ticket-title">5 Tickets de Trampolin</div>
-                                    <div className="lido-ticket-sub">Precio oficial: 2 Creditos</div>
+                                    <div className="lido-ticket-title">5 Tickets de Trampolín</div>
+                                    <div className="lido-ticket-sub">Precio oficial: 2 Créditos</div>
                                 </div>
                             </div>
                             <button type="button" className="lido-btn lido-btn-green" disabled={ busyBuy } onClick={ handleBuyTickets }>
@@ -1806,7 +1810,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
 
                         <div className="lido-meta-row">
                             <span>Tickets: <b>{ tickets }</b></span>
-                            <span>Creditos: <b>{ credits.toLocaleString() }</b></span>
+                            <span>Créditos: <b>{ credits.toLocaleString() }</b></span>
                         </div>
                     </div>
                 </div>
@@ -1823,11 +1827,11 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     </div>
                     <div className="lido-window-body">
                         <div className="lido-meta-row mb-2">
-                            <span>Tu record: <b>{ bestScore.toFixed(1) } / 10</b></span>
+                            <span>Tu récord: <b>{ bestScore.toFixed(1) } / 10</b></span>
                             <span>Tus saltos: <b>{ totalDives }</b></span>
                         </div>
                         { leaderboard.length === 0 ? (
-                            <div className="lido-empty">Se el primero en saltar desde el trampolin.</div>
+                            <div className="lido-empty">Sé el primero en saltar desde el trampolín.</div>
                         ) : (
                             <div className="lido-lb-list">
                                 { leaderboard.map((row, idx) => (
@@ -1858,7 +1862,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                             </span>
                         ) : (
                             <span className="lido-mini-jumbo-trick">
-                                { activeDive.activeTrick ? activeDive.activeTrick.replace('_', ' ').toUpperCase() : 'EN EL TRAMPOLIN' }
+                                { activeDive.activeTrick ? activeDive.activeTrick.replace('_', ' ').toUpperCase() : 'EN EL TRAMPOLÍN' }
                             </span>
                         ) }
                     </div>
@@ -1886,7 +1890,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                                     <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(10, 'star') } title="Estrella">
                                         <PixelSymbol kind="star" />
                                     </button>
-                                    <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart') } title="Me encanto">
+                                    <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart') } title="Me encantó">
                                         <PixelSymbol kind="heart" />
                                     </button>
                                     <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(2, 'skull') } title="Panzazo">
