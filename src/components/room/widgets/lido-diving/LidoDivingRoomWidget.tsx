@@ -784,8 +784,9 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         entryType: 'clean_dive' as 'clean_dive' | 'cannonball' | 'belly_flop',
         swimX: 280,
         swimY: POOL_WATER_Y,
-        splashRings: [] as Array<{ x: number; y: number; rx: number; life: number }>,
-        splashDrops: [] as Array<{ x: number; y: number; vx: number; vy: number; s: number; life: number; color: string }>,
+        splashPlume: null as { x: number; y: number; t: number; duration: number; scale: number } | null,
+        splashRings: [] as Array<{ x: number; y: number; rx: number; maxRx: number; life: number; maxLife: number; width: number; color: string }>,
+        splashDrops: [] as Array<{ x: number; y: number; vx: number; vy: number; r: number; life: number; maxLife: number; color: string }>,
         clouds: [
             { x: 148, y: 126, scale: 1.05, speed: 9 },
             { x: 328, y: 204, scale: 0.72, speed: 6 },
@@ -1024,6 +1025,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             sim.tricks = [];
             sim.jumpQuality = 'good';
             sim.entryType = 'clean_dive';
+            sim.splashPlume = null;
             sim.splashRings = [];
             sim.splashDrops = [];
             sim.replayLog = [];
@@ -1251,6 +1253,13 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     const resultAvgRef = useRef<number | null>(null);
     useEffect(() => { resultAvgRef.current = resultAvg; }, [ resultAvg ]);
 
+    // Hide floating room/bot chat bubbles ONLY while the full-screen diving camera is active
+    useEffect(() =>
+    {
+        document.body.classList.toggle('lido-diving-active', stageOpen);
+        return () => { document.body.classList.remove('lido-diving-active'); };
+    }, [ stageOpen ]);
+
     // Main 60FPS authentic isometric Habbo Lido Diving camera renderer with AUTO-REPLAY -> AUTO-EXIT!
     useEffect(() =>
     {
@@ -1269,26 +1278,108 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         let raf = 0;
         let lastTs = performance.now();
 
-        const spawnPixelSplash = (sx: number, sy: number, intensity: number) =>
+        const spawnWaterSplash = (sx: number, sy: number, intensity: number) =>
         {
             const sim = simRef.current;
-            const count = Math.round(28 * intensity);
+            sim.splashPlume = { x: sx, y: sy, t: 0, duration: 0.92, scale: intensity };
+
+            // Fine arcing teardrop water spray & foam mist (NO black square cubes!)
+            const count = Math.round(34 * intensity);
             for (let i = 0; i < count; i++)
             {
-                const angle = -Math.PI * (0.14 + Math.random() * 0.72);
-                const spd = (75 + Math.random() * 165) * intensity;
+                const spread = (Math.random() - 0.5) * Math.PI * 0.78;
+                const angle = -Math.PI / 2 + spread;
+                const spd = (95 + Math.random() * 195) * (0.78 + intensity * 0.28);
+                const maxLife = 0.45 + Math.random() * 0.48;
                 sim.splashDrops.push({
-                    x: sx + (Math.random() - 0.5) * 14,
-                    y: sy,
+                    x: sx + (Math.random() - 0.5) * 16 * intensity,
+                    y: sy - Math.random() * 6,
                     vx: Math.cos(angle) * spd,
                     vy: Math.sin(angle) * spd,
-                    s: i % 3 === 0 ? 4 : 3,
-                    life: 0.7 + Math.random() * 0.45,
-                    color: i % 2 === 0 ? '#ffffff' : '#b2f2ff'
+                    r: 1.4 + Math.random() * 2.4,
+                    life: maxLife,
+                    maxLife,
+                    color: i % 3 === 0 ? '#ffffff' : (i % 3 === 1 ? '#d4faff' : '#7ae3f5')
                 });
             }
-            sim.splashRings.push({ x: sx, y: sy, rx: 10, life: 1.0 });
-            sim.splashRings.push({ x: sx, y: sy, rx: 4, life: 1.35 });
+
+            // Layered isometric water wave & white foam rings
+            sim.splashRings.push({ x: sx, y: sy + 2, rx: 8, maxRx: 52 * intensity, life: 0.95, maxLife: 0.95, width: 2.5, color: '#ffffff' });
+            sim.splashRings.push({ x: sx, y: sy + 2, rx: 4, maxRx: 72 * intensity, life: 1.25, maxLife: 1.25, width: 2.0, color: '#c4f8ff' });
+            sim.splashRings.push({ x: sx, y: sy + 2, rx: 1, maxRx: 90 * intensity, life: 1.5, maxLife: 1.5, width: 1.4, color: '#7de0f2' });
+        };
+
+        const drawWaterSplashPlume = (plume: { x: number; y: number; t: number; duration: number; scale: number }) =>
+        {
+            const p = Math.min(1, plume.t / plume.duration);
+            if (p >= 1) return;
+
+            // Smooth rise-and-settle curve (fast vertical burst, gentle foam settle)
+            const rise = p < 0.26 ? Math.sin((p / 0.26) * (Math.PI / 2)) : Math.cos(((p - 0.26) / 0.74) * (Math.PI / 2));
+            const alpha = p < 0.65 ? 0.95 : Math.max(0, 0.95 * (1 - (p - 0.65) / 0.35));
+            const s = plume.scale;
+            const h = (54 * s) * rise;
+            const w = (24 + p * 26) * s;
+            const cx = Math.round(plume.x);
+            const cy = Math.round(plume.y + 3);
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            // 1. Base frothy water foam cushion on the pool surface
+            ctx.fillStyle = '#d9fbff';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, w * 0.92, w * 0.36, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy - 1, w * 0.66, w * 0.24, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 2. Curved outer translucent aqua water crown wings
+            if (h > 4)
+            {
+                ctx.fillStyle = 'rgba(130, 232, 248, 0.88)';
+                ctx.beginPath();
+                ctx.moveTo(cx - w * 0.72, cy);
+                ctx.quadraticCurveTo(cx - w * 0.85, cy - h * 0.72, cx - w * 0.45, cy - h * 0.82);
+                ctx.quadraticCurveTo(cx - w * 0.28, cy - h * 0.45, cx - w * 0.16, cy - h);
+                ctx.quadraticCurveTo(cx, cy - h * 1.18, cx + w * 0.16, cy - h);
+                ctx.quadraticCurveTo(cx + w * 0.28, cy - h * 0.45, cx + w * 0.45, cy - h * 0.82);
+                ctx.quadraticCurveTo(cx + w * 0.85, cy - h * 0.72, cx + w * 0.72, cy);
+                ctx.closePath();
+                ctx.fill();
+
+                // 3. Inner bright white frothy water plume & scalloped foam crests
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.moveTo(cx - w * 0.48, cy);
+                ctx.quadraticCurveTo(cx - w * 0.56, cy - h * 0.55, cx - w * 0.28, cy - h * 0.66);
+                ctx.quadraticCurveTo(cx - w * 0.14, cy - h * 0.35, cx, cy - h * 0.94);
+                ctx.quadraticCurveTo(cx + w * 0.14, cy - h * 0.35, cx + w * 0.28, cy - h * 0.66);
+                ctx.quadraticCurveTo(cx + w * 0.56, cy - h * 0.55, cx + w * 0.48, cy);
+                ctx.closePath();
+                ctx.fill();
+
+                // Soft foam puffs crowning the jets
+                const puffs = [
+                    [ cx - w * 0.44, cy - h * 0.78, 5.5 * s * rise ],
+                    [ cx, cy - h * 0.98, 7.0 * s * rise ],
+                    [ cx + w * 0.44, cy - h * 0.78, 5.5 * s * rise ],
+                    [ cx - w * 0.22, cy - h * 0.58, 4.8 * s * rise ],
+                    [ cx + w * 0.22, cy - h * 0.58, 4.8 * s * rise ]
+                ];
+                for (const [ px, py, pr ] of puffs)
+                {
+                    if (pr <= 0.5) continue;
+                    ctx.beginPath();
+                    ctx.arc(px, py, pr, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            ctx.restore();
         };
 
         const drawDiverPose = (ax: number, ay: number, rotDeg: number, trick: TrickId | null, mode: 'std' | 'wlk' | 'head', wlkStep = 0) =>
@@ -1425,7 +1516,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     sim.swimX = sim.airX;
                     sim.swimY = POOL_WATER_Y;
 
-                    spawnPixelSplash(sim.airX, POOL_WATER_Y, entry === 'cannonball' ? 1.55 : (entry === 'belly_flop' ? 1.25 : 0.8));
+                    spawnWaterSplash(sim.airX, POOL_WATER_Y, entry === 'cannonball' ? 1.5 : (entry === 'belly_flop' ? 1.25 : 0.92));
                     setPhase('splash');
 
                     if (!sim.finishedSubmitted)
@@ -1450,6 +1541,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     sim.replayIdx = 0;
                     sim.replayHoldT = 0;
                     sim.replaySplashDone = false;
+                    sim.splashPlume = null;
                     sim.splashDrops = [];
                     sim.splashRings = [];
                     setPhase('replay');
@@ -1468,7 +1560,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     {
                         sim.replaySplashDone = true;
                         const lastF = sim.replayLog[sim.replayLog.length - 1];
-                        spawnPixelSplash(lastF ? lastF.x : sim.airX, POOL_WATER_Y, sim.entryType === 'cannonball' ? 1.5 : 0.95);
+                        spawnWaterSplash(lastF ? lastF.x : sim.airX, POOL_WATER_Y, sim.entryType === 'cannonball' ? 1.45 : 0.98);
                     }
                     sim.camY = WORLD_H - VIEW_H;
                     sim.replayHoldT += dt;
@@ -1482,19 +1574,26 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 }
             }
 
+            if (sim.splashPlume)
+            {
+                sim.splashPlume.t += dt;
+                if (sim.splashPlume.t >= sim.splashPlume.duration) sim.splashPlume = null;
+            }
+
             for (const d of sim.splashDrops)
             {
                 d.x += d.vx * dt;
-                d.vy += 380 * dt;
+                d.vy += 420 * dt;
                 d.y += d.vy * dt;
                 d.life -= dt;
             }
-            sim.splashDrops = sim.splashDrops.filter(d => d.life > 0);
+            sim.splashDrops = sim.splashDrops.filter(d => d.life > 0 && d.y <= POOL_WATER_Y + 14);
 
             for (const r of sim.splashRings)
             {
-                r.rx += 44 * dt;
-                r.life -= dt * 0.9;
+                const progress = 1 - r.life / r.maxLife;
+                r.rx = 6 + (r.maxRx - 6) * (1 - Math.pow(1 - progress, 2));
+                r.life -= dt;
             }
             sim.splashRings = sim.splashRings.filter(r => r.life > 0);
 
@@ -1549,24 +1648,41 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 drawDiverPose(sim.swimX, sim.swimY + 4 + bob, 0, null, 'head');
             }
 
+            // Layered isometric water wave & foam rings
             for (const r of sim.splashRings)
             {
-                ctx.globalAlpha = Math.max(0, Math.min(1, r.life));
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, Math.min(0.92, (r.life / r.maxLife) * 1.15));
+                ctx.strokeStyle = r.color;
+                ctx.lineWidth = r.width;
                 ctx.beginPath();
-                ctx.ellipse(Math.round(r.x), Math.round(r.y), Math.round(r.rx), Math.round(r.rx * 0.5), 0, 0, Math.PI * 2);
+                ctx.ellipse(Math.round(r.x), Math.round(r.y), Math.round(r.rx), Math.round(r.rx * 0.46), 0, 0, Math.PI * 2);
                 ctx.stroke();
+                ctx.restore();
             }
-            ctx.globalAlpha = 1;
 
+            // Billowing organic Habbo water splash plume/crown
+            if (sim.splashPlume)
+            {
+                drawWaterSplashPlume(sim.splashPlume);
+            }
+
+            // Natural velocity-aligned teardrop water spray droplets (zero cubes!)
             for (const d of sim.splashDrops)
             {
-                ctx.globalAlpha = Math.max(0, Math.min(1, d.life));
-                ctx.fillStyle = '#0d3b45';
-                ctx.fillRect(Math.round(d.x) - 1, Math.round(d.y) - 1, d.s + 2, d.s + 2);
+                const a = Math.max(0, Math.min(0.95, (d.life / d.maxLife) * 1.25));
+                const ang = Math.atan2(d.vy, d.vx);
+                const spd = Math.hypot(d.vx, d.vy);
+                const stretch = Math.min(2.6, 1 + spd / 160);
+                ctx.save();
+                ctx.globalAlpha = a;
+                ctx.translate(d.x, d.y);
+                ctx.rotate(ang);
                 ctx.fillStyle = d.color;
-                ctx.fillRect(Math.round(d.x), Math.round(d.y), d.s, d.s);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, d.r * stretch, d.r * 0.78, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
             ctx.globalAlpha = 1;
 

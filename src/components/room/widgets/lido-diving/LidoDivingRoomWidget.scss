@@ -11,6 +11,16 @@
     z-index: 15;
 }
 
+// Ocultar temporalmente las burbujas de chat de la sala/bots mientras se salta
+// para que no tapen al avatar ni el cielo del trampolin (sin tocar toolbars/camara/inventario)
+body.lido-diving-active {
+    .nitro-chat-widget {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+}
+
 .lido-px-icon {
     image-rendering: pixelated;
     display: inline-block;
