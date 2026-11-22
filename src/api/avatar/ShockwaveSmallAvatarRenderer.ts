@@ -331,14 +331,14 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
 
     const isBack = bodyMap.d === 0 || bodyMap.d === 7;
 
-    // 1. Back arm (left hand + matched sleeve)
+    // 1. Back arm (left hand + matched sleeve only when wearing a shirt)
     drawPart(lookupSmallSprite(posture, 'lh', '001', bodyMap.d, frame), skinHex, bodyMap.flipped);
-    drawPart(lookupSmallSprite(posture, 'ls', sleeveId, bodyMap.d, frame), shirtHex, bodyMap.flipped);
+    if(parsed.ch) drawPart(lookupSmallSprite(posture, 'ls', sleeveId, bodyMap.d, frame), shirtHex, bodyMap.flipped);
 
     if(isBack)
     {
         drawPart(lookupSmallSprite(posture, 'rh', '001', bodyMap.d, frame), skinHex, bodyMap.flipped);
-        drawPart(lookupSmallSprite(posture, 'rs', sleeveId, bodyMap.d, frame), shirtHex, bodyMap.flipped);
+        if(parsed.ch) drawPart(lookupSmallSprite(posture, 'rs', sleeveId, bodyMap.d, frame), shirtHex, bodyMap.flipped);
     }
 
     // 2. Body, shoes, legs, shirt
@@ -350,11 +350,11 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
     // 3. Head + classic 1x2 dot-eye face + hair
     drawHead();
 
-    // 4. Front arm (right hand + matched sleeve)
+    // 4. Front arm (right hand + matched sleeve only when wearing a shirt)
     if(!isBack)
     {
         drawPart(lookupSmallSprite(posture, 'rh', '001', bodyMap.d, frame), skinHex, bodyMap.flipped);
-        drawPart(lookupSmallSprite(posture, 'rs', sleeveId, bodyMap.d, frame), shirtHex, bodyMap.flipped);
+        if(parsed.ch) drawPart(lookupSmallSprite(posture, 'rs', sleeveId, bodyMap.d, frame), shirtHex, bodyMap.flipped);
     }
 
     return c.toDataURL('image/png');

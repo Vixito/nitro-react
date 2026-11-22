@@ -1,6 +1,6 @@
 import { AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from '../../../api';
+import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl } from '../../../api';
 import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, SnowStormParkaAvatar, trimTransparentImage } from './SnowStormAvatar';
 import { MobileJoystick } from '../../mobile/MobileJoystick';
@@ -632,55 +632,42 @@ export const SnowStormGameView: FC = () =>
         load(fenceImg, 'fence');
     }, []);
 
-    // Pre-render classic SMALL (sh_) Habbo heads via Nitro AvatarRenderManager (compact dot-eyed retro style)
+    // Pre-render authentic Shockwave SMALL (sh_) Habbo heads for SnowStorm fighters
     useEffect(() =>
     {
         let alive = true;
-        const timers: number[] = [];
         const allFigures = Array.from(new Set([ ...rosterBlue, ...rosterRed ].map(r => r.figure)));
-        const renderManager = GetAvatarRenderManager();
-        if (!renderManager) return;
 
-        const renderHead = (figure: string) =>
+        const renderAllSmall = () =>
         {
-            const buildDir = (dir: number, onReady: (img: HTMLImageElement) => void, attempt = 0) =>
+            if (!alive) return;
+            allFigures.forEach(figure =>
             {
-                if (!alive) return;
-                const avatarImg = renderManager.createAvatarImage(figure, AvatarScaleType.LARGE, 'M', {
-                    resetFigure: () => { if (alive) buildDir(dir, onReady, attempt + 1); },
-                    dispose: () => {},
-                    disposed: false
-                }, null);
-                if (!avatarImg) return;
-                avatarImg.setDirection(AvatarSetType.FULL, dir);
-                avatarImg.setDirection(AvatarSetType.HEAD, dir);
-                const isPh = avatarImg.isPlaceholder();
-                const cropped = avatarImg.getCroppedImage(AvatarSetType.HEAD);
-                if (cropped && cropped.src)
-                {
-                    trimTransparentImage(cropped.src, (_url, trimmedImg) => { if (alive) onReady(trimmedImg); });
-                }
-                avatarImg.dispose();
-                if (isPh && attempt < 6)
-                {
-                    timers.push(window.setTimeout(() => buildDir(dir, onReady, attempt + 1), 350 + attempt * 150));
-                }
-            };
+                const entry = headCacheRef.current.get(figure) || {
+                    front: new Image(),
+                    back: new Image()
+                };
+                headCacheRef.current.set(figure, entry);
 
-            const entry = headCacheRef.current.get(figure) || {
-                front: new Image(),
-                back: new Image()
-            };
-            headCacheRef.current.set(figure, entry);
-            buildDir(2, img => { entry.front = img; }, 0);
-            buildDir(0, img => { entry.back = img; }, 0);
+                const frontUrl = renderShockwaveSmallDataUrl(figure, { direction: 2, headDirection: 2, headOnly: true });
+                if (frontUrl)
+                {
+                    trimTransparentImage(frontUrl, (_u, trimmedImg) => { if (alive) entry.front = trimmedImg; });
+                }
+
+                const backUrl = renderShockwaveSmallDataUrl(figure, { direction: 0, headDirection: 0, headOnly: true });
+                if (backUrl)
+                {
+                    trimTransparentImage(backUrl, (_u, trimmedImg) => { if (alive) entry.back = trimmedImg; });
+                }
+            });
         };
 
-        allFigures.forEach(renderHead);
+        const unsub = onShockwaveSmallAtlasReady(renderAllSmall);
         return () =>
         {
             alive = false;
-            timers.forEach(t => window.clearTimeout(t));
+            unsub();
         };
     }, [ rosterBlue, rosterRed ]);
 
@@ -1975,11 +1962,12 @@ export const SnowStormGameView: FC = () =>
                             : headEntry?.front;
                         if (headImg && headImg.complete && headImg.naturalWidth > 0 && f.koTimer <= 0)
                         {
-                            const hScale = 0.66 * spriteScale;
+                            const hScale = 1.18 * spriteScale;
                             const hw = headImg.naturalWidth * hScale;
                             const hh = headImg.naturalHeight * hScale;
                             const chinFromFeet = f.reloading ? 17.5 : 20.5;
                             const headAnchorX = f.reloading ? (3 * spriteScale) : (1 * spriteScale);
+                            ctx.imageSmoothingEnabled = false;
                             const headAnchorY = -chinFromFeet * spriteScale - hh;
                             ctx.save();
                             ctx.translate(p.sx, p.sy + 3 * sc);
@@ -2429,7 +2417,7 @@ export const SnowStormGameView: FC = () =>
                     />
                     <div className="ss-hud-bottom-left">
                         <div className="ss-hud-my-head">
-                            <HabboHeadImg figure={ myFigure } direction={ 2 } size={ 38 } />
+                            <HabboHeadImg figure={ myFigure } direction={ 2 } size={ 38 } shockwaveSmall={ true } />
                         </div>
                         <div className="ss-hud-hp-bar" title={ `Salud: ${ hud.myHp * 20 }%` }>
                             <div

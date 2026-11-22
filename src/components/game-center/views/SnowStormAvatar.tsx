@@ -222,7 +222,7 @@ export const SnowStormParkaAvatar: FC<{
     const resolvedFacing = facing || (team === 'red' ? 'left' : 'right');
     const flipBody = resolvedFacing === 'left';
     const direction = resolvedFacing === 'left' ? 4 : 2;
-    const headInfo = useCroppedHabboHead(figure, direction);
+    const headInfo = useCroppedHabboHead(figure, direction, true);
 
     const cellW = 60;
     const cellH = 44;
@@ -230,8 +230,8 @@ export const SnowStormParkaAvatar: FC<{
     const bodyScale = 1.0 * scale;
     const marginBot = Math.round(2 * scale);
 
-    // Proportional 1:1 Habbo head-to-parka ratio (so chin sits inside fur collar regardless of hair height!)
-    const headPixelScale = 0.66 * bodyScale;
+    // Proportional 1:1 Shockwave SMALL (sh_) head-to-parka ratio (crisp pixelated dot-eyed classic look!)
+    const headPixelScale = 1.18 * bodyScale;
     const headW = headInfo ? Math.round(headInfo.w * headPixelScale) : 0;
     const headH = headInfo ? Math.round(headInfo.h * headPixelScale) : 0;
     // Exact chin bottom seated snugly into collar opening (20.5px above boots bottom)

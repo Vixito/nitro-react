@@ -1,6 +1,6 @@
 import { AvatarAction, AvatarScaleType, AvatarSetType, IAvatarImageListener } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from '../../../api';
+import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl } from '../../../api';
 import { useGameCenter } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 
@@ -651,53 +651,32 @@ export const WobbleSquabbleGameView: FC = () =>
             .catch(() => {});
     }, []);
 
-    // Placeholder-safe classic SMALL (sh_) Habbo avatar sprite loader (full body, seated, head-only for swimmers)
+    // Authentic Shockwave SMALL (sh_) Habbo avatar sprite loader (full body, seated, head-only for swimmers)
     const ensureAvatarSprite = useCallback((figure: string, dir: number, posture: 'std' | 'sit' | 'head') =>
     {
         const key = `${ figure }__${ posture }__${ dir }`;
         if (avatarReadyRef.current.has(key)) return;
-        try
-        {
-            const mgr = GetAvatarRenderManager();
-            if (!mgr) return;
-            const load = (attempt = 0) =>
-            {
-                const listener: IAvatarImageListener = {
-                    resetFigure: () => { load(attempt + 1); },
-                    dispose: () => {},
-                    disposed: false
-                };
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, listener);
-                if (!avatar) return;
-                avatar.initActionAppends();
-                if (posture === 'sit') avatar.appendAction(AvatarAction.POSTURE, AvatarAction.POSTURE_SIT);
-                else avatar.appendAction(AvatarAction.POSTURE, AvatarAction.POSTURE_STAND);
-                avatar.endActionAppends();
 
-                const setType = posture === 'head' ? AvatarSetType.HEAD : AvatarSetType.FULL;
-                avatar.setDirection(setType, dir);
-                const img = avatar.getCroppedImage(setType);
-                const ready = !avatar.isPlaceholder();
-                avatar.dispose();
-                if (img && img.src)
-                {
-                    trimTransparentImage(img.src, (_url, trimmedImg) =>
-                    {
-                        avatarCacheRef.current.set(key, trimmedImg);
-                        if (ready) avatarReadyRef.current.add(key);
-                    });
-                }
-                if (!ready && attempt < 6)
-                {
-                    window.setTimeout(() => load(attempt + 1), 350 + attempt * 150);
-                }
-            };
-            load(0);
-        }
-        catch
+        const renderSmall = () =>
         {
-            // Ignore transient render init
-        }
+            if (avatarReadyRef.current.has(key)) return;
+            const raw = renderShockwaveSmallDataUrl(figure, {
+                direction: dir,
+                headDirection: dir,
+                posture: posture === 'sit' ? 'sit' : 'std',
+                headOnly: posture === 'head'
+            });
+            if (raw)
+            {
+                trimTransparentImage(raw, (_url, trimmedImg) =>
+                {
+                    avatarCacheRef.current.set(key, trimmedImg);
+                    avatarReadyRef.current.add(key);
+                });
+            }
+        };
+
+        onShockwaveSmallAtlasReady(renderSmall);
     }, []);
 
     // Preload fighters + rooftop audience sprites
@@ -1581,6 +1560,7 @@ export const WobbleSquabbleGameView: FC = () =>
                 {
                     const dh = 18 * sc;
                     const dw = (headImg.naturalWidth / headImg.naturalHeight) * dh;
+                    c.imageSmoothingEnabled = false;
                     c.drawImage(headImg, wx - dw / 2, wy - dh + 3 * sc, dw, dh);
                 }
                 c.restore();
@@ -1627,8 +1607,9 @@ export const WobbleSquabbleGameView: FC = () =>
             c.rotate(rot);
             if (sprite && sprite.naturalWidth > 0)
             {
-                const dh = 46 * sc;
+                const dh = 44 * sc;
                 const dw = (sprite.naturalWidth / sprite.naturalHeight) * dh;
+                c.imageSmoothingEnabled = false;
                 c.drawImage(sprite, -dw / 2, -dh + 4 * sc, dw, dh);
             }
             c.restore();
@@ -1721,6 +1702,7 @@ export const WobbleSquabbleGameView: FC = () =>
                     {
                         const dh = 17 * sc;
                         const dw = (img.naturalWidth / img.naturalHeight) * dh;
+                        ctx.imageSmoothingEnabled = false;
                         ctx.drawImage(img, sp.sx - dw / 2, bobY - dh + 3 * sc, dw, dh);
                     }
                     ctx.restore();
@@ -1734,6 +1716,7 @@ export const WobbleSquabbleGameView: FC = () =>
                         const dh = (npc.kind === 'sofa' ? 37 : 44) * sc;
                         const dw = (img.naturalWidth / img.naturalHeight) * dh;
                         const bobY = npc.kind === 'queue' ? Math.sin(nowSec * 3.4 + npc.phase) * 1.0 * sc : 0;
+                        ctx.imageSmoothingEnabled = false;
                         ctx.drawImage(img, sp.sx - dw / 2, sp.sy - dh + 4 * sc + bobY, dw, dh);
                     }
                 }
@@ -2116,12 +2099,12 @@ export const WobbleSquabbleGameView: FC = () =>
                                 <div className="ws-starting-well">
                                     <div className="ws-vs-preview">
                                         <div className="ws-vs-card">
-                                            <HabboHeadImg figure={ myFigure } direction={ 2 } size={ 40 } />
+                                            <HabboHeadImg figure={ myFigure } direction={ 2 } size={ 40 } shockwaveSmall={ true } />
                                             <span>{ myUsername }</span>
                                         </div>
                                         <span className="ws-vs-badge">VS</span>
                                         <div className="ws-vs-card">
-                                            <HabboHeadImg figure={ activeOpponent.figure } direction={ 4 } size={ 40 } />
+                                            <HabboHeadImg figure={ activeOpponent.figure } direction={ 4 } size={ 40 } shockwaveSmall={ true } />
                                             <span>{ activeOpponent.name }</span>
                                         </div>
                                     </div>
@@ -2152,7 +2135,7 @@ export const WobbleSquabbleGameView: FC = () =>
                                 <div className="ws-results-card">
                                     <div className="ws-results-hero">
                                         <div className="ws-res-fighter">
-                                            <HabboHeadImg figure={ myFigure } direction={ 2 } size={ 46 } />
+                                            <HabboHeadImg figure={ myFigure } direction={ 2 } size={ 46 } shockwaveSmall={ true } />
                                             <span className="ws-res-name">{ myUsername }</span>
                                             <span className="ws-res-rounds">{ finalSummary.playerRounds }</span>
                                         </div>
@@ -2165,7 +2148,7 @@ export const WobbleSquabbleGameView: FC = () =>
                                             </span>
                                         </div>
                                         <div className="ws-res-fighter">
-                                            <HabboHeadImg figure={ finalSummary.opponentFigure } direction={ 4 } size={ 46 } />
+                                            <HabboHeadImg figure={ finalSummary.opponentFigure } direction={ 4 } size={ 46 } shockwaveSmall={ true } />
                                             <span className="ws-res-name">{ finalSummary.opponentName }</span>
                                             <span className="ws-res-rounds">{ finalSummary.opponentRounds }</span>
                                         </div>
@@ -2261,7 +2244,7 @@ export const WobbleSquabbleGameView: FC = () =>
                         onMouseEnter={ () => setHoverLabel('Mi Personaje') }
                         onMouseLeave={ () => setHoverLabel('') }
                     >
-                        <HabboHeadImg figure={ myFigure } direction={ 3 } size={ 36 } />
+                        <HabboHeadImg figure={ myFigure } direction={ 3 } size={ 36 } shockwaveSmall={ true } />
                     </div>
 
                     <div className="ws-hud-zone-chat">
@@ -2464,7 +2447,7 @@ export const WobbleSquabbleGameView: FC = () =>
                                         lbEntries.map(e => (
                                             <div key={ e.userId } className="ws-sw-list-row">
                                                 <b style={{ width: '20px', color: e.rank === 1 ? '#b45309' : '#1e40af' }}>{ e.rank }</b>
-                                                <HabboHeadImg figure={ e.figure } direction={ 2 } size={ 28 } />
+                                                <HabboHeadImg figure={ e.figure } direction={ 2 } size={ 28 } shockwaveSmall={ true } />
                                                 <div style={{ flex: 1 }}>
                                                     <b>{ e.username }</b>
                                                     <div style={{ fontSize: '10px', color: '#4b5563' }}>{ e.wins } victorias · { e.knockoffs } al agua</div>
