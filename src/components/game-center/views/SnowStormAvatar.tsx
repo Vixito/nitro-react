@@ -1,6 +1,6 @@
 import { AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { CSSProperties, FC, useEffect, useState } from 'react';
-import { GetAvatarRenderManager } from '../../../api';
+import { GetAvatarRenderManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl } from '../../../api';
 import posesGridImg from '../../../assets/images/gamecenter/snowstorm/Snowstorm_poses_grid.png';
 
 export interface TrimmedHeadInfo
@@ -82,9 +82,9 @@ export function trimTransparentImage(
     img.src = rawSrc;
 }
 
-export function useCroppedHabboHead(figure: string, direction = 2): TrimmedHeadInfo | null
+export function useCroppedHabboHead(figure: string, direction = 2, shockwaveSmall = false): TrimmedHeadInfo | null
 {
-    const cacheKey = `${ figure }__${ direction }`;
+    const cacheKey = `${ shockwaveSmall ? 'sw_sm__' : '' }${ figure }__${ direction }`;
     const [ info, setInfo ] = useState<TrimmedHeadInfo | null>(() => trimmedHeadCache.get(cacheKey) || null);
     const [ reloadTick, setReloadTick ] = useState<number>(0);
 
@@ -99,6 +99,31 @@ export function useCroppedHabboHead(figure: string, direction = 2): TrimmedHeadI
         {
             setInfo(cached);
             return;
+        }
+
+        if (shockwaveSmall)
+        {
+            const renderSmall = () =>
+            {
+                if (disposed) return;
+                const raw = renderShockwaveSmallDataUrl(figure, { direction, headDirection: direction, headOnly: true });
+                if (raw)
+                {
+                    trimTransparentImage(raw, (trimmedUrl, _img, tw, th) =>
+                    {
+                        if (disposed) return;
+                        const entry: TrimmedHeadInfo = { url: trimmedUrl, w: tw, h: th };
+                        trimmedHeadCache.set(cacheKey, entry);
+                        setInfo(entry);
+                    });
+                }
+            };
+            const unsub = onShockwaveSmallAtlasReady(renderSmall);
+            return () =>
+            {
+                disposed = true;
+                unsub();
+            };
         }
 
         const manager = GetAvatarRenderManager();
@@ -150,7 +175,7 @@ export function useCroppedHabboHead(figure: string, direction = 2): TrimmedHeadI
             disposed = true;
             if (retryTimer) window.clearTimeout(retryTimer);
         };
-    }, [ figure, direction, cacheKey, reloadTick ]);
+    }, [ figure, direction, shockwaveSmall, cacheKey, reloadTick ]);
 
     return info;
 }
@@ -159,11 +184,12 @@ export const HabboHeadImg: FC<{
     figure: string;
     direction?: number;
     size?: number;
+    shockwaveSmall?: boolean;
     className?: string;
     style?: CSSProperties;
-}> = ({ figure, direction = 2, size = 36, className, style }) =>
+}> = ({ figure, direction = 2, size = 36, shockwaveSmall = false, className, style }) =>
 {
-    const info = useCroppedHabboHead(figure, direction);
+    const info = useCroppedHabboHead(figure, direction, shockwaveSmall);
     if (!info) return null;
 
     return (

@@ -1,6 +1,6 @@
 import { AvatarAction, AvatarScaleType, AvatarSetType } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetClubMemberLevel, GetConfiguration, GetSessionDataManager } from '../../../api';
+import { GetAvatarRenderManager, GetClubMemberLevel, GetConfiguration, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl } from '../../../api';
 import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 import { MobileJoystick } from '../../mobile/MobileJoystick';
@@ -542,44 +542,23 @@ const HabboFullAvatarImg: FC<{ figure: string; direction?: number; className?: s
     useEffect(() =>
     {
         let alive = true;
-        let retryTimer: number | null = null;
-        const load = () =>
+        const renderSmall = () =>
         {
-            try
+            if (!alive) return;
+            const raw = renderShockwaveSmallDataUrl(figure, { direction, headDirection: direction, posture: 'std' });
+            if (raw)
             {
-                const mgr = GetAvatarRenderManager();
-                if (!mgr) return;
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
-                    resetFigure: () => { if (alive) load(); },
-                    dispose: () => {},
-                    disposed: false
+                trimTransparentImage(raw, url =>
+                {
+                    if (alive) setSrc(url);
                 });
-                if (!avatar) return;
-                avatar.setDirection(AvatarSetType.FULL, direction);
-                const raw = avatar.getCroppedImage(AvatarSetType.FULL)?.src;
-                if (raw)
-                {
-                    trimTransparentImage(raw, url =>
-                    {
-                        if (alive) setSrc(url);
-                    });
-                }
-                if (avatar.isPlaceholder())
-                {
-                    retryTimer = window.setTimeout(() => { if (alive) load(); }, 450);
-                }
-                avatar.dispose();
-            }
-            catch
-            {
-                // fallback silently
             }
         };
-        load();
+        const unsub = onShockwaveSmallAtlasReady(renderSmall);
         return () =>
         {
             alive = false;
-            if (retryTimer) window.clearTimeout(retryTimer);
+            unsub();
         };
     }, [ figure, direction ]);
 
@@ -930,74 +909,37 @@ export const BattleBallGameView: FC = () =>
         });
     }, []);
 
-    // Preload trimmed classic SMALL (sh_) SEATED/MOUNTED Habbo avatars in all 4 isometric directions (0, 2, 4, 6)!
+    // Preload trimmed authentic Shockwave SMALL (sh_) SEATED/MOUNTED Habbo avatars in all 4 isometric directions (0, 2, 4, 6)!
     useEffect(() =>
     {
         let alive = true;
-        const timers: number[] = [];
-        const readyKeys = new Set<string>();
+        const dirs = [ 0, 2, 4, 6 ];
 
-        const loadFigureDir = (figure: string, dir: number, attempt = 0) =>
+        const renderAllSmall = () =>
         {
             if (!alive) return;
-            const key = `${ figure }__sit__${ dir }`;
-            if (readyKeys.has(key)) return;
-            try
+            roster.forEach(r =>
             {
-                const mgr = GetAvatarRenderManager();
-                if (!mgr) return;
-                const avatar = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
-                    resetFigure: () =>
-                    {
-                        if (alive) loadFigureDir(figure, dir, attempt + 1);
-                    },
-                    dispose: () => {},
-                    disposed: false
-                });
-                if (!avatar) return;
-                avatar.initActionAppends();
-                avatar.appendAction(AvatarAction.POSTURE, AvatarAction.POSTURE_SIT);
-                avatar.endActionAppends();
-                avatar.setDirection(AvatarSetType.FULL, dir);
-                const isPh = avatar.isPlaceholder();
-                const raw = avatar.getCroppedImage(AvatarSetType.FULL)?.src;
-                if (raw)
+                dirs.forEach(d =>
                 {
-                    trimTransparentImage(raw, (_url, trimmedImg) =>
+                    const key = `${ r.figure }__sit__${ d }`;
+                    const raw = renderShockwaveSmallDataUrl(r.figure, { direction: d, headDirection: d, posture: 'sit' });
+                    if (raw)
                     {
-                        if (!alive) return;
-                        if (!isPh || !bodyCacheRef.current.has(key))
+                        trimTransparentImage(raw, (_url, trimmedImg) =>
                         {
-                            bodyCacheRef.current.set(key, trimmedImg);
-                        }
-                    });
-                }
-                avatar.dispose();
-                if (!isPh)
-                {
-                    readyKeys.add(key);
-                }
-                else if (attempt < 8)
-                {
-                    const t = window.setTimeout(() => loadFigureDir(figure, dir, attempt + 1), 350 + attempt * 150);
-                    timers.push(t);
-                }
-            }
-            catch
-            {
-                // skip
-            }
+                            if (alive) bodyCacheRef.current.set(key, trimmedImg);
+                        });
+                    }
+                });
+            });
         };
 
-        const dirs = [ 0, 2, 4, 6 ];
-        roster.forEach(r =>
-        {
-            dirs.forEach(d => loadFigureDir(r.figure, d, 0));
-        });
+        const unsub = onShockwaveSmallAtlasReady(renderAllSmall);
         return () =>
         {
             alive = false;
-            timers.forEach(t => window.clearTimeout(t));
+            unsub();
         };
     }, [ roster ]);
 
@@ -2375,8 +2317,10 @@ export const BattleBallGameView: FC = () =>
                             || bodyCacheRef.current.get(`${ pl.figure }__sit__2`);
                         if (sitImg && sitImg.naturalWidth > 0)
                         {
-                            const drawH = 35 * sc;
+                            const drawH = 34 * sc;
                             const drawW = (sitImg.naturalWidth / sitImg.naturalHeight) * drawH;
+                            const prevSmooth = ctx.imageSmoothingEnabled;
+                            ctx.imageSmoothingEnabled = false;
                             ctx.drawImage(
                                 sitImg,
                                 cx - drawW / 2,
@@ -2384,6 +2328,7 @@ export const BattleBallGameView: FC = () =>
                                 drawW,
                                 drawH
                             );
+                            ctx.imageSmoothingEnabled = prevSmooth;
                         }
 
                         // Dizzy stars when stunned by Bomb or Chinchetas
@@ -2798,7 +2743,7 @@ export const BattleBallGameView: FC = () =>
                         onMouseEnter={ () => setHoverLabel('Mi Personaje') }
                         onMouseLeave={ () => setHoverLabel('') }
                     >
-                        <HabboHeadImg figure={ myFigure } direction={ 3 } size={ 36 } />
+                        <HabboHeadImg figure={ myFigure } direction={ 3 } size={ 36 } shockwaveSmall={ true } />
                     </div>
 
                     <div className="bb-hud-zone-chat">
@@ -3045,7 +2990,7 @@ export const BattleBallGameView: FC = () =>
                                         lbEntries.map(e => (
                                             <div key={ e.userId } className="bb-sw-list-row">
                                                 <b style={{ width: '20px', color: e.rank === 1 ? '#b45309' : '#1e40af' }}>{ e.rank }</b>
-                                                <HabboHeadImg figure={ e.figure } direction={ 2 } size={ 28 } />
+                                                <HabboHeadImg figure={ e.figure } direction={ 2 } size={ 28 } shockwaveSmall={ true } />
                                                 <div style={{ flex: 1 }}>
                                                     <b>{ e.username }</b>
                                                     <div style={{ fontSize: '10px', color: '#4b5563' }}>{ e.wins } victorias · { e.tilesLocked } casillas selladas</div>
