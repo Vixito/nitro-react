@@ -8668,6 +8668,91 @@ body[data-era="shockwave2006"] {
             }
         }
     }
+
+    // ── MODAL "HABBTEN ACTIVIDAD EN DISCORD" EN CLIENT 2006: CONTRASTE 100% LEGIBLE ──
+    .nitro-card.nitro-discord-settings {
+        background: #6794a7 !important;
+        color: #000000 !important;
+
+        > .content-area,
+        > .nitro-card-content {
+            background: #efefef !important;
+            color: #000000 !important;
+
+            // Títulos, subtítulos y textos generales en negro / gris oscuro sobre fondo claro 2006
+            div,
+            span,
+            label,
+            p {
+                color: #1a1a1a !important;
+            }
+
+            .fw-bold,
+            .text-white {
+                color: #000000 !important;
+            }
+
+            // Cajas interiores ("Ajustes:" y "Paso 2:") con panel clásico Shockwave claro y borde nítido
+            div[style*="rgba(0,0,0,0.3)"],
+            div[style*="rgba(0, 0, 0, 0.3)"] {
+                background: #dce2e6 !important;
+                border: 1px solid #8a99a8 !important;
+                color: #000000 !important;
+
+                .fw-bold,
+                .text-white,
+                label,
+                span,
+                div {
+                    color: #000000 !important;
+                }
+            }
+
+            // Tarjeta morada del Servidor Oficial de Habbten: mantener texto blanco nítido sobre fondo oscuro Discord
+            div[style*="#3f385c"],
+            div[style*="rgb(63, 56, 92)"] {
+                background: #3f385c !important;
+                border: 1px solid #2b2344 !important;
+                color: #ffffff !important;
+
+                div,
+                span,
+                .fw-bold,
+                .text-white {
+                    color: #ffffff !important;
+                }
+
+                a.btn {
+                    background: #ffffff !important;
+                    color: #000000 !important;
+                    border: 1px solid #000000 !important;
+                }
+            }
+
+            // Campo de usuario de Discord y prefijo "@"
+            .input-group-text {
+                background: #1e293b !important;
+                color: #ffffff !important;
+                border: 1px solid #000000 !important;
+            }
+
+            input.form-control {
+                background: #ffffff !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+
+                &::placeholder {
+                    color: #666666 !important;
+                    opacity: 1 !important;
+                }
+            }
+
+            .text-success {
+                color: #15803d !important;
+                font-weight: bold !important;
+            }
+        }
+    }
 }
 
 @keyframes shockwaveHandEnter {
