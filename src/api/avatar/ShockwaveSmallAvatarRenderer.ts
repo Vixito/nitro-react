@@ -368,12 +368,10 @@ function convertLargeBundleToSmallInMemory(json: any, sourceImg: HTMLImageElemen
 
         const hRegX = typeof asset.x === 'number' ? asset.x : 0;
         const hRegY = typeof asset.y === 'number' ? asset.y : 0;
-        const partCode = assetKey.split('_')[2] || '';
-        const isHeadLayer = partCode === 'hr' || partCode === 'hrb' || partCode === 'ha' || partCode === 'he' || partCode === 'ea' || partCode === 'fa';
         spriteEntries[shKey] = {
             frameKey: found.key,
             regX: Math.round(hRegX / 2) + 1,
-            regY: isHeadLayer ? (Math.floor(hRegY / 2) - 1) : Math.round(hRegY / 2),
+            regY: Math.round(hRegY / 2),
             flipH: asset.flipH ? 1 : 0
         };
     }
@@ -910,19 +908,16 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
         const showFace = headMap.d === 1 || headMap.d === 2 || headMap.d === 3;
         const hdAct = opts.panicFace ? 'spk' : 'std';
 
-        // Back hair layer behind head
-        drawExactParts([ 'hrb' ], 'std', headMap, 0, extraY);
-
-        // Authentic Shockwave SMALL head + classic 1x2 dot-eye face
+        // Exact official HabboAvatarGeometry head draw order: hd -> fc -> hr -> hrb (HAIR_BIG) -> fa -> ea -> ha -> he
         drawV9Base(lookupV9BaseSprite(hdAct, 'hd', '002', headMap.d, 0), skinHex, headMap.flipped, extraY);
         if(showFace) drawV9Base(lookupV9BaseSprite(hdAct, 'fc', '001', headMap.d, opts.panicFace ? 1 : 0), skinHex, headMap.flipped, extraY);
 
-        // Exact face/eye accessories, hair, head accessories, and hats in authentic Habbo layer order
+        drawExactParts([ 'hr' ], 'std', headMap, 0, extraY);
+        drawExactParts([ 'hrb' ], 'std', headMap, 0, extraY);
         drawExactParts([ 'fa' ], 'std', headMap, 0, extraY);
         drawExactParts([ 'ea' ], 'std', headMap, 0, extraY);
-        drawExactParts([ 'hr' ], 'std', headMap, 0, extraY);
-        drawExactParts([ 'he' ], 'std', headMap, 0, extraY);
         drawExactParts([ 'ha' ], 'std', headMap, 0, extraY);
+        drawExactParts([ 'he' ], 'std', headMap, 0, extraY);
     };
 
     if(opts.headOnly)
