@@ -534,7 +534,7 @@ const MvpStarburstSvg: FC = () =>
     );
 };
 
-// Full-body Habbo Avatar component (used inside MVP starburst!)
+// Full-body Habbo Avatar component (used inside MVP starburst — crisp LARGE scale so it fills the trophy cleanly!)
 const HabboFullAvatarImg: FC<{ figure: string; direction?: number; className?: string }> = ({ figure, direction = 2, className }) =>
 {
     const [ src, setSrc ] = useState<string>('');
@@ -542,19 +542,56 @@ const HabboFullAvatarImg: FC<{ figure: string; direction?: number; className?: s
     useEffect(() =>
     {
         let alive = true;
-        const renderSmall = () =>
+        let renderedLarge = false;
+
+        const tryRenderLarge = () =>
         {
-            if (!alive) return;
+            if (!alive) return false;
+            try
+            {
+                const mgr = GetAvatarRenderManager();
+                if (!mgr) return false;
+                const img = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
+                    resetFigure: () => { if (alive) tryRenderLarge(); },
+                    dispose: () => {},
+                    disposed: false
+                });
+                if (img)
+                {
+                    img.setDirection(AvatarSetType.FULL, direction);
+                    img.setDirection(AvatarSetType.HEAD, direction);
+                    const url = img.getCroppedImage(AvatarSetType.FULL)?.src;
+                    if (url)
+                    {
+                        renderedLarge = true;
+                        setSrc(url);
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                // fallback below
+            }
+            return false;
+        };
+
+        tryRenderLarge();
+
+        const renderSmallFallback = () =>
+        {
+            if (!alive || renderedLarge) return;
             const raw = renderShockwaveSmallDataUrl(figure, { direction, headDirection: direction, posture: 'std' });
             if (raw)
             {
                 trimTransparentImage(raw, url =>
                 {
-                    if (alive) setSrc(url);
+                    if (alive && !renderedLarge) setSrc(url);
                 });
             }
         };
-        const unsub = onShockwaveSmallAtlasReady(renderSmall);
+
+        const unsub = onShockwaveSmallAtlasReady(renderSmallFallback);
         return () =>
         {
             alive = false;
@@ -740,7 +777,11 @@ function findPathBFS(
     const q: Array<[ number, number ]> = [ [ sx, sy ] ];
     visited[sy][sx] = true;
 
-    const dirs: Array<[ number, number ]> = [ [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ] ];
+    // 8-directional Battle Ball movement (4 orthogonal + 4 diagonal!)
+    const dirs: Array<[ number, number ]> = [
+        [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ],
+        [ 1, 1 ], [ 1, -1 ], [ -1, 1 ], [ -1, -1 ]
+    ];
     let found = false;
 
     while (q.length > 0)
@@ -757,6 +798,13 @@ function findPathBFS(
             if (!nt.walkable) continue;
             // Cannot jump straight off a 2-unit cliff; must use stairs (|dz| <= 1.0)
             if (Math.abs(nt.z - cz) > 1.05) continue;
+            // Diagonal corner clearance: at least one adjacent orthogonal tile must be walkable
+            if (dx !== 0 && dy !== 0)
+            {
+                const adjA = tiles[cy]?.[nx];
+                const adjB = tiles[ny]?.[cx];
+                if (!(adjA?.walkable || adjB?.walkable)) continue;
+            }
             visited[ny][nx] = true;
             parent[ny][nx] = [ cx, cy ];
             q.push([ nx, ny ]);
@@ -1671,14 +1719,24 @@ export const BattleBallGameView: FC = () =>
 
             const dx = nx - p.gx;
             const dy = ny - p.gy;
+            if (dx !== 0 && dy !== 0)
+            {
+                const adjA = eng.tiles[p.gy]?.[nx];
+                const adjB = eng.tiles[ny]?.[p.gx];
+                if (!(adjA?.walkable || adjB?.walkable)) return false;
+            }
             p.fromX = p.gx;
             p.fromY = p.gy;
             p.toX = nx;
             p.toY = ny;
             p.dirX = Math.sign(dx);
             p.dirY = Math.sign(dy);
-            // Authentic 4-way Habbo isometric direction: +x = SE(2), +y = SW(4), -x = NW(6), -y = NE(0)
-            if (dx > 0) p.isoDir = 2;
+            // 8-way Habbo isometric facing mapped cleanly to seated angles (0=NE, 2=SE, 4=SW, 6=NW)
+            if (dx > 0 && dy > 0) p.isoDir = 2;
+            else if (dx > 0 && dy < 0) p.isoDir = 0;
+            else if (dx < 0 && dy > 0) p.isoDir = 4;
+            else if (dx < 0 && dy < 0) p.isoDir = 6;
+            else if (dx > 0) p.isoDir = 2;
             else if (dy > 0) p.isoDir = 4;
             else if (dx < 0) p.isoDir = 6;
             else if (dy < 0) p.isoDir = 0;
@@ -1855,11 +1913,19 @@ export const BattleBallGameView: FC = () =>
                     const k = keysRef.current;
                     let kdx = 0;
                     let kdy = 0;
-                    if (k.has('KeyW') || k.has('ArrowUp')) kdy = -1;
-                    else if (k.has('KeyS') || k.has('ArrowDown')) kdy = 1;
-                    else if (k.has('KeyA') || k.has('ArrowLeft')) kdx = -1;
-                    else if (k.has('KeyD') || k.has('ArrowRight')) kdx = 1;
-                    else
+                    // 8-directional keyboard support (WASD / Arrow combos + Q/E/Z/C single-key diagonals)
+                    if (k.has('KeyW') || k.has('ArrowUp')) kdy -= 1;
+                    if (k.has('KeyS') || k.has('ArrowDown')) kdy += 1;
+                    if (k.has('KeyA') || k.has('ArrowLeft')) kdx -= 1;
+                    if (k.has('KeyD') || k.has('ArrowRight')) kdx += 1;
+                    if (kdx === 0 && kdy === 0)
+                    {
+                        if (k.has('KeyQ')) { kdx = -1; kdy = -1; }
+                        else if (k.has('KeyE')) { kdx = 1; kdy = -1; }
+                        else if (k.has('KeyZ')) { kdx = -1; kdy = 1; }
+                        else if (k.has('KeyC')) { kdx = 1; kdy = 1; }
+                    }
+                    if (kdx === 0 && kdy === 0)
                     {
                         let jx = joyVecRef.current.x;
                         let jy = joyVecRef.current.y;
@@ -1871,10 +1937,15 @@ export const BattleBallGameView: FC = () =>
                         }
                         if (Math.hypot(jx, jy) > 0.18)
                         {
-                            const isoX = jx * 0.5 + jy;
-                            const isoY = jy - jx * 0.5;
-                            if (Math.abs(isoX) >= Math.abs(isoY)) kdx = isoX > 0 ? 1 : -1;
-                            else kdy = isoY > 0 ? 1 : -1;
+                            const deg = (Math.atan2(jy, jx) * 180) / Math.PI;
+                            if (deg >= -22.5 && deg < 22.5) { kdx = 1; kdy = -1; }           // → Right
+                            else if (deg >= 22.5 && deg < 67.5) { kdx = 1; kdy = 0; }        // ↘ Down-Right
+                            else if (deg >= 67.5 && deg < 112.5) { kdx = 1; kdy = 1; }       // ↓ Down
+                            else if (deg >= 112.5 && deg < 157.5) { kdx = 0; kdy = 1; }      // ↙ Down-Left
+                            else if (deg >= 157.5 || deg < -157.5) { kdx = -1; kdy = 1; }    // ← Left
+                            else if (deg >= -157.5 && deg < -112.5) { kdx = -1; kdy = 0; }   // ↖ Up-Left
+                            else if (deg >= -112.5 && deg < -67.5) { kdx = -1; kdy = -1; }   // ↑ Up
+                            else { kdx = 0; kdy = -1; }                                      // ↗ Up-Right
                         }
                     }
 
@@ -1907,8 +1978,11 @@ export const BattleBallGameView: FC = () =>
                         p.path = [];
                     }
 
-                    // Pick an appealing nearby neighbor OR pathfind to a power-up / unlocked cluster!
-                    const dirs = [ [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ] ];
+                    // Pick an appealing nearby neighbor (all 8 directions including diagonals!) OR pathfind to a power-up!
+                    const dirs = [
+                        [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ],
+                        [ 1, 1 ], [ 1, -1 ], [ -1, 1 ], [ -1, -1 ]
+                    ];
                     let bestMove: [ number, number ] | null = null;
                     let bestVal = -999;
 
@@ -1933,6 +2007,12 @@ export const BattleBallGameView: FC = () =>
                         const t = eng.tiles[ny][nx];
                         const cur = eng.tiles[p.gy][p.gx];
                         if (!t.walkable || Math.abs(t.z - cur.z) > 1.05) continue;
+                        if (dx !== 0 && dy !== 0)
+                        {
+                            const adjA = eng.tiles[p.gy]?.[nx];
+                            const adjB = eng.tiles[ny]?.[p.gx];
+                            if (!(adjA?.walkable || adjB?.walkable)) continue;
+                        }
 
                         let val = Math.random() * 5;
                         if (t.pinTeam && t.pinTeam !== p.team) val -= 35;
