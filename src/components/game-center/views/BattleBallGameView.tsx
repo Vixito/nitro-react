@@ -534,7 +534,7 @@ const MvpStarburstSvg: FC = () =>
     );
 };
 
-// Full-body Habbo Avatar component (used inside MVP starburst — crisp LARGE scale so it fills the trophy cleanly!)
+// Full-body Habbo Avatar component (used inside MVP starburst — authentic SMALL avatar scaled up crisply!)
 const HabboFullAvatarImg: FC<{ figure: string; direction?: number; className?: string }> = ({ figure, direction = 2, className }) =>
 {
     const [ src, setSrc ] = useState<string>('');
@@ -542,56 +542,19 @@ const HabboFullAvatarImg: FC<{ figure: string; direction?: number; className?: s
     useEffect(() =>
     {
         let alive = true;
-        let renderedLarge = false;
-
-        const tryRenderLarge = () =>
+        const renderSmall = () =>
         {
-            if (!alive) return false;
-            try
-            {
-                const mgr = GetAvatarRenderManager();
-                if (!mgr) return false;
-                const img = mgr.createAvatarImage(figure, AvatarScaleType.LARGE, null, {
-                    resetFigure: () => { if (alive) tryRenderLarge(); },
-                    dispose: () => {},
-                    disposed: false
-                });
-                if (img)
-                {
-                    img.setDirection(AvatarSetType.FULL, direction);
-                    img.setDirection(AvatarSetType.HEAD, direction);
-                    const url = img.getCroppedImage(AvatarSetType.FULL)?.src;
-                    if (url)
-                    {
-                        renderedLarge = true;
-                        setSrc(url);
-                        return true;
-                    }
-                }
-            }
-            catch
-            {
-                // fallback below
-            }
-            return false;
-        };
-
-        tryRenderLarge();
-
-        const renderSmallFallback = () =>
-        {
-            if (!alive || renderedLarge) return;
+            if (!alive) return;
             const raw = renderShockwaveSmallDataUrl(figure, { direction, headDirection: direction, posture: 'std' });
             if (raw)
             {
                 trimTransparentImage(raw, url =>
                 {
-                    if (alive && !renderedLarge) setSrc(url);
+                    if (alive) setSrc(url);
                 });
             }
         };
-
-        const unsub = onShockwaveSmallAtlasReady(renderSmallFallback);
+        const unsub = onShockwaveSmallAtlasReady(renderSmall);
         return () =>
         {
             alive = false;
