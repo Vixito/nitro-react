@@ -3,6 +3,73 @@
     min-width: 452px;
     height: $navigator-height;
 
+    &:has(.navigator-room-creator-modern) {
+        width: 472px;
+        min-width: 472px;
+        height: 506px;
+    }
+
+    .navigator-room-creator-modern {
+        height: 100%;
+        min-height: 0;
+
+        .navigator-room-creator-modern-grid {
+            min-height: 0;
+        }
+
+        .navigator-room-creator-models-list {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+            padding-right: 4px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            scroll-snap-type: y mandatory;
+
+            .navigator-room-creator-model-card {
+                height: 124px !important;
+                min-height: 124px !important;
+                max-height: 124px !important;
+                flex: 0 0 124px !important;
+                flex-shrink: 0 !important;
+                width: 100% !important;
+                padding: 6px 8px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                box-sizing: border-box !important;
+                overflow: hidden !important;
+                scroll-snap-align: start;
+
+                .navigator-room-creator-model-img {
+                    flex: 1 1 0 !important;
+                    width: 100% !important;
+                    min-height: 96px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    overflow: visible !important;
+
+                    img {
+                        width: auto !important;
+                        height: auto !important;
+                        max-width: none !important;
+                        max-height: none !important;
+                        image-rendering: pixelated !important;
+                        display: block !important;
+                    }
+                }
+
+                .navigator-room-creator-model-tiles {
+                    flex-shrink: 0 !important;
+                    line-height: 1.15 !important;
+                    margin-top: 2px !important;
+                }
+            }
+        }
+    }
+
     .nitro-card-tabs {
         .nav-item {
             padding: 0.25rem 0.7rem;

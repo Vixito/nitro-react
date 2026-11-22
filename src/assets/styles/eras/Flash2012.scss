@@ -2879,7 +2879,7 @@ body[data-era="flash2012"] {
             transform: translate(-50%, 0);
         }
         50% {
-            transform: translate(-50%, -6px);
+            transform: translate(-50%, 5px);
         }
     }
 
@@ -3140,10 +3140,10 @@ body[data-era="flash2012"] {
     // 7A-2. CREAR UNA SALA 2012 (Separate Floating Window — exact 12-22-15 colors & bouncing yellow arrow)
     .navigator-room-creator-2012,
     .nitro-card[data-window-key="navigator-room-creator"] {
-        width: 545px !important;
-        min-width: 545px !important;
-        height: 405px !important;
-        max-height: 415px !important;
+        width: 584px !important;
+        min-width: 584px !important;
+        height: 456px !important;
+        max-height: 462px !important;
 
         .nitro-card-header {
             background: #367897 !important;
@@ -3152,9 +3152,9 @@ body[data-era="flash2012"] {
 
         .creator-2012-grid {
             display: grid !important;
-            grid-template-columns: 205px 1fr !important;
+            grid-template-columns: 208px 1fr !important;
             gap: 10px !important;
-            height: 356px !important;
+            height: 406px !important;
         }
 
         .creator-2012-left {
@@ -3239,15 +3239,21 @@ body[data-era="flash2012"] {
         .creator-2012-models {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            grid-auto-rows: 98px !important;
-            gap: 7px !important;
+            grid-auto-rows: 130px !important;
+            gap: 8px !important;
+            height: 406px !important;
+            max-height: 406px !important;
             overflow-y: auto !important;
+            overflow-x: hidden !important;
             padding-right: 4px !important;
             align-content: start !important;
+            scroll-snap-type: y mandatory;
 
             .creator-2012-model-card {
                 position: relative !important;
-                height: 98px !important;
+                height: 130px !important;
+                min-height: 130px !important;
+                max-height: 130px !important;
                 background-color: #cbcbcc !important;
                 border: 1px solid #8a8a86 !important;
                 border-radius: 5px !important;
@@ -3257,10 +3263,13 @@ body[data-era="flash2012"] {
                 justify-content: space-between !important;
                 cursor: pointer !important;
                 overflow: hidden !important;
+                box-sizing: border-box !important;
+                scroll-snap-align: start;
 
                 .creator-2012-model-img {
                     position: relative !important;
-                    flex: 1 !important;
+                    flex: 1 1 0 !important;
+                    min-height: 100px !important;
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
@@ -3268,7 +3277,7 @@ body[data-era="flash2012"] {
 
                     .creator-2012-selected-arrow {
                         position: absolute !important;
-                        top: 0 !important;
+                        top: 1px !important;
                         left: 50% !important;
                         width: 17px !important;
                         height: 20px !important;
@@ -3279,9 +3288,12 @@ body[data-era="flash2012"] {
                     }
 
                     img:not(.creator-2012-selected-arrow) {
-                        max-height: 70px !important;
-                        max-width: 100% !important;
+                        width: auto !important;
+                        height: auto !important;
+                        max-height: none !important;
+                        max-width: none !important;
                         image-rendering: pixelated !important;
+                        display: block !important;
                     }
                 }
 

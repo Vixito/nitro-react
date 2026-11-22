@@ -6939,6 +6939,10 @@ body[data-era="shockwave2006"] {
     // =========================================================================
     .navigator-shockwave-window {
         width: 350px !important;
+
+        &:has(.nav-shockwave-creator-wrapper) {
+            width: 392px !important;
+        }
         background-color: #6596a8 !important;
         border: 1px solid #000000 !important;
         border-radius: 12px !important;
@@ -7067,15 +7071,15 @@ body[data-era="shockwave2006"] {
 
                 .creator-columns-grid {
                     display: grid !important;
-                    grid-template-columns: 1fr 1fr !important;
+                    grid-template-columns: 150px 1fr !important;
                     gap: 10px !important;
-                    height: 274px !important;
-                    min-height: 274px !important;
-                    max-height: 274px !important;
+                    height: 272px !important;
+                    min-height: 272px !important;
+                    max-height: 272px !important;
                 }
 
                 .creator-left-col {
-                    height: 274px !important;
+                    height: 272px !important;
                     display: flex !important;
                     flex-direction: column !important;
                     justify-content: space-between !important;
@@ -7126,20 +7130,23 @@ body[data-era="shockwave2006"] {
                 }
 
                 .creator-right-col {
-                    height: 274px !important;
+                    height: 272px !important;
                     overflow-y: auto !important;
                     overflow-x: hidden !important;
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 4px !important;
+                    gap: 6px !important;
                     border: 1px solid #000000 !important;
                     background: #e2e5e7 !important;
                     padding: 4px !important;
                     box-sizing: border-box !important;
+                    scroll-snap-type: y mandatory;
 
                     .creator-model-card {
-                        min-height: 82px !important;
-                        height: 82px !important;
+                        min-height: 128px !important;
+                        height: 128px !important;
+                        max-height: 128px !important;
+                        flex: 0 0 128px !important;
                         flex-shrink: 0 !important;
                         background-color: #cfd5d8 !important;
                         border: 1px solid #888888 !important;
@@ -7147,16 +7154,22 @@ body[data-era="shockwave2006"] {
                         display: flex !important;
                         flex-direction: column !important;
                         align-items: center !important;
-                        justify-content: center !important;
+                        justify-content: space-between !important;
                         cursor: pointer !important;
                         position: relative !important;
-                        padding: 4px !important;
+                        padding: 6px 4px !important;
+                        box-sizing: border-box !important;
+                        overflow: hidden !important;
+                        scroll-snap-align: start;
 
                         .creator-model-img-wrap {
                             flex: 1 1 0 !important;
+                            width: 100% !important;
+                            min-height: 96px !important;
                             display: flex !important;
                             align-items: center !important;
                             justify-content: center !important;
+                            overflow: visible !important;
 
                             img {
                                 width: auto !important;

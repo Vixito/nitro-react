@@ -185,9 +185,9 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
     if(currentEra !== 'shockwave2006')
     {
         return (
-            <Column overflow="hidden">
-                <Grid overflow="hidden">
-                    <Column size={ 6 } gap={ 1 } overflow="auto">
+            <Column fullHeight overflow="hidden" className="navigator-room-creator-modern">
+                <Grid overflow="hidden" className="navigator-room-creator-modern-grid flex-grow-1">
+                    <Column size={ 6 } gap={ 1 } overflow="auto" className="navigator-room-creator-form-col">
                         <Column gap={ 1 }>
                             <Text>{ LocalizeText('navigator.createroom.roomnameinfo') }</Text>
                             <input type="text" className="form-control form-control-sm" maxLength={ 60 } value={ name } onChange={ event => setName(event.target.value) } placeholder={ LocalizeText('navigator.createroom.roomnameinfo') } />
@@ -221,13 +221,13 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
                             </select>
                         </Column>
                     </Column>
-                    <Column size={ 6 } gap={ 1 } overflow="auto">
+                    <Column size={ 6 } gap={ 1 } overflow="auto" className="navigator-room-creator-models-list">
                         { roomModels && (roomModels.length > 0) && roomModels.map((model, index) => (
-                            <LayoutGridItem key={ model.name } onClick={ () => selectModel(model, index) } itemActive={ (selectedModelName === model.name) } overflow="unset" gap={ 0 } className="p-1" disabled={ (GetClubMemberLevel() < model.clubLevel) }>
-                                <Flex fullHeight center overflow="hidden">
+                            <LayoutGridItem key={ model.name } onClick={ () => selectModel(model, index) } itemActive={ (selectedModelName === model.name) } overflow="unset" gap={ 0 } className="p-1 navigator-room-creator-model-card" disabled={ (GetClubMemberLevel() < model.clubLevel) }>
+                                <Flex fullHeight center overflow="visible" className="navigator-room-creator-model-img">
                                     <img alt="" src={ getRoomModelImage(model.name) } />
                                 </Flex>
-                                <Text bold>{ model.tileSize } { LocalizeText('navigator.createroom.tilesize') }</Text>
+                                <Text bold className="navigator-room-creator-model-tiles">{ model.tileSize } { LocalizeText('navigator.createroom.tilesize') }</Text>
                                 { !hcDisabled && model.clubLevel > HabboClubLevelEnum.NO_CLUB && <LayoutCurrencyIcon position="absolute" className="top-1 end-1" type="hc" /> }
                             </LayoutGridItem>
                         )) }
