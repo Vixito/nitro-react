@@ -11,7 +11,10 @@
     z-index: 15;
 }
 
-// Mantener el chat visible durante el salto pero inhabilitar por completo la escritura
+// Durante el salto:
+// 1) Mantener visible la barra inferior de chat pero con escritura 100% bloqueada
+// 2) Ocultar SOLO las burbujas flotantes de la sala/bots (.nitro-chat-widget / .bubble-container)
+//    para que nunca tapen al avatar en el cielo ni en el trampolin
 body.lido-diving-active {
     .nitro-chat-input-container input,
     input.chat-input,
@@ -19,6 +22,13 @@ body.lido-diving-active {
         pointer-events: none !important;
         opacity: 0.6 !important;
         cursor: not-allowed !important;
+    }
+
+    .nitro-chat-widget,
+    .nitro-chat-widget .bubble-container {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 }
 
@@ -403,18 +413,19 @@ body.lido-diving-active {
 
 .lido-replay-score-pill {
     position: absolute;
-    bottom: 16px;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 5px 10px;
-    background: rgba(16, 25, 33, 0.88);
+    background: rgba(16, 25, 33, 0.9);
     border: 2px solid #000000;
     border-radius: 5px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
     pointer-events: none;
+    z-index: 10;
 }
 
 .lido-replay-score-val {
@@ -709,6 +720,12 @@ body[data-era="shockwave2006"] {
 // ═══════════════════════════════════════════════════════════════════════════
 body.era-flash-2012,
 body[data-era="flash2012"] {
+    // Despejar la barra vertical izquierda de Flash 2012 (Hotel / Salas / Retos / Juegos / Tienda)
+    .lido-sky-keys,
+    .lido-replay-badge {
+        left: 96px;
+    }
+
     .lido-hud-bar {
         padding: 4px 8px;
         background: linear-gradient(180deg, #3b3834 0%, #2b2926 100%);
@@ -1205,6 +1222,11 @@ body.is-mobile-ui {
         top: calc(58px + env(safe-area-inset-top));
         left: 12px;
         gap: 8px;
+    }
+
+    .lido-replay-badge,
+    .lido-replay-score-pill {
+        top: calc(56px + env(safe-area-inset-top));
     }
 
     .lido-keycap {
