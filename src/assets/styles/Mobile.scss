@@ -31,12 +31,10 @@ body.is-mobile-ui {
         right: 8px !important;
         max-width: min(300px, calc(100vw - 16px)) !important;
         z-index: 110 !important;
-    }
 
-    .nitro-notification-bubbles-overlay {
-        top: calc(58px + env(safe-area-inset-top));
-        right: 8px !important;
-        width: min(260px, calc(100vw - 16px)) !important;
+        &.is-game-center-open {
+            z-index: 1025 !important;
+        }
     }
 
     // ── VENTANAS ADAPTADAS A PANTALLA MÓVIL (UNIFICADAS EN ESTILO HABBO MOBILE) ──
