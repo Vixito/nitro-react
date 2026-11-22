@@ -45,6 +45,7 @@ interface ResolvedPart
     colorable: boolean;
     colorIndex: number;
     colorHex: string | null;
+    fallbackLibId: string | null;
 }
 
 const atlasData = v9SmallAtlasRaw as unknown as V9SmallAtlasData;
@@ -218,7 +219,20 @@ function downscalePixelArt2xBrowser(
     {
         for(let ox = 0; ox < sw; ox++)
         {
-            const samples: Array<{ r: number; g: number; b: number; luma: number }> = [];
+            let rSum = 0;
+            let gSum = 0;
+            let bSum = 0;
+            let cnt = 0;
+            let totalCells = 0;
+            let minLuma = 999;
+            let darkR = 0;
+            let darkG = 0;
+            let darkB = 0;
+            let maxLuma = -1;
+            let brightR = 0;
+            let brightG = 0;
+            let brightB = 0;
+
             for(let dy = 0; dy < 2; dy++)
             {
                 const py = oy * 2 + dy;
@@ -227,6 +241,7 @@ function downscalePixelArt2xBrowser(
                 {
                     const px = ox * 2 + dx;
                     if(px >= fw) continue;
+                    totalCells++;
                     const idx = (py * fw + px) * 4;
                     if(patch[idx + 3] >= 128)
                     {
@@ -234,33 +249,50 @@ function downscalePixelArt2xBrowser(
                         const g = patch[idx + 1];
                         const b = patch[idx + 2];
                         const luma = 0.299 * r + 0.587 * g + 0.114 * b;
-                        samples.push({ r, g, b, luma });
+                        rSum += r;
+                        gSum += g;
+                        bSum += b;
+                        cnt++;
+                        if(luma < minLuma) { minLuma = luma; darkR = r; darkG = g; darkB = b; }
+                        if(luma > maxLuma) { maxLuma = luma; brightR = r; brightG = g; brightB = b; }
                     }
                 }
             }
 
-            if(samples.length === 0) continue;
+            if(cnt === 0) continue;
 
-            const hasDarkOutline = samples.some(s => s.luma <= 52);
-            const isBorderCell = (ox === 0 || oy === 0 || ox === sw - 1 || oy === sh - 1);
-            if(samples.length === 1 && !hasDarkOutline && !isBorderCell && sw > 2 && sh > 2) continue;
+            const isSilhouetteEdge = cnt < totalCells;
+            if(cnt === 1 && totalCells === 4 && minLuma > 60) continue;
 
-            samples.sort((a, b) => a.luma - b.luma);
-
-            let chosen = samples[Math.floor(samples.length / 2)];
-            if(hasDarkOutline)
+            let r: number;
+            let g: number;
+            let b: number;
+            if(isSilhouetteEdge && minLuma <= 42)
             {
-                chosen = samples[0];
+                // Preserve crisp 1px dark Habbo outlines ONLY on outer silhouette boundaries
+                r = darkR;
+                g = darkG;
+                b = darkB;
             }
-            else if(samples.length >= 3 && (samples[samples.length - 1].luma - samples[0].luma) > 55)
+            else if((maxLuma - minLuma) > 85 && maxLuma > 130)
             {
-                chosen = samples[samples.length - 1];
+                // Preserve crisp light prints/zippers/studs/highlights on dark clothes
+                r = Math.round((rSum / cnt) * 0.45 + brightR * 0.55);
+                g = Math.round((gSum / cnt) * 0.45 + brightG * 0.55);
+                b = Math.round((bSum / cnt) * 0.45 + brightB * 0.55);
+            }
+            else
+            {
+                // Faithful area-averaged RGB preserves exact colors & shading without crushing dark clothes black
+                r = Math.round(rSum / cnt);
+                g = Math.round(gSum / cnt);
+                b = Math.round(bSum / cnt);
             }
 
             const outIdx = (oy * sw + ox) * 4;
-            dst[outIdx] = chosen.r;
-            dst[outIdx + 1] = chosen.g;
-            dst[outIdx + 2] = chosen.b;
+            dst[outIdx] = r;
+            dst[outIdx + 1] = g;
+            dst[outIdx + 2] = b;
             dst[outIdx + 3] = 255;
         }
     }
@@ -559,12 +591,26 @@ function resolveExactFigureParts(figure: string, parsed: Record<string, ParsedSe
                     for(const hl of hLayers) hiddenLayers.add(hl);
 
                     const rawParts: any[] = partSet.parts || [];
+                    const setIsColorable = (typeof partSet.isColorable === 'boolean') ? partSet.isColorable : !!partSet.colorable;
+
+                    // Resolve sibling library ID for parts in the same set that FigureMap doesn't list separately (e.g. lc:5103, ch:2100)
+                    let siblingLibId: string | null = null;
                     for(const rp of rawParts)
                     {
                         if(!rp || !rp.type || rp.id === undefined) continue;
-                        const cIdx = Math.max(0, (Number(rp.colorIndex) || 1) - 1);
+                        const foundLib = figurePartToLib.get(`${ rp.type }:${ rp.id }`);
+                        if(foundLib) { siblingLibId = foundLib; break; }
+                    }
+
+                    for(const rp of rawParts)
+                    {
+                        if(!rp || !rp.type || rp.id === undefined) continue;
+                        const rawLayerIdx = (typeof rp.colorLayerIndex === 'number')
+                            ? rp.colorLayerIndex
+                            : ((typeof rp.colorindex === 'number') ? rp.colorindex : (typeof rp.colorIndex === 'number' ? rp.colorIndex : 1));
+                        const colorable = setIsColorable && rawLayerIdx > 0;
+                        const cIdx = Math.max(0, rawLayerIdx - 1);
                         const colorId = entry.colorIds[cIdx] ?? entry.colorIds[0] ?? 0;
-                        const colorable = !!rp.colorable;
                         const colorHex = colorable
                             ? resolveColorHex(figure, setType, cIdx, colorId, 'CCCCCC')
                             : null;
@@ -574,7 +620,8 @@ function resolveExactFigureParts(figure: string, parsed: Record<string, ParsedSe
                             partId: Number(rp.id),
                             colorable,
                             colorIndex: cIdx,
-                            colorHex
+                            colorHex,
+                            fallbackLibId: siblingLibId
                         });
                     }
                     expanded = rawParts.length > 0;
@@ -596,7 +643,8 @@ function resolveExactFigureParts(figure: string, parsed: Record<string, ParsedSe
                 partId: entry.id,
                 colorable: true,
                 colorIndex: 0,
-                colorHex
+                colorHex,
+                fallbackLibId: null
             });
         }
     }
@@ -741,7 +789,7 @@ export function isShockwaveSmallFigureReady(figure: string): boolean
     for(const p of parts)
     {
         if(lookupV9ExactPartSprite('std', p.partType, p.partId, 2, 0)) continue;
-        const libId = figurePartToLib.get(`${ p.partType }:${ p.partId }`);
+        const libId = figurePartToLib.get(`${ p.partType }:${ p.partId }`) || p.fallbackLibId;
         if(libId && !smallLibCache.has(libId))
         {
             loadSmallFigureLibrary(libId);
@@ -821,7 +869,7 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
             }
 
             // 2. Otherwise use exact SMALL (sh_) library (pre-generated in R2 via Housekeeping or 1:1 converted from LARGE .nitro)
-            const libId = figurePartToLib.get(`${ p.partType }:${ p.partId }`);
+            const libId = figurePartToLib.get(`${ p.partType }:${ p.partId }`) || p.fallbackLibId;
             if(!libId) continue;
 
             if(!smallLibCache.has(libId))
