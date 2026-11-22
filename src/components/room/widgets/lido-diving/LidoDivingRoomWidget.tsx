@@ -1,6 +1,6 @@
-import { RoomUnitWalkComposer } from '@nitrots/nitro-renderer';
+import { IMessageComposer, RoomUnitWalkComposer } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetOwnRoomObject, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl, SendMessageComposer } from '../../../../api';
+import { GetConnection, GetOwnRoomObject, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl, SendMessageComposer } from '../../../../api';
 import signHeartPng from '../../../../assets/images/icons/sign-heart.png';
 import signSkullPng from '../../../../assets/images/icons/sign-skull.png';
 import signSmilePng from '../../../../assets/images/icons/sign-smile.png';
@@ -25,6 +25,52 @@ const QUEUE_TILES: Array<[ number, number ]> = [
 
 const ELEVATOR_TILE = { x: 11, y: 4 };
 const PRE_ELEVATOR_TILE = { x: 11, y: 5 };
+const LIDO_CLICK_FURNI_HEADER = 2998; // Arcturus RoomUserClickFurniEvent header
+const LIDO_WIRED_TRIGGER_ITEM_ID = 1739; // Hidden wf_trg_click_furni at (11,1) in Room 101
+
+class LidoClickFurniComposer implements IMessageComposer<ConstructorParameters<typeof LidoClickFurniComposer>>
+{
+    private _data: ConstructorParameters<typeof LidoClickFurniComposer>;
+
+    constructor(itemId: number)
+    {
+        this._data = [ itemId ];
+    }
+
+    public getMessageArray()
+    {
+        return this._data;
+    }
+
+    public dispose(): void
+    {
+        return;
+    }
+}
+
+let lidoClickComposerRegistered = false;
+
+function triggerPoolLandingWired(): void
+{
+    try
+    {
+        const conn = GetConnection() as any;
+        if (!conn) return;
+        if (!lidoClickComposerRegistered && conn._messages && typeof conn._messages.registerMessages === 'function')
+        {
+            conn._messages.registerMessages({
+                events: [],
+                composers: [ [ LIDO_CLICK_FURNI_HEADER, LidoClickFurniComposer ] ]
+            });
+            lidoClickComposerRegistered = true;
+        }
+        SendMessageComposer(new LidoClickFurniComposer(LIDO_WIRED_TRIGGER_ITEM_ID));
+    }
+    catch
+    {
+        // non-fatal
+    }
+}
 
 type TrickId = 'star' | 'air_guitar' | 'flex' | 'cannonball' | 'air_punch' | 'front_flip' | 'flip_dive';
 type DivePhase = 'idle' | 'elevator' | 'sprint' | 'airborne' | 'splash' | 'replay';
@@ -908,16 +954,18 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 setTickets(newTickets);
                 setCredits(Number(data.credits || 0));
 
-                // If player was paused right at the elevator entrance (11,5) waiting for tickets,
-                // close the booth and automatically step onto (11,4) to launch the dive + Wired!
+                // If player opened the booth because they tried to dive with 0 tickets (or is standing at the elevator),
+                // close the booth and immediately launch the dive stage!
                 const ownObj = GetOwnRoomObject();
                 const loc = ownObj?.getLocation();
-                const atGate = !!(loc && Math.round(loc.x) === PRE_ELEVATOR_TILE.x && Math.round(loc.y) === PRE_ELEVATOR_TILE.y);
-                if (atGate && newTickets > 0)
+                const nearElevator = !!(loc && Math.abs(Math.round(loc.x) - ELEVATOR_TILE.x) <= 1 && Math.abs(Math.round(loc.y) - ELEVATOR_TILE.y) <= 1);
+                if ((pendingDiveOnBuyRef.current || nearElevator) && newTickets > 0)
                 {
+                    pendingDiveOnBuyRef.current = false;
                     setShowDispenser(false);
                     setStatusBanner('');
-                    SendMessageComposer(new RoomUnitWalkComposer(ELEVATOR_TILE.x, ELEVATOR_TILE.y));
+                    elevatorCooldownRef.current = 0;
+                    window.setTimeout(() => { startElevatorAndDive(); }, 60);
                 }
                 else
                 {
@@ -998,10 +1046,16 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const data = await res.json();
             if (!data?.success)
             {
-                if (data?.needsTickets) setShowDispenser(true);
+                if (data?.needsTickets)
+                {
+                    pendingDiveOnBuyRef.current = true;
+                    setShowDispenser(true);
+                }
                 flashBanner(data?.error || 'Necesitas 1 ticket para subir al trampolín.');
                 return;
             }
+
+            pendingDiveOnBuyRef.current = false;
 
             // Blur chat input immediately so diving keys never type into chat!
             if (document.activeElement instanceof HTMLElement)
@@ -1054,10 +1108,8 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }
     }, [ stageOpen, swimColor, flashBanner ]);
 
-    // Keep latest tickets in a ref so the queue watcher never steps onto the Wired elevator tile (11,4) with 0 tickets!
-    const ticketsRef = useRef<number>(0);
-    useEffect(() => { ticketsRef.current = tickets; }, [ tickets ]);
-    const gateNotifiedRef = useRef<boolean>(false);
+    const wasOnElevatorRef = useRef<boolean>(false);
+    const pendingDiveOnBuyRef = useRef<boolean>(false);
 
     // Room 101 arrowplate roller queue auto-advance into elevator tile (11, 4)
     useEffect(() =>
@@ -1078,32 +1130,20 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             if (tx === ELEVATOR_TILE.x && ty === ELEVATOR_TILE.y)
             {
                 setQueueActive(false);
-                gateNotifiedRef.current = false;
-                if (Date.now() >= elevatorCooldownRef.current) startElevatorAndDive();
+                if (!wasOnElevatorRef.current && Date.now() >= elevatorCooldownRef.current)
+                {
+                    wasOnElevatorRef.current = true;
+                    startElevatorAndDive();
+                }
                 return;
             }
+
+            wasOnElevatorRef.current = false;
 
             const qIdx = QUEUE_TILES.findIndex(([ qx, qy ]) => qx === tx && qy === ty);
             if (qIdx >= 0 && qIdx < QUEUE_TILES.length - 1)
             {
                 const [ nx, ny ] = QUEUE_TILES[qIdx + 1];
-
-                // Ticket gate right before elevator tile (11,4): if 0 tickets, HALT at (11,5)
-                // so the Wired on (11,4) NEVER teleports the player into the pool without tickets!
-                if (nx === ELEVATOR_TILE.x && ny === ELEVATOR_TILE.y && ticketsRef.current <= 0)
-                {
-                    setQueueActive(false);
-                    if (!gateNotifiedRef.current)
-                    {
-                        gateNotifiedRef.current = true;
-                        SendMessageComposer(new RoomUnitWalkComposer(PRE_ELEVATOR_TILE.x, PRE_ELEVATOR_TILE.y));
-                        setShowDispenser(true);
-                        flashBanner('Necesitas 1 ticket para entrar al ascensor (2 créditos = 5 tickets).');
-                    }
-                    return;
-                }
-
-                gateNotifiedRef.current = false;
                 setQueueActive(true);
                 const now = Date.now();
                 if (now - queueStepTimeRef.current >= 780)
@@ -1114,7 +1154,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             }
             else
             {
-                gateNotifiedRef.current = false;
                 setQueueActive(false);
             }
         }, 220);
@@ -1126,22 +1165,16 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     {
         if (tickets <= 0)
         {
+            pendingDiveOnBuyRef.current = true;
             setShowDispenser(true);
             flashBanner('Compra tickets primero (2 créditos = 5 tickets).');
             return;
         }
         const ownObj = GetOwnRoomObject();
         const loc = ownObj?.getLocation();
-        if (loc && Math.round(loc.x) === ELEVATOR_TILE.x && Math.round(loc.y) === ELEVATOR_TILE.y)
-        {
-            // Step off and onto (11,4) or start directly if already on the elevator tile
-            startElevatorAndDive();
-            return;
-        }
         if (loc && Math.abs(Math.round(loc.x) - ELEVATOR_TILE.x) <= 1 && Math.abs(Math.round(loc.y) - ELEVATOR_TILE.y) <= 1)
         {
-            // Physically step onto tile 1729@(11,4) so the Room 101 Wired triggers and teleports the avatar into a random pool water tile!
-            SendMessageComposer(new RoomUnitWalkComposer(ELEVATOR_TILE.x, ELEVATOR_TILE.y));
+            startElevatorAndDive();
             return;
         }
         SendMessageComposer(new RoomUnitWalkComposer(QUEUE_TILES[0][0], QUEUE_TILES[0][1]));
@@ -1578,6 +1611,8 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     if (!sim.finishedSubmitted)
                     {
                         sim.finishedSubmitted = true;
+                        // Fire Room 101 Wired (wf_trg_click_furni 1739 -> wf_act_teleport_to 1740) at the EXACT moment of splash!
+                        triggerPoolLandingWired();
                         submitDiveResult(sim.jumpQuality, sim.tricks, sim.entryType);
                     }
                 }
