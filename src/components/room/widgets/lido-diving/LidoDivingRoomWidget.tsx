@@ -4,6 +4,10 @@ import { GetConnection, GetOwnRoomObject, GetSessionDataManager, onShockwaveSmal
 import signHeartPng from '../../../../assets/images/icons/sign-heart.png';
 import signSkullPng from '../../../../assets/images/icons/sign-skull.png';
 import signSmilePng from '../../../../assets/images/icons/sign-smile.png';
+import lidoCloudLgPng from '../../../../assets/images/lido/lido_cloud_lg.png';
+import lidoCloudMdPng from '../../../../assets/images/lido/lido_cloud_md.png';
+import lidoCloudSm1Png from '../../../../assets/images/lido/lido_cloud_sm1.png';
+import lidoCloudSm2Png from '../../../../assets/images/lido/lido_cloud_sm2.png';
 import { useRoom } from '../../../../hooks';
 import { trimTransparentImage } from '../../../game-center/views/SnowStormAvatar';
 import './LidoDivingRoomWidget.scss';
@@ -698,43 +702,34 @@ function drawIsometricSpringboard(ctx: CanvasRenderingContext2D, bendPx: number)
     }
 }
 
-function drawIsometricCloud(ctx: CanvasRenderingContext2D, x: number, y: number, scale: number)
+const LIDO_CLOUD_URLS = [ lidoCloudLgPng, lidoCloudMdPng, lidoCloudSm1Png, lidoCloudSm2Png ];
+const lidoCloudImages: HTMLImageElement[] = [];
+
+function ensureLidoCloudImages(): HTMLImageElement[]
 {
-    ctx.save();
-    ctx.translate(Math.round(x), Math.round(y));
-    ctx.scale(scale, scale);
+    if (lidoCloudImages.length === 0 && typeof Image !== 'undefined')
+    {
+        for (const url of LIDO_CLOUD_URLS)
+        {
+            const img = new Image();
+            img.src = url;
+            lidoCloudImages.push(img);
+        }
+    }
+    return lidoCloudImages;
+}
 
-    ctx.fillStyle = '#000000';
-    ctx.beginPath();
-    ctx.moveTo(-26, 8);
-    ctx.lineTo(-22, 0);
-    ctx.lineTo(-10, -8);
-    ctx.lineTo(4, -14);
-    ctx.lineTo(20, -10);
-    ctx.lineTo(28, -2);
-    ctx.lineTo(24, 6);
-    ctx.lineTo(8, 12);
-    ctx.lineTo(-14, 14);
-    ctx.closePath();
-    ctx.fill();
+function drawAuthenticHabboCloud(ctx: CanvasRenderingContext2D, x: number, y: number, variantIdx: number, intScale: number)
+{
+    const imgs = ensureLidoCloudImages();
+    const img = imgs[variantIdx % imgs.length];
+    if (!img || !img.complete || img.naturalWidth === 0) return;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.moveTo(-24, 7);
-    ctx.lineTo(-20, 1);
-    ctx.lineTo(-9, -7);
-    ctx.lineTo(4, -12);
-    ctx.lineTo(19, -9);
-    ctx.lineTo(26, -2);
-    ctx.lineTo(22, 5);
-    ctx.lineTo(8, 10);
-    ctx.lineTo(-13, 12);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#d4ecff';
-    ctx.fillRect(-14, 7, 24, 3);
-    ctx.restore();
+    const s = Math.max(1, Math.round(intScale));
+    const dw = img.naturalWidth * s;
+    const dh = img.naturalHeight * s;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, Math.round(x - dw / 2), Math.round(y - dh / 2), dw, dh);
 }
 
 export const LidoDivingRoomWidget: FC<{}> = () =>
@@ -816,10 +811,11 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         splashRings: [] as Array<{ x: number; y: number; rx: number; maxRx: number; life: number; maxLife: number; width: number; color: string }>,
         splashDrops: [] as Array<{ x: number; y: number; vx: number; vy: number; r: number; life: number; maxLife: number; color: string }>,
         clouds: [
-            { x: 148, y: 126, scale: 1.05, speed: 9 },
-            { x: 328, y: 204, scale: 0.72, speed: 6 },
-            { x: 64, y: 274, scale: 0.85, speed: 11 },
-            { x: 432, y: 74, scale: 0.65, speed: 7 }
+            { x: 168, y: 112, variant: 0, scale: 2, speed: 11 },
+            { x: 342, y: 196, variant: 1, scale: 2, speed: 8 },
+            { x: 96, y: 268, variant: 0, scale: 1, speed: 13 },
+            { x: 438, y: 68, variant: 2, scale: 2, speed: 9 },
+            { x: 262, y: 318, variant: 3, scale: 2, speed: 7 }
         ],
         replayLog: [] as Array<{ x: number; y: number; rot: number; trick: TrickId | null; camY: number }>,
         replayIdx: 0,
@@ -1702,7 +1698,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
 
             for (const c of sim.clouds)
             {
-                drawIsometricCloud(ctx, c.x, c.y, c.scale);
+                drawAuthenticHabboCloud(ctx, c.x, c.y, c.variant, c.scale);
             }
 
             drawIsometricSpringboard(ctx, sim.boardBend);
