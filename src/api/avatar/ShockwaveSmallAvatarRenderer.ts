@@ -261,8 +261,8 @@ function downscalePixelArt2xBrowser(
 
             if(cnt === 0) continue;
 
+            // Preserve ALL opaque blocks including thin 1px hair bangs, spiky hair tips, hat brims & eyewear temples
             const isSilhouetteEdge = cnt < totalCells;
-            if(cnt === 1 && totalCells === 4 && minLuma > 60) continue;
 
             let r: number;
             let g: number;
@@ -368,10 +368,12 @@ function convertLargeBundleToSmallInMemory(json: any, sourceImg: HTMLImageElemen
 
         const hRegX = typeof asset.x === 'number' ? asset.x : 0;
         const hRegY = typeof asset.y === 'number' ? asset.y : 0;
+        const partCode = assetKey.split('_')[2] || '';
+        const isHeadLayer = partCode === 'hr' || partCode === 'hrb' || partCode === 'ha' || partCode === 'he' || partCode === 'ea' || partCode === 'fa';
         spriteEntries[shKey] = {
             frameKey: found.key,
             regX: Math.round(hRegX / 2) + 1,
-            regY: Math.round(hRegY / 2),
+            regY: isHeadLayer ? (Math.floor(hRegY / 2) - 1) : Math.round(hRegY / 2),
             flipH: asset.flipH ? 1 : 0
         };
     }
