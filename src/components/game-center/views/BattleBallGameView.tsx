@@ -920,11 +920,11 @@ export const BattleBallGameView: FC = () =>
         });
     }, []);
 
-    // Preload trimmed authentic Shockwave SMALL (sh_) SEATED/MOUNTED Habbo avatars in all 4 isometric directions (0, 2, 4, 6)!
+    // Preload trimmed authentic Shockwave SMALL (sh_) SEATED/MOUNTED Habbo avatars in all 8 isometric directions (0..7)!
     useEffect(() =>
     {
         let alive = true;
-        const dirs = [ 0, 2, 4, 6 ];
+        const dirs = [ 0, 1, 2, 3, 4, 5, 6, 7 ];
 
         const renderAllSmall = () =>
         {
@@ -1694,11 +1694,11 @@ export const BattleBallGameView: FC = () =>
             p.toY = ny;
             p.dirX = Math.sign(dx);
             p.dirY = Math.sign(dy);
-            // 8-way Habbo isometric facing mapped cleanly to seated angles (0=NE, 2=SE, 4=SW, 6=NW)
-            if (dx > 0 && dy > 0) p.isoDir = 2;
-            else if (dx > 0 && dy < 0) p.isoDir = 0;
-            else if (dx < 0 && dy > 0) p.isoDir = 4;
-            else if (dx < 0 && dy < 0) p.isoDir = 6;
+            // Exact 8-way Habbo isometric facing (0=NE, 1=E, 2=SE, 3=S, 4=SW, 5=W, 6=NW, 7=N)
+            if (dx > 0 && dy < 0) p.isoDir = 1;
+            else if (dx > 0 && dy > 0) p.isoDir = 3;
+            else if (dx < 0 && dy > 0) p.isoDir = 5;
+            else if (dx < 0 && dy < 0) p.isoDir = 7;
             else if (dx > 0) p.isoDir = 2;
             else if (dy > 0) p.isoDir = 4;
             else if (dx < 0) p.isoDir = 6;

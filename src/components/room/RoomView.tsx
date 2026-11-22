@@ -4,6 +4,7 @@ import { Base } from '../../common';
 import { useRoom } from '../../hooks';
 import { detectIsMobileViewport, getMobileTouchMode } from '../../hooks/mobile/useIsMobile';
 import { RoomSpectatorView } from './spectator/RoomSpectatorView';
+import { LidoDivingRoomWidget } from './widgets/lido-diving/LidoDivingRoomWidget';
 import { RoomWidgetsView } from './widgets/RoomWidgetsView';
 
 export const RoomView: FC<{}> = props =>
@@ -145,6 +146,7 @@ export const RoomView: FC<{}> = props =>
             { roomSession &&
                 <>
                     <RoomWidgetsView />
+                    <LidoDivingRoomWidget />
                     { roomSession.isSpectator && <RoomSpectatorView /> }
                 </> }
         </Base>

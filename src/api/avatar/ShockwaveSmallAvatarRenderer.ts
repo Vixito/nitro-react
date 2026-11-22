@@ -843,9 +843,8 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
 
     const rawDir = normalizeDir(opts.direction ?? 2);
     const rawHeadDir = normalizeDir(opts.headDirection ?? rawDir);
-    const effDir = posture === 'sit'
-        ? (rawDir % 2 === 0 ? rawDir : normalizeDir(rawDir - 1))
-        : rawDir;
+    // v9_small_atlas includes all 8 directions (0,1,2,3,7 + mirrored 4,5,6) for sit, std, and wlk!
+    const effDir = rawDir;
     const bodyMap = mirrorDir(effDir);
     const headMap = mirrorDir(rawHeadDir);
     const frame = posture === 'wlk' ? (Math.floor(opts.frame ?? 0) % 4) : 0;
