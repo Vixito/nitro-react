@@ -24,6 +24,7 @@ const QUEUE_TILES: Array<[ number, number ]> = [
 ];
 
 const ELEVATOR_TILE = { x: 11, y: 4 };
+const PRE_ELEVATOR_TILE = { x: 11, y: 5 };
 
 type TrickId = 'star' | 'air_guitar' | 'flex' | 'cannonball' | 'air_punch' | 'front_flip' | 'flip_dive';
 type DivePhase = 'idle' | 'elevator' | 'sprint' | 'airborne' | 'splash' | 'replay';
@@ -903,9 +904,25 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const data = await res.json();
             if (data?.success)
             {
-                setTickets(Number(data.tickets || 0));
+                const newTickets = Number(data.tickets || 0);
+                setTickets(newTickets);
                 setCredits(Number(data.credits || 0));
-                flashBanner(data.message || '5 tickets añadidos.');
+
+                // If player was paused right at the elevator entrance (11,5) waiting for tickets,
+                // close the booth and automatically step onto (11,4) to launch the dive + Wired!
+                const ownObj = GetOwnRoomObject();
+                const loc = ownObj?.getLocation();
+                const atGate = !!(loc && Math.round(loc.x) === PRE_ELEVATOR_TILE.x && Math.round(loc.y) === PRE_ELEVATOR_TILE.y);
+                if (atGate && newTickets > 0)
+                {
+                    setShowDispenser(false);
+                    setStatusBanner('');
+                    SendMessageComposer(new RoomUnitWalkComposer(ELEVATOR_TILE.x, ELEVATOR_TILE.y));
+                }
+                else
+                {
+                    flashBanner(data.message || '5 tickets añadidos.');
+                }
             }
             else
             {
@@ -1037,6 +1054,11 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }
     }, [ stageOpen, swimColor, flashBanner ]);
 
+    // Keep latest tickets in a ref so the queue watcher never steps onto the Wired elevator tile (11,4) with 0 tickets!
+    const ticketsRef = useRef<number>(0);
+    useEffect(() => { ticketsRef.current = tickets; }, [ tickets ]);
+    const gateNotifiedRef = useRef<boolean>(false);
+
     // Room 101 arrowplate roller queue auto-advance into elevator tile (11, 4)
     useEffect(() =>
     {
@@ -1056,6 +1078,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             if (tx === ELEVATOR_TILE.x && ty === ELEVATOR_TILE.y)
             {
                 setQueueActive(false);
+                gateNotifiedRef.current = false;
                 if (Date.now() >= elevatorCooldownRef.current) startElevatorAndDive();
                 return;
             }
@@ -1063,23 +1086,41 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const qIdx = QUEUE_TILES.findIndex(([ qx, qy ]) => qx === tx && qy === ty);
             if (qIdx >= 0 && qIdx < QUEUE_TILES.length - 1)
             {
+                const [ nx, ny ] = QUEUE_TILES[qIdx + 1];
+
+                // Ticket gate right before elevator tile (11,4): if 0 tickets, HALT at (11,5)
+                // so the Wired on (11,4) NEVER teleports the player into the pool without tickets!
+                if (nx === ELEVATOR_TILE.x && ny === ELEVATOR_TILE.y && ticketsRef.current <= 0)
+                {
+                    setQueueActive(false);
+                    if (!gateNotifiedRef.current)
+                    {
+                        gateNotifiedRef.current = true;
+                        SendMessageComposer(new RoomUnitWalkComposer(PRE_ELEVATOR_TILE.x, PRE_ELEVATOR_TILE.y));
+                        setShowDispenser(true);
+                        flashBanner('Necesitas 1 ticket para entrar al ascensor (2 créditos = 5 tickets).');
+                    }
+                    return;
+                }
+
+                gateNotifiedRef.current = false;
                 setQueueActive(true);
                 const now = Date.now();
                 if (now - queueStepTimeRef.current >= 780)
                 {
                     queueStepTimeRef.current = now;
-                    const [ nx, ny ] = QUEUE_TILES[qIdx + 1];
                     SendMessageComposer(new RoomUnitWalkComposer(nx, ny));
                 }
             }
             else
             {
+                gateNotifiedRef.current = false;
                 setQueueActive(false);
             }
         }, 220);
 
         return () => window.clearInterval(timer);
-    }, [ isLidoRoom, stageOpen, startElevatorAndDive ]);
+    }, [ isLidoRoom, stageOpen, startElevatorAndDive, flashBanner ]);
 
     const joinQueueInRoom = useCallback(() =>
     {
