@@ -105,18 +105,18 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                 { navigatorData.enteredGuestRoom &&
                     <>
                         <Flex gap={ 2 } overflow="hidden">
-                            <LayoutRoomThumbnailView roomId={ navigatorData.enteredGuestRoom.roomId } customUrl={ navigatorData.enteredGuestRoom.officialRoomPicRef } position="relative">
+                            <LayoutRoomThumbnailView roomId={ navigatorData.enteredGuestRoom.roomId } customUrl={ navigatorData.enteredGuestRoom.officialRoomPicRef } position="relative" className="flex-shrink-0">
                                 { (hasPermission('settings') || navigatorData.currentRoomOwner || (navigatorData.enteredGuestRoom.ownerId === GetSessionDataManager().userId)) &&
                                     <Flex center position="absolute" className="top-0 end-0 m-1 p-1 bg-dark bg-opacity-75 rounded cursor-pointer" title="Tomar / cambiar miniatura" onClick={ () => processAction('open_room_thumbnail_camera') } style={ { zIndex: 10 } }>
                                         <i className="icon icon-camera-small" />
                                     </Flex> }
                             </LayoutRoomThumbnailView>
-                            <Column grow gap={ 1 } overflow="hidden">
-                                <Flex gap={ 1 }>
-                                    <Column grow gap={ 1 }>
-                                        <Flex gap={ 1 }>
-                                            <i onClick={ () => processAction('set_home_room') } className={ classNames('flex-shrink-0 icon icon-house-small cursor-pointer', ((navigatorData.homeRoomId !== navigatorData.enteredGuestRoom.roomId) && 'gray')) } />
-                                            <Text bold>{ navigatorData.enteredGuestRoom.roomName }</Text>
+                            <Column grow gap={ 1 } overflow="hidden" className="min-w-0">
+                                <Flex gap={ 1 } className="min-w-0">
+                                    <Column grow gap={ 1 } className="min-w-0">
+                                        <Flex gap={ 1 } alignItems="start" className="min-w-0">
+                                            <i onClick={ () => processAction('set_home_room') } className={ classNames('flex-shrink-0 icon icon-house-small cursor-pointer mt-1', ((navigatorData.homeRoomId !== navigatorData.enteredGuestRoom.roomId) && 'gray')) } />
+                                            <Text bold className="text-break" style={ { lineHeight: 1.25 } }>{ navigatorData.enteredGuestRoom.roomName }</Text>
                                         </Flex>
                                         { navigatorData.enteredGuestRoom.showOwner &&
                                             <Flex alignItems="center" gap={ 1 }>
@@ -131,20 +131,20 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                                             <Text>{ navigatorData.currentRoomRating }</Text>
                                         </Flex>
                                         { (navigatorData.enteredGuestRoom.tags.length > 0) &&
-                                            <Flex alignItems="center" gap={ 1 }>
+                                            <Flex alignItems="center" gap={ 1 } className="flex-wrap">
                                                 { navigatorData.enteredGuestRoom.tags.map(tag =>
                                                 {
-                                                    return <Text key={ tag } pointer className="bg-muted rounded p-1" onClick={ event => processAction('navigator_search_tag', tag) }>#{ tag }</Text>
+                                                    return <Text key={ tag } pointer className="bg-muted rounded px-1 py-0" style={ { fontSize: '0.85em', lineHeight: 1.5 } } onClick={ event => processAction('navigator_search_tag', tag) }>#{ tag }</Text>
                                                 }) }
                                             </Flex> }
                                     </Column>
-                                    <Column alignItems="center" gap={ 1 }>
+                                    <Column alignItems="center" gap={ 1 } className="flex-shrink-0">
                                         { hasPermission('settings') &&
                                             <i className="icon icon-cog cursor-pointer" title={ LocalizeText('navigator.room.popup.info.room.settings') } onClick={ event => processAction('open_room_settings') } /> }
                                         <FaLink title={ LocalizeText('navigator.embed.caption') } className="cursor-pointer fa-icon" onClick={ event => CreateLinkEvent('navigator/toggle-room-link') } />
                                     </Column>
                                 </Flex>
-                                <Text overflow="auto" style={ { maxHeight: 50 } }>{ navigatorData.enteredGuestRoom.description }</Text>
+                                <Text overflow="auto" className="text-break" style={ { maxHeight: 72, lineHeight: 1.35 } }>{ navigatorData.enteredGuestRoom.description }</Text>
                                 { (navigatorData.enteredGuestRoom.habboGroupId > 0) &&
                                     <Flex pointer alignItems="center" gap={ 1 } onClick={ () => processAction('open_group_info') }>
                                         <LayoutBadgeImageView className="flex-none" badgeCode={ navigatorData.enteredGuestRoom.groupBadgeCode } isGroup={ true } />

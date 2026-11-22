@@ -11,12 +11,14 @@
     z-index: 15;
 }
 
-// Ocultar temporalmente las burbujas de chat de la sala/bots mientras se salta
-// para que no tapen al avatar ni el cielo del trampolin (sin tocar toolbars/camara/inventario)
+// Ocultar completamente burbujas de chat e historial de chat mientras se salta
+// (display: none vence a .bubble-container.visible { visibility: visible !important })
 body.lido-diving-active {
-    .nitro-chat-widget {
+    .nitro-chat-widget,
+    .bubble-container,
+    .nitro-chat-history {
+        display: none !important;
         opacity: 0 !important;
-        visibility: hidden !important;
         pointer-events: none !important;
     }
 }
@@ -334,8 +336,8 @@ body.lido-diving-active {
 }
 
 .lido-card-btn {
-    min-width: 24px;
-    height: 24px;
+    min-width: 28px;
+    height: 28px;
     padding: 0 5px;
     background: #ffffff;
     color: #000000;
@@ -343,7 +345,7 @@ body.lido-diving-active {
     border-radius: 3px;
     box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #c5c5bf;
     font-weight: 700;
-    font-size: 10px;
+    font-size: 11px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -354,6 +356,7 @@ body.lido-diving-active {
 
 .lido-card-sym {
     background: #fff9d6;
+    min-width: 30px;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

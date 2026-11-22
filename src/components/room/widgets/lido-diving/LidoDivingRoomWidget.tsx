@@ -102,33 +102,43 @@ const PixelIconTrophy: FC = () => (
 const PixelSymbol: FC<{ kind: 'star' | 'heart' | 'skull' }> = ({ kind }) =>
 {
     if (kind === 'heart') return (
-        <svg width="11" height="10" viewBox="0 0 11 10" shapeRendering="crispEdges">
-            <rect x="1" y="1" width="3" height="3" fill="#dc2626" />
-            <rect x="7" y="1" width="3" height="3" fill="#dc2626" />
-            <rect x="1" y="3" width="9" height="3" fill="#dc2626" />
-            <rect x="2" y="6" width="7" height="2" fill="#dc2626" />
-            <rect x="4" y="8" width="3" height="1" fill="#dc2626" />
-            <rect x="2" y="2" width="1" height="1" fill="#fca5a5" />
+        <svg width="16" height="16" viewBox="0 0 16 16" className="lido-px-icon" aria-hidden="true">
+            <path
+                d="M8 14.2C7.6 13.9 2 9.9 2 5.7C2 3.6 3.5 2.2 5.3 2.2C6.5 2.2 7.5 2.9 8 3.9C8.5 2.9 9.5 2.2 10.7 2.2C12.5 2.2 14 3.6 14 5.7C14 9.9 8.4 13.9 8 14.2Z"
+                fill="#ef233c"
+                stroke="#111111"
+                strokeWidth="1.3"
+                strokeLinejoin="round"
+            />
+            <circle cx="5.2" cy="5.1" r="1.15" fill="#ffb3be" />
         </svg>
     );
     if (kind === 'star') return (
-        <svg width="11" height="11" viewBox="0 0 11 11" shapeRendering="crispEdges">
-            <rect x="5" y="0" width="1" height="11" fill="#d97706" />
-            <rect x="0" y="4" width="11" height="2" fill="#d97706" />
-            <rect x="3" y="3" width="5" height="5" fill="#facc15" />
-            <rect x="2" y="8" width="2" height="2" fill="#d97706" />
-            <rect x="7" y="8" width="2" height="2" fill="#d97706" />
+        <svg width="16" height="16" viewBox="0 0 16 16" className="lido-px-icon" aria-hidden="true">
+            <polygon
+                points="8,1.3 10.1,5.6 14.8,6.2 11.4,9.5 12.2,14.2 8,11.9 3.8,14.2 4.6,9.5 1.2,6.2 5.9,5.6"
+                fill="#ffd43b"
+                stroke="#111111"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
+            />
+            <polygon points="8,3.2 9.1,5.8 6.9,5.8" fill="#fff6b8" />
         </svg>
     );
     return (
-        <svg width="11" height="11" viewBox="0 0 11 11" shapeRendering="crispEdges">
-            <rect x="2" y="1" width="7" height="6" fill="#1e293b" />
-            <rect x="3" y="2" width="5" height="4" fill="#e2e8f0" />
-            <rect x="3" y="3" width="2" height="2" fill="#000" />
-            <rect x="6" y="3" width="2" height="2" fill="#000" />
-            <rect x="3" y="7" width="5" height="3" fill="#1e293b" />
-            <rect x="4" y="8" width="1" height="1" fill="#e2e8f0" />
-            <rect x="6" y="8" width="1" height="1" fill="#e2e8f0" />
+        <svg width="16" height="16" viewBox="0 0 16 16" className="lido-px-icon" aria-hidden="true">
+            <path
+                d="M8 1.6C4.6 1.6 2.2 3.9 2.2 7.1C2.2 9.1 3.3 10.7 4.7 11.5V13.8C4.7 14.2 5 14.5 5.4 14.5H10.6C11 14.5 11.3 14.2 11.3 13.8V11.5C12.7 10.7 13.8 9.1 13.8 7.1C13.8 3.9 11.4 1.6 8 1.6Z"
+                fill="#f8fafc"
+                stroke="#111111"
+                strokeWidth="1.3"
+                strokeLinejoin="round"
+            />
+            <circle cx="5.7" cy="7.4" r="1.55" fill="#111111" />
+            <circle cx="10.3" cy="7.4" r="1.55" fill="#111111" />
+            <path d="M8 9.2L7.1 10.7H8.9L8 9.2Z" fill="#111111" />
+            <line x1="6.7" y1="12.1" x2="6.7" y2="14.3" stroke="#111111" strokeWidth="1.1" />
+            <line x1="9.3" y1="12.1" x2="9.3" y2="14.3" stroke="#111111" strokeWidth="1.1" />
         </svg>
     );
 };

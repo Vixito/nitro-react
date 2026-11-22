@@ -50,7 +50,8 @@
 }
 
 .nitro-room-info {
-    width: $room-info-width;
+    width: max(#{$room-info-width}, 340px);
+    max-width: calc(100vw - 16px);
 }
 
 .nitro-room-link {
