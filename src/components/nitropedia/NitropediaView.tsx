@@ -14,19 +14,39 @@ export const NitropediaView: FC<{}> = props =>
 
     useEffect(() =>
     {
+        const resolvePageUrl = (subpath: string): string =>
+        {
+            const cleanSubpath = subpath.replace(/^\/+/, '');
+            let base = GetConfiguration<string>('habbopages.url') || '/habbtenpages/';
+
+            // Never attempt to fetch 127.0.0.1 / localhost from a remote or mobile client
+            if(/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i.test(base))
+            {
+                base = base.replace(/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?/i, window.location.origin);
+            }
+            else if(base.startsWith('/'))
+            {
+                base = `${ window.location.origin }${ base }`;
+            }
+
+            if(!base.endsWith('/')) base += '/';
+
+            return `${ base }${ cleanSubpath }`;
+        };
+
         const openPage = async (link: string) =>
         {
             try
             {
-                const response = await fetch(link);
+                const response = await fetch(link, { credentials: 'same-origin' });
 
-                if(!response) return;
+                if(!response || !response.ok) return;
         
                 const text = await response.text();
                 const splitData = text.split(NEW_LINE_REGEX);
-                const line = splitData.shift().split('|');
+                const line = (splitData.shift() || '').split('|');
 
-                setHeader(line[0]);
+                setHeader(line[0] || 'Información');
 
                 setDimensions(prevValue =>
                 {
@@ -59,7 +79,7 @@ export const NitropediaView: FC<{}> = props =>
 
                 value.shift();
 
-                openPage(GetConfiguration<string>('habbopages.url') + value.join('/'));
+                openPage(resolvePageUrl(value.join('/')));
             },
             eventUrlPrefix: 'habbopages/'
         };
@@ -73,7 +93,7 @@ export const NitropediaView: FC<{}> = props =>
 
                 value.shift();
 
-                openPage(GetConfiguration<string>('habbopages.url') + value.join('/'));
+                openPage(resolvePageUrl(value.join('/')));
             },
             eventUrlPrefix: 'habbtenpages/'
         };
@@ -90,34 +110,39 @@ export const NitropediaView: FC<{}> = props =>
 
     useEffect(() =>
     {
+        const container = elementRef.current;
+        if(!container) return;
+
         const handle = (event: MouseEvent) =>
         {
-            if(!(event.target instanceof HTMLAnchorElement)) return;
+            const target = event.target as HTMLElement | null;
+            const anchor = target ? target.closest('a') : null;
+            if(!anchor) return;
 
             event.preventDefault();
 
-            const link = event.target.href;
+            const rawHref = anchor.getAttribute('href') || anchor.href;
+            if(!rawHref || !rawHref.length) return;
 
-            if(!link || !link.length) return;
-
-            OpenUrl(link);
+            const normalized = rawHref.startsWith('event:') ? rawHref.slice(6) : rawHref;
+            OpenUrl(normalized);
         }
 
-        document.addEventListener('click', handle);
+        container.addEventListener('click', handle);
 
         return () =>
         {
-            document.removeEventListener('click', handle);
+            container.removeEventListener('click', handle);
         }
-    }, []);
+    }, [ content ]);
 
     if(!content) return null;
 
     return (
         <NitroCardView uniqueKey="nitropedia" className="nitropedia" theme="primary-slim" style={ dimensions ? { width: dimensions.width, height: dimensions.height } : {} }>
             <NitroCardHeaderView headerText={ header } onCloseClick={ () => setContent(null) }/>
-            <NitroCardContentView>
-                <Base fit innerRef={ elementRef } className="text-black" dangerouslySetInnerHTML={ { __html: content } } />
+            <NitroCardContentView overflow="auto">
+                <Base fullWidth innerRef={ elementRef } className="text-black nitropedia-body" dangerouslySetInnerHTML={ { __html: content } } />
             </NitroCardContentView>
         </NitroCardView>
     );
