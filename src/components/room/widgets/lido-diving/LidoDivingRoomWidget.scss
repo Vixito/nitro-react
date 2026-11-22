@@ -1,12 +1,14 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// HABBTEN LIDO DIVING - AUTENTICO HABBO SHOCKWAVE 2006 / ORIGINS + FLASH / MODERN
+// HABBTEN LIDO DIVING - 4 DISENOS NATIVOS SEPARADOS (SIN MEZCLAR ERAS!)
+// 1) Shockwave 2006  |  2) Flash 2012  |  3) Moderno  |  4) App Movil
+// z-index: 15 (siempre DEBAJO de toolbar, camara, inventario y ventanas!)
 // ═══════════════════════════════════════════════════════════════════════════
 
 .lido-room-widget-root {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 420;
+    z-index: 15;
 }
 
 .lido-px-icon {
@@ -15,7 +17,7 @@
     flex-shrink: 0;
 }
 
-// ── BARRA COMPACTA DEL LIDO (BASE: SHOCKWAVE V14 #6596a8 + VOLTER) ──
+// ── LAYOUT COMUN (SIN ESTILOS DE TEMA PARA NO MEZCLAR ERAS) ──
 .lido-hud-bar {
     position: fixed;
     top: 8px;
@@ -25,14 +27,6 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 3px 6px;
-    background: #6596a8;
-    border: 1px solid #000000;
-    border-radius: 6px;
-    box-shadow: inset 0 1px 0 #8cb8c9, inset 0 -1px 0 #477182, 2px 2px 0 rgba(0, 0, 0, 0.35);
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    color: #ffffff;
     max-width: calc(100vw - 16px);
     user-select: none;
 }
@@ -42,16 +36,13 @@
     align-items: center;
     gap: 4px;
     padding: 0 3px;
-    font-weight: bold;
-    letter-spacing: 0.3px;
+    font-weight: 700;
     white-space: nowrap;
 }
 
 .lido-hud-divider {
     width: 1px;
     height: 15px;
-    background: #3d6373;
-    box-shadow: 1px 0 0 #8cb8c9;
     margin: 0 1px;
 }
 
@@ -59,18 +50,8 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    height: 20px;
-    padding: 0 6px;
-    background: #3f697a;
-    border: 1px solid #000000;
-    border-radius: 3px;
-    box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.35);
-    color: #ffeb7a;
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    font-weight: bold;
-    white-space: nowrap;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .lido-btn {
@@ -78,153 +59,70 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    height: 20px;
-    padding: 0 8px;
-    background: #ffffff;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #b5b5ae, 1px 1px 0 rgba(0, 0, 0, 0.3);
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    font-weight: bold;
-    color: #000000;
     cursor: pointer;
     white-space: nowrap;
 
-    &:hover:not(:disabled) { background: #f4f4ee; }
-    &:active:not(:disabled) { background: #dfdfda; transform: translateY(1px); }
-    &:disabled { opacity: 0.55; cursor: not-allowed; }
-}
-
-.lido-btn-green {
-    background: #87d14b;
-    box-shadow: inset 1px 1px 0 #b8ed8c, inset -1px -1px 0 #559624, 1px 1px 0 rgba(0, 0, 0, 0.3);
-    color: #000000;
-
-    &:hover:not(:disabled) { background: #98dc60; }
-}
-
-.lido-btn-yellow {
-    background: #ffcb00;
-    box-shadow: inset 1px 1px 0 #ffea85, inset -1px -1px 0 #c79500, 1px 1px 0 rgba(0, 0, 0, 0.3);
-    color: #000000;
-
-    &:hover:not(:disabled) { background: #ffd633; }
-}
-
-.lido-btn-neutral {
-    background: #ffffff;
-    color: #000000;
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
 }
 
 .lido-toast {
     position: fixed;
-    top: 40px;
+    top: 44px;
     left: 50%;
     transform: translateX(-50%);
     pointer-events: none;
-    background: #ffffd6;
-    color: #000000;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    padding: 4px 10px;
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
     text-align: center;
     max-width: calc(100vw - 24px);
+    padding: 5px 12px;
 }
 
-// ── VENTANA CLASICA HABBO SHOCKWAVE V14 ──
 .lido-window {
     pointer-events: auto;
-    background: #6596a8;
-    border: 1px solid #000000;
-    border-radius: 8px;
-    box-shadow: inset 0 1px 0 #8cb8c9, 2px 2px 0 rgba(0, 0, 0, 0.4);
     overflow: hidden;
-    font-family: 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    color: #000000;
 }
 
 .lido-window-header {
     position: relative;
-    height: 24px;
-    padding: 2px 24px 0 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #6596a8;
     user-select: none;
 }
 
 .lido-header-dots {
     flex: 1 1 0;
-    height: 9px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23b8d8e6'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    background-size: 2px 2px;
-    image-rendering: pixelated;
+    display: none;
 }
 
 .lido-window-title {
-    color: #ffffff;
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    font-weight: bold;
-    letter-spacing: 0.4px;
     white-space: nowrap;
 }
 
 .lido-close-x {
     position: absolute;
-    right: 5px;
+    right: 6px;
     top: 50%;
     transform: translateY(-50%);
-    width: 13px;
-    height: 13px;
-    padding: 0;
-    background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center;
-    background-size: 13px 13px;
-    border: none;
-    color: transparent;
-    font-size: 0;
     cursor: pointer;
-    image-rendering: pixelated;
-
-    &:active {
-        background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png');
-    }
-}
-
-.lido-window-body {
-    margin: 3px 6px 6px;
-    padding: 8px 10px;
-    background: #ecece6;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    color: #000000;
 }
 
 .lido-dispenser-panel,
 .lido-lb-panel {
     position: fixed;
-    top: 44px;
+    top: 48px;
     left: 50%;
     transform: translateX(-50%);
-    width: min(330px, calc(100vw - 20px));
+    width: min(334px, calc(100vw - 20px));
 }
 
-// ── CABINA DE BANADOR CON VISTA EN VIVO + COLORES REALES PALETTE 3 ──
 .lido-cabin-top {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #ffffff;
-    border: 1px solid #000000;
-    border-radius: 4px;
     padding: 8px;
     margin-bottom: 8px;
 }
@@ -236,10 +134,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #d8eef8;
-    border: 1px solid #000000;
-    border-radius: 3px;
-    box-shadow: inset 1px 1px 0 #ffffff;
 }
 
 .lido-cabin-avatar-img {
@@ -255,10 +149,8 @@
 }
 
 .lido-swim-label {
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-weight: bold;
+    font-weight: 700;
     margin-bottom: 6px;
-    color: #000000;
 }
 
 .lido-swim-swatches {
@@ -287,9 +179,6 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    background: #ffffff;
-    border: 1px solid #000000;
-    border-radius: 4px;
     padding: 7px 8px;
     margin-bottom: 6px;
 }
@@ -301,13 +190,10 @@
 }
 
 .lido-ticket-title {
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-weight: bold;
-    color: #000000;
+    font-weight: 700;
 }
 
 .lido-ticket-sub {
-    color: #444444;
     margin-top: 2px;
 }
 
@@ -315,7 +201,6 @@
     display: flex;
     justify-content: space-between;
     padding: 2px 2px;
-    color: #000000;
 }
 
 .lido-lb-list {
@@ -330,52 +215,36 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #ffffff;
-    border: 1px solid #8a99a8;
-    border-radius: 3px;
     padding: 4px 7px;
 }
 
 .lido-lb-rank {
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-weight: bold;
-    color: #b45309;
+    font-weight: 700;
     width: 22px;
 }
 
 .lido-lb-name {
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-weight: bold;
+    font-weight: 700;
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.lido-lb-dives {
-    color: #555555;
-}
-
 .lido-lb-score {
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-weight: bold;
-    background: #ffcb00;
-    border: 1px solid #000000;
-    border-radius: 3px;
+    font-weight: 700;
     padding: 1px 5px;
-    color: #000000;
 }
 
 .lido-empty {
     text-align: center;
-    color: #555555;
     padding: 10px 0;
 }
 
-// ── MINI JUMBOTRON EN ESQUINA SUPERIOR DERECHA (COMO EN 9V3NpI2Mnto_3) ──
+// ── MINI JUMBOTRON EN ESQUINA SUPERIOR DERECHA ──
 .lido-mini-jumbotron {
     position: fixed;
-    top: 44px;
+    top: 48px;
     right: 12px;
     width: 158px;
     pointer-events: auto;
@@ -393,7 +262,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 3px 6px;
-    background: #6596a8;
+    background: #367897;
     border-bottom: 1px solid #000000;
     color: #ffffff;
 }
@@ -421,11 +290,11 @@
     color: #7eeeff;
 }
 
-// ── BOTON COMPACTO "VOTAR SALTO" ESTILO HABBO V5/V14 (COMO EN Kc4TX4PCxPk_hq) ──
+// ── BOTON COMPACTO "VOTAR SALTO" ──
 .lido-vote-dock {
     position: fixed;
     right: 14px;
-    bottom: 58px;
+    bottom: 62px;
     pointer-events: auto;
     display: flex;
     flex-direction: column;
@@ -437,19 +306,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: 22px;
-    padding: 0 9px;
-    background: #ffffff;
-    color: #000000;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #b8b8b0, 2px 2px 0 rgba(0, 0, 0, 0.35);
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    font-weight: bold;
     cursor: pointer;
-
-    &:hover { background: #fffbe0; }
 }
 
 .lido-vote-caret {
@@ -476,9 +333,8 @@
     border: 1px solid #000000;
     border-radius: 3px;
     box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #c5c5bf;
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    font-weight: bold;
+    font-weight: 700;
+    font-size: 10px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -492,19 +348,18 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// AUTENTICA CAMARA DE SALTO A PANTALLA COMPLETA (COMO EN -4OZLXzT0Xw / 9V3NpI2Mnto)
-// SIN CAJA OSCURA, SIN MARCO DE VENTANA, SIN BARRA INFERIOR GENERICA!
+// CAMARA ISOMETRICA DE SALTO (SIEMPRE DEBAJO DE TOOLBAR / CAMARA / INVENTARIO)
 // ═══════════════════════════════════════════════════════════════════════════
 .lido-fullscreen-camera {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 46px;
+    bottom: 55px; // Exact $toolbar-height (Modern / Flash 2012)
     pointer-events: auto;
     background: #92c8ff;
     overflow: hidden;
-    z-index: 410;
+    z-index: 5;
     user-select: none;
 }
 
@@ -516,28 +371,7 @@
     display: block;
 }
 
-.lido-cam-exit {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    background: #d4d4d4;
-    border: 1px solid #000000;
-    border-radius: 3px;
-    box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #8c8c8c, 1px 1px 0 rgba(0, 0, 0, 0.35);
-    color: #000000;
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-size: 9px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 10;
-
-    &:hover { background: #e8e8e8; }
-}
-
-// Clasica "R" gigante de Replay en la esquina superior izquierda (-4OZLXzT0Xw_3)
+// Clasica "R" gigante de Replay arriba a la izquierda (-4OZLXzT0Xw_3)
 .lido-replay-badge {
     position: absolute;
     top: 14px;
@@ -556,7 +390,51 @@
     pointer-events: none;
 }
 
-// TECLAS GRISES HABBO FLOTANDO DIRECTO SOBRE EL CIELO (TOP-LEFT, SIN CAJA DETRAS!)
+.lido-replay-score-pill {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    background: rgba(16, 25, 33, 0.88);
+    border: 2px solid #000000;
+    border-radius: 5px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+}
+
+.lido-replay-score-val {
+    font-family: 'Volter Bold', 'Volter', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffe14d;
+    white-space: nowrap;
+}
+
+.lido-replay-judges {
+    display: flex;
+    gap: 4px;
+}
+
+.lido-judge-card {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    background: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 3px;
+    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
+    font-weight: 700;
+    font-size: 9px;
+    color: #000000;
+}
+
+// TECLAS GRISES HABBO FLOTANDO DIRECTO SOBRE EL CIELO (TOP-LEFT)
 .lido-sky-keys {
     position: absolute;
     top: 18px;
@@ -576,9 +454,7 @@
     gap: 4px;
     opacity: 0.92;
 
-    &.is-focused {
-        opacity: 1;
-    }
+    &.is-focused { opacity: 1; }
 }
 
 .lido-key-heading {
@@ -618,16 +494,12 @@
     align-items: center;
     justify-content: center;
 
-    &:hover {
-        background: #e2e2e2;
-    }
+    &:hover { background: #e2e2e2; }
 
     &:active,
     &.is-down {
         background: #b8e8ff;
-        box-shadow:
-            inset 2px 2px 0 #7a9bb0,
-            inset -1px -1px 0 #ffffff;
+        box-shadow: inset 2px 2px 0 #7a9bb0, inset -1px -1px 0 #ffffff;
         transform: translateY(1px);
     }
 }
@@ -638,97 +510,424 @@
     letter-spacing: 0.5px;
 }
 
-// ── TARJETA COMPACTA DE PUNTUACION POST-SALTO ──
-.lido-post-score-card {
-    position: absolute;
-    bottom: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(370px, calc(100vw - 24px));
-    z-index: 12;
-}
-
-.lido-score-summary {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #ffffff;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    padding: 7px 10px;
-    margin-bottom: 8px;
-}
-
-.lido-score-big {
-    font-family: 'Volter Bold', 'Volter', monospace;
-    font-size: 20px;
-    font-weight: bold;
-    color: #000000;
-    background: #ffcb00;
-    border: 1px solid #000000;
-    border-radius: 4px;
-    padding: 4px 8px;
-    line-height: 1;
-    flex-shrink: 0;
-
-    span {
-        font-size: 9px;
-        color: #333333;
+// ═══════════════════════════════════════════════════════════════════════════
+// TEMA 1: SHOCKWAVE 2006 (ACERO AZUL #6596a8, PUNTOS V14, VOLTER 9PX)
+// ═══════════════════════════════════════════════════════════════════════════
+body.era-shockwave-2006,
+body[data-era="shockwave2006"] {
+    .lido-fullscreen-camera {
+        bottom: 100px; // Exact 100px Shockwave 2006 bottom toolbar!
     }
-}
 
-.lido-score-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
+    .lido-vote-dock {
+        bottom: 108px;
+    }
 
-.lido-judges-row {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-
-.lido-judge-card {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    background: #ffffff;
-    border: 1px solid #000000;
-    border-radius: 3px;
-    font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
-    font-weight: bold;
-    font-size: 9px;
-    color: #000000;
-}
-
-.lido-scoring-actions {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-// ── VARIANTE MODERNO / FLASH (SOLO CUANDO NO ES SHOCKWAVE 2006 - SELECTOR CORREGIDO!) ──
-body:not(.era-shockwave-2006):not([data-era="shockwave2006"]) {
     .lido-hud-bar {
-        background: #172733;
-        border: 1px solid #0b141b;
+        padding: 3px 6px;
+        background: #6596a8;
+        border: 1px solid #000000;
         border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-        font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 11.5px;
+        box-shadow: inset 0 1px 0 #8cb8c9, inset 0 -1px 0 #477182, 2px 2px 0 rgba(0, 0, 0, 0.35);
+        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
+        font-size: 9px;
+        color: #ffffff;
+    }
+
+    .lido-hud-divider {
+        background: #3d6373;
+        box-shadow: 1px 0 0 #8cb8c9;
     }
 
     .lido-hud-tickets {
+        height: 20px;
+        padding: 0 6px;
+        background: #3f697a;
+        border: 1px solid #000000;
+        border-radius: 3px;
+        box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.35);
+        color: #ffeb7a;
+        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+    .lido-btn {
+        height: 20px;
+        padding: 0 8px;
+        background: #ffffff;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #b5b5ae, 1px 1px 0 rgba(0, 0, 0, 0.3);
+        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
+        font-size: 9px;
+        font-weight: bold;
+        color: #000000;
+
+        &:hover:not(:disabled) { background: #f4f4ee; }
+        &:active:not(:disabled) { background: #dfdfda; transform: translateY(1px); }
+    }
+
+    .lido-btn-green {
+        background: #87d14b;
+        box-shadow: inset 1px 1px 0 #b8ed8c, inset -1px -1px 0 #559624, 1px 1px 0 rgba(0, 0, 0, 0.3);
+        &:hover:not(:disabled) { background: #98dc60; }
+    }
+
+    .lido-toast {
+        background: #ffffd6;
+        color: #000000;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
+        font-size: 9px;
+        box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .lido-window {
+        background: #6596a8;
+        border: 1px solid #000000;
+        border-radius: 8px;
+        box-shadow: inset 0 1px 0 #8cb8c9, 2px 2px 0 rgba(0, 0, 0, 0.4);
+        font-family: 'Volter', Tahoma, sans-serif;
+        font-size: 9px;
+        color: #000000;
+    }
+
+    .lido-window-header {
+        height: 24px;
+        padding: 2px 24px 0 8px;
+        background: #6596a8;
+    }
+
+    .lido-header-dots {
+        display: block;
+        height: 9px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23b8d8e6'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 2px 2px;
+        image-rendering: pixelated;
+    }
+
+    .lido-window-title {
+        color: #ffffff;
+        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+    .lido-close-x {
+        right: 5px;
+        width: 13px;
+        height: 13px;
+        padding: 0;
+        background: transparent url('@/assets/images/eras/shockwave_v14/close_button_up.png') no-repeat center;
+        background-size: 13px 13px;
+        border: none;
+        color: transparent;
+        font-size: 0;
+        image-rendering: pixelated;
+
+        &:active {
+            background-image: url('@/assets/images/eras/shockwave_v14/close_button_down.png');
+        }
+    }
+
+    .lido-window-body {
+        margin: 3px 6px 6px;
+        padding: 8px 10px;
+        background: #ecece6;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        color: #000000;
+    }
+
+    .lido-cabin-top,
+    .lido-inset-box {
+        background: #ffffff;
+        border: 1px solid #000000;
+        border-radius: 4px;
+    }
+
+    .lido-cabin-avatar-box {
+        background: #d8eef8;
+        border: 1px solid #000000;
+        border-radius: 3px;
+    }
+
+    .lido-lb-row {
+        background: #ffffff;
+        border: 1px solid #8a99a8;
+        border-radius: 3px;
+    }
+
+    .lido-lb-rank { color: #b45309; }
+    .lido-lb-dives, .lido-ticket-sub, .lido-empty { color: #444444; }
+
+    .lido-lb-score {
+        background: #ffcb00;
+        border: 1px solid #000000;
+        border-radius: 3px;
+        color: #000000;
+    }
+
+    .lido-mini-jumbo-bar { background: #6596a8; }
+
+    .lido-vote-trigger {
+        height: 22px;
+        padding: 0 9px;
+        background: #ffffff;
+        color: #000000;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #b8b8b0, 2px 2px 0 rgba(0, 0, 0, 0.35);
+        font-family: 'Volter Bold', 'Volter', Tahoma, sans-serif;
+        font-size: 9px;
+        font-weight: bold;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TEMA 2: FLASH 2012 (MARCO AZUL #367897, GRIP 3 LINEAS, BOTONES HABBORATOR!)
+// ═══════════════════════════════════════════════════════════════════════════
+body.era-flash-2012,
+body[data-era="flash2012"] {
+    .lido-hud-bar {
+        padding: 4px 7px;
+        background: #367897;
+        border: 1px solid #000000;
+        border-radius: 6px;
+        box-shadow: inset 0 0 0 1px #4591b2, inset 0 0 0 2px #6cc0e2, 0 2px 6px rgba(0, 0, 0, 0.45);
+        font-family: 'Ubuntu2012', 'Ubuntu', Tahoma, sans-serif;
+        font-size: 11px;
+        color: #ffffff;
+    }
+
+    .lido-hud-divider {
+        background: #1d4a60;
+        box-shadow: 1px 0 0 #6cc0e2;
+    }
+
+    .lido-hud-tickets {
+        height: 23px;
+        padding: 0 7px;
+        background: #1d4c63;
+        border: 1px solid #0f2c3a;
+        border-radius: 4px;
+        color: #ffe46b;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .lido-btn {
+        min-height: 24px;
+        padding: 0 10px 1px;
+        border: none;
+        border-radius: 0;
+        background-color: transparent;
+        background-image:
+            url('@/assets/images/eras/habborator/button-18-left.png'),
+            url('@/assets/images/eras/habborator/button-18-right.png'),
+            url('@/assets/images/eras/habborator/button-18-mid.png');
+        background-position: left top, right top, 4px top;
+        background-repeat: no-repeat, no-repeat, no-repeat;
+        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100%;
+        color: #141414;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        image-rendering: pixelated;
+
+        &:hover:not(:disabled) { filter: brightness(1.05); }
+        &:active:not(:disabled) { filter: brightness(0.92); }
+    }
+
+    .lido-btn-green {
+        background-image:
+            url('@/assets/images/eras/habborator/button-20-left.png'),
+            url('@/assets/images/eras/habborator/button-20-right.png'),
+            url('@/assets/images/eras/habborator/button-20-mid.png');
+        color: #ffffff;
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .lido-toast {
+        background: #e9e9e1;
+        color: #141414;
+        border: 1px solid #000000;
+        border-radius: 5px;
+        box-shadow: inset 0 0 0 1px #ffffff, 0 3px 10px rgba(0, 0, 0, 0.4);
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+    }
+
+    .lido-window {
+        background: #367897;
+        border: 1px solid #000000;
+        border-radius: 6px;
+        box-shadow: inset 0 0 0 1px #4591b2, inset 0 0 0 2px #6cc0e2, 0 4px 14px rgba(0, 0, 0, 0.5);
+        padding: 0 6px 6px;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
+        font-size: 11.5px;
+        color: #141414;
+    }
+
+    .lido-window-header {
+        height: 25px;
+        padding: 0 22px 0 4px;
+        background: transparent;
+    }
+
+    .lido-header-dots {
+        display: block;
+        height: 8px;
+        background: transparent url('@/assets/images/eras/flash2012/skins/grip_volter_blue.png') center repeat-x;
+        image-rendering: pixelated;
+    }
+
+    .lido-window-title {
+        font-family: 'Volter2012', 'Volter', monospace, sans-serif;
+        font-size: 9px;
+        font-weight: 700;
+        color: #ffffff;
+        text-shadow: 0 1px 0 #1b4354;
+    }
+
+    .lido-close-x {
+        right: 2px;
+        width: 15px;
+        height: 15px;
+        padding: 0;
+        border: none;
+        color: transparent;
+        font-size: 0;
+        background: transparent url('@/assets/images/eras/flash2012/skins/close_volter_blue_normal.png') center no-repeat;
+        image-rendering: pixelated;
+
+        &:hover { background-image: url('@/assets/images/eras/flash2012/skins/close_volter_blue_hover.png'); }
+        &:active { background-image: url('@/assets/images/eras/flash2012/skins/close_volter_blue_active.png'); }
+    }
+
+    .lido-window-body {
+        padding: 9px 10px;
+        background: #e9e9e1;
+        border: 1px solid #1e4d63;
+        border-radius: 4px;
+        color: #141414;
+    }
+
+    .lido-cabin-top,
+    .lido-inset-box {
+        background: #ffffff;
+        border: 1px solid #b8b8ae;
+        border-radius: 4px;
+    }
+
+    .lido-cabin-avatar-box {
+        background: #cde0ea;
+        border: 1px solid #7ea4b8;
+        border-radius: 4px;
+    }
+
+    .lido-lb-row {
+        background: #ffffff;
+        border: 1px solid #c6c6bc;
+        border-radius: 4px;
+    }
+
+    .lido-lb-rank { color: #1e5f80; }
+    .lido-lb-dives, .lido-ticket-sub, .lido-empty { color: #555555; }
+
+    .lido-lb-score {
+        background: #367897;
+        border-radius: 3px;
+        color: #ffffff;
+    }
+
+    .lido-vote-trigger {
+        height: 25px;
+        padding: 0 10px;
+        border: none;
+        border-radius: 0;
+        background-color: transparent;
+        background-image:
+            url('@/assets/images/eras/habborator/button-18-left.png'),
+            url('@/assets/images/eras/habborator/button-18-right.png'),
+            url('@/assets/images/eras/habborator/button-18-mid.png');
+        background-position: left top, right top, 4px top;
+        background-repeat: no-repeat, no-repeat, no-repeat;
+        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100%;
+        color: #141414;
+        font-family: 'Ubuntu2012', 'Ubuntu', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TEMA 3: MODERNO (DARK SLATE #172733 / #12202b, FLAT UBUNTU - SIN 2006/2012)
+// ═══════════════════════════════════════════════════════════════════════════
+body.era-modern:not(.is-mobile-ui),
+body[data-era="modern"]:not(.is-mobile-ui),
+body:not(.era-shockwave-2006):not([data-era="shockwave2006"]):not(.era-flash-2012):not([data-era="flash2012"]):not(.is-mobile-ui) {
+    .lido-hud-bar {
+        padding: 5px 8px;
+        background: #172733;
+        border: 1px solid #0b141b;
+        border-radius: 6px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 12px;
+        color: #f8fafc;
+    }
+
+    .lido-hud-divider {
+        background: #253d4f;
+    }
+
+    .lido-hud-tickets {
+        height: 24px;
+        padding: 0 8px;
         background: #12202b;
-        border-color: #253d4f;
+        border: 1px solid #253d4f;
+        border-radius: 4px;
         color: #ffd43b;
         font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .lido-btn {
+        height: 24px;
+        padding: 0 10px;
+        border-radius: 4px;
+        border: 1px solid #35546b;
+        background: #253d4f;
+        color: #ffffff;
+        font-family: 'Ubuntu', -apple-system, sans-serif;
         font-size: 11.5px;
+        font-weight: 600;
+
+        &:hover:not(:disabled) { background: #2f4d63; }
+    }
+
+    .lido-btn-green {
+        background: #179c4c;
+        border-color: #137d3d;
+        &:hover:not(:disabled) { background: #1db358; }
+    }
+
+    .lido-toast {
+        background: #172733;
+        color: #f8fafc;
+        border: 1px solid #35546b;
+        border-radius: 6px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+        font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
     }
 
     .lido-window {
@@ -738,20 +937,20 @@ body:not(.era-shockwave-2006):not([data-era="shockwave2006"]) {
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
         font-family: 'Ubuntu', -apple-system, sans-serif;
         font-size: 12px;
+        color: #e2e8f0;
     }
 
     .lido-window-header {
-        height: 30px;
+        height: 32px;
+        padding: 0 32px 0 12px;
         background: #12202b;
         border-bottom: 1px solid #253d4f;
-        padding: 0 32px 0 12px;
     }
 
-    .lido-header-dots { display: none; }
-
     .lido-window-title {
-        font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 12px;
+        color: #ffffff;
+        font-size: 12.5px;
+        font-weight: 700;
     }
 
     .lido-close-x {
@@ -762,81 +961,214 @@ body:not(.era-shockwave-2006):not([data-era="shockwave2006"]) {
         border-radius: 4px;
         color: #ffffff;
         font-size: 10px;
+        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
     .lido-window-body {
+        padding: 10px 12px;
         background: #172733;
-        border-color: #253d4f;
-        color: #e2e8f0;
     }
 
     .lido-cabin-top,
     .lido-inset-box,
-    .lido-lb-row,
-    .lido-score-summary {
+    .lido-lb-row {
         background: #12202b;
-        border-color: #253d4f;
+        border: 1px solid #253d4f;
+        border-radius: 6px;
         color: #f8fafc;
     }
 
-    .lido-swim-label,
-    .lido-ticket-title,
-    .lido-lb-name {
-        font-family: 'Ubuntu', -apple-system, sans-serif;
+    .lido-cabin-avatar-box {
+        background: #1b3142;
+        border: 1px solid #2e4b61;
+        border-radius: 6px;
+    }
+
+    .lido-lb-rank { color: #ffd43b; }
+    .lido-lb-dives, .lido-ticket-sub, .lido-meta-row, .lido-empty { color: #94a3b8; }
+
+    .lido-lb-score {
+        background: #179c4c;
+        border-radius: 4px;
         color: #ffffff;
-        font-size: 12px;
     }
-
-    .lido-meta-row,
-    .lido-ticket-sub,
-    .lido-lb-dives {
-        color: #94a3b8;
-    }
-
-    .lido-btn {
-        height: 24px;
-        padding: 0 9px;
-        font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 11px;
-        box-shadow: none;
-        border-color: #0b141b;
-    }
-
-    .lido-btn-green { background: #179c4c; color: #ffffff; }
-    .lido-btn-yellow { background: #d97706; color: #ffffff; }
-    .lido-btn-neutral { background: #253d4f; color: #ffffff; border-color: #35546b; }
 
     .lido-vote-trigger {
+        height: 28px;
+        padding: 0 12px;
         background: #172733;
         color: #ffffff;
-        border-color: #253d4f;
+        border: 1px solid #35546b;
+        border-radius: 6px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
         font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 11.5px;
+        font-size: 12px;
+        font-weight: 600;
     }
 }
 
-// ── ADAPTACION APP MOVIL ──
+// ═══════════════════════════════════════════════════════════════════════════
+// TEMA 4: APP MOVIL (DISENO NATIVO HABBO MOBILE #eef3f6 + #165e82 + #c9245e)
+// ═══════════════════════════════════════════════════════════════════════════
 body.is-mobile-ui {
-    .lido-hud-bar {
-        top: calc(52px + env(safe-area-inset-top));
-        padding: 4px 6px;
+    .lido-fullscreen-camera {
+        bottom: 0; // MobileHudView flota limpiamente encima (z-index 95-150)
     }
 
-    .lido-fullscreen-camera {
-        bottom: 0;
+    .lido-hud-bar {
+        top: calc(52px + env(safe-area-inset-top));
+        padding: 5px 8px;
+        background: rgba(20, 84, 117, 0.94);
+        border: 2px solid #0b3952;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 12px;
+        color: #ffffff;
+    }
+
+    .lido-hud-divider {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .lido-hud-tickets {
+        height: 28px;
+        padding: 0 8px;
+        background: #0e3f59;
+        border: 1.5px solid #358eb8;
+        border-radius: 7px;
+        color: #ffe46b;
+        font-weight: 700;
+    }
+
+    .lido-btn {
+        min-height: 30px;
+        padding: 0 11px;
+        border-radius: 7px;
+        border: 1.5px solid #0b3952;
+        background: #eef3f6;
+        color: #142633;
+        font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .lido-btn-green {
+        background: #16a34a;
+        border-color: #0f5132;
+        color: #ffffff;
+    }
+
+    .lido-toast {
+        top: calc(96px + env(safe-area-inset-top));
+        background: #165e82;
+        color: #ffffff;
+        border: 2px solid #0b3952;
+        border-radius: 8px;
+        font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
+    }
+
+    .lido-dispenser-panel,
+    .lido-lb-panel {
+        top: calc(96px + env(safe-area-inset-top));
+    }
+
+    .lido-window {
+        background: #eef3f6;
+        border: 2px solid #0b3952;
+        border-radius: 10px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+        font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 13px;
+        color: #142633;
+    }
+
+    .lido-window-header {
+        height: 38px;
+        padding: 0 38px 0 12px;
+        background: linear-gradient(180deg, #1d7099 0%, #145475 100%);
+        border-bottom: 1.5px solid #0b3952;
+    }
+
+    .lido-window-title {
+        color: #ffffff;
+        font-size: 13.5px;
+        font-weight: 700;
+    }
+
+    .lido-close-x {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: #c9245e;
+        border: 1.5px solid #ffffff;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .lido-window-body {
+        padding: 12px;
+        background: #eef3f6;
+        color: #142633;
+    }
+
+    .lido-cabin-top,
+    .lido-inset-box,
+    .lido-lb-row {
+        background: #ffffff;
+        border: 1.5px solid #c3d6e2;
+        border-radius: 8px;
+        color: #142633;
+    }
+
+    .lido-cabin-avatar-box {
+        background: #d8eef8;
+        border: 1.5px solid #7db2cc;
+        border-radius: 8px;
+    }
+
+    .lido-lb-rank { color: #165e82; }
+    .lido-lb-dives, .lido-ticket-sub, .lido-empty { color: #526a7a; }
+
+    .lido-lb-score {
+        background: #16a34a;
+        border-radius: 5px;
+        color: #ffffff;
     }
 
     .lido-sky-keys {
-        top: calc(54px + env(safe-area-inset-top));
+        top: calc(58px + env(safe-area-inset-top));
         left: 12px;
         gap: 8px;
     }
 
+    .lido-keycap {
+        min-width: 34px;
+        height: 32px;
+    }
+
     .lido-vote-dock {
-        bottom: calc(64px + env(safe-area-inset-bottom));
+        bottom: calc(68px + env(safe-area-inset-bottom));
+    }
+
+    .lido-vote-trigger {
+        min-height: 34px;
+        padding: 0 14px;
+        background: #165e82;
+        color: #ffffff;
+        border: 2px solid #0b3952;
+        border-radius: 9px;
+        font-family: 'Ubuntu', -apple-system, sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
     }
 }

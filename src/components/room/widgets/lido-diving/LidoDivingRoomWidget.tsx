@@ -24,26 +24,9 @@ const ELEVATOR_TILE = { x: 11, y: 4 };
 const POOL_EXIT_TILE = { x: 16, y: 11 };
 
 type TrickId = 'star' | 'air_guitar' | 'flex' | 'cannonball' | 'air_punch' | 'front_flip' | 'flip_dive';
-type DivePhase = 'idle' | 'elevator' | 'sprint' | 'airborne' | 'splash' | 'scoring';
+type DivePhase = 'idle' | 'elevator' | 'sprint' | 'airborne' | 'splash' | 'replay';
 
-interface TrickDef
-{
-    id: TrickId;
-    key: string;
-    name: string;
-}
-
-const LIDO_TRICKS: TrickDef[] = [
-    { id: 'star', key: 'W', name: 'Star' },
-    { id: 'air_guitar', key: 'E', name: 'Air Guitar' },
-    { id: 'flex', key: 'A', name: 'The Flex' },
-    { id: 'cannonball', key: 'S', name: 'Cannonball' },
-    { id: 'air_punch', key: 'D', name: 'Air Punch' },
-    { id: 'front_flip', key: 'Z', name: 'Front Flip' },
-    { id: 'flip_dive', key: 'X', name: 'Swan Dive' }
-];
-
-// Real vibrant non-club Palette 3 color IDs from FigureData.json!
+// Real vibrant non-club Palette 3 color IDs from FigureData.json
 const SWIM_COLORS: Array<{ id: string; label: string; hex: string }> = [
     { id: '106', label: 'Celeste', hex: '#1BD2FF' },
     { id: '107', label: 'Azul', hex: '#1F55FF' },
@@ -195,15 +178,12 @@ function toLidoSwimwear(rawFigure: string, swimColor: string, gender: string): s
 // ═══════════════════════════════════════════════════════════════════════════
 // AUTHENTIC HABBO SHOCKWAVE / ORIGINS ISOMETRIC LIDO TOWER & POOL PAINTER
 // Pre-rendered offscreen at crisp 1:1 Habbo pixel resolution (720 x 1040)
-// Matches the exact camera angle, blue-tiled tower, brown stepped turrets,
-// mint-green isometric springboard, stippled park trees, and diamond pool!
 // ═══════════════════════════════════════════════════════════════════════════
 const WORLD_W = 720;
 const WORLD_H = 1040;
 const VIEW_W = 720;
 const VIEW_H = 450;
 
-// Isometric board path (2:1 diagonal down-left from the tower doorway)
 const DOOR_X = 532;
 const DOOR_Y = 128;
 const BOARD_START_X = 486;
@@ -230,7 +210,6 @@ function drawPoly(ctx: CanvasRenderingContext2D, pts: Array<[ number, number ]>,
 
 function drawHabboTreeCluster(ctx: CanvasRenderingContext2D, cx: number, cy: number, rx: number, ry: number, seed: number)
 {
-    // Deterministic crisp pixel-art Habbo tree foliage with black outline & 4 authentic leaf tones
     let s = seed | 0;
     const rand = () =>
     {
@@ -244,7 +223,6 @@ function drawHabboTreeCluster(ctx: CanvasRenderingContext2D, cx: number, cy: num
     const minY = Math.floor(cy - ry - 4);
     const maxY = Math.ceil(cy + ry + 4);
 
-    // 1. Silhouette mask for crisp 1px black Habbo outer border
     const cols = Math.ceil((maxX - minX) / grid) + 2;
     const rows = Math.ceil((maxY - minY) / grid) + 2;
     const mask = new Uint8Array(cols * rows);
@@ -258,10 +236,7 @@ function drawHabboTreeCluster(ctx: CanvasRenderingContext2D, cx: number, cy: num
             const nx = (px - cx) / rx;
             const ny = (py - cy) / ry;
             const wobble = Math.sin(px * 0.14 + seed) * 0.14 + Math.cos(py * 0.16 - seed) * 0.12;
-            if (nx * nx + ny * ny <= 1.0 + wobble)
-            {
-                mask[gy * cols + gx] = 1;
-            }
+            if (nx * nx + ny * ny <= 1.0 + wobble) mask[gy * cols + gx] = 1;
         }
     }
 
@@ -293,7 +268,6 @@ function drawHabboTreeCluster(ctx: CanvasRenderingContext2D, cx: number, cy: num
             else if (shade < 0.80 && r > 0.22) ctx.fillStyle = '#234a13';
             else ctx.fillStyle = '#122909';
 
-            // Pixel leaf highlights
             if (shade < 0.30 && r > 0.82) ctx.fillStyle = '#7eb644';
             ctx.fillRect(px, py, grid, grid);
         }
@@ -302,7 +276,6 @@ function drawHabboTreeCluster(ctx: CanvasRenderingContext2D, cx: number, cy: num
 
 function drawBrownPyramidalRoof(ctx: CanvasRenderingContext2D, apexX: number, apexY: number, halfW: number, depthH: number, h: number)
 {
-    // Stepped Habbo Lido wooden turret roof (matches -4OZLXzT0Xw_hq & 9V3NpI2Mnto_hq)
     const leftPt: [ number, number ] = [ apexX - halfW, apexY + h ];
     const frontPt: [ number, number ] = [ apexX, apexY + h + depthH ];
     const rightPt: [ number, number ] = [ apexX + halfW, apexY + h ];
@@ -311,21 +284,60 @@ function drawBrownPyramidalRoof(ctx: CanvasRenderingContext2D, apexX: number, ap
     const topR: [ number, number ] = [ apexX + halfW * 0.28, apexY + h * 0.16 ];
     const cap: [ number, number ] = [ apexX, apexY ];
 
-    // Lower sunlit left roof slope
     drawPoly(ctx, [ leftPt, frontPt, topF, topL ], '#915c26', '#180e04');
-    // Lower shaded right roof slope
     drawPoly(ctx, [ frontPt, rightPt, topR, topF ], '#5c3612', '#180e04');
-    // Upper cap slopes
     drawPoly(ctx, [ topL, topF, cap ], '#ad7132', '#180e04');
     drawPoly(ctx, [ topF, topR, cap ], '#734519', '#180e04');
 
-    // Horizontal roof step trim line
     ctx.strokeStyle = '#c48640';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(leftPt[0] + 2, leftPt[1] - 1);
     ctx.lineTo(frontPt[0], frontPt[1] - 1);
     ctx.stroke();
+}
+
+function drawHabboParasol(ctx: CanvasRenderingContext2D, cx: number, baseY: number)
+{
+    // Authentic Habbo Lido red-and-white striped beach umbrella (matching 9V3NpI2Mnto_3!)
+    // Ground shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+    ctx.beginPath();
+    ctx.ellipse(cx + 4, baseY + 2, 20, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Stand base + pole
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(cx - 5, baseY - 2, 10, 4);
+    ctx.fillStyle = '#d4dee6';
+    ctx.fillRect(cx - 4, baseY - 1, 8, 2);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(cx - 2, baseY - 30, 4, 29);
+    ctx.fillStyle = '#f2f7fa';
+    ctx.fillRect(cx - 1, baseY - 29, 2, 28);
+
+    // 8-segment red & white canopy
+    const topY = baseY - 40;
+    const rimY = baseY - 26;
+    const segments: Array<[ [ number, number ], [ number, number ], string ]> = [
+        [ [ cx - 24, rimY ], [ cx - 16, rimY + 7 ], '#d92626' ],
+        [ [ cx - 16, rimY + 7 ], [ cx - 4, rimY + 10 ], '#ffffff' ],
+        [ [ cx - 4, rimY + 10 ], [ cx + 8, rimY + 10 ], '#d92626' ],
+        [ [ cx + 8, rimY + 10 ], [ cx + 18, rimY + 6 ], '#ffffff' ],
+        [ [ cx + 18, rimY + 6 ], [ cx + 24, rimY ], '#c41d1d' ],
+        [ [ cx + 24, rimY ], [ cx + 14, rimY - 6 ], '#ececec' ],
+        [ [ cx + 14, rimY - 6 ], [ cx - 14, rimY - 6 ], '#e33434' ],
+        [ [ cx - 14, rimY - 6 ], [ cx - 24, rimY ], '#f5f5f5' ]
+    ];
+    for (const [ p1, p2, col ] of segments)
+    {
+        drawPoly(ctx, [ [ cx, topY ], p1, p2 ], col, '#181818');
+    }
+    // Finial dot on top
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(cx - 2, topY - 2, 4, 3);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(cx - 1, topY - 1, 2, 1);
 }
 
 function buildIsometricLidoWorld(): HTMLCanvasElement
@@ -336,7 +348,7 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     const ctx = c.getContext('2d')!;
     ctx.imageSmoothingEnabled = false;
 
-    // 1. PURE AUTHENTIC HABBO LIDO SKY BLUE (#92c8ff)
+    // 1. AUTHENTIC HABBO LIDO SKY BLUE (#92c8ff)
     ctx.fillStyle = '#92c8ff';
     ctx.fillRect(0, 0, WORLD_W, 690);
 
@@ -344,7 +356,7 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     ctx.fillStyle = '#5c9c38';
     ctx.fillRect(0, 440, WORLD_W, 250);
 
-    // 2. MIDGROUND PIXEL-ART PARK TREES & WOODEN TURRETS (matching 9V3NpI2Mnto_hq bottom edge!)
+    // 2. MIDGROUND PIXEL-ART PARK TREES & WOODEN TURRETS
     drawHabboTreeCluster(ctx, 132, 412, 118, 86, 17);
     drawHabboTreeCluster(ctx, 290, 456, 98, 72, 42);
     drawHabboTreeCluster(ctx, 415, 442, 92, 68, 77);
@@ -353,47 +365,54 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     drawHabboTreeCluster(ctx, 224, 535, 115, 76, 155);
     drawHabboTreeCluster(ctx, 430, 520, 108, 74, 203);
 
-    // Iconic pointed brown Lido park turrets peeking through the trees!
     drawBrownPyramidalRoof(ctx, 228, 392, 24, 12, 46);
     drawBrownPyramidalRoof(ctx, 355, 384, 38, 18, 62);
     drawBrownPyramidalRoof(ctx, 468, 428, 28, 14, 52);
 
-    // 3. LOWER ISOMETRIC LIDO II POOL DECK & TURQUOISE SWIMMING POOL (y = 630..1040)
-    // Pool wall backdrop (light blue mosaic retaining wall behind yellow bleachers)
+    // 3. CLEAN ISOMETRIC LIDO II POOL DECK & TURQUOISE SWIMMING POOL (y = 630..1040)
+    // Light blue tiled poolside wall backdrop
     ctx.fillStyle = '#9ec6e4';
-    ctx.fillRect(0, 618, WORLD_W, 110);
-    // White isometric pool deck slab
-    drawPoly(ctx, [ [ 0, 680 ], [ WORLD_W, 680 ], [ WORLD_W, 792 ], [ 0, 792 ] ], '#edf3f7', '#000000');
+    ctx.fillRect(0, 618, WORLD_W, 68);
+    ctx.strokeStyle = '#7ea9cc';
+    for (let y = 626; y < 684; y += 10)
+    {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(WORLD_W, y);
+        ctx.stroke();
+    }
+    for (let x = 0; x < WORLD_W; x += 14)
+    {
+        ctx.beginPath();
+        ctx.moveTo(x, 618);
+        ctx.lineTo(x, 686);
+        ctx.stroke();
+    }
 
-    // Isometric deck tile grid lines (2:1 slope)
+    // White isometric mosaic pool deck slab (clean - zero ugly flat yellow blocks!)
+    drawPoly(ctx, [ [ 0, 682 ], [ WORLD_W, 682 ], [ WORLD_W, 776 ], [ 0, 776 ] ], '#edf3f7', '#000000');
+
+    // Crisp 2:1 isometric tile grid across deck
     ctx.strokeStyle = '#c5d6e2';
     ctx.lineWidth = 1;
     for (let i = -WORLD_W; i < WORLD_W * 2; i += 28)
     {
         ctx.beginPath();
-        ctx.moveTo(i, 680);
-        ctx.lineTo(i + 224, 792);
+        ctx.moveTo(i, 682);
+        ctx.lineTo(i + 188, 776);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(i, 680);
-        ctx.lineTo(i - 224, 792);
+        ctx.moveTo(i, 682);
+        ctx.lineTo(i - 188, 776);
         ctx.stroke();
     }
 
-    // Classic Habbo yellow/red spectator benches on left deck
-    for (let row = 0; row < 2; row++)
-    {
-        for (let col = 0; col < 5; col++)
-        {
-            const bx = 54 + col * 52 + row * 12;
-            const by = 694 + row * 26;
-            drawPoly(ctx, [ [ bx, by ], [ bx + 38, by ], [ bx + 34, by + 11 ], [ bx - 4, by + 11 ] ], '#f4c531', '#1a1200');
-            drawPoly(ctx, [ [ bx - 4, by + 11 ], [ bx + 34, by + 11 ], [ bx + 34, by + 16 ], [ bx - 4, by + 16 ] ], '#c69312', '#1a1200');
-        }
-    }
+    // Authentic Habbo Lido red-and-white striped beach umbrellas on the deck
+    drawHabboParasol(ctx, 88, 742);
+    drawHabboParasol(ctx, 438, 742);
 
-    // Deep vertical teal pool rim wall (authentic Habbo Lido drop-off)
+    // Deep vertical teal pool rim wall
     drawPoly(ctx, [ [ 0, 774 ], [ WORLD_W, 774 ], [ WORLD_W, 818 ], [ 0, 818 ] ], '#2a8fa2', '#0d3b45');
     ctx.strokeStyle = '#1f7485';
     for (let x = 0; x < WORLD_W; x += 24)
@@ -404,11 +423,10 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
         ctx.stroke();
     }
 
-    // Authentic Habbo Lido Turquoise Diamond-Pattern Pool Water!
+    // Authentic Habbo Lido Turquoise Diamond-Pattern Pool Water
     ctx.fillStyle = '#40b3c6';
     ctx.fillRect(0, 818, WORLD_W, WORLD_H - 818);
 
-    // Crisp 2:1 isometric water shimmer grid (matches 9V3NpI2Mnto_3 & Kc4TX4PCxPk_hq!)
     ctx.strokeStyle = '#339eb0';
     ctx.lineWidth = 1;
     for (let i = -WORLD_H; i < WORLD_W + WORLD_H; i += 24)
@@ -423,7 +441,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
         ctx.stroke();
     }
 
-    // Subtle crisp Habbo water highlight pixels
     ctx.fillStyle = '#7ad4e3';
     for (let wy = 830; wy < WORLD_H - 12; wy += 18)
     {
@@ -434,7 +451,7 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
         }
     }
 
-    // Chrome pool exit ladders on poolside rim (matching Kc4TX4PCxPk_hq!)
+    // Chrome pool exit ladders
     for (const lx of [ 132, 224, 520 ])
     {
         ctx.fillStyle = '#000000';
@@ -452,7 +469,7 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
         }
     }
 
-    // Floating diving-zone lane buoy ropes (matching 9V3NpI2Mnto_3!)
+    // Floating diving-zone lane buoy ropes
     const drawBuoyLine = (x1: number, y1: number, x2: number, y2: number, steps: number) =>
     {
         ctx.strokeStyle = '#1b5d6b';
@@ -477,7 +494,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     drawBuoyLine(420, 976, 420, 822, 10);
 
     // 4. ICONIC TALL ISOMETRIC BLUE-TILED HABBO DIVING TOWER (RIGHT SIDE)
-    // Exact 2:1 isometric prism matching -4OZLXzT0Xw_hq & 9V3NpI2Mnto_hq!
     const towerTopY = 58;
     const towerBotY = 824;
     const tLeftX = 516;
@@ -486,7 +502,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     const tMidDrop = 24;
     const tRightRise = 36;
 
-    // Left sunlit face of main tower (bright white-blue mosaic tiles)
     const leftFace: Array<[ number, number ]> = [
         [ tLeftX, towerTopY ],
         [ tMidX, towerTopY + tMidDrop ],
@@ -495,7 +510,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     ];
     drawPoly(ctx, leftFace, '#cde6fa', '#102030');
 
-    // Right shaded face of main tower (steel-blue mosaic tiles)
     const rightFace: Array<[ number, number ]> = [
         [ tMidX, towerTopY + tMidDrop ],
         [ tRightX, towerTopY + tMidDrop - tRightRise ],
@@ -504,7 +518,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     ];
     drawPoly(ctx, rightFace, '#86b5dc', '#102030');
 
-    // Fine Habbo mosaic tile grid on LEFT tower face
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(leftFace[0][0], leftFace[0][1]);
@@ -531,7 +544,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     }
     ctx.restore();
 
-    // Fine Habbo mosaic tile grid on RIGHT tower face
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(rightFace[0][0], rightFace[0][1]);
@@ -558,14 +570,11 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     }
     ctx.restore();
 
-    // Crisp black tower corner outlines
     drawPoly(ctx, leftFace, 'rgba(0,0,0,0)', '#102030');
     drawPoly(ctx, rightFace, 'rgba(0,0,0,0)', '#102030');
 
-    // Stepped Brown Pyramidal Roof Cap on TOP of main tower
     drawBrownPyramidalRoof(ctx, tMidX + 12, 4, 66, 28, 52);
 
-    // Smaller Right-Side Blue-Tiled Wing Turret (matching -4OZLXzT0Xw_hq & 9V3NpI2Mnto_hq!)
     const wingTopY = 308;
     const wingBotY = 810;
     const wLeft: Array<[ number, number ]> = [ [ 610, wingTopY ], [ 642, wingTopY + 16 ], [ 642, wingBotY + 16 ], [ 610, wingBotY ] ];
@@ -583,7 +592,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     }
     drawBrownPyramidalRoof(ctx, 644, 244, 38, 18, 66);
 
-    // Recessed Dark Elevator Exit Doorway on upper-left tower wall
     drawPoly(ctx, [
         [ 522, 82 ],
         [ 556, 99 ],
@@ -597,7 +605,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
         [ 526, 129 ]
     ], '#404040');
 
-    // White Tiled Isometric Diving Deck jutting down-left from the elevator door!
     const deckTop: Array<[ number, number ]> = [
         [ 516, 126 ],
         [ 564, 150 ],
@@ -620,7 +627,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
     drawPoly(ctx, deckFrontR, '#89adc9', '#102030');
     drawPoly(ctx, deckTop, '#f7fbff', '#102030');
 
-    // Deck mosaic grid lines
     ctx.strokeStyle = '#b4c9db';
     ctx.lineWidth = 1;
     for (let i = 1; i < 4; i++)
@@ -645,7 +651,6 @@ function buildIsometricLidoWorld(): HTMLCanvasElement
 
 function drawIsometricSpringboard(ctx: CanvasRenderingContext2D, bendPx: number)
 {
-    // Exact 2:1 isometric mint-green diving board with dark olive traction pad at tip!
     const rootL: [ number, number ] = [ 476, 150 ];
     const rootR: [ number, number ] = [ 496, 160 ];
     const gripL: [ number, number ] = [ 374, 201 + bendPx * 0.72 ];
@@ -653,16 +658,11 @@ function drawIsometricSpringboard(ctx: CanvasRenderingContext2D, bendPx: number)
     const tipL: [ number, number ] = [ 334, 221 + bendPx ];
     const tipR: [ number, number ] = [ 354, 231 + bendPx ];
 
-    // Thickness sides of springboard
     drawPoly(ctx, [ tipL, tipR, [ tipR[0], tipR[1] + 5 ], [ tipL[0], tipL[1] + 5 ] ], '#4fa382', '#102030');
     drawPoly(ctx, [ tipR, rootR, [ rootR[0], rootR[1] + 5 ], [ tipR[0], tipR[1] + 5 ] ], '#62bc99', '#102030');
-
-    // Main mint-green/seafoam surface
     drawPoly(ctx, [ rootL, rootR, gripR, gripL ], '#a6f6d6', '#102030');
-    // Non-slip dark grey-olive traction pad at the tip (exact match to -4OZLXzT0Xw_hq!)
     drawPoly(ctx, [ gripL, gripR, tipR, tipL ], '#6c7c73', '#102030');
 
-    // Crisp grip lines on pad
     ctx.strokeStyle = '#4c5952';
     ctx.lineWidth = 1;
     for (let i = 1; i <= 3; i++)
@@ -677,7 +677,6 @@ function drawIsometricSpringboard(ctx: CanvasRenderingContext2D, bendPx: number)
 
 function drawIsometricCloud(ctx: CanvasRenderingContext2D, x: number, y: number, scale: number)
 {
-    // Authentic Habbo diagonal pixel-outlined cloud (exact style from 9V3NpI2Mnto_hq!)
     ctx.save();
     ctx.translate(Math.round(x), Math.round(y));
     ctx.scale(scale, scale);
@@ -740,20 +739,15 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     const [ myVotedDiveId, setMyVotedDiveId ] = useState<string>('');
     const [ queueActive, setQueueActive ] = useState<boolean>(false);
 
-    // Swimwear live preview data URL for the Changing Booth / Ticket Dispenser
+    // Live preview in the swimwear booth
     const [ previewUrl, setPreviewUrl ] = useState<string>('');
 
     // Full-viewport isometric diving camera state
     const [ stageOpen, setStageOpen ] = useState<boolean>(false);
     const [ phase, setPhase ] = useState<DivePhase>('idle');
     const [ pressedKey, setPressedKey ] = useState<string>('');
-    const [ activeTrick, setActiveTrick ] = useState<TrickId | null>(null);
-    const [ performedTricks, setPerformedTricks ] = useState<TrickId[]>([]);
-    const [ jumpQuality, setJumpQuality ] = useState<'perfect' | 'good' | 'drop'>('good');
-    const [ entryType, setEntryType ] = useState<'clean_dive' | 'cannonball' | 'belly_flop'>('clean_dive');
     const [ resultAvg, setResultAvg ] = useState<number | null>(null);
     const [ resultCrowdVotes, setResultCrowdVotes ] = useState<number[]>([]);
-    const [ replayActive, setReplayActive ] = useState<boolean>(false);
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const worldCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -800,8 +794,10 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         ],
         replayLog: [] as Array<{ x: number; y: number; rot: number; trick: TrickId | null; camY: number }>,
         replayIdx: 0,
-        isReplaying: false,
-        finishedSubmitted: false
+        replayHoldT: 0,
+        replaySplashDone: false,
+        finishedSubmitted: false,
+        exited: false
     });
 
     const swimFigure = useMemo(() => toLidoSwimwear(myFigure, swimColor, myGender), [ myFigure, swimColor, myGender ]);
@@ -814,7 +810,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         const renderSprites = () =>
         {
             if (!alive) return;
-            // Direction 4 faces down-left along the authentic isometric diving board!
             const stdRaw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'std' });
             const wlk0Raw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'wlk', frame: 1 });
             const wlk1Raw = renderShockwaveSmallDataUrl(swimFigure, { direction: 4, headDirection: 4, posture: 'wlk', frame: 3 });
@@ -878,7 +873,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     const flashBanner = useCallback((msg: string) =>
     {
         setStatusBanner(msg);
-        window.setTimeout(() => setStatusBanner(prev => (prev === msg ? '' : prev)), 3600);
+        window.setTimeout(() => setStatusBanner(prev => (prev === msg ? '' : prev)), 3800);
     }, []);
 
     const flashKeycap = useCallback((k: string) =>
@@ -887,6 +882,18 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         window.clearTimeout(keyFlashTimerRef.current);
         keyFlashTimerRef.current = window.setTimeout(() => setPressedKey(''), 170);
     }, []);
+
+    const closeStageAndExitPool = useCallback((scoreNotice?: number | null) =>
+    {
+        setStageOpen(false);
+        setPhase('idle');
+        elevatorCooldownRef.current = Date.now() + 3000;
+        SendMessageComposer(new RoomUnitWalkComposer(POOL_EXIT_TILE.x, POOL_EXIT_TILE.y));
+        if (typeof scoreNotice === 'number' && !isNaN(scoreNotice))
+        {
+            flashBanner(`Salto completado: ${ scoreNotice.toFixed(1) } / 10`);
+        }
+    }, [ flashBanner ]);
 
     const handleBuyTickets = useCallback(async () =>
     {
@@ -913,7 +920,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }
         catch
         {
-            flashBanner('Error de conexión con el dispensador.');
+            flashBanner('Error de conexion con el dispensador.');
         }
         finally
         {
@@ -981,8 +988,14 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             if (!data?.success)
             {
                 if (data?.needsTickets) setShowDispenser(true);
-                flashBanner(data?.error || 'Necesitas 1 ticket para subir al trampolín.');
+                flashBanner(data?.error || 'Necesitas 1 ticket para subir al trampolin.');
                 return;
+            }
+
+            // Blur chat input immediately so diving keys never type into chat!
+            if (document.activeElement instanceof HTMLElement)
+            {
+                document.activeElement.blur();
             }
 
             setTickets(Number(data.tickets || 0));
@@ -992,9 +1005,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             setShowVoteMenu(false);
             setResultAvg(null);
             setResultCrowdVotes([]);
-            setPerformedTricks([]);
-            setActiveTrick(null);
-            setReplayActive(false);
 
             const sim = simRef.current;
             sim.phase = 'elevator';
@@ -1018,15 +1028,17 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             sim.splashDrops = [];
             sim.replayLog = [];
             sim.replayIdx = 0;
-            sim.isReplaying = false;
+            sim.replayHoldT = 0;
+            sim.replaySplashDone = false;
             sim.finishedSubmitted = false;
+            sim.exited = false;
 
             setPhase('elevator');
             setStageOpen(true);
         }
         catch
         {
-            flashBanner('No se pudo conectar con el ascensor del trampolín.');
+            flashBanner('No se pudo conectar con el ascensor del trampolin.');
         }
     }, [ stageOpen, swimColor, flashBanner ]);
 
@@ -1079,7 +1091,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         if (tickets <= 0)
         {
             setShowDispenser(true);
-            flashBanner('Compra tickets primero (2 créditos = 5 tickets).');
+            flashBanner('Compra tickets primero (2 creditos = 5 tickets).');
             return;
         }
         const ownObj = GetOwnRoomObject();
@@ -1090,7 +1102,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             return;
         }
         SendMessageComposer(new RoomUnitWalkComposer(QUEUE_TILES[0][0], QUEUE_TILES[0][1]));
-        flashBanner('Entrando a la cola del trampolín...');
+        flashBanner('Entrando a la cola del trampolin...');
     }, [ tickets, startElevatorAndDive, flashBanner ]);
 
     const triggerRunKey = useCallback((runKey: 'A' | 'D') =>
@@ -1122,7 +1134,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         sim.airX = BOARD_START_X + (BOARD_END_X - BOARD_START_X) * bt;
         sim.airY = BOARD_START_Y + (BOARD_END_Y - BOARD_START_Y) * bt - 4;
 
-        // Authentic high up-left Habbo Lido jump arc (matching -4OZLXzT0Xw_hq & 9V3NpI2Mnto_hq!)
         if (q === 'perfect')
         {
             sim.vx = -62;
@@ -1142,7 +1153,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             sim.gravity = 290;
         }
 
-        setJumpQuality(q);
         setPhase('airborne');
 
         fetch('/api/lido/dive/trick', {
@@ -1169,9 +1179,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         else if (trickId === 'air_guitar') sim.spinVel = 95;
         else sim.spinVel = 0;
 
-        setActiveTrick(trickId);
-        setPerformedTricks([ ...sim.tricks ]);
-
         fetch('/api/lido/dive/trick', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1180,63 +1187,71 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }).catch(() => {});
     }, [ flashKeycap ]);
 
-    const triggerReplay = useCallback(() =>
-    {
-        const sim = simRef.current;
-        if (!sim.replayLog.length) return;
-        sim.isReplaying = true;
-        sim.replayIdx = 0;
-        setReplayActive(true);
-    }, []);
-
-    // Keyboard bindings matching authentic Habbo Lido Diving (RUN: A/D, JUMP: SPACE, MOVES: W E A S D Z X)
+    // CAPTURE-PHASE keyboard interception while diving so keys NEVER focus or type into ChatInputView!
     useEffect(() =>
     {
         if (!stageOpen) return;
 
-        const onKeyDown = (e: KeyboardEvent) =>
-        {
-            if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-            const k = e.key.toLowerCase();
-            const sim = simRef.current;
+        const DIVING_KEYS = new Set([ 'a', 'd', 'w', 'e', 's', 'z', 'x', ' ', 'arrowleft', 'arrowright', 'arrowup', 'enter' ]);
 
+        const onKeyDownCapture = (e: KeyboardEvent) =>
+        {
+            const k = e.key.toLowerCase();
+            if (!DIVING_KEYS.has(k)) return;
+
+            // Block ChatInputView from focusing or capturing these keys!
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
+            if (document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement)
+            {
+                document.activeElement.blur();
+            }
+
+            const sim = simRef.current;
             if (sim.phase === 'sprint')
             {
-                if (k === 'a' || k === 'arrowleft')
-                {
-                    e.preventDefault();
-                    triggerRunKey('A');
-                }
-                else if (k === 'd' || k === 'arrowright')
-                {
-                    e.preventDefault();
-                    triggerRunKey('D');
-                }
-                else if (k === ' ' || k === 'enter' || k === 'arrowup')
-                {
-                    e.preventDefault();
-                    triggerBoardJump();
-                }
+                if (k === 'a' || k === 'arrowleft') triggerRunKey('A');
+                else if (k === 'd' || k === 'arrowright') triggerRunKey('D');
+                else if (k === ' ' || k === 'enter' || k === 'arrowup') triggerBoardJump();
                 return;
             }
 
             if (sim.phase === 'airborne')
             {
-                if (k === 'w') { e.preventDefault(); triggerTrick('star', 'W'); }
-                else if (k === 'e') { e.preventDefault(); triggerTrick('air_guitar', 'E'); }
-                else if (k === 'a') { e.preventDefault(); triggerTrick('flex', 'A'); }
-                else if (k === 's') { e.preventDefault(); triggerTrick('cannonball', 'S'); }
-                else if (k === 'd') { e.preventDefault(); triggerTrick('air_punch', 'D'); }
-                else if (k === 'z') { e.preventDefault(); triggerTrick('front_flip', 'Z'); }
-                else if (k === 'x') { e.preventDefault(); triggerTrick('flip_dive', 'X'); }
+                if (k === 'w') triggerTrick('star', 'W');
+                else if (k === 'e') triggerTrick('air_guitar', 'E');
+                else if (k === 'a') triggerTrick('flex', 'A');
+                else if (k === 's') triggerTrick('cannonball', 'S');
+                else if (k === 'd') triggerTrick('air_punch', 'D');
+                else if (k === 'z') triggerTrick('front_flip', 'Z');
+                else if (k === 'x') triggerTrick('flip_dive', 'X');
             }
         };
 
-        window.addEventListener('keydown', onKeyDown);
-        return () => window.removeEventListener('keydown', onKeyDown);
+        const onKeyPressCapture = (e: KeyboardEvent) =>
+        {
+            const k = e.key.toLowerCase();
+            if (!DIVING_KEYS.has(k)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        };
+
+        window.addEventListener('keydown', onKeyDownCapture, true);
+        window.addEventListener('keypress', onKeyPressCapture, true);
+        return () =>
+        {
+            window.removeEventListener('keydown', onKeyDownCapture, true);
+            window.removeEventListener('keypress', onKeyPressCapture, true);
+        };
     }, [ stageOpen, triggerRunKey, triggerBoardJump, triggerTrick ]);
 
-    // Main 60FPS authentic isometric Habbo Lido Diving camera renderer
+    const resultAvgRef = useRef<number | null>(null);
+    useEffect(() => { resultAvgRef.current = resultAvg; }, [ resultAvg ]);
+
+    // Main 60FPS authentic isometric Habbo Lido Diving camera renderer with AUTO-REPLAY -> AUTO-EXIT!
     useEffect(() =>
     {
         if (!stageOpen) return;
@@ -1288,7 +1303,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             ctx.translate(Math.round(ax), Math.round(ay));
             if (rotDeg) ctx.rotate((rotDeg * Math.PI) / 180);
 
-            // Authentic Habbo Lido Diving small crisp avatar scale (matching -4OZLXzT0Xw_hq & 9V3NpI2Mnto_hq!)
             let sx = 1.05;
             let sy = 1.05;
             if (trick === 'star') { sx = 1.38; sy = 0.98; }
@@ -1308,7 +1322,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 ctx.fillRect(-7, -28, 14, 28);
             }
 
-            // Crisp 1px Habbo pixel accents only during special tricks
             if (trick === 'air_guitar')
             {
                 ctx.fillStyle = '#000000';
@@ -1332,26 +1345,18 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const sim = simRef.current;
             sim.phaseT += dt;
 
-            // Gentle drifting Habbo isometric clouds
             for (const c of sim.clouds)
             {
                 c.x -= c.speed * dt;
                 if (c.x < -60) c.x = VIEW_W + 60;
             }
 
-            // Springboard damping bounce
-            if (Math.abs(sim.boardBend) > 0.1)
-            {
-                sim.boardBend *= Math.pow(0.04, dt);
-            }
-            else
-            {
-                sim.boardBend = 0;
-            }
+            if (Math.abs(sim.boardBend) > 0.1) sim.boardBend *= Math.pow(0.04, dt);
+            else sim.boardBend = 0;
 
             if (sim.phase === 'elevator')
             {
-                const p = Math.min(1, sim.phaseT / 0.85);
+                const p = Math.min(1, sim.phaseT / 0.8);
                 sim.camY = Math.round(140 * (1 - p));
                 if (p >= 1)
                 {
@@ -1385,7 +1390,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     sim.vx = -36;
                     sim.vy = -40;
                     sim.gravity = 300;
-                    setJumpQuality('drop');
                     setPhase('airborne');
                 }
             }
@@ -1397,11 +1401,9 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 sim.rotDeg += sim.spinVel * dt;
                 if (sim.trickTimer > 0) sim.trickTimer = Math.max(0, sim.trickTimer - dt);
 
-                // Smooth camera tracking down the tall blue tower into the pool!
                 const targetCam = Math.max(0, Math.min(WORLD_H - VIEW_H, sim.airY - 220));
                 sim.camY += (targetCam - sim.camY) * Math.min(1, dt * 6.5);
 
-                // Record replay frames
                 if (sim.replayLog.length < 360)
                 {
                     sim.replayLog.push({ x: sim.airX, y: sim.airY, rot: sim.rotDeg, trick: sim.trick, camY: sim.camY });
@@ -1424,23 +1426,8 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     sim.swimY = POOL_WATER_Y;
 
                     spawnPixelSplash(sim.airX, POOL_WATER_Y, entry === 'cannonball' ? 1.55 : (entry === 'belly_flop' ? 1.25 : 0.8));
-                    setEntryType(entry);
                     setPhase('splash');
-                }
-            }
-            else if (sim.phase === 'splash')
-            {
-                const targetCam = WORLD_H - VIEW_H;
-                sim.camY += (targetCam - sim.camY) * Math.min(1, dt * 5);
-                // Swim toward left ladder
-                sim.swimX += (224 - sim.swimX) * Math.min(1, dt * 1.4);
-                sim.swimY += (842 - sim.swimY) * Math.min(1, dt * 1.2);
 
-                if (sim.phaseT >= 1.55)
-                {
-                    sim.phase = 'scoring';
-                    sim.phaseT = 0;
-                    setPhase('scoring');
                     if (!sim.finishedSubmitted)
                     {
                         sim.finishedSubmitted = true;
@@ -1448,18 +1435,53 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     }
                 }
             }
-            else if (sim.phase === 'scoring' && sim.isReplaying)
+            else if (sim.phase === 'splash')
             {
-                sim.replayIdx += dt * 42;
-                if (sim.replayIdx >= sim.replayLog.length)
+                const targetCam = WORLD_H - VIEW_H;
+                sim.camY += (targetCam - sim.camY) * Math.min(1, dt * 5);
+                sim.swimX += (224 - sim.swimX) * Math.min(1, dt * 1.4);
+                sim.swimY += (842 - sim.swimY) * Math.min(1, dt * 1.2);
+
+                // Immediately cut to authentic Habbo Replay ('R') after the splash!
+                if (sim.phaseT >= 1.15)
                 {
-                    sim.isReplaying = false;
+                    sim.phase = 'replay';
+                    sim.phaseT = 0;
+                    sim.replayIdx = 0;
+                    sim.replayHoldT = 0;
+                    sim.replaySplashDone = false;
+                    sim.splashDrops = [];
+                    sim.splashRings = [];
+                    setPhase('replay');
+                }
+            }
+            else if (sim.phase === 'replay')
+            {
+                if (sim.replayLog.length > 0 && sim.replayIdx < sim.replayLog.length)
+                {
+                    // Play instant replay smoothly
+                    sim.replayIdx += dt * 44;
+                }
+                else
+                {
+                    if (!sim.replaySplashDone)
+                    {
+                        sim.replaySplashDone = true;
+                        const lastF = sim.replayLog[sim.replayLog.length - 1];
+                        spawnPixelSplash(lastF ? lastF.x : sim.airX, POOL_WATER_Y, sim.entryType === 'cannonball' ? 1.5 : 0.95);
+                    }
                     sim.camY = WORLD_H - VIEW_H;
-                    setReplayActive(false);
+                    sim.replayHoldT += dt;
+                    // Automatically exit back into Room 101 right after the replay finishes!
+                    if (sim.replayHoldT >= 1.45 && !sim.exited)
+                    {
+                        sim.exited = true;
+                        closeStageAndExitPool(resultAvgRef.current);
+                        return;
+                    }
                 }
             }
 
-            // Update splash drops & rings
             for (const d of sim.splashDrops)
             {
                 d.x += d.vx * dt;
@@ -1478,35 +1500,30 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
 
             // ── RENDER FRAME ──
             ctx.imageSmoothingEnabled = false;
-            const activeReplayFrame = (sim.phase === 'scoring' && sim.isReplaying && sim.replayLog.length > 0)
-                ? sim.replayLog[Math.min(sim.replayLog.length - 1, Math.floor(sim.replayIdx))]
+            const activeReplayFrame = (sim.phase === 'replay' && sim.replayLog.length > 0 && sim.replayIdx < sim.replayLog.length)
+                ? sim.replayLog[Math.floor(sim.replayIdx)]
                 : null;
             const renderCamY = Math.round(activeReplayFrame ? activeReplayFrame.camY : sim.camY);
 
-            // Draw pre-rendered crisp isometric Habbo world sliced by camera Y
             ctx.drawImage(worldCanvas, 0, renderCamY, VIEW_W, VIEW_H, 0, 0, VIEW_W, VIEW_H);
 
-            // Translate into world-space for clouds, springboard, diver & splashes
             ctx.save();
             ctx.translate(0, -renderCamY);
 
-            // Drifting Habbo clouds in sky
             for (const c of sim.clouds)
             {
                 drawIsometricCloud(ctx, c.x, c.y, c.scale);
             }
 
-            // Dynamic flexing mint-green isometric springboard
             drawIsometricSpringboard(ctx, sim.boardBend);
 
-            // Draw Diver
             if (activeReplayFrame)
             {
                 drawDiverPose(activeReplayFrame.x, activeReplayFrame.y, activeReplayFrame.rot, activeReplayFrame.trick, 'std');
             }
             else if (sim.phase === 'elevator')
             {
-                const p = Math.min(1, sim.phaseT / 0.85);
+                const p = Math.min(1, sim.phaseT / 0.8);
                 const ex = DOOR_X + (BOARD_START_X - DOOR_X) * p;
                 const ey = DOOR_Y + (BOARD_START_Y - DOOR_Y) * p;
                 drawDiverPose(ex, ey, 0, null, 'wlk', Math.floor(now / 130));
@@ -1521,10 +1538,9 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             {
                 drawDiverPose(sim.airX, sim.airY, sim.rotDeg, sim.trick, 'std');
             }
-            else if (sim.phase === 'splash' || sim.phase === 'scoring')
+            else if (sim.phase === 'splash' || (sim.phase === 'replay' && sim.replaySplashDone))
             {
                 const bob = Math.sin(now / 180) * 1.5;
-                // Isometric water ripple oval around swimmer
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
@@ -1533,7 +1549,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 drawDiverPose(sim.swimX, sim.swimY + 4 + bob, 0, null, 'head');
             }
 
-            // Expanding isometric splash rings
             for (const r of sim.splashRings)
             {
                 ctx.globalAlpha = Math.max(0, Math.min(1, r.life));
@@ -1545,7 +1560,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             }
             ctx.globalAlpha = 1;
 
-            // Crisp pixel splash water droplets
             for (const d of sim.splashDrops)
             {
                 ctx.globalAlpha = Math.max(0, Math.min(1, d.life));
@@ -1562,16 +1576,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
 
         raf = window.requestAnimationFrame(tick);
         return () => window.cancelAnimationFrame(raf);
-    }, [ stageOpen, submitDiveResult ]);
-
-    const closeStageAndExitPool = useCallback(() =>
-    {
-        setStageOpen(false);
-        setPhase('idle');
-        setReplayActive(false);
-        elevatorCooldownRef.current = Date.now() + 3000;
-        SendMessageComposer(new RoomUnitWalkComposer(POOL_EXIT_TILE.x, POOL_EXIT_TILE.y));
-    }, []);
+    }, [ stageOpen, submitDiveResult, closeStageAndExitPool ]);
 
     const handleVote = useCallback(async (score: number | null, symbol: string | null) =>
     {
@@ -1606,7 +1611,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
 
     return (
         <div className="lido-room-widget-root">
-            {/* Compact Era-Authentic In-Room Lido Controls (hidden while full-screen diving camera is active) */}
+            {/* Compact Era-Specific In-Room Lido Strip */}
             { !stageOpen && (
                 <div className="lido-hud-bar">
                     <div className="lido-hud-title">
@@ -1635,7 +1640,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 <div className="lido-toast">{ statusBanner }</div>
             ) }
 
-            {/* Ticket Dispenser & Swimwear Changing Cabin (with LIVE Avatar Preview + Real Palette 3 Colors!) */}
+            {/* Ticket Dispenser & Swimwear Changing Cabin */}
             { showDispenser && !stageOpen && (
                 <div className="lido-window lido-dispenser-panel">
                     <div className="lido-window-header">
@@ -1648,7 +1653,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                         <div className="lido-cabin-top">
                             <div className="lido-cabin-avatar-box">
                                 { previewUrl ? (
-                                    <img src={ previewUrl } alt="Tu avatar en bañador" className="lido-cabin-avatar-img" />
+                                    <img src={ previewUrl } alt="Tu avatar en banador" className="lido-cabin-avatar-img" />
                                 ) : null }
                             </div>
                             <div className="lido-cabin-info">
@@ -1723,7 +1728,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 </div>
             ) }
 
-            {/* Compact Top-Right Jumbotron Mini-TV (matching real Habbo Lido II top-right wall screen!) */}
+            {/* Compact Top-Right Jumbotron Mini-TV (when another user dives) */}
             { showLiveMonitor && activeDive && (
                 <div className="lido-mini-jumbotron">
                     <div className="lido-mini-jumbo-bar">
@@ -1744,7 +1749,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 </div>
             ) }
 
-            {/* Authentic Classic Habbo "Vote here" Button + Popover (matching Kc4TX4PCxPk_hq!) */}
+            {/* Authentic Classic "Votar salto" Button + Popover */}
             { !stageOpen && activeDive && canVoteOnActive && (
                 <div className="lido-vote-dock">
                     { showVoteMenu && (
@@ -1782,28 +1787,31 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 </div>
             ) }
 
-            {/* ══════════════════════════════════════════════════════════════════════
-                AUTHENTIC FULL-VIEWPORT ISOMETRIC HABBO LIDO DIVING CAMERA
-                Zero dark modal box, zero window chrome, zero ugly bottom footer!
-                Exact match to Habbo Shockwave & Habbo Origins Lido Diving videos!
-               ══════════════════════════════════════════════════════════════════════ */}
+            {/* AUTHENTIC FULL-VIEWPORT ISOMETRIC LIDO DIVING CAMERA
+                Sits BEHIND toolbars/camera/inventory (z-index: 5) and AUTO-REPLAYS -> AUTO-EXITS! */}
             { stageOpen && (
                 <div className="lido-fullscreen-camera">
                     <canvas ref={ canvasRef } width={ VIEW_W } height={ VIEW_H } className="lido-fullscreen-canvas" />
 
-                    {/* Top-right subtle close button to exit diving view early */}
-                    <button type="button" className="lido-cam-exit" onClick={ closeStageAndExitPool } title="Salir a la piscina">
-                        X
-                    </button>
-
-                    {/* Classic big outlined 'R' Replay indicator in top-left (matching -4OZLXzT0Xw_3!) */}
-                    { replayActive && (
-                        <div className="lido-replay-badge">R</div>
+                    {/* Classic big outlined 'R' Replay indicator in top-left during automatic replay */}
+                    { phase === 'replay' && (
+                        <>
+                            <div className="lido-replay-badge">R</div>
+                            { resultAvg !== null && (
+                                <div className="lido-replay-score-pill">
+                                    <span className="lido-replay-score-val">{ resultAvg.toFixed(1) } / 10</span>
+                                    <div className="lido-replay-judges">
+                                        { resultCrowdVotes.map((v, i) => (
+                                            <span key={ i } className="lido-judge-card">{ v }</span>
+                                        )) }
+                                    </div>
+                                </div>
+                            ) }
+                        </>
                     ) }
 
-                    {/* AUTHENTIC FLOATING HABBO GREY 3D KEYCAP CONTROLS OVER THE SKY (TOP-LEFT)
-                        EXACT MATCH TO -4OZLXzT0Xw_hq AND 9V3NpI2Mnto_hq! */}
-                    { !replayActive && phase !== 'scoring' && (
+                    {/* AUTHENTIC FLOATING HABBO GREY 3D KEYCAP CONTROLS OVER THE SKY (TOP-LEFT) */}
+                    { phase !== 'replay' && (
                         <div className="lido-sky-keys">
                             <div className={ `lido-key-group ${ phase === 'sprint' ? 'is-focused' : '' }` }>
                                 <div className="lido-key-heading">RUN:</div>
@@ -1846,54 +1854,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                                 <div className="lido-key-row">
                                     <button type="button" className={ `lido-keycap ${ pressedKey === 'MOVE_Z' ? 'is-down' : '' }` } onPointerDown={ () => triggerTrick('front_flip', 'Z') }>Z</button>
                                     <button type="button" className={ `lido-keycap ${ pressedKey === 'MOVE_X' ? 'is-down' : '' }` } onPointerDown={ () => triggerTrick('flip_dive', 'X') }>X</button>
-                                </div>
-                            </div>
-                        </div>
-                    ) }
-
-                    {/* Compact Authentic Habbo Score Card after splashing into the pool */}
-                    { phase === 'scoring' && !replayActive && (
-                        <div className="lido-window lido-post-score-card">
-                            <div className="lido-window-header">
-                                <div className="lido-header-dots" />
-                                <span className="lido-window-title">Puntuacion del Salto - { myUsername }</span>
-                                <div className="lido-header-dots" />
-                                <button type="button" className="lido-close-x" onClick={ closeStageAndExitPool } aria-label="Cerrar">X</button>
-                            </div>
-                            <div className="lido-window-body">
-                                <div className="lido-score-summary">
-                                    <div className="lido-score-big">
-                                        { resultAvg !== null ? resultAvg.toFixed(1) : '...' }<span>/10</span>
-                                    </div>
-                                    <div className="lido-score-details">
-                                        <div>
-                                            <b>Impulso:</b> { jumpQuality === 'perfect' ? 'Perfecto' : (jumpQuality === 'good' ? 'Bueno' : 'Al borde') }
-                                            {' | '}<b>Trucos:</b> { performedTricks.length }
-                                        </div>
-                                        <div className="lido-judges-row">
-                                            <span>Jueces:</span>
-                                            { resultCrowdVotes.map((v, i) => (
-                                                <span key={ i } className="lido-judge-card">{ v }</span>
-                                            )) }
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="lido-scoring-actions">
-                                    <button type="button" className="lido-btn lido-btn-neutral" onClick={ triggerReplay }>
-                                        Replay (R)
-                                    </button>
-                                    { tickets > 0 ? (
-                                        <button type="button" className="lido-btn lido-btn-green" onClick={ () => { setStageOpen(false); window.setTimeout(startElevatorAndDive, 80); } }>
-                                            Saltar otra vez ({ tickets })
-                                        </button>
-                                    ) : (
-                                        <button type="button" className="lido-btn lido-btn-yellow" onClick={ () => { setStageOpen(false); setShowDispenser(true); } }>
-                                            Comprar tickets (2c)
-                                        </button>
-                                    ) }
-                                    <button type="button" className="lido-btn lido-btn-neutral" onClick={ closeStageAndExitPool }>
-                                        Salir a la piscina
-                                    </button>
                                 </div>
                             </div>
                         </div>
