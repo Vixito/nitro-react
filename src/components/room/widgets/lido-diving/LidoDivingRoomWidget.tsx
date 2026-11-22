@@ -32,17 +32,16 @@ interface TrickDef
     name: string;
     keyHint: string;
     desc: string;
-    icon: string;
     accent: string;
 }
 
 const LIDO_TRICKS: TrickDef[] = [
-    { id: 'star', name: 'Star', keyHint: 'W / 1', desc: '¡Abre brazos y piernas! Cuidado al caer así...', icon: '⭐', accent: '#facc15' },
-    { id: 'air_guitar', name: 'Air Guitar', keyHint: 'E / 2', desc: '¡Este solo llega al 11!', icon: '🎸', accent: '#a855f7' },
-    { id: 'flex', name: 'The Flex', keyHint: 'A / 3', desc: '¡Presume esos músculos ante las gradas!', icon: '💪', accent: '#f97316' },
-    { id: 'cannonball', name: 'Cannonball', keyHint: 'S / 4', desc: '¡Bomba de agua para empapar a todos!', icon: '💣', accent: '#ef4444' },
-    { id: 'air_punch', name: 'Air Punch', keyHint: 'D / 5', desc: '¡Puñetazos al aire en caída libre!', icon: '🥊', accent: '#38bdf8' },
-    { id: 'flip_dive', name: 'Flip / Dive', keyHint: 'Z / X / 6', desc: '¡Vuelta mortal y entrada limpia de cabeza!', icon: '🤸', accent: '#22c55e' }
+    { id: 'star', name: 'Star', keyHint: 'W / 1', desc: 'Abre brazos y piernas en el aire', accent: '#f0b400' },
+    { id: 'air_guitar', name: 'Air Guitar', keyHint: 'E / 2', desc: 'Solo de guitarra hasta el 11', accent: '#9333ea' },
+    { id: 'flex', name: 'The Flex', keyHint: 'A / 3', desc: 'Presume musculos ante las gradas', accent: '#ea580c' },
+    { id: 'cannonball', name: 'Cannonball', keyHint: 'S / 4', desc: 'Bomba de agua para empapar a todos', accent: '#dc2626' },
+    { id: 'air_punch', name: 'Air Punch', keyHint: 'D / 5', desc: 'Punetazos al aire en caida libre', accent: '#0284c7' },
+    { id: 'flip_dive', name: 'Flip / Dive', keyHint: 'Z / X / 6', desc: 'Vuelta mortal y entrada limpia', accent: '#16a34a' }
 ];
 
 const SWIM_COLORS: Array<{ id: string; label: string; hex: string }> = [
@@ -53,6 +52,157 @@ const SWIM_COLORS: Array<{ id: string; label: string; hex: string }> = [
     { id: '70', label: 'Rosa', hex: '#e06699' },
     { id: '61', label: 'Negro', hex: '#2e2e2e' }
 ];
+
+// Crisp Habbo-style pixel-art SVGs (zero OS emojis!)
+const PixelIconTicket: FC = () => (
+    <svg width="16" height="12" viewBox="0 0 16 12" shapeRendering="crispEdges" className="lido-px-icon">
+        <rect x="1" y="0" width="14" height="12" fill="#000" />
+        <rect x="0" y="1" width="16" height="3" fill="#000" />
+        <rect x="0" y="8" width="16" height="3" fill="#000" />
+        <rect x="1" y="1" width="14" height="10" fill="#ffcb00" />
+        <rect x="0" y="4" width="2" height="4" fill="#000" />
+        <rect x="14" y="4" width="2" height="4" fill="#000" />
+        <rect x="2" y="2" width="12" height="2" fill="#fff099" />
+        <rect x="5" y="4" width="1" height="4" fill="#b87600" />
+        <rect x="7" y="5" width="5" height="1" fill="#8f5700" />
+        <rect x="7" y="7" width="4" height="1" fill="#8f5700" />
+    </svg>
+);
+
+const PixelIconBoard: FC = () => (
+    <svg width="16" height="14" viewBox="0 0 16 14" shapeRendering="crispEdges" className="lido-px-icon">
+        <rect x="1" y="3" width="4" height="9" fill="#000" />
+        <rect x="2" y="4" width="2" height="7" fill="#c7d5de" />
+        <rect x="2" y="3" width="12" height="4" fill="#000" />
+        <rect x="3" y="4" width="7" height="2" fill="#ffffff" />
+        <rect x="10" y="4" width="3" height="2" fill="#52c41a" />
+        <rect x="0" y="11" width="16" height="3" fill="#1aa7cf" />
+        <rect x="2" y="12" width="4" height="1" fill="#9ce8ff" />
+        <rect x="9" y="12" width="5" height="1" fill="#9ce8ff" />
+    </svg>
+);
+
+const PixelIconTrophy: FC = () => (
+    <svg width="14" height="14" viewBox="0 0 14 14" shapeRendering="crispEdges" className="lido-px-icon">
+        <rect x="3" y="1" width="8" height="7" fill="#000" />
+        <rect x="1" y="2" width="2" height="4" fill="#000" />
+        <rect x="11" y="2" width="2" height="4" fill="#000" />
+        <rect x="4" y="2" width="6" height="5" fill="#ffcb00" />
+        <rect x="4" y="2" width="2" height="3" fill="#fff2a6" />
+        <rect x="2" y="3" width="1" height="2" fill="#ffcb00" />
+        <rect x="11" y="3" width="1" height="2" fill="#ffcb00" />
+        <rect x="5" y="8" width="4" height="3" fill="#000" />
+        <rect x="6" y="8" width="2" height="2" fill="#e09f00" />
+        <rect x="3" y="10" width="8" height="3" fill="#000" />
+        <rect x="4" y="11" width="6" height="1" fill="#ffcb00" />
+    </svg>
+);
+
+const PixelIconTrick: FC<{ id: TrickId }> = ({ id }) =>
+{
+    if (id === 'star') return (
+        <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" className="lido-px-icon">
+            <rect x="7" y="1" width="2" height="4" fill="#000" />
+            <rect x="1" y="6" width="14" height="2" fill="#000" />
+            <rect x="4" y="4" width="8" height="6" fill="#000" />
+            <rect x="3" y="10" width="4" height="4" fill="#000" />
+            <rect x="9" y="10" width="4" height="4" fill="#000" />
+            <rect x="7" y="2" width="2" height="10" fill="#ffcb00" />
+            <rect x="2" y="6" width="12" height="2" fill="#ffcb00" />
+            <rect x="5" y="5" width="6" height="5" fill="#ffe766" />
+            <rect x="4" y="10" width="2" height="3" fill="#ffcb00" />
+            <rect x="10" y="10" width="2" height="3" fill="#ffcb00" />
+        </svg>
+    );
+    if (id === 'air_guitar') return (
+        <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" className="lido-px-icon">
+            <rect x="10" y="1" width="5" height="4" fill="#000" />
+            <rect x="11" y="2" width="3" height="2" fill="#facc15" />
+            <rect x="6" y="5" width="5" height="5" fill="#000" />
+            <rect x="8" y="4" width="3" height="2" fill="#cbd5e1" />
+            <rect x="2" y="8" width="7" height="7" fill="#000" />
+            <rect x="3" y="9" width="5" height="5" fill="#9333ea" />
+            <rect x="4" y="10" width="2" height="2" fill="#e9d5ff" />
+            <rect x="7" y="6" width="3" height="2" fill="#94a3b8" />
+        </svg>
+    );
+    if (id === 'flex') return (
+        <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" className="lido-px-icon">
+            <rect x="2" y="4" width="5" height="9" fill="#000" />
+            <rect x="5" y="8" width="9" height="5" fill="#000" />
+            <rect x="8" y="6" width="4" height="3" fill="#000" />
+            <rect x="3" y="5" width="3" height="7" fill="#ffcc99" />
+            <rect x="6" y="9" width="7" height="3" fill="#ffcc99" />
+            <rect x="9" y="7" width="2" height="2" fill="#ffdfb8" />
+            <rect x="3" y="3" width="3" height="2" fill="#000" />
+            <rect x="4" y="4" width="1" height="1" fill="#ff9966" />
+        </svg>
+    );
+    if (id === 'cannonball') return (
+        <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" className="lido-px-icon">
+            <rect x="4" y="4" width="8" height="10" fill="#000" />
+            <rect x="3" y="5" width="10" height="8" fill="#000" />
+            <rect x="4" y="5" width="8" height="8" fill="#334155" />
+            <rect x="5" y="6" width="3" height="3" fill="#94a3b8" />
+            <rect x="8" y="2" width="2" height="2" fill="#f97316" />
+            <rect x="10" y="1" width="2" height="2" fill="#facc15" />
+        </svg>
+    );
+    if (id === 'air_punch') return (
+        <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" className="lido-px-icon">
+            <rect x="2" y="4" width="9" height="8" fill="#000" />
+            <rect x="3" y="5" width="7" height="6" fill="#dc2626" />
+            <rect x="4" y="6" width="3" height="2" fill="#fca5a5" />
+            <rect x="12" y="5" width="2" height="1" fill="#0284c7" />
+            <rect x="12" y="8" width="3" height="1" fill="#0284c7" />
+            <rect x="12" y="11" width="2" height="1" fill="#0284c7" />
+        </svg>
+    );
+    return (
+        <svg width="16" height="16" viewBox="0 0 16 16" shapeRendering="crispEdges" className="lido-px-icon">
+            <rect x="2" y="2" width="12" height="2" fill="#16a34a" />
+            <rect x="12" y="2" width="2" height="10" fill="#16a34a" />
+            <rect x="10" y="10" width="6" height="2" fill="#16a34a" />
+            <rect x="11" y="12" width="4" height="2" fill="#16a34a" />
+            <rect x="3" y="5" width="6" height="6" fill="#000" />
+            <rect x="4" y="6" width="4" height="4" fill="#38bdf8" />
+        </svg>
+    );
+};
+
+const PixelSymbol: FC<{ kind: 'star' | 'heart' | 'skull' }> = ({ kind }) =>
+{
+    if (kind === 'heart') return (
+        <svg width="11" height="10" viewBox="0 0 11 10" shapeRendering="crispEdges">
+            <rect x="1" y="1" width="3" height="3" fill="#dc2626" />
+            <rect x="7" y="1" width="3" height="3" fill="#dc2626" />
+            <rect x="1" y="3" width="9" height="3" fill="#dc2626" />
+            <rect x="2" y="6" width="7" height="2" fill="#dc2626" />
+            <rect x="4" y="8" width="3" height="1" fill="#dc2626" />
+            <rect x="2" y="2" width="1" height="1" fill="#fca5a5" />
+        </svg>
+    );
+    if (kind === 'star') return (
+        <svg width="11" height="11" viewBox="0 0 11 11" shapeRendering="crispEdges">
+            <rect x="5" y="0" width="1" height="11" fill="#d97706" />
+            <rect x="0" y="4" width="11" height="2" fill="#d97706" />
+            <rect x="3" y="3" width="5" height="5" fill="#facc15" />
+            <rect x="2" y="8" width="2" height="2" fill="#d97706" />
+            <rect x="7" y="8" width="2" height="2" fill="#d97706" />
+        </svg>
+    );
+    return (
+        <svg width="11" height="11" viewBox="0 0 11 11" shapeRendering="crispEdges">
+            <rect x="2" y="1" width="7" height="6" fill="#1e293b" />
+            <rect x="3" y="2" width="5" height="4" fill="#e2e8f0" />
+            <rect x="3" y="3" width="2" height="2" fill="#000" />
+            <rect x="6" y="3" width="2" height="2" fill="#000" />
+            <rect x="3" y="7" width="5" height="3" fill="#1e293b" />
+            <rect x="4" y="8" width="1" height="1" fill="#e2e8f0" />
+            <rect x="6" y="8" width="1" height="1" fill="#e2e8f0" />
+        </svg>
+    );
+};
 
 interface LidoActiveDive
 {
@@ -100,7 +250,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     const { roomSession = null } = useRoom();
     const isLidoRoom = !!(roomSession && roomSession.roomId === LIDO_DIVING_ROOM_ID);
 
-    const myUserId = GetSessionDataManager()?.userId || 0;
     const myUsername = GetSessionDataManager()?.userName || 'Habbten';
     const myFigure = GetSessionDataManager()?.figure || 'hr-115-42.hd-195-19.ch-3030-82.lg-275-1408';
     const myGender = GetSessionDataManager()?.gender || 'M';
@@ -136,11 +285,10 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     const queueStepTimeRef = useRef<number>(0);
     const spritesRef = useRef<{ std?: HTMLImageElement; front?: HTMLImageElement; head?: HTMLImageElement }>({});
 
-    // Mutable physics state for 60fps canvas loop
     const simRef = useRef({
         phase: 'idle' as DivePhase,
         phaseT: 0,
-        boardX: 0,           // 0..1 along diving board
+        boardX: 0,
         sprintSpeed: 0,
         airX: 0,
         airY: 0,
@@ -168,7 +316,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
 
     const swimFigure = useMemo(() => toLidoSwimwear(myFigure, swimColor, myGender), [ myFigure, swimColor, myGender ]);
 
-    // Preload authentic Shockwave SMALL avatar sprites in swimwear
     useEffect(() =>
     {
         if (!isLidoRoom) return;
@@ -194,7 +341,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         };
     }, [ isLidoRoom, swimFigure ]);
 
-    // Fetch live Lido status & poll every 2.5s while in Room 101 so Jumbotron & spectator votes stay live
     const fetchStatus = useCallback(async () =>
     {
         try
@@ -254,7 +400,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             {
                 setTickets(Number(data.tickets || 0));
                 setCredits(Number(data.credits || 0));
-                flashBanner(data.message || '¡5 tickets añadidos!');
+                flashBanner(data.message || '5 tickets añadidos.');
             }
             else
             {
@@ -329,10 +475,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const data = await res.json();
             if (!data?.success)
             {
-                if (data?.needsTickets)
-                {
-                    setShowDispenser(true);
-                }
+                if (data?.needsTickets) setShowDispenser(true);
                 flashBanner(data?.error || 'Necesitas 1 ticket para subir al trampolín.');
                 return;
             }
@@ -377,7 +520,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }
     }, [ stageOpen, swimColor, flashBanner ]);
 
-    // Room 101 live tile watcher: automatic roller queue + elevator boarding WITHOUT wireds!
     useEffect(() =>
     {
         if (!isLidoRoom) return;
@@ -393,18 +535,13 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const tx = Math.round(loc.x);
             const ty = Math.round(loc.y);
 
-            // Check if standing on the elevator tile (11, 4)
             if (tx === ELEVATOR_TILE.x && ty === ELEVATOR_TILE.y)
             {
                 setQueueActive(false);
-                if (Date.now() >= elevatorCooldownRef.current)
-                {
-                    startElevatorAndDive();
-                }
+                if (Date.now() >= elevatorCooldownRef.current) startElevatorAndDive();
                 return;
             }
 
-            // Check if standing on any arrowplate queue tile — auto-advance like authentic Lido rollers!
             const qIdx = QUEUE_TILES.findIndex(([ qx, qy ]) => qx === tx && qy === ty);
             if (qIdx >= 0 && qIdx < QUEUE_TILES.length - 1)
             {
@@ -434,7 +571,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             flashBanner('Compra tickets primero (2 créditos = 5 tickets).');
             return;
         }
-        // Walk onto the roller queue entrance — or board directly if already near the elevator
         const ownObj = GetOwnRoomObject();
         const loc = ownObj?.getLocation();
         if (loc && Math.abs(Math.round(loc.x) - ELEVATOR_TILE.x) <= 1 && Math.abs(Math.round(loc.y) - ELEVATOR_TILE.y) <= 1)
@@ -458,7 +594,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         const sim = simRef.current;
         if (sim.phase !== 'sprint') return;
 
-        // Board coordinates on canvas: board starts at x=120, tip at x=252, y=132
         const bx = sim.boardX;
         let q: 'perfect' | 'good' | 'drop' = 'drop';
         if (bx >= 0.72 && bx <= 0.96) q = 'perfect';
@@ -475,19 +610,19 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         {
             sim.vx = 92;
             sim.vy = -310;
-            sim.gravity = 235; // High lofty jump (~3.3s airtime!)
+            sim.gravity = 235;
         }
         else if (q === 'good')
         {
             sim.vx = 84;
             sim.vy = -225;
-            sim.gravity = 260; // Medium jump (~2.5s airtime)
+            sim.gravity = 260;
         }
         else
         {
             sim.vx = 68;
             sim.vy = -85;
-            sim.gravity = 310; // Weak edge drop (~1.4s airtime)
+            sim.gravity = 310;
         }
 
         setJumpQuality(q);
@@ -518,18 +653,15 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         const def = LIDO_TRICKS.find(t => t.id === trickId);
         if (def)
         {
-            for (let i = 0; i < 4; i++)
-            {
-                sim.trickParticles.push({
-                    x: sim.airX + (Math.random() - 0.5) * 28,
-                    y: sim.airY - 14 + (Math.random() - 0.5) * 22,
-                    vx: (Math.random() - 0.5) * 55,
-                    vy: -25 - Math.random() * 40,
-                    text: i === 0 ? def.name.toUpperCase() : def.icon,
-                    life: 0.75,
-                    color: def.accent
-                });
-            }
+            sim.trickParticles.push({
+                x: sim.airX,
+                y: sim.airY - 24,
+                vx: (Math.random() - 0.5) * 28,
+                vy: -36,
+                text: def.name.toUpperCase(),
+                life: 0.75,
+                color: def.accent
+            });
         }
 
         setActiveTrick(trickId);
@@ -543,7 +675,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         }).catch(() => {});
     }, []);
 
-    // Keyboard controls faithful to HabboxWiki (sprint, edge jump, WEASDZX / 1-6 mid-air trick mashing!)
     useEffect(() =>
     {
         if (!stageOpen) return;
@@ -584,7 +715,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         return () => window.removeEventListener('keydown', onKeyDown);
     }, [ stageOpen, triggerSprintStep, triggerBoardJump, triggerTrick ]);
 
-    // 60fps Lido Diving Canvas Animation Loop
     useEffect(() =>
     {
         if (!stageOpen) return;
@@ -613,7 +743,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     y: sy,
                     vx: Math.cos(angle) * spd,
                     vy: Math.sin(angle) * spd,
-                    r: 2.5 + Math.random() * 4,
+                    r: 2.5 + Math.random() * 3.5,
                     life: 0.75 + Math.random() * 0.45,
                     maxLife: 1.1,
                     color: i % 3 === 0 ? '#ffffff' : '#9be8ff'
@@ -628,14 +758,12 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             const sim = simRef.current;
             sim.phaseT += dt;
 
-            // Clouds move from RIGHT to LEFT (HabboxWiki authentic detail!)
             for (const c of sim.clouds)
             {
                 c.x -= c.speed * dt;
                 if (c.x + c.w < -20) c.x = W + 30;
             }
 
-            // Physics update by phase
             if (sim.phase === 'elevator')
             {
                 if (sim.phaseT >= 1.05)
@@ -653,7 +781,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 sim.sprintSpeed = Math.max(0.28, sim.sprintSpeed - dt * 0.12);
                 setSprintPct(Math.min(100, Math.round(sim.boardX * 100)));
 
-                // If player runs off the tip without pressing Jump -> poor edge drop!
                 if (sim.boardX >= 1.0)
                 {
                     sim.boardX = 1.0;
@@ -675,12 +802,8 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 sim.vy += sim.gravity * dt;
                 sim.airY += sim.vy * dt;
                 sim.rotDeg += sim.spinVel * dt;
-                if (sim.trickTimer > 0)
-                {
-                    sim.trickTimer = Math.max(0, sim.trickTimer - dt);
-                }
+                if (sim.trickTimer > 0) sim.trickTimer = Math.max(0, sim.trickTimer - dt);
 
-                // Hit water!
                 if (sim.airY >= WATER_Y)
                 {
                     sim.airY = WATER_Y;
@@ -703,7 +826,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             }
             else if (sim.phase === 'splash')
             {
-                // Auto-swim clear of diving area to the right ladder (exact HabboxWiki behavior!)
                 sim.swimX += 78 * dt;
                 if (sim.phaseT >= 1.55)
                 {
@@ -718,7 +840,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 }
             }
 
-            // Update splash & trick particles
             for (const p of sim.splashParticles)
             {
                 p.x += p.vx * dt;
@@ -736,36 +857,31 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             }
             sim.trickParticles = sim.trickParticles.filter(p => p.life > 0);
 
-            // ── RENDER SCENE ──
             ctx.imageSmoothingEnabled = false;
 
-            // 1. Retro Habbo Lido Sky
             const skyGrad = ctx.createLinearGradient(0, 0, 0, WATER_Y);
-            skyGrad.addColorStop(0, '#3ba7e0');
-            skyGrad.addColorStop(0.65, '#7fd0f7');
-            skyGrad.addColorStop(1, '#c3ecff');
+            skyGrad.addColorStop(0, '#3a9fd6');
+            skyGrad.addColorStop(0.65, '#7bc8ef');
+            skyGrad.addColorStop(1, '#bce8fc');
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, W, WATER_Y);
 
-            // 2. Pixel Clouds moving right-to-left
             for (const c of sim.clouds)
             {
                 const cx = Math.round(c.x);
                 const cy = Math.round(c.y);
-                ctx.fillStyle = 'rgba(255,255,255,0.92)';
-                ctx.fillRect(cx + 10, cy, c.w - 20, 14);
-                ctx.fillRect(cx, cy + 8, c.w, 14);
-                ctx.fillStyle = 'rgba(210,235,250,0.85)';
-                ctx.fillRect(cx + 4, cy + 20, c.w - 8, 4);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx + 10, cy, c.w - 20, 12);
+                ctx.fillRect(cx, cy + 8, c.w, 12);
+                ctx.fillStyle = '#cbe7f6';
+                ctx.fillRect(cx + 4, cy + 18, c.w - 8, 4);
             }
 
-            // 3. Distant Lido Deck & Yellow Bleachers
             ctx.fillStyle = '#d7e2ea';
             ctx.fillRect(0, WATER_Y - 38, W, 38);
-            ctx.fillStyle = '#759eb8';
+            ctx.fillStyle = '#6596a8';
             ctx.fillRect(0, WATER_Y - 40, W, 3);
 
-            // Yellow bleachers (right background)
             for (let row = 0; row < 3; row++)
             {
                 const by = WATER_Y - 36 + row * 11;
@@ -776,14 +892,12 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 ctx.strokeRect(310, by, 280, 9);
             }
 
-            // Tiny cheering bleacher spectators holding scorecards during scoring phase!
             const crowdVotes = sim.phase === 'scoring' ? (resultCrowdVotes.length ? resultCrowdVotes : [ 8, 9, 8, 9 ]) : [];
             for (let i = 0; i < 6; i++)
             {
                 const sx = 338 + i * 42;
                 const bounce = sim.phase === 'scoring' ? Math.abs(Math.sin(now / 150 + i)) * 4 : Math.sin(now / 500 + i) * 1;
                 const sy = WATER_Y - 22 - bounce;
-                // Tiny head & shirt
                 ctx.fillStyle = [ '#e74c3c', '#2ecc71', '#3498db', '#9b59b6', '#e67e22', '#1abc9c' ][i % 6];
                 ctx.fillRect(sx - 5, sy, 10, 10);
                 ctx.fillStyle = '#ffcc99';
@@ -791,23 +905,21 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 ctx.fillStyle = '#1e293b';
                 ctx.fillRect(sx - 4, sy - 10, 8, 3);
 
-                // Scorecard held aloft in scoring phase!
                 if (sim.phase === 'scoring' && i < 4)
                 {
                     const val = crowdVotes[i] ?? 8;
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(sx - 9, sy - 27, 18, 15);
-                    ctx.strokeStyle = '#0f3d5e';
-                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 1;
                     ctx.strokeRect(sx - 9, sy - 27, 18, 15);
-                    ctx.fillStyle = '#0f3d5e';
+                    ctx.fillStyle = '#000000';
                     ctx.font = 'bold 10px monospace';
                     ctx.textAlign = 'center';
                     ctx.fillText(String(val), sx, sy - 16);
                 }
             }
 
-            // 4. Deep Turquoise Lido Pool Water
             const waterGrad = ctx.createLinearGradient(0, WATER_Y, 0, H);
             waterGrad.addColorStop(0, '#1ab5d8');
             waterGrad.addColorStop(0.5, '#0c8eb8');
@@ -815,7 +927,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             ctx.fillStyle = waterGrad;
             ctx.fillRect(0, WATER_Y, W, H - WATER_Y);
 
-            // Animated water shimmer lines
             ctx.fillStyle = 'rgba(255,255,255,0.28)';
             for (let r = 0; r < 6; r++)
             {
@@ -824,7 +935,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 ctx.fillRect(rx, ry, 34, 2);
             }
 
-            // Yellow pool lane buoys
             for (let b = 0; b < 8; b++)
             {
                 const bx = 268 + b * 44;
@@ -833,37 +943,32 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 ctx.beginPath();
                 ctx.ellipse(bx, by, 7, 4, 0, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.strokeStyle = '#5c3c00';
+                ctx.strokeStyle = '#000000';
                 ctx.lineWidth = 1;
                 ctx.stroke();
             }
 
-            // 5. Iconic Lido Diving Tower & Elevator Shaft (left side)
             ctx.fillStyle = '#b4c7d6';
             ctx.fillRect(58, 126, 68, WATER_Y - 126);
-            ctx.strokeStyle = '#334e68';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1.5;
             ctx.strokeRect(58, 126, 68, WATER_Y - 126);
 
-            // Elevator glass shaft
             ctx.fillStyle = '#1d4d6b';
             ctx.fillRect(72, 138, 40, WATER_Y - 144);
             ctx.fillStyle = 'rgba(130, 215, 255, 0.25)';
             ctx.fillRect(76, 142, 12, WATER_Y - 152);
 
-            // Diving Board (flexes slightly at tip!)
             const boardFlex = sim.phase === 'sprint' && sim.boardX > 0.65 ? Math.sin(now / 45) * 3.5 : 0;
-            ctx.fillStyle = '#f8fafc';
+            ctx.fillStyle = '#ffffff';
             ctx.fillRect(118, 128, 108, 10);
-            // Green launch sweet-spot tip!
-            ctx.fillStyle = '#22c55e';
+            ctx.fillStyle = '#52c41a';
             ctx.fillRect(216, 128 + boardFlex * 0.4, 38, 10);
-            ctx.strokeStyle = '#0f293a';
-            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1.5;
             ctx.strokeRect(118, 128, 136, 10);
 
-            // Safety railing on tower top
-            ctx.strokeStyle = '#e2e8f0';
+            ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(60, 126);
@@ -872,7 +977,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             ctx.lineTo(122, 126);
             ctx.stroke();
 
-            // 6. Draw Diver Avatar!
             const drawAvatarAt = (ax: number, ay: number, rotDeg: number, trick: TrickId | null, headOnly = false) =>
             {
                 const sp = headOnly ? spritesRef.current.head : (trick === 'star' || trick === 'flex' ? (spritesRef.current.front || spritesRef.current.std) : spritesRef.current.std);
@@ -880,7 +984,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 ctx.translate(Math.round(ax), Math.round(ay));
                 if (rotDeg) ctx.rotate((rotDeg * Math.PI) / 180);
 
-                // Expressive pose stretch/visual flourish for each of the 6 HabboxWiki tricks
                 let scaleX = 1.45;
                 let scaleY = 1.45;
                 if (trick === 'star') { scaleX = 1.85; scaleY = 1.32; }
@@ -900,7 +1003,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     ctx.fillRect(-10, -40, 20, 40);
                 }
 
-                // Pose FX props (Air Guitar, Star glow, Air Punch burst, Flex sparkles)
                 if (trick === 'air_guitar')
                 {
                     ctx.strokeStyle = '#fde047';
@@ -909,9 +1011,9 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                     ctx.moveTo(-18, -14);
                     ctx.lineTo(22, -32);
                     ctx.stroke();
-                    ctx.fillStyle = '#a855f7';
+                    ctx.fillStyle = '#9333ea';
                     ctx.beginPath();
-                    ctx.arc(-15, -13, 7, 0, Math.PI * 2);
+                    ctx.arc(-15, -13, 6, 0, Math.PI * 2);
                     ctx.fill();
                 }
                 else if (trick === 'air_punch')
@@ -927,10 +1029,9 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 }
                 else if (trick === 'flex')
                 {
-                    ctx.fillStyle = '#facc15';
-                    ctx.font = 'bold 14px sans-serif';
-                    ctx.fillText('✨', -26, -34);
-                    ctx.fillText('✨', 16, -34);
+                    ctx.fillStyle = '#ffcb00';
+                    ctx.fillRect(-24, -36, 4, 4);
+                    ctx.fillRect(20, -36, 4, 4);
                 }
                 ctx.restore();
             };
@@ -939,8 +1040,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             {
                 const p = Math.min(1, sim.phaseT / 1.05);
                 const ey = WATER_Y - 12 - p * (WATER_Y - 140);
-                // Elevator platform
-                ctx.fillStyle = '#facc15';
+                ctx.fillStyle = '#ffcb00';
                 ctx.fillRect(74, ey, 36, 7);
                 drawAvatarAt(92, ey, 0, null);
             }
@@ -950,11 +1050,12 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 const py = 128 + (sim.boardX > 0.65 ? boardFlex * 0.4 : 0) - Math.abs(Math.sin(now / 65)) * 4;
                 drawAvatarAt(px, py, 0, null);
 
-                // Timing indicator arrow above green zone
-                ctx.fillStyle = '#fef08a';
-                ctx.font = 'bold 11px Ubuntu, sans-serif';
+                ctx.fillStyle = '#000000';
+                ctx.font = 'bold 10px monospace';
                 ctx.textAlign = 'center';
-                ctx.fillText('▼ ¡SALTA AQUÍ!', 235, 114);
+                ctx.fillText('SALTA AQUI', 235, 114);
+                ctx.fillStyle = '#ffcb00';
+                ctx.fillText('SALTA AQUI', 234, 113);
             }
             else if (sim.phase === 'airborne')
             {
@@ -964,8 +1065,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             {
                 const sx = Math.min(W - 44, sim.swimX);
                 const bob = Math.sin(now / 180) * 2.5;
-                // Swim wake ripples
-                ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+                ctx.strokeStyle = 'rgba(255,255,255,0.75)';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.ellipse(sx, WATER_Y + 6, 18, 5, 0, 0, Math.PI * 2);
@@ -973,21 +1073,18 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 drawAvatarAt(sx, WATER_Y + 8 + bob, 0, null, true);
             }
 
-            // 7. Splash & Trick Particles
             for (const p of sim.splashParticles)
             {
                 ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
                 ctx.fillStyle = p.color;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.fillRect(Math.round(p.x), Math.round(p.y), Math.round(p.r), Math.round(p.r));
             }
             ctx.globalAlpha = 1;
 
             for (const tp of sim.trickParticles)
             {
                 ctx.globalAlpha = Math.min(1, tp.life * 1.6);
-                ctx.font = 'bold 13px Ubuntu, sans-serif';
+                ctx.font = 'bold 12px monospace';
                 ctx.textAlign = 'center';
                 ctx.fillStyle = '#000000';
                 ctx.fillText(tp.text, tp.x + 1, tp.y + 1);
@@ -996,34 +1093,34 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             }
             ctx.globalAlpha = 1;
 
-            // 8. Authentic Lido Jumbotron Screen (top-right inside canvas)
+            // Authentic Lido LCD Jumbotron (top-right inside canvas)
             const jx = W - 154;
             const jy = 12;
             const jw = 142;
             const jh = 92;
-            ctx.fillStyle = '#0f172a';
+            ctx.fillStyle = '#2a3542';
+            ctx.fillRect(jx - 3, jy - 3, jw + 6, jh + 6);
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(jx - 3, jy - 3, jw + 6, jh + 6);
+            ctx.fillStyle = '#111c26';
             ctx.fillRect(jx, jy, jw, jh);
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(jx, jy, jw, jh);
-            // Screen header
-            ctx.fillStyle = '#0284c7';
-            ctx.fillRect(jx + 2, jy + 2, jw - 4, 16);
+            ctx.fillStyle = '#6596a8';
+            ctx.fillRect(jx, jy, jw, 15);
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 9px monospace';
             ctx.textAlign = 'center';
-            ctx.fillText('LIDO JUMBOTRON EN VIVO', jx + jw / 2, jy + 13);
+            ctx.fillText('LIDO JUMBOTRON', jx + jw / 2, jy + 11);
 
-            // Jumbotron content
             if (sim.phase === 'scoring')
             {
                 const headSp = spritesRef.current.head;
                 if (headSp && headSp.naturalWidth > 0)
                 {
-                    ctx.drawImage(headSp, jx + jw / 2 - headSp.naturalWidth * 0.9, jy + 22, headSp.naturalWidth * 1.8, headSp.naturalHeight * 1.8);
+                    ctx.drawImage(headSp, jx + jw / 2 - headSp.naturalWidth * 0.9, jy + 20, headSp.naturalWidth * 1.8, headSp.naturalHeight * 1.8);
                 }
-                ctx.fillStyle = '#facc15';
-                ctx.font = 'bold 20px monospace';
+                ctx.fillStyle = '#ffe14d';
+                ctx.font = 'bold 18px monospace';
                 ctx.fillText(resultAvg !== null ? `${ resultAvg.toFixed(1) } / 10` : '...', jx + jw / 2, jy + 82);
             }
             else
@@ -1032,12 +1129,12 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 if (sp && sp.naturalWidth > 0)
                 {
                     const scale = 1.25;
-                    ctx.drawImage(sp, jx + jw / 2 - (sp.naturalWidth * scale) / 2, jy + 24, sp.naturalWidth * scale, sp.naturalHeight * scale);
+                    ctx.drawImage(sp, jx + jw / 2 - (sp.naturalWidth * scale) / 2, jy + 22, sp.naturalWidth * scale, sp.naturalHeight * scale);
                 }
                 const label = sim.trick
                     ? (LIDO_TRICKS.find(t => t.id === sim.trick)?.name.toUpperCase() || '')
-                    : (sim.phase === 'sprint' ? '¡CORRE Y SALTA!' : (sim.phase === 'elevator' ? 'SUBIENDO...' : 'EN EL AIRE'));
-                ctx.fillStyle = '#38bdf8';
+                    : (sim.phase === 'sprint' ? 'CORRE Y SALTA' : (sim.phase === 'elevator' ? 'SUBIENDO...' : 'EN EL AIRE'));
+                ctx.fillStyle = '#64f4ff';
                 ctx.font = 'bold 10px monospace';
                 ctx.fillText(label, jx + jw / 2, jy + 85);
             }
@@ -1054,7 +1151,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         setStageOpen(false);
         setPhase('idle');
         elevatorCooldownRef.current = Date.now() + 3000;
-        // Walk avatar cleanly to the pool ladder in Room 101 so it exits the diving area
         SendMessageComposer(new RoomUnitWalkComposer(POOL_EXIT_TILE.x, POOL_EXIT_TILE.y));
     }, []);
 
@@ -1074,7 +1170,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             {
                 setMyVotedDiveId(activeDive.id);
                 if (data.dive) setActiveDive(data.dive);
-                flashBanner(score ? `¡Levantaste cartilla de ${ score } puntos!` : '¡Cartilla enviada al Jumbotron!');
+                flashBanner(score ? `Cartilla de ${ score } puntos enviada.` : 'Cartilla enviada al Jumbotron.');
             }
         }
         catch
@@ -1090,18 +1186,26 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
 
     return (
         <div className="lido-room-widget-root">
-            {/* Compact Top-Center In-Room Lido Diving Bar (works on Shockwave 2006, Flash 2012, Modern & Mobile!) */}
+            {/* Authentic Habbo Shockwave / Modern Lido Strip (zero emojis, pixel chrome) */}
             <div className="lido-hud-bar">
-                <span className="lido-hud-badge">🏊 Lido Diving</span>
-                <span className="lido-hud-stat" title="Tickets para el trampolín">🎟️ <b>{ tickets }</b></span>
-                <button type="button" className="lido-btn lido-btn-gold" onClick={ () => setShowDispenser(v => !v) }>
-                    + Tickets (2c)
+                <div className="lido-hud-title">
+                    <PixelIconBoard />
+                    <span>Habbten Lido</span>
+                </div>
+                <div className="lido-hud-divider" />
+                <div className="lido-hud-tickets" title="Tickets para el trampolín">
+                    <PixelIconTicket />
+                    <span>{ tickets }</span>
+                </div>
+                <button type="button" className="lido-btn lido-btn-yellow" onClick={ () => setShowDispenser(v => !v) }>
+                    Tickets (2c)
                 </button>
                 <button type="button" className="lido-btn lido-btn-green" onClick={ joinQueueInRoom }>
-                    { queueActive ? 'En cola...' : 'Subir al Trampolín' }
+                    { queueActive ? 'En cola...' : 'Trampolín' }
                 </button>
-                <button type="button" className="lido-btn lido-btn-blue" onClick={ () => setShowLeaderboard(v => !v) }>
-                    🏆 Top
+                <button type="button" className="lido-btn lido-btn-neutral" onClick={ () => setShowLeaderboard(v => !v) }>
+                    <PixelIconTrophy />
+                    <span>Top</span>
                 </button>
             </div>
 
@@ -1109,21 +1213,26 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 <div className="lido-toast">{ statusBanner }</div>
             ) }
 
-            {/* Ticket Dispenser & Swimwear Booth Modal (Authentic 2 Credits = 5 Tickets!) */}
+            {/* Ticket Dispenser & Swimwear Booth Modal */}
             { showDispenser && (
-                <div className="lido-panel lido-dispenser-panel">
-                    <div className="lido-panel-header">
-                        <span>🎟️ Dispensador del Lido & Bañador</span>
-                        <button type="button" className="lido-close-x" onClick={ () => setShowDispenser(false) }>✕</button>
+                <div className="lido-window lido-dispenser-panel">
+                    <div className="lido-window-header">
+                        <div className="lido-header-dots" />
+                        <span className="lido-window-title">Dispensador del Lido</span>
+                        <div className="lido-header-dots" />
+                        <button type="button" className="lido-close-x" onClick={ () => setShowDispenser(false) } aria-label="Cerrar">✕</button>
                     </div>
-                    <div className="lido-panel-body">
+                    <div className="lido-window-body">
                         <p className="lido-desc">
-                            Para subir al trampolín necesitas <b>1 ticket</b> y llevar tu <b>bañador del Lido</b>. Al subir al ascensor el ticket se canjea automáticamente.
+                            Necesitas <b>1 ticket</b> y llevar tu <b>bañador del Lido</b> para subir al trampolín. Al entrar al ascensor el ticket se canjea automáticamente.
                         </p>
-                        <div className="lido-ticket-box">
-                            <div>
-                                <div className="lido-ticket-title">Pack Oficial del Lido</div>
-                                <div className="lido-ticket-sub">5 Tickets de Trampolín • 2 Créditos</div>
+                        <div className="lido-inset-box">
+                            <div className="lido-ticket-row">
+                                <PixelIconTicket />
+                                <div>
+                                    <div className="lido-ticket-title">5 Tickets de Trampolín</div>
+                                    <div className="lido-ticket-sub">Precio oficial: 2 Créditos</div>
+                                </div>
                             </div>
                             <button type="button" className="lido-btn lido-btn-green" disabled={ busyBuy } onClick={ handleBuyTickets }>
                                 { busyBuy ? 'Comprando...' : 'Comprar (2c)' }
@@ -1134,7 +1243,7 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                             <span>Tus créditos: <b>{ credits.toLocaleString() }</b></span>
                         </div>
                         <div className="lido-swim-picker">
-                            <div className="lido-swim-label">Color de tu bañador:</div>
+                            <div className="lido-swim-label">Color del bañador:</div>
                             <div className="lido-swim-swatches">
                                 { SWIM_COLORS.map(c => (
                                     <button
@@ -1152,20 +1261,22 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 </div>
             ) }
 
-            {/* Top Clavadistas Leaderboard Panel */}
+            {/* Top Clavadistas Leaderboard */}
             { showLeaderboard && (
-                <div className="lido-panel lido-lb-panel">
-                    <div className="lido-panel-header">
-                        <span>🏆 Mejores Saltos del Habbten Lido</span>
-                        <button type="button" className="lido-close-x" onClick={ () => setShowLeaderboard(false) }>✕</button>
+                <div className="lido-window lido-lb-panel">
+                    <div className="lido-window-header">
+                        <div className="lido-header-dots" />
+                        <span className="lido-window-title">Mejores Saltos del Lido</span>
+                        <div className="lido-header-dots" />
+                        <button type="button" className="lido-close-x" onClick={ () => setShowLeaderboard(false) } aria-label="Cerrar">✕</button>
                     </div>
-                    <div className="lido-panel-body">
+                    <div className="lido-window-body">
                         <div className="lido-meta-row mb-2">
                             <span>Tu récord: <b>{ bestScore.toFixed(1) } / 10</b></span>
                             <span>Tus saltos: <b>{ totalDives }</b></span>
                         </div>
                         { leaderboard.length === 0 ? (
-                            <div className="lido-empty">¡Sé el primero en saltar desde el trampolín!</div>
+                            <div className="lido-empty">Sé el primero en saltar desde el trampolín.</div>
                         ) : (
                             <div className="lido-lb-list">
                                 { leaderboard.map((row, idx) => (
@@ -1182,145 +1293,160 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 </div>
             ) }
 
-            {/* Live Spectator Jumbotron & Scorecard (1-10 + symbols) when another player dives in Room 101 */}
+            {/* Live Spectator Jumbotron & Scorecard */}
             { showSpectatorJumbotron && activeDive && (
-                <div className="lido-spectator-jumbotron">
-                    <div className="lido-jumbo-head">
-                        <span>📺 JUMBOTRON DEL LIDO — { activeDive.username }</span>
-                        { activeDive.avgScore !== null && (
-                            <span className="lido-jumbo-score">{ Number(activeDive.avgScore).toFixed(1) } / 10</span>
+                <div className="lido-window lido-spectator-jumbotron">
+                    <div className="lido-window-header">
+                        <div className="lido-header-dots" />
+                        <span className="lido-window-title">Jumbotron Lido — { activeDive.username }</span>
+                        <div className="lido-header-dots" />
+                    </div>
+                    <div className="lido-window-body">
+                        <div className="lido-jumbo-row">
+                            <span>
+                                { activeDive.phase === 'scoring'
+                                    ? `Salto completado (${ activeDive.tricks.length } trucos) — Elige tu cartilla:`
+                                    : (activeDive.activeTrick ? `Truco en vivo: ${ activeDive.activeTrick.toUpperCase() }` : 'En el trampolín...') }
+                            </span>
+                            { activeDive.avgScore !== null && (
+                                <span className="lido-jumbo-score">{ Number(activeDive.avgScore).toFixed(1) } / 10</span>
+                            ) }
+                        </div>
+                        { canVoteOnActive && (
+                            <div className="lido-scorecards-row">
+                                { [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map(n => (
+                                    <button key={ n } type="button" className="lido-card-btn" onClick={ () => handleVote(n, null) }>
+                                        { n }
+                                    </button>
+                                )) }
+                                <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(10, 'star') } title="Estrella">
+                                    <PixelSymbol kind="star" />
+                                </button>
+                                <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart') } title="Me encantó">
+                                    <PixelSymbol kind="heart" />
+                                </button>
+                                <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(2, 'skull') } title="Panzazo">
+                                    <PixelSymbol kind="skull" />
+                                </button>
+                            </div>
                         ) }
                     </div>
-                    <div className="lido-jumbo-sub">
-                        { activeDive.phase === 'scoring'
-                            ? `¡Salto completado! (${ activeDive.tricks.length } trucos) — Levanta tu cartilla:`
-                            : (activeDive.activeTrick ? `Truco en vivo: ${ activeDive.activeTrick.toUpperCase() }` : '¡En el trampolín!') }
-                    </div>
-                    { canVoteOnActive && (
-                        <div className="lido-scorecards-row">
-                            { [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map(n => (
-                                <button key={ n } type="button" className="lido-card-btn" onClick={ () => handleVote(n, null) }>
-                                    { n }
-                                </button>
-                            )) }
-                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(10, 'star') } title="¡Estrella!">⭐</button>
-                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart') } title="¡Me encantó!">❤️</button>
-                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(2, 'skull') } title="¡Panzazo!">💀</button>
-                        </div>
-                    ) }
                 </div>
             ) }
 
-            {/* Main In-Room Lido Diving Stage Modal */}
+            {/* Main In-Room Lido Diving Stage Window */}
             { stageOpen && (
                 <div className="lido-stage-backdrop">
-                    <div className="lido-stage-window">
-                        <div className="lido-stage-header">
-                            <span>🏊 Habbten Lido II — Trampolín de Clavados ({ myUsername })</span>
-                            <button type="button" className="lido-close-x" onClick={ closeStageAndExitPool }>✕</button>
+                    <div className="lido-window lido-stage-window">
+                        <div className="lido-window-header">
+                            <div className="lido-header-dots" />
+                            <span className="lido-window-title">Habbten Lido II — Trampolín ({ myUsername })</span>
+                            <div className="lido-header-dots" />
+                            <button type="button" className="lido-close-x" onClick={ closeStageAndExitPool } aria-label="Cerrar">✕</button>
                         </div>
 
-                        <div className="lido-canvas-wrap">
-                            <canvas ref={ canvasRef } width={ 620 } height={ 360 } className="lido-canvas" />
-                        </div>
+                        <div className="lido-stage-inner">
+                            <div className="lido-canvas-wrap">
+                                <canvas ref={ canvasRef } width={ 620 } height={ 360 } className="lido-canvas" />
+                            </div>
 
-                        {/* Interactive Controls Bar (Desktop keyboard + Mobile touch friendly!) */}
-                        <div className="lido-controls-area">
-                            { phase === 'elevator' && (
-                                <div className="lido-phase-tip">
-                                    🛗 Subiendo por el ascensor al trampolín... ¡Prepárate para correr y saltar en la punta verde!
-                                </div>
-                            ) }
-
-                            { phase === 'sprint' && (
-                                <div className="lido-sprint-controls">
-                                    <div className="lido-sprint-meter">
-                                        <div className="lido-sprint-fill" style={{ width: `${ sprintPct }%` }} />
-                                        <div className="lido-sprint-zone" />
+                            <div className="lido-controls-area">
+                                { phase === 'elevator' && (
+                                    <div className="lido-phase-tip">
+                                        Subiendo por el ascensor al trampolín... Prepárate para correr y saltar en la zona verde.
                                     </div>
-                                    <div className="lido-sprint-btns">
-                                        <button type="button" className="lido-big-btn lido-big-run" onClick={ triggerSprintStep }>
-                                            🏃 CORRER (→ / D)
-                                        </button>
-                                        <button type="button" className="lido-big-btn lido-big-jump" onClick={ triggerBoardJump }>
-                                            🚀 ¡SALTAR! (Espacio / W)
-                                        </button>
-                                    </div>
-                                </div>
-                            ) }
+                                ) }
 
-                            { phase === 'airborne' && (
-                                <div className="lido-tricks-panel">
-                                    <div className="lido-tricks-header">
-                                        <span>
-                                            { jumpQuality === 'perfect' ? '🔥 ¡SALTO PERFECTO!' : (jumpQuality === 'good' ? '✨ ¡BUEN IMPULSO!' : '😅 Caída corta') }
-                                            {' • '}¡Combina teclas rápido! (Trucos: <b>{ performedTricks.length }</b>)
-                                        </span>
-                                        { activeTrick && (
-                                            <span className="lido-active-trick-pill">
-                                                { LIDO_TRICKS.find(t => t.id === activeTrick)?.icon } { LIDO_TRICKS.find(t => t.id === activeTrick)?.name }
+                                { phase === 'sprint' && (
+                                    <div className="lido-sprint-controls">
+                                        <div className="lido-sprint-meter">
+                                            <div className="lido-sprint-fill" style={{ width: `${ sprintPct }%` }} />
+                                            <div className="lido-sprint-zone" />
+                                        </div>
+                                        <div className="lido-sprint-btns">
+                                            <button type="button" className="lido-btn lido-btn-neutral lido-big-btn" onClick={ triggerSprintStep }>
+                                                CORRER (→ / D)
+                                            </button>
+                                            <button type="button" className="lido-btn lido-btn-green lido-big-btn" onClick={ triggerBoardJump }>
+                                                SALTAR EN EL BORDE (Espacio / W)
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) }
+
+                                { phase === 'airborne' && (
+                                    <div className="lido-tricks-panel">
+                                        <div className="lido-tricks-header">
+                                            <span>
+                                                { jumpQuality === 'perfect' ? 'SALTO PERFECTO' : (jumpQuality === 'good' ? 'BUEN IMPULSO' : 'CAÍDA CORTA') }
+                                                {' — '}Trucos encadenados: <b>{ performedTricks.length }</b>
                                             </span>
-                                        ) }
-                                    </div>
-                                    <div className="lido-tricks-grid">
-                                        { LIDO_TRICKS.map(t => (
-                                            <button
-                                                key={ t.id }
-                                                type="button"
-                                                className={ `lido-trick-btn ${ activeTrick === t.id ? 'is-active' : '' }` }
-                                                onClick={ () => triggerTrick(t.id) }
-                                            >
-                                                <span className="lido-trick-ico">{ t.icon }</span>
-                                                <span className="lido-trick-name">{ t.name }</span>
-                                                <span className="lido-trick-key">{ t.keyHint }</span>
-                                            </button>
-                                        )) }
-                                    </div>
-                                </div>
-                            ) }
-
-                            { phase === 'splash' && (
-                                <div className="lido-phase-tip">
-                                    💦 { entryType === 'clean_dive' ? '¡Entrada limpia de campeonato!' : (entryType === 'cannonball' ? '¡BOMBAZO! Empapaste a media piscina.' : '¡SPLASH! ¡Menudo panzazo!') } Nadando fuera de la zona de salto...
-                                </div>
-                            ) }
-
-                            { phase === 'scoring' && (
-                                <div className="lido-scoring-panel">
-                                    <div className="lido-score-summary">
-                                        <div className="lido-score-big">
-                                            { resultAvg !== null ? resultAvg.toFixed(1) : '...' }<span>/10</span>
+                                            { activeTrick && (
+                                                <span className="lido-active-trick-pill">
+                                                    { LIDO_TRICKS.find(t => t.id === activeTrick)?.name }
+                                                </span>
+                                            ) }
                                         </div>
-                                        <div className="lido-score-details">
-                                            <div>
-                                                <b>Salto:</b> { jumpQuality === 'perfect' ? 'Perfecto' : (jumpQuality === 'good' ? 'Bueno' : 'Caída al borde') }
-                                                {' • '}<b>Entrada:</b> { entryType === 'clean_dive' ? 'Clavado limpio' : (entryType === 'cannonball' ? 'Bomba' : 'Panzazo') }
-                                                {' • '}<b>Trucos:</b> { performedTricks.length }
-                                            </div>
-                                            <div className="lido-judges-row">
-                                                <span>Cartillas de las gradas:</span>
-                                                { resultCrowdVotes.map((v, i) => (
-                                                    <span key={ i } className="lido-judge-card">{ v }</span>
-                                                )) }
-                                            </div>
+                                        <div className="lido-tricks-grid">
+                                            { LIDO_TRICKS.map(t => (
+                                                <button
+                                                    key={ t.id }
+                                                    type="button"
+                                                    className={ `lido-trick-btn ${ activeTrick === t.id ? 'is-active' : '' }` }
+                                                    onClick={ () => triggerTrick(t.id) }
+                                                >
+                                                    <PixelIconTrick id={ t.id } />
+                                                    <span className="lido-trick-name">{ t.name }</span>
+                                                    <span className="lido-trick-key">{ t.keyHint }</span>
+                                                </button>
+                                            )) }
                                         </div>
                                     </div>
-                                    <div className="lido-scoring-actions">
-                                        { tickets > 0 ? (
-                                            <button type="button" className="lido-btn lido-btn-green" onClick={ () => { setStageOpen(false); window.setTimeout(startElevatorAndDive, 80); } }>
-                                                🏊 Saltar otra vez (1 ticket • quedan { tickets })
-                                            </button>
-                                        ) : (
-                                            <button type="button" className="lido-btn lido-btn-gold" onClick={ () => { setStageOpen(false); setShowDispenser(true); } }>
-                                                🎟️ Comprar más tickets (2c = 5)
-                                            </button>
-                                        ) }
-                                        <button type="button" className="lido-btn lido-btn-blue" onClick={ closeStageAndExitPool }>
-                                            Salir a la piscina
-                                        </button>
+                                ) }
+
+                                { phase === 'splash' && (
+                                    <div className="lido-phase-tip">
+                                        { entryType === 'clean_dive' ? 'Entrada limpia de campeonato.' : (entryType === 'cannonball' ? 'Bomba al agua: empapaste a media piscina.' : 'Panzazo directo al agua.') } Nadando fuera de la zona de salto...
                                     </div>
-                                </div>
-                            ) }
+                                ) }
+
+                                { phase === 'scoring' && (
+                                    <div className="lido-scoring-panel">
+                                        <div className="lido-score-summary">
+                                            <div className="lido-score-big">
+                                                { resultAvg !== null ? resultAvg.toFixed(1) : '...' }<span>/10</span>
+                                            </div>
+                                            <div className="lido-score-details">
+                                                <div>
+                                                    <b>Salto:</b> { jumpQuality === 'perfect' ? 'Perfecto' : (jumpQuality === 'good' ? 'Bueno' : 'Caída al borde') }
+                                                    {' • '}<b>Entrada:</b> { entryType === 'clean_dive' ? 'Clavado limpio' : (entryType === 'cannonball' ? 'Bomba' : 'Panzazo') }
+                                                    {' • '}<b>Trucos:</b> { performedTricks.length }
+                                                </div>
+                                                <div className="lido-judges-row">
+                                                    <span>Cartillas:</span>
+                                                    { resultCrowdVotes.map((v, i) => (
+                                                        <span key={ i } className="lido-judge-card">{ v }</span>
+                                                    )) }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="lido-scoring-actions">
+                                            { tickets > 0 ? (
+                                                <button type="button" className="lido-btn lido-btn-green" onClick={ () => { setStageOpen(false); window.setTimeout(startElevatorAndDive, 80); } }>
+                                                    Saltar otra vez (1 ticket • quedan { tickets })
+                                                </button>
+                                            ) : (
+                                                <button type="button" className="lido-btn lido-btn-yellow" onClick={ () => { setStageOpen(false); setShowDispenser(true); } }>
+                                                    Comprar tickets (2c = 5)
+                                                </button>
+                                            ) }
+                                            <button type="button" className="lido-btn lido-btn-neutral" onClick={ closeStageAndExitPool }>
+                                                Salir a la piscina
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) }
+                            </div>
                         </div>
                     </div>
                 </div>
