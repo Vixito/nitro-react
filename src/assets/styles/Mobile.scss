@@ -25,12 +25,18 @@ body.is-mobile-ui {
         display: none !important;
     }
 
-    // Mantener notificaciones arriba al centro sin chocar con el monedero ni "?"
+    // Mantener notificaciones arriba a la derecha debajo del monedero y "?" (incluyendo en Game Center)
     .nitro-right-side {
         top: calc(56px + env(safe-area-inset-top)) !important;
         right: 8px !important;
         max-width: min(300px, calc(100vw - 16px)) !important;
         z-index: 110 !important;
+    }
+
+    .nitro-notification-bubbles-overlay {
+        top: calc(58px + env(safe-area-inset-top));
+        right: 8px !important;
+        width: min(260px, calc(100vw - 16px)) !important;
     }
 
     // ── VENTANAS ADAPTADAS A PANTALLA MÓVIL (UNIFICADAS EN ESTILO HABBO MOBILE) ──
