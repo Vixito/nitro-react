@@ -11,15 +11,14 @@
     z-index: 15;
 }
 
-// Ocultar completamente burbujas de chat e historial de chat mientras se salta
-// (display: none vence a .bubble-container.visible { visibility: visible !important })
+// Mantener el chat visible durante el salto pero inhabilitar por completo la escritura
 body.lido-diving-active {
-    .nitro-chat-widget,
-    .bubble-container,
-    .nitro-chat-history {
-        display: none !important;
-        opacity: 0 !important;
+    .nitro-chat-input-container input,
+    input.chat-input,
+    input.mobile-chat-input {
         pointer-events: none !important;
+        opacity: 0.6 !important;
+        cursor: not-allowed !important;
     }
 }
 

@@ -43,6 +43,7 @@ export const ChatInputView: FC<{}> = props =>
 
     const setInputFocus = useCallback(() =>
     {
+        if(document.body.classList.contains('lido-diving-active') || document.querySelector('.lido-fullscreen-camera')) return;
         inputRef.current.focus();
 
         inputRef.current.setSelectionRange((inputRef.current.value.length * 2), (inputRef.current.value.length * 2));
@@ -120,6 +121,8 @@ export const ChatInputView: FC<{}> = props =>
 
     const updateChatInput = useCallback((value: string) =>
     {
+        if(document.body.classList.contains('lido-diving-active') || document.querySelector('.lido-fullscreen-camera')) return;
+
         if(!value || !value.length)
         {
             setIsTyping(false);
@@ -135,7 +138,7 @@ export const ChatInputView: FC<{}> = props =>
 
     const onKeyDownEvent = useCallback((event: KeyboardEvent) =>
     {
-        if(document.querySelector('.snowstorm-game-root, .battleball-game-root, .game-center-stage, .game-stage-container')) return;
+        if(document.body.classList.contains('lido-diving-active') || document.querySelector('.snowstorm-game-root, .battleball-game-root, .game-center-stage, .game-stage-container, .lido-fullscreen-camera')) return;
         if(floodBlocked || !inputRef.current || anotherInputHasFocus()) return;
 
         if(document.activeElement !== inputRef.current) setInputFocus();

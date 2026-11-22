@@ -1246,11 +1246,41 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     const resultAvgRef = useRef<number | null>(null);
     useEffect(() => { resultAvgRef.current = resultAvg; }, [ resultAvg ]);
 
-    // Hide floating room/bot chat bubbles ONLY while the full-screen diving camera is active
+    // Disable chat input typing strictly while diving (keep chat visible, block all writing!)
     useEffect(() =>
     {
         document.body.classList.toggle('lido-diving-active', stageOpen);
-        return () => { document.body.classList.remove('lido-diving-active'); };
+        const inputs = Array.from(document.querySelectorAll<HTMLInputElement>('input.chat-input, input.mobile-chat-input, .nitro-chat-input-container input'));
+
+        if (stageOpen)
+        {
+            for (const inp of inputs)
+            {
+                inp.blur();
+                inp.readOnly = true;
+                inp.disabled = true;
+            }
+            if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+        }
+        else
+        {
+            for (const inp of inputs)
+            {
+                inp.readOnly = false;
+                inp.disabled = false;
+            }
+        }
+
+        return () =>
+        {
+            document.body.classList.remove('lido-diving-active');
+            const cleanupInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input.chat-input, input.mobile-chat-input, .nitro-chat-input-container input'));
+            for (const inp of cleanupInputs)
+            {
+                inp.readOnly = false;
+                inp.disabled = false;
+            }
+        };
     }, [ stageOpen ]);
 
     // Main 60FPS authentic isometric Habbo Lido Diving camera renderer with AUTO-REPLAY -> AUTO-EXIT!
