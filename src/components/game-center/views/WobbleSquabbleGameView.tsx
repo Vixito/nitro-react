@@ -1,6 +1,6 @@
 import { AvatarAction, AvatarScaleType, AvatarSetType, IAvatarImageListener } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl } from '../../../api';
+import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager, isShockwaveSmallFigureReady, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl } from '../../../api';
 import { useGameCenter } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 
@@ -652,6 +652,7 @@ export const WobbleSquabbleGameView: FC = () =>
     }, []);
 
     // Authentic Shockwave SMALL (sh_) Habbo avatar sprite loader (full body, seated, head-only, wobble, push & step!)
+    const avatarPendingRef = useRef<Set<string>>(new Set());
     const ensureAvatarSprite = useCallback((
         figure: string,
         dir: number,
@@ -659,11 +660,17 @@ export const WobbleSquabbleGameView: FC = () =>
     ) =>
     {
         const key = `${ figure }__${ posture }__${ dir }`;
-        if (avatarReadyRef.current.has(key)) return;
+        if (avatarReadyRef.current.has(key) || avatarPendingRef.current.has(key)) return;
+        avatarPendingRef.current.add(key);
 
+        let unsub: (() => void) | null = null;
         const renderSmall = () =>
         {
-            if (avatarReadyRef.current.has(key)) return;
+            if (avatarReadyRef.current.has(key))
+            {
+                unsub?.();
+                return;
+            }
             const raw = renderShockwaveSmallDataUrl(figure, {
                 direction: dir,
                 headDirection: dir,
@@ -681,15 +688,21 @@ export const WobbleSquabbleGameView: FC = () =>
             });
             if (raw)
             {
+                const fullyReady = isShockwaveSmallFigureReady(figure);
                 trimTransparentImage(raw, (_url, trimmedImg) =>
                 {
                     avatarCacheRef.current.set(key, trimmedImg);
-                    avatarReadyRef.current.add(key);
+                    if (fullyReady)
+                    {
+                        avatarReadyRef.current.add(key);
+                        avatarPendingRef.current.delete(key);
+                        unsub?.();
+                    }
                 });
             }
         };
 
-        onShockwaveSmallAtlasReady(renderSmall);
+        unsub = onShockwaveSmallAtlasReady(renderSmall);
     }, []);
 
     // Preload fighters (idle + wobble flailing + pushing + stepping) + rooftop audience sprites

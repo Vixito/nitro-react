@@ -1,3 +1,4 @@
+import { NitroBundle } from '@nitrots/nitro-renderer';
 import { GetAvatarRenderManager } from '../nitro';
 import v9SmallAtlasImgUrl from '../../assets/shockwave-small/v9_small_atlas.png';
 import v9SmallAtlasRaw from '../../assets/shockwave-small/v9_small_atlas.json';
@@ -8,6 +9,13 @@ interface V9SmallAtlasData
     h: number;
     parts: Record<string, string[]>;
     // [x, y, w, h, regX, regY, isColored]
+    s: Record<string, [ number, number, number, number, number, number, number ]>;
+}
+
+interface DynamicSmallLib
+{
+    img: HTMLImageElement | HTMLCanvasElement;
+    // [x, y, w, h, regX, regY, flipH]
     s: Record<string, [ number, number, number, number, number, number, number ]>;
 }
 
@@ -23,49 +31,38 @@ export interface V9SmallRenderOptions
     gender?: string | null;
 }
 
-interface ParsedPart
+interface ParsedSet
 {
     id: number;
-    colorId: number;
+    colorIds: number[];
+}
+
+interface ResolvedPart
+{
+    setType: string;
+    partType: string;
+    partId: number;
+    colorable: boolean;
+    colorIndex: number;
+    colorHex: string | null;
 }
 
 const atlasData = v9SmallAtlasRaw as unknown as V9SmallAtlasData;
 let atlasImage: HTMLImageElement | null = null;
 let atlasLoading = false;
-const readyCallbacks = new Set<() => void>();
 
-// Verified (shirt chId, matching sleeve ls/rsId) pairs from hh_people_small_1.cct & hh_people_small_2.cct
-// Guarantees 100% seamless shoulders with ZERO mismatched sleeves!
-const MALE_TOP_PAIRS: Array<[ string, string ]> = [
-    [ '001', '001' ], // classic long-sleeve sweater
-    [ '003', '001' ], // classic collared jacket
-    [ '005', '001' ], // classic zip/hoodie long-sleeve
-    [ '008', '002' ], // classic striped short-sleeve tee
-    [ '009', '002' ], // classic plain short-sleeve tee
-    [ '010', '002' ], // classic v-neck short-sleeve tee
-    [ '100', '001' ], // classic retro suit jacket
-    [ '101', '001' ], // classic retro vest+shirt
-    [ '200', '001' ], // classic HC long-sleeve
-    [ '201', '002' ], // classic HC short-sleeve
-];
+// Persistent listeners notified whenever the base v9 atlas OR any exact SMALL clothing library finishes loading
+const assetListeners = new Set<() => void>();
+let notifyTimer: number | null = null;
 
-const FEMALE_TOP_PAIRS: Array<[ string, string ]> = [
-    [ '002', '001' ], // classic female long-sleeve top
-    [ '004', '001' ], // classic female sweater
-    [ '006', '001' ], // classic female jacket
-    [ '008', '002' ], // classic striped short-sleeve tee
-    [ '009', '002' ], // classic plain short-sleeve tee
-    [ '015', '017' ], // classic female sleeveless tank
-    [ '016', '017' ], // classic female halter/tank
-    [ '501', '001' ], // classic HC female long-sleeve
-    [ '502', '002' ], // classic HC female short-sleeve
-];
+// FigureMap part ("ch:3030") -> library ID ("shirt_M_...")
+const figurePartToLib = new Map<string, string>();
+let figureMapLoaded = false;
+let figureMapLoading = false;
 
-const MALE_HAIR_POOL = [ '001', '002', '003', '005', '006', '007', '008', '009', '010', '011', '013', '014', '015', '016', '017', '018', '019', '020', '200', '201', '202', '203', '503', '504', '505', '506' ];
-const FEMALE_HAIR_POOL = [ '004', '013', '014', '015', '021', '022', '023', '024', '025', '026', '457', '458', '501', '502', '507', '508', '509' ];
-const MALE_LEG_POOL = [ '001', '002', '003', '004', '005', '200' ];
-const FEMALE_LEG_POOL = [ '001', '002', '004', '006', '200', '201' ];
-const SHOE_POOL = [ '001', '002', '003', '004' ];
+// Cache of exact SMALL (sh_) libraries (loaded from R2 figure_small/*.nitro or converted 1:1 from figure/*.nitro)
+const smallLibCache = new Map<string, DynamicSmallLib | null>();
+const smallLibLoading = new Set<string>();
 
 const FALLBACK_COLORS: Record<number, string> = {
     1: 'FFCC99', 2: 'F5C29B', 3: 'E6AC84', 4: 'D4956A', 5: 'B67346', 6: '8E522B', 7: '63371B',
@@ -80,13 +77,59 @@ const FALLBACK_COLORS: Record<number, string> = {
 
 const tintedCache = new Map<string, HTMLCanvasElement>();
 
+function scheduleNotifyListeners(): void
+{
+    if(notifyTimer !== null) return;
+    notifyTimer = window.setTimeout(() =>
+    {
+        notifyTimer = null;
+        assetListeners.forEach(fn => { try { fn(); } catch {} });
+    }, 16);
+}
+
 export function isShockwaveSmallAtlasReady(): boolean
 {
     return !!(atlasImage && atlasImage.complete && atlasImage.naturalWidth > 0);
 }
 
+function preloadFigureMap(): void
+{
+    if(figureMapLoaded || figureMapLoading) return;
+    figureMapLoading = true;
+
+    fetch('/game/assets/gamedata/FigureMap.json')
+        .then(r => (r.ok ? r.json() : null))
+        .then(data =>
+        {
+            if(data && Array.isArray(data.libraries))
+            {
+                for(const lib of data.libraries)
+                {
+                    if(!lib || !lib.id || !Array.isArray(lib.parts)) continue;
+                    // Prefer standard LARGE libraries (non-_50_) as canonical source for exact 2:1 SMALL conversion
+                    if(String(lib.id).includes('_50_')) continue;
+                    for(const part of lib.parts)
+                    {
+                        if(!part || !part.type || part.id === undefined) continue;
+                        const k = `${ part.type }:${ part.id }`;
+                        if(!figurePartToLib.has(k)) figurePartToLib.set(k, lib.id);
+                    }
+                }
+            }
+            figureMapLoaded = true;
+            figureMapLoading = false;
+            scheduleNotifyListeners();
+        })
+        .catch(() =>
+        {
+            figureMapLoaded = true;
+            figureMapLoading = false;
+        });
+}
+
 export function preloadShockwaveSmallAtlas(): void
 {
+    preloadFigureMap();
     if(isShockwaveSmallAtlasReady() || atlasLoading) return;
     atlasLoading = true;
     const img = new Image();
@@ -95,8 +138,7 @@ export function preloadShockwaveSmallAtlas(): void
     {
         atlasImage = img;
         atlasLoading = false;
-        readyCallbacks.forEach(fn => { try { fn(); } catch {} });
-        readyCallbacks.clear();
+        scheduleNotifyListeners();
     };
     img.onerror = () => { atlasLoading = false; };
     img.src = v9SmallAtlasImgUrl;
@@ -104,51 +146,356 @@ export function preloadShockwaveSmallAtlas(): void
 
 export function onShockwaveSmallAtlasReady(cb: () => void): () => void
 {
+    assetListeners.add(cb);
+    preloadShockwaveSmallAtlas();
     if(isShockwaveSmallAtlasReady())
     {
         cb();
-        return () => {};
     }
-    readyCallbacks.add(cb);
-    preloadShockwaveSmallAtlas();
-    return () => { readyCallbacks.delete(cb); };
+    return () => { assetListeners.delete(cb); };
 }
 
-function parseFigure(figure: string): Record<string, ParsedPart>
+function waitBaseTextureSource(bt: any): Promise<HTMLImageElement | HTMLCanvasElement | null>
 {
-    const out: Record<string, ParsedPart> = {};
+    return new Promise((resolve) =>
+    {
+        if(!bt) return resolve(null);
+        const getSrc = () => (bt.resource && bt.resource.source) ? bt.resource.source : null;
+        if(bt.valid)
+        {
+            const src = getSrc();
+            if(src) return resolve(src);
+        }
+        let done = false;
+        const finish = () =>
+        {
+            if(done) return;
+            done = true;
+            resolve(getSrc());
+        };
+        bt.once('update', finish);
+        bt.once('error', () => { if(!done) { done = true; resolve(null); } });
+        window.setTimeout(finish, 4000);
+    });
+}
+
+/**
+ * Exact 2:1 pixel-art morphology downscaler (LARGE h_ -> SMALL sh_).
+ * Identical deterministic algorithm to server-side generate-small-figure.cjs:
+ * preserves crisp 1px Habbo outlines, silhouette edges, and grayscale shading.
+ */
+function downscalePixelArt2xBrowser(
+    srcData: Uint8ClampedArray,
+    srcW: number,
+    fx: number,
+    fy: number,
+    fw: number,
+    fh: number,
+    rotated: boolean
+): { sw: number; sh: number; data: Uint8ClampedArray }
+{
+    const patch = new Uint8ClampedArray(fw * fh * 4);
+    for(let y = 0; y < fh; y++)
+    {
+        for(let x = 0; x < fw; x++)
+        {
+            const sx = rotated ? (fx + (fh - 1 - y)) : (fx + x);
+            const sy = rotated ? (fy + x) : (fy + y);
+            const sIdx = (sy * srcW + sx) * 4;
+            const dIdx = (y * fw + x) * 4;
+            patch[dIdx] = srcData[sIdx];
+            patch[dIdx + 1] = srcData[sIdx + 1];
+            patch[dIdx + 2] = srcData[sIdx + 2];
+            patch[dIdx + 3] = srcData[sIdx + 3];
+        }
+    }
+
+    const sw = Math.max(1, Math.ceil(fw / 2));
+    const sh = Math.max(1, Math.ceil(fh / 2));
+    const dst = new Uint8ClampedArray(sw * sh * 4);
+
+    for(let oy = 0; oy < sh; oy++)
+    {
+        for(let ox = 0; ox < sw; ox++)
+        {
+            const samples: Array<{ r: number; g: number; b: number; luma: number }> = [];
+            for(let dy = 0; dy < 2; dy++)
+            {
+                const py = oy * 2 + dy;
+                if(py >= fh) continue;
+                for(let dx = 0; dx < 2; dx++)
+                {
+                    const px = ox * 2 + dx;
+                    if(px >= fw) continue;
+                    const idx = (py * fw + px) * 4;
+                    if(patch[idx + 3] >= 128)
+                    {
+                        const r = patch[idx];
+                        const g = patch[idx + 1];
+                        const b = patch[idx + 2];
+                        const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+                        samples.push({ r, g, b, luma });
+                    }
+                }
+            }
+
+            if(samples.length === 0) continue;
+
+            const hasDarkOutline = samples.some(s => s.luma <= 52);
+            const isBorderCell = (ox === 0 || oy === 0 || ox === sw - 1 || oy === sh - 1);
+            if(samples.length === 1 && !hasDarkOutline && !isBorderCell && sw > 2 && sh > 2) continue;
+
+            samples.sort((a, b) => a.luma - b.luma);
+
+            let chosen = samples[Math.floor(samples.length / 2)];
+            if(hasDarkOutline)
+            {
+                chosen = samples[0];
+            }
+            else if(samples.length >= 3 && (samples[samples.length - 1].luma - samples[0].luma) > 55)
+            {
+                chosen = samples[samples.length - 1];
+            }
+
+            const outIdx = (oy * sw + ox) * 4;
+            dst[outIdx] = chosen.r;
+            dst[outIdx + 1] = chosen.g;
+            dst[outIdx + 2] = chosen.b;
+            dst[outIdx + 3] = 255;
+        }
+    }
+
+    return { sw, sh, data: dst };
+}
+
+function convertLargeBundleToSmallInMemory(json: any, sourceImg: HTMLImageElement | HTMLCanvasElement, libId: string): DynamicSmallLib | null
+{
+    const srcW = (sourceImg as HTMLImageElement).naturalWidth || sourceImg.width;
+    const srcH = (sourceImg as HTMLImageElement).naturalHeight || sourceImg.height;
+    if(!srcW || !srcH || !json) return null;
+
+    const srcCanvas = document.createElement('canvas');
+    srcCanvas.width = srcW;
+    srcCanvas.height = srcH;
+    const srcCtx = srcCanvas.getContext('2d', { willReadFrequently: true });
+    if(!srcCtx) return null;
+    srcCtx.imageSmoothingEnabled = false;
+    srcCtx.drawImage(sourceImg, 0, 0);
+    const srcPixels = srcCtx.getImageData(0, 0, srcW, srcH).data;
+
+    const assets = json.assets || {};
+    const frames = (json.spritesheet && json.spritesheet.frames) ? json.spritesheet.frames : {};
+    const jsonName = json.name || libId;
+
+    const findFrameData = (assetKey: string) =>
+    {
+        const cands = [
+            `${ jsonName }_${ assetKey }`,
+            `${ libId }_${ assetKey }`,
+            assetKey,
+            `${ jsonName }_${ assetKey }.png`,
+            `${ libId }_${ assetKey }.png`
+        ];
+        for(const c of cands)
+        {
+            if(frames[c] && frames[c].frame) return { key: c, data: frames[c] };
+        }
+        return null;
+    };
+
+    const uniqueFrames = new Map<string, { sw: number; sh: number; data: Uint8ClampedArray }>();
+    const spriteEntries: Record<string, { frameKey: string; regX: number; regY: number; flipH: number }> = {};
+    const hRegex = /^h_([a-z0-9]+)_([a-z]+)_(\d+)_(\d+)_(\d+)$/;
+
+    for(const [ assetKey, asset ] of Object.entries<any>(assets))
+    {
+        if(!asset) continue;
+        if(!hRegex.test(assetKey)) continue;
+
+        const shKey = 'sh_' + assetKey.slice(2);
+        const sourceAssetKey = asset.source || assetKey;
+        const found = findFrameData(sourceAssetKey);
+        if(!found) continue;
+
+        const fRect = found.data.frame;
+        if(!fRect || fRect.w <= 0 || fRect.h <= 0) continue;
+
+        if(!uniqueFrames.has(found.key))
+        {
+            const small = downscalePixelArt2xBrowser(
+                srcPixels,
+                srcW,
+                Math.floor(fRect.x),
+                Math.floor(fRect.y),
+                Math.floor(fRect.w),
+                Math.floor(fRect.h),
+                !!found.data.rotated
+            );
+            uniqueFrames.set(found.key, small);
+        }
+
+        const hRegX = typeof asset.x === 'number' ? asset.x : 0;
+        const hRegY = typeof asset.y === 'number' ? asset.y : 0;
+        spriteEntries[shKey] = {
+            frameKey: found.key,
+            regX: Math.round(hRegX / 2) + 1,
+            regY: Math.round(hRegY / 2),
+            flipH: asset.flipH ? 1 : 0
+        };
+    }
+
+    if(uniqueFrames.size === 0) return null;
+
+    // Shelf-pack into a compact offscreen canvas
+    const PAD = 1;
+    const list = Array.from(uniqueFrames.entries()).sort((a, b) => (b[1].sh - a[1].sh) || (b[1].sw - a[1].sw));
+    let totalArea = 0;
+    let maxW = 1;
+    for(const [ , sp ] of list)
+    {
+        totalArea += (sp.sw + PAD) * (sp.sh + PAD);
+        if(sp.sw + PAD > maxW) maxW = sp.sw + PAD;
+    }
+    const targetW = Math.min(2048, Math.max(maxW, Math.ceil(Math.sqrt(totalArea * 1.2))));
+
+    const placements = new Map<string, { x: number; y: number; w: number; h: number }>();
+    let curX = 0;
+    let curY = 0;
+    let rowH = 0;
+    let atlasW = 0;
+
+    for(const [ fKey, sp ] of list)
+    {
+        if(curX > 0 && curX + sp.sw > targetW)
+        {
+            curX = 0;
+            curY += rowH + PAD;
+            rowH = 0;
+        }
+        placements.set(fKey, { x: curX, y: curY, w: sp.sw, h: sp.sh });
+        if(curX + sp.sw > atlasW) atlasW = curX + sp.sw;
+        if(sp.sh > rowH) rowH = sp.sh;
+        curX += sp.sw + PAD;
+    }
+    const atlasH = Math.max(1, curY + rowH);
+    atlasW = Math.max(1, atlasW);
+
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = atlasW;
+    outCanvas.height = atlasH;
+    const outCtx = outCanvas.getContext('2d');
+    if(!outCtx) return null;
+
+    const outImgData = outCtx.createImageData(atlasW, atlasH);
+    const outBuf = outImgData.data;
+    for(const [ fKey, sp ] of list)
+    {
+        const p = placements.get(fKey);
+        if(!p) continue;
+        for(let y = 0; y < sp.sh; y++)
+        {
+            const srcOff = y * sp.sw * 4;
+            const dstOff = ((p.y + y) * atlasW + p.x) * 4;
+            outBuf.set(sp.data.subarray(srcOff, srcOff + sp.sw * 4), dstOff);
+        }
+    }
+    outCtx.putImageData(outImgData, 0, 0);
+
+    const sMap: Record<string, [ number, number, number, number, number, number, number ]> = {};
+    for(const [ shKey, info ] of Object.entries(spriteEntries))
+    {
+        const p = placements.get(info.frameKey);
+        if(!p) continue;
+        sMap[shKey] = [ p.x, p.y, p.w, p.h, info.regX, info.regY, info.flipH ];
+    }
+
+    return { img: outCanvas, s: sMap };
+}
+
+function loadSmallFigureLibrary(libId: string): void
+{
+    if(!libId || smallLibCache.has(libId) || smallLibLoading.has(libId)) return;
+    smallLibLoading.add(libId);
+
+    (async () =>
+    {
+        try
+        {
+            // 1. Try pre-generated exact SMALL (sh_) bundle from R2 (created by Housekeeping / converter)
+            const smallResp = await fetch(`/game/assets/bundled/figure_small/${ encodeURIComponent(libId) }.nitro`);
+            if(smallResp.ok)
+            {
+                const buf = await smallResp.arrayBuffer();
+                if(buf.byteLength > 12)
+                {
+                    const bundle = new NitroBundle(buf);
+                    const j: any = bundle.jsonFile;
+                    const src = await waitBaseTextureSource(bundle.baseTexture);
+                    if(j && j.s && src)
+                    {
+                        smallLibCache.set(libId, { img: src, s: j.s });
+                        smallLibLoading.delete(libId);
+                        scheduleNotifyListeners();
+                        return;
+                    }
+                }
+            }
+
+            // 2. Fallback: fetch the garment's exact LARGE .nitro bundle and convert 1:1 to exact SMALL pixel-art in memory
+            const largeResp = await fetch(`/game/assets/bundled/figure/${ encodeURIComponent(libId) }.nitro`);
+            if(largeResp.ok)
+            {
+                const buf = await largeResp.arrayBuffer();
+                if(buf.byteLength > 12)
+                {
+                    const bundle = new NitroBundle(buf);
+                    const src = await waitBaseTextureSource(bundle.baseTexture);
+                    if(bundle.jsonFile && src)
+                    {
+                        const converted = convertLargeBundleToSmallInMemory(bundle.jsonFile, src, libId);
+                        smallLibCache.set(libId, converted);
+                        smallLibLoading.delete(libId);
+                        scheduleNotifyListeners();
+                        return;
+                    }
+                }
+            }
+
+            smallLibCache.set(libId, null);
+        }
+        catch
+        {
+            smallLibCache.set(libId, null);
+        }
+        finally
+        {
+            smallLibLoading.delete(libId);
+        }
+    })();
+}
+
+function parseFigure(figure: string): Record<string, ParsedSet>
+{
+    const out: Record<string, ParsedSet> = {};
     if(!figure) return out;
     for(const seg of figure.split('.'))
     {
         const p = seg.split('-');
         if(p.length < 2) continue;
         const id = parseInt(p[1], 10);
-        const colorId = p.length >= 3 ? parseInt(p[2], 10) : 0;
-        if(!isNaN(id)) out[p[0]] = { id, colorId: isNaN(colorId) ? 0 : colorId };
+        if(isNaN(id)) continue;
+        const colorIds: number[] = [];
+        for(let i = 2; i < p.length; i++)
+        {
+            const cid = parseInt(p[i], 10);
+            if(!isNaN(cid)) colorIds.push(cid);
+        }
+        out[p[0]] = { id, colorIds };
     }
     return out;
 }
 
-function detectIsFemale(parsed: Record<string, ParsedPart>, gender?: string | null): boolean
-{
-    if(gender)
-    {
-        const g = gender.toUpperCase();
-        if(g === 'F') return true;
-        if(g === 'M') return false;
-    }
-    const hd = parsed.hd?.id || 0;
-    const hr = parsed.hr?.id || 0;
-    const ch = parsed.ch?.id || 0;
-    const lg = parsed.lg?.id || 0;
-    if(hd >= 600 && hd < 700) return true;
-    if((hr >= 500 && hr < 600) || (hr >= 800 && hr < 900)) return true;
-    if(ch >= 600 && ch < 700) return true;
-    if(lg >= 700 && lg < 800) return true;
-    return false;
-}
-
-function resolveColorHex(figure: string, partType: string, colorId: number, fallbackHex: string): string
+function resolveColorHex(figure: string, setType: string, colorIndex: number, fallbackColorId: number, fallbackHex: string): string
 {
     try
     {
@@ -158,7 +505,8 @@ function resolveColorHex(figure: string, partType: string, colorId: number, fall
             const container = mgr.createFigureContainer(figure);
             if(container)
             {
-                const pc = mgr.structure.getPartColor(container, partType, 0);
+                let pc = mgr.structure.getPartColor(container, setType, colorIndex);
+                if(!pc && colorIndex > 0) pc = mgr.structure.getPartColor(container, setType, 0);
                 if(pc && typeof pc.rgb === 'number')
                 {
                     return pc.rgb.toString(16).padStart(6, '0').toUpperCase();
@@ -170,8 +518,90 @@ function resolveColorHex(figure: string, partType: string, colorId: number, fall
     {
         // fallback below
     }
-    if(colorId && FALLBACK_COLORS[colorId]) return FALLBACK_COLORS[colorId];
+    if(fallbackColorId && FALLBACK_COLORS[fallbackColorId]) return FALLBACK_COLORS[fallbackColorId];
     return fallbackHex;
+}
+
+/**
+ * Expand a figure string into its exact parts and hiddenLayers using Nitro's live FigureData.
+ */
+function resolveExactFigureParts(figure: string, parsed: Record<string, ParsedSet>): { parts: ResolvedPart[]; hiddenLayers: Set<string> }
+{
+    const parts: ResolvedPart[] = [];
+    const hiddenLayers = new Set<string>();
+    const CLOTHING_SETS = [ 'hr', 'ch', 'lg', 'sh', 'ha', 'he', 'ea', 'fa', 'ca', 'wa', 'cc', 'cp' ];
+
+    let figureData: any = null;
+    try
+    {
+        figureData = GetAvatarRenderManager()?.structure?.figureData || null;
+    }
+    catch
+    {
+        figureData = null;
+    }
+
+    for(const setType of CLOTHING_SETS)
+    {
+        const entry = parsed[setType];
+        if(!entry) continue;
+
+        let expanded = false;
+        if(figureData && typeof figureData.getSetType === 'function')
+        {
+            try
+            {
+                const st = figureData.getSetType(setType);
+                const partSet = st ? st.getPartSet(entry.id) : null;
+                if(partSet)
+                {
+                    const hLayers: string[] = partSet.hiddenLayers || [];
+                    for(const hl of hLayers) hiddenLayers.add(hl);
+
+                    const rawParts: any[] = partSet.parts || [];
+                    for(const rp of rawParts)
+                    {
+                        if(!rp || !rp.type || rp.id === undefined) continue;
+                        const cIdx = Math.max(0, (Number(rp.colorIndex) || 1) - 1);
+                        const colorId = entry.colorIds[cIdx] ?? entry.colorIds[0] ?? 0;
+                        const colorable = !!rp.colorable;
+                        const colorHex = colorable
+                            ? resolveColorHex(figure, setType, cIdx, colorId, 'CCCCCC')
+                            : null;
+                        parts.push({
+                            setType,
+                            partType: String(rp.type),
+                            partId: Number(rp.id),
+                            colorable,
+                            colorIndex: cIdx,
+                            colorHex
+                        });
+                    }
+                    expanded = rawParts.length > 0;
+                }
+            }
+            catch
+            {
+                expanded = false;
+            }
+        }
+
+        if(!expanded)
+        {
+            const colorId = entry.colorIds[0] ?? 0;
+            const colorHex = resolveColorHex(figure, setType, 0, colorId, 'CCCCCC');
+            parts.push({
+                setType,
+                partType: setType,
+                partId: entry.id,
+                colorable: true,
+                colorIndex: 0,
+                colorHex
+            });
+        }
+    }
+
+    return { parts, hiddenLayers };
 }
 
 function normalizeDir(dir: number): number
@@ -188,7 +618,7 @@ function mirrorDir(dir: number): { d: number; flipped: boolean }
     return { d: n, flipped: false };
 }
 
-function lookupSmallSprite(action: string, partType: string, partId: string, dir: number, frame: number): string | null
+function lookupV9BaseSprite(action: string, partType: string, partId: string, dir: number, frame: number): string | null
 {
     const s = atlasData.s;
     const cands = [
@@ -206,14 +636,63 @@ function lookupSmallSprite(action: string, partType: string, partId: string, dir
     return null;
 }
 
-function getTintedSmallSprite(name: string, hexColor: string | null): HTMLCanvasElement | null
+function lookupV9ExactPartSprite(action: string, partType: string, partId: number, dir: number, frame: number): string | null
 {
-    if(!atlasImage) return null;
-    const meta = atlasData.s[name];
-    if(!meta) return null;
-    const [ sx, sy, sw, sh, , , isColored ] = meta;
-    const effHex = (isColored || !hexColor) ? 'RAW' : hexColor.toUpperCase();
-    const key = `${ name }|${ effHex }`;
+    const s = atlasData.s;
+    const padded = String(partId).padStart(3, '0');
+    const raw = String(partId);
+    const ids = padded === raw ? [ raw ] : [ padded, raw ];
+    for(const pid of ids)
+    {
+        const cands = [
+            `sh_${ action }_${ partType }_${ pid }_${ dir }_${ frame }`,
+            `sh_${ action }_${ partType }_${ pid }_${ dir }_0`,
+            `sh_std_${ partType }_${ pid }_${ dir }_0`
+        ];
+        for(const nm of cands)
+        {
+            if(s[nm]) return nm;
+        }
+    }
+    return null;
+}
+
+function lookupDynamicSmallSprite(
+    lib: DynamicSmallLib,
+    action: string,
+    partType: string,
+    partId: number,
+    dir: number,
+    frame: number
+): [ number, number, number, number, number, number, number ] | null
+{
+    const s = lib.s;
+    const pid = String(partId);
+    const cands = [
+        `sh_${ action }_${ partType }_${ pid }_${ dir }_${ frame }`,
+        `sh_${ action }_${ partType }_${ pid }_${ dir }_0`,
+        `sh_std_${ partType }_${ pid }_${ dir }_0`,
+        `sh_wlk_${ partType }_${ pid }_${ dir }_0`
+    ];
+    for(const nm of cands)
+    {
+        if(s[nm]) return s[nm];
+    }
+    return null;
+}
+
+function getTintedSprite(
+    cacheKey: string,
+    sourceImg: HTMLImageElement | HTMLCanvasElement,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    hexColor: string | null
+): HTMLCanvasElement | null
+{
+    const effHex = hexColor ? hexColor.toUpperCase() : 'RAW';
+    const key = `${ cacheKey }|${ effHex }`;
     const cached = tintedCache.get(key);
     if(cached) return cached;
 
@@ -223,7 +702,7 @@ function getTintedSmallSprite(name: string, hexColor: string | null): HTMLCanvas
     const ctx = c.getContext('2d');
     if(!ctx) return null;
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(atlasImage, sx, sy, sw, sh, 0, 0, sw, sh);
+    ctx.drawImage(sourceImg, sx, sy, sw, sh, 0, 0, sw, sh);
 
     if(effHex !== 'RAW')
     {
@@ -242,7 +721,7 @@ function getTintedSmallSprite(name: string, hexColor: string | null): HTMLCanvas
         ctx.putImageData(imgData, 0, 0);
     }
 
-    if(tintedCache.size > 1500)
+    if(tintedCache.size > 2500)
     {
         const first = tintedCache.keys().next().value;
         if(first) tintedCache.delete(first);
@@ -251,15 +730,37 @@ function getTintedSmallSprite(name: string, hexColor: string | null): HTMLCanvas
     return c;
 }
 
+/**
+ * Returns true if the base v9 atlas AND all exact SMALL clothing libraries for this figure are loaded.
+ */
+export function isShockwaveSmallFigureReady(figure: string): boolean
+{
+    if(!isShockwaveSmallAtlasReady() || !figureMapLoaded) return false;
+    const parsed = parseFigure(figure);
+    const { parts } = resolveExactFigureParts(figure, parsed);
+    for(const p of parts)
+    {
+        if(lookupV9ExactPartSprite('std', p.partType, p.partId, 2, 0)) continue;
+        const libId = figurePartToLib.get(`${ p.partType }:${ p.partId }`);
+        if(libId && !smallLibCache.has(libId))
+        {
+            loadSmallFigureLibrary(libId);
+            return false;
+        }
+    }
+    return true;
+}
+
 export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderOptions = {}): string | null
 {
     if(!isShockwaveSmallAtlasReady()) return null;
+    preloadFigureMap();
 
     const posture = opts.posture || 'std';
-    const canvasW = 44;
-    const canvasH = 60;
-    const ox = 6;
-    const oy = 52;
+    const canvasW = 52;
+    const canvasH = 68;
+    const ox = 10;
+    const oy = 58;
 
     const c = document.createElement('canvas');
     c.width = canvasW;
@@ -269,23 +770,8 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
     ctx.imageSmoothingEnabled = false;
 
     const parsed = parseFigure(figure);
-    const isFemale = detectIsFemale(parsed, opts.gender);
-
-    const skinHex = resolveColorHex(figure, 'hd', parsed.hd?.colorId || 1, 'FFCC99');
-    const hairHex = resolveColorHex(figure, 'hr', parsed.hr?.colorId || 42, '784215');
-    const shirtHex = resolveColorHex(figure, 'ch', parsed.ch?.colorId || 82, '3D85C6');
-    const legHex = resolveColorHex(figure, 'lg', parsed.lg?.colorId || 110, '2F4F6F');
-    const shoeHex = resolveColorHex(figure, 'sh', parsed.sh?.colorId || 62, '4A4A4A');
-
-    const topPool = isFemale ? FEMALE_TOP_PAIRS : MALE_TOP_PAIRS;
-    const topIdx = Math.abs(parsed.ch?.id ?? 0) % topPool.length;
-    const [ chId, sleeveId ] = topPool[topIdx];
-
-    const hairPool = isFemale ? FEMALE_HAIR_POOL : MALE_HAIR_POOL;
-    const hrId = hairPool[Math.abs(parsed.hr?.id ?? 0) % hairPool.length];
-    const legPool = isFemale ? FEMALE_LEG_POOL : MALE_LEG_POOL;
-    const lgId = legPool[Math.abs(parsed.lg?.id ?? 0) % legPool.length];
-    const shId = SHOE_POOL[Math.abs(parsed.sh?.id ?? 0) % SHOE_POOL.length];
+    const skinHex = resolveColorHex(figure, 'hd', 0, parsed.hd?.colorIds[0] || 1, 'FFCC99');
+    const { parts: resolvedParts, hiddenLayers } = resolveExactFigureParts(figure, parsed);
 
     const rawDir = normalizeDir(opts.direction ?? 2);
     const rawHeadDir = normalizeDir(opts.headDirection ?? rawDir);
@@ -296,14 +782,15 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
     const headMap = mirrorDir(rawHeadDir);
     const frame = posture === 'wlk' ? (Math.floor(opts.frame ?? 0) % 4) : 0;
 
-    const drawPart = (name: string | null, hex: string | null, flipped: boolean, extraY = 0) =>
+    // Draw a base anatomy sprite from authentic v9_small_atlas
+    const drawV9Base = (name: string | null, hex: string | null, flipped: boolean, extraY = 0) =>
     {
-        if(!name) return;
+        if(!name || !atlasImage) return;
         const meta = atlasData.s[name];
         if(!meta) return;
-        const spCanvas = getTintedSmallSprite(name, hex);
+        const [ sx, sy, sw, sh, regX, regY, isColored ] = meta;
+        const spCanvas = getTintedSprite(`v9:${ name }`, atlasImage, sx, sy, sw, sh, isColored ? null : hex);
         if(!spCanvas) return;
-        const [ , , sw, sh, regX, regY ] = meta;
         const drawX = ox - regX;
         const drawY = oy - regY + extraY;
 
@@ -317,13 +804,75 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
         ctx.restore();
     };
 
+    // Draw an exact clothing/hair/accessory part (native v9 SMALL first, else exact converted SMALL library)
+    const drawExactParts = (partTypes: string[], action: string, dirMap: { d: number; flipped: boolean }, frm: number, extraY = 0) =>
+    {
+        for(const p of resolvedParts)
+        {
+            if(!partTypes.includes(p.partType)) continue;
+            if(hiddenLayers.has(p.partType)) continue;
+
+            // 1. Check native authentic v9 hh_people_small sprite for exact numeric ID
+            const v9Exact = lookupV9ExactPartSprite(action, p.partType, p.partId, dirMap.d, frm);
+            if(v9Exact && atlasImage)
+            {
+                drawV9Base(v9Exact, p.colorable ? p.colorHex : null, dirMap.flipped, extraY);
+                continue;
+            }
+
+            // 2. Otherwise use exact SMALL (sh_) library (pre-generated in R2 via Housekeeping or 1:1 converted from LARGE .nitro)
+            const libId = figurePartToLib.get(`${ p.partType }:${ p.partId }`);
+            if(!libId) continue;
+
+            if(!smallLibCache.has(libId))
+            {
+                loadSmallFigureLibrary(libId);
+                continue;
+            }
+
+            const lib = smallLibCache.get(libId);
+            if(!lib) continue;
+
+            const meta = lookupDynamicSmallSprite(lib, action, p.partType, p.partId, dirMap.d, frm);
+            if(!meta) continue;
+
+            const [ sx, sy, sw, sh, regX, regY ] = meta;
+            const tint = p.colorable ? p.colorHex : null;
+            const spCanvas = getTintedSprite(`dyn:${ libId }:${ action }_${ p.partType }_${ p.partId }_${ dirMap.d }_${ frm }`, lib.img, sx, sy, sw, sh, tint);
+            if(!spCanvas) continue;
+
+            const drawX = ox - regX;
+            const drawY = oy - regY + extraY;
+
+            ctx.save();
+            if(dirMap.flipped)
+            {
+                ctx.translate(canvasW, 0);
+                ctx.scale(-1, 1);
+            }
+            ctx.drawImage(spCanvas, drawX, drawY, sw, sh);
+            ctx.restore();
+        }
+    };
+
     const drawHead = (extraY = 0) =>
     {
         const showFace = headMap.d === 1 || headMap.d === 2 || headMap.d === 3;
         const hdAct = opts.panicFace ? 'spk' : 'std';
-        drawPart(lookupSmallSprite(hdAct, 'hd', '002', headMap.d, 0), skinHex, headMap.flipped, extraY);
-        if(showFace) drawPart(lookupSmallSprite(hdAct, 'fc', '001', headMap.d, opts.panicFace ? 1 : 0), skinHex, headMap.flipped, extraY);
-        if(parsed.hr) drawPart(lookupSmallSprite(hdAct, 'hr', hrId, headMap.d, 0), hairHex, headMap.flipped, extraY);
+
+        // Back hair layer behind head
+        drawExactParts([ 'hrb' ], 'std', headMap, 0, extraY);
+
+        // Authentic Shockwave SMALL head + classic 1x2 dot-eye face
+        drawV9Base(lookupV9BaseSprite(hdAct, 'hd', '002', headMap.d, 0), skinHex, headMap.flipped, extraY);
+        if(showFace) drawV9Base(lookupV9BaseSprite(hdAct, 'fc', '001', headMap.d, opts.panicFace ? 1 : 0), skinHex, headMap.flipped, extraY);
+
+        // Exact face/eye accessories, hair, head accessories, and hats in authentic Habbo layer order
+        drawExactParts([ 'fa' ], 'std', headMap, 0, extraY);
+        drawExactParts([ 'ea' ], 'std', headMap, 0, extraY);
+        drawExactParts([ 'hr' ], 'std', headMap, 0, extraY);
+        drawExactParts([ 'he' ], 'std', headMap, 0, extraY);
+        drawExactParts([ 'ha' ], 'std', headMap, 0, extraY);
     };
 
     if(opts.headOnly)
@@ -340,30 +889,37 @@ export function renderShockwaveSmallDataUrl(figure: string, opts: V9SmallRenderO
     const rightFrm = (arms === 'normal') ? frame : 0;
     const bounceY = (posture === 'wlk' && (frame === 1 || frame === 3)) ? -1 : 0;
 
-    // 1. Back arm (left hand + matched sleeve only when wearing a shirt)
-    drawPart(lookupSmallSprite(leftAct, 'lh', '001', bodyMap.d, leftFrm), skinHex, bodyMap.flipped, bounceY);
-    if(parsed.ch) drawPart(lookupSmallSprite(leftAct, 'ls', sleeveId, bodyMap.d, leftFrm), shirtHex, bodyMap.flipped, bounceY);
+    // 1. Back arm (left hand + exact left sleeves from shirt & jacket)
+    drawV9Base(lookupV9BaseSprite(leftAct, 'lh', '001', bodyMap.d, leftFrm), skinHex, bodyMap.flipped, bounceY);
+    drawExactParts([ 'ls' ], leftAct, bodyMap, leftFrm, bounceY);
+    drawExactParts([ 'lc' ], leftAct, bodyMap, leftFrm, bounceY);
 
     if(isBack)
     {
-        drawPart(lookupSmallSprite(rightAct, 'rh', '001', bodyMap.d, rightFrm), skinHex, bodyMap.flipped, bounceY);
-        if(parsed.ch) drawPart(lookupSmallSprite(rightAct, 'rs', sleeveId, bodyMap.d, rightFrm), shirtHex, bodyMap.flipped, bounceY);
+        drawV9Base(lookupV9BaseSprite(rightAct, 'rh', '001', bodyMap.d, rightFrm), skinHex, bodyMap.flipped, bounceY);
+        drawExactParts([ 'rs' ], rightAct, bodyMap, rightFrm, bounceY);
+        drawExactParts([ 'rc' ], rightAct, bodyMap, rightFrm, bounceY);
     }
 
-    // 2. Body, shoes, legs, shirt
-    drawPart(lookupSmallSprite(posture, 'bd', '001', bodyMap.d, frame), skinHex, bodyMap.flipped);
-    if(parsed.sh) drawPart(lookupSmallSprite(posture, 'sh', shId, bodyMap.d, frame), shoeHex, bodyMap.flipped);
-    if(parsed.lg) drawPart(lookupSmallSprite(posture, 'lg', lgId, bodyMap.d, frame), legHex, bodyMap.flipped);
-    if(parsed.ch) drawPart(lookupSmallSprite('std', 'ch', chId, bodyMap.d, 0), shirtHex, bodyMap.flipped, bounceY);
+    // 2. Body + exact shoes, legs, shirt, chest print, waist, jacket, chest/back accessory
+    drawV9Base(lookupV9BaseSprite(posture, 'bd', '001', bodyMap.d, frame), skinHex, bodyMap.flipped);
+    drawExactParts([ 'sh' ], posture, bodyMap, frame, 0);
+    drawExactParts([ 'lg' ], posture, bodyMap, frame, 0);
+    drawExactParts([ 'ch' ], 'std', bodyMap, 0, bounceY);
+    drawExactParts([ 'cp' ], 'std', bodyMap, 0, bounceY);
+    drawExactParts([ 'wa' ], 'std', bodyMap, 0, bounceY);
+    drawExactParts([ 'cc' ], 'std', bodyMap, 0, bounceY);
+    drawExactParts([ 'ca' ], 'std', bodyMap, 0, bounceY);
 
-    // 3. Head + classic 1x2 dot-eye face + hair
+    // 3. Head + exact hair/hat/eyewear/face accessories
     drawHead(bounceY);
 
-    // 4. Front arm (right hand + matched sleeve only when wearing a shirt)
+    // 4. Front arm (right hand + exact right sleeves from shirt & jacket)
     if(!isBack)
     {
-        drawPart(lookupSmallSprite(rightAct, 'rh', '001', bodyMap.d, rightFrm), skinHex, bodyMap.flipped, bounceY);
-        if(parsed.ch) drawPart(lookupSmallSprite(rightAct, 'rs', sleeveId, bodyMap.d, rightFrm), shirtHex, bodyMap.flipped, bounceY);
+        drawV9Base(lookupV9BaseSprite(rightAct, 'rh', '001', bodyMap.d, rightFrm), skinHex, bodyMap.flipped, bounceY);
+        drawExactParts([ 'rs' ], rightAct, bodyMap, rightFrm, bounceY);
+        drawExactParts([ 'rc' ], rightAct, bodyMap, rightFrm, bounceY);
     }
 
     return c.toDataURL('image/png');

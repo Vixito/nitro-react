@@ -1,12 +1,14 @@
 import { ConfigurationEvent, GetAssetManager, HabboWebTools, LegacyExternalInterface, Nitro, NitroCommunicationDemoEvent, NitroConfiguration, NitroEvent, NitroLocalizationEvent, NitroVersion, RoomEngineEvent } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { GetCommunication, GetConfiguration, GetNitroInstance, GetUIVersion } from './api';
+import { installOversizedSpritesheetPatch } from './api/nitro/patchOversizedSpritesheets';
 import { Base, TransitionAnimation, TransitionAnimationTypes } from './common';
 import { LoadingView } from './components/loading/LoadingView';
 import { MainView } from './components/main/MainView';
 import { useConfigurationEvent, useEraTheme, useLocalizationEvent, useMainEvent, useRoomEngineEvent } from './hooks';
 
 NitroVersion.UI_VERSION = GetUIVersion();
+installOversizedSpritesheetPatch();
 
 const debugLog = (step: string, data?: any) => {
     console.log('[DEBUG_CLIENT]', step, data);
