@@ -66,6 +66,21 @@
                     transform: translateY(1px);
                 }
             }
+
+            // Elementos exclusivos de la versión Moderna (ocultos en Flash 2012, Shockwave 2006 y Móvil)
+            .disconnect-status-dot,
+            .disconnect-frank-box,
+            .disconnect-eyebrow,
+            .disconnect-hint,
+            .disconnect-btn-icon {
+                display: none;
+            }
+
+            .disconnect-body-row,
+            .disconnect-copy,
+            .disconnect-actions {
+                width: 100%;
+            }
         }
     }
 
@@ -135,79 +150,203 @@
     }
 }
 
-// Diseño exclusivo para la ventana de desconexión en la versión Moderna (sin tocar Flash 2012 ni Shockwave 2006)
-body.era-modern .nitro-loading.is-error {
+// Diseño exclusivo para la ventana de desconexión en la versión Moderna (sin tocar Flash 2012, Shockwave 2006 ni Móvil)
+body.era-modern:not(.is-mobile-ui) .nitro-loading.is-error {
     .nitro-alert-backdrop {
-        background: rgba(12, 20, 32, 0.72) !important;
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
+        background: rgba(8, 15, 24, 0.74) !important;
+        backdrop-filter: blur(5px) !important;
+        -webkit-backdrop-filter: blur(5px) !important;
     }
 
-    .nitro-card.nitro-alert {
-        width: 380px !important;
+    .nitro-card.nitro-alert.nitro-disconnect-card {
+        width: 424px !important;
         max-width: 92vw !important;
-        background: #dfdfdf !important;
-        border: 2px solid #283f5d !important;
-        border-radius: 7px !important;
+        background: #172733 !important;
+        border: 2px solid #2b4e68 !important;
+        border-radius: 8px !important;
         overflow: hidden !important;
-        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55) !important;
+        box-shadow: 0 0 0 1px rgba(5, 11, 17, 0.9), 0 22px 52px rgba(0, 0, 0, 0.68) !important;
         filter: none !important;
         resize: none !important;
+        font-family: 'Ubuntu', sans-serif !important;
     }
 
     .nitro-card-header {
-        height: 34px !important;
-        min-height: 34px !important;
-        padding: 0 12px !important;
-        background: linear-gradient(180deg, #4393b9 0%, #367897 52%, #2c6581 100%) !important;
-        border-bottom: 1px solid #1b3d52 !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+        height: 38px !important;
+        min-height: 38px !important;
+        padding: 0 14px !important;
+        background: #1e7295 !important;
+        border-bottom: 2px solid #0e3b50 !important;
+        box-shadow: inset 0 2px 0 #2dabc2 !important;
+
+        .nitro-card-header-inner {
+            gap: 8px !important;
+        }
+
+        .disconnect-status-dot {
+            display: inline-block !important;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #f87171;
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.25);
+            flex-shrink: 0;
+        }
 
         .nitro-card-header-text {
             color: #ffffff !important;
             font-size: 14px !important;
             font-weight: 700 !important;
-            letter-spacing: 0.2px;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45) !important;
+            letter-spacing: 0.25px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35) !important;
         }
     }
 
     .nitro-card-content {
-        background: #e6e6e6 !important;
-        padding: 20px 22px 18px !important;
-        gap: 14px;
-        color: #1e293b !important;
+        background: #172733 !important;
+        padding: 20px 20px 18px !important;
+        gap: 16px !important;
+        color: #f1f5f9 !important;
+        text-align: left !important;
 
-        .fs-5 {
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            line-height: 1.45 !important;
-            color: #1e293b !important;
-            margin-bottom: 4px !important;
+        .disconnect-body-row {
+            display: flex !important;
+            align-items: center !important;
+            gap: 16px !important;
+            width: 100% !important;
         }
 
-        button.btn {
-            width: 100% !important;
-            padding: 9px 14px !important;
-            margin-top: 2px !important;
-            background: linear-gradient(180deg, #22c55e 0%, #16a34a 55%, #15803d 100%) !important;
-            border: 1px solid #14532d !important;
-            border-bottom-width: 2px !important;
-            border-radius: 5px !important;
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 2px 4px rgba(0, 0, 0, 0.16) !important;
-            color: #ffffff !important;
-            font-size: 13px !important;
+        .disconnect-frank-box {
+            display: flex !important;
+            align-items: flex-end !important;
+            justify-content: center !important;
+            position: relative !important;
+            width: 78px !important;
+            height: 98px !important;
+            flex-shrink: 0 !important;
+            background-color: #0f1b24 !important;
+            background-image:
+                radial-gradient(circle at 50% 78%, rgba(45, 171, 194, 0.16) 0%, transparent 65%),
+                linear-gradient(rgba(45, 171, 194, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(45, 171, 194, 0.05) 1px, transparent 1px) !important;
+            background-size: 100% 100%, 10px 10px, 10px 10px !important;
+            border: 1.5px solid #26455b !important;
+            border-radius: 6px !important;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.48) !important;
+            padding-bottom: 4px !important;
+        }
+
+        .disconnect-frank-sprite {
+            width: 47px;
+            height: 85px;
+            background: url('@/assets/images/notifications/frank.gif') no-repeat center bottom;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.55));
+        }
+
+        .disconnect-offline-badge {
+            position: absolute;
+            right: -6px;
+            bottom: -6px;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: #172733;
+            border: 1.5px solid #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+        }
+
+        .disconnect-copy {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            text-align: left !important;
+            gap: 6px !important;
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+        }
+
+        .disconnect-eyebrow {
+            display: inline-block !important;
+            font-size: 10px !important;
             font-weight: 700 !important;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35) !important;
-            transition: filter 0.12s ease, transform 0.08s ease;
+            letter-spacing: 0.75px !important;
+            text-transform: uppercase !important;
+            color: #7dd3fc !important;
+            background: rgba(45, 171, 194, 0.14) !important;
+            border: 1px solid rgba(45, 171, 194, 0.3) !important;
+            border-radius: 4px !important;
+            padding: 2px 7px !important;
+            line-height: 1.2 !important;
+        }
+
+        .fs-5.disconnect-message {
+            font-size: 14.5px !important;
+            font-weight: 700 !important;
+            line-height: 1.38 !important;
+            color: #f8fafc !important;
+            text-align: left !important;
+            margin: 2px 0 0 0 !important;
+        }
+
+        .disconnect-hint {
+            display: block !important;
+            font-size: 12px !important;
+            font-weight: 400 !important;
+            line-height: 1.42 !important;
+            color: #9bb4c7 !important;
+            text-align: left !important;
+        }
+
+        .disconnect-actions {
+            border-top: 1px solid rgba(255, 255, 255, 0.09) !important;
+            padding-top: 14px !important;
+            margin-top: 0 !important;
+        }
+
+        button.btn.nitro-reconnect-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            width: 100% !important;
+            min-height: 40px !important;
+            padding: 9px 16px !important;
+            margin-top: 0 !important;
+            background: #179c4c !important;
+            background-image: none !important;
+            border: 2px solid #0e602e !important;
+            border-radius: 6px !important;
+            box-shadow: 0 2px 0 #0a4421 !important;
+            color: #ffffff !important;
+            font-size: 13.5px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.2px !important;
+            text-shadow: none !important;
+            transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.08s ease, box-shadow 0.08s ease !important;
+
+            .disconnect-btn-icon {
+                display: inline-block !important;
+                flex-shrink: 0 !important;
+            }
 
             &:hover {
-                filter: brightness(1.07);
+                background: #1bb358 !important;
+                border-color: #117036 !important;
+                color: #ffffff !important;
+                filter: none !important;
             }
 
             &:active {
-                filter: brightness(0.95);
-                transform: translateY(1px);
+                background: #13823f !important;
+                border-color: #0b4f26 !important;
+                box-shadow: 0 1px 0 #0a4421 !important;
+                transform: translateY(1px) !important;
+                filter: none !important;
             }
         }
     }
