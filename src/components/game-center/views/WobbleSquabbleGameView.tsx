@@ -651,8 +651,12 @@ export const WobbleSquabbleGameView: FC = () =>
             .catch(() => {});
     }, []);
 
-    // Authentic Shockwave SMALL (sh_) Habbo avatar sprite loader (full body, seated, head-only for swimmers)
-    const ensureAvatarSprite = useCallback((figure: string, dir: number, posture: 'std' | 'sit' | 'head') =>
+    // Authentic Shockwave SMALL (sh_) Habbo avatar sprite loader (full body, seated, head-only, wobble, push & step!)
+    const ensureAvatarSprite = useCallback((
+        figure: string,
+        dir: number,
+        posture: 'std' | 'sit' | 'head' | 'push' | 'wobble0' | 'wobble1' | 'step0' | 'step1'
+    ) =>
     {
         const key = `${ figure }__${ posture }__${ dir }`;
         if (avatarReadyRef.current.has(key)) return;
@@ -663,7 +667,16 @@ export const WobbleSquabbleGameView: FC = () =>
             const raw = renderShockwaveSmallDataUrl(figure, {
                 direction: dir,
                 headDirection: dir,
-                posture: posture === 'sit' ? 'sit' : 'std',
+                posture: posture === 'sit'
+                    ? 'sit'
+                    : (posture === 'wobble0' || posture === 'wobble1' || posture === 'step0' || posture === 'step1')
+                        ? 'wlk'
+                        : 'std',
+                arms: posture === 'push'
+                    ? 'push'
+                    : (posture === 'wobble0' || posture === 'wobble1' ? posture : 'normal'),
+                panicFace: posture === 'wobble0' || posture === 'wobble1',
+                frame: (posture === 'wobble1' || posture === 'step1') ? 3 : 1,
                 headOnly: posture === 'head'
             });
             if (raw)
@@ -679,15 +692,21 @@ export const WobbleSquabbleGameView: FC = () =>
         onShockwaveSmallAtlasReady(renderSmall);
     }, []);
 
-    // Preload fighters + rooftop audience sprites
+    // Preload fighters (idle + wobble flailing + pushing + stepping) + rooftop audience sprites
     useEffect(() =>
     {
         const mySwim = toSwimwearFigure(myFigure, '64');
         const oppSwim = toSwimwearFigure(activeOpponent.figure, activeOpponent.swimColor);
+        const fighterStates: Array<'std' | 'push' | 'wobble0' | 'wobble1' | 'step0' | 'step1'> = [
+            'std', 'push', 'wobble0', 'wobble1', 'step0', 'step1'
+        ];
         [ 1, 2, 5, 6 ].forEach(d =>
         {
-            ensureAvatarSprite(mySwim, d, 'std');
-            ensureAvatarSprite(oppSwim, d, 'std');
+            fighterStates.forEach(st =>
+            {
+                ensureAvatarSprite(mySwim, d, st);
+                ensureAvatarSprite(oppSwim, d, st);
+            });
         });
         ensureAvatarSprite(mySwim, 2, 'head');
         ensureAvatarSprite(oppSwim, 5, 'head');
@@ -1599,7 +1618,26 @@ export const WobbleSquabbleGameView: FC = () =>
             }
 
             const dir = f.isHuman ? 1 : 5;
-            const sprite = avatarCacheRef.current.get(`${ f.swimFigure }__std__${ dir }`)
+            const absBal = Math.abs(f.balance);
+            const isWobbling = f.falling || absBal >= 30 || Math.abs(f.leanVis) >= 0.32;
+            const isStepping = !f.falling && Math.abs(f.visualPos - f.pos) > 0.08;
+            const wobbleTick = Math.floor(nowSec * (absBal > 60 ? 11 : 7)) % 2;
+
+            let animKey: 'std' | 'push' | 'wobble0' | 'wobble1' | 'step0' | 'step1' = 'std';
+            if (f.pushAnim > 0) animKey = 'push';
+            else if (isWobbling) animKey = wobbleTick === 0 ? 'wobble0' : 'wobble1';
+            else if (isStepping) animKey = (Math.floor(nowSec * 9) % 2 === 0) ? 'step0' : 'step1';
+
+            // Extra frantic micro-shake & sway when perilously close to falling into the pool!
+            if (isWobbling && !f.falling)
+            {
+                const panicAmt = Math.min(1, (absBal - 28) / 55);
+                rot += Math.sin(nowSec * 16 + (f.isHuman ? 0 : 1.4)) * (0.08 + panicAmt * 0.14);
+                drawX += Math.sin(nowSec * 20) * (0.8 + panicAmt * 1.4) * sc;
+            }
+
+            const sprite = avatarCacheRef.current.get(`${ f.swimFigure }__${ animKey }__${ dir }`)
+                || avatarCacheRef.current.get(`${ f.swimFigure }__std__${ dir }`)
                 || avatarCacheRef.current.get(`${ f.swimFigure }__std__${ f.isHuman ? 2 : 6 }`);
 
             c.save();
