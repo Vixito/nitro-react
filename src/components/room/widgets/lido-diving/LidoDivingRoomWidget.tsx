@@ -811,11 +811,10 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
         splashRings: [] as Array<{ x: number; y: number; rx: number; maxRx: number; life: number; maxLife: number; width: number; color: string }>,
         splashDrops: [] as Array<{ x: number; y: number; vx: number; vy: number; r: number; life: number; maxLife: number; color: string }>,
         clouds: [
-            { x: 168, y: 112, variant: 0, scale: 2, speed: 11 },
-            { x: 342, y: 196, variant: 1, scale: 2, speed: 8 },
-            { x: 96, y: 268, variant: 0, scale: 1, speed: 13 },
-            { x: 438, y: 68, variant: 2, scale: 2, speed: 9 },
-            { x: 262, y: 318, variant: 3, scale: 2, speed: 7 }
+            { x: 176, y: 74, variant: 2, scale: 1, speed: 7 },
+            { x: 412, y: 66, variant: 3, scale: 1, speed: 6 },
+            { x: 278, y: 312, variant: 0, scale: 1, speed: 10 },
+            { x: 446, y: 204, variant: 1, scale: 1, speed: 9 }
         ],
         replayLog: [] as Array<{ x: number; y: number; rot: number; trick: TrickId | null; camY: number }>,
         replayIdx: 0,
