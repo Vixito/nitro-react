@@ -1739,13 +1739,19 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                         <PixelIconTicket />
                         <span>{ tickets }</span>
                     </button>
-                    <button type="button" className="lido-btn lido-btn-neutral" onClick={ () => { setShowLeaderboard(false); setShowDispenser(v => !v); } }>
+                    <button type="button" className="lido-btn lido-btn-neutral" onClick={ () => { setShowLeaderboard(false); setShowVoteMenu(false); setShowDispenser(v => !v); } }>
                         Cabina / Tickets
                     </button>
                     <button type="button" className="lido-btn lido-btn-green" onClick={ joinQueueInRoom }>
                         { queueActive ? 'En cola...' : 'Trampolín' }
                     </button>
-                    <button type="button" className="lido-btn lido-btn-neutral" onClick={ () => { setShowDispenser(false); setShowLeaderboard(v => !v); } }>
+                    { activeDive && canVoteOnActive && (
+                        <button type="button" className="lido-btn lido-btn-vote" onClick={ () => { setShowDispenser(false); setShowLeaderboard(false); setShowVoteMenu(v => !v); } }>
+                            <span>Votar salto</span>
+                            <span className="lido-vote-caret">{ showVoteMenu ? '▲' : '▼' }</span>
+                        </button>
+                    ) }
+                    <button type="button" className="lido-btn lido-btn-neutral" onClick={ () => { setShowDispenser(false); setShowVoteMenu(false); setShowLeaderboard(v => !v); } }>
                         <PixelIconTrophy />
                         <span>Top</span>
                     </button>
@@ -1869,41 +1875,33 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 </div>
             ) }
 
-            {/* Authentic Classic "Votar salto" Button + Popover */}
-            { !stageOpen && activeDive && canVoteOnActive && (
-                <div className="lido-vote-dock">
-                    { showVoteMenu && (
-                        <div className="lido-window lido-vote-popover">
-                            <div className="lido-window-header">
-                                <div className="lido-header-dots" />
-                                <span className="lido-window-title">Votar: { activeDive.username }</span>
-                                <div className="lido-header-dots" />
-                                <button type="button" className="lido-close-x" onClick={ () => setShowVoteMenu(false) } aria-label="Cerrar">X</button>
-                            </div>
-                            <div className="lido-window-body">
-                                <div className="lido-scorecards-row">
-                                    { [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map(n => (
-                                        <button key={ n } type="button" className="lido-card-btn" onClick={ () => handleVote(n, null) }>
-                                            { n }
-                                        </button>
-                                    )) }
-                                    <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(10, 'star') } title="Estrella">
-                                        <PixelSymbol kind="star" />
-                                    </button>
-                                    <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart') } title="Me encantó">
-                                        <PixelSymbol kind="heart" />
-                                    </button>
-                                    <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(2, 'skull') } title="Panzazo">
-                                        <PixelSymbol kind="skull" />
-                                    </button>
-                                </div>
-                            </div>
+            {/* Vote Scorecard Popover anchored cleanly under top-center Lido bar (never collides with Infostand!) */}
+            { !stageOpen && activeDive && canVoteOnActive && showVoteMenu && (
+                <div className="lido-window lido-vote-popover">
+                    <div className="lido-window-header">
+                        <div className="lido-header-dots" />
+                        <span className="lido-window-title">Votar: { activeDive.username }</span>
+                        <div className="lido-header-dots" />
+                        <button type="button" className="lido-close-x" onClick={ () => setShowVoteMenu(false) } aria-label="Cerrar">X</button>
+                    </div>
+                    <div className="lido-window-body">
+                        <div className="lido-scorecards-row">
+                            { [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ].map(n => (
+                                <button key={ n } type="button" className="lido-card-btn" onClick={ () => handleVote(n, null) }>
+                                    { n }
+                                </button>
+                            )) }
+                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(10, 'star') } title="Estrella">
+                                <PixelSymbol kind="star" />
+                            </button>
+                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(9, 'heart') } title="Me encantó">
+                                <PixelSymbol kind="heart" />
+                            </button>
+                            <button type="button" className="lido-card-btn lido-card-sym" onClick={ () => handleVote(2, 'skull') } title="Panzazo">
+                                <PixelSymbol kind="skull" />
+                            </button>
                         </div>
-                    ) }
-                    <button type="button" className="lido-vote-trigger" onClick={ () => setShowVoteMenu(v => !v) }>
-                        <span>Votar salto</span>
-                        <span className="lido-vote-caret">{ showVoteMenu ? '▲' : '▼' }</span>
-                    </button>
+                    </div>
                 </div>
             ) }
 
