@@ -5,6 +5,7 @@ import creditIconImg from '../../assets/images/eras/flash2012/purse/credit_icon.
 import ducketIconImg from '../../assets/images/eras/flash2012/purse/ducket_icon.png';
 import iconBonusBagImg from '../../assets/images/eras/flash2012/streak/icon_bonusbag_habbo.png';
 import iconDiamondHabboImg from '../../assets/images/eras/flash2012/streak/icon_diamond_habbo.png';
+import lockedCircleBg from '../../assets/images/campaign/locked_bg.png';
 import roomLockedIcon from '../../assets/images/navigator/icons/room_locked.png';
 
 export interface AdventCalendarDay
@@ -125,7 +126,8 @@ export const CalendarView: FC<CalendarViewProps> = props =>
         }
         return (
             <div className="advent-sprite-stage">
-                <div className="advent-lock-circle">
+                <div className="advent-lock-badge">
+                    <img src={ lockedCircleBg } alt="" className="advent-lock-bg-img" />
                     <img src={ roomLockedIcon } alt="Cerrado" className="advent-room-lock-icon" />
                 </div>
             </div>
