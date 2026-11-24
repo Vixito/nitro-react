@@ -28,6 +28,8 @@ export const HotelView: FC<{}> = props =>
     const { userFigure = null, userInfo = null } = useSessionInfo();
     const [ onlineUsers, setOnlineUsers ] = useState(0);
     const [ layoutState, setLayoutState ] = useState<Record<string, any>>({});
+    const [ nativePromo, setNativePromo ] = useState<any>(null);
+    const [ promoDismissed, setPromoDismissed ] = useState(false);
 
     useRoomSessionManagerEvent<RoomSessionEvent>([
         RoomSessionEvent.CREATED,
@@ -62,6 +64,38 @@ export const HotelView: FC<{}> = props =>
         return () => clearInterval(interval);
     }, [isVisible]);
 
+    useEffect(() => {
+        if (!isVisible || promoDismissed) return;
+        let cancelled = false;
+        const eraKey = isMobile ? 'mobile' : (currentEra || 'modern');
+        fetch(`/api/promos/slot/hotelview_native?era=${ encodeURIComponent(eraKey) }`, { credentials: 'same-origin' })
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                if (cancelled) return;
+                if (data && data.show && data.campaign && data.campaign.format === 'image' && data.campaign.imageUrl) {
+                    setNativePromo(data.campaign);
+                } else {
+                    setNativePromo(null);
+                }
+            })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, [ isVisible, isMobile, currentEra, promoDismissed ]);
+
+    const handleNativePromoClick = useCallback(() => {
+        if (!nativePromo) return;
+        if (nativePromo.internalLink) {
+            if (nativePromo.trackClickUrl) {
+                fetch(nativePromo.trackClickUrl, { method: 'POST', credentials: 'same-origin' }).catch(() => {});
+            }
+            CreateLinkEvent(nativePromo.internalLink);
+            return;
+        }
+        if (nativePromo.clickUrl) {
+            window.open(nativePromo.clickUrl, '_blank', 'noopener,noreferrer');
+        }
+    }, [ nativePromo ]);
+
     if(!isVisible) return null;
 
     let habbtenConfig: any = null;
@@ -75,6 +109,32 @@ export const HotelView: FC<{}> = props =>
     }
 
     const activeEraKey = isMobile ? 'mobile' : (currentEra || 'modern');
+
+    const nativePromoBox = (nativePromo && !promoDismissed) ? (
+        <div className={ `hb-hv-promo hb-hv-promo-${ activeEraKey }` }>
+            <div className="hb-hv-promo-bar">
+                <span className="hb-hv-promo-tag">{ nativePromo.title || 'Destacado' }</span>
+                <button
+                    type="button"
+                    className="hb-hv-promo-close"
+                    onClick={ () => setPromoDismissed(true) }
+                    title="Ocultar"
+                    aria-label="Ocultar"
+                >
+                    X
+                </button>
+            </div>
+            <div
+                className={ `hb-hv-promo-body ${ (nativePromo.clickUrl || nativePromo.internalLink) ? 'is-clickable' : '' }` }
+                onClick={ (nativePromo.clickUrl || nativePromo.internalLink) ? handleNativePromoClick : undefined }
+            >
+                <img src={ nativePromo.imageUrl } alt={ nativePromo.title || nativePromo.name || 'Destacado' } />
+                { nativePromo.subtitle && (
+                    <div className="hb-hv-promo-sub">{ nativePromo.subtitle }</div>
+                ) }
+            </div>
+        </div>
+    ) : null;
     const layout = (activeEraKey === 'shockwave2006')
         ? habbtenConfig?.hotel_view?.custom_layouts?.['shockwave2006']
         : (activeEraKey === 'flash2012')
@@ -381,6 +441,7 @@ export const HotelView: FC<{}> = props =>
                     </div>
                 </div>
                 { customOverlay }
+                { nativePromoBox }
             </div>
         );
     }
@@ -598,6 +659,7 @@ export const HotelView: FC<{}> = props =>
                 </div>
 
                 { customOverlay }
+                { nativePromoBox }
             </div>
         );
     }
@@ -650,6 +712,7 @@ export const HotelView: FC<{}> = props =>
                     </div>
                 ) }
                 { customOverlay }
+                { nativePromoBox }
             </div>
         );
     }
@@ -724,6 +787,7 @@ export const HotelView: FC<{}> = props =>
                     <img src={habbtenConfig.hotel_view.banner} alt="Hotel Banner" style={{ maxWidth: 350, borderRadius: 8, boxShadow: '0 4px 6px rgba(0,0,0,0.3)' }} />
                 </div>
             ) }
+            { nativePromoBox }
         </div>
     );
 };
