@@ -1,3 +1,4 @@
+export * from './ClassicHabboSymbols';
 export * from './CloneObject';
 export * from './ColorUtils';
 export * from './ConvertSeconds';

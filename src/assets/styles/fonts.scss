@@ -110,3 +110,52 @@
     src: url('@/assets/webfonts/volter/volter-bold.woff') format('woff');
 }
 
+// Símbolos clásicos de Habbo (bomba †, estrella ¥, corazón ƒ, pulgar •, calavera ª, etc.) dentro de fuentes Volter
+@font-face {
+    font-family: "Volter";
+    font-weight: normal;
+    font-style: normal;
+    src: url('@/assets/webfonts/Ubuntu.ttf') format('truetype');
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+
+@font-face {
+    font-family: "Volter";
+    font-weight: bold;
+    font-style: normal;
+    src: url('@/assets/webfonts/Ubuntu-b.ttf') format('truetype');
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+
+@font-face {
+    font-family: "Volter Bold";
+    font-weight: normal;
+    font-style: normal;
+    src: url('@/assets/webfonts/Ubuntu-b.ttf') format('truetype');
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+
+@font-face {
+    font-family: "Volter Bold";
+    font-weight: bold;
+    font-style: normal;
+    src: url('@/assets/webfonts/Ubuntu-b.ttf') format('truetype');
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+
+@font-face {
+    font-family: "Volter (Goldfish)";
+    font-weight: normal;
+    font-style: normal;
+    src: url('@/assets/webfonts/Ubuntu.ttf') format('truetype');
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+
+@font-face {
+    font-family: "Volter (Goldfish)";
+    font-weight: bold;
+    font-style: normal;
+    src: url('@/assets/webfonts/Ubuntu-b.ttf') format('truetype');
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+

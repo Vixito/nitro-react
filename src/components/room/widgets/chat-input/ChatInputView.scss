@@ -174,8 +174,8 @@
             color: #e2e8f0;
             border: 1px solid #334155;
             border-radius: 4px;
-            padding: 5px 12px;
-            font-size: 13px;
+            padding: 4px 9px;
+            font-size: 12px;
             font-weight: 600;
             white-space: nowrap;
             cursor: pointer;
@@ -238,6 +238,13 @@
                 cursor: pointer;
                 border-radius: 3px;
                 padding: 4px 2px;
+
+                &.emoji-item-habbo-classic {
+                    font-family: 'Ubuntu', sans-serif !important;
+                    color: #f8fafc !important;
+                    font-size: 20px !important;
+                    line-height: 1.2 !important;
+                }
 
                 &:hover {
                     background: #2b3947;

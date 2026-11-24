@@ -313,6 +313,8 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
         }
     }, [ isDragging, onDragMouseUp, onDragMouseMove, onDragTouchUp, onDragTouchMove ]);
 
+    // Restore saved offset from localStorage, but clamp it so the window stays visible.
+    // Use requestAnimationFrame to wait until the element has real dimensions.
     useEffect(() =>
     {
         if(!uniqueKey || document.body.classList.contains('is-mobile-ui')) return;
@@ -321,8 +323,69 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
 
         if(!localStorage || !localStorage.offset) return;
 
-        setDelta({ x: 0, y: 0 });
-        if(localStorage.offset) setOffset(localStorage.offset);
+        const savedOffset = localStorage.offset;
+
+        // Wait for the element to have dimensions before validating
+        const applyOffset = () =>
+        {
+            const element = elementRef.current;
+            if(!element) return;
+
+            const vw = window.innerWidth || document.documentElement.clientWidth;
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            const elemW = element.offsetWidth;
+            const elemH = element.offsetHeight;
+
+            // If the element hasn't been laid out yet, skip
+            if(elemW === 0 || elemH === 0) return;
+
+            // Center of the screen is the base position
+            const centerX = (vw - elemW) / 2;
+            const centerY = (vh - elemH) / 2;
+
+            // Clamp the offset so at least 50px of the window remains visible on each edge
+            const margin = 50;
+            let clampedX = savedOffset.x;
+            let clampedY = savedOffset.y;
+
+            // Top edge: proposedTop = centerY + clampedY >= margin
+            const minTop = margin - centerY;
+            if(clampedY < minTop) clampedY = minTop;
+
+            // Bottom edge: proposedTop + elemH <= vh - margin  =>  centerY + clampedY + elemH <= vh - margin
+            const maxTop = vh - margin - elemH - centerY;
+            if(clampedY > maxTop) clampedY = maxTop;
+
+            // Left edge: proposedLeft = centerX + clampedX >= margin
+            const minLeft = margin - centerX;
+            if(clampedX < minLeft) clampedX = minLeft;
+
+            // Right edge: proposedLeft + elemW <= vw - margin  =>  centerX + clampedX + elemW <= vw - margin
+            const maxLeft = vw - margin - elemW - centerX;
+            if(clampedX > maxLeft) clampedX = maxLeft;
+
+            // If clamped values differ significantly from saved, update localStorage
+            if(clampedX !== savedOffset.x || clampedY !== savedOffset.y)
+            {
+                const newStorage = { ...GetLocalStorage<WindowSaveOptions>(`nitro.windows.${ uniqueKey }`) } as WindowSaveOptions;
+                newStorage.offset = { x: clampedX, y: clampedY };
+                SetLocalStorage<WindowSaveOptions>(`nitro.windows.${ uniqueKey }`, newStorage);
+            }
+
+            setDelta({ x: 0, y: 0 });
+            setOffset({ x: clampedX, y: clampedY });
+        };
+
+        // Try immediately; if dimensions aren't ready, retry on next frame
+        if(elementRef.current && elementRef.current.offsetWidth > 0)
+        {
+            applyOffset();
+        }
+        else
+        {
+            const raf = requestAnimationFrame(applyOffset);
+            return () => cancelAnimationFrame(raf);
+        }
     }, [ uniqueKey ]);
 
     return (

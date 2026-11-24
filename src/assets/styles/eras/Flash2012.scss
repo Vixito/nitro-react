@@ -27,7 +27,7 @@
 
 @font-face {
     font-family: 'Ubuntu2012';
-    src: url('@/assets/fonts/eras/flash2012/Ubuntu.ttf') format('truetype');
+    src: url('@/assets/webfonts/Ubuntu.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -35,7 +35,7 @@
 
 @font-face {
     font-family: 'Ubuntu2012';
-    src: url('@/assets/fonts/eras/flash2012/UbuntuMedium.ttf') format('truetype');
+    src: url('@/assets/webfonts/Ubuntu-m.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -43,10 +43,26 @@
 
 @font-face {
     font-family: 'Ubuntu2012';
-    src: url('@/assets/fonts/eras/flash2012/UbuntuBold.ttf') format('truetype');
+    src: url('@/assets/webfonts/Ubuntu-b.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
+}
+
+@font-face {
+    font-family: 'Volter2012';
+    src: url('@/assets/webfonts/Ubuntu.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+
+@font-face {
+    font-family: 'Volter2012';
+    src: url('@/assets/webfonts/Ubuntu-b.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    unicode-range: U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
 }
 
 body.era-flash-2012,
@@ -5401,6 +5417,10 @@ body[data-era="flash2012"] {
                 }
             }
 
+            .emoji-classic-section > div {
+                color: #333333 !important;
+            }
+
             .emoji-item {
                 width: 34px !important;
                 height: 34px !important;
@@ -5417,6 +5437,12 @@ body[data-era="flash2012"] {
                 align-items: center !important;
                 justify-content: center !important;
                 cursor: pointer !important;
+
+                &.emoji-item-habbo-classic {
+                    font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                    color: #141414 !important;
+                    font-size: 20px !important;
+                }
 
                 &:hover {
                     background-color: #e2ecf2 !important;

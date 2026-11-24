@@ -1,5 +1,6 @@
 import { FC, useMemo, useRef, useState } from 'react';
 import { Overlay, Popover } from 'react-bootstrap';
+import { CLASSIC_HABBO_FONT_SYMBOLS, CLASSIC_HABBO_SYMBOLS, GetAltCodeForCharacter } from '../../../../api';
 import { Base, Flex } from '../../../../common';
 
 export interface ChatInputEmojiPickerViewProps
@@ -75,6 +76,11 @@ const EMOJI_CATEGORIES = [
             '🎲', '🎯', '🎳', '🎸', '🎹', '💸', '💵', '💰', '🪙', '💳', '⚠️', '⛔', '🚫',
             '✅', '❌', '❓', '❗'
         ]
+    },
+    {
+        id: 'classic',
+        name: 'Clásicos',
+        emojis: CLASSIC_HABBO_SYMBOLS
     },
     {
         id: 'commands',
@@ -172,6 +178,41 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
                                     </div>
                                 )) }
                             </div>
+                        ) : activeCategory === 'classic' ? (
+                            <div className="emoji-classic-section">
+                                <div className="mb-1" style={ { fontSize: '12px', color: '#cbd5e1' } }>
+                                    <strong>Íconos clásicos de Habbo</strong> (también con <strong>ALT + Numpad</strong> en chat y salas):
+                                </div>
+                                <div className="emoji-grid mb-2">
+                                    { CLASSIC_HABBO_FONT_SYMBOLS.map(item => (
+                                        <button
+                                            key={ item.char }
+                                            type="button"
+                                            className="emoji-item emoji-item-habbo-classic btn btn-link p-0 text-decoration-none"
+                                            title={ `${ item.label } (${ item.altCode })` }
+                                            onClick={ () => handleSelect(item.char) }
+                                        >
+                                            { item.char }
+                                        </button>
+                                    )) }
+                                </div>
+                                <div className="mb-1" style={ { fontSize: '11.5px', color: '#94a3b8' } }>
+                                    Otros símbolos y flechas:
+                                </div>
+                                <div className="emoji-grid">
+                                    { CLASSIC_HABBO_SYMBOLS.map((emoji, idx) => (
+                                        <button
+                                            key={ idx }
+                                            type="button"
+                                            className="emoji-item emoji-item-habbo-classic btn btn-link p-0 text-decoration-none"
+                                            title={ (GetAltCodeForCharacter(emoji) > 0) ? `ALT + ${ GetAltCodeForCharacter(emoji) }` : undefined }
+                                            onClick={ () => handleSelect(emoji) }
+                                        >
+                                            { emoji }
+                                        </button>
+                                    )) }
+                                </div>
+                            </div>
                         ) : (
                             <div className="emoji-grid">
                                 { filteredEmojis.map((emoji, idx) => (
@@ -179,6 +220,7 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
                                         key={ idx }
                                         type="button"
                                         className="emoji-item btn btn-link p-0 text-decoration-none"
+                                        title={ (GetAltCodeForCharacter(emoji) > 0) ? `ALT + ${ GetAltCodeForCharacter(emoji) }` : undefined }
                                         onClick={ () => handleSelect(emoji) }
                                     >
                                         { emoji }

@@ -12,10 +12,6 @@ export const UserSettingsView: FC<{}> = props => {
     const [catalogPlaceMultipleObjects, setCatalogPlaceMultipleObjects] = useCatalogPlaceMultipleItems();
     const [catalogSkipPurchaseConfirmation, setCatalogSkipPurchaseConfirmation] = useCatalogSkipPurchaseConfirmation();
     const [infinitePermissions, setInfinitePermissions] = useState<{ credits: { rankHas: boolean, enabled: boolean }, pixels: { rankHas: boolean, enabled: boolean }, points: { rankHas: boolean, enabled: boolean } }>(null);
-    const [showDiscordModal, setShowDiscordModal] = useState(false);
-    const [discordTag, setDiscordTag] = useState(localStorage.getItem('habbten_discord_tag') || '');
-    const [isDiscordConnected, setIsDiscordConnected] = useState(!!localStorage.getItem('habbten_discord_tag'));
-    const [discordStatusMsg, setDiscordStatusMsg] = useState('');
     const { currentEra, setEra, eras } = useEraTheme();
     const isMobile = useIsMobile();
     const { enabled: dpadEnabled, side: dpadSide, setEnabled: setDpadEnabled, setSide: setDpadSide } = useMobileDpadSettings();
@@ -299,7 +295,7 @@ export const UserSettingsView: FC<{}> = props => {
                                 <button type="button" className="btn-shiny-2012 flex-fill" onClick={ () => CreateLinkEvent('era-selector/open') }>
                                     Selector Visual
                                 </button>
-                                <button type="button" className="btn-shiny-2012 flex-fill" onClick={ () => setShowDiscordModal(true) }>
+                                <button type="button" className="btn-shiny-2012 flex-fill" onClick={ () => CreateLinkEvent('discord/open') }>
                                     Discord
                                 </button>
                             </div>
@@ -319,71 +315,6 @@ export const UserSettingsView: FC<{}> = props => {
                         </div>
                     </NitroCardContentView>
                 </NitroCardView>
-                { showDiscordModal && (
-                    <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings settings-flash2012" style={{ zIndex: 1050, width: 380 }}>
-                        <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
-                        <NitroCardContentView className="settings-2012-body">
-                            <div className="settings-2012-sunk-box d-flex align-items-center gap-2">
-                                <div style={{ width: 48, height: 48, minWidth: 48, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <svg width="44" height="44" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M32 6L56 18V44L32 58L8 44V18L32 6Z" fill="#5865F2" stroke="#000000" strokeWidth="2" />
-                                        <path d="M32 6L56 18L32 30L8 18L32 6Z" fill="#7983F5" />
-                                        <path d="M32 30V58L8 44V18L32 30Z" fill="#4752C4" />
-                                        <path d="M32 30V58L56 44V18L32 30Z" fill="#5865F2" />
-                                        <path d="M24 24C22.5 24.5 21 25.5 20 27.5C20 33.5 23 39 27 41C28 40 29 38.5 30 37.5C27.5 36.8 26.5 35 26.5 35C26.5 35 27 35.3 28 35.8C30.5 37 33 37.5 35.5 37.5C38 37.5 40.5 37 43 35.8C44 35.3 44.5 35 44.5 35C44.5 35 43.5 36.8 41 37.5C42 38.5 43 40 44 41C48 39 51 33.5 51 27.5C50 25.5 48.5 24.5 47 24C45.5 26 44.5 28 44 30C41.5 29.5 39 29.5 35.5 29.5C32 29.5 29.5 29.5 27 30C26.5 28 25.5 26 24 24Z" fill="white" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div className="settings-2012-box-title mb-1">Conecta Habbten a Discord</div>
-                                    <div style={{ fontSize: '11px', color: '#e6e4de', lineHeight: '1.35' }}>
-                                        ¡Comparte tu actividad del hotel con tus amigos en Discord!
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="settings-2012-sunk-box">
-                                <div className="settings-2012-box-title">Escribe tu Usuario de Discord:</div>
-                                <div className="d-flex align-items-center gap-1 mt-1">
-                                    <input
-                                        type="text"
-                                        className="form-control form-control-sm"
-                                        placeholder="@tu_usuario_discord"
-                                        value={discordTag}
-                                        onChange={e => setDiscordTag(e.target.value)}
-                                    />
-                                    <button
-                                        type="button"
-                                        className="btn-shiny-2012 px-3"
-                                        onClick={() => {
-                                            if (discordTag.trim()) {
-                                                localStorage.setItem('habbten_discord_tag', discordTag.trim());
-                                                setIsDiscordConnected(true);
-                                                setDiscordStatusMsg('¡Cuenta vinculada correctamente!');
-                                                setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                            } else {
-                                                localStorage.removeItem('habbten_discord_tag');
-                                                setIsDiscordConnected(false);
-                                                setDiscordStatusMsg('Cuenta desvinculada.');
-                                                setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                            }
-                                        }}
-                                    >
-                                        {isDiscordConnected ? '✓ Vinculado' : 'Vincular'}
-                                    </button>
-                                </div>
-                                {discordStatusMsg && <div className="small text-center mt-1" style={{ color: '#7ce850' }}>{discordStatusMsg}</div>}
-                            </div>
-                            <div className="settings-2012-footer">
-                                <button
-                                    type="button"
-                                    className="btn-shiny-2012 px-3"
-                                    onClick={() => setShowDiscordModal(false)}
-                                >
-                                    Volver
-                                </button>
-                            </div>
-                        </NitroCardContentView>
-                    </NitroCardView>
-                ) }
             </>
         );
     }
@@ -497,7 +428,7 @@ export const UserSettingsView: FC<{}> = props => {
                             </>
                         ) }
                         <HorizontalRule />
-                        <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => setShowDiscordModal(true)}>
+                        <Button variant="primary" className="d-flex align-items-center justify-content-center my-2 py-2" onClick={() => CreateLinkEvent('discord/open')}>
                             <Text bold variant="white">Conectar a Discord</Text>
                         </Button>
                         {infinitePermissions && (infinitePermissions.credits.rankHas || infinitePermissions.pixels.rankHas || infinitePermissions.points.rankHas) &&
@@ -553,124 +484,6 @@ export const UserSettingsView: FC<{}> = props => {
                     </Column>
                 </NitroCardContentView>
             </NitroCardView>
-            {showDiscordModal && (
-                <NitroCardView uniqueKey="nitro-discord-settings" theme="primary-slim" className="nitro-discord-settings" style={{ zIndex: 1050, width: 430, backgroundColor: '#2d2847', color: '#ffffff', boxShadow: '0 8px 24px rgba(0,0,0,0.6)' }}>
-                    <NitroCardHeaderView headerText="Habbten Actividad en Discord" onCloseClick={() => setShowDiscordModal(false)} />
-                    <NitroCardContentView className="p-3" style={{ backgroundColor: '#2d2847', color: '#ffffff' }}>
-                        <div className="d-flex align-items-center gap-3 mb-3">
-                            <div style={{ width: 64, height: 64, minWidth: 64, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M32 6L56 18V44L32 58L8 44V18L32 6Z" fill="#5865F2" stroke="#4752C4" strokeWidth="2" />
-                                    <path d="M32 6L56 18L32 30L8 18L32 6Z" fill="#7983F5" />
-                                    <path d="M32 30V58L8 44V18L32 30Z" fill="#4752C4" />
-                                    <path d="M32 30V58L56 44V18L32 30Z" fill="#5865F2" />
-                                    <path d="M24 24C22.5 24.5 21 25.5 20 27.5C20 33.5 23 39 27 41C28 40 29 38.5 30 37.5C27.5 36.8 26.5 35 26.5 35C26.5 35 27 35.3 28 35.8C30.5 37 33 37.5 35.5 37.5C38 37.5 40.5 37 43 35.8C44 35.3 44.5 35 44.5 35C44.5 35 43.5 36.8 41 37.5C42 38.5 43 40 44 41C48 39 51 33.5 51 27.5C50 25.5 48.5 24.5 47 24C45.5 26 44.5 28 44 30C41.5 29.5 39 29.5 35.5 29.5C32 29.5 29.5 29.5 27 30C26.5 28 25.5 26 24 24Z" fill="white" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div className="fw-bold mb-1" style={{ fontSize: '15px', color: '#ffffff' }}>Conecta Habbten a Discord</div>
-                                <div style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.4' }}>
-                                    ¡Hemos detectado que tienes un auténtico espíritu gamer! *Choca esos cinco*<br />
-                                    ¿Quieres que tus amigos/as sepan lo que estás haciendo en este loco hotel?
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mb-3 p-3 rounded" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="fw-bold mb-2 text-white" style={{ fontSize: '13px' }}>Ajustes:</div>
-                            <div className="d-flex flex-column gap-2" style={{ fontSize: '12px' }}>
-                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0 ps-1">
-                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                    <span className="text-white">Mostrar Habbten en mi estado de Discord</span>
-                                </label>
-                                <label className="d-flex align-items-center gap-2 cursor-pointer mb-0 ps-1">
-                                    <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                    <span className="text-white">Compartir mi actividad dentro del juego</span>
-                                </label>
-                                <div className="ps-4 d-flex flex-column gap-2">
-                                    <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
-                                        <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                        <span style={{ color: '#cbd5e1' }}>Esconder actividad en salas ocultas</span>
-                                    </label>
-                                    <label className="d-flex align-items-center gap-2 cursor-pointer mb-0">
-                                        <input type="checkbox" className="form-check-input mt-0" defaultChecked />
-                                        <span style={{ color: '#cbd5e1' }}>Permitir que los/as usuarios/as se unan a mí</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mb-3">
-                            <div className="fw-bold mb-1.5 text-white" style={{ fontSize: '13px' }}>Paso 1: Servidor Oficial de Habbten</div>
-                            <div className="d-flex align-items-center justify-content-between p-1 rounded mt-2" style={{ background: '#3f385c', border: '1px solid #5a4f7e', color: '#ffffff' }}>
-                                <div className="d-flex align-items-center gap-3">
-                                    <div style={{ width: 44, height: 44, minWidth: 44, background: '#261f38', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #5a4f7e', padding: '3px' }}>
-                                        <img src="habbten_logo.png" onError={({ currentTarget }) => { currentTarget.src = '/game/habbten_logo.png'; }} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} alt="" />
-                                    </div>
-                                    <div>
-                                        <div className="fw-bold text-white" style={{ fontSize: '13px' }}>Servidor Oficial de Habbten</div>
-                                        <div style={{ fontSize: '12.5px', color: '#e2e8f0' }}>Únete a nuestra comunidad oficial</div>
-                                    </div>
-                                </div>
-                                <a
-                                    href="https://discord.com/invite/EVafmrDh"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn btn-sm py-1.5 px-3 fw-bold text-decoration-none"
-                                    style={{ background: '#5865F2', color: '#ffffff', border: 'none', fontSize: '12px', borderRadius: '6px', marginRight: '4px' }}
-                                >
-                                    Unirse
-                                </a>
-                            </div>
-                        </div>
-
-                        <div className="p-3 rounded mb-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                            <div className="fw-bold mb-2 text-white" style={{ fontSize: '12px' }}>Paso 2: Escribe tu Usuario de Discord:</div>
-                            <div className="input-group">
-                                <span className="input-group-text bg-dark text-white border-secondary">@</span>
-                                <input
-                                    type="text"
-                                    className="form-control bg-dark text-white border-secondary"
-                                    placeholder="tu_usuario_discord"
-                                    value={discordTag}
-                                    onChange={e => setDiscordTag(e.target.value)}
-                                    style={{ fontSize: '12px' }}
-                                />
-                                <button
-                                    type="button"
-                                    className={`btn ${isDiscordConnected ? 'btn-success' : 'btn-primary'} fw-bold px-3`}
-                                    style={{ fontSize: '12px' }}
-                                    onClick={() => {
-                                        if (discordTag.trim()) {
-                                            localStorage.setItem('habbten_discord_tag', discordTag.trim());
-                                            setIsDiscordConnected(true);
-                                            setDiscordStatusMsg('¡Cuenta vinculada correctamente!');
-                                            setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                        } else {
-                                            localStorage.removeItem('habbten_discord_tag');
-                                            setIsDiscordConnected(false);
-                                            setDiscordStatusMsg('Cuenta desvinculada.');
-                                            setTimeout(() => setDiscordStatusMsg(''), 3000);
-                                        }
-                                    }}
-                                >
-                                    {isDiscordConnected ? '✓ Vinculado' : 'Vincular'}
-                                </button>
-                            </div>
-                            {discordStatusMsg && <div className="text-success small text-center mt-1.5">{discordStatusMsg}</div>}
-                        </div>
-
-                        <button
-                            type="button"
-                            className="btn w-100 py-2 fw-bold"
-                            style={{ background: '#4a406b', color: '#ffffff', border: '2px solid #2b2344', borderRadius: '6px', fontSize: '12px' }}
-                            onClick={() => setShowDiscordModal(false)}
-                        >
-                            ¿Habbten en Discord? ¿Con esta economía..? ¡Sácame de aquí!
-                        </button>
-                    </NitroCardContentView>
-                </NitroCardView>
-            )}
         </>
     );
 }

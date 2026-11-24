@@ -1,6 +1,6 @@
 import { HabboWebTools, ILinkEventTracker, RoomSessionEvent } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
-import { AddEventLinkTracker, GetCommunication, RemoveLinkEventTracker } from '../../api';
+import { AddEventLinkTracker, GetAltCodeCharacter, GetCommunication, RemoveLinkEventTracker, StripControlCharacters } from '../../api';
 import { Base, TransitionAnimation, TransitionAnimationTypes } from '../../common';
 import { useRoomSessionManagerEvent } from '../../hooks';
 import { useIsMobile } from '../../hooks/mobile/useIsMobile';
@@ -31,6 +31,8 @@ import { UserProfileView } from '../user-profile/UserProfileView';
 import { UserSettingsView } from '../user-settings/UserSettingsView';
 import { WiredView } from '../wired/WiredView';
 import { EraSelectorModalView } from '../eras/EraSelectorModalView';
+import { DiscordLinkModalView } from '../discord/DiscordLinkModalView';
+import { DiscordActivityReporter } from '../discord/DiscordActivityReporter';
 import { LoginStreakView } from '../streak/LoginStreakView';
 import { BulletinBoardView } from '../bulletin/BulletinBoardView';
 import { ClientTutorialView } from '../tutorial/ClientTutorialView';
@@ -53,6 +55,114 @@ export const MainView: FC<{}> = props =>
         setIsReady(true);
 
         GetCommunication()?.connection?.onReady();
+    }, []);
+
+    // Soporte global de códigos ALT + teclado numérico (ALT+7 = •, ALT+0134 = † bomba, ALT+157 = ¥ estrella, etc.)
+    // Funciona en cualquier <input> o <textarea> (chat, nombre de sala, ajustes, misión, mensajero) en todas las versiones y SO.
+    useEffect(() =>
+    {
+        let buffer = '';
+        let activeEl: HTMLInputElement | HTMLTextAreaElement | null = null;
+        let startValue = '';
+        let selStart = 0;
+        let selEnd = 0;
+
+        const isEditable = (el: Element | null): el is HTMLInputElement | HTMLTextAreaElement =>
+        {
+            if(!el) return false;
+            if(el instanceof HTMLTextAreaElement) return !el.disabled && !el.readOnly;
+            if(el instanceof HTMLInputElement)
+            {
+                const allowed = [ 'text', 'search', 'url', 'email', 'password', '' ];
+                return !el.disabled && !el.readOnly && allowed.includes((el.type || '').toLowerCase());
+            }
+            return false;
+        };
+
+        const setNativeValue = (el: HTMLInputElement | HTMLTextAreaElement, nextValue: string, caretPos: number) =>
+        {
+            const proto = (el instanceof HTMLTextAreaElement) ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+            const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+            if(setter) setter.call(el, nextValue);
+            else el.value = nextValue;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            try
+            {
+                el.setSelectionRange(caretPos, caretPos);
+            }
+            catch (_) {}
+        };
+
+        const onKeyDown = (event: KeyboardEvent) =>
+        {
+            if(!event.altKey || !/^Numpad[0-9]$/.test(event.code)) return;
+
+            const target = isEditable(document.activeElement) ? document.activeElement : null;
+            if(!target) return;
+
+            // Evitar que Linux/Chrome cambie de pestaña o mueva el cursor al usar Alt+Numpad
+            event.preventDefault();
+
+            if(!buffer)
+            {
+                activeEl = target;
+                startValue = target.value;
+                selStart = target.selectionStart ?? target.value.length;
+                selEnd = target.selectionEnd ?? target.value.length;
+            }
+
+            buffer += event.code.charAt(6);
+        };
+
+        const onKeyUp = (event: KeyboardEvent) =>
+        {
+            if(event.key !== 'Alt' || !buffer) return;
+
+            const capturedBuffer = buffer;
+            const target = activeEl;
+            const capturedStartVal = startValue;
+            const start = selStart;
+            const end = selEnd;
+
+            buffer = '';
+            activeEl = null;
+
+            if(!target || !target.isConnected) return;
+
+            const leadingZero = capturedBuffer.charAt(0) === '0';
+            const code = parseInt(capturedBuffer, 10);
+            const char = GetAltCodeCharacter(code, leadingZero);
+
+            setTimeout(() =>
+            {
+                if(!target.isConnected) return;
+
+                // Si el SO (Windows) ya insertó el carácter nativamente, solo limpiamos caracteres de control
+                if(target.value !== capturedStartVal)
+                {
+                    const cleaned = StripControlCharacters(target.value);
+                    if(cleaned !== target.value)
+                    {
+                        setNativeValue(target, cleaned, cleaned.length);
+                    }
+                    return;
+                }
+
+                if(!char) return;
+
+                const nextVal = capturedStartVal.substring(0, start) + char + capturedStartVal.substring(end);
+                setNativeValue(target, nextVal, start + char.length);
+            }, 0);
+        };
+
+        window.addEventListener('keydown', onKeyDown, true);
+        window.addEventListener('keyup', onKeyUp, true);
+
+        return () =>
+        {
+            window.removeEventListener('keydown', onKeyDown, true);
+            window.removeEventListener('keyup', onKeyUp, true);
+        };
     }, []);
 
     useEffect(() =>
@@ -126,6 +236,8 @@ export const MainView: FC<{}> = props =>
             <BulletinBoardView />
             <ClientTutorialView />
             <EraSelectorModalView />
+            <DiscordLinkModalView />
+            <DiscordActivityReporter />
         </Base>
     );
 }

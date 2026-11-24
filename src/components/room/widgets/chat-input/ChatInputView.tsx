@@ -1,7 +1,7 @@
 import { HabboClubLevelEnum, RoomControllerLevel } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfiguration, GetSessionDataManager, LocalizeText, RoomWidgetUpdateChatInputContentEvent } from '../../../../api';
+import { ChatMessageTypeEnum, GetClubMemberLevel, GetConfiguration, GetSessionDataManager, LocalizeText, RoomWidgetUpdateChatInputContentEvent, StripControlCharacters } from '../../../../api';
 import { Text } from '../../../../common';
 import { useChatInputWidget, useRoom, useSessionInfo, useUiEvent } from '../../../../hooks';
 import { useEraTheme } from '../../../../hooks/era/useEraTheme';
@@ -133,7 +133,7 @@ export const ChatInputView: FC<{}> = props =>
             setIsIdle(true);
         }
 
-        setChatValue(value);
+        setChatValue(StripControlCharacters(value));
     }, [ setIsTyping, setIsIdle ]);
 
     const onKeyDownEvent = useCallback((event: KeyboardEvent) =>
