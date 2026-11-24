@@ -33,12 +33,12 @@ export const PromoArticleWidgetView: FC<{}> = props =>
                 ) }
             </div>
             { articles && articles[index] &&
-                <div className="promo-article d-flex flex-row row mx-0">
-                    <div className="promo-article-image" style={ { backgroundImage: `url(${ articles[index].imageUrl })` } }/>
-                    <div className="col-3 d-flex flex-column h-100">
+                <div className="promo-article d-flex flex-row flex-nowrap align-items-start mx-0">
+                    <div className="promo-article-image flex-shrink-0" style={ { backgroundImage: `url(${ articles[index].imageUrl })` } }/>
+                    <div className="promo-article-body d-flex flex-column flex-grow-1">
                         <h3 className="my-0">{ articles[index].title }</h3>
                         <b>{ articles[index].bodyText }</b>
-                        <button className="btn btn-sm mt-auto btn-gainsboro" onClick={ event => OpenUrl(articles[index].linkContent) }>{ articles[index].buttonText }</button>
+                        <button className="btn btn-sm mt-2 align-self-start px-3 btn-gainsboro" onClick={ event => OpenUrl(articles[index].linkContent) }>{ articles[index].buttonText }</button>
                     </div>
                 </div> }
         </div>

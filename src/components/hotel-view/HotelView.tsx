@@ -552,7 +552,7 @@ export const HotelView: FC<{}> = props =>
                                 widgetSlot={ 1 }
                                 widgetType={ getWidgetType(1) }
                                 widgetConf={ getWidgetConf(1) }
-                                className="col-6"
+                                className="col-10"
                             />
                             <div className="col-12 row mx-0">
                                 <WidgetSlotView
@@ -668,7 +668,7 @@ export const HotelView: FC<{}> = props =>
                             widgetSlot={ 1 }
                             widgetType={ getWidgetType(1) }
                             widgetConf={ getWidgetConf(1) }
-                            className="col-6"
+                            className="col-10"
                         />
                         <div className="col-12 row mx-0">
                             <WidgetSlotView

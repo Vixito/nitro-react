@@ -1,12 +1,11 @@
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
-import hdCreditsImg from '../../assets/images/eras/flash2012/streak/hd_credits.png';
-import hdDiamondsImg from '../../assets/images/eras/flash2012/streak/hd_diamonds.png';
-import hdGiftBoxImg from '../../assets/images/eras/flash2012/streak/hd_gift_box.png';
-import hdPixelsImg from '../../assets/images/eras/flash2012/streak/hd_pixels.png';
-import hdRareCrownImg from '../../assets/images/eras/flash2012/streak/hd_rare_crown.png';
+import { AddEventLinkTracker, GetRoomEngine, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
+import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import creditIconImg from '../../assets/images/eras/flash2012/purse/credit_icon.png';
+import ducketIconImg from '../../assets/images/eras/flash2012/purse/ducket_icon.png';
+import iconBonusBagImg from '../../assets/images/eras/flash2012/streak/icon_bonusbag_habbo.png';
+import iconDiamondHabboImg from '../../assets/images/eras/flash2012/streak/icon_diamond_habbo.png';
 import iconFlameSmallImg from '../../assets/images/eras/flash2012/streak/icon_flame_small.png';
 import iconStarStreakImg from '../../assets/images/eras/flash2012/streak/icon_star_streak.png';
 import trophyBaseImg from '../../assets/images/eras/flash2012/streak/streak_trophy_base.png';
@@ -18,6 +17,9 @@ interface StreakMilestone
     rewardType: 'diamonds' | 'pixels' | 'credits' | 'gift' | 'rare' | 'badge';
     rewardAmount: number;
     rewardLabel: string;
+    itemId?: number;
+    itemCode?: string;
+    itemName?: string;
     claimed: boolean;
     reached: boolean;
     canClaim: boolean;
@@ -141,7 +143,7 @@ export const LoginStreakView: FC<{}> = () =>
             const json = await res.json();
             if(json && json.success)
             {
-                setStatusMsg(`¡Has reclamado ${ json.rewardLabel }!`);
+                setStatusMsg(`Has reclamado ${ json.rewardLabel }.`);
                 await loadStreak(targetUserId);
             }
             else if(json?.error)
@@ -170,28 +172,51 @@ export const LoginStreakView: FC<{}> = () =>
     const currentPage = Math.min(page, totalPages);
     const pageItems = milestones.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-    // Highlight the first claimable or first upcoming unreached milestone (matching Habbo 2012 yellow highlight)
     const highlightedDays = (milestones.find(m => m.canClaim) || milestones.find(m => !m.claimed))?.days ?? -1;
+
+    const getFurniIconUrl = (itemCode?: string): string | null =>
+    {
+        if(!itemCode) return null;
+        try
+        {
+            const session = GetSessionDataManager();
+            const engine = GetRoomEngine();
+            const floor = session?.getFloorItemDataByName(itemCode);
+            if(floor) return engine?.getFurnitureFloorIconUrl(floor.id) || null;
+            const wall = session?.getWallItemDataByName(itemCode);
+            if(wall) return engine?.getFurnitureWallIconUrl(wall.id) || null;
+        }
+        catch
+        {
+            // Fallback to static hof_furni icon path
+        }
+        const safeCode = itemCode.replace('*', '_');
+        return `/game/swf/dcr/hof_furni/icons/${ encodeURIComponent(safeCode) }_icon.png`;
+    };
 
     const renderRewardIcon = (m: StreakMilestone) =>
     {
+        if(m.rewardType === 'rare' && m.itemCode)
+        {
+            const furniUrl = getFurniIconUrl(m.itemCode);
+            if(furniUrl)
+            {
+                return <img src={ furniUrl } alt={ m.itemName || m.rewardLabel } className="streak-pixel-img streak-reward-icon" />;
+            }
+        }
         if(m.rewardType === 'diamonds')
         {
-            return <img src={ hdDiamondsImg } alt="Diamantes" width={ 30 } height={ 30 } className="streak-hd-img" />;
+            return <img src={ iconDiamondHabboImg } alt="Diamantes" className="streak-pixel-img streak-reward-icon" />;
         }
         if(m.rewardType === 'pixels')
         {
-            return <img src={ hdPixelsImg } alt="Píxeles" width={ 30 } height={ 30 } className="streak-hd-img" />;
+            return <img src={ ducketIconImg } alt="Píxeles" width={ 23 } height={ 22 } className="streak-pixel-img" />;
         }
         if(m.rewardType === 'gift')
         {
-            return <img src={ hdGiftBoxImg } alt="Cofre especial" width={ 30 } height={ 30 } className="streak-hd-img" />;
+            return <img src={ iconBonusBagImg } alt="Cofre especial" width={ 27 } height={ 30 } className="streak-pixel-img" />;
         }
-        if(m.rewardType === 'rare' || m.rewardType === 'badge')
-        {
-            return <img src={ hdRareCrownImg } alt="Recompensa rara" width={ 30 } height={ 30 } className="streak-hd-img" />;
-        }
-        return <img src={ hdCreditsImg } alt="Créditos" width={ 30 } height={ 30 } className="streak-hd-img" />;
+        return <img src={ creditIconImg } alt="Créditos" width={ 23 } height={ 22 } className="streak-pixel-img" />;
     };
 
     const currentStreak = data?.currentStreak ?? 0;
@@ -295,14 +320,14 @@ export const LoginStreakView: FC<{}> = () =>
                 </div>
 
                 <div className="login-streak-pagination">
-                    <button
-                        type="button"
-                        className="streak-page-nav"
+                    <Button
+                        variant="secondary"
+                        size="sm"
                         disabled={ currentPage <= 1 }
-                        onClick={ () => setPage(prev => Math.max(1, prev - 1)) }
+                        onClick={ () => currentPage > 1 && setPage(prev => Math.max(1, prev - 1)) }
                     >
                         Anterior
-                    </button>
+                    </Button>
                     <div className="streak-page-numbers">
                         { Array.from({ length: totalPages }, (_, idx) => idx + 1).map(p => (
                             <button
@@ -315,14 +340,14 @@ export const LoginStreakView: FC<{}> = () =>
                             </button>
                         )) }
                     </div>
-                    <button
-                        type="button"
-                        className="streak-page-nav"
+                    <Button
+                        variant="secondary"
+                        size="sm"
                         disabled={ currentPage >= totalPages }
-                        onClick={ () => setPage(prev => Math.min(totalPages, prev + 1)) }
+                        onClick={ () => currentPage < totalPages && setPage(prev => Math.min(totalPages, prev + 1)) }
                     >
                         Siguiente
-                    </button>
+                    </Button>
                 </div>
             </NitroCardContentView>
         </NitroCardView>

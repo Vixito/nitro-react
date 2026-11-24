@@ -10,7 +10,8 @@ interface AdventCalendarPayload
     subtitle: string;
     totalDays: number;
     currentDay: number;
-    isEarlyPreview: boolean;
+    isBeforeStart: boolean;
+    daysUntilStart: number;
     isStaff: boolean;
     days: AdventCalendarDay[];
 }
@@ -55,7 +56,7 @@ export const CampaignView: FC<{}> = () =>
             const json = await res.json();
             if(json && json.success)
             {
-                setStatusMessage(`¡Enhorabuena! Recibiste: ${ json.rewardLabel }`);
+                setStatusMessage(`Enhorabuena, has recibido: ${ json.rewardLabel }`);
                 await loadCalendar();
             }
             else if(json?.error)
@@ -105,8 +106,8 @@ export const CampaignView: FC<{}> = () =>
         <CalendarView
             onClose={ () => setCalendarOpen(false) }
             title={ calendarData?.title || 'Calendario de Adviento Navidad 2026' }
-            subtitle={ calendarData?.subtitle || 'Del 1 al 25 de diciembre de 2026 • ¡Abre un regalo cada día en Habbten!' }
-            currentDay={ calendarData?.currentDay || 1 }
+            subtitle={ calendarData?.subtitle || 'Del 1 al 25 de diciembre de 2026 en Habbten' }
+            currentDay={ calendarData?.currentDay ?? 0 }
             totalDays={ calendarData?.totalDays || 25 }
             isStaff={ !!calendarData?.isStaff }
             days={ calendarData?.days || [] }
