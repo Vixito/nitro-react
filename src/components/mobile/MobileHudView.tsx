@@ -62,7 +62,28 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     const [ isSoundActive, setIsSoundActive ] = useState(true);
     const [ modeToast, setModeToast ] = useState<string>('');
     const chatInputRef = useRef<HTMLInputElement>(null);
+    const topRightRef = useRef<HTMLDivElement>(null);
     const toastTimerRef = useRef<number | null>(null);
+
+    useEffect(() =>
+    {
+        const el = topRightRef.current;
+        if(!el) return;
+        const syncWidth = () =>
+        {
+            const w = Math.ceil(el.getBoundingClientRect().width);
+            if(w > 0) document.documentElement.style.setProperty('--hmob-top-right-width', `${ w }px`);
+        };
+        syncWidth();
+        const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncWidth) : null;
+        ro?.observe(el);
+        window.addEventListener('resize', syncWidth);
+        return () =>
+        {
+            ro?.disconnect();
+            window.removeEventListener('resize', syncWidth);
+        };
+    }, [ credits, duckets, diamonds ]);
 
     const isMod = GetSessionDataManager() ? GetSessionDataManager().isModerator : false;
     const credits = getCurrencyAmount ? getCurrencyAmount(-1) : 0;
@@ -293,7 +314,7 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     return (
         <div className="hmob-hud">
             {/* BARRA SUPERIOR DERECHA: MONEDERO COMPACTO + BOTÓN ORIGINAL "?" */}
-            <div className="hmob-top-right">
+            <div className="hmob-top-right" ref={ topRightRef }>
                 <button
                     type="button"
                     className="hmob-purse-pill"

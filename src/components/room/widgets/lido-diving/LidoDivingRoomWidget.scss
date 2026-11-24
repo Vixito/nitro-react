@@ -1085,40 +1085,62 @@ body.is-mobile-ui {
     }
 
     .lido-hud-bar {
-        top: calc(52px + env(safe-area-inset-top));
-        padding: 5px 8px;
-        background: rgba(20, 84, 117, 0.94);
-        border: 2px solid #0b3952;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        top: calc(max(10px, env(safe-area-inset-top)) + 4px);
+        left: auto;
+        right: calc(max(10px, env(safe-area-inset-right)) + var(--hmob-top-right-width, 276px) + 8px);
+        transform: none;
+        height: 36px;
+        padding: 0 8px;
+        gap: 4px;
+        max-width: calc(100vw - var(--hmob-top-right-width, 276px) - 28px - env(safe-area-inset-left) - env(safe-area-inset-right));
+        overflow-x: auto;
+        scrollbar-width: none;
+        box-sizing: border-box;
+        background: rgba(9, 44, 65, 0.88);
+        border: 1.5px solid rgba(125, 198, 232, 0.45);
+        border-radius: 999px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(4px);
         font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 12px;
+        font-size: 11px;
         color: #ffffff;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .lido-hud-title {
+        font-size: 11px;
+        padding: 0 2px;
     }
 
     .lido-hud-divider {
+        height: 16px;
         background: rgba(255, 255, 255, 0.25);
     }
 
     .lido-hud-tickets {
-        height: 28px;
-        padding: 0 8px;
+        height: 24px;
+        padding: 0 7px;
         background: #0e3f59;
         border: 1.5px solid #358eb8;
-        border-radius: 7px;
+        border-radius: 999px;
         color: #ffe46b;
+        font-size: 11px;
         font-weight: 700;
     }
 
     .lido-btn {
-        min-height: 30px;
-        padding: 0 11px;
-        border-radius: 7px;
+        height: 24px;
+        min-height: 24px;
+        padding: 0 9px;
+        border-radius: 999px;
         border: 1.5px solid #0b3952;
         background: #eef3f6;
         color: #142633;
         font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
     }
 
@@ -1135,20 +1157,23 @@ body.is-mobile-ui {
     }
 
     .lido-toast {
-        top: calc(96px + env(safe-area-inset-top));
+        top: calc(max(10px, env(safe-area-inset-top)) + 46px);
         background: #165e82;
         color: #ffffff;
         border: 2px solid #0b3952;
         border-radius: 8px;
         font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 12.5px;
+        font-size: 12px;
         font-weight: 700;
     }
 
     .lido-dispenser-panel,
     .lido-lb-panel,
     .lido-vote-popover {
-        top: calc(96px + env(safe-area-inset-top));
+        top: calc(max(10px, env(safe-area-inset-top)) + 46px);
+        max-height: calc(100dvh - max(10px, env(safe-area-inset-top)) - 112px - env(safe-area-inset-bottom));
+        display: flex;
+        flex-direction: column;
     }
 
     .lido-window {
@@ -1157,31 +1182,32 @@ body.is-mobile-ui {
         border-radius: 10px;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
         font-family: 'Ubuntu', -apple-system, sans-serif;
-        font-size: 13px;
+        font-size: 12.5px;
         color: #142633;
     }
 
     .lido-window-header {
-        height: 38px;
-        padding: 0 38px 0 12px;
+        height: 32px;
+        flex-shrink: 0;
+        padding: 0 34px 0 12px;
         background: linear-gradient(180deg, #1d7099 0%, #145475 100%);
         border-bottom: 1.5px solid #0b3952;
     }
 
     .lido-window-title {
         color: #ffffff;
-        font-size: 13.5px;
+        font-size: 13px;
         font-weight: 700;
     }
 
     .lido-close-x {
-        width: 26px;
-        height: 26px;
+        width: 22px;
+        height: 22px;
         border-radius: 6px;
         background: #c9245e;
         border: 1.5px solid #ffffff;
         color: #ffffff;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
         display: flex;
         align-items: center;
@@ -1189,9 +1215,31 @@ body.is-mobile-ui {
     }
 
     .lido-window-body {
-        padding: 12px;
+        padding: 8px 10px;
         background: #eef3f6;
         color: #142633;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .lido-cabin-top {
+        padding: 6px 8px;
+        margin-bottom: 6px;
+    }
+
+    .lido-cabin-avatar-box {
+        width: 54px;
+        height: 64px;
+    }
+
+    .lido-cabin-avatar-img {
+        width: 48px;
+        height: 62px;
+    }
+
+    .lido-inset-box {
+        padding: 6px 8px;
+        margin-bottom: 4px;
     }
 
     .lido-cabin-top,
