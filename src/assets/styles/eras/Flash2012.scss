@@ -43,6 +43,15 @@
 
 @font-face {
     font-family: 'Ubuntu2012';
+    src: url('@/assets/webfonts/Ubuntu.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+007C, U+2020-2022, U+0192, U+00A5, U+00AA, U+00BA, U+2014, U+00B5, U+00B1, U+00AC, U+00F7, U+00B6, U+00BB, U+2018;
+}
+
+@font-face {
+    font-family: 'Ubuntu2012';
     src: url('@/assets/webfonts/Ubuntu-b.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
@@ -1438,8 +1447,12 @@ body[data-era="flash2012"] {
                 }
 
                 .action-sep {
-                    color: #6b675f !important;
-                    font-size: 10px !important;
+                    display: inline-block !important;
+                    width: 1px !important;
+                    height: 10px !important;
+                    background-color: #6b675f !important;
+                    align-self: center !important;
+                    flex-shrink: 0 !important;
                 }
             }
         }

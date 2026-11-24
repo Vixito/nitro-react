@@ -127,9 +127,9 @@ export const PurseView: FC<{}> = props =>
                     {/* Barra superior/inferior compacta de utilidades 2012 (Ayuda | Ajustes | Salir) */}
                     <div className="purse-action-bar">
                         <span className="action-link" title="Ayuda" onClick={ () => CreateLinkEvent('help/show') }>Ayuda</span>
-                        <span className="action-sep">|</span>
+                        <span className="action-sep" aria-hidden="true" />
                         <span className="action-link" title="Ajustes" onClick={ () => CreateLinkEvent('user-settings/toggle') }>Ajustes</span>
-                        <span className="action-sep">|</span>
+                        <span className="action-sep" aria-hidden="true" />
                         <span className="action-link" title="Cerrar sesión" onClick={ handleLogout }>Salir</span>
                     </div>
                 </div>

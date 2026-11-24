@@ -242,8 +242,12 @@
                 &.emoji-item-habbo-classic {
                     font-family: 'Ubuntu', sans-serif !important;
                     color: #f8fafc !important;
-                    font-size: 20px !important;
+                    font-size: 18px !important;
                     line-height: 1.2 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    white-space: nowrap !important;
                 }
 
                 &:hover {
