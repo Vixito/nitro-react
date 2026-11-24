@@ -64,19 +64,286 @@ export const HotelView: FC<{}> = props =>
 
     if(!isVisible) return null;
 
+    let habbtenConfig: any = null;
+    try
+    {
+        habbtenConfig = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig || null;
+    }
+    catch(e)
+    {
+        habbtenConfig = (window as any)?.HabbtenConfig || null;
+    }
+
+    const activeEraKey = isMobile ? 'mobile' : (currentEra || 'modern');
+    const layout = (activeEraKey === 'shockwave2006')
+        ? habbtenConfig?.hotel_view?.custom_layouts?.['shockwave2006']
+        : (activeEraKey === 'flash2012')
+            ? habbtenConfig?.hotel_view?.custom_layouts?.['flash2012']
+            : (activeEraKey === 'mobile')
+                ? habbtenConfig?.hotel_view?.custom_layouts?.['mobile']
+                : (habbtenConfig?.hotel_view?.custom_layouts?.['modern'] || habbtenConfig?.hotel_view?.custom_layout);
+    const sceneConf = (layout && layout.scene) ? layout.scene : {};
+    const stageWidth = Number(layout?.stageWidth) || CANVAS_W;
+    const stageHeight = Number(layout?.stageHeight) || CANVAS_H;
+
+    // Helper: Build CSS shadow string from shadow object
+    const buildShadow = (shadow: any): string => {
+        if (!shadow) return '';
+        if (typeof shadow === 'string') return shadow;
+        const { color = 'rgba(0,0,0,0.5)', blur = 0, offsetX = 0, offsetY = 0 } = shadow;
+        if (!blur && !offsetX && !offsetY) return '';
+        return `${offsetX}px ${offsetY}px ${blur}px ${color}`;
+    };
+
+    // Filter out invisible and broken image objects
+    const validObjects = (layout && layout.objects) ? layout.objects.filter((el: any) => {
+        if (el.visible === false) return false;
+        if (el.type === 'image' && (!el.src || el.width === 0 || el.height === 0)) return false;
+        return true;
+    }) : [];
+
+    const customOverlay = validObjects.length > 0 ? (
+        <div className="custom-landing-overlay" style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            zIndex: 10,
+            overflow: 'hidden',
+        }}>
+            {validObjects.map((el: any, i: number) => {
+                // Interactive Engine: Evaluate visibility condition
+                if (el.condition) {
+                    try {
+                        const keys = Object.keys(layoutState);
+                        const values = Object.values(layoutState);
+                        const fn = new Function(...keys, `return ${el.condition};`);
+                        el._hiddenByCondition = !fn(...values);
+                    } catch(e) { el._hiddenByCondition = false; }
+                } else {
+                    el._hiddenByCondition = false;
+                }
+
+                const elWidth = (Number(el.width) || 100) * (Number(el.scaleX) || 1);
+                const elHeight = (Number(el.height) || 40) * (Number(el.scaleY) || 1);
+                const rawLeft = Number(el.left) || 0;
+                const rawTop = Number(el.top) || 0;
+                const anchor = el.anchor || (layout?.version >= 2 ? 'percent' : 'top-left');
+
+                const baseTransform = `skew(${el.skewX || 0}deg, ${el.skewY || 0}deg) rotate(${el.angle || 0}deg)`;
+                const posStyle: React.CSSProperties = {
+                    position: 'absolute',
+                    width: elWidth,
+                    height: (el.type === 'i-text' || el.type === 'text') ? 'auto' : elHeight,
+                    minHeight: (el.type === 'i-text' || el.type === 'text') ? elHeight : undefined,
+                    transform: baseTransform,
+                    transformOrigin: 'top left',
+                };
+
+                if (anchor === 'percent') {
+                    const leftPct = (el.leftPct !== undefined && el.leftPct !== null) ? Number(el.leftPct) : (rawLeft / stageWidth) * 100;
+                    const topPct = (el.topPct !== undefined && el.topPct !== null) ? Number(el.topPct) : (rawTop / stageHeight) * 100;
+                    posStyle.left = `${leftPct}%`;
+                    posStyle.top = `${topPct}%`;
+                } else if (anchor === 'top-right') {
+                    posStyle.right = Math.round(stageWidth - (rawLeft + elWidth));
+                    posStyle.top = Math.round(rawTop);
+                } else if (anchor === 'bottom-left') {
+                    posStyle.left = Math.round(rawLeft);
+                    posStyle.bottom = Math.round(stageHeight - (rawTop + elHeight));
+                } else if (anchor === 'bottom-right') {
+                    posStyle.right = Math.round(stageWidth - (rawLeft + elWidth));
+                    posStyle.bottom = Math.round(stageHeight - (rawTop + elHeight));
+                } else if (anchor === 'top-center') {
+                    const offsetX = Math.round((rawLeft + elWidth / 2) - (stageWidth / 2));
+                    posStyle.left = `calc(50% + ${offsetX}px)`;
+                    posStyle.top = Math.round(rawTop);
+                    posStyle.transform = `translateX(-50%) ${baseTransform}`;
+                    posStyle.transformOrigin = 'top center';
+                } else if (anchor === 'bottom-center') {
+                    const offsetX = Math.round((rawLeft + elWidth / 2) - (stageWidth / 2));
+                    posStyle.left = `calc(50% + ${offsetX}px)`;
+                    posStyle.bottom = Math.round(stageHeight - (rawTop + elHeight));
+                    posStyle.transform = `translateX(-50%) ${baseTransform}`;
+                    posStyle.transformOrigin = 'bottom center';
+                } else if (anchor === 'center') {
+                    const offsetX = Math.round((rawLeft + elWidth / 2) - (stageWidth / 2));
+                    const offsetY = Math.round((rawTop + elHeight / 2) - (stageHeight / 2));
+                    posStyle.left = `calc(50% + ${offsetX}px)`;
+                    posStyle.top = `calc(50% + ${offsetY}px)`;
+                    posStyle.transform = `translate(-50%, -50%) ${baseTransform}`;
+                    posStyle.transformOrigin = 'center center';
+                } else {
+                    posStyle.left = Math.round(rawLeft);
+                    posStyle.top = Math.round(rawTop);
+                }
+
+                const customCssProps = el.cssStyle ? el.cssStyle.split(';').reduce((acc: any, rule: string) => {
+                    const match = rule.match(/^\s*([\w-]+)\s*:\s*(.+?)\s*$/);
+                    if (match) {
+                        const camelKey = match[1].replace(/-([a-z])/g, g => g[1].toUpperCase());
+                        acc[camelKey] = match[2];
+                    }
+                    return acc;
+                }, {}) : {};
+
+                const style: React.CSSProperties = {
+                    ...posStyle,
+                    zIndex: el.zIndex || (i + 1),
+                    opacity: el._hiddenByCondition ? 0 : (el.opacity ?? 1),
+                    pointerEvents: el._hiddenByCondition ? 'none' : (el.hyperlink || el.clickAction || el.type === 'custom-widget' ? 'auto' : 'none'),
+                    cursor: (el.hyperlink || el.clickAction) && !el._hiddenByCondition ? 'pointer' : 'default',
+                    ...customCssProps
+                };
+
+                // Interactive Engine: Click Actions
+                const onClick = () => {
+                    if (el._hiddenByCondition) return;
+                    if (el.hyperlink) window.open(el.hyperlink, '_blank');
+                    if (el.clickAction) {
+                        try {
+                            const parts = el.clickAction.split('=').map((s: string) => s.trim());
+                            if (parts.length === 2) {
+                                let val = isNaN(Number(parts[1])) ? parts[1].replace(/['"]/g, '') : Number(parts[1]);
+                                setLayoutState(prev => ({ ...prev, [parts[0]]: val }));
+                            }
+                        } catch(e) {}
+                    }
+                };
+
+                // Parse Data Binding Variables
+                const parseTemplate = (str: string) => {
+                    if (!str) return '';
+                    let parsed = str.replace(/\{\{\s*online_users\s*\}\}/g, onlineUsers.toString());
+                    parsed = parsed.replace(/\{\{\s*user\.username\s*\}\}/g, userInfo?.username || '');
+                    return parsed;
+                };
+
+                let boundText = parseTemplate(el.text);
+
+                if (el.dataBinding) {
+                    const dbStr = parseTemplate(el.dataBinding);
+                    try {
+                        const keys = Object.keys(layoutState);
+                        const values = Object.values(layoutState);
+                        const args = ['onlineUsers', 'userInfo', 'Math', 'window', ...keys];
+                        const fnArgs = [onlineUsers, userInfo, Math, window, ...values];
+
+                        const evaluated = new Function(...args, `return ${dbStr}`);
+                        const res = evaluated(...fnArgs);
+
+                        if (res !== null && typeof res === 'object') {
+                            Object.assign(style, res);
+                            if (res.text !== undefined) boundText = res.text;
+                        } else if (res !== undefined) {
+                            boundText = String(res);
+                        }
+                    } catch(e) {
+                        boundText = dbStr;
+                    }
+                }
+
+                const customClasses = el.cssClasses ? ` ${parseTemplate(el.cssClasses)}` : '';
+                if (el.cssStyle) {
+                    try {
+                        const parsedStyle = parseTemplate(el.cssStyle);
+                        const extraStyles = parsedStyle.split(';').filter((s: string) => s.trim().length > 0).reduce((acc: any, rule: string) => {
+                            const idx = rule.indexOf(':');
+                            if (idx > 0) {
+                                const key = rule.slice(0, idx).trim();
+                                const val = rule.slice(idx + 1).trim();
+                                if (key && val) {
+                                    const camelKey = key.replace(/-([a-z])/g, (g: string) => g[1].toUpperCase());
+                                    acc[camelKey] = val;
+                                }
+                            }
+                            return acc;
+                        }, {});
+                        Object.assign(style, extraStyles);
+                    } catch(e) {}
+                }
+
+                if (el.type === 'custom-widget') {
+                    return (
+                        <div key={el.id || ('w' + i)} className={`custom-widget-container${customClasses}`} style={{ ...style, pointerEvents: 'auto' }}>
+                            <WidgetSlotView widgetSlot={el.slotId || 1} widgetType={el.widgetType || 'promoarticle'} widgetConf={el.widgetConf || {}} />
+                        </div>
+                    );
+                }
+
+                if (el.type === 'i-text' || el.type === 'text') {
+                    return (
+                        <div key={el.id || ('t' + i)} className={`custom-landing-text${customClasses}`} style={{
+                            ...style,
+                            color: el.fill || '#ffffff',
+                            fontFamily: el.fontFamily || 'Ubuntu, sans-serif',
+                            fontSize: el.fontSize || 24,
+                            fontWeight: el.fontWeight || 'normal',
+                            lineHeight: 1.2,
+                            textAlign: el.textAlign || 'left',
+                            whiteSpace: 'pre-wrap',
+                            wordBreak: 'break-word',
+                            textShadow: buildShadow(el.shadow) || undefined,
+                        }} onClick={onClick}>
+                            {boundText}
+                        </div>
+                    );
+                }
+
+                if (el.type === 'rect') {
+                    return <div key={el.id || ('r' + i)} className={`custom-landing-shape custom-rect${customClasses}`} style={{
+                        ...style,
+                        backgroundColor: el.fill,
+                        borderRadius: el.rx ? `${el.rx}px` : undefined,
+                        boxShadow: buildShadow(el.shadow) || undefined,
+                    }} onClick={onClick} />;
+                }
+
+                if (el.type === 'circle') {
+                    return <div key={el.id || ('c' + i)} className={`custom-landing-shape custom-circle${customClasses}`} style={{
+                        ...style,
+                        backgroundColor: el.fill,
+                        borderRadius: '50%',
+                        boxShadow: buildShadow(el.shadow) || undefined,
+                    }} onClick={onClick} />;
+                }
+
+                if (el.type === 'image' && el.src) {
+                    return (
+                        <img key={el.id || ('i' + i)} src={el.src} className={`custom-landing-img${customClasses}`} style={{
+                            ...style,
+                            objectFit: el.objectFit || 'contain',
+                            imageRendering: el.pixelated ? 'pixelated' : undefined,
+                            filter: (el.shadow && (el.shadow.blur || el.shadow.offsetX || el.shadow.offsetY))
+                                ? `drop-shadow(${el.shadow.offsetX || 0}px ${el.shadow.offsetY || 0}px ${el.shadow.blur || 0}px ${el.shadow.color || '#000000'})`
+                                : 'none'
+                        }} onClick={onClick} alt={el.name || 'hotel-widget'} />
+                    );
+                }
+                return null;
+            })}
+        </div>
+    ) : null;
+
     if(isMobile)
     {
         const displayName = userInfo?.username || 'Habbten';
+        const mobileBg = sceneConf.background || undefined;
+        const mobileArt = sceneConf.leftImage === 'none' ? '' : (sceneConf.leftImage || mobileHotelExterior);
         return (
-            <div className="nitro-hotel-view hmob-hotel-view">
+            <div className="nitro-hotel-view hmob-hotel-view" style={ mobileBg ? { background: mobileBg } : undefined }>
                 <div className="hmob-hv-stage">
-                    <div className="hmob-hv-art-wrap">
-                        <img
-                            src={ mobileHotelExterior }
-                            alt="Habbten Hotel"
-                            className="hmob-hv-art"
-                        />
-                    </div>
+                    { mobileArt && (
+                        <div className="hmob-hv-art-wrap">
+                            <img
+                                src={ mobileArt }
+                                alt="Habbten Hotel"
+                                className="hmob-hv-art"
+                            />
+                        </div>
+                    ) }
                     <div className="hmob-hv-actions">
                         <h1 className="hmob-hv-title">
                             ¿Qué hay, { displayName }?
@@ -113,31 +380,26 @@ export const HotelView: FC<{}> = props =>
                         </button>
                     </div>
                 </div>
+                { customOverlay }
             </div>
         );
-    }
-
-    let habbtenConfig: any = null;
-    try
-    {
-        habbtenConfig = (window.parent as any)?.HabbtenConfig || (window as any)?.HabbtenConfig || null;
-    }
-    catch(e)
-    {
-        habbtenConfig = (window as any)?.HabbtenConfig || null;
     }
 
     const hotelViewConf = GetConfiguration<Record<string, any>>('hotelview') || {};
     const hotelViewImages = hotelViewConf['images'] || {};
     const hotelViewWidgets = hotelViewConf['widgets'] || {};
 
-    const backgroundColor = habbtenConfig?.hotel_view?.backgroundColor || hotelViewImages['background.colour'] || '#6eadc8';
-    const background = hotelViewImages['background'] ? NitroConfiguration.interpolate(hotelViewImages['background']) : '';
+    const backgroundColor = sceneConf.background || habbtenConfig?.hotel_view?.backgroundColor || hotelViewImages['background.colour'] || '#6eadc8';
+    const background = sceneConf.background ? '' : (hotelViewImages['background'] ? NitroConfiguration.interpolate(hotelViewImages['background']) : '');
     const sun = hotelViewImages['sun'] ? NitroConfiguration.interpolate(hotelViewImages['sun']) : '';
     const drape = hotelViewImages['drape'] ? NitroConfiguration.interpolate(hotelViewImages['drape']) : '';
-    const left = habbtenConfig?.hotel_view?.custom_layout?.background_image || (hotelViewImages['left'] ? NitroConfiguration.interpolate(hotelViewImages['left']) : '');
+    const defaultLeft = hotelViewImages['left'] ? NitroConfiguration.interpolate(hotelViewImages['left']) : '';
+    const left = sceneConf.leftImage === 'none'
+        ? ''
+        : (sceneConf.leftImage || habbtenConfig?.hotel_view?.custom_layout?.background_image || defaultLeft);
     const rightRepeat = hotelViewImages['right.repeat'] ? NitroConfiguration.interpolate(hotelViewImages['right.repeat']) : '';
-    const right = hotelViewImages['right'] ? NitroConfiguration.interpolate(hotelViewImages['right']) : '';
+    const defaultRight = hotelViewImages['right'] ? NitroConfiguration.interpolate(hotelViewImages['right']) : '';
+    const right = sceneConf.rightImage === 'none' ? '' : (sceneConf.rightImage || defaultRight);
 
     const getWidgetConf = (slotId: number) => {
         if (habbtenConfig?.hotel_view?.slots?.[slotId]) {
@@ -153,14 +415,6 @@ export const HotelView: FC<{}> = props =>
         return hotelViewWidgets['slot.' + slotId + '.widget'] || '';
     };
 
-    // Helper: Build CSS shadow string from Fabric.js shadow object
-    const buildShadow = (shadow: any): string => {
-        if (!shadow) return '';
-        if (typeof shadow === 'string') return shadow;
-        const { color = 'rgba(0,0,0,0.5)', blur = 0, offsetX = 0, offsetY = 0 } = shadow;
-        return `${offsetX}px ${offsetY}px ${blur}px ${color}`;
-    };
-
     const backgrounds = (
         <>
             <div className="background position-absolute" style={ (background && background.length) ? { backgroundImage: `url(${ background })` } : {} } />
@@ -172,306 +426,121 @@ export const HotelView: FC<{}> = props =>
         </>
     );
 
-    const layout = (currentEra === 'shockwave2006')
-        ? habbtenConfig?.hotel_view?.custom_layouts?.['shockwave2006']
-        : (currentEra === 'flash2012')
-            ? habbtenConfig?.hotel_view?.custom_layouts?.['flash2012']
-            : (habbtenConfig?.hotel_view?.custom_layouts?.[currentEra] || habbtenConfig?.hotel_view?.custom_layout);
-    const customBg = (layout?.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '') 
-        ? layout.background 
-        : backgroundColor;
-
-    // Filter out invisible and broken image objects
-    const validObjects = (layout && layout.objects) ? layout.objects.filter((el: any) => {
-        if (el.visible === false) return false;
-        if (el.type === 'image' && (!el.src || el.width === 0 || el.height === 0)) return false;
-        return true;
-    }) : [];
-
-    const customOverlay = validObjects.length > 0 ? (
-        <div className="custom-landing-overlay" style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            zIndex: 10,
-        }}>
-            {validObjects.map((el: any, i: number) => {
-                // Interactive Engine: Evaluate visibility condition
-                if (el.condition) {
-                    try {
-                        const keys = Object.keys(layoutState);
-                        const values = Object.values(layoutState);
-                        const fn = new Function(...keys, `return ${el.condition};`);
-                        if (!fn(...values)) {
-                            el._hiddenByCondition = true;
-                        } else {
-                            el._hiddenByCondition = false;
-                        }
-                    } catch(e) { el._hiddenByCondition = false; }
-                } else {
-                    el._hiddenByCondition = false;
-                }
-
-                const elWidth = el.width;
-                const elHeight = el.height;
-                const topPx = el.top;
-                
-                const customCssProps = el.cssStyle ? el.cssStyle.split(';').reduce((acc: any, rule: string) => {
-                    const match = rule.match(/^\s*([\w-]+)\s*:\s*(.+?)\s*$/);
-                    if (match) {
-                        const camelKey = match[1].replace(/-([a-z])/g, g => g[1].toUpperCase());
-                        acc[camelKey] = match[2];
-                    }
-                    return acc;
-                }, {}) : {};
-
-                const style: React.CSSProperties = {
-                    position: 'absolute',
-                    left: el.left,
-                    top: topPx,
-                    width: elWidth,
-                    height: elHeight,
-                    transform: `skew(${el.skewX || 0}deg, ${el.skewY || 0}deg) rotate(${el.angle || 0}deg) scaleX(${el.scaleX || 1}) scaleY(${el.scaleY || 1})`,
-                    transformOrigin: 'top left',
-                    zIndex: i + 1,
-                    opacity: el._hiddenByCondition ? 0 : (el.opacity ?? 1),
-                    pointerEvents: el._hiddenByCondition ? 'none' : (el.hyperlink || el.clickAction || el.type === 'custom-widget' ? 'auto' : 'none'),
-                    cursor: (el.hyperlink || el.clickAction) && !el._hiddenByCondition ? 'pointer' : 'default',
-                    ...customCssProps
-                };
-
-                // Interactive Engine: Click Actions
-                const onClick = () => {
-                    if (el._hiddenByCondition) return;
-                    if (el.hyperlink) window.open(el.hyperlink, '_blank');
-                    if (el.clickAction) {
-                        try {
-                            const parts = el.clickAction.split('=').map((s: string) => s.trim());
-                            if (parts.length === 2) {
-                                let val = isNaN(Number(parts[1])) ? parts[1].replace(/['"]/g, '') : Number(parts[1]);
-                                setLayoutState(prev => ({ ...prev, [parts[0]]: val }));
-                            }
-                        } catch(e) {}
-                    }
-                };
-
-                // Parse Data Binding Variables
-                const parseTemplate = (str: string) => {
-                    if (!str) return '';
-                    let parsed = str.replace(/\{\{\s*online_users\s*\}\}/g, onlineUsers.toString());
-                    parsed = parsed.replace(/\{\{\s*user\.username\s*\}\}/g, userInfo?.username || '');
-                    return parsed;
-                };
-
-                let boundText = parseTemplate(el.text);
-                let boundWidth = elWidth;
-                let boundHeight = elHeight;
-
-                // Support advanced Data Binding via JS Expression
-                if (el.dataBinding) {
-                    const dbStr = parseTemplate(el.dataBinding);
-                    try {
-                        const keys = Object.keys(layoutState);
-                        const values = Object.values(layoutState);
-                        const args = ['onlineUsers', 'userInfo', 'Math', 'window', ...keys];
-                        const fnArgs = [onlineUsers, userInfo, Math, window, ...values];
-                        
-                        const evaluated = new Function(...args, `return ${dbStr}`);
-                        const res = evaluated(...fnArgs);
-                        
-                        if (res !== null && typeof res === 'object') {
-                            Object.assign(style, res);
-                            if (res.text !== undefined) boundText = res.text;
-                        } else if (res !== undefined) {
-                            boundText = String(res);
-                        }
-                    } catch(e) { 
-                        boundText = dbStr;
-                    }
-                }
-
-                style.width = style.width !== undefined ? style.width : boundWidth;
-                style.height = style.height !== undefined ? style.height : boundHeight;
-
-                const customClasses = el.cssClasses ? ` ${parseTemplate(el.cssClasses)}` : '';
-                if (el.cssStyle) {
-                    try {
-                        const parsedStyle = parseTemplate(el.cssStyle);
-                        const extraStyles = parsedStyle.split(';').filter((s: string) => s.trim().length > 0).reduce((acc: any, rule: string) => {
-                            const [key, val] = rule.split(':').map((s: string) => s.trim());
-                            if (key && val) {
-                                const camelKey = key.replace(/-([a-z])/g, (g: string) => g[1].toUpperCase());
-                                acc[camelKey] = val;
-                            }
-                            return acc;
-                        }, {});
-                        Object.assign(style, extraStyles);
-                    } catch(e) {}
-                }
-
-                if (el.type === 'custom-widget') {
-                    if (el.widgetType === 'promo_article') {
-                        return (
-                            <div key={'w'+i} className={`custom-landing-widget${customClasses}`} style={style} onClick={onClick}>
-                                <div className="custom-widget-promo">
-                                </div>
-                            </div>
-                        );
-                    }
-                    return (
-                        <div key={i} className={`custom-widget-container${customClasses}`} style={{ ...style, pointerEvents: 'auto' }}>
-                            <WidgetSlotView widgetSlot={el.slotId || 1} widgetType={el.widgetType || ''} widgetConf={el.widgetConf || ''} />
-                        </div>
-                    );
-                }
-
-                if (el.type === 'i-text' || el.type === 'text') {
-                    return (
-                        <div key={'t'+i} className={`custom-landing-text${customClasses}`} style={{
-                            ...style,
-                            color: el.fill,
-                            fontFamily: el.fontFamily,
-                            fontSize: el.fontSize,
-                            lineHeight: 1.16,
-                            textAlign: el.textAlign,
-                            whiteSpace: 'pre-wrap',
-                            textShadow: buildShadow(el.shadow) || undefined,
-                        }} onClick={onClick}>
-                            {boundText}
-                        </div>
-                    );
-                }
-
-                if (el.type === 'rect') {
-                    return <div key={'r'+i} className={`custom-landing-shape custom-rect${customClasses}`} style={{
-                        ...style,
-                        backgroundColor: el.fill,
-                        borderRadius: el.rx ? `${el.rx}px` : undefined,
-                        boxShadow: buildShadow(el.shadow) || undefined,
-                    }} onClick={onClick} />;
-                }
-                
-                if (el.type === 'circle') {
-                    return <div key={'c'+i} className={`custom-landing-shape custom-circle${customClasses}`} style={{
-                        ...style,
-                        backgroundColor: el.fill,
-                        borderRadius: '50%',
-                        boxShadow: buildShadow(el.shadow) || undefined,
-                    }} onClick={onClick} />;
-                }
-
-                if (el.type === 'image' && el.src) {
-                    return (
-                        <img key={'i'+i} src={el.src} className={`custom-landing-img${customClasses}`} style={{
-                            ...style,
-                            objectFit: 'fill',
-                            filter: el.shadow ? `drop-shadow(${el.shadow.offsetX}px ${el.shadow.offsetY}px ${el.shadow.blur}px ${el.shadow.color})` : 'none'
-                        }} onClick={onClick} alt="hotel-widget" />
-                    );
-                }
-                return null;
-            })}
-        </div>
-    ) : null;
+    const customBg = (sceneConf.background && sceneConf.background !== '')
+        ? sceneConf.background
+        : ((layout?.background && layout.background !== 'rgba(0,0,0,0)' && layout.background !== '')
+            ? layout.background
+            : backgroundColor);
 
     if(currentEra === 'flash2012')
     {
+        const f12ShowAvatar = sceneConf.showAvatar !== undefined ? !!sceneConf.showAvatar : (hotelViewConf['show.avatar'] ?? true);
+        const f12AvatarLeft = Number.isFinite(Number(sceneConf.avatarLeft)) ? Number(sceneConf.avatarLeft) : 28;
+        const f12AvatarBottom = Number.isFinite(Number(sceneConf.avatarBottom)) ? Number(sceneConf.avatarBottom) : 60;
+        const f12AvatarDir = Number.isFinite(Number(sceneConf.avatarDirection)) ? Number(sceneConf.avatarDirection) : 2;
+        const f12HasCustomBg = !!(sceneConf.background && sceneConf.background !== '');
+        const f12LeftImg = sceneConf.leftImage === 'none' ? '' : (sceneConf.leftImage || receptionLeft2012);
+        const f12RightImg = sceneConf.rightImage === 'none' ? '' : (sceneConf.rightImage || receptionRight2012);
+
         return (
             <div
                 className="nitro-hotel-view flash2012-hotel-view"
-                style={{
+                style={ f12HasCustomBg ? {
+                    background: sceneConf.background,
+                    overflow: 'hidden'
+                } : {
                     backgroundColor: '#89d4f1',
                     backgroundImage: `url(${ receptionStretch2012 })`,
                     backgroundRepeat: 'repeat-x',
                     backgroundSize: '100% calc(100% - 36px)',
                     backgroundPosition: 'top left',
                     overflow: 'hidden'
-                }}
+                } }
             >
-                {/* Paseo costero con palmeras y horizonte lejano (Marzo 2012) */}
-                <div
-                    className="reception-2012-horizon position-absolute"
-                    style={{
-                        left: 112,
-                        bottom: 36,
-                        width: 693,
-                        height: 341,
-                        backgroundImage: `url(${ receptionHorizon2012 })`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'bottom left',
-                        imageRendering: 'pixelated',
-                        pointerEvents: 'none',
-                        zIndex: 2
-                    }}
-                />
+                { !f12HasCustomBg && (
+                    <div
+                        className="reception-2012-horizon position-absolute"
+                        style={{
+                            left: 112,
+                            bottom: 36,
+                            width: 693,
+                            height: 341,
+                            backgroundImage: `url(${ receptionHorizon2012 })`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'bottom left',
+                            imageRendering: 'pixelated',
+                            pointerEvents: 'none',
+                            zIndex: 2
+                        }}
+                    />
+                ) }
 
-                {/* Arboleda derecha con montañas y paloma blanca (Marzo 2012) */}
-                <div
-                    className="reception-2012-right position-absolute"
-                    style={{
-                        right: 0,
-                        bottom: -12,
-                        width: 526,
-                        height: 455,
-                        backgroundImage: `url(${ receptionRight2012 })`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'bottom right',
-                        imageRendering: 'pixelated',
-                        pointerEvents: 'none',
-                        zIndex: 3
-                    }}
-                />
+                { f12RightImg && (
+                    <div
+                        className="reception-2012-right position-absolute"
+                        style={{
+                            right: 0,
+                            bottom: sceneConf.rightImage ? 0 : -12,
+                            width: sceneConf.rightImage ? '100%' : 526,
+                            height: sceneConf.rightImage ? '100%' : 455,
+                            backgroundImage: `url(${ f12RightImg })`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'bottom right',
+                            imageRendering: 'pixelated',
+                            pointerEvents: 'none',
+                            zIndex: 3
+                        }}
+                    />
+                ) }
 
-                {/* Extensión vertical de la torre naranja para monitores altos */}
-                <div
-                    className="reception-2012-tower-top position-absolute"
-                    style={{
-                        left: 0,
-                        top: 0,
-                        bottom: 1100,
-                        width: 134,
-                        backgroundImage: `url(${ receptionTopStretch2012 })`,
-                        backgroundRepeat: 'repeat-y',
-                        backgroundSize: '134px 1px',
-                        imageRendering: 'pixelated',
-                        pointerEvents: 'none',
-                        zIndex: 4
-                    }}
-                />
+                { !sceneConf.leftImage && (
+                    <div
+                        className="reception-2012-tower-top position-absolute"
+                        style={{
+                            left: 0,
+                            top: 0,
+                            bottom: 1100,
+                            width: 134,
+                            backgroundImage: `url(${ receptionTopStretch2012 })`,
+                            backgroundRepeat: 'repeat-y',
+                            backgroundSize: '134px 1px',
+                            imageRendering: 'pixelated',
+                            pointerEvents: 'none',
+                            zIndex: 4
+                        }}
+                    />
+                ) }
 
-                {/* Torre principal de Recepción Habbten 2012 sobre las nubes con toldo rojo 'H' */}
-                <div
-                    className="reception-2012-left position-absolute"
-                    style={{
-                        left: 0,
-                        bottom: 36,
-                        width: 874,
-                        height: 1064,
-                        backgroundImage: `url(${ receptionLeft2012 })`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'bottom left',
-                        imageRendering: 'pixelated',
-                        pointerEvents: 'none',
-                        zIndex: 4
-                    }}
-                />
+                { f12LeftImg && (
+                    <div
+                        className="reception-2012-left position-absolute"
+                        style={{
+                            left: 0,
+                            bottom: sceneConf.leftImage ? 0 : 36,
+                            width: sceneConf.leftImage ? '100%' : 874,
+                            height: sceneConf.leftImage ? '100%' : 1064,
+                            backgroundImage: `url(${ f12LeftImg })`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'bottom left',
+                            imageRendering: 'pixelated',
+                            pointerEvents: 'none',
+                            zIndex: 4
+                        }}
+                    />
+                ) }
 
-                {/* Avatar del jugador sobre la alfombra roja de la entrada 'H' */}
-                { (hotelViewConf['show.avatar'] ?? true) && (
+                { f12ShowAvatar && (
                     <div
                         className="reception-2012-avatar position-absolute"
                         style={{
-                            left: 28,
-                            bottom: 60,
+                            left: f12AvatarLeft,
+                            bottom: f12AvatarBottom,
                             zIndex: 6,
                             pointerEvents: 'none',
                             imageRendering: 'pixelated'
                         }}
                     >
-                        <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
+                        <LayoutAvatarImageView figure={ userFigure } direction={ f12AvatarDir } />
                     </div>
                 ) }
 
@@ -535,35 +604,60 @@ export const HotelView: FC<{}> = props =>
 
     if(currentEra === 'shockwave2006')
     {
-        if(validObjects.length > 0)
-        {
-            return (
-                <div className="nitro-hotel-view shockwave-hotel-view" style={ (customBg) ? { background: customBg } : { backgroundColor: '#000000' } }>
-                    { customOverlay }
-                </div>
-            );
-        }
+        const swBg = (sceneConf.background && sceneConf.background !== '') ? sceneConf.background : '#000000';
+        const swCenterImg = sceneConf.leftImage === 'none' ? '' : (sceneConf.leftImage || shockwaveEntryAuGif);
+        const swRightImg = sceneConf.rightImage === 'none' ? '' : (sceneConf.rightImage || '');
+        const swShowAvatar = sceneConf.showAvatar === true;
+        const swAvatarLeft = Number.isFinite(Number(sceneConf.avatarLeft)) ? Number(sceneConf.avatarLeft) : 100;
+        const swAvatarBottom = Number.isFinite(Number(sceneConf.avatarBottom)) ? Number(sceneConf.avatarBottom) : 40;
+        const swAvatarDir = Number.isFinite(Number(sceneConf.avatarDirection)) ? Number(sceneConf.avatarDirection) : 2;
 
         return (
-            <div className="nitro-hotel-view shockwave-hotel-view" style={{ backgroundColor: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <div 
-                    className="shockwave-hotel-entry"
-                    style={{
-                        width: 718,
-                        height: 480,
-                        maxWidth: '100%',
-                        maxHeight: '100%',
-                        backgroundImage: `url(${ shockwaveEntryAuGif })`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center',
-                        backgroundSize: '718px 480px',
-                        imageRendering: 'pixelated',
-                        position: 'relative'
-                    }}
-                />
+            <div className="nitro-hotel-view shockwave-hotel-view" style={{ background: swBg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                { swCenterImg && (
+                    <div
+                        className="shockwave-hotel-entry"
+                        style={{
+                            width: 718,
+                            height: 480,
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            backgroundImage: `url(${ swCenterImg })`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center',
+                            backgroundSize: 'contain',
+                            imageRendering: 'pixelated',
+                            position: 'relative',
+                            pointerEvents: 'none'
+                        }}
+                    />
+                ) }
+                { swRightImg && (
+                    <div
+                        className="right position-absolute"
+                        style={{
+                            backgroundImage: `url(${ swRightImg })`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'right bottom',
+                            imageRendering: 'pixelated',
+                            pointerEvents: 'none'
+                        }}
+                    />
+                ) }
+                { swShowAvatar && (
+                    <div className="avatar-image" style={{ zIndex: 11, left: swAvatarLeft, bottom: swAvatarBottom }}>
+                        <LayoutAvatarImageView figure={ userFigure } direction={ swAvatarDir } />
+                    </div>
+                ) }
+                { customOverlay }
             </div>
         );
     }
+
+    const modernShowAvatar = sceneConf.showAvatar !== undefined ? !!sceneConf.showAvatar : (hotelViewConf['show.avatar'] ?? true);
+    const modernAvatarLeft = Number.isFinite(Number(sceneConf.avatarLeft)) ? Number(sceneConf.avatarLeft) : 103;
+    const modernAvatarBottom = Number.isFinite(Number(sceneConf.avatarBottom)) ? Number(sceneConf.avatarBottom) : 24;
+    const modernAvatarDir = Number.isFinite(Number(sceneConf.avatarDirection)) ? Number(sceneConf.avatarDirection) : 2;
 
     return (
         <div className="nitro-hotel-view" style={ (customBg) ? { background: customBg } : (backgroundColor ? { background: backgroundColor } : {}) }>
@@ -620,9 +714,9 @@ export const HotelView: FC<{}> = props =>
             </div>
             { backgrounds }
             { customOverlay }
-            { (hotelViewConf['show.avatar'] ?? true) && (
-                <div className="avatar-image" style={{ zIndex: 11 }}>
-                    <LayoutAvatarImageView figure={ userFigure } direction={ 2 } />
+            { modernShowAvatar && (
+                <div className="avatar-image" style={{ zIndex: 11, left: modernAvatarLeft, bottom: modernAvatarBottom }}>
+                    <LayoutAvatarImageView figure={ userFigure } direction={ modernAvatarDir } />
                 </div>
             ) }
             { habbtenConfig?.hotel_view?.banner && (

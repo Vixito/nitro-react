@@ -24,11 +24,11 @@
 	--hv-scale-x: 1;
 	--hv-scale-y: 1;
 	
-	.avatar-image {
+	> .avatar-image {
 		bottom: 24px;
-		left: 132px;
+		left: 103px;
 		position: absolute;
-		z-index: 1;
+		z-index: 11;
 		pointer-events: none;
 		image-rendering: pixelated;
 	}
