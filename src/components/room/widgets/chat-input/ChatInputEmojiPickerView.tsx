@@ -181,7 +181,7 @@ export const ChatInputEmojiPickerView: FC<ChatInputEmojiPickerViewProps> = ({ on
                         ) : activeCategory === 'classic' ? (
                             <div className="emoji-classic-section">
                                 <div className="mb-1" style={ { fontSize: '12px', color: '#cbd5e1' } }>
-                                    <strong>Íconos clásicos de Habbo</strong> (también con <strong>ALT + Numpad</strong> en chat y salas):
+                                    <strong>Íconos clásicos de Habbten</strong> (también con <strong>ALT + Numpad</strong> en chat y salas):
                                 </div>
                                 <div className="emoji-grid mb-2">
                                     { CLASSIC_HABBO_FONT_SYMBOLS.map(item => (

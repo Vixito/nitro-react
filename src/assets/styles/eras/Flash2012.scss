@@ -5388,6 +5388,7 @@ body[data-era="flash2012"] {
             }
 
             .emoji-grid,
+            .emoji-classic-section,
             .habbten-shortcuts-grid,
             .gif-grid,
             .custom-gif-container {
@@ -5400,6 +5401,18 @@ body[data-era="flash2012"] {
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
                 box-sizing: border-box !important;
+            }
+
+            .emoji-classic-section {
+                .emoji-grid {
+                    background-color: transparent !important;
+                    border: none !important;
+                    border-radius: 0 !important;
+                    padding: 2px 0 !important;
+                    max-height: none !important;
+                    height: auto !important;
+                    overflow: visible !important;
+                }
             }
 
             .custom-gif-container {
