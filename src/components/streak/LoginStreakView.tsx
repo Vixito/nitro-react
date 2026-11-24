@@ -2,18 +2,20 @@ import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
 import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
-import iconDiamondImg from '../../assets/images/eras/flash2012/streak/icon_diamond_2012.png';
+import hdCreditsImg from '../../assets/images/eras/flash2012/streak/hd_credits.png';
+import hdDiamondsImg from '../../assets/images/eras/flash2012/streak/hd_diamonds.png';
+import hdGiftBoxImg from '../../assets/images/eras/flash2012/streak/hd_gift_box.png';
+import hdPixelsImg from '../../assets/images/eras/flash2012/streak/hd_pixels.png';
+import hdRareCrownImg from '../../assets/images/eras/flash2012/streak/hd_rare_crown.png';
 import iconFlameSmallImg from '../../assets/images/eras/flash2012/streak/icon_flame_small.png';
-import iconPixelImg from '../../assets/images/eras/flash2012/streak/icon_pixel_2012.png';
 import iconStarStreakImg from '../../assets/images/eras/flash2012/streak/icon_star_streak.png';
 import trophyBaseImg from '../../assets/images/eras/flash2012/streak/streak_trophy_base.png';
-import iconCreditImg from '../../assets/images/eras/shockwave_v14/credits_icon.png';
 
 interface StreakMilestone
 {
     days: number;
     title: string;
-    rewardType: 'diamonds' | 'pixels' | 'credits' | 'badge';
+    rewardType: 'diamonds' | 'pixels' | 'credits' | 'gift' | 'rare' | 'badge';
     rewardAmount: number;
     rewardLabel: string;
     claimed: boolean;
@@ -175,13 +177,21 @@ export const LoginStreakView: FC<{}> = () =>
     {
         if(m.rewardType === 'diamonds')
         {
-            return <img src={ iconDiamondImg } alt="Diamantes" width={ 22 } height={ 21 } className="streak-pixel-img" />;
+            return <img src={ hdDiamondsImg } alt="Diamantes" width={ 30 } height={ 30 } className="streak-hd-img" />;
         }
         if(m.rewardType === 'pixels')
         {
-            return <img src={ iconPixelImg } alt="Píxeles" width={ 22 } height={ 24 } className="streak-pixel-img" />;
+            return <img src={ hdPixelsImg } alt="Píxeles" width={ 30 } height={ 30 } className="streak-hd-img" />;
         }
-        return <img src={ iconCreditImg } alt="Créditos" width={ 20 } height={ 20 } className="streak-pixel-img" />;
+        if(m.rewardType === 'gift')
+        {
+            return <img src={ hdGiftBoxImg } alt="Cofre especial" width={ 30 } height={ 30 } className="streak-hd-img" />;
+        }
+        if(m.rewardType === 'rare' || m.rewardType === 'badge')
+        {
+            return <img src={ hdRareCrownImg } alt="Recompensa rara" width={ 30 } height={ 30 } className="streak-hd-img" />;
+        }
+        return <img src={ hdCreditsImg } alt="Créditos" width={ 30 } height={ 30 } className="streak-hd-img" />;
     };
 
     const currentStreak = data?.currentStreak ?? 0;
@@ -285,16 +295,34 @@ export const LoginStreakView: FC<{}> = () =>
                 </div>
 
                 <div className="login-streak-pagination">
-                    { Array.from({ length: totalPages }, (_, idx) => idx + 1).map(p => (
-                        <button
-                            key={ p }
-                            type="button"
-                            className={ `streak-page-btn ${ p === currentPage ? 'is-active' : '' }` }
-                            onClick={ () => setPage(p) }
-                        >
-                            { p }
-                        </button>
-                    )) }
+                    <button
+                        type="button"
+                        className="streak-page-nav"
+                        disabled={ currentPage <= 1 }
+                        onClick={ () => setPage(prev => Math.max(1, prev - 1)) }
+                    >
+                        Anterior
+                    </button>
+                    <div className="streak-page-numbers">
+                        { Array.from({ length: totalPages }, (_, idx) => idx + 1).map(p => (
+                            <button
+                                key={ p }
+                                type="button"
+                                className={ `streak-page-btn ${ p === currentPage ? 'is-active' : '' }` }
+                                onClick={ () => setPage(p) }
+                            >
+                                { p }
+                            </button>
+                        )) }
+                    </div>
+                    <button
+                        type="button"
+                        className="streak-page-nav"
+                        disabled={ currentPage >= totalPages }
+                        onClick={ () => setPage(prev => Math.min(totalPages, prev + 1)) }
+                    >
+                        Siguiente
+                    </button>
                 </div>
             </NitroCardContentView>
         </NitroCardView>

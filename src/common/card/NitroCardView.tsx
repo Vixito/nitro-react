@@ -34,6 +34,7 @@ const SKIN_2012_BY_KEY: Record<string, string> = {
     'era-selector': 'illumina-light',
     'help-center': 'illumina-light',
     'guide-tool': 'illumina-light',
+    'campaign-calendar': 'illumina-light',
     'navigator': 'ubuntu-blue',
     'navigator-room-creator': 'ubuntu-blue',
     'login-streak': 'ubuntu-blue',
@@ -57,7 +58,7 @@ export const NitroCardView: FC<NitroCardViewProps> = props =>
 
         const joined = [ ...(classNames || []), ((rest as any)?.className || '') ].join(' ');
         if(/commands-alert/i.test(joined)) return 'volter-blue';
-        if(/nitro-alert|nitro-help|nitro-guide|user-profile|nitro-friends-messenger/i.test(joined)) return 'illumina-light';
+        if(/nitro-alert|nitro-help|nitro-guide|nitro-campaign-calendar|user-profile|nitro-friends-messenger/i.test(joined)) return 'illumina-light';
         if(/nitro-friends/i.test(joined)) return 'volter-yellow';
         if(/nitro-wired|user-settings|nitro-discord-settings|avatar-editor|chat-history|floorplan-editor/i.test(joined)) return 'illumina-dark';
         if(/nitro-catalog|nitro-achievements|nitro-battle-pass/i.test(joined)) return 'ubuntu-blue';

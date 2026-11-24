@@ -5947,9 +5947,9 @@ body[data-era="flash2012"] {
 }
 
 .login-streak-window {
-    width: 492px !important;
-    min-width: 492px !important;
-    max-width: 492px !important;
+    width: 516px !important;
+    min-width: 516px !important;
+    max-width: 516px !important;
 
     .login-streak-body {
         background-color: #ecece6 !important;
@@ -5962,6 +5962,16 @@ body[data-era="flash2012"] {
         display: block !important;
         image-rendering: pixelated !important;
         flex-shrink: 0 !important;
+    }
+
+    .streak-hd-img {
+        display: block !important;
+        width: 30px !important;
+        height: 30px !important;
+        object-fit: contain !important;
+        image-rendering: auto !important;
+        flex-shrink: 0 !important;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.28)) !important;
     }
 
     .login-streak-summary {
@@ -6247,16 +6257,55 @@ body[data-era="flash2012"] {
     .login-streak-pagination {
         display: flex !important;
         align-items: center !important;
-        justify-content: flex-end !important;
+        justify-content: space-between !important;
         gap: 8px !important;
-        margin-top: 8px !important;
-        padding-right: 4px !important;
+        margin-top: 10px !important;
+        padding: 0 2px !important;
+
+        .streak-page-numbers {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+        }
+
+        .streak-page-nav {
+            height: 24px !important;
+            padding: 0 10px !important;
+            border-radius: 3px !important;
+            border: 1px solid #96968f !important;
+            background: linear-gradient(180deg, #f8f8f5 0%, #dfdfd8 100%) !important;
+            box-shadow: inset 0 1px 0 #ffffff !important;
+            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+            font-size: 11.5px !important;
+            font-weight: 700 !important;
+            color: #1f1e1c !important;
+            cursor: pointer !important;
+            line-height: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+
+            &:hover:not(:disabled) {
+                background: linear-gradient(180deg, #ffffff 0%, #eaeae4 100%) !important;
+                border-color: #6f6f68 !important;
+            }
+
+            &:active:not(:disabled) {
+                background: #d5d5ce !important;
+            }
+
+            &:disabled {
+                opacity: 0.45 !important;
+                cursor: default !important;
+            }
+        }
 
         .streak-page-btn {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            padding: 0 2px !important;
+            padding: 2px 4px !important;
             margin: 0 !important;
             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
             font-size: 12px !important;

@@ -1,71 +1,77 @@
-import { CampaignCalendarData, CampaignCalendarDataMessageEvent, CampaignCalendarDoorOpenedMessageEvent, ILinkEventTracker, OpenCampaignCalendarDoorAsStaffComposer, OpenCampaignCalendarDoorComposer } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
-import { AddEventLinkTracker, CalendarItem, RemoveLinkEventTracker, SendMessageComposer } from '../../api';
-import { useMessageEvent } from '../../hooks';
-import { CalendarView } from './CalendarView';
+import { ILinkEventTracker } from '@nitrots/nitro-renderer';
+import { FC, useCallback, useEffect, useState } from 'react';
+import { AddEventLinkTracker, RemoveLinkEventTracker } from '../../api';
+import { AdventCalendarDay, CalendarView } from './CalendarView';
 
-export const CampaignView: FC<{}> = props =>
+interface AdventCalendarPayload
 {
-    const [ calendarData, setCalendarData ] = useState<CampaignCalendarData>(null);
-    const [ lastOpenAttempt, setLastOpenAttempt ] = useState<number>(-1);
-    const [ receivedProducts, setReceivedProducts ] = useState<Map<number, CalendarItem>>(new Map());
+    campaignName: string;
+    title: string;
+    subtitle: string;
+    totalDays: number;
+    currentDay: number;
+    isEarlyPreview: boolean;
+    isStaff: boolean;
+    days: AdventCalendarDay[];
+}
+
+export const CampaignView: FC<{}> = () =>
+{
     const [ isCalendarOpen, setCalendarOpen ] = useState(false);
+    const [ calendarData, setCalendarData ] = useState<AdventCalendarPayload | null>(null);
+    const [ openingDay, setOpeningDay ] = useState<number | null>(null);
+    const [ statusMessage, setStatusMessage ] = useState<string>('');
 
-    const openPackage = (id: number, asStaff = false) =>
+    const loadCalendar = useCallback(async () =>
     {
-        if(!calendarData) return;
-
-        setLastOpenAttempt(id);
-
-        if(asStaff)
+        try
         {
-            SendMessageComposer(new OpenCampaignCalendarDoorAsStaffComposer(calendarData.campaignName, id));
-        }
-
-        else
-        {
-            SendMessageComposer(new OpenCampaignCalendarDoorComposer(calendarData.campaignName, id));
-        }
-    }
-
-    useMessageEvent<CampaignCalendarDataMessageEvent>(CampaignCalendarDataMessageEvent, event =>
-    {
-        const parser = event.getParser();
-
-        if(!parser) return;
-        
-        setCalendarData(parser.calendarData);
-    });
-
-    useMessageEvent<CampaignCalendarDoorOpenedMessageEvent>(CampaignCalendarDoorOpenedMessageEvent, event =>
-    {
-        const parser = event.getParser();
-
-        if(!parser) return;
-
-        const lastAttempt = lastOpenAttempt;
-
-        if(parser.doorOpened)
-        {
-            setCalendarData(prev => 
+            const res = await fetch('/api/client/calendar', { credentials: 'include' });
+            const json = await res.json();
+            if(json && json.success)
             {
-                const copy = prev.clone();
-                copy.openedDays.push(lastOpenAttempt);
-                    
-                return copy;
-            });
-    
-            setReceivedProducts(prev =>
-            {
-                const copy = new Map(prev);
-                copy.set(lastAttempt, new CalendarItem(parser.productName, parser.customImage,parser.furnitureClassName));
-                    
-                return copy;
-            });
+                setCalendarData(json as AdventCalendarPayload);
+            }
         }
+        catch
+        {
+            setStatusMessage('No se pudo cargar el Calendario de Adviento.');
+        }
+    }, []);
 
-        setLastOpenAttempt(-1);
-    });
+    const openDay = useCallback(async (day: number, asStaff = false) =>
+    {
+        if(openingDay !== null) return;
+        setOpeningDay(day);
+        setStatusMessage('');
+        try
+        {
+            const res = await fetch('/api/client/calendar/open', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ day, asStaff })
+            });
+            const json = await res.json();
+            if(json && json.success)
+            {
+                setStatusMessage(`¡Enhorabuena! Recibiste: ${ json.rewardLabel }`);
+                await loadCalendar();
+            }
+            else if(json?.error)
+            {
+                setStatusMessage(json.error);
+            }
+        }
+        catch
+        {
+            setStatusMessage('Error al abrir el regalo. Inténtalo de nuevo.');
+        }
+        finally
+        {
+            setOpeningDay(null);
+        }
+    }, [ loadCalendar, openingDay ]);
 
     useEffect(() =>
     {
@@ -73,13 +79,15 @@ export const CampaignView: FC<{}> = props =>
             linkReceived: (url: string) =>
             {
                 const value = url.split('/');
-        
+
                 if(value.length < 2) return;
-        
+
                 switch(value[1])
                 {
                     case 'calendar':
+                        setStatusMessage('');
                         setCalendarOpen(true);
+                        loadCalendar();
                         break;
                 }
             },
@@ -89,13 +97,22 @@ export const CampaignView: FC<{}> = props =>
         AddEventLinkTracker(linkTracker);
 
         return () => RemoveLinkEventTracker(linkTracker);
-    }, []);
+    }, [ loadCalendar ]);
+
+    if(!isCalendarOpen) return null;
 
     return (
-        <>
-            { (calendarData && isCalendarOpen) && 
-                <CalendarView onClose={ () => setCalendarOpen(false) } campaignName={ calendarData.campaignName } currentDay={ calendarData.currentDay } numDays={ calendarData.campaignDays } openedDays={ calendarData.openedDays } missedDays={ calendarData.missedDays } openPackage={ openPackage } receivedProducts={ receivedProducts } />
-            }
-        </>
-    )
-}
+        <CalendarView
+            onClose={ () => setCalendarOpen(false) }
+            title={ calendarData?.title || 'Calendario de Adviento Navidad 2026' }
+            subtitle={ calendarData?.subtitle || 'Del 1 al 25 de diciembre de 2026 • ¡Abre un regalo cada día en Habbten!' }
+            currentDay={ calendarData?.currentDay || 1 }
+            totalDays={ calendarData?.totalDays || 25 }
+            isStaff={ !!calendarData?.isStaff }
+            days={ calendarData?.days || [] }
+            openingDay={ openingDay }
+            statusMessage={ statusMessage }
+            onOpenDay={ openDay }
+        />
+    );
+};
