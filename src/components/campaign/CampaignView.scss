@@ -256,10 +256,23 @@
         image-rendering: pixelated;
     }
 
-    .advent-lock-sprite {
-        transform: scale(0.9);
-        transform-origin: center;
+    .advent-lock-circle {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: #d2d8df;
+        border: 2px solid #8c96a3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .advent-room-lock-icon {
+        width: 24px;
+        height: auto;
         image-rendering: pixelated;
+        display: block;
     }
 
     .advent-opened-box {
@@ -442,6 +455,11 @@ body[data-era="flash2012"] {
 
         .advent-footer-range {
             color: #3a3833 !important;
+        }
+
+        .advent-lock-circle {
+            background-color: #d6d3c8 !important;
+            border-color: #969388 !important;
         }
     }
 }

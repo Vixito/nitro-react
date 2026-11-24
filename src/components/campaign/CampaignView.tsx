@@ -12,7 +12,6 @@ interface AdventCalendarPayload
     currentDay: number;
     isBeforeStart: boolean;
     daysUntilStart: number;
-    isStaff: boolean;
     days: AdventCalendarDay[];
 }
 
@@ -40,7 +39,7 @@ export const CampaignView: FC<{}> = () =>
         }
     }, []);
 
-    const openDay = useCallback(async (day: number, asStaff = false) =>
+    const openDay = useCallback(async (day: number) =>
     {
         if(openingDay !== null) return;
         setOpeningDay(day);
@@ -51,7 +50,7 @@ export const CampaignView: FC<{}> = () =>
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ day, asStaff })
+                body: JSON.stringify({ day })
             });
             const json = await res.json();
             if(json && json.success)
@@ -109,7 +108,6 @@ export const CampaignView: FC<{}> = () =>
             subtitle={ calendarData?.subtitle || 'Del 1 al 25 de diciembre de 2026 en Habbten' }
             currentDay={ calendarData?.currentDay ?? 0 }
             totalDays={ calendarData?.totalDays || 25 }
-            isStaff={ !!calendarData?.isStaff }
             days={ calendarData?.days || [] }
             openingDay={ openingDay }
             statusMessage={ statusMessage }

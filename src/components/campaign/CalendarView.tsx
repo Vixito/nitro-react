@@ -5,6 +5,7 @@ import creditIconImg from '../../assets/images/eras/flash2012/purse/credit_icon.
 import ducketIconImg from '../../assets/images/eras/flash2012/purse/ducket_icon.png';
 import iconBonusBagImg from '../../assets/images/eras/flash2012/streak/icon_bonusbag_habbo.png';
 import iconDiamondHabboImg from '../../assets/images/eras/flash2012/streak/icon_diamond_habbo.png';
+import roomLockedIcon from '../../assets/images/navigator/icons/room_locked.png';
 
 export interface AdventCalendarDay
 {
@@ -23,18 +24,17 @@ interface CalendarViewProps
     subtitle: string;
     currentDay: number;
     totalDays: number;
-    isStaff: boolean;
     days: AdventCalendarDay[];
     openingDay: number | null;
     statusMessage: string;
-    onOpenDay(day: number, asStaff?: boolean): void;
+    onOpenDay(day: number): void;
 }
 
 const VISIBLE_COUNT = 5;
 
 export const CalendarView: FC<CalendarViewProps> = props =>
 {
-    const { onClose, title, subtitle, currentDay, totalDays, isStaff, days, openingDay, statusMessage, onOpenDay } = props;
+    const { onClose, title, subtitle, currentDay, totalDays, days, openingDay, statusMessage, onOpenDay } = props;
     const initialDay = currentDay >= 1 ? Math.min(totalDays, currentDay) : 1;
     const [ selectedDay, setSelectedDay ] = useState<number>(initialDay);
     const [ startIndex, setStartIndex ] = useState<number>(Math.max(0, Math.min(totalDays - VISIBLE_COUNT, initialDay - 2)));
@@ -59,7 +59,6 @@ export const CalendarView: FC<CalendarViewProps> = props =>
 
     const selected = dayList.find(d => d.day === selectedDay) || dayList[0];
     const visibleDays = dayList.slice(startIndex, startIndex + VISIBLE_COUNT);
-    const isModerator = isStaff || !!GetSessionDataManager()?.isModerator;
 
     const getFurniIconUrl = (itemName: string | null): string | null =>
     {
@@ -126,7 +125,9 @@ export const CalendarView: FC<CalendarViewProps> = props =>
         }
         return (
             <div className="advent-sprite-stage">
-                <Base className="campaign-spritesheet locked advent-lock-sprite" />
+                <div className="advent-lock-circle">
+                    <img src={ roomLockedIcon } alt="Cerrado" className="advent-room-lock-icon" />
+                </div>
             </div>
         );
     };
@@ -177,7 +178,7 @@ export const CalendarView: FC<CalendarViewProps> = props =>
     {
         if(selectedDay === dayObj.day && dayObj.state === 'available')
         {
-            onOpenDay(dayObj.day, false);
+            onOpenDay(dayObj.day);
             return;
         }
         setSelectedDay(dayObj.day);
@@ -214,28 +215,18 @@ export const CalendarView: FC<CalendarViewProps> = props =>
                         <div className="advent-info-desc">{ getStateText(selected) }</div>
                         { statusMessage && <div className="advent-feedback">{ statusMessage }</div> }
                     </div>
-                    <div className="advent-info-actions">
-                        { selected.state === 'available' && (
+                    { selected.state === 'available' && (
+                        <div className="advent-info-actions">
                             <Button
                                 variant="success"
                                 size="sm"
                                 disabled={ isOpening }
-                                onClick={ () => !isOpening && onOpenDay(selected.day, false) }
+                                onClick={ () => !isOpening && onOpenDay(selected.day) }
                             >
                                 { isOpening ? 'Abriendo...' : 'Abrir regalo' }
                             </Button>
-                        ) }
-                        { isModerator && selected.state !== 'unlocked' && selected.state !== 'available' && (
-                            <Button
-                                variant="danger"
-                                size="sm"
-                                disabled={ isOpening }
-                                onClick={ () => !isOpening && onOpenDay(selected.day, true) }
-                            >
-                                { isOpening ? '...' : 'Forzar apertura' }
-                            </Button>
-                        ) }
-                    </div>
+                        </div>
+                    ) }
                 </div>
 
                 <div className="advent-carousel-row">
