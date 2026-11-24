@@ -65,6 +65,11 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
     const topRightRef = useRef<HTMLDivElement>(null);
     const toastTimerRef = useRef<number | null>(null);
 
+    const isMod = GetSessionDataManager() ? GetSessionDataManager().isModerator : false;
+    const credits = getCurrencyAmount ? getCurrencyAmount(-1) : 0;
+    const duckets = getCurrencyAmount ? getCurrencyAmount(0) : 0;
+    const diamonds = getCurrencyAmount ? getCurrencyAmount(5) : 0;
+
     useEffect(() =>
     {
         const el = topRightRef.current;
@@ -84,11 +89,6 @@ export const MobileHudView: FC<MobileHudViewProps> = props =>
             window.removeEventListener('resize', syncWidth);
         };
     }, [ credits, duckets, diamonds ]);
-
-    const isMod = GetSessionDataManager() ? GetSessionDataManager().isModerator : false;
-    const credits = getCurrencyAmount ? getCurrencyAmount(-1) : 0;
-    const duckets = getCurrencyAmount ? getCurrencyAmount(0) : 0;
-    const diamonds = getCurrencyAmount ? getCurrencyAmount(5) : 0;
 
     useMessageEvent<UserSettingsEvent>(UserSettingsEvent, event =>
     {
