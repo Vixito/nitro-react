@@ -949,14 +949,12 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
                 setTickets(newTickets);
                 setCredits(Number(data.credits || 0));
 
-                // If player opened the booth because they tried to dive with 0 tickets (or is standing at the elevator),
-                // close the booth and immediately launch the dive stage!
+                // Only launch the dive stage immediately if the player is standing right ON the elevator trigger tile (11, 4)
                 const ownObj = GetOwnRoomObject();
                 const loc = ownObj?.getLocation();
-                const nearElevator = !!(loc && Math.abs(Math.round(loc.x) - ELEVATOR_TILE.x) <= 1 && Math.abs(Math.round(loc.y) - ELEVATOR_TILE.y) <= 1);
-                if ((pendingDiveOnBuyRef.current || nearElevator) && newTickets > 0)
+                const onElevatorTile = !!(loc && Math.round(loc.x) === ELEVATOR_TILE.x && Math.round(loc.y) === ELEVATOR_TILE.y);
+                if (onElevatorTile && newTickets > 0)
                 {
-                    pendingDiveOnBuyRef.current = false;
                     setShowDispenser(false);
                     setStatusBanner('');
                     elevatorCooldownRef.current = 0;
@@ -1043,14 +1041,11 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
             {
                 if (data?.needsTickets)
                 {
-                    pendingDiveOnBuyRef.current = true;
                     setShowDispenser(true);
                 }
                 flashBanner(data?.error || 'Necesitas 1 ticket para subir al trampolín.');
                 return;
             }
-
-            pendingDiveOnBuyRef.current = false;
 
             // Blur chat input immediately so diving keys never type into chat!
             if (document.activeElement instanceof HTMLElement)
@@ -1104,7 +1099,6 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     }, [ stageOpen, swimColor, flashBanner ]);
 
     const wasOnElevatorRef = useRef<boolean>(false);
-    const pendingDiveOnBuyRef = useRef<boolean>(false);
 
     // Room 101 arrowplate roller queue auto-advance into elevator tile (11, 4)
     useEffect(() =>
@@ -1160,14 +1154,13 @@ export const LidoDivingRoomWidget: FC<{}> = () =>
     {
         if (tickets <= 0)
         {
-            pendingDiveOnBuyRef.current = true;
             setShowDispenser(true);
             flashBanner('Compra tickets primero (2 créditos = 5 tickets).');
             return;
         }
         const ownObj = GetOwnRoomObject();
         const loc = ownObj?.getLocation();
-        if (loc && Math.abs(Math.round(loc.x) - ELEVATOR_TILE.x) <= 1 && Math.abs(Math.round(loc.y) - ELEVATOR_TILE.y) <= 1)
+        if (loc && Math.round(loc.x) === ELEVATOR_TILE.x && Math.round(loc.y) === ELEVATOR_TILE.y)
         {
             startElevatorAndDive();
             return;

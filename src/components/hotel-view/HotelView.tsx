@@ -435,8 +435,8 @@ export const HotelView: FC<{}> = props =>
     if(currentEra === 'flash2012')
     {
         const f12ShowAvatar = sceneConf.showAvatar !== undefined ? !!sceneConf.showAvatar : (hotelViewConf['show.avatar'] ?? true);
-        const f12AvatarLeft = Number.isFinite(Number(sceneConf.avatarLeft)) ? Number(sceneConf.avatarLeft) : 28;
-        const f12AvatarBottom = Number.isFinite(Number(sceneConf.avatarBottom)) ? Number(sceneConf.avatarBottom) : 60;
+        const f12AvatarLeft = Number.isFinite(Number(sceneConf.avatarLeft)) ? Number(sceneConf.avatarLeft) : 85;
+        const f12AvatarBottom = Number.isFinite(Number(sceneConf.avatarBottom)) ? Number(sceneConf.avatarBottom) : 72;
         const f12AvatarDir = Number.isFinite(Number(sceneConf.avatarDirection)) ? Number(sceneConf.avatarDirection) : 2;
         const f12HasCustomBg = !!(sceneConf.background && sceneConf.background !== '');
         const f12LeftImg = sceneConf.leftImage === 'none' ? '' : (sceneConf.leftImage || receptionLeft2012);
