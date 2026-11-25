@@ -16,4 +16,6 @@ export class WiredTriggerLayout
     public static BOT_REACHED_AVATAR: number = 14;
     public static VARIABLE_CHANGED: number = 15;
     public static USER_PERFORMS_ACTION: number = 16;
+    public static ROOM_INITIALIZES: number = 17;
+    public static CLOCK_COUNTER: number = 18;
 }

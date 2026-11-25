@@ -5,12 +5,14 @@ import { WiredTriggerAvatarWalksOffFurniView } from './WiredTriggerAvatarWalksOf
 import { WiredTriggerAvatarWalksOnFurniView } from './WiredTriggerAvatarWalksOnFurni';
 import { WiredTriggerBotReachedAvatarView } from './WiredTriggerBotReachedAvatarView';
 import { WiredTriggerBotReachedStuffView } from './WiredTriggerBotReachedStuffView';
+import { WiredTriggerClockCounterView } from './WiredTriggerClockCounterView';
 import { WiredTriggerCollisionView } from './WiredTriggerCollisionView';
 import { WiredTriggeExecuteOnceView } from './WiredTriggerExecuteOnceView';
 import { WiredTriggeExecutePeriodicallyLongView } from './WiredTriggerExecutePeriodicallyLongView';
 import { WiredTriggeExecutePeriodicallyView } from './WiredTriggerExecutePeriodicallyView';
 import { WiredTriggerGameEndsView } from './WiredTriggerGameEndsView';
 import { WiredTriggerGameStartsView } from './WiredTriggerGameStartsView';
+import { WiredTriggerRoomInitializesView } from './WiredTriggerRoomInitializesView';
 import { WiredTriggeScoreAchievedView } from './WiredTriggerScoreAchievedView';
 import { WiredTriggerToggleFurniView } from './WiredTriggerToggleFurniView';
 import { WiredTriggerUserPerformsActionView } from './WiredTriggerUserPerformsActionView';
@@ -52,6 +54,10 @@ export const WiredTriggerLayoutView = (code: number) =>
             return <WiredTriggerVariableChangedView />;
         case WiredTriggerLayout.USER_PERFORMS_ACTION:
             return <WiredTriggerUserPerformsActionView />;
+        case WiredTriggerLayout.ROOM_INITIALIZES:
+            return <WiredTriggerRoomInitializesView />;
+        case WiredTriggerLayout.CLOCK_COUNTER:
+            return <WiredTriggerClockCounterView />;
     }
 
     return null;
