@@ -2,6 +2,7 @@ import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { AddEventLinkTracker, GetRoomEngine, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
 import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
+import { useEraTheme } from '../../hooks';
 import creditIconImg from '../../assets/images/eras/flash2012/purse/credit_icon.png';
 import ducketIconImg from '../../assets/images/eras/flash2012/purse/ducket_icon.png';
 import iconBonusBagImg from '../../assets/images/eras/flash2012/streak/icon_bonusbag_habbo.png';
@@ -21,8 +22,26 @@ interface StreakMilestone
     itemCode?: string;
     itemName?: string;
     claimed: boolean;
+    doubled?: boolean;
     reached: boolean;
     canClaim: boolean;
+    canDouble?: boolean;
+}
+
+interface RewardedSession
+{
+    token: string;
+    days: number;
+    minSeconds: number;
+    campaign: {
+        id: number;
+        format: 'image' | 'html';
+        title: string;
+        subtitle: string;
+        imageUrl: string;
+        clickUrl: string | null;
+        frameUrl: string | null;
+    };
 }
 
 interface StreakData
@@ -41,6 +60,7 @@ const ITEMS_PER_PAGE = 5;
 
 export const LoginStreakView: FC<{}> = () =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ targetUserId, setTargetUserId ] = useState<number>(0);
     const [ data, setData ] = useState<StreakData | null>(null);
@@ -48,11 +68,15 @@ export const LoginStreakView: FC<{}> = () =>
     const [ secondsLeft, setSecondsLeft ] = useState<number>(0);
     const [ claimingDay, setClaimingDay ] = useState<number | null>(null);
     const [ statusMsg, setStatusMsg ] = useState<string>('');
+    const [ rewardedSession, setRewardedSession ] = useState<RewardedSession | null>(null);
+    const [ rewardedCountdown, setRewardedCountdown ] = useState<number>(0);
+    const [ completingDouble, setCompletingDouble ] = useState<boolean>(false);
 
     const loadStreak = useCallback(async (uid?: number) =>
     {
         const resolvedId = uid && uid > 0 ? uid : (GetSessionDataManager()?.userId || 0);
-        const endpoint = resolvedId > 0 ? `/api/client/streak/${ resolvedId }` : '/api/client/streak/me';
+        const eraQuery = `?era=${ encodeURIComponent(currentEra || 'modern') }`;
+        const endpoint = (resolvedId > 0 ? `/api/client/streak/${ resolvedId }` : '/api/client/streak/me') + eraQuery;
         try
         {
             const res = await fetch(endpoint, { credentials: 'include' });
@@ -67,7 +91,7 @@ export const LoginStreakView: FC<{}> = () =>
         {
             // Ignore network error
         }
-    }, []);
+    }, [ currentEra ]);
 
     useEffect(() =>
     {
@@ -158,6 +182,84 @@ export const LoginStreakView: FC<{}> = () =>
         finally
         {
             setClaimingDay(null);
+        }
+    };
+
+    useEffect(() =>
+    {
+        if(!rewardedSession || rewardedCountdown <= 0) return;
+        const t = setInterval(() =>
+        {
+            setRewardedCountdown(prev => (prev > 1 ? prev - 1 : 0));
+        }, 1000);
+        return () => clearInterval(t);
+    }, [ rewardedSession, rewardedCountdown ]);
+
+    const handleStartDouble = async (milestone: StreakMilestone) =>
+    {
+        if(!milestone.canDouble || claimingDay !== null || rewardedSession) return;
+        setClaimingDay(milestone.days);
+        setStatusMsg('');
+        try
+        {
+            const res = await fetch('/api/client/streak/double/start', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ days: milestone.days, era: currentEra || 'modern' })
+            });
+            const json = await res.json();
+            if(json && json.success && json.token)
+            {
+                setRewardedSession(json as RewardedSession);
+                setRewardedCountdown(Number(json.minSeconds || 10));
+            }
+            else if(json?.error)
+            {
+                setStatusMsg(json.error);
+            }
+        }
+        catch
+        {
+            setStatusMsg('No se pudo cargar el anuncio recompensado.');
+        }
+        finally
+        {
+            setClaimingDay(null);
+        }
+    };
+
+    const handleCompleteDouble = async () =>
+    {
+        if(!rewardedSession || rewardedCountdown > 0 || completingDouble) return;
+        setCompletingDouble(true);
+        try
+        {
+            const res = await fetch('/api/client/streak/double/complete', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: rewardedSession.token })
+            });
+            const json = await res.json();
+            if(json && json.success)
+            {
+                setStatusMsg(`Bono x2 recibido: ${ json.bonusLabel }.`);
+                setRewardedSession(null);
+                await loadStreak(targetUserId);
+            }
+            else if(json?.error)
+            {
+                setStatusMsg(json.error);
+            }
+        }
+        catch
+        {
+            setStatusMsg('No se pudo acreditar el bono x2.');
+        }
+        finally
+        {
+            setCompletingDouble(false);
         }
     };
 
@@ -296,9 +398,20 @@ export const LoginStreakView: FC<{}> = () =>
 
                                 <div className="streak-action-wrap">
                                     { m.claimed ? (
-                                        <button type="button" className="streak-btn is-claimed" disabled>
-                                            Reclamado
-                                        </button>
+                                        m.canDouble ? (
+                                            <Button
+                                                variant="success"
+                                                size="sm"
+                                                disabled={ isClaiming || !!rewardedSession }
+                                                onClick={ () => handleStartDouble(m) }
+                                            >
+                                                { isClaiming ? '...' : 'Duplicar x2' }
+                                            </Button>
+                                        ) : (
+                                            <button type="button" className="streak-btn is-claimed" disabled>
+                                                { m.doubled ? 'Reclamado x2' : 'Reclamado' }
+                                            </button>
+                                        )
                                     ) : m.canClaim ? (
                                         <button
                                             type="button"
@@ -349,6 +462,54 @@ export const LoginStreakView: FC<{}> = () =>
                         Siguiente
                     </Button>
                 </div>
+                { rewardedSession && (
+                    <div className="streak-rewarded-overlay">
+                        <div className="streak-rewarded-modal">
+                            <div className="streak-rewarded-head">
+                                <span>Anuncio Recompensado x2</span>
+                                <span className="streak-rewarded-timer">
+                                    { rewardedCountdown > 0 ? `Espera ${ rewardedCountdown }s` : 'Listo para canjear' }
+                                </span>
+                            </div>
+                            <div className="streak-rewarded-stage">
+                                { rewardedSession.campaign.format === 'html' && rewardedSession.campaign.frameUrl ? (
+                                    <iframe
+                                        src={ rewardedSession.campaign.frameUrl }
+                                        title="Anuncio Recompensado"
+                                        className="streak-rewarded-frame"
+                                        scrolling="no"
+                                    />
+                                ) : rewardedSession.campaign.imageUrl ? (
+                                    <a
+                                        href={ rewardedSession.campaign.clickUrl || '#' }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        onClick={ e => { if(!rewardedSession.campaign.clickUrl) e.preventDefault(); } }
+                                    >
+                                        <img src={ rewardedSession.campaign.imageUrl } alt={ rewardedSession.campaign.title } />
+                                    </a>
+                                ) : null }
+                            </div>
+                            <div className="streak-rewarded-actions">
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={ () => setRewardedSession(null) }
+                                >
+                                    Cancelar
+                                </Button>
+                                <Button
+                                    variant="success"
+                                    size="sm"
+                                    disabled={ rewardedCountdown > 0 || completingDouble }
+                                    onClick={ handleCompleteDouble }
+                                >
+                                    { completingDouble ? 'Acreditando...' : (rewardedCountdown > 0 ? `Reclamar x2 (${ rewardedCountdown }s)` : 'Reclamar x2') }
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                ) }
             </NitroCardContentView>
         </NitroCardView>
     );
