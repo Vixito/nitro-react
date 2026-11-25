@@ -1,6 +1,6 @@
 import { CloseIssuesMessageComposer, ReleaseIssuesMessageComposer } from '@nitrots/nitro-renderer';
 import { FC, useState } from 'react';
-import { GetIssueCategoryName, LocalizeText, SendMessageComposer } from '../../../../api';
+import { GetIssueCategoryName, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api';
 import { Button, Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
 import { useModTools } from '../../../../hooks';
 import { CfhChatlogView } from './CfhChatlogView';
@@ -15,8 +15,10 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = props =>
 {
     const { issueId = null, onIssueInfoClosed = null } = props;
     const [ cfhChatlogOpen, setcfhChatlogOpen ] = useState(false);
-    const { tickets = [], openUserInfo = null } = useModTools();
+    const { tickets = [], openUserInfo = null, openRoomInfo = null } = useModTools();
     const ticket = tickets.find(issue => (issue.issueId === issueId));
+
+    if(!ticket) return null;
 
     const releaseIssue = (issueId: number) =>
     {
@@ -29,8 +31,12 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = props =>
     {
         SendMessageComposer(new CloseIssuesMessageComposer([ issueId ], resolutionType));
 
-        onIssueInfoClosed(issueId)
+        onIssueInfoClosed(issueId);
     }
+
+    const topicKey = 'help.cfh.topic.' + ticket.reportedCategoryId;
+    const localizedTopic = LocalizeText(topicKey);
+    const topicLabel = (localizedTopic && localizedTopic !== topicKey) ? localizedTopic : `Categoría #${ ticket.reportedCategoryId }`;
     
     return (
         <>
@@ -48,7 +54,7 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = props =>
                                     </tr>
                                     <tr>
                                         <th>Categoría</th>
-                                        <td className="text-break">{ LocalizeText('help.cfh.topic.' + ticket.reportedCategoryId) }</td>
+                                        <td className="text-break">{ topicLabel }</td>
                                     </tr>
                                     <tr>
                                         <th>Descripción</th>
@@ -57,13 +63,17 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = props =>
                                     <tr>
                                         <th>Denunciante</th>
                                         <td>
-                                            <Text bold underline pointer onClick={ event => openUserInfo(ticket.reporterUserId) }>{ ticket.reporterUserName }</Text>
+                                            { ticket.reporterUserId > 0
+                                                ? <Text bold underline pointer onClick={ () => openUserInfo(ticket.reporterUserId) }>{ ticket.reporterUserName }</Text>
+                                                : <Text className="text-muted">{ ticket.reporterUserName || 'Sistema' } (Automático)</Text> }
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>Usuario Denunciado</th>
                                         <td>
-                                            <Text bold underline pointer onClick={ event => openUserInfo(ticket.reportedUserId) }>{ ticket.reportedUserName }</Text>
+                                            { ticket.reportedUserId > 0
+                                                ? <Text bold underline pointer onClick={ () => openUserInfo(ticket.reportedUserId) }>{ ticket.reportedUserName }</Text>
+                                                : <Text className="text-muted">{ ticket.reportedUserName || 'N/A' }</Text> }
                                         </td>
                                     </tr>
                                 </tbody>
@@ -71,10 +81,15 @@ export const ModToolsIssueInfoView: FC<IssueInfoViewProps> = props =>
                         </Column>
                         <Column size={ 4 } gap={ 1 }>
                             <Button variant="secondary" onClick={ () => setcfhChatlogOpen(!cfhChatlogOpen) }>Historial</Button>
-                            <Button onClick={ event => closeIssue(CloseIssuesMessageComposer.RESOLUTION_USELESS) }>Cerrar como inútil</Button>
-                            <Button variant="danger" onClick={ event => closeIssue(CloseIssuesMessageComposer.RESOLUTION_ABUSIVE) }>Cerrar como abusivo</Button>
-                            <Button variant="success" onClick={ event => closeIssue(CloseIssuesMessageComposer.RESOLUTION_RESOLVED) }>Cerrar como resuelto</Button> 
-                            <Button variant="secondary" onClick={ event => releaseIssue(issueId) } >Liberar</Button>
+                            { (ticket.roomId > 0) &&
+                                <>
+                                    <Button variant="primary" onClick={ () => TryVisitRoom(ticket.roomId) }>Visitar Sala</Button>
+                                    <Button variant="secondary" onClick={ () => openRoomInfo(ticket.roomId) }>Info de Sala</Button>
+                                </> }
+                            <Button onClick={ () => closeIssue(CloseIssuesMessageComposer.RESOLUTION_USELESS) }>Cerrar como inútil</Button>
+                            <Button variant="danger" onClick={ () => closeIssue(CloseIssuesMessageComposer.RESOLUTION_ABUSIVE) }>Cerrar como abusivo</Button>
+                            <Button variant="success" onClick={ () => closeIssue(CloseIssuesMessageComposer.RESOLUTION_RESOLVED) }>Cerrar como resuelto</Button> 
+                            <Button variant="secondary" onClick={ () => releaseIssue(issueId) } >Liberar</Button>
                         </Column>
                     </Grid>
                 </NitroCardContentView>

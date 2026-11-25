@@ -1,7 +1,7 @@
 import { ChatRecordData, GetRoomChatlogMessageComposer, RoomChatlogEvent } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { SendMessageComposer } from '../../../../api';
-import { DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { ChatlogView } from '../chatlog/ChatlogView';
 
@@ -30,14 +30,13 @@ export const ModToolsChatlogView: FC<ModToolsChatlogViewProps> = props =>
         SendMessageComposer(new GetRoomChatlogMessageComposer(roomId));
     }, [ roomId ]);
 
-    if(!roomChatlog) return null;
-
     return (
         <NitroCardView className="nitro-mod-tools-chatlog" theme="primary-slim" windowPosition={ DraggableWindowPosition.TOP_LEFT }>
-            <NitroCardHeaderView headerText={ `Historial de Chat: ${ roomChatlog.roomName }` } onCloseClick={ onCloseClick } />
+            <NitroCardHeaderView headerText={ `Historial de Chat: ${ roomChatlog ? roomChatlog.roomName : ('Sala #' + roomId) }` } onCloseClick={ onCloseClick } />
             <NitroCardContentView className="text-black" overflow="hidden">
-                { roomChatlog &&
-                    <ChatlogView records={ [ roomChatlog ] } /> }
+                { roomChatlog
+                    ? <ChatlogView records={ [ roomChatlog ] } />
+                    : <Text small className="text-muted p-2">Cargando historial de la sala...</Text> }
             </NitroCardContentView>
         </NitroCardView>
     );

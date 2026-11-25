@@ -21,13 +21,18 @@ export const ChatlogView: FC<ChatlogViewProps> = props =>
 
         records.forEach(record =>
         {
-            results.push({
-                isRoomInfo: true,
-                roomId: record.roomId,
-                roomName: record.roomName
-            });
+            if(!record) return;
 
-            record.chatlog.forEach(chatlog =>
+            if(record.roomId > 0 || record.roomName)
+            {
+                results.push({
+                    isRoomInfo: true,
+                    roomId: record.roomId,
+                    roomName: record.roomName || `Sala #${ record.roomId }`
+                });
+            }
+
+            (record.chatlog || []).forEach(chatlog =>
             {
                 results.push({
                     timestamp: chatlog.timestamp,
@@ -69,7 +74,7 @@ export const ChatlogView: FC<ChatlogViewProps> = props =>
                         <Base className="g-col-7">Mensaje</Base>
                     </Grid>
                 </Column>
-                { (records && (records.length > 0)) &&
+                { (allRecords.length > 0) ?
                     <InfiniteScroll rows={ allRecords } rowRender={ (row: ChatlogRecord) =>
                     {
                         return (
@@ -84,7 +89,8 @@ export const ChatlogView: FC<ChatlogViewProps> = props =>
                                     </Grid> }
                             </>
                         );
-                    } } /> }
+                    } } />
+                    : <Text small className="text-muted p-2">No hay registros de chat disponibles.</Text> }
             </Column>
         </>
     );

@@ -43,7 +43,10 @@ export const ModToolsUserRoomVisitsView: FC<ModToolsUserRoomVisitsViewProps> = p
                             <Base className="g-col-3">Visitar</Base>
                         </Grid>
                     </Column>
-                    <InfiniteScroll rows={ roomVisitData?.rooms ?? [] } rowRender={ row =>
+                    { !roomVisitData ? (
+                        <Text small className="text-muted p-2">Cargando visitas a salas...</Text>
+                    ) : (roomVisitData.rooms && roomVisitData.rooms.length > 0) ? (
+                    <InfiniteScroll rows={ roomVisitData.rooms } rowRender={ row =>
                     {
                         return (
                             <Grid fullHeight={ false } gap={ 1 } alignItems="center" className="text-black py-1 border-bottom">
@@ -53,6 +56,9 @@ export const ModToolsUserRoomVisitsView: FC<ModToolsUserRoomVisitsViewProps> = p
                             </Grid>
                         );
                     } } />
+                    ) : (
+                        <Text small className="text-muted p-2">No hay visitas registradas para este usuario.</Text>
+                    ) }
                 </Column>
             </NitroCardContentView>
         </NitroCardView>

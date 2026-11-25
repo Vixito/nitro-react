@@ -1,7 +1,7 @@
 import { CfhChatlogData, CfhChatlogEvent, GetCfhChatlogMessageComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { SendMessageComposer } from '../../../../api';
-import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { ChatlogView } from '../chatlog/ChatlogView';
 
@@ -33,8 +33,10 @@ export const CfhChatlogView: FC<CfhChatlogViewProps> = props =>
     return (
         <NitroCardView className="nitro-mod-tools-chatlog" theme="primary-slim">
             <NitroCardHeaderView headerText={ 'Historial de Chat del Ticket #' + issueId } onCloseClick={ onCloseClick } />
-            <NitroCardContentView className="text-black">
-                { chatlogData && <ChatlogView records={ [ chatlogData.chatRecord ] } /> }
+            <NitroCardContentView className="text-black" overflow="hidden">
+                { chatlogData
+                    ? <ChatlogView records={ [ chatlogData.chatRecord ] } />
+                    : <Text small className="text-muted p-2">Cargando historial de chat...</Text> }
             </NitroCardContentView>
         </NitroCardView>
     );

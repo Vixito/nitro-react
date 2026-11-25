@@ -14,11 +14,20 @@ export const ModToolsView: FC<{}> = props =>
 {
     const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
-    const [ currentRoomId, setCurrentRoomId ] = useState<number>(-1);
+    const [ currentRoomId, setCurrentRoomId ] = useState<number>(() => GetRoomSession()?.roomId ?? -1);
     const [ selectedUser, setSelectedUser ] = useState<ISelectedUser>(null);
     const [ isTicketsVisible, setIsTicketsVisible ] = useState(false);
     const { openRooms = [], openRoomChatlogs = [], openUserChatlogs = [], openUserInfos = [], openRoomInfo = null, closeRoomInfo = null, toggleRoomInfo = null, openRoomChatlog = null, closeRoomChatlog = null, toggleRoomChatlog = null, openUserInfo = null, closeUserInfo = null, toggleUserInfo = null, openUserChatlog = null, closeUserChatlog = null, toggleUserChatlog = null } = useModTools();
     const elementRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() =>
+    {
+        if(!isVisible) return;
+
+        const sessionRoomId = GetRoomSession()?.roomId ?? -1;
+
+        if(sessionRoomId > 0 && sessionRoomId !== currentRoomId) setCurrentRoomId(sessionRoomId);
+    }, [ isVisible, currentRoomId ]);
 
     useRoomEngineEvent<RoomEngineEvent>([
         RoomEngineEvent.INITIALIZED,

@@ -18,9 +18,9 @@ const useModToolsState = () =>
 
     const openRoomInfo = (roomId: number) =>
     {
-        if(openRooms.indexOf(roomId) >= 0) return;
+        if(!roomId || roomId <= 0) return;
 
-        setOpenRooms(prevValue => [ ...prevValue, roomId ]);
+        setOpenRooms(prevValue => (prevValue.indexOf(roomId) >= 0 ? prevValue : [ ...prevValue, roomId ]));
     }
 
     const closeRoomInfo = (roomId: number) =>
@@ -30,7 +30,7 @@ const useModToolsState = () =>
             const newValue = [ ...prevValue ];
             const existingIndex = newValue.indexOf(roomId);
 
-            if(existingIndex >= 0) newValue.splice(existingIndex);
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
 
             return newValue;
         });
@@ -38,15 +38,25 @@ const useModToolsState = () =>
 
     const toggleRoomInfo = (roomId: number) =>
     {
-        if(openRooms.indexOf(roomId) >= 0) closeRoomInfo(roomId);
-        else openRoomInfo(roomId);
+        if(!roomId || roomId <= 0) return;
+
+        setOpenRooms(prevValue =>
+        {
+            const newValue = [ ...prevValue ];
+            const existingIndex = newValue.indexOf(roomId);
+
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
+            else newValue.push(roomId);
+
+            return newValue;
+        });
     }
 
     const openRoomChatlog = (roomId: number) =>
     {
-        if(openRoomChatlogs.indexOf(roomId) >= 0) return;
+        if(!roomId || roomId <= 0) return;
 
-        setOpenRoomChatlogs(prevValue => [ ...prevValue, roomId ]);
+        setOpenRoomChatlogs(prevValue => (prevValue.indexOf(roomId) >= 0 ? prevValue : [ ...prevValue, roomId ]));
     }
 
     const closeRoomChatlog = (roomId: number) =>
@@ -56,7 +66,7 @@ const useModToolsState = () =>
             const newValue = [ ...prevValue ];
             const existingIndex = newValue.indexOf(roomId);
 
-            if(existingIndex >= 0) newValue.splice(existingIndex);
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
 
             return newValue;
         });
@@ -64,15 +74,25 @@ const useModToolsState = () =>
 
     const toggleRoomChatlog = (roomId: number) =>
     {
-        if(openRoomChatlogs.indexOf(roomId) >= 0) closeRoomChatlog(roomId);
-        else openRoomChatlog(roomId);
+        if(!roomId || roomId <= 0) return;
+
+        setOpenRoomChatlogs(prevValue =>
+        {
+            const newValue = [ ...prevValue ];
+            const existingIndex = newValue.indexOf(roomId);
+
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
+            else newValue.push(roomId);
+
+            return newValue;
+        });
     }
 
     const openUserInfo = (userId: number) =>
     {
-        if(openUserInfos.indexOf(userId) >= 0) return;
+        if(!userId || userId <= 0) return;
 
-        setOpenUserInfos(prevValue => [ ...prevValue, userId ]);
+        setOpenUserInfos(prevValue => (prevValue.indexOf(userId) >= 0 ? prevValue : [ ...prevValue, userId ]));
     }
 
     const closeUserInfo = (userId: number) =>
@@ -82,7 +102,7 @@ const useModToolsState = () =>
             const newValue = [ ...prevValue ];
             const existingIndex = newValue.indexOf(userId);
 
-            if(existingIndex >= 0) newValue.splice(existingIndex);
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
 
             return newValue;
         });
@@ -90,15 +110,25 @@ const useModToolsState = () =>
 
     const toggleUserInfo = (userId: number) =>
     {
-        if(openUserInfos.indexOf(userId) >= 0) closeUserInfo(userId);
-        else openUserInfo(userId);
+        if(!userId || userId <= 0) return;
+
+        setOpenUserInfos(prevValue =>
+        {
+            const newValue = [ ...prevValue ];
+            const existingIndex = newValue.indexOf(userId);
+
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
+            else newValue.push(userId);
+
+            return newValue;
+        });
     }
 
     const openUserChatlog = (userId: number) =>
     {
-        if(openUserChatlogs.indexOf(userId) >= 0) return;
+        if(!userId || userId <= 0) return;
 
-        setOpenUserChatlogs(prevValue => [ ...prevValue, userId ]);
+        setOpenUserChatlogs(prevValue => (prevValue.indexOf(userId) >= 0 ? prevValue : [ ...prevValue, userId ]));
     }
 
     const closeUserChatlog = (userId: number) =>
@@ -108,7 +138,7 @@ const useModToolsState = () =>
             const newValue = [ ...prevValue ];
             const existingIndex = newValue.indexOf(userId);
 
-            if(existingIndex >= 0) newValue.splice(existingIndex);
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
 
             return newValue;
         });
@@ -116,8 +146,18 @@ const useModToolsState = () =>
 
     const toggleUserChatlog = (userId: number) =>
     {
-        if(openRoomChatlogs.indexOf(userId) >= 0) closeUserChatlog(userId);
-        else openUserChatlog(userId);
+        if(!userId || userId <= 0) return;
+
+        setOpenUserChatlogs(prevValue =>
+        {
+            const newValue = [ ...prevValue ];
+            const existingIndex = newValue.indexOf(userId);
+
+            if(existingIndex >= 0) newValue.splice(existingIndex, 1);
+            else newValue.push(userId);
+
+            return newValue;
+        });
     }
 
     useMessageEvent<ModeratorInitMessageEvent>(ModeratorInitMessageEvent, event =>

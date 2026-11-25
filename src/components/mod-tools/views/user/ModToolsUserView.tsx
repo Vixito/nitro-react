@@ -124,15 +124,16 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
         SendMessageComposer(new GetModeratorUserInfoMessageComposer(userId));
     }, [ userId ]);
 
-    if(!userInfo) return null;
-
-    const titleText = `Información del usuario: ${ userInfo.userName }`;
+    const titleText = userInfo ? `Información del usuario: ${ userInfo.userName }` : `Cargando usuario #${ userId }...`;
 
     return (
         <>
             <NitroCardView className="nitro-mod-tools-user" theme="primary-slim" windowPosition={ DraggableWindowPosition.TOP_LEFT }>
                 <NitroCardHeaderView headerText={ titleText } onCloseClick={ () => onCloseClick() } />
                 <NitroCardContentView className="text-black">
+                    { !userInfo ? (
+                        <div className="p-3 text-muted small">Cargando información del usuario...</div>
+                    ) : (
                     <Grid overflow="hidden">
                         <Column size={ 8 } overflow="auto">
                             <table className="table table-striped table-sm table-text-small text-black m-0">
@@ -169,13 +170,14 @@ export const ModToolsUserView: FC<ModToolsUserViewProps> = props =>
                             </Button>
                         </Column>
                     </Grid>
+                    ) }
                 </NitroCardContentView>
             </NitroCardView>
-            { sendMessageVisible &&
+            { userInfo && sendMessageVisible &&
                 <ModToolsUserSendMessageView user={ { userId: userId, username: userInfo.userName } } onCloseClick={ () => setSendMessageVisible(false) } /> }
-            { modActionVisible &&
+            { userInfo && modActionVisible &&
                 <ModToolsUserModActionView user={ { userId: userId, username: userInfo.userName } } onCloseClick={ () => setModActionVisible(false) } /> }
-            { roomVisitsVisible &&
+            { userInfo && roomVisitsVisible &&
                 <ModToolsUserRoomVisitsView userId={ userId } onCloseClick={ () => setRoomVisitsVisible(false) } /> }
         </>
     );

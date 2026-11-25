@@ -1,7 +1,7 @@
 import { ChatRecordData, GetUserChatlogMessageComposer, UserChatlogEvent } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { SendMessageComposer } from '../../../../api';
-import { DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { DraggableWindowPosition, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
 import { useMessageEvent } from '../../../../hooks';
 import { ChatlogView } from '../chatlog/ChatlogView';
 
@@ -34,10 +34,11 @@ export const ModToolsUserChatlogView: FC<ModToolsUserChatlogViewProps> = props =
 
     return (
         <NitroCardView className="nitro-mod-tools-chatlog" theme="primary-slim" windowPosition={ DraggableWindowPosition.TOP_LEFT }>
-            <NitroCardHeaderView headerText={ `Historial de Chat: ${ username || '' }` } onCloseClick={ onCloseClick } />
-            <NitroCardContentView className="text-black h-100">
-                { userChatlog &&
-                    <ChatlogView records={ userChatlog } /> }
+            <NitroCardHeaderView headerText={ `Historial de Chat: ${ username || ('#' + userId) }` } onCloseClick={ onCloseClick } />
+            <NitroCardContentView className="text-black h-100" overflow="hidden">
+                { userChatlog
+                    ? <ChatlogView records={ userChatlog } />
+                    : <Text small className="text-muted p-2">Cargando historial del usuario...</Text> }
             </NitroCardContentView>
         </NitroCardView>
     );
