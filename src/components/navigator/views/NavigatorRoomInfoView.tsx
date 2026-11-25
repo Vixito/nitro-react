@@ -41,13 +41,9 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
     const [ backupBusy, setBackupBusy ] = useState(false);
     const [ backupNotice, setBackupNotice ] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
     const [ pendingImport, setPendingImport ] = useState<{ fileName: string; data: ParsedRoomBackup } | null>(null);
-    const [ restoreMetadata, setRestoreMetadata ] = useState(true);
-    const [ spawnMissing, setSpawnMissing ] = useState(false);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const { report = null } = useHelp();
     const { navigatorData = null } = useNavigator();
-
-    const isStaff = GetSessionDataManager().isModerator || GetSessionDataManager().securityLevel >= SecurityLevel.MODERATOR;
 
     const hasPermission = (permission: string) =>
     {
@@ -198,8 +194,6 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                 return;
             }
             setPendingImport({ fileName: file.name, data: parsed });
-            setRestoreMetadata(true);
-            setSpawnMissing(false);
         }
         catch
         {
@@ -222,8 +216,7 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     backup: pendingImport.data,
-                    restoreMetadata,
-                    spawnMissing: isStaff ? spawnMissing : false
+                    restoreMetadata: true
                 })
             });
             const data = await res.json();
@@ -318,19 +311,6 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                                         { hasPermission('settings') &&
                                             <i className="icon icon-cog cursor-pointer" title={ LocalizeText('navigator.room.popup.info.room.settings') } onClick={ () => processAction('open_room_settings') } /> }
                                         <FaLink title={ LocalizeText('navigator.embed.caption') } className="cursor-pointer fa-icon" onClick={ () => CreateLinkEvent('navigator/toggle-room-link') } />
-                                        { hasPermission('settings') &&
-                                            <>
-                                                <FaDownload
-                                                    title="Exportar copia de seguridad de esta sala (.habbten-room.json)"
-                                                    className="cursor-pointer fa-icon room-backup-icon"
-                                                    onClick={ handleExportRoom }
-                                                />
-                                                <FaUpload
-                                                    title="Importar copia de seguridad en esta sala (.habbten-room.json)"
-                                                    className="cursor-pointer fa-icon room-backup-icon"
-                                                    onClick={ handleTriggerImportPicker }
-                                                />
-                                            </> }
                                     </Column>
                                 </Flex>
                                 <Text overflow="auto" className="text-break" style={ { maxHeight: 72, lineHeight: 1.35 } }>{ navigatorData.enteredGuestRoom.description }</Text>
@@ -390,26 +370,8 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                                                 { pendingImport.data.customModel?.heightmap && ' | Plano personalizado' }
                                             </div>
                                         </div>
-                                        <label className="room-backup-check">
-                                            <input
-                                                type="checkbox"
-                                                checked={ restoreMetadata }
-                                                onChange={ e => setRestoreMetadata(e.target.checked) }
-                                            />
-                                            <span>Restaurar nombre, descripción y etiquetas</span>
-                                        </label>
-                                        { isStaff && (
-                                            <label className="room-backup-check">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={ spawnMissing }
-                                                    onChange={ e => setSpawnMissing(e.target.checked) }
-                                                />
-                                                <span>Generar furnis faltantes (Solo Staff)</span>
-                                            </label>
-                                        ) }
                                         <div className="room-backup-warn">
-                                            Los furnis actuales de esta sala volverán a tu inventario y se colocará la copia de seguridad.
+                                            Se reemplazará el diseño actual de esta sala por la copia seleccionada. Los furnis actuales volverán a tu inventario.
                                         </div>
                                         <Flex gap={ 1 }>
                                             <Button fullWidth variant="success" disabled={ backupBusy } onClick={ handleConfirmImport }>
