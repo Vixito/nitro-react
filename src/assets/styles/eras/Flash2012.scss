@@ -137,46 +137,41 @@ body[data-era="flash2012"] {
         overflow: visible !important;
     }
 
-    // Authentic 2012 Two-Tone Stepped Button everywhere (inside windows, Infostand, HotelView)
+    // Authentic 2012 White/Silver Stepped Button everywhere (crisp 1px/2px black border, subtle #f3f3f1/#dcdcd9 fill, regular Ubuntu2012)
     // Wrapped in :where() so specificity stays (0,1,1) and component-specific rules like ModTools override cleanly
     :where(
         .btn-shiny-2012,
         .nitro-card:not([class*="nitro-mod-tools"]) :is(.btn, .btn-primary, .btn-secondary, .btn-light),
         .btn:not(.btn-danger):not(.btn-success)
     ):where(:not(.friend-bar-item):not(.friend-bar-button):not(.purchase-button):not(.nitro-catalog-purchase-button):not(.nitro-catalog-gift-button):not(.gift-color-swatch):not(.emoji-item):not(.tab-btn):not(.friends-2012-action-btn):not(.messenger-btn-close-thread):not(.messenger-btn-follow):not(.messenger-btn-profile):not(.btn-link):not(.chat-say-btn-2012):not(.bottom-bar-btn):not(.btn-play-game):not(.btn-success)) {
-        border: none !important;
-        background-color: transparent !important;
-        background-image:
-            url('@/assets/images/eras/habborator/button-18-left.png'),
-            url('@/assets/images/eras/habborator/button-18-right.png'),
-            url('@/assets/images/eras/habborator/button-18-mid.png') !important;
-        background-position: left top, right top, 4px top !important;
-        background-repeat: no-repeat, no-repeat, no-repeat !important;
-        background-size: 4px 100%, 4px 100%, calc(100% - 8px) 100% !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
+        border: 1px solid #000000 !important;
+        border-bottom-width: 2px !important;
+        border-radius: 4px !important;
+        background-color: #ecece9 !important;
+        background-image: linear-gradient(180deg, #f3f3f1 0%, #f3f3f1 52%, #dcdcd9 52%, #dcdcd9 100%) !important;
+        box-shadow: inset 0 1px 0 #ffffff, inset 1px 0 0 rgba(255, 255, 255, 0.55), inset -1px 0 0 rgba(255, 255, 255, 0.55) !important;
         display: inline-flex;
         align-items: center !important;
         justify-content: center !important;
-        color: #141414 !important;
+        color: #000000 !important;
         font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
-        font-weight: 700 !important;
-        font-size: 11px !important;
-        line-height: 1 !important;
-        min-height: 25px !important;
+        font-weight: 400 !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+        min-height: 27px !important;
         text-shadow: none !important;
-        padding: 0 10px 1px !important;
-        image-rendering: pixelated !important;
+        padding: 2px 12px !important;
         cursor: pointer !important;
         user-select: none !important;
 
         &:hover:not(:disabled) {
             color: #000000 !important;
-            filter: brightness(1.05) !important;
+            background-image: linear-gradient(180deg, #fafafa 0%, #fafafa 52%, #e6e6e3 52%, #e6e6e3 100%) !important;
         }
 
         &:active:not(:disabled) {
-            filter: brightness(0.92) !important;
+            background-image: linear-gradient(180deg, #dcdcd9 0%, #dcdcd9 52%, #ecece9 52%, #ecece9 100%) !important;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.12) !important;
         }
 
         &:disabled {
@@ -3500,25 +3495,26 @@ body[data-era="flash2012"] {
                         .ri2012-tag {
                             display: inline-flex !important;
                             align-items: center !important;
-                            gap: 1px !important;
-                            background: linear-gradient(180deg, #4c95b8 0%, #4c95b8 48%, #367897 49%, #367897 100%) !important;
-                            border: 1px solid #1b4a60 !important;
+                            gap: 0 !important;
+                            background: #367897 !important;
+                            background-image: none !important;
+                            border: none !important;
                             border-radius: 3px !important;
-                            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 0 rgba(0, 0, 0, 0.14) !important;
+                            box-shadow: none !important;
                             padding: 2px 7px !important;
                             margin: 0 !important;
                             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                             font-size: 11px !important;
                             font-weight: 700 !important;
-                            line-height: 1.25 !important;
+                            line-height: 1.3 !important;
                             color: #ffffff !important;
-                            text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.32) !important;
+                            text-shadow: none !important;
                             cursor: pointer !important;
                             max-width: 100% !important;
                             white-space: nowrap !important;
 
                             .ri2012-tag-hash {
-                                color: #c7eafc !important;
+                                color: #ffffff !important;
                                 font-weight: 700 !important;
                             }
 
@@ -3529,13 +3525,11 @@ body[data-era="flash2012"] {
                             }
 
                             &:hover {
-                                background: linear-gradient(180deg, #5aa4c8 0%, #5aa4c8 48%, #408caf 49%, #408caf 100%) !important;
-                                border-color: #163d50 !important;
+                                background: #408caf !important;
                             }
 
                             &:active {
-                                background: linear-gradient(180deg, #2e6783 0%, #2e6783 48%, #367897 49%, #367897 100%) !important;
-                                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28) !important;
+                                background: #2c6480 !important;
                             }
                         }
                     }
