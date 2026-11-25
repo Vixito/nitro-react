@@ -1,7 +1,7 @@
 import { AvatarAction, AvatarScaleType, AvatarSetType, IAvatarImageListener } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager, isShockwaveSmallFigureReady, onShockwaveSmallAtlasReady, renderShockwaveSmallDataUrl } from '../../../api';
-import { useGameCenter } from '../../../hooks';
+import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 
 // Authentic widescreen (1120x484) Habbo Rooftop Rumble Pool backdrop + Shockwave pixel-art FX bursts
@@ -505,6 +505,17 @@ const AnalogBalanceGauge: FC<{ balance: number }> = ({ balance }) =>
 export const WobbleSquabbleGameView: FC = () =>
 {
     const { setIsWobbleSquabblePlaying, setIsVisible } = useGameCenter();
+    const { setMyGamePresence } = useGamePresence();
+
+    useEffect(() =>
+    {
+        if (document.activeElement instanceof HTMLElement)
+        {
+            document.activeElement.blur();
+        }
+        setMyGamePresence('wobblesquabble', 'WOBBLE SQUABBLE');
+        return () => setMyGamePresence(null);
+    }, [ setMyGamePresence ]);
     const session = GetSessionDataManager();
     const myUsername = session?.userName || 'Jugador';
     const myFigure = session?.figure || 'hr-100-61.hd-180-1.ch-210-66.lg-270-82.sh-290-80';
@@ -1108,9 +1119,10 @@ export const WobbleSquabbleGameView: FC = () =>
 
     const exitToGameCenter = useCallback(() =>
     {
+        setMyGamePresence(null);
         setIsWobbleSquabblePlaying(false);
         setIsVisible(true);
-    }, [ setIsWobbleSquabblePlaying, setIsVisible ]);
+    }, [ setIsWobbleSquabblePlaying, setIsVisible, setMyGamePresence ]);
 
     const handleRematch = useCallback(async () =>
     {

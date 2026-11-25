@@ -26,15 +26,17 @@ import snowballSmallImg from '../../../assets/images/gamecenter/snowstorm/thumbn
 import iceCubeBigImg from '../../../assets/images/gamecenter/snowstorm/thumbnails_Icecube_big.png';
 import machineImg from '../../../assets/images/gamecenter/snowstorm/thumbnails_S_snowball_machine_name.png';
 import snowstormLogoImg from '../../../assets/images/gamecenter/snowstorm/thumbnails_Snowstorm_Logo.png';
+import snowDuckImg from '../../../assets/images/gamecenter/snowstorm/sprite_snow_duck.png';
 
 import './SnowStormGameView.scss';
 
 type Stage = 'lobby' | 'playing' | 'results';
 type Team = 'blue' | 'red';
-type TileType = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+type TileType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 // 0 = snow walkable, 1 = ice water (impassable), 2 = wooden bridge (walkable),
-// 3 = snow pine tree (solid), 4 = ice-cube bunker (solid, low cover - lob flies over),
-// 5 = wooden fence (solid, low cover - lob flies over), 6 = central Snowball Machine
+// 3 = snow pine tree (solid), 4 = snow cube bunker h=1 (solid, low cover - lob flies over),
+// 5 = wooden fence (solid, low cover - lob flies over), 6 = Snowball Machine,
+// 7 = stacked snow bunker h=2 ('B'), 8 = Snow Duck statue ('D')
 
 interface ArenaDef
 {
@@ -69,6 +71,7 @@ interface Fighter
     targetY: number | null;
     facingX: number; // 1 = right, -1 = left
     facingY: number; // 1 = down, -1 = up
+    dir: number;     // 0..7 true Habbo isometric direction (0=NE,1=E,2=SE,3=S,4=SW,5=W,6=NW,7=N)
     hp: number; // 0..5 (each hit = 1)
     snowballs: number; // 0..5
     reloading: boolean;
@@ -218,127 +221,144 @@ const BOT_CHAT_LINES = [
     '¡Jajaja qué puntería!'
 ];
 
+function isoVecToHabboDir(isoDx: number, isoDy: number): number
+{
+    // Convert screen-space isometric vector (+x right, +y down) into Habbo 8-way direction:
+    // 0=NE, 1=E, 2=SE, 3=S (front), 4=SW, 5=W, 6=NW, 7=N (back)
+    const deg = (Math.atan2(isoDy, isoDx) * 180) / Math.PI;
+    if (deg >= -112.5 && deg < -67.5) return 7;
+    if (deg >= -67.5 && deg < -22.5) return 0;
+    if (deg >= -22.5 && deg < 22.5) return 1;
+    if (deg >= 22.5 && deg < 67.5) return 2;
+    if (deg >= 67.5 && deg < 112.5) return 3;
+    if (deg >= 112.5 && deg < 157.5) return 4;
+    if (deg >= -157.5 && deg < -112.5) return 6;
+    return 5;
+}
+
 function parseMap(rows: string[]): TileType[][]
 {
-    // Legend: . snow, ~ water/ice, = bridge, T tree, I ice-cube bunker, F fence, M snowball machine
+    // Legend: . snow, ~ water/ice, = bridge, T tree, I snow cube (h=1), F fence, M snowball machine, B stacked snow cube (h=2), D snow duck
     const mapChar: Record<string, TileType> = {
-        '.': 0, '~': 1, '=': 2, 'T': 3, 'I': 4, 'F': 5, 'M': 6
+        '.': 0, '~': 1, '=': 2, 'T': 3, 'I': 4, 'F': 5, 'M': 6, 'B': 7, 'D': 8
     };
     return rows.map(r => r.split('').map(ch => mapChar[ch] ?? 0));
 }
 
+// All 5 authentic Habbo SnowStorm arenas (Room_snowstorm_1..5.png)
+// Note: Maps 1 & 2 have a Snowball Machine ('M'); Maps 3, 4 & 5 have NO Snowball Machine!
 const ARENAS: ArenaDef[] = [
     {
         id: 1,
-        name: 'Lago de la Máquina',
+        name: 'Isla de la Máquina',
         preview: room1Img,
         grid: parseMap([
-            '................',
-            '..T..III....T...',
-            '.....I..........',
-            '..T..I..FF..T...',
-            '................',
-            '.....~~~~~~.....',
-            '.....~..=.~.....',
-            '.....=..M.=.....',
-            '.....~....~.....',
-            '.....~.=..~.....',
-            '.....~~~~~~.....',
-            '................',
-            '...T..FF..I..T..',
-            '..........I.....',
-            '...T....III..T..',
-            '................'
+            '......T...T.....',
+            '............T...',
+            '.T.FFFFF........',
+            '.............F..',
+            '....~~~~~~~~.F..',
+            '....~T.....=.F..',
+            '....=..M...=.F.T',
+            '....=......~....',
+            '.T..~.....I~....',
+            '....~.....I~....',
+            '....~TIII.I~..T.',
+            '....~~.....~~~=.',
+            '.....~.......~..',
+            '.....~......T~..',
+            '.....~..........',
+            '.........T......'
         ])
     },
     {
         id: 2,
-        name: 'Bosque Prohibido',
+        name: 'Los Cuatro Puentes',
         preview: room2Img,
         grid: parseMap([
             '................',
-            '..T....T....T...',
-            '....T.....T.....',
-            '..F....I....F...',
-            '....T.....T.....',
-            '......~~~~......',
-            '......=..=......',
-            '...T..~.M~..T...',
-            '......~..~......',
-            '......~~~~......',
-            '....T.....T.....',
-            '..F....I....F...',
-            '....T.....T.....',
-            '..T....T....T...',
-            '................',
+            '.B...T....T...T.',
+            '.BBBB..FFFF.....',
+            '.B..........T...',
+            '.....T........F.',
+            '.....~~==~~...F.',
+            '.T...~....~...F.',
+            '.....=..M.=.....',
+            '.....=....=.....',
+            '.....~....~.BBB.',
+            '.IF..~~==~~.B...',
+            '.IF..T......B.T.',
+            '.IF.........B...',
+            '.IF.....BBBB....',
+            '..T...........T.',
             '................'
         ])
     },
     {
         id: 3,
-        name: 'Fortaleza Ártica',
+        name: 'Arena del Pato',
         preview: room3Img,
         grid: parseMap([
+            '....T......T....',
             '................',
-            '................',
-            '..IIII....T.....',
-            '..I..........T..',
-            '..I...FF........',
-            '......~~~~......',
-            '.....~=..=~.....',
-            '.....~..M.~.....',
-            '.....~=..=~.....',
-            '......~~~~......',
-            '........FF...I..',
-            '..T..........I..',
-            '.....T....IIII..',
-            '................',
-            '................',
+            '..T..BBB..BB....',
+            '.....B....B...T.',
+            '.....B.....B....',
+            '.....IIIII......',
+            '..T..I...I..B...',
+            '.....I.D.I..BB..',
+            '.....I...I......',
+            '.....IIIII..T...',
+            '...B........BB..',
+            '...B.......B....',
+            '..BB..B....B.B..',
+            '......BB.....B..',
+            '....T.....T.....',
             '................'
         ])
     },
     {
         id: 4,
-        name: 'Puente Helado',
+        name: 'Bosque Nevado',
         preview: room4Img,
         grid: parseMap([
-            '................',
-            '...T...II...T...',
-            '................',
-            '..FF........FF..',
-            '................',
-            '................',
-            '~~==~~~==~~~==~~',
-            '~~==~~~M=~~~==~~',
-            '~~==~~~==~~~==~~',
-            '................',
-            '................',
-            '..FF........FF..',
-            '................',
-            '...T...II...T...',
-            '................',
+            '...T..T..T..T...',
+            'T..............T',
+            '...T...T...T....',
+            '.............T..',
+            '.T....T.........',
+            '..........T.....',
+            '....T.........T.',
+            '.......T........',
+            '.T..............',
+            '..........T.....',
+            '....T........T..',
+            '.......T........',
+            '.T..............',
+            '...T......T.....',
+            'T.....T........T',
             '................'
         ])
     },
     {
         id: 5,
-        name: 'Colina Invernal',
+        name: 'Laberinto de Nieve',
         preview: room5Img,
         grid: parseMap([
+            '....T.......T...',
             '................',
-            '....T......T....',
+            '..III..II..III..',
+            '..I....I.....I..',
+            '....I..I..II....',
             '..II........II..',
-            '................',
-            '....F..TT..F....',
-            '................',
-            '......I..I......',
-            '.......M........',
-            '......I..I......',
-            '................',
-            '....F..TT..F....',
-            '................',
+            '..I...........I.',
+            '....I.......I...',
+            '....I.......I...',
+            '..I...........I.',
             '..II........II..',
-            '....T......T....',
+            '....II..I..I....',
+            '..I.....I....I..',
+            '..III..II..III..',
             '................',
             '................'
         ])
@@ -369,11 +389,20 @@ function isWalkable(grid: TileType[][], gx: number, gy: number, radius = 0.34): 
 
 function findSafeSpawn(grid: TileType[][], team: Team): { x: number; y: number }
 {
-    for (let attempt = 0; attempt < 25; attempt++)
+    for (let attempt = 0; attempt < 40; attempt++)
     {
-        const bx = team === 'blue' ? 0.8 + Math.random() * 2.8 : 12.4 + Math.random() * 2.8;
-        const by = team === 'blue' ? 0.8 + Math.random() * 2.8 : 12.4 + Math.random() * 2.8;
+        const bx = team === 'blue' ? 0.6 + Math.random() * 3.2 : 12.2 + Math.random() * 3.2;
+        const by = team === 'blue' ? 0.6 + Math.random() * 3.2 : 12.2 + Math.random() * 3.2;
         if (isWalkable(grid, bx, by, 0.38)) return { x: bx, y: by };
+    }
+    for (let y = 0; y < GRID_SIZE; y++)
+    {
+        for (let x = 0; x < GRID_SIZE; x++)
+        {
+            const tx = team === 'blue' ? x : GRID_SIZE - 1 - x;
+            const ty = team === 'blue' ? y : GRID_SIZE - 1 - y;
+            if (isWalkable(grid, tx + 0.5, ty + 0.5, 0.36)) return { x: tx + 0.5, y: ty + 0.5 };
+        }
     }
     return team === 'blue' ? { x: 0.6, y: 0.6 } : { x: 15.4, y: 15.4 };
 }
@@ -384,14 +413,14 @@ function blocksDirectShot(grid: TileType[][], gx: number, gy: number): boolean
     const iy = Math.floor(gy);
     if (ix < 0 || iy < 0 || ix >= GRID_SIZE || iy >= GRID_SIZE) return true;
     const t = grid[iy][ix];
-    if (t !== 3 && t !== 4 && t !== 5 && t !== 6) return false;
+    if (t !== 3 && t !== 4 && t !== 5 && t !== 6 && t !== 7 && t !== 8) return false;
     // Tight inner core so players peeking beside a tree/bunker can still be hit fairly!
     const fx = gx - ix;
     const fy = gy - iy;
     return fx >= 0.18 && fx <= 0.82 && fy >= 0.18 && fy <= 0.82;
 }
 
-function findMachineTile(grid: TileType[][]): { x: number; y: number }
+function findMachineTile(grid: TileType[][]): { x: number; y: number } | null
 {
     for (let y = 0; y < GRID_SIZE; y++)
     {
@@ -400,7 +429,7 @@ function findMachineTile(grid: TileType[][]): { x: number; y: number }
             if (grid[y][x] === 6) return { x: x + 0.5, y: y + 0.5 };
         }
     }
-    return { x: 7.5, y: 7.5 };
+    return null;
 }
 
 class SnowStormAudio
@@ -574,10 +603,11 @@ export const SnowStormGameView: FC = () =>
         pineTree?: HTMLImageElement;
         berryTree?: HTMLImageElement;
         fence?: HTMLImageElement;
+        snowDuck?: HTMLImageElement;
     }>({});
 
-    // Cached real Habbo heads rendered via GetAvatarRenderManager()
-    const headCacheRef = useRef<Map<string, { front: HTMLImageElement; back: HTMLImageElement }>>(new Map());
+    // Cached real Habbo heads rendered in ALL 8 isometric directions (0..7)
+    const headCacheRef = useRef<Map<string, Record<number, HTMLImageElement>>>(new Map());
 
     // Mutable match engine state
     const engineRef = useRef<{
@@ -630,9 +660,10 @@ export const SnowStormGameView: FC = () =>
         load(pineTreeImg, 'pineTree');
         load(berryTreeImg, 'berryTree');
         load(fenceImg, 'fence');
+        load(snowDuckImg, 'snowDuck');
     }, []);
 
-    // Pre-render authentic Shockwave SMALL (sh_) Habbo heads for SnowStorm fighters
+    // Pre-render authentic Shockwave SMALL (sh_) Habbo heads in ALL 8 directions (0..7)
     useEffect(() =>
     {
         let alive = true;
@@ -643,22 +674,17 @@ export const SnowStormGameView: FC = () =>
             if (!alive) return;
             allFigures.forEach(figure =>
             {
-                const entry = headCacheRef.current.get(figure) || {
-                    front: new Image(),
-                    back: new Image()
-                };
+                const entry = headCacheRef.current.get(figure) || {};
                 headCacheRef.current.set(figure, entry);
 
-                const frontUrl = renderShockwaveSmallDataUrl(figure, { direction: 2, headDirection: 2, headOnly: true });
-                if (frontUrl)
+                for (let d = 0; d < 8; d++)
                 {
-                    trimTransparentImage(frontUrl, (_u, trimmedImg) => { if (alive) entry.front = trimmedImg; });
-                }
-
-                const backUrl = renderShockwaveSmallDataUrl(figure, { direction: 0, headDirection: 0, headOnly: true });
-                if (backUrl)
-                {
-                    trimTransparentImage(backUrl, (_u, trimmedImg) => { if (alive) entry.back = trimmedImg; });
+                    const dirUrl = renderShockwaveSmallDataUrl(figure, { direction: d, headDirection: d, headOnly: true });
+                    if (dirUrl)
+                    {
+                        const dirIdx = d;
+                        trimTransparentImage(dirUrl, (_u, trimmedImg) => { if (alive) entry[dirIdx] = trimmedImg; });
+                    }
                 }
             });
         };
@@ -727,6 +753,7 @@ export const SnowStormGameView: FC = () =>
                 targetY: null,
                 facingX: bot.team === 'blue' ? 1 : -1,
                 facingY: bot.team === 'blue' ? 1 : -1,
+                dir: bot.team === 'blue' ? 3 : 7,
                 hp: 5,
                 snowballs: 5,
                 reloading: false,
@@ -754,15 +781,18 @@ export const SnowStormGameView: FC = () =>
 
         const machine = findMachineTile(arena.grid);
         const piles: SnowPile[] = [];
-        const offsets = [ [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ] ];
-        for (const [ ox, oy ] of offsets)
+        if (machine)
         {
-            const px = Math.floor(machine.x) + ox;
-            const py = Math.floor(machine.y) + oy;
-            if (isWalkable(arena.grid, px, py))
+            const offsets = [ [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ] ];
+            for (const [ ox, oy ] of offsets)
             {
-                piles.push({ x: px + 0.5, y: py + 0.5, balls: 5 });
-                if (piles.length >= 2) break;
+                const px = Math.floor(machine.x) + ox;
+                const py = Math.floor(machine.y) + oy;
+                if (isWalkable(arena.grid, px, py))
+                {
+                    piles.push({ x: px + 0.5, y: py + 0.5, balls: 5 });
+                    if (piles.length >= 2) break;
+                }
             }
         }
 
@@ -783,7 +813,9 @@ export const SnowStormGameView: FC = () =>
                     name: rosterBlue[1].name,
                     figure: rosterBlue[1].figure,
                     team: 'blue',
-                    text: '¡Vamos Equipo Azul! ¡A la máquina de nieve!',
+                    text: machine
+                        ? '¡Vamos Equipo Azul! ¡A la máquina de nieve!'
+                        : '¡Vamos Equipo Azul! ¡A cubrirse y recargar nieve!',
                     life: 4.5
                 }
             ],
@@ -1022,11 +1054,12 @@ export const SnowStormGameView: FC = () =>
             shooter.throwAnimTimer = 0.28;
             shooter.throwCooldown = isLob ? 0.55 : 0.34;
 
-            // Update facing in isometric space
+            // Update 8-way facing in isometric space
             const isoDx = (finalTx - shooter.x) - (finalTy - shooter.y);
             const isoDy = (finalTx - shooter.x) + (finalTy - shooter.y);
             shooter.facingX = isoDx >= 0 ? 1 : -1;
             shooter.facingY = isoDy >= 0 ? 1 : -1;
+            shooter.dir = isoVecToHabboDir(isoDx, isoDy);
 
             const speed = isLob ? 5.6 : 11.2;
             const duration = Math.max(0.14, clampedDist / speed);
@@ -1233,6 +1266,7 @@ export const SnowStormGameView: FC = () =>
                 const isoDy = nx + ny;
                 f.facingX = isoDx >= 0 ? 1 : -1;
                 f.facingY = isoDy >= 0 ? 1 : -1;
+                f.dir = isoVecToHabboDir(isoDx, isoDy);
                 f.walkPhase += dt * 10;
             }
             return moved;
@@ -1253,23 +1287,46 @@ export const SnowStormGameView: FC = () =>
             const grid = eng.arena.grid;
             const machine = findMachineTile(grid);
 
-            // Spawn snow piles around central Snowball Machine
+            // Spawn snow piles around Snowball Machine (only on maps that have one!)
+            // On machine-less maps (Maps 3, 4, 5), players pack snowballs manually (Space)
+            // and occasional natural snowdrifts spawn on open snow tiles.
             eng.pileTimer -= dt;
-            if (eng.pileTimer <= 0 && eng.piles.length < 4)
+            if (eng.pileTimer <= 0)
             {
-                eng.pileTimer = 5.5;
-                const candidates = [
-                    [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ], [ 1, 1 ], [ -1, -1 ], [ 1, -1 ], [ -1, 1 ]
-                ];
-                for (const [ ox, oy ] of candidates)
+                if (machine && eng.piles.length < 4)
                 {
-                    const px = Math.floor(machine.x) + ox + 0.5;
-                    const py = Math.floor(machine.y) + oy + 0.5;
-                    if (isWalkable(grid, px, py) && !eng.piles.some(p => Math.hypot(p.x - px, p.y - py) < 0.6))
+                    eng.pileTimer = 5.5;
+                    const candidates = [
+                        [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ], [ 1, 1 ], [ -1, -1 ], [ 1, -1 ], [ -1, 1 ]
+                    ];
+                    for (const [ ox, oy ] of candidates)
                     {
-                        eng.piles.push({ x: px, y: py, balls: 5 });
-                        break;
+                        const px = Math.floor(machine.x) + ox + 0.5;
+                        const py = Math.floor(machine.y) + oy + 0.5;
+                        if (isWalkable(grid, px, py) && !eng.piles.some(p => Math.hypot(p.x - px, p.y - py) < 0.6))
+                        {
+                            eng.piles.push({ x: px, y: py, balls: 5 });
+                            break;
+                        }
                     }
+                }
+                else if (!machine && eng.piles.length < 2)
+                {
+                    eng.pileTimer = 9.0;
+                    for (let attempt = 0; attempt < 20; attempt++)
+                    {
+                        const rx = 2 + Math.floor(Math.random() * (GRID_SIZE - 4)) + 0.5;
+                        const ry = 2 + Math.floor(Math.random() * (GRID_SIZE - 4)) + 0.5;
+                        if (isWalkable(grid, rx, ry, 0.42) && !eng.piles.some(p => Math.hypot(p.x - rx, p.y - ry) < 2.2))
+                        {
+                            eng.piles.push({ x: rx, y: ry, balls: 5 });
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    eng.pileTimer = 4.0;
                 }
             }
 
@@ -1312,7 +1369,7 @@ export const SnowStormGameView: FC = () =>
                         if (f.isHuman) audioRef.current.playReload();
                         eng.popups.push({ x: f.x, y: f.y, text: '❄ +5 Bolas', color: '#1b82c9', life: 1.0, maxLife: 1.0 });
                     }
-                    else if (Math.hypot(machine.x - f.x, machine.y - f.y) < 1.35)
+                    else if (machine && Math.hypot(machine.x - f.x, machine.y - f.y) < 1.35)
                     {
                         f.snowballs = 5;
                         f.reloading = false;
@@ -1405,13 +1462,16 @@ export const SnowStormGameView: FC = () =>
                         // Occasional tactical callout
                         if (Math.random() < 0.035 && eng.chats.length < 4)
                         {
+                            const allowedLines = machine
+                                ? BOT_CHAT_LINES
+                                : BOT_CHAT_LINES.filter(l => !l.toLowerCase().includes('máquina'));
                             eng.chats.push({
                                 id: eng.nextChatId++,
                                 fighterId: f.id,
                                 name: f.name,
                                 figure: f.figure,
                                 team: f.team,
-                                text: BOT_CHAT_LINES[Math.floor(Math.random() * BOT_CHAT_LINES.length)],
+                                text: allowedLines[Math.floor(Math.random() * allowedLines.length)],
                                 life: 3.4
                             });
                         }
@@ -1721,21 +1781,58 @@ export const SnowStormGameView: FC = () =>
 
                     if (t === 1)
                     {
-                        // Frozen icy moat with icy rim bevel
+                        // Sunken frozen icy river/moat with authentic icy bank walls (Room_snowstorm_1 & 2)
+                        const drop = 9 * sc;
+                        const nwLand = x === 0 || (grid[y][x - 1] !== 1);
+                        const neLand = y === 0 || (grid[y - 1][x] !== 1);
+
+                        // Water diamond slightly sunken
                         ctx.beginPath();
-                        ctx.moveTo(p.sx, p.sy);
-                        ctx.lineTo(p.sx + hw, p.sy + hh);
-                        ctx.lineTo(p.sx, p.sy + hh * 2);
-                        ctx.lineTo(p.sx - hw, p.sy + hh);
+                        ctx.moveTo(p.sx, p.sy + drop * 0.45);
+                        ctx.lineTo(p.sx + hw, p.sy + hh + drop * 0.45);
+                        ctx.lineTo(p.sx, p.sy + hh * 2 + drop * 0.45);
+                        ctx.lineTo(p.sx - hw, p.sy + hh + drop * 0.45);
                         ctx.closePath();
                         const iceGrad = ctx.createLinearGradient(p.sx, p.sy, p.sx, p.sy + hh * 2);
-                        iceGrad.addColorStop(0, '#c2e8fb');
-                        iceGrad.addColorStop(1, '#d8f2ff');
+                        iceGrad.addColorStop(0, '#9bdaf5');
+                        iceGrad.addColorStop(1, '#c5ecfc');
                         ctx.fillStyle = iceGrad;
                         ctx.fill();
-                        ctx.strokeStyle = '#8cc2de';
-                        ctx.lineWidth = 1.1;
+                        ctx.strokeStyle = 'rgba(108, 176, 209, 0.55)';
+                        ctx.lineWidth = 0.9;
                         ctx.stroke();
+
+                        // NW icy cliff face (when land is to the top-left of this water tile)
+                        if (nwLand)
+                        {
+                            ctx.beginPath();
+                            ctx.moveTo(p.sx, p.sy);
+                            ctx.lineTo(p.sx - hw, p.sy + hh);
+                            ctx.lineTo(p.sx - hw, p.sy + hh + drop);
+                            ctx.lineTo(p.sx, p.sy + drop);
+                            ctx.closePath();
+                            ctx.fillStyle = '#8db4c4';
+                            ctx.fill();
+                            ctx.strokeStyle = '#608696';
+                            ctx.lineWidth = 0.9;
+                            ctx.stroke();
+                        }
+
+                        // NE icy cliff face (when land is to the top-right of this water tile)
+                        if (neLand)
+                        {
+                            ctx.beginPath();
+                            ctx.moveTo(p.sx, p.sy);
+                            ctx.lineTo(p.sx + hw, p.sy + hh);
+                            ctx.lineTo(p.sx + hw, p.sy + hh + drop);
+                            ctx.lineTo(p.sx, p.sy + drop);
+                            ctx.closePath();
+                            ctx.fillStyle = '#a9cedd';
+                            ctx.fill();
+                            ctx.strokeStyle = '#6e94a4';
+                            ctx.lineWidth = 0.9;
+                            ctx.stroke();
+                        }
                     }
                     else if (t === 2)
                     {
@@ -1866,6 +1963,46 @@ export const SnowStormGameView: FC = () =>
                             }
                         });
                     }
+                    else if (t === 7)
+                    {
+                        // Stacked 2-high snow bunker (Room_snowstorm_2 & Room_snowstorm_3)
+                        drawables.push({
+                            depth: depth + 0.05,
+                            draw: () =>
+                            {
+                                const ic = spritesRef.current.iceCube;
+                                if (ic)
+                                {
+                                    const w = 48 * sc;
+                                    const h = 46 * sc;
+                                    ctx.drawImage(ic, p.sx - w / 2, p.sy - h + 11 * sc, w, h);
+                                    ctx.drawImage(ic, p.sx - w / 2, p.sy - h - 7 * sc, w, h);
+                                }
+                                else
+                                {
+                                    ctx.fillStyle = '#cde9f8';
+                                    ctx.fillRect(p.sx - 16 * sc, p.sy - 42 * sc, 32 * sc, 42 * sc);
+                                }
+                            }
+                        });
+                    }
+                    else if (t === 8)
+                    {
+                        // Official Habbo Snow Duck centerpiece (Room_snowstorm_3)
+                        drawables.push({
+                            depth: depth + 0.08,
+                            draw: () =>
+                            {
+                                const duck = spritesRef.current.snowDuck;
+                                if (duck && duck.complete && duck.naturalWidth > 0)
+                                {
+                                    const w = 38 * sc;
+                                    const h = (duck.naturalHeight / duck.naturalWidth) * w;
+                                    ctx.drawImage(duck, p.sx - w / 2, p.sy - h + 8 * sc, w, h);
+                                }
+                            }
+                        });
+                    }
                 }
             }
 
@@ -1923,17 +2060,57 @@ export const SnowStormGameView: FC = () =>
                             ctx.stroke();
                         }
 
-                        // Authentic 3/4-diagonal body + smooth grounded 4-step Habbo walking (ZERO jumping/bobbing!)
+                        // Authentic 8-direction Habbo parka + full 8-way back/diagonal Shockwave heads!
                         const poses = spritesRef.current.poses;
                         const isMoving = Math.hypot(f.vx, f.vy) > 0.18;
                         const walkFrames = [ 1, 0, 2, 0 ];
+                        const isBack = (f.dir === 0 || f.dir === 6 || f.dir === 7);
+                        const isLeftDir = (f.dir === 4 || f.dir === 5 || f.dir === 6);
+
                         let colIdx = 0; // 0 = 3/4 standing idle
-                        if (f.koTimer > 0) colIdx = 6;
-                        else if (f.hitAnimTimer > 0) colIdx = 5;
-                        else if (f.throwAnimTimer > 0) colIdx = 4;
-                        else if (f.reloading) colIdx = 3;
-                        else if (isMoving) colIdx = walkFrames[Math.floor(f.walkPhase) % 4];
-                        else if (f.facingY < 0) colIdx = 7;
+                        let flipBody = isLeftDir;
+                        let strideBobY = 0;
+
+                        if (f.koTimer > 0)
+                        {
+                            colIdx = 6;
+                            flipBody = false;
+                        }
+                        else if (f.hitAnimTimer > 0)
+                        {
+                            colIdx = 5;
+                        }
+                        else if (f.throwAnimTimer > 0)
+                        {
+                            colIdx = 4;
+                            if (f.dir === 7) flipBody = f.facingX < 0;
+                        }
+                        else if (f.reloading)
+                        {
+                            colIdx = 3;
+                        }
+                        else if (isBack)
+                        {
+                            // Back & back-diagonal views (0=NE, 6=NW, 7=N) ALWAYS use back-facing parka!
+                            colIdx = 7;
+                            if (f.dir === 7)
+                            {
+                                // Alternate subtle left/right stride while walking straight up (away from camera)
+                                flipBody = isMoving ? (Math.floor(f.walkPhase) % 2 === 1) : false;
+                            }
+                            else
+                            {
+                                flipBody = (f.dir === 6);
+                            }
+                            if (isMoving)
+                            {
+                                strideBobY = (Math.floor(f.walkPhase) % 2 === 1) ? -1.2 * sc : 0;
+                            }
+                        }
+                        else if (isMoving)
+                        {
+                            colIdx = walkFrames[Math.floor(f.walkPhase) % 4];
+                        }
 
                         const cellW = 60;
                         const cellH = 44;
@@ -1945,8 +2122,8 @@ export const SnowStormGameView: FC = () =>
                         if (poses)
                         {
                             ctx.save();
-                            ctx.translate(p.sx, p.sy + 3 * sc);
-                            if (f.facingX < 0 && f.koTimer <= 0) ctx.scale(-1, 1);
+                            ctx.translate(p.sx, p.sy + 3 * sc + strideBobY);
+                            if (flipBody) ctx.scale(-1, 1);
                             ctx.drawImage(
                                 poses,
                                 colIdx * cellW, rowY, cellW, cellH,
@@ -1955,24 +2132,28 @@ export const SnowStormGameView: FC = () =>
                             ctx.restore();
                         }
 
-                        // Tightly-trimmed real Habbo head anchored by CHIN BOTTOM snugly inside the parka fur collar
+                        // Tightly-trimmed real Habbo head in TRUE 8-way direction (0..7 — front, diagonals & back!)
+                        // Do NOT flip canvas because renderShockwaveSmallDataUrl already renders exact direction 0..7!
                         const headEntry = headCacheRef.current.get(f.figure);
-                        const headImg = (f.facingY < 0 && !isMoving && f.koTimer <= 0 && !f.reloading && f.throwAnimTimer <= 0)
-                            ? headEntry?.back
-                            : headEntry?.front;
+                        const headImg = headEntry?.[f.dir] || headEntry?.[2];
                         if (headImg && headImg.complete && headImg.naturalWidth > 0 && f.koTimer <= 0)
                         {
                             const hScale = 1.18 * spriteScale;
                             const hw = headImg.naturalWidth * hScale;
                             const hh = headImg.naturalHeight * hScale;
-                            const chinFromFeet = f.reloading ? 17.5 : 20.5;
-                            const headAnchorX = f.reloading ? (3 * spriteScale) : (1 * spriteScale);
+                            const chinFromFeet = f.reloading ? 17.5 : (isBack ? 20.8 : 20.5);
+                            let headOffsetX = 0;
+                            if (f.reloading) headOffsetX = flipBody ? -3 : 3;
+                            else if (f.dir === 1 || f.dir === 2) headOffsetX = 1;
+                            else if (f.dir === 4 || f.dir === 5) headOffsetX = -1;
+                            else if (f.dir === 0) headOffsetX = 0.5;
+                            else if (f.dir === 6) headOffsetX = -0.5;
+
                             ctx.imageSmoothingEnabled = false;
                             const headAnchorY = -chinFromFeet * spriteScale - hh;
                             ctx.save();
-                            ctx.translate(p.sx, p.sy + 3 * sc);
-                            if (f.facingX < 0) ctx.scale(-1, 1);
-                            ctx.drawImage(headImg, -hw / 2 + headAnchorX, headAnchorY, hw, hh);
+                            ctx.translate(p.sx, p.sy + 3 * sc + strideBobY);
+                            ctx.drawImage(headImg, -hw / 2 + headOffsetX * spriteScale, headAnchorY, hw, hh);
                             ctx.restore();
                         }
 
@@ -2115,7 +2296,7 @@ export const SnowStormGameView: FC = () =>
                 ctx.stroke();
 
                 // Crisp full-size tightly-trimmed avatar head inside left side of speech bubble
-                const chHead = headCacheRef.current.get(ch.figure)?.front;
+                const chHead = headCacheRef.current.get(ch.figure)?.[2];
                 if (chHead && chHead.complete && chHead.naturalWidth > 0)
                 {
                     const mh = 23;

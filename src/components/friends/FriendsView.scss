@@ -99,6 +99,77 @@
     .friends-action-bar-2012 {
         display: none !important;
     }
+
+    .friends-list-item-row {
+        .friends-list-game-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 4px;
+            padding: 1px 5px 1px 3px;
+            border-radius: 3px;
+            background: var(--game-badge-bg, #485420);
+            border: 1px solid var(--game-badge-border, #353f16);
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
+            .friends-list-game-icon {
+                width: 14px;
+                height: 14px;
+                object-fit: contain;
+                image-rendering: pixelated;
+                flex-shrink: 0;
+            }
+        }
+
+        .friends-list-game-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: calc(100% + 16px);
+            margin: 5px -8px -4px -8px;
+            padding: 5px 10px;
+            background: var(--game-band-bg, #485420);
+            border-top: 1px solid var(--game-band-border, #353f16);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+
+            .friends-list-game-banner-icon {
+                width: 24px;
+                height: 24px;
+                object-fit: contain;
+                image-rendering: pixelated;
+                flex-shrink: 0;
+                filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+            }
+
+            .friends-list-game-banner-text {
+                line-height: 1.15;
+                text-align: left;
+            }
+
+            .friends-list-game-banner-sub {
+                font-style: italic;
+                font-size: 10.5px;
+                font-weight: 400;
+                color: var(--game-sub-color, #eef5d8);
+            }
+
+            .friends-list-game-banner-title {
+                font-size: 11.5px;
+                font-weight: 800;
+                letter-spacing: 0.4px;
+                color: #ffffff;
+                text-transform: uppercase;
+            }
+        }
+    }
 }
 
 .nitro-friends-messenger {
@@ -136,25 +207,45 @@
 
         &.friend-bar-item-active {
             margin-bottom: 21px;
+
+            &.friend-bar-playing-game {
+                margin-bottom: 62px;
+                min-width: 176px;
+                max-width: 214px;
+            }
         }
 
-        .friend-bar-game-snowball {
+        .friend-bar-game-badge {
             position: absolute;
-            top: -9px;
+            top: -11px;
             right: 4px;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
             image-rendering: pixelated;
             pointer-events: none;
-            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
             z-index: 4;
+
+            &.is-game-battleball,
+            &.is-game-wobblesquabble {
+                width: 25px;
+                height: 25px;
+                top: -12px;
+            }
+
+            &.is-game-fastfood {
+                width: 26px;
+                height: 22px;
+                top: -10px;
+            }
         }
 
         .friend-bar-playing-band {
             margin: 5px -12px 6px -38px;
             padding: 4px 10px 5px 10px;
-            background: rgba(24, 38, 12, 0.42);
-            border-top: 1px solid rgba(0, 0, 0, 0.25);
+            background: var(--game-band-bg, #485420);
+            border-top: 1px solid var(--game-band-border, #353f16);
             border-bottom: 1px solid rgba(255, 255, 255, 0.14);
             text-align: left;
             line-height: 1.15;
@@ -163,7 +254,7 @@
                 font-style: italic;
                 font-size: 10.5px;
                 font-weight: 400;
-                color: #e8f5dc;
+                color: var(--game-sub-color, #eef5d8);
                 text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
             }
 

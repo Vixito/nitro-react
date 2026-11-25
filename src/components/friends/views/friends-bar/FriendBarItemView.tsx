@@ -1,10 +1,9 @@
 import { MouseEventType } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useRef, useState } from 'react';
+import { CSSProperties, FC, useEffect, useRef, useState } from 'react';
 import { CreateLinkEvent, GetUserProfile, LocalizeText, MessengerFriend, OpenMessengerChat } from '../../../../api';
 import { Base, LayoutAvatarImageView, LayoutBadgeImageView } from '../../../../common';
 import { useFriends, useGamePresence } from '../../../../hooks';
-import SnowballIconImg from '../../../../assets/images/gamecenter/snowstorm/thumbnails_Extra_ss_snowball.png';
-import BattleBallIconImg from '../../../../assets/images/gamecenter/battleball/pu_spring.png';
+import { getGamePresenceMeta } from '../../gamePresenceMeta';
 
 export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
 {
@@ -49,12 +48,19 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
 
     const isAvatar = (friend.id > 0);
     const activeGame = isAvatar ? activePlayers[friend.id] : null;
+    const gameMeta = getGamePresenceMeta(activeGame);
+    const gameStyle = gameMeta ? ({
+        '--game-band-bg': gameMeta.bandBg,
+        '--game-band-border': gameMeta.bandBorder,
+        '--game-sub-color': gameMeta.subColor
+    } as CSSProperties) : undefined;
 
     return (
-        <div 
-            ref={ elementRef } 
-            className={ `btn btn-success friend-bar-item ${ isVisible ? 'friend-bar-item-active' : '' } ${ activeGame ? 'friend-bar-playing-game' : '' }` } 
-            onClick={ event => {
+        <div
+            ref={ elementRef }
+            style={ gameStyle }
+            className={ `btn btn-success friend-bar-item ${ isVisible ? 'friend-bar-item-active' : '' } ${ gameMeta ? `friend-bar-playing-game ${ gameMeta.cardClass }` : '' }` }
+            onClick={ () => {
                 if(friend.id <= 0) {
                     OpenMessengerChat(friend.id);
                 } else {
@@ -64,27 +70,27 @@ export const FriendBarItemView: FC<{ friend: MessengerFriend }> = props =>
         >
             <div className={ `friend-bar-item-head position-absolute ${ isAvatar ? 'avatar': 'group' }` }>
                 { isAvatar && <LayoutAvatarImageView headOnly={ true } figure={ friend.figure } direction={ 2 } /> }
-                { !isAvatar && <LayoutBadgeImageView isGroup={ false } badgeCode={ friend.figure || 'ADM' } /> } 
+                { !isAvatar && <LayoutBadgeImageView isGroup={ false } badgeCode={ friend.figure || 'ADM' } /> }
             </div>
-            { activeGame && (
+            { gameMeta && (
                 <img
-                    src={ activeGame.game === 'battleball' ? BattleBallIconImg : SnowballIconImg }
-                    alt={ activeGame.label }
-                    title={ `${ friend.name } está jugando a ${ activeGame.label }` }
-                    className="friend-bar-game-snowball"
+                    src={ gameMeta.icon }
+                    alt={ gameMeta.label }
+                    title={ `${ friend.name } está jugando a ${ gameMeta.label }` }
+                    className={ `friend-bar-game-badge ${ gameMeta.cardClass }` }
                 />
             ) }
             <div className="text-truncate">{ friend.name }</div>
-            { isVisible && friend.id > 0 && activeGame && (
+            { isVisible && friend.id > 0 && gameMeta && (
                 <div className="friend-bar-playing-band" onClick={ event => event.stopPropagation() }>
                     <div className="friend-bar-playing-sub">está jugando un juego</div>
-                    <div className="friend-bar-playing-title">{ activeGame.label }</div>
+                    <div className="friend-bar-playing-title">{ gameMeta.label }</div>
                 </div>
             ) }
             { isVisible && friend.id > 0 &&
             <div className="d-flex justify-content-between friend-bar-actions-row">
                 <Base className="nitro-friends-spritesheet icon-friendbar-chat cursor-pointer" onClick={ event => { event.stopPropagation(); OpenMessengerChat(friend.id); } } />
-                { friend.followingAllowed && !activeGame &&
+                { friend.followingAllowed && !gameMeta &&
                 <Base className="nitro-friends-spritesheet icon-friendbar-visit cursor-pointer" onClick={ event => { event.stopPropagation(); followFriend(friend); } } /> }
                 <Base className="nitro-friends-spritesheet icon-profile cursor-pointer" onClick={ event => { event.stopPropagation(); GetUserProfile(friend.id); } } />
             </div> }

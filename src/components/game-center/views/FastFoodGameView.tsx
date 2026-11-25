@@ -1,7 +1,7 @@
 import { AvatarAction, AvatarScaleType, AvatarSetType, IAvatarImageListener } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GetAvatarRenderManager, GetConfiguration, GetSessionDataManager } from '../../../api';
-import { useGameCenter } from '../../../hooks';
+import { useGameCenter, useGamePresence } from '../../../hooks';
 import { HabboHeadImg, trimTransparentImage } from './SnowStormAvatar';
 
 // Official cleaned Fast Food assets (restaurant, 5 food sprites, Habbten logo, original Sulake buttons, theme music)
@@ -604,6 +604,17 @@ const TrophyIconSvg: FC<{ size?: number }> = ({ size = 26 }) => (
 export const FastFoodGameView: FC = () =>
 {
     const { setIsFastFoodPlaying, setIsVisible } = useGameCenter();
+    const { setMyGamePresence } = useGamePresence();
+
+    useEffect(() =>
+    {
+        if (document.activeElement instanceof HTMLElement)
+        {
+            document.activeElement.blur();
+        }
+        setMyGamePresence('fastfood', 'FAST FOOD');
+        return () => setMyGamePresence(null);
+    }, [ setMyGamePresence ]);
     const session = GetSessionDataManager();
     const myUsername = session?.userName || 'Jugador';
     const myFigure = session?.figure || 'hr-100-61.hd-180-1.ch-210-66.lg-270-82.sh-290-80';
@@ -1849,9 +1860,10 @@ export const FastFoodGameView: FC = () =>
     const exitToGameCenter = useCallback(() =>
     {
         if (audioElRef.current) audioElRef.current.pause();
+        setMyGamePresence(null);
         setIsFastFoodPlaying(false);
         setIsVisible(true);
-    }, [ setIsFastFoodPlaying, setIsVisible ]);
+    }, [ setIsFastFoodPlaying, setIsVisible, setMyGamePresence ]);
 
     const backToLobby = useCallback(() =>
     {

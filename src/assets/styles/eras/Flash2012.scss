@@ -1142,15 +1142,15 @@ body[data-era="flash2012"] {
                                     .friend-bar-playing-band {
                                         margin: 4px -10px 4px -10px !important;
                                         padding: 4px 10px !important;
-                                        background: #485420 !important;
-                                        border-top: 1px solid #353f16 !important;
-                                        border-bottom: 1px solid #353f16 !important;
+                                        background: var(--game-band-bg, #485420) !important;
+                                        border-top: 1px solid var(--game-band-border, #353f16) !important;
+                                        border-bottom: 1px solid var(--game-band-border, #353f16) !important;
 
                                         .friend-bar-playing-sub {
                                             font-style: italic !important;
                                             font-weight: 400 !important;
                                             font-size: 11px !important;
-                                            color: #eef5d8 !important;
+                                            color: var(--game-sub-color, #eef5d8) !important;
                                             text-shadow: none !important;
                                         }
 
