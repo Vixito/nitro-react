@@ -442,7 +442,7 @@ const useNavigatorState = () =>
         VisitDesktop();
     });
 
-    useMessageEvent<NavigatorOpenRoomCreatorEvent>(NavigatorOpenRoomCreatorEvent, event => CreateLinkEvent('navigator/show'));
+    useMessageEvent<NavigatorOpenRoomCreatorEvent>(NavigatorOpenRoomCreatorEvent, event => CreateLinkEvent('navigator/create'));
 
     return { categories, doorData, setDoorData, topLevelContext, topLevelContexts, searchResult, navigatorData };
 }

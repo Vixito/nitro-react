@@ -1,5 +1,5 @@
 /* eslint-disable no-template-curly-in-string */
-import { CreateFlatMessageComposer, HabboClubLevelEnum } from '@nitrots/nitro-renderer';
+import { CreateFlatMessageComposer, GetUserFlatCatsMessageComposer, HabboClubLevelEnum } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { GetClubMemberLevel, GetConfiguration, IRoomModel, LocalizeText, SendMessageComposer } from '../../../api';
 import { Button, Column, Flex, Grid, LayoutCurrencyIcon, LayoutGridItem, ShockwaveDropdown, Text } from '../../../common';
@@ -39,8 +39,12 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
 
     const createRoom = () =>
     {
-        if(!name || name.length < 3) return;
-        SendMessageComposer(new CreateFlatMessageComposer(name, description, 'model_' + selectedModelName, Number(category), Number(visitorsCount), tradesSetting));
+        const trimmedName = name.trim();
+        if(!trimmedName || trimmedName.length < 3) return;
+        const resolvedModel = selectedModelName || roomModels?.[0]?.name || 'a';
+        const resolvedCategory = (category !== null && category !== undefined) ? Number(category) : (categories?.[0]?.id ?? 11);
+        const resolvedVisitors = (visitorsCount !== null && visitorsCount !== undefined) ? Number(visitorsCount) : 10;
+        SendMessageComposer(new CreateFlatMessageComposer(trimmedName, description, 'model_' + resolvedModel, resolvedCategory, resolvedVisitors, tradesSetting));
     };
 
     useEffect(() =>
@@ -58,7 +62,14 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
 
     useEffect(() =>
     {
-        if(categories && categories.length) setCategory(categories[0].id);
+        if(categories && categories.length)
+        {
+            setCategory(prev => (prev !== null && prev !== undefined) ? prev : categories[0].id);
+        }
+        else
+        {
+            SendMessageComposer(new GetUserFlatCatsMessageComposer());
+        }
     }, [ categories ]);
 
     useEffect(() =>
@@ -74,7 +85,7 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
 
     if(currentEra === 'flash2012')
     {
-        const canCreate = Boolean(name && name.length >= 3);
+        const canCreate = Boolean(name && name.trim().length >= 3);
 
         return (
             <div className="creator-2012-grid">
@@ -233,7 +244,7 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
                         )) }
                     </Column>
                 </Grid>
-                <Button fullWidth variant={ (!name || (name.length < 3)) ? 'danger' : 'success' } onClick={ createRoom } disabled={ (!name || (name.length < 3)) }>{ LocalizeText('navigator.createroom.create') }</Button>
+                <Button fullWidth variant={ (!name || (name.trim().length < 3)) ? 'danger' : 'success' } onClick={ createRoom } disabled={ (!name || (name.trim().length < 3)) }>{ LocalizeText('navigator.createroom.create') }</Button>
             </Column>
         );
     }
@@ -328,9 +339,9 @@ export const NavigatorRoomCreatorView: FC<NavigatorRoomCreatorViewProps> = props
                 <Button
                     fullWidth
                     className="creator-submit-btn"
-                    variant={ (!name || (name.length < 3)) ? 'danger' : 'success' }
+                    variant={ (!name || (name.trim().length < 3)) ? 'danger' : 'success' }
                     onClick={ createRoom }
-                    disabled={ (!name || (name.length < 3)) }
+                    disabled={ (!name || (name.trim().length < 3)) }
                 >
                     { LocalizeText('navigator.createroom.create') }
                 </Button>

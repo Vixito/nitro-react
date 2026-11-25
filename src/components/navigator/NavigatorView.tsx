@@ -217,6 +217,21 @@ export const NavigatorView: FC<{}> = props =>
         LegacyExternalInterface.addCallback(HabboWebTools.OPENROOM, (k: string, _arg_2: boolean = false, _arg_3: string = null) => SendMessageComposer(new ConvertGlobalRoomIdMessageComposer(k)));
     }, []);
 
+    const handleOpenCreator = useCallback(() =>
+    {
+        setCreatorOpen(true);
+
+        requestAnimationFrame(() =>
+        {
+            const creatorCard = document.querySelector('.nitro-card[data-window-key="navigator-room-creator"]') as HTMLElement | null;
+            const draggableParent = creatorCard?.closest('.draggable-window') as HTMLElement | null;
+            if(draggableParent)
+            {
+                draggableParent.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+            }
+        });
+    }, []);
+
     const handleVisitRandomRoom = () =>
     {
         const allRooms = (searchResult?.results || []).flatMap(r => r.rooms || []);
@@ -260,7 +275,7 @@ export const NavigatorView: FC<{}> = props =>
                                 { (searchResult && searchResult.results.map((result, index) => <NavigatorSearchResultView key={ index } searchResult={ result } />)) }
                             </Column>
                             <div className="navigator-2012-bottom-actions">
-                                <button type="button" className="nav2012-big-btn" title="Crear Sala" onClick={ () => setCreatorOpen(true) }>
+                                <button type="button" className="nav2012-big-btn" title="Crear Sala" onClick={ handleOpenCreator }>
                                     <img src={ btnCreateRoom2012 } alt="Crear Sala" />
                                 </button>
                                 <button type="button" className="nav2012-big-btn" title="Ir a un sitio nuevo" onClick={ handleVisitRandomRoom }>
