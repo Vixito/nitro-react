@@ -72,7 +72,10 @@ export const HotelView: FC<{}> = props =>
             .then(r => r.ok ? r.json() : null)
             .then(data => {
                 if (cancelled) return;
-                if (data && data.show && data.campaign && data.campaign.format === 'image' && data.campaign.imageUrl) {
+                if (data && data.show && data.campaign && (
+                    (data.campaign.format === 'image' && data.campaign.imageUrl) ||
+                    (data.campaign.format === 'html' && data.campaign.frameUrl)
+                )) {
                     setNativePromo(data.campaign);
                 } else {
                     setNativePromo(null);
@@ -125,12 +128,24 @@ export const HotelView: FC<{}> = props =>
                 </button>
             </div>
             <div
-                className={ `hb-hv-promo-body ${ (nativePromo.clickUrl || nativePromo.internalLink) ? 'is-clickable' : '' }` }
-                onClick={ (nativePromo.clickUrl || nativePromo.internalLink) ? handleNativePromoClick : undefined }
+                className={ `hb-hv-promo-body ${ (nativePromo.format === 'image' && (nativePromo.clickUrl || nativePromo.internalLink)) ? 'is-clickable' : '' }` }
+                onClick={ (nativePromo.format === 'image' && (nativePromo.clickUrl || nativePromo.internalLink)) ? handleNativePromoClick : undefined }
             >
-                <img src={ nativePromo.imageUrl } alt={ nativePromo.title || nativePromo.name || 'Destacado' } />
-                { nativePromo.subtitle && (
-                    <div className="hb-hv-promo-sub">{ nativePromo.subtitle }</div>
+                { nativePromo.format === 'html' && nativePromo.frameUrl ? (
+                    <iframe
+                        src={ nativePromo.frameUrl }
+                        title={ nativePromo.title || 'Publicidad' }
+                        className="hb-hv-promo-frame"
+                        scrolling="no"
+                        referrerPolicy="no-referrer-when-downgrade"
+                    />
+                ) : (
+                    <>
+                        <img src={ nativePromo.imageUrl } alt={ nativePromo.title || nativePromo.name || 'Destacado' } />
+                        { nativePromo.subtitle && (
+                            <div className="hb-hv-promo-sub">{ nativePromo.subtitle }</div>
+                        ) }
+                    </>
                 ) }
             </div>
         </div>
