@@ -291,9 +291,45 @@
 }
 
 .nitro-widget-high-score {
-    width: 250px;
-    max-width: 250px;
-    height: 200px;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
+    height: 215px;
+
+    .menu-header {
+        height: auto !important;
+        max-height: none !important;
+        min-height: 26px;
+        padding: 4px 8px !important;
+        font-size: 12px !important;
+        line-height: 1.25 !important;
+        text-align: center;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .nitro-context-menu-list,
+    .menu-list {
+        padding: 4px 6px;
+    }
+
+    .high-score-col-header {
+        font-size: 11px;
+        line-height: 1.2;
+        padding: 2px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .high-score-row-cell {
+        font-size: 11px;
+        line-height: 1.25;
+        padding: 1px 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .youtube-tv-widget {

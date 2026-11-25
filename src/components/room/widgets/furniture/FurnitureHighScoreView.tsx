@@ -26,10 +26,10 @@ export const FurnitureHighScoreView: FC<{}> = props =>
                             <ContextMenuListView overflow="hidden" gap={ 1 } className="h-100">
                                 <Column gap={ 1 }>
                                     <Flex alignItems="center">
-                                        <Text center bold variant="white" className="col-8">
+                                        <Text center bold variant="white" className="col-7 high-score-col-header">
                                             { LocalizeText('high.score.display.users.header') }
                                         </Text>
-                                        <Text center bold variant="white" className="col-4">
+                                        <Text center bold variant="white" className="col-5 high-score-col-header">
                                             { LocalizeText('high.score.display.score.header') }
                                         </Text>
                                     </Flex>
@@ -40,10 +40,10 @@ export const FurnitureHighScoreView: FC<{}> = props =>
                                     {
                                         return (
                                             <Flex key={ index } alignItems="center">
-                                                <Text center variant="white" className="col-8">
+                                                <Text center variant="white" className="col-7 high-score-row-cell">
                                                     { entry.users.join(', ') }
                                                 </Text>
-                                                <Text center variant="white" className="col-4">
+                                                <Text center variant="white" className="col-5 high-score-row-cell">
                                                     { entry.score }
                                                 </Text>
                                             </Flex>

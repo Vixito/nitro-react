@@ -2743,6 +2743,44 @@ body[data-era="flash2012"] {
         }
     }
 
+    // Keep Wired Creator Tools (Inspector / Variables / Monitor) crisp & readable in Flash 2012
+    .nitro-card.nitro-wired-creator-tools {
+        width: 520px !important;
+        min-width: 520px !important;
+        max-width: 96vw !important;
+        background-color: #ecebe7 !important;
+
+        .creator-banner-strip {
+            height: auto !important;
+            min-height: 34px !important;
+            padding: 4px 12px !important;
+            overflow: visible !important;
+
+            .creator-banner-title {
+                color: #ffffff !important;
+                line-height: 1.25 !important;
+            }
+        }
+
+        .content-area,
+        .nitro-card-content,
+        .nitro-card-body,
+        .nitro-wired-creator-body {
+            background-color: #ecebe7 !important;
+            color: #111827 !important;
+            padding: 10px 14px !important;
+        }
+
+        .creator-section-title,
+        .wired-checkbox-retro,
+        .creator-stat-line,
+        .wired-retro-table thead th,
+        .wired-retro-table tbody td,
+        .creator-list-item {
+            color: #111827 !important;
+        }
+    }
+
     // Alertas de evento y del hotel con pausa oscura y desenfoque en los alrededores
     .nitro-alert-backdrop {
         position: fixed !important;

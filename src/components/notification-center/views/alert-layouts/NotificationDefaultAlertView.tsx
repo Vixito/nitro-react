@@ -15,12 +15,16 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
     const [ activeCategory, setActiveCategory ] = useState<string>('ALL');
     const [ customSize, setCustomSize ] = useState<{ width: number, height: number }>({ width: 620, height: 600 });
 
+    const isInstructionsWindow = useMemo(() => {
+        return item && item.messages.some(msg => msg.includes('class="is-game-instructions"'));
+    }, [item]);
+
     const isCommandsList = useMemo(() => {
-        return item && item.messages.some(msg => msg.includes('class="is-commands-list"') || msg.includes('cmd-category-block') || msg.includes('cmd-row'));
+        return item && item.messages.some(msg => msg.includes('class="is-commands-list"') || msg.includes('class="is-game-instructions"') || msg.includes('cmd-category-block') || msg.includes('cmd-row'));
     }, [item]);
 
     const displayMessages = useMemo(() => {
-        if (!isCommandsList || !item?.messages) return item?.messages || [];
+        if (!isCommandsList || isInstructionsWindow || !item?.messages) return item?.messages || [];
         const hasWired = item.messages.some(msg => msg.includes(':wired, :wf') || />:wired(<\/td>|,|\b)/i.test(msg));
         if (hasWired) return item.messages;
 
@@ -145,8 +149,8 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
 
     return (
         <LayoutNotificationAlertView 
-            uniqueKey={ isCommandsList ? 'commands-alert' : undefined }
-            title={ isCommandsList ? 'Lista de Comandos' : title } 
+            uniqueKey={ isInstructionsWindow ? 'instructions-alert' : (isCommandsList ? 'commands-alert' : undefined) }
+            title={ isInstructionsWindow ? 'Instrucciones del Juego' : (isCommandsList ? 'Lista de Comandos' : title) } 
             onClose={ onClose } 
             { ...rest } 
             type={ isCommandsList ? 'custom-commands' : (hasFrank ? NotificationAlertType.DEFAULT : item.alertType) } 
@@ -161,7 +165,7 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
                         <div className="d-flex flex-column gap-2 mb-2 flex-shrink-0">
                             <Flex fullWidth alignItems="center" gap={ 1 } className="bg-white rounded border" style={{ padding: '5px 10px' }}>
                                 <i className="icon icon-zoom" style={{ transform: 'scale(0.85)' }}></i>
-                                <input type="text" className="w-100 border-0" style={{ outline: 'none', background: 'transparent', color: '#0f172a', fontSize: '13px' }} placeholder="Buscar comando o descripción..." value={ searchTerm } onChange={ handleSearch } />
+                                <input type="text" className="w-100 border-0" style={{ outline: 'none', background: 'transparent', color: '#0f172a', fontSize: '13px' }} placeholder={ isInstructionsWindow ? 'Buscar en las instrucciones...' : 'Buscar comando o descripción...' } value={ searchTerm } onChange={ handleSearch } />
                                 { searchTerm && (
                                     <button onClick={ () => { setSearchTerm(''); filterCommands('', activeCategory); } } className="border-0 bg-transparent cursor-pointer px-1" style={{ color: '#475569', fontSize: '13px' }}>✕</button>
                                 ) }
