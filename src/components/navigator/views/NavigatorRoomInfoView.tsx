@@ -1,10 +1,32 @@
 import { GetCustomRoomFilterMessageComposer, NavigatorSearchComposer, RoomMuteComposer, RoomSettingsComposer, SecurityLevel, ToggleStaffPickMessageComposer, UpdateHomeRoomMessageComposer } from '@nitrots/nitro-renderer';
-import { FC, useEffect, useState } from 'react';
-import { FaLink } from 'react-icons/fa';
-import { CreateLinkEvent, DispatchUiEvent, GetGroupInformation, GetSessionDataManager, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
+import { FaDownload, FaLink, FaUpload } from 'react-icons/fa';
+import { CreateLinkEvent, DispatchUiEvent, GetGroupInformation, GetSessionDataManager, LocalizeText, ReportType, SendMessageComposer, TryVisitRoom } from '../../../api';
 import { Button, classNames, Column, Flex, LayoutBadgeImageView, LayoutRoomThumbnailView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text, UserProfileIconView } from '../../../common';
 import { RoomWidgetThumbnailEvent } from '../../../events';
 import { useHelp, useNavigator } from '../../../hooks';
+
+interface ParsedRoomBackup
+{
+    format: string;
+    version?: number;
+    exportedAt?: string;
+    sourceRoomId?: number;
+    room: {
+        name?: string;
+        description?: string;
+        model?: string;
+        override_model?: string;
+    };
+    customModel?: { heightmap?: string } | null;
+    items: Array<Record<string, unknown>>;
+    stats?: {
+        totalItems?: number;
+        floorItems?: number;
+        wallItems?: number;
+        wiredCount?: number;
+    };
+}
 
 export class NavigatorRoomInfoViewProps
 {
@@ -16,8 +38,16 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
     const { onCloseClick = null } = props;
     const [ isRoomPicked, setIsRoomPicked ] = useState(false);
     const [ isRoomMuted, setIsRoomMuted ] = useState(false);
+    const [ backupBusy, setBackupBusy ] = useState(false);
+    const [ backupNotice, setBackupNotice ] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+    const [ pendingImport, setPendingImport ] = useState<{ fileName: string; data: ParsedRoomBackup } | null>(null);
+    const [ restoreMetadata, setRestoreMetadata ] = useState(true);
+    const [ spawnMissing, setSpawnMissing ] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const { report = null } = useHelp();
     const { navigatorData = null } = useNavigator();
+
+    const isStaff = GetSessionDataManager().isModerator || GetSessionDataManager().securityLevel >= SecurityLevel.MODERATOR;
 
     const hasPermission = (permission: string) =>
     {
@@ -87,6 +117,146 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
 
     }
 
+    const handleExportRoom = async () =>
+    {
+        if(!navigatorData?.enteredGuestRoom || backupBusy) return;
+        const roomId = navigatorData.enteredGuestRoom.roomId;
+        setBackupBusy(true);
+        setBackupNotice(null);
+        try
+        {
+            const res = await fetch(`/api/client/rooms/${ roomId }/export`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if(!res.ok)
+            {
+                let errMsg = 'No se pudo exportar la sala.';
+                try
+                {
+                    const j = await res.json();
+                    if(j?.error) errMsg = j.error;
+                }
+                catch {}
+                setBackupNotice({ type: 'err', text: errMsg });
+                return;
+            }
+            const blob = await res.blob();
+            const disp = res.headers.get('Content-Disposition') || '';
+            const match = disp.match(/filename="?([^"]+)"?/i);
+            const fileName = match?.[1] || `habbten_sala_${ roomId }.habbten-room.json`;
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
+            setBackupNotice({ type: 'ok', text: `Copia guardada (${ fileName }).` });
+        }
+        catch
+        {
+            setBackupNotice({ type: 'err', text: 'Error de conexión al exportar la sala.' });
+        }
+        finally
+        {
+            setBackupBusy(false);
+        }
+    };
+
+    const handleTriggerImportPicker = () =>
+    {
+        if(backupBusy) return;
+        setBackupNotice(null);
+        if(fileInputRef.current)
+        {
+            fileInputRef.current.value = '';
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleFileSelected = async (event: ChangeEvent<HTMLInputElement>) =>
+    {
+        const file = event.target.files?.[0];
+        if(!file) return;
+        setBackupNotice(null);
+
+        if(file.size > 4.5 * 1024 * 1024)
+        {
+            setBackupNotice({ type: 'err', text: 'El archivo es demasiado grande (máximo 4.5 MB).' });
+            return;
+        }
+
+        try
+        {
+            const rawText = await file.text();
+            const parsed = JSON.parse(rawText) as ParsedRoomBackup;
+            if(!parsed || parsed.format !== 'habbten_room_backup' || !parsed.room || !Array.isArray(parsed.items))
+            {
+                setBackupNotice({ type: 'err', text: 'Archivo inválido. Usa un .habbten-room.json exportado desde Habbten.' });
+                return;
+            }
+            setPendingImport({ fileName: file.name, data: parsed });
+            setRestoreMetadata(true);
+            setSpawnMissing(false);
+        }
+        catch
+        {
+            setBackupNotice({ type: 'err', text: 'No se pudo leer el archivo JSON de la sala.' });
+        }
+    };
+
+    const handleConfirmImport = async () =>
+    {
+        if(!navigatorData?.enteredGuestRoom || !pendingImport || backupBusy) return;
+        const roomId = navigatorData.enteredGuestRoom.roomId;
+        setBackupBusy(true);
+        setBackupNotice(null);
+
+        try
+        {
+            const res = await fetch(`/api/client/rooms/${ roomId }/import`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    backup: pendingImport.data,
+                    restoreMetadata,
+                    spawnMissing: isStaff ? spawnMissing : false
+                })
+            });
+            const data = await res.json();
+            if(!res.ok || !data?.success)
+            {
+                setBackupNotice({ type: 'err', text: data?.error || 'Error al importar la sala.' });
+                return;
+            }
+
+            const missingPart = data.missingItems > 0 ? ` (${ data.missingItems } no estaban en tu inventario)` : '';
+            const wiredPart = data.wiredRemapped > 0 ? `, ${ data.wiredRemapped } Wired reconectados` : '';
+            setPendingImport(null);
+            setBackupNotice({
+                type: 'ok',
+                text: `Restaurada: ${ data.restoredItems }/${ data.totalItems } furnis${ wiredPart }${ missingPart }. Recargando sala...`
+            });
+
+            setTimeout(() =>
+            {
+                TryVisitRoom(roomId);
+                onCloseClick();
+            }, 900);
+        }
+        catch
+        {
+            setBackupNotice({ type: 'err', text: 'Error de conexión al restaurar la sala.' });
+        }
+        finally
+        {
+            setBackupBusy(false);
+        }
+    };
+
     useEffect(() =>
     {
         if(!navigatorData) return;
@@ -95,6 +265,12 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
 
         if(navigatorData.enteredGuestRoom) setIsRoomMuted(navigatorData.enteredGuestRoom.allInRoomMuted);
     }, [ navigatorData ]);
+
+    useEffect(() =>
+    {
+        setPendingImport(null);
+        setBackupNotice(null);
+    }, [ navigatorData?.enteredGuestRoom?.roomId ]);
 
     if(!navigatorData.enteredGuestRoom) return null;
 
@@ -140,8 +316,21 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                                     </Column>
                                     <Column alignItems="center" gap={ 1 } className="flex-shrink-0">
                                         { hasPermission('settings') &&
-                                            <i className="icon icon-cog cursor-pointer" title={ LocalizeText('navigator.room.popup.info.room.settings') } onClick={ event => processAction('open_room_settings') } /> }
-                                        <FaLink title={ LocalizeText('navigator.embed.caption') } className="cursor-pointer fa-icon" onClick={ event => CreateLinkEvent('navigator/toggle-room-link') } />
+                                            <i className="icon icon-cog cursor-pointer" title={ LocalizeText('navigator.room.popup.info.room.settings') } onClick={ () => processAction('open_room_settings') } /> }
+                                        <FaLink title={ LocalizeText('navigator.embed.caption') } className="cursor-pointer fa-icon" onClick={ () => CreateLinkEvent('navigator/toggle-room-link') } />
+                                        { hasPermission('settings') &&
+                                            <>
+                                                <FaDownload
+                                                    title="Exportar copia de seguridad de esta sala (.habbten-room.json)"
+                                                    className="cursor-pointer fa-icon room-backup-icon"
+                                                    onClick={ handleExportRoom }
+                                                />
+                                                <FaUpload
+                                                    title="Importar copia de seguridad en esta sala (.habbten-room.json)"
+                                                    className="cursor-pointer fa-icon room-backup-icon"
+                                                    onClick={ handleTriggerImportPicker }
+                                                />
+                                            </> }
                                     </Column>
                                 </Flex>
                                 <Text overflow="auto" className="text-break" style={ { maxHeight: 72, lineHeight: 1.35 } }>{ navigatorData.enteredGuestRoom.description }</Text>
@@ -173,6 +362,70 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                                 <Button onClick={ () => processAction('open_floorplan_editor') }>
                                     { LocalizeText('open.floor.plan.editor') }
                                 </Button>
+                                <input
+                                    ref={ fileInputRef }
+                                    type="file"
+                                    accept=".json,.habbten-room.json,application/json"
+                                    style={ { display: 'none' } }
+                                    onChange={ handleFileSelected }
+                                />
+                                <Flex gap={ 1 } className="room-backup-btn-row">
+                                    <Button fullWidth disabled={ backupBusy } onClick={ handleExportRoom }>
+                                        <FaDownload className="me-1" />
+                                        Exportar Sala
+                                    </Button>
+                                    <Button fullWidth disabled={ backupBusy } onClick={ handleTriggerImportPicker }>
+                                        <FaUpload className="me-1" />
+                                        Importar Sala
+                                    </Button>
+                                </Flex>
+                                { pendingImport && (
+                                    <div className="room-backup-confirm-box">
+                                        <div className="room-backup-confirm-title">Restaurar copia en esta sala</div>
+                                        <div className="room-backup-confirm-meta">
+                                            <div><strong>Sala:</strong> { pendingImport.data.room?.name || pendingImport.fileName }</div>
+                                            <div>
+                                                <strong>Furnis:</strong> { pendingImport.data.items.length }
+                                                { (pendingImport.data.stats?.wiredCount || 0) > 0 && ` | Wired: ${ pendingImport.data.stats?.wiredCount }` }
+                                                { pendingImport.data.customModel?.heightmap && ' | Plano personalizado' }
+                                            </div>
+                                        </div>
+                                        <label className="room-backup-check">
+                                            <input
+                                                type="checkbox"
+                                                checked={ restoreMetadata }
+                                                onChange={ e => setRestoreMetadata(e.target.checked) }
+                                            />
+                                            <span>Restaurar nombre, descripción y etiquetas</span>
+                                        </label>
+                                        { isStaff && (
+                                            <label className="room-backup-check">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={ spawnMissing }
+                                                    onChange={ e => setSpawnMissing(e.target.checked) }
+                                                />
+                                                <span>Generar furnis faltantes (Solo Staff)</span>
+                                            </label>
+                                        ) }
+                                        <div className="room-backup-warn">
+                                            Los furnis actuales de esta sala volverán a tu inventario y se colocará la copia de seguridad.
+                                        </div>
+                                        <Flex gap={ 1 }>
+                                            <Button fullWidth variant="success" disabled={ backupBusy } onClick={ handleConfirmImport }>
+                                                { backupBusy ? 'Restaurando...' : 'Restaurar ahora' }
+                                            </Button>
+                                            <Button variant="secondary" disabled={ backupBusy } onClick={ () => setPendingImport(null) }>
+                                                Cancelar
+                                            </Button>
+                                        </Flex>
+                                    </div>
+                                ) }
+                                { backupNotice && (
+                                    <div className={ `room-backup-notice ${ backupNotice.type === 'ok' ? 'is-ok' : 'is-err' }` }>
+                                        { backupNotice.text }
+                                    </div>
+                                ) }
                             </> }
                         </Column>
                     </> }

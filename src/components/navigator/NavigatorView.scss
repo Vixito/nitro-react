@@ -119,6 +119,81 @@
 .nitro-room-info {
     width: max(#{$room-info-width}, 340px);
     max-width: calc(100vw - 16px);
+
+    .room-backup-icon {
+        font-size: 13px;
+        opacity: 0.85;
+        transition: opacity 0.12s ease, transform 0.12s ease;
+
+        &:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    .room-backup-confirm-box {
+        margin-top: 4px;
+        padding: 8px;
+        border-radius: 5px;
+        background: rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.22);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 11px;
+        color: #111827;
+
+        .room-backup-confirm-title {
+            font-weight: 800;
+            font-size: 11.5px;
+            color: #0f172a;
+        }
+
+        .room-backup-confirm-meta {
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .room-backup-check {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 11px;
+        }
+
+        .room-backup-warn {
+            font-size: 10.5px;
+            line-height: 1.3;
+            color: #7c2d12;
+            background: rgba(251, 146, 60, 0.18);
+            border: 1px solid rgba(234, 88, 12, 0.35);
+            border-radius: 4px;
+            padding: 4px 6px;
+        }
+    }
+
+    .room-backup-notice {
+        margin-top: 4px;
+        padding: 5px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.3;
+
+        &.is-ok {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #14532d;
+        }
+
+        &.is-err {
+            background: #fee2e2;
+            border: 1px solid #dc2626;
+            color: #7f1d1d;
+        }
+    }
 }
 
 .nitro-room-link {
