@@ -302,8 +302,8 @@
     /* Vertical Line running down the center */
     .bp-vertical-line {
         position: absolute;
-        top: 26px;
-        bottom: 26px;
+        top: 41px;
+        bottom: 47px;
         left: 50%;
         width: 3px;
         transform: translateX(-50%);
@@ -315,7 +315,7 @@
     /* Green portion of the vertical line for reached levels */
     .bp-vertical-line-reached {
         position: absolute;
-        top: 26px;
+        top: 41px;
         left: 50%;
         width: 3px;
         transform: translateX(-50%);
@@ -398,8 +398,36 @@
                 border-color: #16a34a;
                 background: #dcfce7;
                 animation: bp-pulse-green 1.8s infinite;
+
+                .bp-vip-tag {
+                    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+                }
+            }
+
+            &.claimed {
+                border-color: #94a3b8;
+                background: #f1f5f9;
+                opacity: 0.75;
             }
         }
+    }
+
+    /* Green Claimable Tag for Free Rewards */
+    .bp-claim-tag {
+        position: absolute;
+        top: -7px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: #ffffff;
+        font-size: 8px;
+        font-weight: 900;
+        padding: 1px 5px;
+        border-radius: 3px;
+        letter-spacing: 0.4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        z-index: 5;
+        white-space: nowrap;
     }
 
     /* Reward icon container within square box */

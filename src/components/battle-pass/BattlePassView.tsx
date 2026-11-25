@@ -198,6 +198,34 @@ export const BattlePassView: FC<{}> = () => {
         }
     };
 
+    const handleClaimAll = async () => {
+        try {
+            setClaiming('all');
+            setStatusMessage(null);
+            const userId = GetSessionDataManager().userId;
+            const res = await fetch('/api/battlepass/claim', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, claim_all: true })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setStatusMessage({ text: data.message || '¡Recompensas reclamadas con éxito!', type: 'success' });
+                await fetchData(true);
+            }
+            else {
+                setStatusMessage({ text: data.error || 'No se pudieron reclamar las recompensas.', type: 'danger' });
+            }
+        }
+        catch (err) {
+            console.error('Error claiming all rewards:', err);
+            setStatusMessage({ text: 'Error de conexión al reclamar recompensas.', type: 'danger' });
+        }
+        finally {
+            setClaiming(null);
+        }
+    };
+
     const handleClaimReward = async (rewardId: number, isVip: boolean) => {
         const claimKey = `${rewardId}_${isVip ? 1 : 0}`;
         try {
@@ -304,7 +332,18 @@ export const BattlePassView: FC<{}> = () => {
         return set;
     }, [bpData.claimedRewards]);
 
-    // Calculate how far the green line should extend (for reached levels)
+    // Count unclaimed rewards currently available to the user
+    const unclaimedCount = useMemo(() => {
+        let count = 0;
+        for (const r of bpData.rewards) {
+            if (bpData.user.level < r.level_required) continue;
+            if (!claimedSet.has(`${r.id}_0`)) count++;
+            if (bpData.isVip && !claimedSet.has(`${r.id}_1`)) count++;
+        }
+        return count;
+    }, [bpData.rewards, bpData.user.level, bpData.isVip, claimedSet]);
+
+    // Calculate how far the green line should extend without overshooting into the next locked level circle
     const reachedLineHeight = useMemo(() => {
         if (!bpData.rewards || bpData.rewards.length === 0) return 0;
         let reachedCount = 0;
@@ -313,7 +352,17 @@ export const BattlePassView: FC<{}> = () => {
             else break;
         }
         if (reachedCount === 0) return 0;
-        return reachedCount * 76;
+        const ROW_STRIDE = 76; // 62px box height + 14px margin-bottom
+        const baseHeight = (reachedCount - 1) * ROW_STRIDE;
+        const lastReached = bpData.rewards[reachedCount - 1];
+        const nextTier = bpData.rewards[reachedCount];
+        if (nextTier && bpData.user.level > lastReached.level_required) {
+            const span = Math.max(1, nextTier.level_required - lastReached.level_required);
+            const frac = Math.min(0.95, Math.max(0, (bpData.user.level - lastReached.level_required) / span));
+            // Stop well before the next locked circle (top edge is ~55px down from current center)
+            return baseHeight + Math.round(frac * 42);
+        }
+        return baseHeight;
     }, [bpData.rewards, bpData.user.level]);
 
     const [missionFilter, setMissionFilter] = useState<'all' | 'in_progress' | 'completed'>('in_progress');
@@ -571,8 +620,8 @@ export const BattlePassView: FC<{}> = () => {
                                                 {bpData.user.xp} / {bpData.user.xpNext || 100}
                                             </span>
                                         </div>
-                                        <span className="badge bg-dark text-white fw-bold px-2 py-1 rounded-1" style={{ fontSize: '12px' }}>
-                                            {bpData.user.level + 1}
+                                        <span className="badge bg-dark text-white fw-bold px-2 py-1 rounded-1" style={{ fontSize: '12px' }} title={`Próximo nivel: ${bpData.user.level + 1}`}>
+                                            → {bpData.user.level + 1}
                                         </span>
                                     </div>
                                 </div>
@@ -709,6 +758,17 @@ export const BattlePassView: FC<{}> = () => {
                     <div className="bp-rewards-column bp-card-box">
                         <div className="d-flex align-items-center justify-content-between pb-2 border-bottom mb-2 px-1">
                             <span className="fw-bold text-secondary bp-free-label" style={{ fontSize: '12px' }}>GRATIS</span>
+                            {unclaimedCount > 0 && (
+                                <button
+                                    type="button"
+                                    className="btn btn-success btn-sm py-0 px-2 fw-bold"
+                                    style={{ fontSize: '10px', lineHeight: '18px' }}
+                                    disabled={claiming !== null}
+                                    onClick={handleClaimAll}
+                                    title="Reclamar todas las recompensas desbloqueadas">
+                                    {claiming === 'all' ? 'Reclamando...' : `Reclamar (${unclaimedCount})`}
+                                </button>
+                            )}
                             <div className="d-flex align-items-center gap-1">
                                 <span className="fw-bold" style={{ fontSize: '12px', color: '#b45309' }}>VIP</span>
                                 {bpData.isVip ? (
@@ -746,6 +806,7 @@ export const BattlePassView: FC<{}> = () => {
                                                     else setPreviewReward({ reward: r, isVip: false });
                                                 }}
                                                 title={`${r.name} ${isFreeClaimable ? '(¡Clic para reclamar!)' : ''}`}>
+                                                {isFreeClaimable && <span className="bp-claim-tag">RECLAMAR</span>}
                                                 {renderRewardBox(r.type, r.image, r.badge, r.point_type, r.amount, false, r.name)}
                                             </div>
 
@@ -768,7 +829,7 @@ export const BattlePassView: FC<{}> = () => {
                                                     else setPreviewReward({ reward: r, isVip: true });
                                                 }}
                                                 title={`${r.name_vip || r.name} ${isVipClaimable ? '(¡Clic para reclamar VIP!)' : (!bpData.isVip ? '(Requiere Pase VIP)' : '')}`}>
-                                                <span className="bp-vip-tag">VIP</span>
+                                                <span className="bp-vip-tag">{isVipClaimable ? 'RECLAMAR' : 'VIP'}</span>
                                                 {renderRewardBox(r.type_vip || r.type, r.image_vip, r.badge_vip, r.point_type_vip, r.amount_vip, true, r.name_vip || r.name)}
                                                 {(!isUnlocked || !bpData.isVip) && (
                                                     <div className="bp-lock-overlay" title={!bpData.isVip ? 'Requiere Pase VIP' : `Requiere Nivel ${r.level_required}`}>
