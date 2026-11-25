@@ -3481,6 +3481,38 @@ body[data-era="flash2012"] {
                         line-height: 1.35 !important;
                         word-break: break-word !important;
                     }
+
+                    .room-info-2012-tags {
+                        display: flex !important;
+                        flex-wrap: wrap !important;
+                        gap: 5px !important;
+                        margin-top: 3px !important;
+
+                        .ri2012-tag {
+                            background-color: #d6eef9 !important;
+                            background-image: none !important;
+                            border: 1px solid #9cc7dc !important;
+                            border-radius: 3px !important;
+                            box-shadow: none !important;
+                            padding: 1px 6px !important;
+                            margin: 0 !important;
+                            font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
+                            font-size: 11px !important;
+                            font-weight: 700 !important;
+                            line-height: 1.35 !important;
+                            color: #1f4e6b !important;
+                            cursor: pointer !important;
+                            max-width: 100% !important;
+                            overflow: hidden !important;
+                            text-overflow: ellipsis !important;
+                            white-space: nowrap !important;
+
+                            &:hover {
+                                background-color: #bfe4f6 !important;
+                                text-decoration: underline !important;
+                            }
+                        }
+                    }
                 }
             }
 

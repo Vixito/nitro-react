@@ -1,4 +1,4 @@
-import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer, RoomDataParser, UpdateHomeRoomMessageComposer } from '@nitrots/nitro-renderer';
+import { AddFavouriteRoomMessageComposer, DeleteFavouriteRoomMessageComposer, NavigatorSearchComposer, RoomDataParser, UpdateHomeRoomMessageComposer } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useRef, useState } from 'react';
 import { Overlay, Popover } from 'react-bootstrap';
 import { FaUser } from 'react-icons/fa';
@@ -113,6 +113,18 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
         };
     }, [ roomId ]);
 
+    const visibleTags = (roomData?.tags || [])
+        .map(tag => (tag || '').trim())
+        .filter(Boolean)
+        .slice(0, 2);
+
+    const searchByTag = (tag: string) =>
+    {
+        if(!tag) return;
+        SendMessageComposer(new NavigatorSearchComposer('hotel_view', `tag:${ tag }`));
+        setIsVisible(false);
+    };
+
     const getUserCounterColor = () =>
     {
         const num: number = (100 * (roomData.userCount / roomData.maxUserCount));
@@ -180,6 +192,20 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
                                 <div className="room-info-2012-head">
                                     <div className="room-info-2012-title">{ roomData.roomName }</div>
                                     <div className="room-info-2012-desc">{ roomData.description }</div>
+                                    { (visibleTags.length > 0) && (
+                                        <div className="room-info-2012-tags">
+                                            { visibleTags.map(tag => (
+                                                <button
+                                                    key={ tag }
+                                                    type="button"
+                                                    className="ri2012-tag"
+                                                    onClick={ () => searchByTag(tag) }
+                                                >
+                                                    #{ tag.replace(/^#+/, '') }
+                                                </button>
+                                            )) }
+                                        </div>
+                                    ) }
                                 </div>
                             </div>
 
@@ -263,9 +289,24 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
                                                 <Text italics truncate>{ roomData.ownerName }</Text>
                                             </Flex>
                                         </Flex> }
-                                    <Text className="flex-grow-1" style={ { wordBreak: 'break-word', overflowWrap: 'anywhere', paddingBottom: '22px', lineHeight: '1.3' } }>
+                                    <Text className="flex-grow-1" style={ { wordBreak: 'break-word', overflowWrap: 'anywhere', paddingBottom: visibleTags.length > 0 ? '4px' : '22px', lineHeight: '1.3' } }>
                                         { roomData.description }
                                     </Text>
+                                    { (visibleTags.length > 0) && (
+                                        <Flex alignItems="center" gap={ 1 } className="flex-wrap" style={ { paddingBottom: '22px', paddingRight: '46px' } }>
+                                            { visibleTags.map(tag => (
+                                                <Text
+                                                    key={ tag }
+                                                    pointer
+                                                    className="bg-muted rounded px-1 py-0"
+                                                    style={ { fontSize: '0.82em', lineHeight: 1.45 } }
+                                                    onClick={ () => searchByTag(tag) }
+                                                >
+                                                    #{ tag.replace(/^#+/, '') }
+                                                </Text>
+                                            )) }
+                                        </Flex>
+                                    ) }
                                     <Flex className={ 'badge p-1 position-absolute m-1 bottom-0 end-0 m-2 ' + getUserCounterColor() } gap={ 1 }>
                                         <FaUser className="fa-icon" />
                                         { roomData.userCount }

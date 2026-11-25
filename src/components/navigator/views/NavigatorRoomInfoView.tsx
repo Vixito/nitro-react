@@ -301,9 +301,9 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                                         </Flex>
                                         { (navigatorData.enteredGuestRoom.tags.length > 0) &&
                                             <Flex alignItems="center" gap={ 1 } className="flex-wrap">
-                                                { navigatorData.enteredGuestRoom.tags.map(tag =>
+                                                { navigatorData.enteredGuestRoom.tags.map(t => (t || '').trim()).filter(Boolean).slice(0, 2).map(tag =>
                                                 {
-                                                    return <Text key={ tag } pointer className="bg-muted rounded px-1 py-0" style={ { fontSize: '0.85em', lineHeight: 1.5 } } onClick={ event => processAction('navigator_search_tag', tag) }>#{ tag }</Text>
+                                                    return <Text key={ tag } pointer className="bg-muted rounded px-1 py-0" style={ { fontSize: '0.85em', lineHeight: 1.5 } } onClick={ event => processAction('navigator_search_tag', tag) }>#{ tag.replace(/^#+/, '') }</Text>
                                                 }) }
                                             </Flex> }
                                     </Column>
