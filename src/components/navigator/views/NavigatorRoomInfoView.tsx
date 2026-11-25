@@ -366,8 +366,8 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                                             <div><strong>Sala:</strong> { pendingImport.data.room?.name || pendingImport.fileName }</div>
                                             <div>
                                                 <strong>Furnis:</strong> { pendingImport.data.items.length }
-                                                { (pendingImport.data.stats?.wiredCount || 0) > 0 && ` | Wired: ${ pendingImport.data.stats?.wiredCount }` }
-                                                { pendingImport.data.customModel?.heightmap && ' | Plano personalizado' }
+                                                { (pendingImport.data.stats?.wiredCount || 0) > 0 && ` - Wired: ${ pendingImport.data.stats?.wiredCount }` }
+                                                { pendingImport.data.customModel?.heightmap && ' - Plano personalizado' }
                                             </div>
                                         </div>
                                         <div className="room-backup-warn">
