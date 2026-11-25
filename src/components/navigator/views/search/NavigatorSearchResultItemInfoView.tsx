@@ -190,8 +190,10 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
                                     ) }
                                 </LayoutRoomThumbnailView>
                                 <div className="room-info-2012-head">
-                                    <div className="room-info-2012-title">{ roomData.roomName }</div>
-                                    <div className="room-info-2012-desc">{ roomData.description }</div>
+                                    <div className="room-info-2012-head-top">
+                                        <div className="room-info-2012-title">{ roomData.roomName }</div>
+                                        <div className="room-info-2012-desc">{ roomData.description }</div>
+                                    </div>
                                     { (visibleTags.length > 0) && (
                                         <div className="room-info-2012-tags">
                                             { visibleTags.map(tag => (
@@ -199,9 +201,11 @@ export const NavigatorSearchResultItemInfoView: FC<NavigatorSearchResultItemInfo
                                                     key={ tag }
                                                     type="button"
                                                     className="ri2012-tag"
+                                                    title={ `Buscar salas con #${ tag.replace(/^#+/, '') }` }
                                                     onClick={ () => searchByTag(tag) }
                                                 >
-                                                    #{ tag.replace(/^#+/, '') }
+                                                    <span className="ri2012-tag-hash">#</span>
+                                                    <span className="ri2012-tag-text">{ tag.replace(/^#+/, '') }</span>
                                                 </button>
                                             )) }
                                         </div>

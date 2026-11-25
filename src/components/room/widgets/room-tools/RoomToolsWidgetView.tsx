@@ -313,7 +313,7 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                             </Column>
                             { roomTags && roomTags.length > 0 &&
                                 <Flex gap={ 2 }>
-                                    { roomTags.map((tag, index) => <Text key={ index } small pointer variant="white" className="rounded bg-primary p-1" onClick={ () => handleToolClick('navigator_search_tag', tag) }>#{ tag }</Text>) }
+                                    { roomTags.map(t => (t || '').trim()).filter(Boolean).slice(0, 2).map((tag, index) => <Text key={ index } small pointer variant="white" className="rounded bg-primary p-1" onClick={ () => handleToolClick('navigator_search_tag', tag) }>#{ tag.replace(/^#+/, '') }</Text>) }
                                 </Flex> }
                         </Column>
                     </Column>

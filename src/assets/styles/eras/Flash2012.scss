@@ -3462,9 +3462,17 @@ body[data-era="flash2012"] {
                 .room-info-2012-head {
                     flex: 1 !important;
                     min-width: 0 !important;
+                    min-height: 110px !important;
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 5px !important;
+                    justify-content: space-between !important;
+                    gap: 8px !important;
+
+                    .room-info-2012-head-top {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        gap: 4px !important;
+                    }
 
                     .room-info-2012-title {
                         font-size: 13.5px !important;
@@ -3485,31 +3493,49 @@ body[data-era="flash2012"] {
                     .room-info-2012-tags {
                         display: flex !important;
                         flex-wrap: wrap !important;
+                        align-items: center !important;
                         gap: 5px !important;
-                        margin-top: 3px !important;
+                        padding-top: 2px !important;
 
                         .ri2012-tag {
-                            background-color: #d6eef9 !important;
-                            background-image: none !important;
-                            border: 1px solid #9cc7dc !important;
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            gap: 1px !important;
+                            background: linear-gradient(180deg, #4c95b8 0%, #4c95b8 48%, #367897 49%, #367897 100%) !important;
+                            border: 1px solid #1b4a60 !important;
                             border-radius: 3px !important;
-                            box-shadow: none !important;
-                            padding: 1px 6px !important;
+                            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 0 rgba(0, 0, 0, 0.14) !important;
+                            padding: 2px 7px !important;
                             margin: 0 !important;
                             font-family: 'Ubuntu2012', 'Ubuntu', sans-serif !important;
                             font-size: 11px !important;
                             font-weight: 700 !important;
-                            line-height: 1.35 !important;
-                            color: #1f4e6b !important;
+                            line-height: 1.25 !important;
+                            color: #ffffff !important;
+                            text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.32) !important;
                             cursor: pointer !important;
                             max-width: 100% !important;
-                            overflow: hidden !important;
-                            text-overflow: ellipsis !important;
                             white-space: nowrap !important;
 
+                            .ri2012-tag-hash {
+                                color: #c7eafc !important;
+                                font-weight: 700 !important;
+                            }
+
+                            .ri2012-tag-text {
+                                overflow: hidden !important;
+                                text-overflow: ellipsis !important;
+                                color: #ffffff !important;
+                            }
+
                             &:hover {
-                                background-color: #bfe4f6 !important;
-                                text-decoration: underline !important;
+                                background: linear-gradient(180deg, #5aa4c8 0%, #5aa4c8 48%, #408caf 49%, #408caf 100%) !important;
+                                border-color: #163d50 !important;
+                            }
+
+                            &:active {
+                                background: linear-gradient(180deg, #2e6783 0%, #2e6783 48%, #367897 49%, #367897 100%) !important;
+                                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28) !important;
                             }
                         }
                     }
