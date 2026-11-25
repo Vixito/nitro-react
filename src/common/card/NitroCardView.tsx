@@ -25,8 +25,8 @@ const SKIN_2012_BY_KEY: Record<string, string> = {
     'user-settings': 'illumina-dark',
     'nitro-discord-settings': 'illumina-dark',
     'nitro-wired': 'illumina-dark',
-    'wired-creator-tools': 'illumina-dark',
-    'wired-creator-tools-error': 'illumina-dark',
+    'wired-creator-tools': 'illumina-light',
+    'wired-creator-tools-error': 'illumina-light',
     'floorpan-editor': 'illumina-dark',
     'chat-history': 'illumina-dark',
     'mod-tools': 'volter-blue',
@@ -44,6 +44,7 @@ const SKIN_2012_BY_KEY: Record<string, string> = {
     'nitro-room-filter': 'volter-blue',
     'pet-training': 'volter-blue',
     'commands-alert': 'volter-blue',
+    'instructions-alert': 'volter-blue',
     'nitropedia': 'volter-blue'
 };
 

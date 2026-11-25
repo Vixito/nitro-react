@@ -1,6 +1,6 @@
-import { RoomEngineObjectEvent, RoomEngineRoomAdEvent, RoomEngineTriggerWidgetEvent, RoomEngineUseProductEvent, RoomId, RoomSessionErrorMessageEvent, RoomZoomEvent } from '@nitrots/nitro-renderer';
+import { RoomEngineObjectEvent, RoomEngineRoomAdEvent, RoomEngineTriggerWidgetEvent, RoomEngineUseProductEvent, RoomId, RoomObjectVariable, RoomSessionErrorMessageEvent, RoomZoomEvent } from '@nitrots/nitro-renderer';
 import { FC } from 'react';
-import { DispatchUiEvent, GetRoomEngine, LocalizeText, NotificationAlertType, RoomWidgetUpdateRoomObjectEvent } from '../../../api';
+import { DispatchUiEvent, GetRoomEngine, LocalizeText, NotificationAlertType, OpenUrl, RoomWidgetUpdateRoomObjectEvent } from '../../../api';
 import { useNotification, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent } from '../../../hooks';
 import { AvatarInfoWidgetView } from './avatar-info/AvatarInfoWidgetView';
 import { ChatInputView } from './chat-input/ChatInputView';
@@ -67,8 +67,25 @@ export const RoomWidgetsView: FC<{}> = props =>
                     //widgetHandler.processEvent(event);
                     break;
                 case RoomEngineRoomAdEvent.FURNI_CLICK:
+                    {
+                        const roomObject = GetRoomEngine().getRoomObject(event.roomId, objectId, category);
+                        const adData = roomObject?.model?.getValue<any>(RoomObjectVariable.FURNITURE_DATA);
+                        const rawClickUrl =
+                            (event as any).clickUrl ||
+                            (adData && typeof adData.getValue === 'function' ? adData.getValue('clickUrl') : '') ||
+                            (adData && typeof adData.get === 'function' ? adData.get('clickUrl') : '') ||
+                            '';
+                        if(rawClickUrl && /^https?:\/\//i.test(rawClickUrl))
+                        {
+                            OpenUrl(rawClickUrl);
+                        }
+                        else
+                        {
+                            roomSession.useMultistateItem(objectId);
+                        }
+                    }
+                    break;
                 case RoomEngineRoomAdEvent.FURNI_DOUBLE_CLICK:
-                    //handleRoomAdClick(event);
                     break;
                 case RoomEngineRoomAdEvent.TOOLTIP_SHOW:
                 case RoomEngineRoomAdEvent.TOOLTIP_HIDE:
