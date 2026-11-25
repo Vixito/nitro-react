@@ -621,7 +621,7 @@ export const BattlePassView: FC<{}> = () => {
                                             </span>
                                         </div>
                                         <span className="badge bg-dark text-white fw-bold px-2 py-1 rounded-1" style={{ fontSize: '12px' }} title={`Próximo nivel: ${bpData.user.level + 1}`}>
-                                            → {bpData.user.level + 1}
+                                            {bpData.user.level + 1}
                                         </span>
                                     </div>
                                 </div>
