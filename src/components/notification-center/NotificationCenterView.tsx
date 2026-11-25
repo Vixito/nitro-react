@@ -74,7 +74,7 @@ export const NotificationCenterView: FC<{}> = props =>
         return alerts.some(alert =>
         {
             if (alert.alertType === NotificationAlertType.MOTD || alert.alertType === NotificationAlertType.SEARCH) return false;
-            if (alert.messages && alert.messages.some(msg => msg.includes('is-commands-list') || msg.includes('cmd-category-block') || msg.includes('cmd-row'))) return false;
+            if (alert.messages && alert.messages.some(msg => msg.includes('is-commands-list') || msg.includes('is-game-instructions') || msg.includes('cmd-category-block') || msg.includes('cmd-row'))) return false;
             return true;
         });
     }, [ alerts, confirms ]);

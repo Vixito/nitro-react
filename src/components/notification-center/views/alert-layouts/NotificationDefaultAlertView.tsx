@@ -19,12 +19,21 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
         return item && item.messages.some(msg => msg.includes('class="is-game-instructions"'));
     }, [item]);
 
+    const instructionsTitle = useMemo(() => {
+        if (!isInstructionsWindow || !item?.messages) return 'Instrucciones del Juego';
+        for (const msg of item.messages) {
+            const m = msg.match(/data-title="([^"]+)"/i);
+            if (m && m[1]) return m[1];
+        }
+        return 'Instrucciones del Juego';
+    }, [isInstructionsWindow, item]);
+
     const isCommandsList = useMemo(() => {
-        return item && item.messages.some(msg => msg.includes('class="is-commands-list"') || msg.includes('class="is-game-instructions"') || msg.includes('cmd-category-block') || msg.includes('cmd-row'));
-    }, [item]);
+        return !isInstructionsWindow && item && item.messages.some(msg => msg.includes('class="is-commands-list"') || msg.includes('cmd-category-block') || msg.includes('cmd-row'));
+    }, [isInstructionsWindow, item]);
 
     const displayMessages = useMemo(() => {
-        if (!isCommandsList || isInstructionsWindow || !item?.messages) return item?.messages || [];
+        if (!isCommandsList || !item?.messages) return item?.messages || [];
         const hasWired = item.messages.some(msg => msg.includes(':wired, :wf') || />:wired(<\/td>|,|\b)/i.test(msg));
         if (hasWired) return item.messages;
 
@@ -145,17 +154,17 @@ export const NotificationDefaultAlertView: FC<NotificationDefaultAlertViewProps>
         onClose();
     };
     
-    const hasFrank = !isCommandsList && (item.alertType === NotificationAlertType.DEFAULT);
+    const hasFrank = !isCommandsList && !isInstructionsWindow && (item.alertType === NotificationAlertType.DEFAULT);
 
     return (
         <LayoutNotificationAlertView 
             uniqueKey={ isInstructionsWindow ? 'instructions-alert' : (isCommandsList ? 'commands-alert' : undefined) }
-            title={ isInstructionsWindow ? 'Instrucciones del Juego' : (isCommandsList ? 'Lista de Comandos' : title) } 
+            title={ isInstructionsWindow ? instructionsTitle : (isCommandsList ? 'Lista de Comandos' : title) } 
             onClose={ onClose } 
             { ...rest } 
-            type={ isCommandsList ? 'custom-commands' : (hasFrank ? NotificationAlertType.DEFAULT : item.alertType) } 
-            classNames={ isCommandsList ? ['commands-alert'] : [] }
-            style={ isCommandsList ? { width: `${customSize.width}px`, height: `${customSize.height}px`, maxWidth: '96vw', maxHeight: '94vh' } : {} }
+            type={ (isCommandsList || isInstructionsWindow) ? 'custom-commands' : (hasFrank ? NotificationAlertType.DEFAULT : item.alertType) } 
+            classNames={ isInstructionsWindow ? ['commands-alert', 'game-instructions-alert'] : (isCommandsList ? ['commands-alert'] : []) }
+            style={ isInstructionsWindow ? { width: '340px', height: '490px', maxWidth: '94vw', maxHeight: '90vh' } : (isCommandsList ? { width: `${customSize.width}px`, height: `${customSize.height}px`, maxWidth: '96vw', maxHeight: '94vh' } : {}) }
         >
             <Flex fullHeight overflow="hidden" className="w-100" gap={ hasFrank || (item.imageUrl && !imageFailed) ? 2 : 0 }>
                 { hasFrank && !item.imageUrl && <Base className="notification-frank flex-shrink-0" /> }
