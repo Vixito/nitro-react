@@ -31,6 +31,8 @@ import { WiredActionGiveVariableView } from './WiredActionGiveVariableView';
 import { WiredActionRemoveVariableView } from './WiredActionRemoveVariableView';
 import { WiredActionMoveRotateUserView } from './WiredActionMoveRotateUserView';
 import { WiredActionMoveUserToFurniView } from './WiredActionMoveUserToFurniView';
+import { WiredActionControlClockView } from './WiredActionControlClockView';
+import { WiredActionSetAltitudeView } from './WiredActionSetAltitudeView';
 
 export const WiredActionLayoutView = (code: number) =>
 {
@@ -100,6 +102,10 @@ export const WiredActionLayoutView = (code: number) =>
             return <WiredActionMoveRotateUserView />;
         case WiredActionLayoutCode.USER_TO_FURNI:
             return <WiredActionMoveUserToFurniView />;
+        case WiredActionLayoutCode.CONTROL_CLOCK:
+            return <WiredActionControlClockView />;
+        case WiredActionLayoutCode.SET_ALTITUDE:
+            return <WiredActionSetAltitudeView />;
     }
 
     return null;

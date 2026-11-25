@@ -18,4 +18,6 @@ export class WiredTriggerLayout
     public static USER_PERFORMS_ACTION: number = 16;
     public static ROOM_INITIALIZES: number = 17;
     public static CLOCK_COUNTER: number = 18;
+    public static USER_IDLES: number = 19;
+    public static STUFF_STATE: number = 20;
 }

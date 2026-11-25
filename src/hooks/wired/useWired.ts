@@ -12,6 +12,7 @@ const useWiredState = () =>
     const [ stringParam, setStringParam ] = useState<string>('');
     const [ furniIds, setFurniIds ] = useState<number[]>([]);
     const [ actionDelay, setActionDelay ] = useState<number>(0);
+    const [ furniSource, setFurniSource ] = useState<number>(0);
     const [ allowsFurni, setAllowsFurni ] = useState<number>(WiredFurniType.STUFF_SELECTION_OPTION_NONE);
     const [ isWiredCreatorToolsVisible, setIsWiredCreatorToolsVisible ] = useState<boolean>(false);
     const { showConfirm = null } = useNotification();
@@ -24,17 +25,17 @@ const useWiredState = () =>
 
             if(trigger instanceof WiredActionDefinition)
             {
-                SendMessageComposer(new UpdateActionMessageComposer(trigger.id, intParams, stringParam, furniIds, actionDelay, trigger.stuffTypeSelectionCode));
+                SendMessageComposer(new UpdateActionMessageComposer(trigger.id, intParams, stringParam, furniIds, actionDelay, furniSource));
             }
 
             else if(trigger instanceof TriggerDefinition)
             {
-                SendMessageComposer(new UpdateTriggerMessageComposer(trigger.id, intParams, stringParam, furniIds, trigger.stuffTypeSelectionCode));
+                SendMessageComposer(new UpdateTriggerMessageComposer(trigger.id, intParams, stringParam, furniIds, furniSource));
             }
 
             else if(trigger instanceof ConditionDefinition)
             {
-                SendMessageComposer(new UpdateConditionMessageComposer(trigger.id, intParams, stringParam, furniIds, trigger.stuffTypeSelectionCode));
+                SendMessageComposer(new UpdateConditionMessageComposer(trigger.id, intParams, stringParam, furniIds, furniSource));
             }
         }
 
@@ -49,7 +50,7 @@ const useWiredState = () =>
         {
             save(trigger);
         }
-    }, [ trigger, intParams, stringParam, furniIds, actionDelay, showConfirm ]);
+    }, [ trigger, intParams, stringParam, furniIds, actionDelay, furniSource, showConfirm ]);
 
 
     const selectObjectForWired = (objectId: number, category: number) =>
@@ -114,11 +115,14 @@ const useWiredState = () =>
     {
         if(!trigger) return;
 
+        setFurniSource(trigger.stuffTypeSelectionCode || 0);
+
         return () =>
         {
             setIntParams([]);
             setStringParam('');
             setActionDelay(0);
+            setFurniSource(0);
             setFurniIds(prevValue =>
             {
                 if(prevValue && prevValue.length) WiredSelectionVisualizer.clearSelectionShaderFromFurni(prevValue);
@@ -155,7 +159,8 @@ const useWiredState = () =>
         intParams, setIntParams, 
         stringParam, setStringParam, 
         furniIds, setFurniIds, 
-        actionDelay, setActionDelay, 
+        actionDelay, setActionDelay,
+        furniSource, setFurniSource,
         setAllowsFurni, 
         saveWired, 
         selectObjectForWired,

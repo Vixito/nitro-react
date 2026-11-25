@@ -1,9 +1,9 @@
-import { FC, PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { FC, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react';
 import { FaCheck, FaPaintBrush, FaSave } from 'react-icons/fa';
 import { GetRoomSession, GetSessionDataManager, LocalizeText, WiredFurniType, WiredSelectionVisualizer } from '../../../api';
 import { Button, Column, Flex, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../common';
 import { useWired } from '../../../hooks';
-import { WiredFurniSelectorView } from './WiredFurniSelectorView';
+import { WIRED_FURNI_SOURCE_SELECTED, WIRED_FURNI_SOURCE_SELECTOR, WIRED_FURNI_SOURCE_SIGNAL, WIRED_FURNI_SOURCE_TRIGGERING, WiredFurniSelectorView } from './WiredFurniSelectorView';
 
 export interface WiredBaseViewProps
 {
@@ -12,6 +12,8 @@ export interface WiredBaseViewProps
     hasSpecialInput: boolean;
     save: () => void;
     validate?: () => boolean;
+    allowedFurniSources?: number[];
+    advancedChildren?: ReactNode;
 }
 
 interface WiredClipboardData
@@ -23,18 +25,28 @@ interface WiredClipboardData
     stringData: string;
     furniIds: number[];
     actionDelay: number;
+    furniSource?: number;
 }
 
 export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
 {
-    const { wiredType = '', requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_NONE, save = null, validate = null, children = null, hasSpecialInput = false } = props;
+    const {
+        wiredType = '',
+        requiresFurni = WiredFurniType.STUFF_SELECTION_OPTION_NONE,
+        save = null,
+        validate = null,
+        children = null,
+        hasSpecialInput = false,
+        allowedFurniSources = undefined,
+        advancedChildren = null
+    } = props;
     const [ wiredName, setWiredName ] = useState<string>(null);
     const [ wiredDescription, setWiredDescription ] = useState<string>(null);
     const [ needsSave, setNeedsSave ] = useState<boolean>(false);
     const [ isMenuOpen, setIsMenuOpen ] = useState<boolean>(false);
     const [ toastMessage, setToastMessage ] = useState<string>(null);
     const [ continuousBrush, setContinuousBrush ] = useState<boolean>(() => sessionStorage.getItem('wired_continuous_brush') === 'true');
-    const { trigger = null, setTrigger = null, setIntParams = null, setStringParam = null, setFurniIds = null, setAllowsFurni = null, saveWired = null, intParams = [], stringParam = '', furniIds = [], actionDelay = 0, setActionDelay = null, setIsWiredCreatorToolsVisible } = useWired();
+    const { trigger = null, setTrigger = null, setIntParams = null, setStringParam = null, setFurniIds = null, setAllowsFurni = null, saveWired = null, intParams = [], stringParam = '', furniIds = [], actionDelay = 0, setActionDelay = null, furniSource = 0, setFurniSource = null, setIsWiredCreatorToolsVisible } = useWired();
     const initializedTriggerIdRef = useRef<number>(-1);
     const menuRef = useRef<HTMLDivElement>(null);
     const menuButtonRef = useRef<HTMLDivElement>(null);
@@ -97,7 +109,8 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
             intData: [ ...(intParams || trigger.intData || []) ],
             stringData: stringParam || trigger.stringData || '',
             furniIds: [ ...(furniIds || trigger.selectedItems || []) ],
-            actionDelay: actionDelay || 0
+            actionDelay: actionDelay || 0,
+            furniSource: furniSource || 0
         };
 
         (window as any).__WIRED_CLIPBOARD__ = clipboardData;
@@ -118,6 +131,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
         if(raw.intData && setIntParams) setIntParams([ ...raw.intData ]);
         if(raw.stringData !== undefined && setStringParam) setStringParam(raw.stringData);
         if(raw.actionDelay !== undefined && setActionDelay) setActionDelay(raw.actionDelay);
+        if(raw.furniSource !== undefined && setFurniSource) setFurniSource(raw.furniSource);
 
         if(raw.furniIds && raw.furniIds.length && setFurniIds && requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE)
         {
@@ -152,6 +166,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
         if(setIntParams) setIntParams([]);
         if(setStringParam) setStringParam('');
         if(setActionDelay) setActionDelay(0);
+        if(setFurniSource) setFurniSource(0);
         if(setFurniIds)
         {
             setFurniIds(prev =>
@@ -379,7 +394,12 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
                 { (requiresFurni > WiredFurniType.STUFF_SELECTION_OPTION_NONE) &&
                     <>
                         <hr className="m-0 bg-dark" />
-                        <WiredFurniSelectorView />
+                        <WiredFurniSelectorView
+                            allowedFurniSources={ allowedFurniSources ?? (wiredType === 'trigger'
+                                ? [ WIRED_FURNI_SOURCE_SELECTED, WIRED_FURNI_SOURCE_SELECTOR ]
+                                : [ WIRED_FURNI_SOURCE_SELECTED, WIRED_FURNI_SOURCE_TRIGGERING, WIRED_FURNI_SOURCE_SELECTOR, WIRED_FURNI_SOURCE_SIGNAL ]) }
+                            advancedChildren={ advancedChildren }
+                        />
                     </> }
                 <Flex alignItems="center" gap={ 1 } className="mt-2">
                     <Button fullWidth variant="success" onClick={ onSave }>{ LocalizeText('wiredfurni.ready') }</Button>

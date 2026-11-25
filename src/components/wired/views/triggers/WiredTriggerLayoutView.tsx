@@ -14,7 +14,9 @@ import { WiredTriggerGameEndsView } from './WiredTriggerGameEndsView';
 import { WiredTriggerGameStartsView } from './WiredTriggerGameStartsView';
 import { WiredTriggerRoomInitializesView } from './WiredTriggerRoomInitializesView';
 import { WiredTriggeScoreAchievedView } from './WiredTriggerScoreAchievedView';
+import { WiredTriggerStuffStateView } from './WiredTriggerStuffStateView';
 import { WiredTriggerToggleFurniView } from './WiredTriggerToggleFurniView';
+import { WiredTriggerUserIdlesView } from './WiredTriggerUserIdlesView';
 import { WiredTriggerUserPerformsActionView } from './WiredTriggerUserPerformsActionView';
 import { WiredTriggerVariableChangedView } from './WiredTriggerVariableChangedView';
 
@@ -58,6 +60,10 @@ export const WiredTriggerLayoutView = (code: number) =>
             return <WiredTriggerRoomInitializesView />;
         case WiredTriggerLayout.CLOCK_COUNTER:
             return <WiredTriggerClockCounterView />;
+        case WiredTriggerLayout.USER_IDLES:
+            return <WiredTriggerUserIdlesView />;
+        case WiredTriggerLayout.STUFF_STATE:
+            return <WiredTriggerStuffStateView />;
     }
 
     return null;

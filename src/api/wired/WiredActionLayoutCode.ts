@@ -33,4 +33,6 @@ export class WiredActionLayoutCode
     public static REMOVE_VARIABLE: number = 32;
     public static MOVE_ROTATE_USER: number = 33;
     public static USER_TO_FURNI: number = 34;
+    public static CONTROL_CLOCK: number = 35;
+    public static SET_ALTITUDE: number = 36;
 }

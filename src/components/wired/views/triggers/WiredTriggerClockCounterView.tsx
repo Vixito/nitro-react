@@ -5,6 +5,14 @@ import { WiredFurniType } from '../../../../api';
 import { Button, Column, Flex, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
 import { WiredTriggerBaseView } from './WiredTriggerBaseView';
+import { WIRED_FURNI_SOURCE_SELECTED, WIRED_FURNI_SOURCE_SELECTOR, WIRED_FURNI_SOURCE_SIGNAL, WIRED_FURNI_SOURCE_TRIGGERING } from '../WiredFurniSelectorView';
+
+const CLOCK_COUNTER_SOURCES = [
+    WIRED_FURNI_SOURCE_SELECTED,
+    WIRED_FURNI_SOURCE_TRIGGERING,
+    WIRED_FURNI_SOURCE_SELECTOR,
+    WIRED_FURNI_SOURCE_SIGNAL
+];
 
 export const WiredTriggerClockCounterView: FC<{}> = props =>
 {
@@ -23,7 +31,12 @@ export const WiredTriggerClockCounterView: FC<{}> = props =>
     }, [ trigger ]);
 
     return (
-        <WiredTriggerBaseView requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID } hasSpecialInput={ true } save={ save }>
+        <WiredTriggerBaseView
+            requiresFurni={ WiredFurniType.STUFF_SELECTION_OPTION_BY_ID }
+            hasSpecialInput={ true }
+            save={ save }
+            allowedFurniSources={ CLOCK_COUNTER_SOURCES }
+        >
             <Column gap={ 2 }>
                 <Column gap={ 1 }>
                     <Text bold>{ minutes } { minutes === 1 ? 'minuto' : 'minutos' }</Text>
