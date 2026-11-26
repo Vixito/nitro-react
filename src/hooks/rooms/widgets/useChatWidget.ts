@@ -263,7 +263,8 @@ const useChatWidgetState = () =>
 
         const isMutedOthers = Boolean((window as any).__HABBTEN_MUTE_OTHERS_CHAT__);
         const myUsername = (GetSessionDataManager()?.userName || '').toLowerCase();
-        const isOtherUser = (userType === RoomObjectType.USER) && Boolean(username) && (username.toLowerCase() !== myUsername);
+        const plainSenderName = (username || '').replace(/<[^>]*>/g, '').replace(/<\/?font\b[^>]*>?/gi, '').trim().toLowerCase();
+        const isOtherUser = (userType === RoomObjectType.USER) && Boolean(plainSenderName) && (plainSenderName !== myUsername);
 
         if(!(isMutedOthers && isOtherUser))
         {

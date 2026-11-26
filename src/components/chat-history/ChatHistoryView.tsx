@@ -5,6 +5,29 @@ import { Flex, InfiniteScroll, NitroCardContentView, NitroCardHeaderView, NitroC
 import { useChatHistory, useEraTheme } from '../../hooks';
 import rtBtnHistory from '../../assets/images/eras/flash2012/roomtools/btn_history.png';
 
+const stripHtmlTags = (value: string): string =>
+{
+    if(!value) return '';
+
+    return value
+        .replace(/<[^>]*>/g, '')
+        .replace(/<\/?font\b[^>]*>?/gi, '')
+        .trim();
+};
+
+const sanitizeNameHtml = (value: string): string =>
+{
+    if(!value) return '';
+
+    // Strip malformed or empty <font color=''> / <font color='> tags emitted when name_color is empty
+    if(/<font\s+color=['"]?\s*['"]?\s*>/i.test(value) || /<font\s+color=['"][^'"]*$/i.test(value))
+    {
+        return stripHtmlTags(value);
+    }
+
+    return value;
+};
+
 export const ChatHistoryView: FC<{}> = props =>
 {
     const { currentEra } = useEraTheme();
@@ -21,7 +44,8 @@ export const ChatHistoryView: FC<{}> = props =>
         {
             if(entry.type === ChatEntryType.TYPE_CHAT && entry.name)
             {
-                set.add(entry.name);
+                const cleanName = stripHtmlTags(entry.name);
+                if(cleanName) set.add(cleanName);
             }
         }
         return Array.from(set).sort((a, b) => a.localeCompare(b));
@@ -33,10 +57,13 @@ export const ChatHistoryView: FC<{}> = props =>
 
         return chatHistory.filter(entry =>
         {
-            if(selectedUser && entry.type === ChatEntryType.TYPE_CHAT && entry.name !== selectedUser) return false;
+            const cleanName = stripHtmlTags(entry.name || '');
+            const cleanMsg = stripHtmlTags(entry.message || '');
+
+            if(selectedUser && entry.type === ChatEntryType.TYPE_CHAT && cleanName !== selectedUser) return false;
             if(selectedUser && entry.type !== ChatEntryType.TYPE_CHAT) return false;
             if(!text.length) return true;
-            return ((entry.message && entry.message.toLowerCase().includes(text)) || (entry.name && entry.name.toLowerCase().includes(text)));
+            return (cleanMsg.toLowerCase().includes(text) || cleanName.toLowerCase().includes(text));
         });
     }, [ chatHistory, searchText, selectedUser ]);
 
@@ -78,12 +105,10 @@ export const ChatHistoryView: FC<{}> = props =>
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
-    if(!isVisible) return null;
-
     if(currentEra === 'flash2012')
     {
         return (
-            <div className="chat-history-2012-drawer">
+            <div className={ `chat-history-2012-drawer${ isVisible ? ' is-open' : '' }` } aria-hidden={ !isVisible }>
                 <div ref={ elementRef } className="chat-history-2012-list">
                     { filteredChatHistory.map((row, idx) => (
                         <div key={ `${ row.id }-${ idx }` } className="chat-history-2012-row">
@@ -91,11 +116,11 @@ export const ChatHistoryView: FC<{}> = props =>
                             { (row.type === ChatEntryType.TYPE_ROOM_INFO) ? (
                                 <span className="ch2012-room">
                                     <img src={ rtBtnHistory } alt="" className="ch2012-room-ico" />
-                                    <span className="ch2012-room-name">{ row.name }</span>
+                                    <span className="ch2012-room-name">{ stripHtmlTags(row.name) }</span>
                                 </span>
                             ) : (
                                 <span className="ch2012-chat">
-                                    <b className="ch2012-user" dangerouslySetInnerHTML={ { __html: `${ row.name }: ` } } />
+                                    <b className="ch2012-user">{ stripHtmlTags(row.name) }: </b>
                                     <span className="ch2012-msg" dangerouslySetInnerHTML={ { __html: row.message } } />
                                 </span>
                             ) }
@@ -131,6 +156,8 @@ export const ChatHistoryView: FC<{}> = props =>
         );
     }
 
+    if(!isVisible) return null;
+
     const headerTitle = LocalizeText('room.chathistory.button.text');
     const displayTitle = (headerTitle && headerTitle !== 'room.chathistory.button.text') ? headerTitle : 'Historial de Chat';
 
@@ -154,7 +181,7 @@ export const ChatHistoryView: FC<{}> = props =>
                                                 <div className={ `user-image ${ (row.entityType === RoomObjectType.PET) ? 'pet-image' : '' }` } style={ { backgroundImage: `url(${ row.imageUrl })` } } /> }
                                         </div>
                                         <div className="chat-content">
-                                            <b className="username mr-1" dangerouslySetInnerHTML={ { __html: `${ row.name }: ` } } />
+                                            <b className="username mr-1" dangerouslySetInnerHTML={ { __html: `${ sanitizeNameHtml(row.name) }: ` } } />
                                             <span className="message" dangerouslySetInnerHTML={ { __html: `${ row.message }` } } />
                                         </div>
                                     </div>
@@ -162,7 +189,7 @@ export const ChatHistoryView: FC<{}> = props =>
                             { (row.type === ChatEntryType.TYPE_ROOM_INFO) &&
                                 <>
                                     <i className="icon icon-small-room" />
-                                    <Text textBreak wrap grow>{ row.name }</Text>
+                                    <Text textBreak wrap grow>{ stripHtmlTags(row.name) }</Text>
                                 </> }
                         </Flex>
                     )
