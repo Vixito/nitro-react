@@ -40,4 +40,8 @@ export class WiredActionLayoutCode
     public static MATCH_COUNTER: number = 39;
     public static RESET_HIGHSCORE: number = 40;
     public static FURNI_TO_USER: number = 41;
+    public static SET_HIGHLIGHT: number = 42;
+    public static SEND_SIGNAL: number = 43;
+    public static FREEZE_USER: number = 44;
+    public static UNFREEZE_USER: number = 45;
 }

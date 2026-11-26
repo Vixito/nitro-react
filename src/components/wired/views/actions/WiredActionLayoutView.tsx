@@ -38,6 +38,9 @@ import { WiredActionSetVisibilityView } from './WiredActionSetVisibilityView';
 import { WiredActionMatchCounterView } from './WiredActionMatchCounterView';
 import { WiredActionResetHighscoreView } from './WiredActionResetHighscoreView';
 import { WiredActionFurniToUserView } from './WiredActionFurniToUserView';
+import { WiredActionSetHighlightView } from './WiredActionSetHighlightView';
+import { WiredActionFreezeUserView } from './WiredActionFreezeUserView';
+import { WiredActionUnfreezeUserView } from './WiredActionUnfreezeUserView';
 
 export const WiredActionLayoutView = (code: number) =>
 {
@@ -121,6 +124,14 @@ export const WiredActionLayoutView = (code: number) =>
             return <WiredActionResetHighscoreView />;
         case WiredActionLayoutCode.FURNI_TO_USER:
             return <WiredActionFurniToUserView />;
+        case WiredActionLayoutCode.SET_HIGHLIGHT:
+            return <WiredActionSetHighlightView />;
+        case WiredActionLayoutCode.SEND_SIGNAL:
+            return <WiredActionCallStacksWithConditionsView />;
+        case WiredActionLayoutCode.FREEZE_USER:
+            return <WiredActionFreezeUserView />;
+        case WiredActionLayoutCode.UNFREEZE_USER:
+            return <WiredActionUnfreezeUserView />;
     }
 
     return null;

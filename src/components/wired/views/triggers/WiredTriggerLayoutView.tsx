@@ -15,6 +15,7 @@ import { WiredTriggerGameStartsView } from './WiredTriggerGameStartsView';
 import { WiredTriggerRoomInitializesView } from './WiredTriggerRoomInitializesView';
 import { WiredTriggeScoreAchievedView } from './WiredTriggerScoreAchievedView';
 import { WiredTriggerStuffStateView } from './WiredTriggerStuffStateView';
+import { WiredTriggerReceiveSignalView } from './WiredTriggerReceiveSignalView';
 import { WiredTriggerToggleFurniView } from './WiredTriggerToggleFurniView';
 import { WiredTriggerUserIdlesView } from './WiredTriggerUserIdlesView';
 import { WiredTriggerUserPerformsActionView } from './WiredTriggerUserPerformsActionView';
@@ -64,6 +65,8 @@ export const WiredTriggerLayoutView = (code: number) =>
             return <WiredTriggerUserIdlesView />;
         case WiredTriggerLayout.STUFF_STATE:
             return <WiredTriggerStuffStateView />;
+        case WiredTriggerLayout.RECEIVE_SIGNAL:
+            return <WiredTriggerReceiveSignalView />;
     }
 
     return null;

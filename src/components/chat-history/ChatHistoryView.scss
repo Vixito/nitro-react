@@ -6,14 +6,16 @@
 .chat-history-2012-drawer {
     position: fixed;
     top: 0;
-    left: 0;
+    left: 82px;
     bottom: 50px;
-    width: 465px;
-    max-width: calc(100vw - 26px);
-    background: rgba(12, 12, 12, 0.88);
-    border-right: 1px solid rgba(255, 255, 255, 0.16);
-    box-shadow: 4px 0 18px rgba(0, 0, 0, 0.55);
-    z-index: 60;
+    width: 455px;
+    max-width: calc(100vw - 104px);
+    background: rgba(34, 36, 40, 0.66);
+    backdrop-filter: blur(1.5px);
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    border-right: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 4px 0 18px rgba(0, 0, 0, 0.42);
+    z-index: 1015;
     display: flex;
     flex-direction: column;
     font-family: Ubuntu, 'Trebuchet MS', sans-serif;
@@ -26,7 +28,7 @@
         flex-direction: column;
         gap: 6px;
         scrollbar-width: thin;
-        scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+        scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
     }
 
     .chat-history-2012-row {
@@ -35,12 +37,13 @@
         gap: 8px;
         font-size: 12px;
         line-height: 1.35;
-        color: #efefef;
+        color: #f3f4f6;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
         word-break: break-word;
 
         .ch2012-time {
             flex-shrink: 0;
-            color: #8c8c8c;
+            color: #b4bac0;
             font-size: 11px;
             font-variant-numeric: tabular-nums;
             padding-top: 1px;
@@ -59,13 +62,13 @@
             }
 
             .ch2012-room-name {
-                color: #e53935;
-                font-weight: 500;
+                color: #ff5c5c;
+                font-weight: 600;
             }
         }
 
         .ch2012-chat {
-            color: #ececec;
+            color: #f1f2f4;
 
             .ch2012-user {
                 color: #ffffff;
@@ -79,16 +82,16 @@
         align-items: center;
         gap: 8px;
         padding: 8px 10px;
-        background: rgba(8, 8, 8, 0.94);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(24, 26, 30, 0.74);
+        border-top: 1px solid rgba(255, 255, 255, 0.14);
 
         .ch2012-search {
             flex: 1 1 auto;
             height: 26px;
             padding: 2px 8px;
-            border: 1px solid #888;
+            border: 1px solid rgba(0, 0, 0, 0.45);
             border-radius: 3px;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.94);
             color: #111111;
             font-size: 12px;
             font-style: italic;
@@ -100,13 +103,13 @@
         }
 
         .ch2012-user-select {
-            width: 138px;
+            width: 142px;
             flex-shrink: 0;
             height: 26px;
             padding: 1px 6px;
-            border: 1px solid #888;
+            border: 1px solid rgba(0, 0, 0, 0.45);
             border-radius: 3px;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.94);
             color: #111111;
             font-size: 11px;
             font-weight: 600;
@@ -120,11 +123,11 @@
         bottom: 58px;
         width: 16px;
         height: 46px;
-        background: rgba(34, 34, 34, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(42, 45, 50, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.22);
         border-left: none;
         border-radius: 0 5px 5px 0;
-        color: #d4d4d4;
+        color: #e2e4e8;
         font-size: 14px;
         line-height: 1;
         display: flex;
@@ -134,7 +137,7 @@
         padding: 0;
 
         &:hover {
-            background: rgba(54, 54, 54, 0.96);
+            background: rgba(62, 66, 74, 0.9);
             color: #ffffff;
         }
     }

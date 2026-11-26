@@ -20,4 +20,5 @@ export class WiredTriggerLayout
     public static CLOCK_COUNTER: number = 18;
     public static USER_IDLES: number = 19;
     public static STUFF_STATE: number = 20;
+    public static RECEIVE_SIGNAL: number = 21;
 }
