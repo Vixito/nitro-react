@@ -47,4 +47,5 @@ export class WiredActionLayoutCode
     public static ADJUST_CLOCK: number = 46;
     public static CLOSE_DICE: number = 47;
     public static RELATIVE_MOVE: number = 48;
+    public static GIVE_DANCE: number = 49;
 }

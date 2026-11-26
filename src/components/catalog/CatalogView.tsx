@@ -265,6 +265,14 @@ export const CatalogView: FC<{}> = props =>
         return tpl.replace('%name%', raw);
     }, [ currentPage ]);
     const f12ActiveTitle = sanitizeCatalogTitle(activeLeafNode?.localization || currentPage?.localization?.getText(2) || LocalizeText('catalog.title'));
+    const f12ParentTitle = activeNodes.length > 1
+        ? sanitizeCatalogTitle(activeNodes[activeNodes.length - 2]?.localization || '')
+        : '';
+
+    useEffect(() =>
+    {
+        setFailedHeadlineUrl('');
+    }, [ f12HeadlineUrl ]);
 
     return (
         <>
@@ -422,7 +430,20 @@ export const CatalogView: FC<{}> = props =>
                                             </div>
                                         ) : (
                                             <div className="f12-headline-fallback">
-                                                <span>{ f12ActiveTitle }</span>
+                                                <div className="f12-headline-fallback-icon">
+                                                    <CatalogIconView icon={ activeLeafNode?.iconId || 1 } />
+                                                </div>
+                                                <div className="f12-headline-fallback-text">
+                                                    { f12ParentTitle && f12ParentTitle !== f12ActiveTitle && (
+                                                        <span className="f12-headline-fallback-kicker">{ f12ParentTitle }</span>
+                                                    ) }
+                                                    <span className="f12-headline-fallback-title">{ f12ActiveTitle }</span>
+                                                </div>
+                                                <div className="f12-headline-fallback-decor" aria-hidden="true">
+                                                    <span />
+                                                    <span />
+                                                    <span />
+                                                </div>
                                             </div>
                                         ) }
                                         { f12ShowIntroText && (

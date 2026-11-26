@@ -45,6 +45,7 @@ import { WiredActionSendSignalView } from './WiredActionSendSignalView';
 import { WiredActionAdjustClockView } from './WiredActionAdjustClockView';
 import { WiredActionCloseDiceView } from './WiredActionCloseDiceView';
 import { WiredActionRelativeMoveView } from './WiredActionRelativeMoveView';
+import { WiredActionGiveDanceView } from './WiredActionGiveDanceView';
 
 export const WiredActionLayoutView = (code: number) =>
 {
@@ -142,6 +143,8 @@ export const WiredActionLayoutView = (code: number) =>
             return <WiredActionCloseDiceView />;
         case WiredActionLayoutCode.RELATIVE_MOVE:
             return <WiredActionRelativeMoveView />;
+        case WiredActionLayoutCode.GIVE_DANCE:
+            return <WiredActionGiveDanceView />;
     }
 
     return null;
