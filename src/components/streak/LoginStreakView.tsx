@@ -211,6 +211,57 @@ export const LoginStreakView: FC<{}> = () =>
             const json = await res.json();
             if(json && json.success && json.token)
             {
+                const nativeBridge = (window as any).HabbtenNative;
+                const canUseNativeAdMob = Boolean(
+                    nativeBridge &&
+                    typeof nativeBridge.isRewardedAdReady === 'function' &&
+                    typeof nativeBridge.showRewardedAd === 'function' &&
+                    nativeBridge.isRewardedAdReady()
+                );
+
+                if(canUseNativeAdMob)
+                {
+                    const startedAt = Date.now();
+                    const minMs = Number(json.minSeconds || 10) * 1000;
+                    const cbName = '__habbtenAdMobRewardedCb';
+                    (window as any)[cbName] = async (result: { earned?: boolean; reason?: string }) =>
+                    {
+                        try { delete (window as any)[cbName]; } catch {}
+                        if(!result?.earned)
+                        {
+                            setStatusMsg('Debes ver el video completo para recibir el bono x2.');
+                            return;
+                        }
+                        const remaining = minMs - (Date.now() - startedAt);
+                        if(remaining > 0) await new Promise(r => setTimeout(r, remaining + 250));
+                        try
+                        {
+                            const compRes = await fetch('/api/client/streak/double/complete', {
+                                method: 'POST',
+                                credentials: 'include',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ token: json.token })
+                            });
+                            const compJson = await compRes.json();
+                            if(compJson && compJson.success)
+                            {
+                                setStatusMsg(`Bono x2 recibido: ${ compJson.bonusLabel }.`);
+                                await loadStreak(targetUserId);
+                            }
+                            else if(compJson?.error)
+                            {
+                                setStatusMsg(compJson.error);
+                            }
+                        }
+                        catch
+                        {
+                            setStatusMsg('No se pudo acreditar el bono x2.');
+                        }
+                    };
+                    nativeBridge.showRewardedAd(cbName);
+                    return;
+                }
+
                 setRewardedSession(json as RewardedSession);
                 setRewardedCountdown(Number(json.minSeconds || 10));
             }
