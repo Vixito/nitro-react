@@ -76,10 +76,11 @@
         var proto = window.location.protocol;
         var host = window.location.host;
         var wsProto = proto === 'https:' ? 'wss:' : 'ws:';
+        var cacheBust = Date.now();
         var cfg = {
           'config.urls': gamePrefix
-            ? [ origin + gamePrefix + '/renderer-config.json', origin + gamePrefix + '/ui-config.json' ]
-            : [ '/renderer-config.json', '/ui-config.json' ],
+            ? [ origin + gamePrefix + '/renderer-config.json?t=' + cacheBust, origin + gamePrefix + '/ui-config.json?t=' + cacheBust ]
+            : [ '/renderer-config.json?t=' + cacheBust, '/ui-config.json?t=' + cacheBust ],
           'sso.ticket': ticket,
           'forward.type': (params.get('room') ? 2 : -1),
           'forward.id': (params.get('room') || 0),
@@ -91,8 +92,6 @@
           cfg['asset.url'] = root + '/assets';
           cfg['image.library.url'] = root + '/swf/c_images/';
           cfg['hof.furni.url'] = root + '/swf/dcr/hof_furni';
-          cfg['furnidata.url'] = root + '/assets/gamedata/FurnitureData.json?v=20261122_v15';
-          cfg['productdata.url'] = root + '/assets/gamedata/ProductData.json?v=20260821_v14';
         }
         Object.defineProperty(window, 'NitroConfig', {
           value: cfg,

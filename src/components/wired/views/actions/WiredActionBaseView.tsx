@@ -14,6 +14,7 @@ export interface WiredActionBaseViewProps
     save: () => void;
     allowedFurniSources?: number[];
     advancedChildren?: ReactNode;
+    furniSourceLabel?: string;
 }
 
 export const WiredActionBaseView: FC<PropsWithChildren<WiredActionBaseViewProps>> = props =>
@@ -24,6 +25,7 @@ export const WiredActionBaseView: FC<PropsWithChildren<WiredActionBaseViewProps>
         hasSpecialInput = false,
         allowedFurniSources = undefined,
         advancedChildren = null,
+        furniSourceLabel = undefined,
         children = null
     } = props;
     const { trigger = null, actionDelay = 0, setActionDelay = null } = useWired();
@@ -41,6 +43,7 @@ export const WiredActionBaseView: FC<PropsWithChildren<WiredActionBaseViewProps>
             hasSpecialInput={ hasSpecialInput }
             allowedFurniSources={ allowedFurniSources }
             advancedChildren={ advancedChildren }
+            furniSourceLabel={ furniSourceLabel }
         >
             { children }
             { !!children && <hr className="m-0 bg-dark" /> }

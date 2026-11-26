@@ -44,4 +44,7 @@ export class WiredActionLayoutCode
     public static SEND_SIGNAL: number = 43;
     public static FREEZE_USER: number = 44;
     public static UNFREEZE_USER: number = 45;
+    public static ADJUST_CLOCK: number = 46;
+    public static CLOSE_DICE: number = 47;
+    public static RELATIVE_MOVE: number = 48;
 }

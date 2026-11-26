@@ -20,6 +20,7 @@ export interface WiredFurniSelectorViewProps
 {
     allowedFurniSources?: number[];
     advancedChildren?: ReactNode;
+    furniSourceLabel?: string;
 }
 
 export const WiredFurniSelectorView: FC<WiredFurniSelectorViewProps> = props =>
@@ -31,7 +32,8 @@ export const WiredFurniSelectorView: FC<WiredFurniSelectorViewProps> = props =>
             WIRED_FURNI_SOURCE_SELECTOR,
             WIRED_FURNI_SOURCE_SIGNAL
         ],
-        advancedChildren = null
+        advancedChildren = null,
+        furniSourceLabel = 'Seleccionar fuente de los furnis:'
     } = props;
     const { trigger = null, furniIds = [], furniSource = 0, setFurniSource = null } = useWired();
     const [ isAdvancedOpen, setIsAdvancedOpen ] = useState<boolean>(false);
@@ -79,7 +81,7 @@ export const WiredFurniSelectorView: FC<WiredFurniSelectorViewProps> = props =>
                                 <>
                                     <hr className="m-0 bg-dark" />
                                     <Column gap={ 1 }>
-                                        <Text bold>Seleccionar fuente de los furnis:</Text>
+                                        <Text bold>{ furniSourceLabel }</Text>
                                         <Flex alignItems="center" justifyContent="between" gap={ 2 }>
                                             <Button
                                                 size="sm"

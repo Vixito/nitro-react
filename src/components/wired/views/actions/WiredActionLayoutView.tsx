@@ -41,6 +41,10 @@ import { WiredActionFurniToUserView } from './WiredActionFurniToUserView';
 import { WiredActionSetHighlightView } from './WiredActionSetHighlightView';
 import { WiredActionFreezeUserView } from './WiredActionFreezeUserView';
 import { WiredActionUnfreezeUserView } from './WiredActionUnfreezeUserView';
+import { WiredActionSendSignalView } from './WiredActionSendSignalView';
+import { WiredActionAdjustClockView } from './WiredActionAdjustClockView';
+import { WiredActionCloseDiceView } from './WiredActionCloseDiceView';
+import { WiredActionRelativeMoveView } from './WiredActionRelativeMoveView';
 
 export const WiredActionLayoutView = (code: number) =>
 {
@@ -127,11 +131,17 @@ export const WiredActionLayoutView = (code: number) =>
         case WiredActionLayoutCode.SET_HIGHLIGHT:
             return <WiredActionSetHighlightView />;
         case WiredActionLayoutCode.SEND_SIGNAL:
-            return <WiredActionCallStacksWithConditionsView />;
+            return <WiredActionSendSignalView />;
         case WiredActionLayoutCode.FREEZE_USER:
             return <WiredActionFreezeUserView />;
         case WiredActionLayoutCode.UNFREEZE_USER:
             return <WiredActionUnfreezeUserView />;
+        case WiredActionLayoutCode.ADJUST_CLOCK:
+            return <WiredActionAdjustClockView />;
+        case WiredActionLayoutCode.CLOSE_DICE:
+            return <WiredActionCloseDiceView />;
+        case WiredActionLayoutCode.RELATIVE_MOVE:
+            return <WiredActionRelativeMoveView />;
     }
 
     return null;

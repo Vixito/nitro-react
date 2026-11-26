@@ -14,6 +14,7 @@ export interface WiredBaseViewProps
     validate?: () => boolean;
     allowedFurniSources?: number[];
     advancedChildren?: ReactNode;
+    furniSourceLabel?: string;
 }
 
 interface WiredClipboardData
@@ -38,7 +39,8 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
         children = null,
         hasSpecialInput = false,
         allowedFurniSources = undefined,
-        advancedChildren = null
+        advancedChildren = null,
+        furniSourceLabel = undefined
     } = props;
     const [ wiredName, setWiredName ] = useState<string>(null);
     const [ wiredDescription, setWiredDescription ] = useState<string>(null);
@@ -399,6 +401,7 @@ export const WiredBaseView: FC<PropsWithChildren<WiredBaseViewProps>> = props =>
                                 ? [ WIRED_FURNI_SOURCE_SELECTED, WIRED_FURNI_SOURCE_SELECTOR ]
                                 : [ WIRED_FURNI_SOURCE_SELECTED, WIRED_FURNI_SOURCE_TRIGGERING, WIRED_FURNI_SOURCE_SELECTOR, WIRED_FURNI_SOURCE_SIGNAL ]) }
                             advancedChildren={ advancedChildren }
+                            furniSourceLabel={ furniSourceLabel }
                         />
                     </> }
                 <Flex alignItems="center" gap={ 1 } className="mt-2">
