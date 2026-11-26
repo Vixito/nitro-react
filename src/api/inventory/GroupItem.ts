@@ -500,6 +500,20 @@ export class GroupItem
         return (item ? item.sellable : false);
     }
 
+    public get isRecyclable(): boolean
+    {
+        const item = this.getLastItem();
+
+        return (item ? item.recyclable : true);
+    }
+
+    public get isTradeable(): boolean
+    {
+        const item = this.getLastItem();
+
+        return (item ? item.isTradable : true);
+    }
+
     public get items(): FurnitureItem[]
     {
         return this._items;

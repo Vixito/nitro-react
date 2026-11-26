@@ -8,6 +8,7 @@ import { useEraTheme } from '../../../../hooks/era/useEraTheme';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryFurnitureItemView } from './InventoryFurnitureItemView';
 import { InventoryFurnitureSearchView } from './InventoryFurnitureSearchView';
+import iconEcotronHeaderImg from '../../../../assets/images/eras/flash2012/ecotron/icon_ecotron_header.png';
 
 interface InventoryFurnitureViewProps
 {
@@ -134,6 +135,64 @@ export const InventoryFurnitureView: FC<InventoryFurnitureViewProps> = props =>
                         <LayoutLimitedEditionCompactPlateView className="top-2 end-2" position="absolute" uniqueNumber={ selectedItem.stuffData.uniqueNumber } uniqueSeries={ selectedItem.stuffData.uniqueSeries } /> }
                     { (selectedItem && selectedItem.stuffData.rarityLevel > -1) &&
                         <LayoutRarityLevelView className="top-2 end-2" position="absolute" level={ selectedItem.stuffData.rarityLevel } /> }
+                    { selectedItem && (!selectedItem.isRecyclable || !selectedItem.isTradeable) && (
+                        <div className="position-absolute bottom-1 start-1 d-flex align-items-center gap-1" style={ { zIndex: 5 } }>
+                            { !selectedItem.isRecyclable && (
+                                <span
+                                    title="No se puede reciclar en el Ecotrón"
+                                    className="d-inline-flex align-items-center justify-content-center position-relative"
+                                    style={ {
+                                        width: 22,
+                                        height: 22,
+                                        borderRadius: 4,
+                                        background: 'rgba(0, 0, 0, 0.55)',
+                                        border: '1px solid rgba(255, 255, 255, 0.25)'
+                                    } }
+                                >
+                                    <img
+                                        src={ iconEcotronHeaderImg }
+                                        alt="Ecotrón"
+                                        style={ { width: 14, height: 14, imageRendering: 'pixelated', opacity: 0.9 } }
+                                    />
+                                    <svg
+                                        viewBox="0 0 16 16"
+                                        width="14"
+                                        height="14"
+                                        style={ { position: 'absolute', right: -2, bottom: -2 } }
+                                    >
+                                        <circle cx="8" cy="8" r="6.5" fill="#d92b2b" stroke="#ffffff" strokeWidth="1.2" />
+                                        <line x1="4.2" y1="4.2" x2="11.8" y2="11.8" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </span>
+                            ) }
+                            { !selectedItem.isTradeable && (
+                                <span
+                                    title="No se puede tradear"
+                                    className="d-inline-flex align-items-center justify-content-center position-relative"
+                                    style={ {
+                                        width: 22,
+                                        height: 22,
+                                        borderRadius: 4,
+                                        background: 'rgba(0, 0, 0, 0.55)',
+                                        border: '1px solid rgba(255, 255, 255, 0.25)'
+                                    } }
+                                >
+                                    <svg viewBox="0 0 16 16" width="14" height="14">
+                                        <path d="M2 5h9l-2-2m5 8H5l2 2" fill="none" stroke="#ffd84d" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    <svg
+                                        viewBox="0 0 16 16"
+                                        width="14"
+                                        height="14"
+                                        style={ { position: 'absolute', right: -2, bottom: -2 } }
+                                    >
+                                        <circle cx="8" cy="8" r="6.5" fill="#d92b2b" stroke="#ffffff" strokeWidth="1.2" />
+                                        <line x1="4.2" y1="4.2" x2="11.8" y2="11.8" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </span>
+                            ) }
+                        </div>
+                    ) }
                 </Column>
                 { selectedItem &&
                     <Column grow justifyContent="between" gap={ 2 }>
