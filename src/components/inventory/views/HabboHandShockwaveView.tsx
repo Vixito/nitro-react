@@ -168,7 +168,9 @@ export const HabboHandShockwaveView: FC<HabboHandShockwaveViewProps> = ({ isClos
                         className="habbo-hand-next-btn"
                         onClick={ handleNextPage }
                         title={`Página ${ currentPage + 1 } de ${ totalPages }`}
-                    />
+                    >
+                        { 'Siguiente >' }
+                    </button>
                 ) }
             </div>
         </div>

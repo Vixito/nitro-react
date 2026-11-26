@@ -3397,8 +3397,18 @@ body[data-era="shockwave2006"] {
             background-size: 77px 16px !important;
             border: none !important;
             cursor: pointer !important;
-            padding: 0 !important;
+            padding: 0 2px !important;
             z-index: 10 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-family: 'Volter', 'Tahoma', sans-serif !important;
+            font-size: 9px !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+            color: #000000 !important;
+            text-shadow: none !important;
+            white-space: nowrap !important;
 
             &:hover {
                 background-image: url('@/assets/images/eras/shockwave_v14/room_hand_next_hi.png') !important;
