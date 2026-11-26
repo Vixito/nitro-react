@@ -15,7 +15,7 @@ export const CatalogLayoutPets3View: FC<CatalogLayoutProps> = props =>
     if(isWiredIntro)
     {
         return (
-            <Column grow className="rounded text-black p-3" overflow="auto" style={{ backgroundColor: '#ebe8e0', fontSize: '12px', lineHeight: '1.42' }}>
+            <Column grow className="bg-muted rounded text-black p-3" overflow="auto" style={{ fontSize: '12px', lineHeight: '1.42' }}>
                 <div style={{ position: 'relative' }}>
                     <img
                         src={ wiredFrontpageTower }
