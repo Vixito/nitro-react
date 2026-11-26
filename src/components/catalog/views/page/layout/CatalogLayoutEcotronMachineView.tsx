@@ -9,6 +9,8 @@ interface RecyclableItem
 {
     itemId: number;
     baseId: number;
+    spriteId?: number;
+    itemType?: string;
     itemName: string;
     publicName: string;
 }
@@ -16,7 +18,7 @@ interface RecyclableItem
 interface RecycleResult
 {
     tier: { id: string; label: string; oddsText: string };
-    prize: { baseId: number; itemName: string; publicName: string };
+    prize: { baseId: number; spriteId?: number; itemType?: string; itemName: string; publicName: string };
 }
 
 const SLOT_COUNT = 12;
@@ -64,11 +66,14 @@ export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
     const filledCount = slots.filter(Boolean).length;
     const isReady = filledCount === SLOT_COUNT && !recycling;
 
-    const getIconUrl = (baseId: number) =>
+    const getIconUrl = (spriteId: number, itemType?: string) =>
     {
         try
         {
-            return GetRoomEngine()?.getFurnitureFloorIconUrl(baseId) || '';
+            const engine = GetRoomEngine();
+            if(!engine || !spriteId) return '';
+            if(itemType === 'i') return engine.getFurnitureWallIconUrl(spriteId) || '';
+            return engine.getFurnitureFloorIconUrl(spriteId) || '';
         }
         catch
         {
@@ -173,7 +178,7 @@ export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
 
             { result && (
                 <div className="ecotron-result-banner">
-                    <img src={ getIconUrl(result.prize.baseId) } alt="" className="ecotron-result-ico" />
+                    <img src={ getIconUrl(result.prize.spriteId ?? result.prize.baseId, result.prize.itemType) } alt="" className="ecotron-result-ico" style={ { imageRendering: 'pixelated' } } />
                     <div className="ecotron-result-txt">
                         <b>¡Premio { result.tier.label }!</b> Ganaste <u>{ result.prize.publicName }</u>. ¡Revisa tu inventario!
                     </div>
@@ -192,7 +197,12 @@ export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
                         onClick={ () => handleSlotClick(idx) }
                     >
                         { item && (
-                            <img src={ getIconUrl(item.baseId) } alt={ item.publicName } className="ecotron-slot-ico" />
+                            <img
+                                src={ getIconUrl(item.spriteId ?? item.baseId, item.itemType) }
+                                alt=""
+                                className="ecotron-slot-ico"
+                                style={ { imageRendering: 'pixelated' } }
+                            />
                         ) }
                     </button>
                 )) }
@@ -228,7 +238,11 @@ export const CatalogLayoutEcotronMachineView: FC<CatalogLayoutProps> = () =>
                                 title={ item.publicName }
                                 onClick={ () => handlePickItem(item) }
                             >
-                                <img src={ getIconUrl(item.baseId) } alt={ item.publicName } />
+                                <img
+                                    src={ getIconUrl(item.spriteId ?? item.baseId, item.itemType) }
+                                    alt=""
+                                    style={ { imageRendering: 'pixelated' } }
+                                />
                             </button>
                         )) }
                     </div>
