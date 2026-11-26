@@ -1,5 +1,7 @@
 import { FC, useEffect, useState } from 'react';
-import { FaArrowLeft, FaArrowRight, FaChair, FaUser } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import IconScopeFurni from '../../../../assets/images/wired/icon_scope_furni.png';
+import IconScopeUser from '../../../../assets/images/wired/icon_scope_user.png';
 import { WiredFurniType } from '../../../../api';
 import { Button, Column, Flex, Text } from '../../../../common';
 import { useWired } from '../../../../hooks';
@@ -75,14 +77,24 @@ export const WiredActionSetHighlightView: FC<{}> = props =>
             <Column gap={ 1 }>
                 <Flex alignItems="center" justifyContent="between">
                     <Text bold>Seleccionar objetivo:</Text>
-                    <Flex gap={ 1 }>
-                        <Button size="sm" variant={ targetType === 0 ? 'warning' : 'secondary' } title="Furnis" onClick={ () => setTargetType(0) }>
-                            <FaChair className="fa-icon" />
-                        </Button>
-                        <Button size="sm" variant={ targetType === 1 ? 'warning' : 'secondary' } title="Usuarios" onClick={ () => setTargetType(1) }>
-                            <FaUser className="fa-icon" />
-                        </Button>
-                    </Flex>
+                    <div className="wired-scope-selector">
+                        <button
+                            type="button"
+                            className={ `scope-btn ${ targetType === 0 ? 'active' : '' }` }
+                            title="Furnis"
+                            onClick={ () => setTargetType(0) }
+                        >
+                            <img src={ IconScopeFurni } alt="Furnis" className="scope-icon-img" />
+                        </button>
+                        <button
+                            type="button"
+                            className={ `scope-btn ${ targetType === 1 ? 'active' : '' }` }
+                            title="Usuarios"
+                            onClick={ () => setTargetType(1) }
+                        >
+                            <img src={ IconScopeUser } alt="Usuarios" className="scope-icon-img" />
+                        </button>
+                    </div>
                 </Flex>
                 <Flex alignItems="center" justifyContent="between" gap={ 2 }>
                     <Button size="sm" variant="secondary" onClick={ () => cycleFurniSource(-1) }>
