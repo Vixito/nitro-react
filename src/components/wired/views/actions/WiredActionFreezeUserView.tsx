@@ -25,19 +25,26 @@ export const WiredActionFreezeUserView: FC<{}> = props =>
     const [ effectType, setEffectType ] = useState<number>(1);
     const [ unfreezeOnTeleport, setUnfreezeOnTeleport ] = useState<number>(0);
     const [ userSource, setUserSource ] = useState<number>(0);
+    const [ message, setMessage ] = useState<string>('');
     const [ isEffectOpen, setIsEffectOpen ] = useState<boolean>(true);
     const [ isAdvancedOpen, setIsAdvancedOpen ] = useState<boolean>(false);
-    const { trigger = null, setIntParams = null } = useWired();
+    const { trigger = null, setIntParams = null, setStringParam = null } = useWired();
 
-    const save = () => setIntParams([ effectType, unfreezeOnTeleport, userSource ]);
+    const save = () =>
+    {
+        setIntParams([ effectType, unfreezeOnTeleport, userSource ]);
+        setStringParam(message);
+    };
 
     useEffect(() =>
     {
-        if(!trigger || !trigger.intData) return;
-        setEffectType(trigger.intData.length > 0 ? Math.max(0, Math.min(5, trigger.intData[0])) : 1);
-        setUnfreezeOnTeleport((trigger.intData.length > 1 && trigger.intData[1] === 1) ? 1 : 0);
-        const src = trigger.intData.length > 2 ? trigger.intData[2] : 0;
+        if(!trigger) return;
+        const data = trigger.intData || [];
+        setEffectType(data.length > 0 ? Math.max(0, Math.min(5, data[0])) : 1);
+        setUnfreezeOnTeleport((data.length > 1 && data[1] === 1) ? 1 : 0);
+        const src = data.length > 2 ? data[2] : 0;
         setUserSource(src);
+        setMessage(trigger.stringData || '');
         if(src !== 0) setIsAdvancedOpen(true);
     }, [ trigger ]);
 
@@ -82,6 +89,18 @@ export const WiredActionFreezeUserView: FC<{}> = props =>
                             </Flex>
                         </Column>
                     ) }
+                </Column>
+                <hr className="m-0 bg-dark" />
+                <Column gap={ 1 }>
+                    <Text bold>Mensaje:</Text>
+                    <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        placeholder="Opcional: mensaje al congelar"
+                        maxLength={ 100 }
+                        value={ message }
+                        onChange={ e => setMessage(e.target.value) }
+                    />
                 </Column>
                 <hr className="m-0 bg-dark" />
                 <Column gap={ 1 }>

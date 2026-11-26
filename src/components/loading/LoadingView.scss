@@ -104,6 +104,71 @@
         background: transparent url('https://assets.nitrodev.co/logos/react-loader.png') no-repeat center;
         z-index: 1;
     }
+
+    &.is-shockwave-2006 {
+        background: #000000 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .shockwave-2006-loader {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+        }
+
+        .shockwave-2006-loader-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: -8vh;
+        }
+
+        .shockwave-2006-logo {
+            display: block;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            margin-bottom: 14px;
+            max-width: 240px;
+            height: auto;
+        }
+
+        .shockwave-2006-status {
+            color: #d6dde1;
+            font-family: 'Verdana', 'Tahoma', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+            margin-bottom: 2px;
+        }
+
+        .shockwave-2006-bar {
+            width: 224px;
+            height: 16px;
+            background: #000000;
+            border: 1px solid #96a4ac;
+            border-radius: 2px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .shockwave-2006-bar-fill {
+            height: 100%;
+            transition: width 0.18s linear;
+
+            &.primary {
+                background: linear-gradient(180deg, #bcced8 0%, #9db4c1 55%, #8ca5b3 100%);
+            }
+
+            &.secondary {
+                background: linear-gradient(180deg, #7f97a3 0%, #667e8a 55%, #586f7b 100%);
+            }
+        }
+    }
 }
 
 @keyframes connecting-duck {

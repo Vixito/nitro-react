@@ -21,4 +21,5 @@ export class WiredTriggerLayout
     public static USER_IDLES: number = 19;
     public static STUFF_STATE: number = 20;
     public static RECEIVE_SIGNAL: number = 21;
+    public static EXECUTE_PERIODICALLY_SHORT: number = 22;
 }

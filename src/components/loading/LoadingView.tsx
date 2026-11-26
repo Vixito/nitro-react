@@ -1,5 +1,7 @@
 import { FC } from 'react';
+import habbten2006Logo from '@/assets/images/loading/habbten_2006_loader_logo.png';
 import { Base, Column, LayoutProgressBar, Text } from '../../common';
+import { useEraTheme } from '../../hooks/era/useEraTheme';
 
 interface LoadingViewProps
 {
@@ -11,6 +13,10 @@ interface LoadingViewProps
 export const LoadingView: FC<LoadingViewProps> = props =>
 {
     const { isError = false, message = '', percent = 0 } = props;
+    const { currentEra } = useEraTheme();
+    const isShockwave2006 = !isError && currentEra === 'shockwave2006';
+    const clampedPercent = Math.max(0, Math.min(100, percent));
+    const secondaryPercent = Math.max(12, Math.min(100, Math.round(clampedPercent * 0.72 + 28)));
 
     const reload = (event?: any) =>
     {
@@ -28,7 +34,7 @@ export const LoadingView: FC<LoadingViewProps> = props =>
     };
     
     return (
-        <div className={ `nitro-loading ${ isError ? 'is-error' : '' }` }>
+        <div className={ `nitro-loading ${ isError ? 'is-error' : '' } ${ isShockwave2006 ? 'is-shockwave-2006' : '' }` }>
             { isError ?
                 <div className="nitro-alert-backdrop d-flex align-items-center justify-content-center" onClick={ (e) => e.stopPropagation() }>
                     <div className="nitro-card nitro-alert nitro-disconnect-card no-resize rounded shadow" data-skin-2012="illumina-light" style={{ width: 380, maxWidth: '90vw', position: 'relative', zIndex: 1000001, pointerEvents: 'auto' }}>
@@ -72,6 +78,21 @@ export const LoadingView: FC<LoadingViewProps> = props =>
                                     <span>Reconectar al Hotel</span>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                : isShockwave2006 ?
+                <div className="shockwave-2006-loader">
+                    <div className="shockwave-2006-loader-box">
+                        <img src={ habbten2006Logo } alt="HABBTEN" className="shockwave-2006-logo" />
+                        <div className="shockwave-2006-status">
+                            { clampedPercent >= 95 ? 'Entrando al hotel...' : 'Preparando el hotel...' }
+                        </div>
+                        <div className="shockwave-2006-bar">
+                            <div className="shockwave-2006-bar-fill primary" style={{ width: `${ clampedPercent }%` }} />
+                        </div>
+                        <div className="shockwave-2006-bar">
+                            <div className="shockwave-2006-bar-fill secondary" style={{ width: `${ secondaryPercent }%` }} />
                         </div>
                     </div>
                 </div>

@@ -46,6 +46,7 @@ import { WiredActionAdjustClockView } from './WiredActionAdjustClockView';
 import { WiredActionCloseDiceView } from './WiredActionCloseDiceView';
 import { WiredActionRelativeMoveView } from './WiredActionRelativeMoveView';
 import { WiredActionGiveDanceView } from './WiredActionGiveDanceView';
+import { WiredActionUserMessageView } from './WiredActionUserMessageView';
 
 export const WiredActionLayoutView = (code: number) =>
 {
@@ -98,8 +99,12 @@ export const WiredActionLayoutView = (code: number) =>
         case WiredActionLayoutCode.SET_FURNI_STATE:
             return <WiredActionSetFurniStateToView />;
         case WiredActionLayoutCode.TELEPORT:
+        case WiredActionLayoutCode.TELEPORT_TEAM:
             return <WiredActionTeleportView />;
         case WiredActionLayoutCode.TOGGLE_FURNI_STATE:
+        case WiredActionLayoutCode.TOGGLE_TO_RANDOM_STATE:
+        case WiredActionLayoutCode.TOGGLE_STATE_DOWN:
+        case WiredActionLayoutCode.COLLISION_NO_MOVE:
             return <WiredActionToggleFurniStateView />;
         case WiredActionLayoutCode.CHANGE_VARIABLE_VALUE:
             return <WiredActionChangeVariableValueView />;
@@ -145,6 +150,12 @@ export const WiredActionLayoutView = (code: number) =>
             return <WiredActionRelativeMoveView />;
         case WiredActionLayoutCode.GIVE_DANCE:
             return <WiredActionGiveDanceView />;
+        case WiredActionLayoutCode.GIVE_EFFECT:
+            return <WiredActionUserMessageView label="ID del efecto:" placeholder="Ej: 12 (0 para quitar)" showUserSource={ true } maxLength={ 32 } />;
+        case WiredActionLayoutCode.GIVE_HANDITEM:
+            return <WiredActionUserMessageView label="ID del objeto de mano:" placeholder="Ej: 10 té (0 para quitar)" showUserSource={ true } maxLength={ 32 } />;
+        case WiredActionLayoutCode.ROOM_MESSAGE:
+            return <WiredActionUserMessageView label="Mensaje para toda la sala:" placeholder="Escribe el mensaje..." showUserSource={ false } maxLength={ 150 } />;
     }
 
     return null;

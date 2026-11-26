@@ -48,4 +48,10 @@ export class WiredActionLayoutCode
     public static CLOSE_DICE: number = 47;
     public static RELATIVE_MOVE: number = 48;
     public static GIVE_DANCE: number = 49;
+    public static GIVE_EFFECT: number = 50;
+    public static GIVE_HANDITEM: number = 51;
+    public static ROOM_MESSAGE: number = 52;
+    public static TOGGLE_STATE_DOWN: number = 53;
+    public static COLLISION_NO_MOVE: number = 54;
+    public static TELEPORT_TEAM: number = 55;
 }
