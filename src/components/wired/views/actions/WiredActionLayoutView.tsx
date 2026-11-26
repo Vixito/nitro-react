@@ -33,6 +33,11 @@ import { WiredActionMoveRotateUserView } from './WiredActionMoveRotateUserView';
 import { WiredActionMoveUserToFurniView } from './WiredActionMoveUserToFurniView';
 import { WiredActionControlClockView } from './WiredActionControlClockView';
 import { WiredActionSetAltitudeView } from './WiredActionSetAltitudeView';
+import { WiredActionCallStacksWithConditionsView } from './WiredActionCallStacksWithConditionsView';
+import { WiredActionSetVisibilityView } from './WiredActionSetVisibilityView';
+import { WiredActionMatchCounterView } from './WiredActionMatchCounterView';
+import { WiredActionResetHighscoreView } from './WiredActionResetHighscoreView';
+import { WiredActionFurniToUserView } from './WiredActionFurniToUserView';
 
 export const WiredActionLayoutView = (code: number) =>
 {
@@ -106,6 +111,16 @@ export const WiredActionLayoutView = (code: number) =>
             return <WiredActionControlClockView />;
         case WiredActionLayoutCode.SET_ALTITUDE:
             return <WiredActionSetAltitudeView />;
+        case WiredActionLayoutCode.CALL_STACKS_CONDITIONS:
+            return <WiredActionCallStacksWithConditionsView />;
+        case WiredActionLayoutCode.SET_VISIBILITY:
+            return <WiredActionSetVisibilityView />;
+        case WiredActionLayoutCode.MATCH_COUNTER:
+            return <WiredActionMatchCounterView />;
+        case WiredActionLayoutCode.RESET_HIGHSCORE:
+            return <WiredActionResetHighscoreView />;
+        case WiredActionLayoutCode.FURNI_TO_USER:
+            return <WiredActionFurniToUserView />;
     }
 
     return null;

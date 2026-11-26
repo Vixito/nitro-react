@@ -35,4 +35,9 @@ export class WiredActionLayoutCode
     public static USER_TO_FURNI: number = 34;
     public static CONTROL_CLOCK: number = 35;
     public static SET_ALTITUDE: number = 36;
+    public static CALL_STACKS_CONDITIONS: number = 37;
+    public static SET_VISIBILITY: number = 38;
+    public static MATCH_COUNTER: number = 39;
+    public static RESET_HIGHSCORE: number = 40;
+    public static FURNI_TO_USER: number = 41;
 }

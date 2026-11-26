@@ -2,7 +2,7 @@ import { GetGuestRoomResultEvent, NavigatorSearchComposer, RateFlatMessageCompos
 import { FC, useEffect, useState } from 'react';
 import { CreateLinkEvent, GetRoomEngine, GetSessionDataManager, LocalizeText, SendMessageComposer, TryVisitRoom } from '../../../../api';
 import { Base, classNames, Column, Flex, Text, TransitionAnimation, TransitionAnimationTypes } from '../../../../common';
-import { useEraTheme, useMessageEvent, useNavigator, useRoom, useRoomEngineEvent } from '../../../../hooks';
+import { useEraTheme, useMessageEvent, useNavigator, useNotification, useRoom, useRoomEngineEvent } from '../../../../hooks';
 import { useIsMobile } from '../../../../hooks/mobile/useIsMobile';
 import rtIconSettings from '../../../../assets/images/eras/flash2012/roomtools/icon_settings.png';
 import rtIconZoom from '../../../../assets/images/eras/flash2012/roomtools/icon_zoom.png';
@@ -35,9 +35,11 @@ export const RoomToolsWidgetView: FC<{}> = props =>
     const [ isOpen, setIsOpen ] = useState<boolean>(false);
     const [ isCollapsed2012, setIsCollapsed2012 ] = useState<boolean>(false);
     const [ showHistoryMenu, setShowHistoryMenu ] = useState<boolean>(false);
+    const [ isUsersChatMuted, setIsUsersChatMuted ] = useState<boolean>(() => Boolean((window as any).__HABBTEN_MUTE_OTHERS_CHAT__));
     const [ roomHistory, setRoomHistory ] = useState<RoomHistoryEntry[]>(() => [ ...sharedRoomHistory ]);
     const [ historyIdx, setHistoryIdx ] = useState<number>(() => sharedHistoryIdx);
     const { navigatorData = null } = useNavigator();
+    const { simpleAlert = null } = useNotification();
     const { roomSession = null } = useRoom();
 
     const isOwner = (roomOwner && GetSessionDataManager().userName && roomOwner.toLowerCase() === GetSessionDataManager().userName.toLowerCase()) || (roomSession && roomSession.isRoomOwner);
@@ -248,11 +250,29 @@ export const RoomToolsWidgetView: FC<{}> = props =>
                                 </button>
                                 <button
                                     type="button"
-                                    className="rt2012-sq-btn"
-                                    title="Historial del chat"
-                                    onClick={ () => handleToolClick('chat_history') }
+                                    className={ `rt2012-sq-btn ${ isUsersChatMuted ? 'is-dim' : '' }` }
+                                    style={ isUsersChatMuted ? { opacity: 0.45, boxShadow: 'inset 0 0 0 1px #e53935' } : undefined }
+                                    title={ isUsersChatMuted ? 'Mostrar mensajes de usuarios' : 'Ocultar mensajes de usuarios' }
+                                    onClick={ () => {
+                                        const nextMuted = !isUsersChatMuted;
+                                        (window as any).__HABBTEN_MUTE_OTHERS_CHAT__ = nextMuted;
+                                        window.dispatchEvent(new CustomEvent('habbten-mute-others-chat', { detail: { muted: nextMuted } }));
+                                        setIsUsersChatMuted(nextMuted);
+                                        if(simpleAlert)
+                                        {
+                                            simpleAlert(
+                                                nextMuted
+                                                    ? 'AVISO: A partir de ahora no verás hablar al resto de usuarios, para volver a leerlos haz clic de nuevo en el botón.'
+                                                    : 'AVISO: A partir de ahora volverás a ver hablar al resto de usuarios.',
+                                                null,
+                                                null,
+                                                null,
+                                                'Mensaje de los Staffs'
+                                            );
+                                        }
+                                    } }
                                 >
-                                    <img src={ rtBtnChat } alt="Chat" />
+                                    <img src={ rtBtnChat } alt="Silenciar chat" />
                                 </button>
                             </div>
                         </div>

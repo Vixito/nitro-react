@@ -2,28 +2,51 @@ import { ILinkEventTracker, RoomObjectType } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { AddEventLinkTracker, ChatEntryType, LocalizeText, RemoveLinkEventTracker } from '../../api';
 import { Flex, InfiniteScroll, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
-import { useChatHistory } from '../../hooks';
+import { useChatHistory, useEraTheme } from '../../hooks';
+import rtBtnHistory from '../../assets/images/eras/flash2012/roomtools/btn_history.png';
 
 export const ChatHistoryView: FC<{}> = props =>
 {
+    const { currentEra } = useEraTheme();
     const [ isVisible, setIsVisible ] = useState(false);
     const [ searchText, setSearchText ] = useState<string>('');
+    const [ selectedUser, setSelectedUser ] = useState<string>('');
     const { chatHistory = [] } = useChatHistory();
     const elementRef = useRef<HTMLDivElement>(null);
 
+    const uniqueUsers = useMemo(() =>
+    {
+        const set = new Set<string>();
+        for(const entry of chatHistory)
+        {
+            if(entry.type === ChatEntryType.TYPE_CHAT && entry.name)
+            {
+                set.add(entry.name);
+            }
+        }
+        return Array.from(set).sort((a, b) => a.localeCompare(b));
+    }, [ chatHistory ]);
+
     const filteredChatHistory = useMemo(() => 
     {
-        if (searchText.length === 0) return chatHistory;
+        const text = searchText.trim().toLowerCase();
 
-        let text = searchText.toLowerCase();
-
-        return chatHistory.filter(entry => ((entry.message && entry.message.toLowerCase().includes(text))) || (entry.name && entry.name.toLowerCase().includes(text)));
-    }, [ chatHistory, searchText ]);
+        return chatHistory.filter(entry =>
+        {
+            if(selectedUser && entry.type === ChatEntryType.TYPE_CHAT && entry.name !== selectedUser) return false;
+            if(selectedUser && entry.type !== ChatEntryType.TYPE_CHAT) return false;
+            if(!text.length) return true;
+            return ((entry.message && entry.message.toLowerCase().includes(text)) || (entry.name && entry.name.toLowerCase().includes(text)));
+        });
+    }, [ chatHistory, searchText, selectedUser ]);
 
     useEffect(() =>
     {
-        if(elementRef && elementRef.current && isVisible) elementRef.current.scrollTop = elementRef.current.scrollHeight;
-    }, [ isVisible ]);
+        if(elementRef && elementRef.current && isVisible)
+        {
+            elementRef.current.scrollTop = elementRef.current.scrollHeight;
+        }
+    }, [ isVisible, filteredChatHistory.length ]);
 
     useEffect(() =>
     {
@@ -56,6 +79,57 @@ export const ChatHistoryView: FC<{}> = props =>
     }, []);
 
     if(!isVisible) return null;
+
+    if(currentEra === 'flash2012')
+    {
+        return (
+            <div className="chat-history-2012-drawer">
+                <div ref={ elementRef } className="chat-history-2012-list">
+                    { filteredChatHistory.map((row, idx) => (
+                        <div key={ `${ row.id }-${ idx }` } className="chat-history-2012-row">
+                            <span className="ch2012-time">{ row.timestamp }</span>
+                            { (row.type === ChatEntryType.TYPE_ROOM_INFO) ? (
+                                <span className="ch2012-room">
+                                    <img src={ rtBtnHistory } alt="" className="ch2012-room-ico" />
+                                    <span className="ch2012-room-name">{ row.name }</span>
+                                </span>
+                            ) : (
+                                <span className="ch2012-chat">
+                                    <b className="ch2012-user" dangerouslySetInnerHTML={ { __html: `${ row.name }: ` } } />
+                                    <span className="ch2012-msg" dangerouslySetInnerHTML={ { __html: row.message } } />
+                                </span>
+                            ) }
+                        </div>
+                    )) }
+                </div>
+                <div className="chat-history-2012-footer">
+                    <input
+                        type="text"
+                        className="ch2012-search"
+                        placeholder="Buscar palabra o usuario"
+                        value={ searchText }
+                        onChange={ e => setSearchText(e.target.value) }
+                    />
+                    <select
+                        className="ch2012-user-select"
+                        value={ selectedUser }
+                        onChange={ e => setSelectedUser(e.target.value) }
+                    >
+                        <option value="">Todos los usuarios</option>
+                        { uniqueUsers.map(u => <option key={ u } value={ u }>{ u }</option>) }
+                    </select>
+                </div>
+                <button
+                    type="button"
+                    className="chat-history-2012-handle"
+                    title="Ocultar historial del chat"
+                    onClick={ () => setIsVisible(false) }
+                >
+                    ‹
+                </button>
+            </div>
+        );
+    }
 
     const headerTitle = LocalizeText('room.chathistory.button.text');
     const displayTitle = (headerTitle && headerTitle !== 'room.chathistory.button.text') ? headerTitle : 'Historial de Chat';
