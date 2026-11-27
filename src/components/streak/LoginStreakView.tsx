@@ -10,6 +10,8 @@ import iconDiamondHabboImg from '../../assets/images/eras/flash2012/streak/icon_
 import iconFlameSmallImg from '../../assets/images/eras/flash2012/streak/icon_flame_small.png';
 import iconStarStreakImg from '../../assets/images/eras/flash2012/streak/icon_star_streak.png';
 import trophyBaseImg from '../../assets/images/eras/flash2012/streak/streak_trophy_base.png';
+import streakBubbleImg from '../../assets/images/notifications/streak_bubble.png';
+import voteBubbleImg from '../../assets/images/notifications/vote_bubble.png';
 
 interface StreakMilestone
 {
@@ -229,7 +231,7 @@ export const LoginStreakView: FC<{}> = () =>
                     ? `¡Racha de ${ streakDays } ${ streakDays === 1 ? 'día' : 'días' }! Tienes ${ claimableCount } ${ claimableCount === 1 ? 'recompensa lista' : 'recompensas listas' }. Haz clic aquí para reclamar.`
                     : `¡Nuevo día de racha! Llevas ${ streakDays } ${ streakDays === 1 ? 'día consecutivo' : 'días consecutivos' }. Haz clic aquí para ver tus premios.`;
 
-                showSingleBubble(msg, NotificationBubbleType.INFO, iconFlameSmallImg, 'streak/open', 'Racha diaria');
+                showSingleBubble(msg, NotificationBubbleType.INFO, streakBubbleImg, 'streak/open', 'Racha diaria');
             }
             catch
             {
@@ -289,7 +291,7 @@ export const LoginStreakView: FC<{}> = () =>
                     ? '¡Vota hoy por Habbten y gana hasta 700 Créditos, 400 Duckets y 35 Diamantes! Haz clic aquí para votar.'
                     : '¡Te falta 1 voto hoy para completar el 2/2 y ganar el Bono Combo! Haz clic aquí para votar.';
 
-                showSingleBubble(msg, NotificationBubbleType.INFO, iconStarStreakImg, 'vote/open', 'Vota y gana');
+                showSingleBubble(msg, NotificationBubbleType.INFO, voteBubbleImg, 'vote/open', 'Vota y gana');
             }
             catch
             {
