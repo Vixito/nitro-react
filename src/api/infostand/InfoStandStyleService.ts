@@ -30,6 +30,7 @@ import wsIconImg from '../../assets/images/gamecenter/wobblesquabble/ws_presence
 import wsRooftopImg from '../../assets/images/gamecenter/wobblesquabble/ws_rooftop_wide.png';
 
 import hcSmallImg from '../../assets/images/catalog/hc_small.png';
+import wiredTowerImg from '../../assets/images/catalog/wired_frontpage_tower.png';
 import wiredBannerImg from '../../assets/images/wired/wired_banner_pattern.png';
 
 export type InfoStandPlatePattern =
@@ -285,7 +286,7 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         pattern: 'starlight'
     },
 
-    // Wired (textura oficial Wired + tríada real de cajas Wired)
+    // Wired (textura oficial Wired + Torre Wired oficial + Pirámide Oculta)
     {
         id: 'wired_tech',
         name: 'Maestro Wired',
@@ -294,13 +295,13 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         borderColor: '#38bdf8',
         bgStyle: 'linear-gradient(180deg, #2b333d 0%, #14181e 100%)',
         emblemColor: '#00e5ff',
-        emblemFurniId: 3668, // Causante WIRED
+        emblemFurniId: 3672, // Pirámide Oculta WIRED
         bgImageUrl: wiredBannerImg,
         bgImageOpacity: 0.28,
         topTrim: 'wired_bar',
         decors: [
-            { slot: 'bl', furniId: 3668, size: 34 },  // Causante WIRED
-            { slot: 'br', furniId: 3663, size: 34 }   // Efecto WIRED
+            { slot: 'bl', furniId: 3672, size: 36 },     // Pirámide Oculta WIRED
+            { slot: 'br', img: wiredTowerImg, size: 84 } // Torre WIRED oficial de Habbo
         ],
         pattern: 'circuit'
     },

@@ -6046,9 +6046,7 @@ body[data-era="shockwave2006"] {
                 max-width: 240px !important;
                 width: auto !important;
                 height: 20px !important;
-                background: rgba(74, 74, 74, 0.72) !important;
                 backdrop-filter: blur(0.5px) !important;
-                border: 2px solid #ffffff !important;
                 border-radius: 10px !important;
                 box-shadow: 0 0 0 1px #000000, 2px 2px 0px rgba(0, 0, 0, 0.6) !important;
                 display: flex !important;
@@ -6058,8 +6056,23 @@ body[data-era="shockwave2006"] {
                 box-sizing: border-box !important;
                 cursor: pointer !important;
 
+                &:not(.has-custom-plate) {
+                    background: rgba(74, 74, 74, 0.72) !important;
+                    border: 2px solid #ffffff !important;
+                }
+
+                &.has-custom-plate {
+                    height: 24px !important;
+                    border-radius: 12px !important;
+                    background: var(--is-plate-bg) !important;
+                    border: 2px solid var(--is-plate-border, #ffffff) !important;
+                    padding: 0 10px 0 12px !important;
+                    overflow: visible !important;
+                }
+
                 &.empty {
                     background: rgba(74, 74, 74, 0.72) !important;
+                    border: 2px solid #ffffff !important;
                     cursor: default !important;
                 }
 
