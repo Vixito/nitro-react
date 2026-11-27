@@ -139,8 +139,33 @@ export const LoginStreakView: FC<{}> = () =>
             eventUrlPrefix: 'streak/'
         };
 
+        const voteLinkTracker: ILinkEventTracker = {
+            linkReceived: (url: string) =>
+            {
+                const parts = url.split('/');
+                if(parts.length < 2) return;
+                if(parts[1] === 'open' || parts[1] === 'show')
+                {
+                    if(window.parent && window.parent !== window)
+                    {
+                        window.parent.postMessage({ type: 'openCmsOverlay', url: '/vote' }, '*');
+                    }
+                    else
+                    {
+                        window.open('/vote', '_blank', 'noopener,noreferrer');
+                    }
+                }
+            },
+            eventUrlPrefix: 'vote/'
+        };
+
         AddEventLinkTracker(linkTracker);
-        return () => RemoveLinkEventTracker(linkTracker);
+        AddEventLinkTracker(voteLinkTracker);
+        return () =>
+        {
+            RemoveLinkEventTracker(linkTracker);
+            RemoveLinkEventTracker(voteLinkTracker);
+        };
     }, [ loadStreak ]);
 
     useEffect(() =>
@@ -223,6 +248,66 @@ export const LoginStreakView: FC<{}> = () =>
             if(pollTimer) clearTimeout(pollTimer);
         };
     }, [ currentEra, showSingleBubble ]);
+
+    // Notificación diaria de votos disponibles (arriba a la derecha): al hacer clic abre /vote en el overlay
+    useEffect(() =>
+    {
+        if(!showSingleBubble) return;
+
+        let cancelled = false;
+        let pollTimer: ReturnType<typeof setTimeout> = null;
+
+        const checkDailyClientVotes = async (attempt: number) =>
+        {
+            if(cancelled) return;
+
+            const uid = GetSessionDataManager()?.userId || 0;
+            if(uid <= 0)
+            {
+                if(attempt < 20) pollTimer = setTimeout(() => checkDailyClientVotes(attempt + 1), 1500);
+                return;
+            }
+
+            try
+            {
+                const res = await fetch('/api/vote/status', { credentials: 'include' });
+                const json = await res.json();
+                if(cancelled || !json || !json.success) return;
+
+                const claimedCount = Number(json.claimedCountToday || 0);
+                if(claimedCount >= 2) return;
+
+                const todayKey = `${ String(json.today || new Date().toISOString().slice(0, 10)) }_${ claimedCount }`;
+                const storageKey = `habbten_client_vote_notified_${ uid }`;
+                let lastNotified: string | null = null;
+                try { lastNotified = localStorage.getItem(storageKey); } catch {}
+
+                if(lastNotified === todayKey) return;
+                try { localStorage.setItem(storageKey, todayKey); } catch {}
+
+                const msg = claimedCount === 0
+                    ? '¡Vota hoy por Habbten y gana hasta 700 Créditos, 400 Duckets y 35 Diamantes! Haz clic aquí para votar.'
+                    : '¡Te falta 1 voto hoy para completar el 2/2 y ganar el Bono Combo! Haz clic aquí para votar.';
+
+                showSingleBubble(msg, NotificationBubbleType.INFO, iconStarStreakImg, 'vote/open', 'Vota y gana');
+            }
+            catch
+            {
+                if(!cancelled && attempt < 3)
+                {
+                    pollTimer = setTimeout(() => checkDailyClientVotes(attempt + 1), 4000);
+                }
+            }
+        };
+
+        pollTimer = setTimeout(() => checkDailyClientVotes(0), 4800);
+
+        return () =>
+        {
+            cancelled = true;
+            if(pollTimer) clearTimeout(pollTimer);
+        };
+    }, [ showSingleBubble ]);
 
     const handleClaim = async (milestone: StreakMilestone) =>
     {
