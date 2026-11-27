@@ -1,38 +1,40 @@
-import { FC, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, FormEvent, PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    FaAmbulance,
     FaBolt,
-    FaBriefcase,
     FaChevronLeft,
     FaChevronRight,
-    FaClipboardList,
-    FaCog,
     FaCommentDots,
-    FaCrosshairs,
-    FaDumbbell,
-    FaFlag,
     FaHeart,
-    FaMapMarkedAlt,
     FaMoneyBillWave,
-    FaNewspaper,
-    FaPhoneAlt,
-    FaQuestion,
-    FaShieldAlt,
-    FaSignOutAlt,
-    FaStar,
-    FaTimes,
-    FaTrophy,
-    FaTshirt,
-    FaUniversity,
-    FaUserFriends,
-    FaUtensils
+    FaSearch,
+    FaTimes
 } from 'react-icons/fa';
+import helpTripleQIcon from '@/assets/images/roleplay/help-triple-q.png';
+import iconBuildersClub from '@/assets/images/toolbar/icons/buildersclub.png';
+import iconCamera from '@/assets/images/toolbar/icons/camera.png';
+import iconCatalog from '@/assets/images/toolbar/icons/catalog.png';
+import iconFriends from '@/assets/images/toolbar/icons/friend_all.png';
+import iconHouse from '@/assets/images/toolbar/icons/house.png';
+import iconInventory from '@/assets/images/toolbar/icons/inventory.png';
+import iconMessage from '@/assets/images/toolbar/icons/message.png';
+import iconModTools from '@/assets/images/toolbar/icons/modtools.png';
+import iconQuest from '@/assets/images/toolbar/icons/quest.png';
+import iconRooms from '@/assets/images/toolbar/icons/rooms.png';
+import iconAnnouncements from '@/assets/images/toolbar/icons/me-menu/announcements.png';
+import iconClothing from '@/assets/images/toolbar/icons/me-menu/clothing.png';
+import iconCog from '@/assets/images/toolbar/icons/me-menu/cog.png';
+import iconForums from '@/assets/images/toolbar/icons/me-menu/forums.png';
+import iconHelperTool from '@/assets/images/toolbar/icons/me-menu/helper-tool.png';
+import iconProfile from '@/assets/images/toolbar/icons/me-menu/profile.png';
+import iconTalents from '@/assets/images/toolbar/icons/me-menu/talents.png';
+import iconHeartSprite from '@/assets/images/icons/sign-heart.png';
 import { ChatMessageTypeEnum, CreateLinkEvent, CreateRoomSession, GetRoomSession } from '../../api';
 import { useChatInputWidget, useSessionInfo } from '../../hooks';
 import {
     isRoleplayMode,
     RpFullState,
     RpGang,
+    RpItem,
     rpGetGangs,
     rpGetNews,
     rpGetRankings,
@@ -63,14 +65,38 @@ const RP_CHAT_COMMANDS = new Set([
     'curar', 'revivir', 'pagar', '911', 'trabajar', 'turno', 'robar', 'ayuda', 'rp'
 ]);
 
-const SHOP_CATS: Array<{ id: string; label: string }> = [
-    { id: 'all', label: 'Todo' },
-    { id: 'food', label: 'Comida' },
-    { id: 'medical', label: 'Salud' },
-    { id: 'weapon', label: 'Armas' },
-    { id: 'armor', label: 'Chalecos' },
-    { id: 'vehicle', label: 'Autos' }
+const SHOP_CATEGORIES: Array<{ id: string; label: string; icon: string; banner: string }> = [
+    { id: 'all', label: 'Todo', icon: iconCatalog, banner: '/img/rp_city_banner_hd.jpg' },
+    { id: 'food', label: 'Comida y Café', icon: iconHeartSprite, banner: '/img/rp_city_night_hd.jpg' },
+    { id: 'medical', label: 'Farmacia', icon: iconHelperTool, banner: '/img/rp_city_banner_hd.jpg' },
+    { id: 'weapon', label: 'Armería', icon: iconModTools, banner: '/img/rp_city_night_hd.jpg' },
+    { id: 'armor', label: 'Chalecos', icon: iconProfile, banner: '/img/rp_city_banner_hd.jpg' },
+    { id: 'vehicle', label: 'Vehículos', icon: iconRooms, banner: '/img/rp_city_night_hd.jpg' },
+    { id: 'gym', label: 'Gimnasio', icon: iconTalents, banner: '/img/rp_city_night_hd.jpg' }
 ];
+
+const INV_CATEGORIES: Array<{ id: string; label: string; icon: string }> = [
+    { id: 'all', label: 'Todo', icon: iconInventory },
+    { id: 'weapon', label: 'Armas', icon: iconModTools },
+    { id: 'armor', label: 'Chalecos', icon: iconClothing },
+    { id: 'food', label: 'Comida', icon: iconHeartSprite },
+    { id: 'medical', label: 'Salud', icon: iconHelperTool },
+    { id: 'vehicle', label: 'Vehículos', icon: iconRooms }
+];
+
+function getItemSpriteIcon(category: string): string
+{
+    switch(category)
+    {
+        case 'food': return iconHeartSprite;
+        case 'medical': return iconHelperTool;
+        case 'weapon': return iconModTools;
+        case 'armor': return iconClothing;
+        case 'vehicle': return iconRooms;
+        case 'gym': return iconTalents;
+        default: return iconCatalog;
+    }
+}
 
 export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) =>
 {
@@ -86,11 +112,29 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const [ busy, setBusy ] = useState<boolean>(false);
     const [ toasts, setToasts ] = useState<ToastMsg[]>([]);
 
+    // Swipe-to-unlock real (arrastre físico mouse/touch)
+    const unlockTrackRef = useRef<HTMLDivElement | null>(null);
+    const dragStartXRef = useRef<number>(0);
+    const maxDragRef = useRef<number>(0);
+    const [ swipeX, setSwipeX ] = useState<number>(0);
+    const [ isSwiping, setIsSwiping ] = useState<boolean>(false);
+
+    // Catálogo / Tienda 3 columnas
     const [ shopCategory, setShopCategory ] = useState<string>('all');
+    const [ shopSearch, setShopSearch ] = useState<string>('');
+    const [ selectedShopSlug, setSelectedShopSlug ] = useState<string>('');
+    const [ shopQty, setShopQty ] = useState<number>(1);
+
+    // Inventario 3 columnas
+    const [ invCategory, setInvCategory ] = useState<string>('all');
+    const [ invSearch, setInvSearch ] = useState<string>('');
+    const [ selectedInvSlug, setSelectedInvSlug ] = useState<string>('');
+
+    // Apps internas del celular
     const [ bankAmount, setBankAmount ] = useState<string>('250');
     const [ bankTarget, setBankTarget ] = useState<string>('');
     const [ targetPlayer, setTargetPlayer ] = useState<string>('');
-    const [ arrestReason, setArrestReason ] = useState<string>('Delitos en Ciudad Habbten');
+    const [ arrestReason, setArrestReason ] = useState<string>('Delitos en Habbten RP');
     const [ call911Msg, setCall911Msg ] = useState<string>('');
     const [ chatText, setChatText ] = useState<string>('');
     const [ mobileChatOpen, setMobileChatOpen ] = useState<boolean>(false);
@@ -102,6 +146,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const [ selectedArticle, setSelectedArticle ] = useState<any>(null);
 
     const lastServerLocRef = useRef<string>('');
+    const initialRoomEnteredRef = useRef<boolean>(false);
 
     const pushToast = useCallback((type: 'ok' | 'err' | 'warn', text: string) =>
     {
@@ -112,8 +157,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             setToasts(prev => prev.filter(t => t.id !== id));
         }, 4200);
     }, []);
-
-    const initialRoomEnteredRef = useRef<boolean>(false);
 
     const refreshState = useCallback(async () =>
     {
@@ -171,7 +214,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         };
     }, [ rpActive, refreshState, pushToast ]);
 
-    // Cargar datos dinámicos cuando se abren las apps del Smartphone
     useEffect(() =>
     {
         if(!rpActive || !phoneOpen) return;
@@ -189,7 +231,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     }, [ rpActive, phoneOpen, phoneApp ]);
 
-    // Animación del avatar sosteniendo el celular en la sala
     const togglePhone = useCallback((forceState?: boolean) =>
     {
         setPhoneOpen(prev =>
@@ -202,6 +243,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 {
                     setSideModal(null);
                     setSelectedArticle(null);
+                    setSwipeX(0);
+                    setIsSwiping(false);
                     setPhoneApp(phoneUnlocked ? 'home' : 'lock');
                 }
             }
@@ -259,9 +302,75 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
         catch (_)
         {
-            return 'Ciudad Habbten';
+            return 'Habbten RP';
         }
     }, []);
+
+    // Artículos del catálogo (incluyendo entrenamientos del gimnasio en categoría gym)
+    const gymVirtualItems: RpItem[] = useMemo(() => ([
+        {
+            slug: '__gym_strength',
+            name: 'Entrenar Fuerza',
+            category: 'tool',
+            description: 'Sesión de pesas en el Gimnasio para aumentar tu daño físico (+1 Fuerza).',
+            price: 35,
+            damage: 1,
+            heal_hp: 0,
+            restore_energy: 0,
+            restore_hunger: 0,
+            armor_value: 0,
+            speed_bonus: 0,
+            legal: 1,
+            min_level: 1
+        },
+        {
+            slug: '__gym_stamina',
+            name: 'Entrenar Resistencia',
+            category: 'tool',
+            description: 'Entrenamiento cardiovascular en el Gimnasio (+1 Resistencia y mayor vida máxima).',
+            price: 35,
+            damage: 0,
+            heal_hp: 5,
+            restore_energy: 0,
+            restore_hunger: 0,
+            armor_value: 0,
+            speed_bonus: 0,
+            legal: 1,
+            min_level: 1
+        }
+    ]), []);
+
+    const filteredShop = useMemo(() =>
+    {
+        if(!state) return [];
+        const base = shopCategory === 'gym'
+            ? gymVirtualItems
+            : state.catalog.filter(it => shopCategory === 'all' || it.category === shopCategory);
+        const q = shopSearch.trim().toLowerCase();
+        if(!q) return base;
+        return base.filter(it => it.name.toLowerCase().includes(q) || (it.description || '').toLowerCase().includes(q));
+    }, [ state, shopCategory, shopSearch, gymVirtualItems ]);
+
+    const selectedShopItem = useMemo(() =>
+    {
+        if(filteredShop.length === 0) return null;
+        return filteredShop.find(i => i.slug === selectedShopSlug) || filteredShop[0];
+    }, [ filteredShop, selectedShopSlug ]);
+
+    const filteredInv = useMemo(() =>
+    {
+        if(!state) return [];
+        const base = state.inventory.filter(it => invCategory === 'all' || it.category === invCategory);
+        const q = invSearch.trim().toLowerCase();
+        if(!q) return base;
+        return base.filter(it => it.name.toLowerCase().includes(q) || (it.description || '').toLowerCase().includes(q));
+    }, [ state, invCategory, invSearch ]);
+
+    const selectedInvItem = useMemo(() =>
+    {
+        if(filteredInv.length === 0) return null;
+        return filteredInv.find(i => (i.item_slug || i.slug) === selectedInvSlug) || filteredInv[0];
+    }, [ filteredInv, selectedInvSlug ]);
 
     if(!rpActive || !state) return null;
 
@@ -271,7 +380,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const hunPct = Math.max(0, Math.min(100, Math.round(character.hunger)));
     const xpPct = Math.max(0, Math.min(100, Math.round((character.rp_xp / Math.max(1, character.xpForNextLevel)) * 100)));
     const claimableMissions = (state.missions || []).filter(m => m.canClaim).length;
-    const filteredShop = state.catalog.filter(it => shopCategory === 'all' || it.category === shopCategory);
+    const activeShopMeta = SHOP_CATEGORIES.find(c => c.id === shopCategory) || SHOP_CATEGORIES[0];
 
     const handleTravel = (slug: string, useTaxi: boolean) =>
     {
@@ -285,6 +394,47 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             }
             togglePhone(false);
         });
+    };
+
+    const handleShopBuy = async () =>
+    {
+        if(!selectedShopItem || busy) return;
+        if(selectedShopItem.slug === '__gym_strength')
+        {
+            runAction('/gym/train', { stat: 'strength' });
+            return;
+        }
+        if(selectedShopItem.slug === '__gym_stamina')
+        {
+            runAction('/gym/train', { stat: 'stamina' });
+            return;
+        }
+        const count = Math.max(1, Math.min(20, Number(shopQty) || 1));
+        setBusy(true);
+        try
+        {
+            let lastRes: any = null;
+            for(let i = 0; i < count; i++)
+            {
+                const res = await rpPost('/shop/buy', { itemSlug: selectedShopItem.slug });
+                if(!res?.success)
+                {
+                    pushToast('err', res?.error || 'No se pudo completar la compra.');
+                    break;
+                }
+                lastRes = res;
+            }
+            if(lastRes?.state) setState(prev => prev ? { ...prev, ...lastRes.state } : lastRes.state);
+            if(lastRes?.message) pushToast('ok', count > 1 ? `Compraste ${ count }× ${ selectedShopItem.name }.` : lastRes.message);
+        }
+        catch (_)
+        {
+            pushToast('err', 'Error de conexión con el servidor RP.');
+        }
+        finally
+        {
+            setBusy(false);
+        }
     };
 
     const handleChatSubmit = (e: FormEvent) =>
@@ -331,49 +481,83 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         setSideModal(prev => (prev === tab ? null : tab));
     };
 
-    const unlockPhone = () =>
+    // Handlers de arrastre físico para Deslizar para Desbloquear
+    const onSwipeStart = (e: PointerEvent<HTMLDivElement>) =>
     {
-        setPhoneUnlocked(true);
-        setPhoneApp('home');
+        const track = unlockTrackRef.current;
+        if(!track) return;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        maxDragRef.current = Math.max(0, track.clientWidth - 44);
+        dragStartXRef.current = e.clientX;
+        setIsSwiping(true);
     };
 
-    const phoneAppsGrid: Array<{ id: PhoneApp; label: string; color: string; badge?: number; icon: JSX.Element }> = [
-        { id: 'news', label: 'Noticias', color: '#dc2626', icon: <FaNewspaper /> },
-        { id: 'map', label: 'GPS Mapa', color: '#16a34a', icon: <FaMapMarkedAlt /> },
-        { id: 'jobs', label: 'Empleos', color: '#2563eb', icon: <FaBriefcase /> },
-        { id: 'bank', label: 'Banco', color: '#0d9488', icon: <FaUniversity /> },
-        { id: 'gangs', label: 'Bandas', color: '#b91c1c', icon: <FaFlag /> },
-        { id: 'actions', label: '911 / Calle', color: '#d97706', icon: <FaPhoneAlt /> },
-        { id: 'missions', label: 'Misiones', color: '#7c3aed', badge: claimableMissions, icon: <FaClipboardList /> },
-        { id: 'rankings', label: 'Rankings', color: '#ca8a04', icon: <FaTrophy /> },
-        { id: 'settings', label: 'Ajustes', color: '#475569', icon: <FaCog /> }
+    const onSwipeMove = (e: PointerEvent<HTMLDivElement>) =>
+    {
+        if(!isSwiping) return;
+        const delta = Math.max(0, Math.min(maxDragRef.current, e.clientX - dragStartXRef.current));
+        setSwipeX(delta);
+    };
+
+    const onSwipeEnd = () =>
+    {
+        if(!isSwiping) return;
+        setIsSwiping(false);
+        if(maxDragRef.current > 0 && swipeX >= maxDragRef.current * 0.72)
+        {
+            setSwipeX(0);
+            setPhoneUnlocked(true);
+            setPhoneApp('home');
+        }
+        else
+        {
+            setSwipeX(0);
+        }
+    };
+
+    // Apps del Celular usando EXCLUSIVAMENTE los íconos pixel-art originales del juego
+    const phoneApps: Array<{ id: string; label: string; icon: string; badge?: number; action: () => void }> = [
+        { id: 'contacts', label: 'Contactos', icon: iconFriends, action: () => { CreateLinkEvent('friends/toggle'); } },
+        { id: 'messages', label: 'Mensajes', icon: iconMessage, action: () => { CreateLinkEvent('friendlist/toggle'); } },
+        { id: 'camera', label: 'Cámara', icon: iconCamera, action: () => { CreateLinkEvent('camera/toggle'); } },
+        { id: 'settings', label: 'Ajustes', icon: iconCog, action: () => setPhoneApp('settings') },
+        { id: 'missions', label: 'Misiones', icon: iconQuest, badge: claimableMissions, action: () => setPhoneApp('missions') },
+        { id: 'map', label: 'GPS Mapa', icon: iconRooms, action: () => setPhoneApp('map') },
+        { id: 'jobs', label: 'Empleos', icon: iconProfile, action: () => setPhoneApp('jobs') },
+        { id: 'bank', label: 'Banco', icon: iconHouse, action: () => setPhoneApp('bank') },
+        { id: 'gangs', label: 'Bandas', icon: iconForums, action: () => setPhoneApp('gangs') },
+        { id: 'news', label: 'Noticias', icon: iconAnnouncements, action: () => { setSelectedArticle(null); setPhoneApp('news'); } },
+        { id: 'actions', label: '911', icon: iconModTools, action: () => setPhoneApp('actions') },
+        { id: 'rankings', label: 'Rankings', icon: iconTalents, action: () => setPhoneApp('rankings') }
     ];
 
     const phoneAppTitle: Record<PhoneApp, string> = {
         lock: 'Bloqueado',
-        home: 'HabbtenOS',
+        home: state.user.username,
         news: 'Noticias',
-        map: 'GPS Ciudad',
+        map: 'GPS Mapa',
         jobs: 'Empleos',
-        bank: 'Banco Central',
-        gangs: 'Bandas y Turfs',
+        bank: 'Banco',
+        gangs: 'Bandas',
         actions: '911 y Acciones',
         missions: 'Misiones',
-        rankings: 'Rankings RP',
-        settings: 'Mi Ciudadano'
+        rankings: 'Rankings',
+        settings: 'Ajustes'
     };
+
+    const swipeFade = maxDragRef.current > 0 ? Math.max(0, 1 - (swipeX / (maxDragRef.current * 0.65))) : 1;
 
     return (
         <div className={ `rp-modern-root ${ isMobile ? 'is-mobile' : 'is-desktop' }` }>
 
-            {/* ==================== AVISOS DE ESTADO CRITICO (ARRIBA CENTRO) ==================== */}
+            {/* ==================== AVISOS DE ESTADO CRÍTICO ==================== */}
             { (character.jailSecondsLeft > 0 || character.hospitalSecondsLeft > 0 || character.cuffed_by > 0) && (
                 <div className="rp-alert-strip">
                     { character.jailSecondsLeft > 0 && (
                         <span className="rp-alert-pill is-jail">Prisión · { character.jailSecondsLeft }s ({ character.jail_reason || 'Arrestado' })</span>
                     ) }
                     { character.hospitalSecondsLeft > 0 && (
-                        <span className="rp-alert-pill is-hosp">Hospital Central · Recuperación { character.hospitalSecondsLeft }s</span>
+                        <span className="rp-alert-pill is-hosp">Hospital · Recuperación { character.hospitalSecondsLeft }s</span>
                     ) }
                     { character.cuffed_by > 0 && (
                         <span className="rp-alert-pill is-cuff">Estás esposado por la Policía HPD</span>
@@ -381,7 +565,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </div>
             ) }
 
-            {/* ==================== TOASTS MODERNOS ==================== */}
+            {/* ==================== TOASTS ==================== */}
             { toasts.length > 0 && (
                 <div className="rp-toast-stack">
                     { toasts.map(t => (
@@ -390,53 +574,53 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </div>
             ) }
 
-            {/* ==================== BOTONES SUPERIORES DERECHA (ÍCONOS HD) ==================== */}
+            {/* ==================== BOTONES SUPERIORES DERECHA (ÍCONOS ORIGINALES DEL JUEGO) ==================== */}
             <div className="rp-top-right-tools">
                 <button
                     type="button"
                     className="rp-square-btn"
-                    title="Cambiar Ropa / Look"
+                    title="Cambiar Ropa / Aspecto"
                     onClick={ () => CreateLinkEvent('avatar-editor/toggle') }>
-                    <FaTshirt />
+                    <img src={ iconBuildersClub } alt="Aspecto" className="rp-pixel-sprite" />
                 </button>
                 <button
                     type="button"
                     className={ `rp-square-btn ${ sideModal === 'help' ? 'is-active' : '' }` }
-                    title="Ayuda y Comandos RP"
+                    title="Ayuda y Comandos"
                     onClick={ () => openSideModal('help') }>
-                    <img src="/mobile-assets/mob_help.png" alt="Ayuda" className="rp-top-icon-hd" />
+                    <img src={ helpTripleQIcon } alt="Ayuda" className="rp-pixel-sprite" />
                 </button>
             </div>
 
-            {/* ==================== DOCK VERTICAL IZQUIERDO (ÍCONOS HD) ==================== */}
+            {/* ==================== DOCK VERTICAL IZQUIERDO (CATÁLOGO · INVENTARIO · CELULAR) ==================== */}
             <aside className="rp-left-dock" aria-label="Herramientas RP">
                 <button
                     type="button"
                     className={ `rp-dock-btn ${ sideModal === 'shop' ? 'is-active' : '' }` }
-                    title="Tiendas, Concesionario y Gimnasio"
+                    title="Catálogo"
                     onClick={ () => openSideModal('shop') }>
-                    <img src="/mobile-assets/mob_shop.png" alt="Tienda" className="rp-dock-icon-hd" />
+                    <img src="/mobile-assets/mob_shop.png" alt="Catálogo" className="rp-dock-icon-hd" />
                 </button>
                 <button
                     type="button"
                     className={ `rp-dock-btn ${ sideModal === 'inventory' ? 'is-active' : '' }` }
-                    title="Mochila e Inventario"
+                    title="Inventario"
                     onClick={ () => openSideModal('inventory') }>
-                    <img src="/mobile-assets/mob_inventory.png" alt="Mochila" className="rp-dock-icon-hd" />
+                    <img src="/mobile-assets/mob_inventory.png" alt="Inventario" className="rp-dock-icon-hd" />
                 </button>
                 <button
                     type="button"
                     className={ `rp-dock-btn is-phone ${ phoneOpen ? 'is-active' : '' }` }
-                    title="Abrir Celular"
+                    title="Celular"
                     onClick={ () => togglePhone() }>
                     <img src="/img/rp_phone_icon_hd.png" alt="Celular" className="rp-dock-icon-hd" />
                     { (claimableMissions > 0 || !phoneUnlocked) && <span className="rp-dock-dot" /> }
                 </button>
             </aside>
 
-            {/* ==================== TARJETA DE PERSONAJE + CHAT MODERNO INFERIOR ==================== */}
+            {/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA ==================== */}
             <div className="rp-bottom-cluster">
-                <div className="rp-char-hud" onClick={ () => { if(!phoneOpen) { setPhoneUnlocked(true); setPhoneApp('settings'); togglePhone(true); } } } title="Ver estado completo en tu celular">
+                <div className="rp-char-hud" onClick={ () => togglePhone(true) } title="Abrir celular">
                     <div className="rp-char-avatar-box">
                         <img
                             className="rp-char-head-img"
@@ -472,7 +656,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     </div>
                 </div>
 
-                {/* Chat blanco moderno (Desktop siempre visible; Móvil botón desplegable) */}
                 { !isMobile ? (
                     <form className="rp-chat-pill" onSubmit={ handleChatSubmit }>
                         <input
@@ -510,9 +693,9 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </form>
             ) }
 
-            {/* ==================== SMARTPHONE INTERACTIVO DEL AVATAR (ESTILO HABBORP) ==================== */}
+            {/* ==================== SMARTPHONE DEL AVATAR ==================== */}
             { phoneOpen && (
-                <section className="rp-phone-device" aria-label="Celular de Ciudad Habbten">
+                <section className="rp-phone-device" aria-label="Celular Habbten RP">
                     <div className="rp-phone-top-bezel">
                         <span className="rp-phone-cam" />
                         <span className="rp-phone-speaker" />
@@ -522,86 +705,67 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     </div>
 
                     <div className="rp-phone-screen">
-                        {/* Barra de estado iOS/HabboRP */}
                         <div className="rp-phone-statusbar">
-                            <span className="rp-sb-carrier">HabbtenRP</span>
+                            <span className="rp-sb-carrier">Habbten RP</span>
                             <span className="rp-sb-time">{ clock.formatted }</span>
                             <span className="rp-sb-battery" title="Batería 100%">
                                 <span className="rp-sb-battery-fill" />
                             </span>
                         </div>
 
-                        {/* PANTALLA DE BLOQUEO */}
+                        {/* PANTALLA DE BLOQUEO CON SLIDER REAL DE ARRASTRE */}
                         { phoneApp === 'lock' && (
                             <div className="rp-phone-lock">
                                 <div className="rp-lock-clock-wrap">
                                     <div className="rp-lock-time">{ clock.formatted }</div>
                                     <div className="rp-lock-date">{ formattedDate }</div>
-                                    <div className="rp-lock-loc">{ currentLocation?.name || 'Plaza Central' } · { clock.label }</div>
                                 </div>
 
-                                <div className="rp-lock-notifs">
-                                    { claimableMissions > 0 && (
-                                        <div className="rp-lock-notif" onClick={ () => { setPhoneUnlocked(true); setPhoneApp('missions'); } }>
-                                            <b>Misiones</b>
-                                            <span>Tienes { claimableMissions } recompensa(s) lista(s) para cobrar.</span>
-                                        </div>
-                                    ) }
-                                    <div className="rp-lock-notif" onClick={ () => { setPhoneUnlocked(true); setPhoneApp('news'); } }>
-                                        <b>Ciudad Habbten</b>
-                                        <span>{ job.name } · Efectivo ${ character.cash.toLocaleString() } · Banco ${ character.bank.toLocaleString() }</span>
+                                <div className="rp-unlock-track" ref={ unlockTrackRef }>
+                                    <div
+                                        className={ `rp-unlock-thumb ${ isSwiping ? 'is-dragging' : '' }` }
+                                        style={ { transform: `translateX(${ swipeX }px)` } }
+                                        onPointerDown={ onSwipeStart }
+                                        onPointerMove={ onSwipeMove }
+                                        onPointerUp={ onSwipeEnd }
+                                        onPointerCancel={ onSwipeEnd }
+                                        role="slider"
+                                        aria-label="Desliza para desbloquear"
+                                        aria-valuemin={ 0 }
+                                        aria-valuemax={ 100 }
+                                        aria-valuenow={ maxDragRef.current > 0 ? Math.round((swipeX / maxDragRef.current) * 100) : 0 }>
+                                        <FaChevronRight />
                                     </div>
+                                    <span className="rp-unlock-text" style={ { opacity: swipeFade } }>
+                                        Desliza para desbloquear
+                                    </span>
                                 </div>
-
-                                <button type="button" className="rp-unlock-bar" onClick={ unlockPhone }>
-                                    <span className="rp-unlock-arrow"><FaChevronRight /></span>
-                                    <span className="rp-unlock-text">Deslizar para desbloquear</span>
-                                </button>
                             </div>
                         ) }
 
-                        {/* PANTALLA PRINCIPAL DE APPS */}
+                        {/* PANTALLA DE INICIO CON ÍCONOS ORIGINALES DEL JUEGO (EXACTO A REFERENCIA) */}
                         { phoneApp === 'home' && (
                             <div className="rp-phone-home">
-                                <div className="rp-home-mini-widget">
-                                    <div className="rp-home-w-left">
-                                        <b>{ currentLocation?.name || 'Ciudad Habbten' }</b>
-                                        <span>{ job.name } · { character.on_duty ? 'En turno' : 'Libre' }</span>
-                                    </div>
-                                    <div className="rp-home-w-right">
-                                        <span className="is-cash">${ character.cash.toLocaleString() }</span>
-                                        <span className="is-bank">${ character.bank.toLocaleString() } Bco</span>
-                                    </div>
-                                </div>
-
+                                <div className="rp-phone-home-user">{ state.user.username }</div>
                                 <div className="rp-app-grid">
-                                    { phoneAppsGrid.map(app => (
+                                    { phoneApps.map(app => (
                                         <button
                                             key={ app.id }
                                             type="button"
                                             className="rp-app-tile"
-                                            onClick={ () => { setSelectedArticle(null); setPhoneApp(app.id); } }>
-                                            <span className="rp-app-icon" style={ { backgroundColor: app.color } }>
-                                                { app.icon }
+                                            onClick={ app.action }>
+                                            <span className="rp-app-icon-box">
+                                                <img src={ app.icon } alt={ app.label } className="rp-app-sprite" />
                                                 { !!app.badge && app.badge > 0 && <span className="rp-app-badge">{ app.badge }</span> }
                                             </span>
                                             <span className="rp-app-label">{ app.label }</span>
                                         </button>
                                     )) }
                                 </div>
-
-                                <div className="rp-home-quickbar">
-                                    <button type="button" className="rp-btn is-green is-sm" disabled={ busy } onClick={ () => runAction('/job/work') }>
-                                        Trabajar
-                                    </button>
-                                    <button type="button" className="rp-btn is-dark is-sm" disabled={ busy } onClick={ () => runAction('/job/duty') }>
-                                        { character.on_duty ? 'Salir Turno' : 'Entrar Turno' }
-                                    </button>
-                                </div>
                             </div>
                         ) }
 
-                        {/* CABECERA COMÚN DE APPS INTERNAS */}
+                        {/* APPS INTERNAS DEL CELULAR */}
                         { phoneApp !== 'lock' && phoneApp !== 'home' && (
                             <div className="rp-phone-appview">
                                 <div className="rp-app-navbar">
@@ -617,7 +781,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                 </div>
 
                                 <div className="rp-app-scroll">
-                                    {/* APP: NOTICIAS */}
                                     { phoneApp === 'news' && (
                                         selectedArticle ? (
                                             <div className="rp-news-reader">
@@ -632,8 +795,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                                 <div className="rp-app-sec-title">Últimas Noticias</div>
                                                 { newsData.articles.length === 0 ? (
                                                     <div className="rp-phone-card">
-                                                        <b>Ciudad Habbten en vivo</b>
-                                                        <span>Recorre los 10 distritos, postúlate a empleos y conquista territorios con tu banda.</span>
+                                                        <b>Habbten RP</b>
+                                                        <span className="rp-pc-desc">Recorre los 10 distritos, postúlate a empleos y conquista territorios.</span>
                                                     </div>
                                                 ) : newsData.articles.map(art => (
                                                     <div
@@ -645,7 +808,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                                     </div>
                                                 )) }
 
-                                                <div className="rp-app-sec-title" style={ { marginTop: 8 } }>Boletín de la Ciudad</div>
+                                                <div className="rp-app-sec-title" style={ { marginTop: 6 } }>Sucesos recientes</div>
                                                 { (newsData.events.length > 0 ? newsData.events : state.recentEvents || []).slice(0, 8).map(ev => (
                                                     <div key={ ev.id } className="rp-phone-card is-compact">
                                                         <span>{ ev.message }</span>
@@ -655,7 +818,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         )
                                     ) }
 
-                                    {/* APP: GPS MAPA */}
                                     { phoneApp === 'map' && (
                                         <div className="rp-app-stack">
                                             { state.locations.map(loc => {
@@ -692,7 +854,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         </div>
                                     ) }
 
-                                    {/* APP: EMPLEOS */}
                                     { phoneApp === 'jobs' && (
                                         <div className="rp-app-stack">
                                             <div className="rp-phone-card is-highlight">
@@ -732,7 +893,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         </div>
                                     ) }
 
-                                    {/* APP: BANCO */}
                                     { phoneApp === 'bank' && (
                                         <div className="rp-app-stack">
                                             <div className="rp-bank-summary">
@@ -780,7 +940,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         </div>
                                     ) }
 
-                                    {/* APP: BANDAS */}
                                     { phoneApp === 'gangs' && (
                                         <div className="rp-app-stack">
                                             { state.gang ? (
@@ -835,18 +994,17 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         </div>
                                     ) }
 
-                                    {/* APP: 911 / ACCIONES */}
                                     { phoneApp === 'actions' && (
                                         <div className="rp-app-stack">
                                             <div className="rp-phone-card">
-                                                <div className="rp-app-sec-title">Llamada de Emergencia 911</div>
+                                                <div className="rp-app-sec-title">Emergencia 911</div>
                                                 <input className="rp-p-input" value={ call911Msg } onChange={ e => setCall911Msg(e.target.value) } placeholder="Describe la emergencia..." />
                                                 <div className="rp-btn-row">
                                                     <button type="button" className="rp-btn is-blue is-sm" disabled={ busy } onClick={ () => runAction('/911', { service: 'police', message: call911Msg }, () => setCall911Msg('')) }>
-                                                        <FaShieldAlt /> Policía
+                                                        Policía
                                                     </button>
                                                     <button type="button" className="rp-btn is-green is-sm" disabled={ busy } onClick={ () => runAction('/911', { service: 'medic', message: call911Msg }, () => setCall911Msg('')) }>
-                                                        <FaAmbulance /> Médicos
+                                                        Médicos
                                                     </button>
                                                 </div>
                                             </div>
@@ -856,24 +1014,15 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                                 <input className="rp-p-input" value={ targetPlayer } onChange={ e => setTargetPlayer(e.target.value) } placeholder="Nombre del jugador" />
                                                 <input className="rp-p-input" value={ arrestReason } onChange={ e => setArrestReason(e.target.value) } placeholder="Motivo (si arrestas)" />
                                                 <div className="rp-btn-grid2">
-                                                    <button type="button" className="rp-btn is-red is-xs" disabled={ busy } onClick={ () => runAction('/combat/attack', { target: targetPlayer }) }>
-                                                        <FaCrosshairs /> Golpear
-                                                    </button>
-                                                    <button type="button" className="rp-btn is-green is-xs" disabled={ busy } onClick={ () => runAction('/medic/heal', { target: targetPlayer }) }>
-                                                        Curar
-                                                    </button>
-                                                    <button type="button" className="rp-btn is-blue is-xs" disabled={ busy } onClick={ () => runAction('/police/action', { action: 'cuff', target: targetPlayer }) }>
-                                                        Esposar
-                                                    </button>
-                                                    <button type="button" className="rp-btn is-blue is-xs" disabled={ busy } onClick={ () => runAction('/police/action', { action: 'arrest', target: targetPlayer, reason: arrestReason }) }>
-                                                        Arrestar
-                                                    </button>
+                                                    <button type="button" className="rp-btn is-red is-xs" disabled={ busy } onClick={ () => runAction('/combat/attack', { target: targetPlayer }) }>Golpear</button>
+                                                    <button type="button" className="rp-btn is-green is-xs" disabled={ busy } onClick={ () => runAction('/medic/heal', { target: targetPlayer }) }>Curar</button>
+                                                    <button type="button" className="rp-btn is-blue is-xs" disabled={ busy } onClick={ () => runAction('/police/action', { action: 'cuff', target: targetPlayer }) }>Esposar</button>
+                                                    <button type="button" className="rp-btn is-blue is-xs" disabled={ busy } onClick={ () => runAction('/police/action', { action: 'arrest', target: targetPlayer, reason: arrestReason }) }>Arrestar</button>
                                                 </div>
                                             </div>
                                         </div>
                                     ) }
 
-                                    {/* APP: MISIONES */}
                                     { phoneApp === 'missions' && (
                                         <div className="rp-app-stack">
                                             { (state.missions || []).map(m => {
@@ -902,7 +1051,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         </div>
                                     ) }
 
-                                    {/* APP: RANKINGS */}
                                     { phoneApp === 'rankings' && (
                                         <div className="rp-app-stack">
                                             <div className="rp-app-sec-title">Top Millonarios</div>
@@ -922,43 +1070,35 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         </div>
                                     ) }
 
-                                    {/* APP: AJUSTES / PERFIL */}
                                     { phoneApp === 'settings' && (
                                         <div className="rp-app-stack">
                                             <div className="rp-phone-card">
                                                 <div className="rp-pc-top">
                                                     <b>{ state.user.username }</b>
-                                                    <span className="rp-tag is-safe">Nivel { character.rp_level } ({ xpPct }%)</span>
+                                                    <span className="rp-tag is-safe">Nv.{ character.rp_level } ({ xpPct }%)</span>
                                                 </div>
                                                 <div className="rp-vitals-mini">
-                                                    <span><FaHeart style={ { color: '#ef4444' } } /> Vida: { character.hp }/{ character.max_hp }</span>
-                                                    <span><FaBolt style={ { color: '#eab308' } } /> Energía: { character.energy }%</span>
-                                                    <span><FaUtensils style={ { color: '#22c55e' } } /> Hambre: { hunPct }%</span>
-                                                    <span><FaShieldAlt style={ { color: '#38bdf8' } } /> Chaleco: { character.armor }%</span>
-                                                    <span>Fuerza: { character.strength } · Resist.: { character.stamina_stat }</span>
-                                                    { character.wanted_level > 0 && (
-                                                        <span style={ { color: '#f87171' } }><FaStar /> Buscado: { character.wanted_level }/5</span>
-                                                    ) }
+                                                    <span>Vida: { character.hp }/{ character.max_hp } · Energía: { character.energy }%</span>
+                                                    <span>Hambre: { hunPct }% · Chaleco: { character.armor }%</span>
+                                                    <span>Fuerza: { character.strength } · Resistencia: { character.stamina_stat }</span>
+                                                    <span>Ubicación: { currentLocation?.name || 'Plaza Central' }</span>
                                                 </div>
                                             </div>
 
                                             <button type="button" className="rp-phone-menu-btn" onClick={ () => CreateLinkEvent('user-settings/toggle') }>
-                                                <FaCog /> <span>Ajustes de Sonido y Cliente</span>
+                                                Ajustes de Sonido y Cliente
                                             </button>
                                             <button type="button" className="rp-phone-menu-btn" onClick={ () => CreateLinkEvent('avatar-editor/toggle') }>
-                                                <FaTshirt /> <span>Cambiar Ropa / Aspecto</span>
-                                            </button>
-                                            <button type="button" className="rp-phone-menu-btn" onClick={ () => CreateLinkEvent('friends/toggle') }>
-                                                <FaUserFriends /> <span>Contactos y Amigos</span>
+                                                Cambiar Ropa / Aspecto
                                             </button>
                                             <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/rp') }>
-                                                <FaNewspaper /> <span>Inicio de Habbten RP</span>
+                                                Inicio de Habbten RP
                                             </button>
                                             <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/') }>
-                                                <FaSignOutAlt /> <span>Entra a Habbten</span>
+                                                Entra a Habbten
                                             </button>
                                             <button type="button" className="rp-phone-menu-btn is-danger" onClick={ () => navigateParent('/logout') }>
-                                                <FaSignOutAlt /> <span>Cerrar sesión</span>
+                                                Cerrar sesión
                                             </button>
                                         </div>
                                     ) }
@@ -977,116 +1117,245 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </section>
             ) }
 
-            {/* ==================== VENTANAS MODERNAS COMPACTAS (TIENDA / MOCHILA / AYUDA) ==================== */}
-            { sideModal && (
-                <section className="rp-modern-modal" aria-label="Panel RP">
-                    <div className="rp-mm-header">
-                        <span>
-                            { sideModal === 'shop' && 'Tiendas, Concesionario y Gimnasio' }
-                            { sideModal === 'inventory' && 'Mochila e Inventario' }
-                            { sideModal === 'help' && 'Guía y Comandos de Ciudad Habbten' }
-                        </span>
-                        <button type="button" className="rp-mm-close" onClick={ () => setSideModal(null) }><FaTimes /></button>
+            {/* ==================== CATÁLOGO / TIENDA (3 COLUMNAS — EXACTO A IMAGEN 4) ==================== */}
+            { sideModal === 'shop' && (
+                <section className="rp-catalog-win" aria-label="Catálogo">
+                    <div className="rp-win-header">
+                        <span className="rp-win-title">Catálogo</span>
+                        <button type="button" className="rp-habbo-close-btn" onClick={ () => setSideModal(null) } title="Cerrar">
+                            <FaTimes />
+                        </button>
                     </div>
 
-                    <div className="rp-mm-body">
-                        { sideModal === 'shop' && (
-                            <>
-                                <div className="rp-gym-strip">
-                                    <span><FaDumbbell /> Gimnasio · FUE { character.strength } · RES { character.stamina_stat }</span>
-                                    <div className="rp-btn-row">
-                                        <button type="button" className="rp-btn is-blue is-xs" disabled={ busy } onClick={ () => runAction('/gym/train', { stat: 'strength' }) }>+Fuerza ($35)</button>
-                                        <button type="button" className="rp-btn is-green is-xs" disabled={ busy } onClick={ () => runAction('/gym/train', { stat: 'stamina' }) }>+Resist. ($35)</button>
-                                    </div>
-                                </div>
+                    <div className="rp-catalog-body">
+                        {/* Columna izquierda: Buscador + Categorías */}
+                        <div className="rp-cat-sidebar">
+                            <div className="rp-white-search">
+                                <FaSearch className="rp-search-ico" />
+                                <input
+                                    type="text"
+                                    value={ shopSearch }
+                                    onChange={ e => setShopSearch(e.target.value) }
+                                    placeholder="Buscar" />
+                            </div>
 
-                                <div className="rp-cat-tabs">
-                                    { SHOP_CATS.map(c => (
-                                        <button
-                                            key={ c.id }
-                                            type="button"
-                                            className={ `rp-cat-tab ${ shopCategory === c.id ? 'is-active' : '' }` }
-                                            onClick={ () => setShopCategory(c.id) }>
-                                            { c.label }
-                                        </button>
-                                    )) }
-                                </div>
-
-                                <div className="rp-mm-list">
-                                    { filteredShop.map(item => (
-                                        <div key={ item.slug } className="rp-phone-card">
-                                            <div className="rp-pc-top">
-                                                <b>{ item.name }</b>
-                                                <span className="rp-pc-cash">${ item.price.toLocaleString() }</span>
-                                            </div>
-                                            <span className="rp-pc-desc">{ item.description }</span>
-                                            <div className="rp-pc-foot">
-                                                <span className="rp-pc-muted">
-                                                    { item.damage > 0 ? `Daño +${ item.damage } ` : '' }
-                                                    { item.heal_hp > 0 ? `HP +${ item.heal_hp } ` : '' }
-                                                    { item.restore_hunger > 0 ? `HM +${ item.restore_hunger } ` : '' }
-                                                    { item.armor_value > 0 ? `Chaleco +${ item.armor_value } ` : '' }
-                                                    { item.speed_bonus > 0 ? `Vel +${ item.speed_bonus }% ` : '' }
-                                                </span>
-                                                <button type="button" className="rp-btn is-green is-xs" disabled={ busy } onClick={ () => runAction('/shop/buy', { itemSlug: item.slug }) }>
-                                                    Comprar
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )) }
-                                </div>
-                            </>
-                        ) }
-
-                        { sideModal === 'inventory' && (
-                            <div className="rp-mm-list">
-                                { state.inventory.length === 0 ? (
-                                    <div className="rp-phone-card">
-                                        <b>Tu mochila está vacía</b>
-                                        <span className="rp-pc-desc">Compra comida, botiquines, chalecos o vehículos en la Tienda del dock izquierdo.</span>
-                                    </div>
-                                ) : state.inventory.map(item => (
-                                    <div key={ item.item_slug || item.slug } className="rp-phone-card">
-                                        <div className="rp-pc-top">
-                                            <b>{ item.name } ×{ item.quantity || 1 }</b>
-                                            <button
-                                                type="button"
-                                                className="rp-btn is-green is-xs"
-                                                disabled={ busy }
-                                                onClick={ () => runAction('/inventory/use', { itemSlug: item.item_slug || item.slug }) }>
-                                                { item.category === 'weapon' || item.category === 'vehicle' ? 'Equipar' : 'Usar' }
-                                            </button>
-                                        </div>
-                                        <span className="rp-pc-desc">{ item.description }</span>
-                                    </div>
+                            <div className="rp-cat-navlist">
+                                { SHOP_CATEGORIES.map(cat => (
+                                    <button
+                                        key={ cat.id }
+                                        type="button"
+                                        className={ `rp-cat-navitem ${ shopCategory === cat.id ? 'is-active' : '' }` }
+                                        onClick={ () => { setShopCategory(cat.id); setSelectedShopSlug(''); setShopQty(1); } }>
+                                        <img src={ cat.icon } alt="" className="rp-cat-sprite" />
+                                        <span>{ cat.label }</span>
+                                    </button>
                                 )) }
                             </div>
-                        ) }
+                        </div>
 
-                        { sideModal === 'help' && (
-                            <div className="rp-app-stack">
-                                <div className="rp-phone-card">
-                                    <b>Tu Celular es tu centro de control</b>
-                                    <span className="rp-pc-desc">Pulsa el ícono del smartphone en la barra izquierda para abrir Noticias, GPS de la ciudad, Empleos, Banco, Bandas, 911, Misiones, Rankings y Ajustes.</span>
-                                </div>
-                                <div className="rp-phone-card">
-                                    <b>Comandos en la barra de chat</b>
-                                    <div className="rp-cmd-list">
-                                        <code>:me &lt;acción&gt;</code>
-                                        <code>:do &lt;entorno&gt;</code>
-                                        <code>:trabajar</code>
-                                        <code>:turno</code>
-                                        <code>:pagar &lt;user&gt; &lt;$&gt;</code>
-                                        <code>:golpear &lt;user&gt;</code>
-                                        <code>:esposar &lt;user&gt;</code>
-                                        <code>:arrestar &lt;user&gt;</code>
-                                        <code>:curar &lt;user&gt;</code>
-                                        <code>:robar [tienda|banco]</code>
-                                        <code>:911 &lt;mensaje&gt;</code>
-                                    </div>
-                                </div>
+                        {/* Columna central: Banner + Cuadrícula de artículos con precio */}
+                        <div className="rp-cat-center">
+                            <div className="rp-cat-banner" style={ { backgroundImage: `url('${ activeShopMeta.banner }')` } }>
+                                <span>{ activeShopMeta.label }</span>
                             </div>
-                        ) }
+
+                            <div className="rp-cat-grid">
+                                { filteredShop.map(item => {
+                                    const active = selectedShopItem?.slug === item.slug;
+                                    return (
+                                        <button
+                                            key={ item.slug }
+                                            type="button"
+                                            className={ `rp-cat-slot ${ active ? 'is-selected' : '' }` }
+                                            onClick={ () => { setSelectedShopSlug(item.slug || ''); setShopQty(1); } }
+                                            title={ item.name }>
+                                            <img
+                                                src={ getItemSpriteIcon(shopCategory === 'gym' ? 'gym' : item.category) }
+                                                alt={ item.name }
+                                                className="rp-slot-sprite" />
+                                            <span className="rp-slot-price">${ item.price }</span>
+                                        </button>
+                                    );
+                                }) }
+                            </div>
+                        </div>
+
+                        {/* Columna derecha: Detalle, Precio, Saldo, Cantidad y Comprar */}
+                        <div className="rp-cat-detail">
+                            { selectedShopItem ? (
+                                <>
+                                    <div className="rp-detail-name">{ selectedShopItem.name }</div>
+                                    <div className="rp-detail-preview">
+                                        <img
+                                            src={ getItemSpriteIcon(shopCategory === 'gym' ? 'gym' : selectedShopItem.category) }
+                                            alt={ selectedShopItem.name }
+                                            className="rp-detail-sprite" />
+                                    </div>
+                                    <p className="rp-detail-desc">{ selectedShopItem.description }</p>
+
+                                    <div className="rp-detail-divider" />
+
+                                    <div className="rp-detail-pricing">
+                                        <div className="rp-detail-total">${ (selectedShopItem.price * (shopCategory === 'gym' ? 1 : Math.max(1, shopQty))).toLocaleString() }</div>
+                                        <div className="rp-detail-sub">${ selectedShopItem.price.toLocaleString() } c/u</div>
+                                        <div className="rp-detail-sub">Saldo ${ character.cash.toLocaleString() }</div>
+                                    </div>
+
+                                    { shopCategory !== 'gym' && (
+                                        <div className="rp-detail-qty-row">
+                                            <span>Cantidad</span>
+                                            <input
+                                                type="number"
+                                                min={ 1 }
+                                                max={ 20 }
+                                                value={ shopQty }
+                                                onChange={ e => setShopQty(Math.max(1, Math.min(20, Number(e.target.value) || 1))) } />
+                                        </div>
+                                    ) }
+
+                                    <button
+                                        type="button"
+                                        className="rp-catalog-buy-btn"
+                                        disabled={ busy }
+                                        onClick={ handleShopBuy }>
+                                        { shopCategory === 'gym' ? 'Entrenar' : 'Comprar' }
+                                    </button>
+                                </>
+                            ) : (
+                                <div className="rp-detail-empty">No hay artículos en esta categoría.</div>
+                            ) }
+                        </div>
+                    </div>
+                </section>
+            ) }
+
+            {/* ==================== INVENTARIO (3 COLUMNAS — EXACTO A IMAGEN 5) ==================== */}
+            { sideModal === 'inventory' && (
+                <section className="rp-inventory-win" aria-label="Inventario">
+                    <div className="rp-win-header">
+                        <span className="rp-win-title">Inventario</span>
+                        <button type="button" className="rp-habbo-close-btn" onClick={ () => setSideModal(null) } title="Cerrar">
+                            <FaTimes />
+                        </button>
+                    </div>
+
+                    <div className="rp-inventory-body">
+                        {/* Columna izquierda: Categorías */}
+                        <div className="rp-inv-sidebar">
+                            { INV_CATEGORIES.map(cat => (
+                                <button
+                                    key={ cat.id }
+                                    type="button"
+                                    className={ `rp-cat-navitem ${ invCategory === cat.id ? 'is-active' : '' }` }
+                                    onClick={ () => { setInvCategory(cat.id); setSelectedInvSlug(''); } }>
+                                    <img src={ cat.icon } alt="" className="rp-cat-sprite" />
+                                    <span>{ cat.label }</span>
+                                </button>
+                            )) }
+                        </div>
+
+                        {/* Columna central: Buscador + Contador + Cuadrícula */}
+                        <div className="rp-inv-center">
+                            <div className="rp-white-search">
+                                <FaSearch className="rp-search-ico" />
+                                <input
+                                    type="text"
+                                    value={ invSearch }
+                                    onChange={ e => setInvSearch(e.target.value) }
+                                    placeholder="Buscar en inventario" />
+                            </div>
+                            <div className="rp-inv-count">
+                                { filteredInv.reduce((acc, it) => acc + Number(it.quantity || 1), 0) } objetos guardados
+                            </div>
+
+                            <div className="rp-cat-grid">
+                                { filteredInv.map(item => {
+                                    const slug = item.item_slug || item.slug || '';
+                                    const active = (selectedInvItem?.item_slug || selectedInvItem?.slug) === slug;
+                                    return (
+                                        <button
+                                            key={ slug }
+                                            type="button"
+                                            className={ `rp-cat-slot ${ active ? 'is-selected' : '' }` }
+                                            onClick={ () => setSelectedInvSlug(slug) }
+                                            title={ item.name }>
+                                            <img src={ getItemSpriteIcon(item.category) } alt={ item.name } className="rp-slot-sprite" />
+                                            <span className="rp-slot-price">×{ item.quantity || 1 }</span>
+                                        </button>
+                                    );
+                                }) }
+                            </div>
+                        </div>
+
+                        {/* Columna derecha: Detalle y botones */}
+                        <div className="rp-inv-detail">
+                            { selectedInvItem ? (
+                                <>
+                                    <div className="rp-detail-name">{ selectedInvItem.name }</div>
+                                    <div className="rp-detail-preview">
+                                        <img src={ getItemSpriteIcon(selectedInvItem.category) } alt={ selectedInvItem.name } className="rp-detail-sprite" />
+                                    </div>
+                                    <p className="rp-detail-desc">{ selectedInvItem.description }</p>
+                                    <div className="rp-inv-actions">
+                                        <button
+                                            type="button"
+                                            className="rp-inv-btn is-use"
+                                            disabled={ busy }
+                                            onClick={ () => runAction('/inventory/use', { itemSlug: selectedInvItem.item_slug || selectedInvItem.slug }) }>
+                                            { selectedInvItem.category === 'weapon' || selectedInvItem.category === 'vehicle' ? 'Equipar' : 'Usar' }
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="rp-inv-btn is-cancel"
+                                            onClick={ () => setSideModal(null) }>
+                                            Cerrar
+                                        </button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="rp-detail-name">Tu inventario está vacío</div>
+                                    <div className="rp-inv-actions">
+                                        <button type="button" className="rp-inv-btn is-use" disabled>Usar</button>
+                                        <button type="button" className="rp-inv-btn is-cancel" disabled>Cerrar</button>
+                                    </div>
+                                </>
+                            ) }
+                        </div>
+                    </div>
+                </section>
+            ) }
+
+            {/* ==================== AYUDA Y COMANDOS ==================== */}
+            { sideModal === 'help' && (
+                <section className="rp-help-win" aria-label="Ayuda">
+                    <div className="rp-win-header">
+                        <span className="rp-win-title">Ayuda y Comandos</span>
+                        <button type="button" className="rp-habbo-close-btn" onClick={ () => setSideModal(null) } title="Cerrar">
+                            <FaTimes />
+                        </button>
+                    </div>
+                    <div className="rp-help-body">
+                        <div className="rp-phone-card">
+                            <b>Celular</b>
+                            <span className="rp-pc-desc">Pulsa el ícono del celular en el dock izquierdo y desliza la flecha verde para desbloquear Contactos, Mensajes, Cámara, GPS, Empleos, Banco, Bandas, Misiones y Ajustes.</span>
+                        </div>
+                        <div className="rp-phone-card">
+                            <b>Comandos en la barra de chat</b>
+                            <div className="rp-cmd-list">
+                                <code>:me &lt;acción&gt;</code>
+                                <code>:do &lt;entorno&gt;</code>
+                                <code>:trabajar</code>
+                                <code>:turno</code>
+                                <code>:pagar &lt;user&gt; &lt;$&gt;</code>
+                                <code>:golpear &lt;user&gt;</code>
+                                <code>:esposar &lt;user&gt;</code>
+                                <code>:arrestar &lt;user&gt;</code>
+                                <code>:curar &lt;user&gt;</code>
+                                <code>:robar [tienda|banco]</code>
+                                <code>:911 &lt;mensaje&gt;</code>
+                            </div>
+                        </div>
                     </div>
                 </section>
             ) }

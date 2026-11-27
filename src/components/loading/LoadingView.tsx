@@ -2,6 +2,7 @@ import { FC } from 'react';
 import habbten2006Logo from '@/assets/images/loading/habbten_2006_loader_logo.png';
 import { Base, Column, LayoutProgressBar, Text } from '../../common';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
+import { isRoleplayMode } from '../roleplay/RoleplayService';
 
 interface LoadingViewProps
 {
@@ -14,9 +15,23 @@ export const LoadingView: FC<LoadingViewProps> = props =>
 {
     const { isError = false, message = '', percent = 0 } = props;
     const { currentEra } = useEraTheme();
-    const isShockwave2006 = !isError && currentEra === 'shockwave2006';
+    const isRpClient = isRoleplayMode();
+    const isShockwave2006 = !isError && !isRpClient && currentEra === 'shockwave2006';
     const clampedPercent = Math.max(0, Math.min(100, percent));
     const secondaryPercent = Math.max(12, Math.min(100, Math.round(clampedPercent * 0.72 + 28)));
+
+    const goRpLobby = () =>
+    {
+        try
+        {
+            if(window.top && window.top !== window) window.top.location.href = '/rp';
+            else window.location.href = '/rp';
+        }
+        catch (_)
+        {
+            window.location.href = '/rp';
+        }
+    };
 
     const reload = (event?: any) =>
     {
@@ -33,6 +48,33 @@ export const LoadingView: FC<LoadingViewProps> = props =>
         }
     };
     
+    if(isRpClient && isError)
+    {
+        return (
+            <div className="rp-disconnect-overlay" onClick={ (e) => e.stopPropagation() }>
+                <div className="rp-disconnect-modal">
+                    <div className="rp-disconnect-header">
+                        <span>Desconexión</span>
+                    </div>
+                    <div className="rp-disconnect-body">
+                        <div className="rp-disconnect-title">Se perdió la conexión con Habbten RP</div>
+                        <p className="rp-disconnect-text">
+                            { message || 'Tu sesión ha finalizado o la conexión con el servidor fue cerrada.' }
+                        </p>
+                        <div className="rp-disconnect-actions">
+                            <button type="button" className="rp-dc-btn is-primary" onClick={ reload }>
+                                Reconectar
+                            </button>
+                            <button type="button" className="rp-dc-btn is-secondary" onClick={ goRpLobby }>
+                                Volver a Habbten RP
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={ `nitro-loading ${ isError ? 'is-error' : '' } ${ isShockwave2006 ? 'is-shockwave-2006' : '' }` }>
             { isError ?

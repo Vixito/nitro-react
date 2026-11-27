@@ -1,5 +1,5 @@
 /* ============================================================================
-   HABBTEN RP — CLIENTE MODERNO 100% PLANO (SIN DEGRADADOS, SIN BISELADOS)
+   HABBTEN RP — CLIENTE MODERNO PLANO (INFOSTAND, CELULAR SWIPE, CATÁLOGO, INVENTARIO)
    Aislado exclusivamente bajo body.habbten-rp-client (Web y Móvil)
    ============================================================================ */
 
@@ -28,6 +28,154 @@ body.habbten-rp-client {
     }
 }
 
+/* ==================== BOTÓN ROJO CLÁSICO HABBO DE CERRAR ==================== */
+.rp-habbo-close-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    background: #d93829;
+    border: 2px solid #ffffff;
+    outline: 1px solid #1b1e22;
+    color: #ffffff;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    &:hover { background: #ef4444; }
+}
+
+/* ==================== INFOSTAND RP DEDICADO (EXACTO A IMAGEN 1) ==================== */
+.rp-infostand-card {
+    width: 274px;
+    background: #2b2e33;
+    border: 1px solid #4c515a;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #f3f4f6;
+}
+
+.rp-infostand-header {
+    position: relative;
+    height: 36px;
+    padding: 0 10px;
+    background: #3a3d43;
+    border-bottom: 1px solid #4c515a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .rp-habbo-close-btn {
+        position: absolute;
+        right: 7px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+.rp-infostand-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    max-width: 195px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-infostand-body {
+    padding: 10px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rp-infostand-role {
+    font-size: 12px;
+    font-weight: 500;
+    color: #b4bac4;
+}
+
+.rp-infostand-main {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+}
+
+.rp-infostand-stage {
+    position: relative;
+    width: 112px;
+    height: 192px;
+    background: #3d4148;
+    border: 1px solid #5a606a;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.rp-infostand-tile {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    width: 48px;
+    height: 48px;
+    background: #eef1f5;
+    border: 2px solid #181a1e;
+    transform: translateX(-50%) scaleY(0.5) rotate(45deg);
+    z-index: 1;
+}
+
+.rp-infostand-avatar {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 14px;
+    pointer-events: none;
+}
+
+.rp-infostand-badges-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.rp-infostand-badges-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f3f4f6;
+}
+
+.rp-infostand-badges-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 7px;
+}
+
+.rp-infostand-badge-slot {
+    width: 52px;
+    height: 52px;
+    background: #232529;
+    border: 1px solid #4c515a;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-infostand-rp-actions {
+    border-top: 1px solid #3f444c;
+    padding-top: 8px;
+}
+
+/* ==================== CONTENEDOR PRINCIPAL HUD RP ==================== */
 .rp-modern-root {
     position: fixed;
     inset: 0;
@@ -40,7 +188,6 @@ body.habbten-rp-client {
     > * { pointer-events: auto; }
 }
 
-/* ==================== AVISOS CRÍTICOS / TOASTS (PLANOS) ==================== */
 .rp-alert-strip {
     position: fixed;
     top: 12px;
@@ -92,7 +239,7 @@ body.habbten-rp-client {
     &.is-warn { border-color: #d97706; color: #fef3c7; }
 }
 
-/* ==================== BOTONES SUPERIORES DERECHA (PLANOS + HD) ==================== */
+/* ==================== BOTONES SUPERIORES DERECHA (EXACTO A IMAGEN 3) ==================== */
 .rp-top-right-tools {
     position: fixed;
     top: 12px;
@@ -103,32 +250,31 @@ body.habbten-rp-client {
 }
 
 .rp-square-btn {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 6px;
-    background: #282c31;
-    border: 1px solid #3c424b;
-    color: #e5e7eb;
+    background: #55524d;
+    border: 1px solid #6c6963;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 19px;
     cursor: pointer;
-    transition: background 0.12s ease, border-color 0.12s ease;
+    transition: background 0.12s ease;
 
-    &:hover { background: #333840; color: #ffffff; }
-    &.is-active { background: #1ea866; border-color: #1ea866; color: #ffffff; }
+    &:hover { background: #65625c; }
+    &.is-active { background: #495464; border-color: #7c899c; }
 }
 
-.rp-top-icon-hd {
-    width: 32px;
-    height: 32px;
+.rp-pixel-sprite {
+    width: 30px;
+    height: 30px;
     object-fit: contain;
-    image-rendering: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
     display: block;
 }
 
-/* ==================== DOCK VERTICAL IZQUIERDO (PLANO + ÍCONOS HD GRANDES) ==================== */
+/* ==================== DOCK VERTICAL IZQUIERDO ==================== */
 .rp-left-dock {
     position: fixed;
     left: 12px;
@@ -154,10 +300,9 @@ body.habbten-rp-client {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.12s ease, border-color 0.12s ease;
 
     &:hover { background: #2f343c; border-color: #4b525c; }
-    &.is-active { background: #193829; border-color: #1ea866; }
+    &.is-active { background: #38414e; border-color: #6b788a; }
 }
 
 .rp-dock-icon-hd {
@@ -179,7 +324,7 @@ body.habbten-rp-client {
     border: 2px solid #25282d;
 }
 
-/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA (PLANO) ==================== */
+/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA ==================== */
 .rp-bottom-cluster {
     position: fixed;
     left: 12px;
@@ -205,7 +350,6 @@ body.habbten-rp-client {
     gap: 10px;
     cursor: pointer;
     flex-shrink: 0;
-    transition: border-color 0.15s ease;
 
     &:hover { border-color: #525964; }
 }
@@ -229,7 +373,7 @@ body.habbten-rp-client {
     height: 54px;
     object-fit: contain;
     object-position: center;
-    image-rendering: auto;
+    image-rendering: pixelated;
     display: block;
 }
 
@@ -334,7 +478,6 @@ body.habbten-rp-client {
     color: #ffffff;
 }
 
-/* Barra blanca plana de chat */
 .rp-chat-pill {
     flex: 1;
     max-width: 680px;
@@ -358,7 +501,7 @@ body.habbten-rp-client {
     &:focus { border-color: #1ea866; }
 }
 
-/* ==================== SMARTPHONE DEL AVATAR (100% PLANO, SIN SOMBRAS NI DEGRADADOS) ==================== */
+/* ==================== SMARTPHONE DEL AVATAR (SWIPE REAL + ÍCONOS ORIGINALES) ==================== */
 .rp-phone-device {
     position: fixed;
     left: 78px;
@@ -422,6 +565,8 @@ body.habbten-rp-client {
     flex: 1;
     min-height: 0;
     background-color: #25282c;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 0);
+    background-size: 14px 14px;
     border: 1px solid #383e47;
     border-radius: 6px;
     overflow: hidden;
@@ -458,10 +603,10 @@ body.habbten-rp-client {
     background: #4ade80;
 }
 
-/* Pantalla de Bloqueo */
+/* Pantalla de Bloqueo + Slider Físico Real */
 .rp-phone-lock {
     flex: 1;
-    padding: 26px 14px 16px;
+    padding: 36px 14px 18px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -470,7 +615,7 @@ body.habbten-rp-client {
 .rp-lock-clock-wrap { text-align: center; }
 
 .rp-lock-time {
-    font-size: 40px;
+    font-size: 42px;
     font-weight: 700;
     color: #ffffff;
     letter-spacing: -0.02em;
@@ -480,120 +625,81 @@ body.habbten-rp-client {
 .rp-lock-date {
     font-size: 12px;
     color: #9ca3af;
-    margin-top: 4px;
+    margin-top: 6px;
     text-transform: lowercase;
 }
 
-.rp-lock-loc {
-    font-size: 11px;
-    color: #60a5fa;
-    margin-top: 6px;
-    font-weight: 600;
-}
-
-.rp-lock-notifs {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.rp-lock-notif {
-    background: #1b1e22;
-    border: 1px solid #343942;
-    border-radius: 6px;
-    padding: 9px 11px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-
-    b { font-size: 11px; color: #f3f4f6; }
-    span { font-size: 11px; color: #9ca3af; line-height: 1.35; }
-    &:hover { border-color: #1ea866; }
-}
-
-.rp-unlock-bar {
+.rp-unlock-track {
+    position: relative;
     width: 100%;
-    height: 44px;
-    background: #1b1e22;
-    border: 1px solid #3e444e;
-    border-radius: 6px;
+    height: 46px;
+    background: #1c1f24;
+    border: 1px solid #444b55;
+    border-radius: 8px;
     padding: 4px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    cursor: pointer;
-
-    &:hover { border-color: #1ea866; }
+    overflow: hidden;
+    touch-action: none;
 }
 
-.rp-unlock-arrow {
-    width: 34px;
-    height: 34px;
-    border-radius: 4px;
+.rp-unlock-thumb {
+    position: relative;
+    z-index: 3;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
     background: #1ea866;
     color: #ffffff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 14px;
+    cursor: grab;
     flex-shrink: 0;
+    transition: transform 0.2s ease;
+
+    &.is-dragging {
+        cursor: grabbing;
+        transition: none;
+    }
 }
 
 .rp-unlock-text {
-    flex: 1;
-    text-align: center;
+    position: absolute;
+    inset: 0;
+    padding-left: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 11.5px;
     font-weight: 600;
     color: #cbd5e1;
-    padding-right: 16px;
+    pointer-events: none;
 }
 
-/* Pantalla de Inicio Apps */
+/* Pantalla Principal del Celular (Exacta a Imagen 2) */
 .rp-phone-home {
     flex: 1;
-    padding: 12px;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 14px 14px 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
-.rp-home-mini-widget {
-    background: #1b1e22;
-    border: 1px solid #343942;
-    border-radius: 6px;
-    padding: 8px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-
-.rp-home-w-left {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-
-    b { font-size: 11.5px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    span { font-size: 10px; color: #9ca3af; }
-}
-
-.rp-home-w-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    font-size: 10.5px;
+.rp-phone-home-user {
+    font-size: 13px;
     font-weight: 700;
-
-    .is-cash { color: #4ade80; }
-    .is-bank { color: #38bdf8; }
+    color: #e5e7eb;
+    padding-left: 2px;
 }
 
 .rp-app-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px 8px;
-    padding: 4px 2px;
+    gap: 14px 10px;
 }
 
 .rp-app-tile {
@@ -602,30 +708,43 @@ body.habbten-rp-client {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     cursor: pointer;
 
-    &:hover .rp-app-icon { filter: brightness(1.08); }
+    &:hover .rp-app-icon-box {
+        background: #535962;
+        border-color: #777f8a;
+    }
 }
 
-.rp-app-icon {
+.rp-app-icon-box {
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 10px;
-    color: #ffffff;
-    font-size: 20px;
+    background: #464b52;
+    border: 1px solid #636972;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.rp-app-sprite {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
 }
 
 .rp-app-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 17px;
-    height: 17px;
+    top: -5px;
+    right: -5px;
+    min-width: 18px;
+    height: 18px;
     padding: 0 4px;
     border-radius: 99px;
     background: #ef4444;
@@ -643,13 +762,7 @@ body.habbten-rp-client {
     font-weight: 600;
     color: #e5e7eb;
     text-align: center;
-}
-
-.rp-home-quickbar {
-    margin-top: auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    white-space: nowrap;
 }
 
 /* Vista Interna de App del Celular */
@@ -868,8 +981,6 @@ body.habbten-rp-client {
     margin-top: 4px;
     font-size: 11px;
     color: #d1d5db;
-
-    span { display: inline-flex; align-items: center; gap: 6px; }
 }
 
 .rp-phone-menu-btn {
@@ -882,9 +993,7 @@ body.habbten-rp-client {
     font-family: 'Montserrat', sans-serif;
     font-size: 11.5px;
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 9px;
+    text-align: left;
     cursor: pointer;
 
     &:hover { background: #262b33; border-color: #4b5563; }
@@ -910,100 +1019,403 @@ body.habbten-rp-client {
     &:hover { border-color: #9ca3af; }
 }
 
-/* ==================== VENTANAS MODERNAS PLANAS (TIENDA / MOCHILA / AYUDA) ==================== */
-.rp-modern-modal {
+/* ==================== VENTANA CATÁLOGO / TIENDA (EXACTA A IMAGEN 4) ==================== */
+.rp-catalog-win,
+.rp-inventory-win,
+.rp-help-win {
     position: fixed;
-    left: 78px;
-    bottom: 98px;
-    width: 390px;
-    max-width: calc(100vw - 92px);
-    max-height: min(520px, calc(100vh - 130px));
-    background: #202328;
-    border: 1px solid #3a4049;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #2c2f34;
+    border: 1px solid #4c515a;
     border-radius: 8px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    z-index: 78;
+    z-index: 82;
 }
 
-.rp-mm-header {
+.rp-catalog-win {
+    width: 780px;
+    max-width: 94vw;
+    height: 540px;
+    max-height: 84vh;
+}
+
+.rp-inventory-win {
+    width: 730px;
+    max-width: 94vw;
+    height: 360px;
+    max-height: 80vh;
+}
+
+.rp-help-win {
+    width: 420px;
+    max-width: 92vw;
+    max-height: 75vh;
+}
+
+.rp-win-header {
+    position: relative;
     height: 40px;
     padding: 0 14px;
-    background: #181b1f;
-    border-bottom: 1px solid #323740;
+    background: #3a3d43;
+    border-bottom: 1px solid #4c515a;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-size: 12.5px;
+    justify-content: center;
+    flex-shrink: 0;
+
+    .rp-habbo-close-btn {
+        position: absolute;
+        right: 9px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+.rp-win-title {
+    font-size: 13.5px;
     font-weight: 700;
     color: #ffffff;
+}
+
+.rp-catalog-body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 185px 1fr 230px;
+}
+
+.rp-inventory-body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 165px 1fr 220px;
+}
+
+.rp-cat-sidebar,
+.rp-inv-sidebar {
+    border-right: 1px solid #41454d;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+}
+
+.rp-white-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 10px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    flex-shrink: 0;
+
+    .rp-search-ico {
+        color: #64748b;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+    input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #111827;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+
+        &::placeholder { color: #9ca3af; }
+    }
+}
+
+.rp-cat-navlist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rp-cat-navitem {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: transparent;
+    border: none;
+    color: #d1d5db;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: #373b42; color: #ffffff; }
+    &.is-active { background: #4d5a6a; color: #ffffff; }
+}
+
+.rp-cat-sprite {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    image-rendering: pixelated;
     flex-shrink: 0;
 }
 
-.rp-mm-close {
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    background: transparent;
-    border: 1px solid #383e47;
-    color: #cbd5e1;
-    display: inline-flex;
+.rp-cat-center,
+.rp-inv-center {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.rp-cat-banner {
+    position: relative;
+    height: 62px;
+    border-radius: 5px;
+    border: 2px solid #15181c;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(14, 18, 24, 0.48);
+    }
+
+    span {
+        position: relative;
+        z-index: 2;
+        font-size: 18px;
+        font-weight: 800;
+        color: #ffffff;
+    }
+}
+
+.rp-inv-count {
+    font-size: 11.5px;
+    color: #9ca3af;
+}
+
+.rp-cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(66px, 1fr));
+    gap: 8px;
+}
+
+.rp-cat-slot {
+    position: relative;
+    height: 68px;
+    background: #3d4046;
+    border: 1px solid #23262b;
+    border-radius: 5px;
+    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 
-    &:hover { background: #dc2626; border-color: #dc2626; color: #ffffff; }
+    &:hover { border-color: #6b7280; }
+    &.is-selected {
+        background: #4e535c;
+        border: 2px solid #ffffff;
+    }
 }
 
-.rp-mm-body {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 12px;
+.rp-slot-sprite {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    display: block;
+}
+
+.rp-slot-price {
+    position: absolute;
+    left: 4px;
+    bottom: 4px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #1b1e22;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.rp-cat-detail,
+.rp-inv-detail {
+    border-left: 1px solid #41454d;
+    padding: 16px 14px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
+    overflow-y: auto;
 }
 
-.rp-gym-strip {
-    background: #181b1f;
-    border: 1px solid #323740;
-    border-radius: 6px;
-    padding: 8px 10px;
+.rp-detail-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+}
+
+.rp-detail-preview {
+    width: 100%;
+    height: 92px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-detail-sprite {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.rp-detail-desc {
+    font-size: 11px;
+    color: #b4bac4;
+    text-align: center;
+    line-height: 1.45;
+    margin: 0;
+}
+
+.rp-detail-divider {
+    width: 100%;
+    height: 1px;
+    background: #41454d;
+    margin: 2px 0;
+}
+
+.rp-detail-pricing {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.rp-detail-total {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.rp-detail-sub {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.rp-detail-qty-row {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: 12px;
+    color: #d1d5db;
+    margin-top: 4px;
+
+    input {
+        width: 64px;
+        height: 32px;
+        padding: 0 8px;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 5px;
+        color: #111827;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
+        text-align: center;
+    }
 }
 
-.rp-cat-tabs {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-
-.rp-cat-tab {
-    padding: 5px 10px;
-    border-radius: 5px;
-    background: #181b1f;
-    border: 1px solid #353b44;
-    color: #9ca3af;
+.rp-catalog-buy-btn {
+    width: 100%;
+    height: 40px;
+    margin-top: auto;
+    border-radius: 6px;
+    background: #1ea866;
+    border: 1px solid #126b40;
+    color: #ffffff;
     font-family: 'Montserrat', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     cursor: pointer;
 
-    &.is-active { background: #1ea866; border-color: #1ea866; color: #ffffff; }
+    &:hover:not(:disabled) { background: #19945a; }
+    &:disabled { opacity: 0.55; cursor: not-allowed; }
 }
 
-.rp-mm-list {
+.rp-inv-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.rp-inv-btn {
+    height: 38px;
+    border-radius: 5px;
+    border: 1px solid #1c1f24;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &.is-use {
+        background: #3f6a52;
+        color: #ffffff;
+
+        &:hover:not(:disabled) { background: #1ea866; }
+    }
+
+    &.is-cancel {
+        background: #72767d;
+        color: #181a1e;
+
+        &:hover:not(:disabled) { background: #878c94; }
+    }
+
+    &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+}
+
+.rp-detail-empty {
+    font-size: 12px;
+    color: #9ca3af;
+    text-align: center;
+    margin: auto 0;
+}
+
+.rp-help-body {
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    overflow-y: auto;
 }
 
 .rp-cmd-list {
@@ -1022,7 +1434,7 @@ body.habbten-rp-client {
     }
 }
 
-/* Botones reutilizables planos */
+/* Botones reutilizables */
 .rp-btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .rp-btn-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
@@ -1036,7 +1448,6 @@ body.habbten-rp-client {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.12s ease;
 
     &:disabled { opacity: 0.55; cursor: not-allowed; }
 
@@ -1117,12 +1528,28 @@ body.habbten-rp-client {
         height: min(540px, 84vh);
     }
 
-    .rp-modern-modal {
-        left: 50%;
-        top: 50%;
-        bottom: auto;
-        transform: translate(-50%, -50%);
-        width: min(360px, 94vw);
-        max-height: 78vh;
+    .rp-catalog-win,
+    .rp-inventory-win {
+        width: 96vw;
+        height: 82vh;
+    }
+
+    .rp-catalog-body,
+    .rp-inventory-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+    .rp-cat-sidebar,
+    .rp-inv-sidebar {
+        border-right: none;
+        border-bottom: 1px solid #41454d;
+        max-height: 112px;
+    }
+
+    .rp-cat-detail,
+    .rp-inv-detail {
+        border-left: none;
+        border-top: 1px solid #41454d;
     }
 }

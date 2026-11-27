@@ -11,6 +11,7 @@ import { useEraTheme, useMessageEvent, useRoom, useRoomSessionManagerEvent } fro
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
 import { RpAvatarQuickActions } from '../../../../roleplay/RpAvatarQuickActions';
+import { isRoleplayMode } from '../../../../roleplay/RoleplayService';
 
 interface InfoStandWidgetUserViewProps
 {
@@ -175,13 +176,58 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
 
     if(!avatarInfo) return null;
 
+    const isOwn = avatarInfo.type === AvatarInfoUser.OWN_USER;
+
+    // InfoStand dedicado para Habbten RP: limpio, sin fondos/muebles personalizables y sin placas del juego clásico
+    if(isRoleplayMode())
+    {
+        return (
+            <div className="rp-infostand-card">
+                <div className="rp-infostand-header">
+                    <span className="rp-infostand-title" onClick={ () => GetUserProfile(avatarInfo.webID) }>
+                        { avatarInfo.name }
+                    </span>
+                    <button type="button" className="rp-habbo-close-btn" onClick={ onClose } title="Cerrar">
+                        <FaTimes />
+                    </button>
+                </div>
+
+                <div className="rp-infostand-body">
+                    <div className="rp-infostand-role">Jugador</div>
+                    <div className="rp-infostand-main">
+                        <div className="rp-infostand-stage" onClick={ () => GetUserProfile(avatarInfo.webID) }>
+                            <div className="rp-infostand-tile" />
+                            <div className="rp-infostand-avatar">
+                                <LayoutAvatarImageView figure={ avatarInfo.figure } direction={ 4 } />
+                            </div>
+                        </div>
+
+                        <div className="rp-infostand-badges-col">
+                            <div className="rp-infostand-badges-title">Placas</div>
+                            <div className="rp-infostand-badges-grid">
+                                { [ 0, 1, 2, 3, 4, 5 ].map(slot => (
+                                    <div key={ slot } className="rp-infostand-badge-slot" />
+                                )) }
+                            </div>
+                        </div>
+                    </div>
+
+                    { !isOwn && (
+                        <div className="rp-infostand-rp-actions">
+                            <RpAvatarQuickActions targetName={ avatarInfo.name } />
+                        </div>
+                    ) }
+                </div>
+            </div>
+        );
+    }
+
     const hasCustomPlate = customPlate.id !== 'default';
     const customPlateVars = hasCustomPlate ? ({
         '--is-plate-bg': customPlate.bgStyle,
         '--is-plate-border': customPlate.borderColor,
         '--is-plate-accent': customPlate.accentColor
     } as CSSProperties) : undefined;
-    const isOwn = avatarInfo.type === AvatarInfoUser.OWN_USER;
     const isSittingOnFurni = customFurni.furnitureId > 0 && customAction.id === 'sit';
     const seatShiftX = isSittingOnFurni ? (customFurni.seatOffsetX ?? 0) : 0;
     const seatShiftY = isSittingOnFurni ? (customFurni.seatOffsetY ?? 0) : 0;
