@@ -244,7 +244,7 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         topTrim: 'magic_stars',
         decors: [
             { slot: 'bl', furniId: 225, size: 38 },  // Velas Rojas
-            { slot: 'br', furniId: 1620, size: 46 }  // Dragón de Fuego Rojo
+            { slot: 'br', furniId: 1620, size: 56 }  // Dragón de Fuego Rojo 1:1
         ],
         pattern: 'crest'
     },
@@ -259,8 +259,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         emblemFurniId: 1622, // Dragón de Fuego Jade (verde esmeralda)
         topTrim: 'magic_stars',
         decors: [
-            { slot: 'bl', furniId: 2625, size: 40 }, // Caldero burbujeante verde
-            { slot: 'br', furniId: 1622, size: 46 }  // Dragón Jade Esmeralda
+            { slot: 'bl', furniId: 10824, size: 42 }, // Pociones de la Bruja (sin fondo negro)
+            { slot: 'br', furniId: 1622, size: 56 }   // Dragón Jade Esmeralda 1:1
         ],
         pattern: 'crest'
     },
