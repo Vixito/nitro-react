@@ -3,6 +3,7 @@ import { CSSProperties, Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction,
 import { FaChevronDown, FaChevronUp, FaCog, FaExchangeAlt, FaHandPaper, FaInfoCircle, FaMusic, FaPalette, FaPencilAlt, FaRedo, FaTimes, FaTrash, FaUserCheck, FaUserPlus, FaUserSlash } from 'react-icons/fa';
 import { AvatarInfoFurni, AvatarInfoPet, AvatarInfoRentableBot, AvatarInfoUser, CloneObject, CreateLinkEvent, DispatchUiEvent, GetCanStandUp, GetConfiguration, GetGroupInformation, GetNitroInstance, GetOwnPosture, GetRoomEngine, GetSessionDataManager, GetUserProfile, HasHabboVip, LocalizeText, PostureTypeEnum, RoomWidgetUpdateChatInputContentEvent, SendMessageComposer } from '../../../../../api';
 import { getActionDef, getFurniDef, getPlateDef, useInfoStandFurniSprite, useUserInfoStandStyle } from '../../../../../api/infostand/InfoStandStyleService';
+import { InfoStandPlateDecor, PlateEmblemIcon } from './InfoStandPlateDecor';
 import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, LayoutLimitedEditionCompactPlateView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { useFriends, useMessageEvent, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent, useSessionInfo } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -584,8 +585,10 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
         if(isUser || isBot)
         {
             const userInfo = avatarInfo as AvatarInfoUser;
+            const hasSwPlate = isUser && customPlate.id !== 'default';
             return (
-                <div className="infostand-shockwave-card">
+                <div className={ `infostand-shockwave-card ${ hasSwPlate ? 'has-plate-decors' : '' }` }>
+                    { hasSwPlate && <InfoStandPlateDecor plate={ customPlate } compact /> }
                     <div className="card-header-bar">
                         <div className="header-title" title={ userInfo.name }>{ userInfo.name }</div>
                         <div className="header-close" onClick={ () => setIsCardExpanded(false) } title="Cerrar detalles" />
@@ -742,9 +745,7 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                         <>
                             <span className="pill-name d-flex align-items-center" title={ entityName }>
                                 { isUser && customPlate.id !== 'default' && (
-                                    <span className="sw-plate-emblem" style={ { background: customPlate.emblemColor } }>
-                                        { customPlate.emblemLabel || '' }
-                                    </span>
+                                    <PlateEmblemIcon plate={ customPlate } className="sw-plate-emblem" />
                                 ) }
                                 <span>{ entityName }</span>
                             </span>

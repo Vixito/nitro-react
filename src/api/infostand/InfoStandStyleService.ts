@@ -2,6 +2,36 @@ import { AvatarAction, IGetImageListener, ImageResult, TextureUtils, Vector3d } 
 import { useEffect, useState } from 'react';
 import { GetRoomEngine } from '../nitro';
 
+// Real Habbo / Game Center / Wired pixel-art assets bundled in Nitro
+import bbLogoImg from '../../assets/images/gamecenter/battleball/battleball_logo.png';
+import bbBackdropImg from '../../assets/images/gamecenter/battleball/bb_arena_backdrop.png';
+import bbIconImg from '../../assets/images/gamecenter/battleball/bb_presence_icon.png';
+import bbBombImg from '../../assets/images/gamecenter/battleball/pu_bomb.png';
+import bbCannonImg from '../../assets/images/gamecenter/battleball/pu_cannon.png';
+import bbSpringImg from '../../assets/images/gamecenter/battleball/pu_spring.png';
+
+import ffArenaImg from '../../assets/images/gamecenter/fastfood/ff_arena_classic.png';
+import ffParachuteImg from '../../assets/images/gamecenter/fastfood/ff_btn_parachute.png';
+import ffBurgerImg from '../../assets/images/gamecenter/fastfood/ff_food_burger.png';
+import ffDrinksImg from '../../assets/images/gamecenter/fastfood/ff_food_drinks.png';
+import ffPizzaImg from '../../assets/images/gamecenter/fastfood/ff_food_pizza.png';
+import ffLogoImg from '../../assets/images/gamecenter/fastfood/ff_logo_habbten.png';
+
+import ssPineImg from '../../assets/images/gamecenter/snowstorm/sprite_pine_tree.png';
+import ssDuckImg from '../../assets/images/gamecenter/snowstorm/sprite_snow_duck.png';
+import ssHorizonImg from '../../assets/images/gamecenter/snowstorm/ss_horizon_bg.png';
+import ssIceSmallImg from '../../assets/images/gamecenter/snowstorm/thumbnails_Icecube_small.png';
+import ssSnowballImg from '../../assets/images/gamecenter/snowstorm/thumbnails_Snowball.png';
+import ssLogoImg from '../../assets/images/gamecenter/snowstorm/thumbnails_Snowstorm_Logo.png';
+
+import wsSplashImg from '../../assets/images/gamecenter/wobblesquabble/ws_fx_splash.png';
+import wsWhackImg from '../../assets/images/gamecenter/wobblesquabble/ws_fx_whack.png';
+import wsIconImg from '../../assets/images/gamecenter/wobblesquabble/ws_presence_icon.png';
+import wsRooftopImg from '../../assets/images/gamecenter/wobblesquabble/ws_rooftop_wide.png';
+
+import wiredBannerImg from '../../assets/images/wired/wired_banner_pattern.png';
+import wiredMonitorImg from '../../assets/images/wired/wired_monitor_illustration.png';
+
 export type InfoStandPlatePattern =
     | 'none'
     | 'diamond'
@@ -18,6 +48,16 @@ export type InfoStandPlatePattern =
     | 'pitch'
     | 'grid';
 
+export type InfoStandTopTrim = 'none' | 'icicles' | 'garland' | 'awning' | 'wired_bar' | 'magic_stars';
+
+export interface InfoStandPlateDecorItem
+{
+    slot: 'tl' | 'tr' | 'bl' | 'br';
+    img?: string;
+    furniId?: number;
+    size?: number;
+}
+
 export interface InfoStandPlateDef
 {
     id: string;
@@ -28,6 +68,13 @@ export interface InfoStandPlateDef
     bgStyle: string;
     emblemColor: string;
     emblemLabel?: string;
+    emblemImg?: string;
+    emblemFurniId?: number;
+    bgImageUrl?: string;
+    bgImageOpacity?: number;
+    topTrim?: InfoStandTopTrim;
+    topBannerImg?: string;
+    decors?: InfoStandPlateDecorItem[];
     pattern?: InfoStandPlatePattern;
 }
 
@@ -76,25 +123,250 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
     { id: 'crimson',        name: 'Rubí Real',           price: 400, accentColor: '#b01e2b', borderColor: '#ff6b6b', bgStyle: 'linear-gradient(180deg, #8e1420 0%, #520911 100%)', emblemColor: '#e03131', pattern: 'diamond' },
     { id: 'obsidian',       name: 'Obsidiana VIP',       price: 500, accentColor: '#2a2d34', borderColor: '#ff6b35', bgStyle: 'linear-gradient(180deg, #2d3036 0%, #16181c 100%)', emblemColor: '#e85d04', pattern: 'diamond' },
     { id: 'gold_hc',        name: 'Oro Imperial',        price: 600, accentColor: '#b5891b', borderColor: '#ffe066', bgStyle: 'linear-gradient(180deg, #8f670e 0%, #523905 100%)', emblemColor: '#ffd43b', pattern: 'diamond' },
-    // Navidad / Invierno 2008
-    { id: 'xmas_2008',      name: 'Navidad Helada 2008', price: 450, accentColor: '#3b95c9', borderColor: '#d4f3ff', bgStyle: 'linear-gradient(180deg, #4fa8d6 0%, #246394 55%, #143a5e 100%)', emblemColor: '#9ce6ff', pattern: 'frost' },
-    { id: 'xmas_classic',   name: 'Espíritu Navideño',   price: 400, accentColor: '#b91c1c', borderColor: '#f7d060', bgStyle: 'linear-gradient(180deg, #991b1b 0%, #5c0f15 100%)', emblemColor: '#22c55e', pattern: 'candy' },
-    // Game Center
-    { id: 'gc_snowstorm',   name: 'SnowStorm',           price: 450, accentColor: '#1d5d9b', borderColor: '#e0f2fe', bgStyle: 'linear-gradient(180deg, #1d5d9b 0%, #0d325c 100%)', emblemColor: '#7dd3fc', pattern: 'snow' },
-    { id: 'gc_fastfood',    name: 'FastFood',            price: 400, accentColor: '#c92a2a', borderColor: '#ffd43b', bgStyle: 'linear-gradient(180deg, #b82525 0%, #7d1515 100%)', emblemColor: '#ff922b', pattern: 'checker' },
-    { id: 'gc_wobble',      name: 'Wobble Squabble',     price: 400, accentColor: '#0e9f9e', borderColor: '#7ef9ff', bgStyle: 'linear-gradient(180deg, #0ea5a4 0%, #0b5d69 100%)', emblemColor: '#22d3ee', pattern: 'wave' },
-    { id: 'gc_battleball',  name: 'Battle Ball',         price: 450, accentColor: '#6d28d9', borderColor: '#a3e635', bgStyle: 'linear-gradient(180deg, #6d28d9 0%, #3b0764 100%)', emblemColor: '#84cc16', pattern: 'tiles' },
-    // Mundo Mágico (Harry Potter)
-    { id: 'hp_gryffindor',  name: 'León Escarlata',      price: 500, accentColor: '#7f1d1d', borderColor: '#f5c542', bgStyle: 'linear-gradient(180deg, #7f1d1d 0%, #450a0a 100%)', emblemColor: '#eab308', pattern: 'crest' },
-    { id: 'hp_slytherin',   name: 'Serpiente Esmeralda', price: 500, accentColor: '#14532d', borderColor: '#cbd5e1', bgStyle: 'linear-gradient(180deg, #14532d 0%, #052e16 100%)', emblemColor: '#22c55e', pattern: 'crest' },
-    { id: 'hp_magic',       name: 'Hechicero Nocturno',  price: 550, accentColor: '#312e81', borderColor: '#fde047', bgStyle: 'linear-gradient(180deg, #1e1b4b 0%, #090721 100%)', emblemColor: '#818cf8', pattern: 'starlight' },
-    // Wired / Tech
-    { id: 'wired_tech',     name: 'Maestro Wired',       price: 550, accentColor: '#334155', borderColor: '#38bdf8', bgStyle: 'linear-gradient(180deg, #2b333d 0%, #15191f 100%)', emblemColor: '#00e5ff', pattern: 'circuit' },
-    // Deportes & Retro
-    { id: 'sport_football', name: 'Estadio Fútbol',      price: 350, accentColor: '#15803d', borderColor: '#f8fafc', bgStyle: 'linear-gradient(180deg, #1f7a38 0%, #125224 100%)', emblemColor: '#4ade80', pattern: 'pitch' },
-    { id: 'sport_basket',   name: 'Cancha Basket',       price: 350, accentColor: '#c2410c', borderColor: '#fed7aa', bgStyle: 'linear-gradient(180deg, #c2410c 0%, #7c2d12 100%)', emblemColor: '#fb923c', pattern: 'stripe' },
-    { id: 'arcade_retro',   name: 'Arcade 8-Bit',        price: 450, accentColor: '#3b0764', borderColor: '#f472b6', bgStyle: 'linear-gradient(180deg, #22104a 0%, #0e0626 100%)', emblemColor: '#ec4899', pattern: 'grid' },
-    { id: 'habbo_club',     name: 'VIP Clásico',         price: 650, accentColor: '#166534', borderColor: '#facc15', bgStyle: 'linear-gradient(180deg, #166534 0%, #0b3b1e 100%)', emblemColor: '#fde047', pattern: 'diamond' }
+
+    // Navidad / Invierno 2008 (con carámbanos congelados y furnis reales xmas08)
+    {
+        id: 'xmas_2008',
+        name: 'Navidad Helada 2008',
+        price: 450,
+        accentColor: '#3b95c9',
+        borderColor: '#d9f4ff',
+        bgStyle: 'linear-gradient(180deg, #5eb8e6 0%, #246596 52%, #13395c 100%)',
+        emblemColor: '#9ce6ff',
+        emblemImg: ssIceSmallImg,
+        topTrim: 'icicles',
+        decors: [
+            { slot: 'bl', furniId: 2972, size: 34 }, // Pingüino Polo 2008 (xmas08_trph1)
+            { slot: 'br', furniId: 2967, size: 42 }  // Árbol Ártico 2008 (xmas08_icetree)
+        ],
+        pattern: 'frost'
+    },
+    {
+        id: 'xmas_classic',
+        name: 'Espíritu Navideño',
+        price: 400,
+        accentColor: '#b91c1c',
+        borderColor: '#f7d060',
+        bgStyle: 'linear-gradient(180deg, #9c1a1a 0%, #590d14 100%)',
+        emblemColor: '#22c55e',
+        emblemFurniId: 215, // Pato de Navidad (xmasduck)
+        topTrim: 'garland',
+        decors: [
+            { slot: 'bl', furniId: 2971, size: 34 }, // Pingüino Santa (penguin_elf)
+            { slot: 'br', furniId: 4291, size: 42 }  // Arbolito Navideño (xmas2011_tree1)
+        ],
+        pattern: 'candy'
+    },
+
+    // Game Center (con logos, fondos y sprites originales de los 4 juegos)
+    {
+        id: 'gc_snowstorm',
+        name: 'SnowStorm',
+        price: 450,
+        accentColor: '#1d5d9b',
+        borderColor: '#e0f4ff',
+        bgStyle: 'linear-gradient(180deg, #1d5d9b 0%, #0c2f59 100%)',
+        emblemColor: '#7dd3fc',
+        emblemImg: ssSnowballImg,
+        bgImageUrl: ssHorizonImg,
+        bgImageOpacity: 0.32,
+        topTrim: 'icicles',
+        topBannerImg: ssLogoImg,
+        decors: [
+            { slot: 'bl', img: ssPineImg, size: 38 },
+            { slot: 'br', img: ssDuckImg, size: 32 }
+        ],
+        pattern: 'snow'
+    },
+    {
+        id: 'gc_fastfood',
+        name: 'FastFood',
+        price: 400,
+        accentColor: '#c92a2a',
+        borderColor: '#ffd43b',
+        bgStyle: 'linear-gradient(180deg, #b82525 0%, #751313 100%)',
+        emblemColor: '#ff922b',
+        emblemImg: ffBurgerImg,
+        bgImageUrl: ffArenaImg,
+        bgImageOpacity: 0.24,
+        topTrim: 'awning',
+        topBannerImg: ffLogoImg,
+        decors: [
+            { slot: 'tl', img: ffParachuteImg, size: 28 },
+            { slot: 'bl', img: ffPizzaImg, size: 34 },
+            { slot: 'br', img: ffBurgerImg, size: 32 }
+        ],
+        pattern: 'checker'
+    },
+    {
+        id: 'gc_wobble',
+        name: 'Wobble Squabble',
+        price: 400,
+        accentColor: '#0e9f9e',
+        borderColor: '#7ef9ff',
+        bgStyle: 'linear-gradient(180deg, #0ea5a4 0%, #084f5c 100%)',
+        emblemColor: '#22d3ee',
+        emblemImg: wsIconImg,
+        bgImageUrl: wsRooftopImg,
+        bgImageOpacity: 0.3,
+        decors: [
+            { slot: 'bl', img: wsWhackImg, size: 38 },
+            { slot: 'br', img: wsSplashImg, size: 42 }
+        ],
+        pattern: 'wave'
+    },
+    {
+        id: 'gc_battleball',
+        name: 'Battle Ball',
+        price: 450,
+        accentColor: '#6d28d9',
+        borderColor: '#a3e635',
+        bgStyle: 'linear-gradient(180deg, #5b21b6 0%, #2e0759 100%)',
+        emblemColor: '#84cc16',
+        emblemImg: bbIconImg,
+        bgImageUrl: bbBackdropImg,
+        bgImageOpacity: 0.34,
+        topBannerImg: bbLogoImg,
+        decors: [
+            { slot: 'tl', img: bbBombImg, size: 26 },
+            { slot: 'bl', img: bbCannonImg, size: 28 },
+            { slot: 'br', img: bbSpringImg, size: 26 }
+        ],
+        pattern: 'tiles'
+    },
+
+    // Mundo Mágico (Harry Potter — furnis mágicos reales de Habbo)
+    {
+        id: 'hp_gryffindor',
+        name: 'León Escarlata',
+        price: 500,
+        accentColor: '#7f1d1d',
+        borderColor: '#f5c542',
+        bgStyle: 'linear-gradient(180deg, #7f1d1d 0%, #420909 100%)',
+        emblemColor: '#eab308',
+        emblemFurniId: 225, // Velas rojas (rcandleset)
+        topTrim: 'magic_stars',
+        decors: [
+            { slot: 'bl', furniId: 225, size: 34 },   // Velas Rojas
+            { slot: 'br', furniId: 10831, size: 40 }  // Escobas Embrujadas
+        ],
+        pattern: 'crest'
+    },
+    {
+        id: 'hp_slytherin',
+        name: 'Serpiente Esmeralda',
+        price: 500,
+        accentColor: '#14532d',
+        borderColor: '#cbd5e1',
+        bgStyle: 'linear-gradient(180deg, #14532d 0%, #052b14 100%)',
+        emblemColor: '#22c55e',
+        emblemFurniId: 4578, // Poción mágica
+        topTrim: 'magic_stars',
+        decors: [
+            { slot: 'bl', furniId: 4578, size: 32 },  // Poción resucitadora
+            { slot: 'br', furniId: 2625, size: 38 }   // Caldero mágico
+        ],
+        pattern: 'crest'
+    },
+    {
+        id: 'hp_magic',
+        name: 'Hechicero Nocturno',
+        price: 550,
+        accentColor: '#312e81',
+        borderColor: '#fde047',
+        bgStyle: 'linear-gradient(180deg, #1e1b4b 0%, #090721 100%)',
+        emblemColor: '#818cf8',
+        emblemFurniId: 2997, // Pingüino Abracadabra
+        topTrim: 'magic_stars',
+        decors: [
+            { slot: 'bl', furniId: 2997, size: 36 },  // Pingüino Abracadabra
+            { slot: 'br', furniId: 10789, size: 40 }  // Caldero de la Bruja
+        ],
+        pattern: 'starlight'
+    },
+
+    // Wired (textura oficial Wired + cajas Wired reales)
+    {
+        id: 'wired_tech',
+        name: 'Maestro Wired',
+        price: 550,
+        accentColor: '#334155',
+        borderColor: '#38bdf8',
+        bgStyle: 'linear-gradient(180deg, #2b333d 0%, #14181e 100%)',
+        emblemColor: '#00e5ff',
+        emblemFurniId: 3668, // Causante WIRED
+        bgImageUrl: wiredBannerImg,
+        bgImageOpacity: 0.28,
+        topTrim: 'wired_bar',
+        decors: [
+            { slot: 'tl', img: wiredMonitorImg, size: 28 },
+            { slot: 'bl', furniId: 3668, size: 34 },  // Causante WIRED
+            { slot: 'br', furniId: 3663, size: 34 }   // Efecto WIRED
+        ],
+        pattern: 'circuit'
+    },
+
+    // Deportes & Retro (furnis deportivos y arcade reales)
+    {
+        id: 'sport_football',
+        name: 'Estadio Fútbol',
+        price: 350,
+        accentColor: '#15803d',
+        borderColor: '#f8fafc',
+        bgStyle: 'linear-gradient(180deg, #1f7a38 0%, #104a20 100%)',
+        emblemColor: '#4ade80',
+        emblemFurniId: 3508, // Balón Clásico (fball_ball)
+        decors: [
+            { slot: 'bl', furniId: 3508, size: 30 },  // Balón Clásico
+            { slot: 'br', furniId: 3505, size: 38 }   // Trofeo Mundial
+        ],
+        pattern: 'pitch'
+    },
+    {
+        id: 'sport_basket',
+        name: 'Cancha Basket',
+        price: 350,
+        accentColor: '#c2410c',
+        borderColor: '#fed7aa',
+        bgStyle: 'linear-gradient(180deg, #c2410c 0%, #75280f 100%)',
+        emblemColor: '#fb923c',
+        emblemFurniId: 280, // Trofeo Baloncesto
+        decors: [
+            { slot: 'bl', furniId: 3547, size: 30 },  // Balón
+            { slot: 'br', furniId: 280, size: 38 }    // Trofeo Baloncesto
+        ],
+        pattern: 'stripe'
+    },
+    {
+        id: 'arcade_retro',
+        name: 'Arcade 8-Bit',
+        price: 450,
+        accentColor: '#3b0764',
+        borderColor: '#f472b6',
+        bgStyle: 'linear-gradient(180deg, #22104a 0%, #0d0524 100%)',
+        emblemColor: '#ec4899',
+        emblemFurniId: 5063, // Raro Armario Arcade
+        decors: [
+            { slot: 'bl', furniId: 3277, size: 36 },  // Arcade Tank
+            { slot: 'br', furniId: 5063, size: 42 }   // Armario Arcade
+        ],
+        pattern: 'grid'
+    },
+    {
+        id: 'habbo_club',
+        name: 'VIP Clásico',
+        price: 650,
+        accentColor: '#166534',
+        borderColor: '#facc15',
+        bgStyle: 'linear-gradient(180deg, #166534 0%, #0a361b 100%)',
+        emblemColor: '#fde047',
+        emblemFurniId: 1506, // Trofeo Pato Dorado
+        decors: [
+            { slot: 'bl', furniId: 267, size: 38 },   // El Club Sofa
+            { slot: 'br', furniId: 1506, size: 36 }   // Trofeo Pato Dorado
+        ],
+        pattern: 'diamond'
+    }
 ];
 
 export const INFOSTAND_FURNIS: InfoStandFurniDef[] = [
@@ -214,7 +486,7 @@ export function useUserInfoStandStyle(userId?: number): UserInfoStandStyle
 
 const furniImageCache = new Map<number, string>();
 
-export function useInfoStandFurniSprite(furnitureId: number): string | null
+export function useInfoStandFurniSprite(furnitureId?: number): string | null
 {
     const [ imageUrl, setImageUrl ] = useState<string | null>(() =>
     {
@@ -293,4 +565,12 @@ export function useInfoStandFurniSprite(furnitureId: number): string | null
     }, [ furnitureId ]);
 
     return imageUrl;
+}
+
+export function useInfoStandFurniIcon(furnitureId?: number): string | null
+{
+    if(!furnitureId || furnitureId <= 0) return null;
+    const engine = GetRoomEngine();
+    if(!engine) return null;
+    return engine.getFurnitureFloorIconUrl(furnitureId) || null;
 }

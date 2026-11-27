@@ -16,6 +16,7 @@ import {
 } from '../../../../../api/infostand/InfoStandStyleService';
 import { LayoutAvatarImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, UserProfileIconView } from '../../../../../common';
 import { useEraTheme } from '../../../../../hooks/era/useEraTheme';
+import { InfoStandPlateDecor, PlateEmblemIcon } from './InfoStandPlateDecor';
 import './InfoStandCustom.scss';
 
 type EditorTab = 'plates' | 'furnis' | 'actions' | 'shop';
@@ -317,9 +318,7 @@ export const InfoStandEditorView: FC<{}> = () =>
                                                     className={ `infostand-mini-pill infostand-pattern-${ plate.pattern || 'none' }` }
                                                     style={ { '--is-plate-bg': plate.bgStyle, borderColor: plate.borderColor } as CSSProperties }
                                                 >
-                                                    <span className="mini-emblem" style={ { background: plate.emblemColor } }>
-                                                        { plate.emblemLabel || '' }
-                                                    </span>
+                                                    <PlateEmblemIcon plate={ plate } className="mini-emblem-slot" />
                                                     <span className="mini-label">{ plate.name }</span>
                                                 </div>
                                                 { isEq ? (
@@ -427,8 +426,9 @@ export const InfoStandEditorView: FC<{}> = () =>
 
                         <div className="infostand-preview-stage" style={ platePreviewCss }>
                             { isShockwave2006 ? (
-                                /* Preview Shockwave 2006: plataforma isométrica + cápsula */
-                                <div className="preview-era-shockwave">
+                                /* Preview Shockwave 2006: plataforma isométrica + adornos temáticos + cápsula */
+                                <div className={ `preview-era-shockwave ${ hasPreviewCustomPlate ? 'has-plate-decors' : '' }` }>
+                                    { hasPreviewCustomPlate && <InfoStandPlateDecor plate={ previewPlate } compact /> }
                                     <div className="preview-pedestal">
                                         { previewFurniUrl && (
                                             <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-furni-layer" />
@@ -450,69 +450,64 @@ export const InfoStandEditorView: FC<{}> = () =>
                                         className={ `infostand-preview-pill infostand-pattern-${ previewPlate.pattern || 'none' }` }
                                         style={ { '--is-plate-bg': previewPlate.bgStyle, borderColor: previewPlate.borderColor } as CSSProperties }
                                     >
-                                        { hasPreviewCustomPlate && (
-                                            <span className="preview-emblem" style={ { background: previewPlate.emblemColor } }>
-                                                { previewPlate.emblemLabel || '' }
-                                            </span>
-                                        ) }
+                                        { hasPreviewCustomPlate && <PlateEmblemIcon plate={ previewPlate } className="preview-emblem-slot" /> }
                                         <span className="preview-name">{ ownName }</span>
                                     </div>
                                 </div>
                             ) : (
                                 /* Preview Moderna / Flash 2012 / Móvil: réplica exacta de la tarjeta InfoStand */
                                 <div
-                                    className={ `preview-infostand-card ${ hasPreviewCustomPlate ? `has-custom-plate infostand-pattern-${ previewPlate.pattern || 'none' }` : '' }` }
+                                    className={ `preview-infostand-card ${ hasPreviewCustomPlate ? `has-custom-plate infostand-pattern-${ previewPlate.pattern || 'none' } ${ previewPlate.topBannerImg ? 'has-top-banner' : '' }` : '' }` }
                                     style={ hasPreviewCustomPlate ? platePreviewCss : undefined }
                                 >
-                                    <div className="preview-card-header">
-                                        <div className="preview-card-user">
-                                            { hasPreviewCustomPlate && (
-                                                <span className="preview-card-emblem" style={ { background: previewPlate.emblemColor } }>
-                                                    { previewPlate.emblemLabel || '' }
-                                                </span>
-                                            ) }
-                                            { ownUserId > 0 && <UserProfileIconView userId={ ownUserId } /> }
-                                            <span className="preview-card-username">{ ownName }</span>
+                                    { hasPreviewCustomPlate && <InfoStandPlateDecor plate={ previewPlate } /> }
+                                    <div className="preview-card-inner">
+                                        <div className="preview-card-header">
+                                            <div className="preview-card-user">
+                                                { hasPreviewCustomPlate && <PlateEmblemIcon plate={ previewPlate } /> }
+                                                { ownUserId > 0 && <UserProfileIconView userId={ ownUserId } /> }
+                                                <span className="preview-card-username">{ ownName }</span>
+                                            </div>
+                                            <FaTimes className="preview-card-close" />
                                         </div>
-                                        <FaTimes className="preview-card-close" />
-                                    </div>
 
-                                    <div className="preview-card-divider" />
+                                        <div className="preview-card-divider" />
 
-                                    <div className="preview-card-main">
-                                        <div className="preview-card-body-image">
-                                            { previewFurniUrl && (
-                                                <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-card-furni" />
-                                            ) }
-                                            <div
-                                                className="preview-card-avatar"
-                                                style={ { transform: avatarSeatTransform } }
-                                            >
-                                                <LayoutAvatarImageView
-                                                    figure={ ownFigure }
-                                                    direction={ 4 }
-                                                    posture={ previewAction.posture }
-                                                    gesture={ previewAction.gesture }
-                                                    expression={ previewAction.expression }
-                                                    carryItem={ previewAction.carryItem }
-                                                />
+                                        <div className="preview-card-main">
+                                            <div className="preview-card-body-image">
+                                                { previewFurniUrl && (
+                                                    <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-card-furni" />
+                                                ) }
+                                                <div
+                                                    className="preview-card-avatar"
+                                                    style={ { transform: avatarSeatTransform } }
+                                                >
+                                                    <LayoutAvatarImageView
+                                                        figure={ ownFigure }
+                                                        direction={ 4 }
+                                                        posture={ previewAction.posture }
+                                                        gesture={ previewAction.gesture }
+                                                        expression={ previewAction.expression }
+                                                        carryItem={ previewAction.carryItem }
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="preview-card-badges">
+                                                <span className="preview-badge-slot" />
+                                                <span className="preview-badge-slot" />
+                                                <span className="preview-badge-slot" />
+                                                <span className="preview-badge-slot" />
+                                                <span className="preview-badge-slot" />
+                                                <span className="preview-badge-slot" />
                                             </div>
                                         </div>
-                                        <div className="preview-card-badges">
-                                            <span className="preview-badge-slot" />
-                                            <span className="preview-badge-slot" />
-                                            <span className="preview-badge-slot" />
-                                            <span className="preview-badge-slot" />
-                                            <span className="preview-badge-slot" />
-                                            <span className="preview-badge-slot" />
+
+                                        <div className="preview-card-divider" />
+
+                                        <div className="preview-card-motto">
+                                            <FaPencilAlt className="preview-motto-icon" />
+                                            <span>Tu misión aquí</span>
                                         </div>
-                                    </div>
-
-                                    <div className="preview-card-divider" />
-
-                                    <div className="preview-card-motto">
-                                        <FaPencilAlt className="preview-motto-icon" />
-                                        <span>Tu misión aquí</span>
                                     </div>
                                 </div>
                             ) }

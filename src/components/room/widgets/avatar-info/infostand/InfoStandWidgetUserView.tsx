@@ -5,6 +5,7 @@ import close2012Img from '../../../../../assets/images/infostand/close-2012.png'
 import pencilIconImg from '../../../../../assets/images/infostand/pencil-icon.png';
 import { AvatarInfoUser, CloneObject, CreateLinkEvent, GetConfiguration, GetGroupInformation, GetSessionDataManager, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { getActionDef, getFurniDef, getPlateDef, useInfoStandFurniSprite, useUserInfoStandStyle } from '../../../../../api/infostand/InfoStandStyleService';
+import { InfoStandPlateDecor, PlateEmblemIcon } from './InfoStandPlateDecor';
 import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserProfileIconView } from '../../../../../common';
 import { useEraTheme, useMessageEvent, useRoom, useRoomSessionManagerEvent } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -187,18 +188,15 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
 
     return (
         <Column
-            className={ `nitro-infostand rounded ${ hasCustomPlate ? `has-custom-plate infostand-pattern-${ customPlate.pattern || 'none' }` : '' }` }
+            className={ `nitro-infostand rounded ${ hasCustomPlate ? `has-custom-plate infostand-pattern-${ customPlate.pattern || 'none' } ${ customPlate.topBannerImg ? 'has-top-banner' : '' }` : '' }` }
             style={ customPlateVars }
         >
-            <Column overflow="visible" className="container-fluid content-area" gap={ 1 }>
+            { hasCustomPlate && <InfoStandPlateDecor plate={ customPlate } /> }
+            <Column overflow="visible" className="container-fluid content-area infostand-foreground" gap={ 1 }>
                 <Column gap={ 1 }>
                     <Flex alignItems="center" justifyContent="between">
                         <Flex alignItems="center" gap={ 1 }>
-                            { hasCustomPlate && (
-                                <span className="infostand-plate-emblem" style={ { background: customPlate.emblemColor } } title={ customPlate.name }>
-                                    { customPlate.emblemLabel || '' }
-                                </span>
-                            ) }
+                            { hasCustomPlate && <PlateEmblemIcon plate={ customPlate } /> }
                             <UserProfileIconView userId={ avatarInfo.webID } />
                             <Text bold variant="white" small wrap className="infostand-name fw-bold"><b>{ avatarInfo.name }</b></Text>
                         </Flex>
