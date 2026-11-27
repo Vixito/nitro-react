@@ -1,5 +1,5 @@
 /* ============================================================================
-   HABBTEN RP — CLIENTE MODERNO PLANO (INFOSTAND, CELULAR SWIPE, CATÁLOGO, INVENTARIO)
+   HABBTEN RP — CLIENTE MODERNO PLANO
    Aislado exclusivamente bajo body.habbten-rp-client (Web y Móvil)
    ============================================================================ */
 
@@ -26,6 +26,55 @@ body.habbten-rp-client {
 
         > * { pointer-events: auto; }
     }
+
+    /* Menú contextual al hacer clic sobre el avatar (exacto a Imagen 3) */
+    .nitro-context-menu {
+        background-color: #464642 !important;
+        border: 1.5px solid #1b1d20 !important;
+        border-radius: 7px !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        box-shadow: none !important;
+        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+
+        .menu-header {
+            background-color: #4b4b47 !important;
+            color: #ffffff !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            height: 36px !important;
+            max-height: 36px !important;
+            min-width: 150px !important;
+            padding: 0 14px !important;
+            margin-bottom: 0 !important;
+            border-bottom: 1px solid #393936 !important;
+        }
+
+        .menu-footer {
+            background-color: #43433f !important;
+            color: #f3f4f6 !important;
+            height: 24px !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .menu-item.list-item {
+            background: #3d3d39 !important;
+            color: #f3f4f6 !important;
+            height: 28px !important;
+            max-height: 28px !important;
+            padding: 4px 12px !important;
+            margin-bottom: 1px !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+
+            &:not(.disabled):hover {
+                background: #52524c !important;
+            }
+        }
+    }
 }
 
 /* ==================== BOTÓN ROJO CLÁSICO HABBO DE CERRAR ==================== */
@@ -47,7 +96,7 @@ body.habbten-rp-client {
     &:hover { background: #ef4444; }
 }
 
-/* ==================== INFOSTAND RP DEDICADO (EXACTO A IMAGEN 1) ==================== */
+/* ==================== INFOSTAND RP DEDICADO ==================== */
 .rp-infostand-card {
     width: 274px;
     background: #2b2e33;
@@ -239,14 +288,62 @@ body.habbten-rp-client {
     &.is-warn { border-color: #d97706; color: #fef3c7; }
 }
 
-/* ==================== BOTONES SUPERIORES DERECHA (EXACTO A IMAGEN 3) ==================== */
+/* ==================== BOTONES SUPERIORES DERECHA + MENÚ HOVER DE SALA ==================== */
 .rp-top-right-tools {
     position: fixed;
     top: 12px;
     right: 12px;
     display: flex;
+    align-items: flex-start;
     gap: 6px;
     z-index: 65;
+}
+
+.rp-builder-hover-wrap {
+    position: relative;
+    padding-bottom: 6px;
+}
+
+.rp-builder-tray {
+    position: absolute;
+    top: 46px;
+    right: 0;
+    width: 205px;
+    background: #2b2e33;
+    border: 1px solid #4c515a;
+    border-radius: 7px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    z-index: 80;
+}
+
+.rp-builder-item {
+    width: 100%;
+    padding: 7px 9px;
+    border-radius: 5px;
+    background: transparent;
+    border: none;
+    color: #e5e7eb;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: #3e434b; color: #ffffff; }
+}
+
+.rp-builder-sprite {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
 }
 
 .rp-square-btn {
@@ -259,7 +356,6 @@ body.habbten-rp-client {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.12s ease;
 
     &:hover { background: #65625c; }
     &.is-active { background: #495464; border-color: #7c899c; }
@@ -324,7 +420,7 @@ body.habbten-rp-client {
     border: 2px solid #25282d;
 }
 
-/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA ==================== */
+/* ==================== HUD INFERIOR IZQUIERDA (CABEZA FRONTAL) + CHAT ==================== */
 .rp-bottom-cluster {
     position: fixed;
     left: 12px;
@@ -359,7 +455,7 @@ body.habbten-rp-client {
     width: 58px;
     height: 58px;
     border-radius: 6px;
-    background: #1b1e22;
+    background: #4e4d48;
     border: 1px solid #353a42;
     overflow: hidden;
     flex-shrink: 0;
@@ -370,10 +466,11 @@ body.habbten-rp-client {
 
 .rp-char-head-img {
     width: 54px;
-    height: 54px;
+    height: 62px;
+    margin-top: -2px;
     object-fit: contain;
-    object-position: center;
     image-rendering: pixelated;
+    image-rendering: crisp-edges;
     display: block;
 }
 
@@ -384,8 +481,9 @@ body.habbten-rp-client {
     min-width: 19px;
     height: 17px;
     padding: 0 4px;
-    border-radius: 3px;
-    background: #4d7c0f;
+    border-radius: 4px;
+    background: #678734;
+    border: 1px solid #1c2411;
     color: #ffffff;
     font-size: 10px;
     font-weight: 700;
@@ -501,7 +599,7 @@ body.habbten-rp-client {
     &:focus { border-color: #1ea866; }
 }
 
-/* ==================== SMARTPHONE DEL AVATAR (SWIPE REAL + ÍCONOS ORIGINALES) ==================== */
+/* ==================== SMARTPHONE DEL AVATAR ==================== */
 .rp-phone-device {
     position: fixed;
     left: 78px;
@@ -603,7 +701,7 @@ body.habbten-rp-client {
     background: #4ade80;
 }
 
-/* Pantalla de Bloqueo + Slider Físico Real */
+/* Bloqueo + Slider Físico */
 .rp-phone-lock {
     flex: 1;
     padding: 36px 14px 18px;
@@ -678,7 +776,7 @@ body.habbten-rp-client {
     pointer-events: none;
 }
 
-/* Pantalla Principal del Celular (Exacta a Imagen 2) */
+/* Home Screen Apps */
 .rp-phone-home {
     flex: 1;
     min-height: 0;
@@ -727,7 +825,6 @@ body.habbten-rp-client {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.12s ease, border-color 0.12s ease;
 }
 
 .rp-app-sprite {
@@ -765,7 +862,7 @@ body.habbten-rp-client {
     white-space: nowrap;
 }
 
-/* Vista Interna de App del Celular */
+/* ==================== CONTACTOS Y MENSAJES DENTRO DEL CELULAR (IMÁGENES 4 Y 5) ==================== */
 .rp-phone-appview {
     flex: 1;
     min-height: 0;
@@ -773,6 +870,251 @@ body.habbten-rp-client {
     flex-direction: column;
 }
 
+.rp-phone-solid-bg {
+    background: #2f3338;
+}
+
+.rp-phone-top-nav {
+    height: 44px;
+    padding: 0 10px;
+    background: #3d4147;
+    border-bottom: 1px solid #25282c;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.rp-phone-back-square {
+    width: 30px;
+    height: 26px;
+    border-radius: 5px;
+    background: #eef1f5;
+    border: 1px solid #1b1e22;
+    color: #54a82a;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover { background: #ffffff; }
+}
+
+.rp-phone-top-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    max-width: 155px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-phone-right-square {
+    width: 32px;
+    height: 30px;
+    border-radius: 6px;
+    background: #464b52;
+    border: 1px solid #6b7280;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover { background: #555b64; }
+}
+
+.rp-mini-nav-sprite {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.rp-phone-contacts-search {
+    padding: 10px;
+}
+
+.rp-phone-sec-band {
+    padding: 6px 10px;
+    background: #44484f;
+    border-top: 1px solid #35383e;
+    border-bottom: 1px solid #35383e;
+    font-size: 11px;
+    font-weight: 700;
+    color: #e5e7eb;
+    flex-shrink: 0;
+}
+
+.rp-phone-contact-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rp-phone-empty-note {
+    font-size: 12px;
+    color: #9ca3af;
+    padding: 8px 2px;
+    line-height: 1.45;
+}
+
+.rp-contact-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 8px;
+    background: #26292e;
+    border: 1px solid #3c4048;
+    border-radius: 6px;
+}
+
+.rp-contact-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.rp-contact-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #6b7280;
+    flex-shrink: 0;
+
+    &.is-on { background: #22c55e; }
+}
+
+.rp-contact-head {
+    width: 26px;
+    height: 28px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.rp-contact-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f3f4f6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-phone-msg-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 18px;
+    text-align: center;
+    gap: 14px;
+
+    p {
+        font-size: 12.5px;
+        color: #9ca3af;
+        margin: 0;
+    }
+}
+
+.rp-msg-empty-sprite {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.rp-habbo-white-btn {
+    padding: 8px 20px;
+    border-radius: 5px;
+    background: #f3f4f6;
+    border: 1.5px solid #181a1e;
+    color: #181a1e;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover { background: #ffffff; }
+}
+
+.rp-phone-thread-view {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.rp-phone-thread-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rp-msg-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+
+    &.is-own {
+        align-items: flex-end;
+
+        .rp-msg-bubble {
+            background: #1ea866;
+            color: #ffffff;
+        }
+    }
+}
+
+.rp-msg-bubble {
+    max-width: 85%;
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: #40454d;
+    color: #f3f4f6;
+    font-size: 11.5px;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.rp-phone-thread-form {
+    padding: 8px;
+    background: #23262b;
+    border-top: 1px solid #3c4048;
+    display: flex;
+    gap: 6px;
+
+    input {
+        flex: 1;
+        min-width: 0;
+        height: 32px;
+        padding: 0 9px;
+        background: #ffffff;
+        border: none;
+        border-radius: 5px;
+        color: #111827;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11.5px;
+        outline: none;
+    }
+}
+
+/* Navbar interna otras apps */
 .rp-app-navbar {
     height: 36px;
     padding: 0 8px;
@@ -1019,7 +1361,7 @@ body.habbten-rp-client {
     &:hover { border-color: #9ca3af; }
 }
 
-/* ==================== VENTANA CATÁLOGO / TIENDA (EXACTA A IMAGEN 4) ==================== */
+/* ==================== CATÁLOGO, INVENTARIO Y AYUDA ==================== */
 .rp-catalog-win,
 .rp-inventory-win,
 .rp-help-win {
@@ -1051,9 +1393,9 @@ body.habbten-rp-client {
 }
 
 .rp-help-win {
-    width: 420px;
-    max-width: 92vw;
-    max-height: 75vh;
+    width: 660px;
+    max-width: 94vw;
+    max-height: 82vh;
 }
 
 .rp-win-header {
@@ -1081,6 +1423,127 @@ body.habbten-rp-client {
     color: #ffffff;
 }
 
+/* Ventana Ayuda y Soporte (Exacta a Imagen 2) */
+.rp-help-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid #454952;
+}
+
+.rp-help-hero-copy {
+    h3 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0 0 6px;
+    }
+
+    p {
+        font-size: 12.5px;
+        color: #b4bac4;
+        margin: 0;
+    }
+}
+
+.rp-help-lifebuoy {
+    width: 118px;
+    height: auto;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.rp-help-split {
+    display: grid;
+    grid-template-columns: 215px 1fr;
+    min-height: 270px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.rp-help-nav {
+    padding: 16px 14px;
+    border-right: 1px solid #454952;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
+}
+
+.rp-help-nav-btn {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #d1d5db;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: #3b3e45; color: #ffffff; }
+    &.is-active {
+        background: #55544d;
+        border-color: #7c7a72;
+        color: #ffffff;
+    }
+}
+
+.rp-help-nav-ico {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.rp-help-content {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+
+    h4 {
+        font-size: 15px;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0;
+    }
+
+    p {
+        font-size: 12.5px;
+        line-height: 1.55;
+        color: #c7cdd6;
+        margin: 0;
+    }
+}
+
+.rp-help-cta {
+    align-self: flex-start;
+    margin-top: 6px;
+    padding: 10px 18px;
+    border-radius: 5px;
+    background: #1ea866;
+    border: 1px solid #126b40;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover { background: #19945a; }
+}
+
+/* Catálogo e Inventario */
 .rp-catalog-body {
     flex: 1;
     min-height: 0;
@@ -1410,30 +1873,6 @@ body.habbten-rp-client {
     margin: auto 0;
 }
 
-.rp-help-body {
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    overflow-y: auto;
-}
-
-.rp-cmd-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 4px;
-
-    code {
-        background: #131619;
-        border: 1px solid #323740;
-        color: #fde047;
-        font-size: 11px;
-        padding: 3px 7px;
-        border-radius: 4px;
-    }
-}
-
 /* Botones reutilizables */
 .rp-btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .rp-btn-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -1488,8 +1927,8 @@ body.habbten-rp-client {
     }
 
     .rp-char-head-img {
-        width: 44px;
-        height: 44px;
+        width: 46px;
+        height: 52px;
     }
 
     .rp-mob-chat-btn {
@@ -1529,22 +1968,24 @@ body.habbten-rp-client {
     }
 
     .rp-catalog-win,
-    .rp-inventory-win {
+    .rp-inventory-win,
+    .rp-help-win {
         width: 96vw;
         height: 82vh;
     }
 
     .rp-catalog-body,
-    .rp-inventory-body {
+    .rp-inventory-body,
+    .rp-help-split {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
     }
 
     .rp-cat-sidebar,
-    .rp-inv-sidebar {
+    .rp-inv-sidebar,
+    .rp-help-nav {
         border-right: none;
         border-bottom: 1px solid #41454d;
-        max-height: 112px;
+        max-height: 118px;
     }
 
     .rp-cat-detail,

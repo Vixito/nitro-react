@@ -1,5 +1,6 @@
 import { FC, FormEvent, PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+    FaArrowLeft,
     FaBolt,
     FaChevronLeft,
     FaChevronRight,
@@ -9,6 +10,7 @@ import {
     FaSearch,
     FaTimes
 } from 'react-icons/fa';
+import helpLifebuoyImg from '@/assets/images/roleplay/help-lifebuoy.png';
 import helpTripleQIcon from '@/assets/images/roleplay/help-triple-q.png';
 import iconBuildersClub from '@/assets/images/toolbar/icons/buildersclub.png';
 import iconCamera from '@/assets/images/toolbar/icons/camera.png';
@@ -28,8 +30,8 @@ import iconHelperTool from '@/assets/images/toolbar/icons/me-menu/helper-tool.pn
 import iconProfile from '@/assets/images/toolbar/icons/me-menu/profile.png';
 import iconTalents from '@/assets/images/toolbar/icons/me-menu/talents.png';
 import iconHeartSprite from '@/assets/images/icons/sign-heart.png';
-import { ChatMessageTypeEnum, CreateLinkEvent, CreateRoomSession, GetRoomSession } from '../../api';
-import { useChatInputWidget, useSessionInfo } from '../../hooks';
+import { ChatMessageTypeEnum, CreateLinkEvent, CreateRoomSession, GetRoomSession, GetSessionDataManager, MessengerThreadChat } from '../../api';
+import { useChatInputWidget, useFriends, useMessenger, useSessionInfo } from '../../hooks';
 import {
     isRoleplayMode,
     RpFullState,
@@ -45,7 +47,8 @@ import {
 import './RoleplayHudView.scss';
 
 type SideModalTab = null | 'shop' | 'inventory' | 'help';
-type PhoneApp = 'lock' | 'home' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'missions' | 'rankings' | 'settings';
+type HelpTopicId = 'around' | 'rooms' | 'character' | 'phone' | 'chat';
+type PhoneApp = 'lock' | 'home' | 'contacts' | 'messages' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'missions' | 'rankings' | 'settings';
 
 interface ToastMsg
 {
@@ -103,9 +106,14 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const rpActive = isRoleplayMode();
     const { sendChat = null } = useChatInputWidget();
     const { chatStyleId = 0 } = useSessionInfo();
+    const { onlineFriends = [], offlineFriends = [], requests = [], requestResponse = null, followFriend = null } = useFriends();
+    const { visibleThreads = [], activeThread = null, getMessageThread = null, setActiveThreadId = null, sendMessage = null } = useMessenger();
 
     const [ state, setState ] = useState<RpFullState | null>(null);
     const [ sideModal, setSideModal ] = useState<SideModalTab>(null);
+    const [ helpTopic, setHelpTopic ] = useState<HelpTopicId>('around');
+    const [ builderOpen, setBuilderOpen ] = useState<boolean>(false);
+
     const [ phoneOpen, setPhoneOpen ] = useState<boolean>(false);
     const [ phoneUnlocked, setPhoneUnlocked ] = useState<boolean>(false);
     const [ phoneApp, setPhoneApp ] = useState<PhoneApp>('lock');
@@ -118,6 +126,11 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const maxDragRef = useRef<number>(0);
     const [ swipeX, setSwipeX ] = useState<number>(0);
     const [ isSwiping, setIsSwiping ] = useState<boolean>(false);
+
+    // Contactos y Mensajes dentro del celular
+    const [ contactSearch, setContactSearch ] = useState<string>('');
+    const [ phoneChatInput, setPhoneChatInput ] = useState<string>('');
+    const [ activeChatUserId, setActiveChatUserId ] = useState<number | null>(null);
 
     // Catálogo / Tienda 3 columnas
     const [ shopCategory, setShopCategory ] = useState<string>('all');
@@ -306,7 +319,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     }, []);
 
-    // Artículos del catálogo (incluyendo entrenamientos del gimnasio en categoría gym)
     const gymVirtualItems: RpItem[] = useMemo(() => ([
         {
             slug: '__gym_strength',
@@ -372,6 +384,24 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         return filteredInv.find(i => (i.item_slug || i.slug) === selectedInvSlug) || filteredInv[0];
     }, [ filteredInv, selectedInvSlug ]);
 
+    const allContacts = useMemo(() =>
+    {
+        const merged = [ ...onlineFriends, ...offlineFriends ];
+        const q = contactSearch.trim().toLowerCase();
+        if(!q) return merged;
+        return merged.filter(f => (f.name || '').toLowerCase().includes(q));
+    }, [ onlineFriends, offlineFriends, contactSearch ]);
+
+    const currentPhoneThread = useMemo(() =>
+    {
+        if(activeChatUserId !== null)
+        {
+            const byUser = visibleThreads.find(t => t.participant?.id === activeChatUserId);
+            if(byUser) return byUser;
+        }
+        return activeThread || null;
+    }, [ activeChatUserId, visibleThreads, activeThread ]);
+
     if(!rpActive || !state) return null;
 
     const { character, job, clock } = state;
@@ -381,6 +411,26 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const xpPct = Math.max(0, Math.min(100, Math.round((character.rp_xp / Math.max(1, character.xpForNextLevel)) * 100)));
     const claimableMissions = (state.missions || []).filter(m => m.canClaim).length;
     const activeShopMeta = SHOP_CATEGORIES.find(c => c.id === shopCategory) || SHOP_CATEGORIES[0];
+
+    const openContactChat = (userId: number) =>
+    {
+        if(getMessageThread)
+        {
+            const thread = getMessageThread(userId);
+            if(thread && setActiveThreadId) setActiveThreadId(thread.threadId);
+        }
+        setActiveChatUserId(userId);
+        setPhoneApp('messages');
+    };
+
+    const handlePhoneMsgSend = (e: FormEvent) =>
+    {
+        e.preventDefault();
+        const text = phoneChatInput.trim();
+        if(!text || !currentPhoneThread || !sendMessage) return;
+        sendMessage(currentPhoneThread, GetSessionDataManager().userId, text);
+        setPhoneChatInput('');
+    };
 
     const handleTravel = (slug: string, useTaxi: boolean) =>
     {
@@ -478,10 +528,11 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const openSideModal = (tab: SideModalTab) =>
     {
         if(tab && phoneOpen) togglePhone(false);
+        setBuilderOpen(false);
         setSideModal(prev => (prev === tab ? null : tab));
     };
 
-    // Handlers de arrastre físico para Deslizar para Desbloquear
+    // Arrastre físico real para Deslizar para Desbloquear
     const onSwipeStart = (e: PointerEvent<HTMLDivElement>) =>
     {
         const track = unlockTrackRef.current;
@@ -515,10 +566,50 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     };
 
-    // Apps del Celular usando EXCLUSIVAMENTE los íconos pixel-art originales del juego
+    // Herramientas de sala al hacer hover en el botón Constructor (exacto a HabboRP)
+    const roomBuilderTools: Array<{ id: string; label: string; icon: string; action: () => void }> = [
+        {
+            id: 'room-settings',
+            label: 'Ajustes de sala',
+            icon: iconCog,
+            action: () => { setBuilderOpen(false); pushToast('ok', `Sala actual: ${ currentLocation?.name || 'Ciudad Habbten' }`); }
+        },
+        {
+            id: 'room-dimmer',
+            label: 'Regulador de luz',
+            icon: iconHelperTool,
+            action: () => { setBuilderOpen(false); pushToast('warn', 'Coloca un regulador de luz en tu sala propia para ajustar la iluminación.'); }
+        },
+        {
+            id: 'window-bg',
+            label: 'Fondo de ventana',
+            icon: iconCamera,
+            action: () => { setBuilderOpen(false); openSideModal('shop'); }
+        },
+        {
+            id: 'walls-floors',
+            label: 'Paredes y suelos',
+            icon: iconHouse,
+            action: () => { setBuilderOpen(false); openSideModal('shop'); }
+        },
+        {
+            id: 'wall-decor',
+            label: 'Decoración de pared',
+            icon: iconCatalog,
+            action: () => { setBuilderOpen(false); openSideModal('inventory'); }
+        },
+        {
+            id: 'floor-plan',
+            label: 'Plano de suelo',
+            icon: iconRooms,
+            action: () => { setBuilderOpen(false); CreateLinkEvent('floor-editor/toggle'); }
+        }
+    ];
+
+    // Apps del Celular con sprites originales del juego (Contactos y Mensajes integrados DENTRO del celular!)
     const phoneApps: Array<{ id: string; label: string; icon: string; badge?: number; action: () => void }> = [
-        { id: 'contacts', label: 'Contactos', icon: iconFriends, action: () => { CreateLinkEvent('friends/toggle'); } },
-        { id: 'messages', label: 'Mensajes', icon: iconMessage, action: () => { CreateLinkEvent('friendlist/toggle'); } },
+        { id: 'contacts', label: 'Contactos', icon: iconFriends, badge: requests.length, action: () => setPhoneApp('contacts') },
+        { id: 'messages', label: 'Mensajes', icon: iconMessage, action: () => { setActiveChatUserId(null); setPhoneApp('messages'); } },
         { id: 'camera', label: 'Cámara', icon: iconCamera, action: () => { CreateLinkEvent('camera/toggle'); } },
         { id: 'settings', label: 'Ajustes', icon: iconCog, action: () => setPhoneApp('settings') },
         { id: 'missions', label: 'Misiones', icon: iconQuest, badge: claimableMissions, action: () => setPhoneApp('missions') },
@@ -534,6 +625,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const phoneAppTitle: Record<PhoneApp, string> = {
         lock: 'Bloqueado',
         home: state.user.username,
+        contacts: 'Contactos',
+        messages: 'Mensajes',
         news: 'Noticias',
         map: 'GPS Mapa',
         jobs: 'Empleos',
@@ -545,6 +638,71 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         settings: 'Ajustes'
     };
 
+    const helpTopics: Array<{ id: HelpTopicId; label: string; icon: string; title: string; paragraphs: string[]; ctaLabel: string; ctaAction: () => void }> = [
+        {
+            id: 'around',
+            label: 'Moverse por la ciudad',
+            icon: iconRooms,
+            title: 'Moverse por la ciudad',
+            paragraphs: [
+                'Haz clic en cualquier baldosa del suelo para caminar. Usa la app GPS Mapa en tu celular para viajar a pie, en taxi o en tu vehículo entre los 10 distritos.',
+                'Arrastra en el espacio vacío fuera de la sala para mover la cámara y centrar tu vista.',
+                'Escribe en la barra blanca de chat inferior para hablar o ejecutar comandos rápidos como :me, :do, :trabajar o :911.'
+            ],
+            ctaLabel: 'Explorar catálogo',
+            ctaAction: () => openSideModal('shop')
+        },
+        {
+            id: 'rooms',
+            label: 'Salas y mobiliario',
+            icon: iconInventory,
+            title: 'Salas y mobiliario',
+            paragraphs: [
+                'Compra equipamiento, vehículos, chalecos y artículos en el Catálogo (ícono del carrito a la izquierda) y guárdalos automáticamente en tu Inventario.',
+                'Pasa el cursor sobre el ícono del casco arriba a la derecha para acceder a las herramientas de sala: Ajustes de sala, Regulador de luz, Fondo, Paredes y Plano de suelo.'
+            ],
+            ctaLabel: 'Abrir inventario',
+            ctaAction: () => openSideModal('inventory')
+        },
+        {
+            id: 'character',
+            label: 'Tu personaje',
+            icon: iconClothing,
+            title: 'Tu personaje',
+            paragraphs: [
+                'Controla tu Vida (barra roja), Energía (barra dorada), Nivel RP y Efectivo desde la tarjeta inferior izquierda.',
+                'Haz clic sobre tu propio avatar en la sala para cambiar tu aspecto, bailar o hacer gestos. También puedes postularte a empleos (Policía HPD, Médico, Banquero, Mecánico, Chef o Sindicato) desde tu celular.'
+            ],
+            ctaLabel: 'Cambiar aspecto',
+            ctaAction: () => { setSideModal(null); CreateLinkEvent('avatar-editor/toggle'); }
+        },
+        {
+            id: 'phone',
+            label: 'Celular y contactos',
+            icon: '/img/rp_phone_icon_hd.png',
+            title: 'Celular y contactos',
+            paragraphs: [
+                'Pulsa el ícono del celular en el dock izquierdo y desliza la flecha verde hasta el final para desbloquearlo.',
+                'Desde el celular puedes gestionar tus Contactos, enviar Mensajes privados, usar la Cámara, consultar el GPS, cobrar Misiones, operar en el Banco, crear Bandas y leer Noticias.'
+            ],
+            ctaLabel: 'Abrir celular',
+            ctaAction: () => togglePhone(true)
+        },
+        {
+            id: 'chat',
+            label: 'Chat y comandos',
+            icon: helpTripleQIcon,
+            title: 'Chat y comandos RP',
+            paragraphs: [
+                'Además de chatear normalmente en sala, puedes escribir comandos directamente en la barra blanca inferior:',
+                ':me <acción> · :do <entorno> · :trabajar · :turno · :pagar <usuario> <$> · :golpear <usuario> · :esposar <usuario> · :arrestar <usuario> · :curar <usuario> · :robar [tienda|banco] · :911 <mensaje>'
+            ],
+            ctaLabel: 'Entendido',
+            ctaAction: () => setSideModal(null)
+        }
+    ];
+
+    const activeHelp = helpTopics.find(t => t.id === helpTopic) || helpTopics[0];
     const swipeFade = maxDragRef.current > 0 ? Math.max(0, 1 - (swipeX / (maxDragRef.current * 0.65))) : 1;
 
     return (
@@ -574,25 +732,47 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </div>
             ) }
 
-            {/* ==================== BOTONES SUPERIORES DERECHA (ÍCONOS ORIGINALES DEL JUEGO) ==================== */}
+            {/* ==================== BOTONES SUPERIORES DERECHA (HOVER HERRAMIENTAS DE SALA + AYUDA ???) ==================== */}
             <div className="rp-top-right-tools">
-                <button
-                    type="button"
-                    className="rp-square-btn"
-                    title="Cambiar Ropa / Aspecto"
-                    onClick={ () => CreateLinkEvent('avatar-editor/toggle') }>
-                    <img src={ iconBuildersClub } alt="Aspecto" className="rp-pixel-sprite" />
-                </button>
+                <div
+                    className={ `rp-builder-hover-wrap ${ builderOpen ? 'is-open' : '' }` }
+                    onMouseEnter={ () => !isMobile && setBuilderOpen(true) }
+                    onMouseLeave={ () => !isMobile && setBuilderOpen(false) }>
+                    <button
+                        type="button"
+                        className={ `rp-square-btn ${ builderOpen ? 'is-active' : '' }` }
+                        title="Herramientas de sala"
+                        onClick={ () => setBuilderOpen(v => !v) }>
+                        <img src={ iconBuildersClub } alt="Herramientas de sala" className="rp-pixel-sprite" />
+                    </button>
+
+                    { builderOpen && (
+                        <div className="rp-builder-tray" role="menu" aria-label="Herramientas de sala">
+                            { roomBuilderTools.map(tool => (
+                                <button
+                                    key={ tool.id }
+                                    type="button"
+                                    className="rp-builder-item"
+                                    title={ tool.label }
+                                    onClick={ tool.action }>
+                                    <img src={ tool.icon } alt="" className="rp-builder-sprite" />
+                                    <span>{ tool.label }</span>
+                                </button>
+                            )) }
+                        </div>
+                    ) }
+                </div>
+
                 <button
                     type="button"
                     className={ `rp-square-btn ${ sideModal === 'help' ? 'is-active' : '' }` }
-                    title="Ayuda y Comandos"
+                    title="Ayuda y Soporte"
                     onClick={ () => openSideModal('help') }>
                     <img src={ helpTripleQIcon } alt="Ayuda" className="rp-pixel-sprite" />
                 </button>
             </div>
 
-            {/* ==================== DOCK VERTICAL IZQUIERDO (CATÁLOGO · INVENTARIO · CELULAR) ==================== */}
+            {/* ==================== DOCK VERTICAL IZQUIERDO ==================== */}
             <aside className="rp-left-dock" aria-label="Herramientas RP">
                 <button
                     type="button"
@@ -614,17 +794,17 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     title="Celular"
                     onClick={ () => togglePhone() }>
                     <img src="/img/rp_phone_icon_hd.png" alt="Celular" className="rp-dock-icon-hd" />
-                    { (claimableMissions > 0 || !phoneUnlocked) && <span className="rp-dock-dot" /> }
+                    { (claimableMissions > 0 || requests.length > 0 || !phoneUnlocked) && <span className="rp-dock-dot" /> }
                 </button>
             </aside>
 
-            {/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA ==================== */}
+            {/* ==================== HUD INFERIOR IZQUIERDA (CABEZA FRONTAL) + CHAT BLANCO ==================== */}
             <div className="rp-bottom-cluster">
                 <div className="rp-char-hud" onClick={ () => togglePhone(true) } title="Abrir celular">
                     <div className="rp-char-avatar-box">
                         <img
                             className="rp-char-head-img"
-                            src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(state.user.look || '') }&headonly=1&size=m&direction=2&head_direction=2` }
+                            src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(state.user.look || '') }&headonly=1&size=m&direction=3&head_direction=3` }
                             alt={ state.user.username } />
                         <span className="rp-char-lvl">{ character.rp_level }</span>
                     </div>
@@ -713,7 +893,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </span>
                         </div>
 
-                        {/* PANTALLA DE BLOQUEO CON SLIDER REAL DE ARRASTRE */}
+                        {/* PANTALLA DE BLOQUEO CON SLIDER REAL */}
                         { phoneApp === 'lock' && (
                             <div className="rp-phone-lock">
                                 <div className="rp-lock-clock-wrap">
@@ -743,7 +923,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* PANTALLA DE INICIO CON ÍCONOS ORIGINALES DEL JUEGO (EXACTO A REFERENCIA) */}
+                        {/* PANTALLA DE INICIO CON ÍCONOS ORIGINALES */}
                         { phoneApp === 'home' && (
                             <div className="rp-phone-home">
                                 <div className="rp-phone-home-user">{ state.user.username }</div>
@@ -765,8 +945,155 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* APPS INTERNAS DEL CELULAR */}
-                        { phoneApp !== 'lock' && phoneApp !== 'home' && (
+                        {/* APP CONTACTOS DENTRO DEL CELULAR (EXACTA A IMAGEN 4) */}
+                        { phoneApp === 'contacts' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button type="button" className="rp-phone-back-square" onClick={ () => setPhoneApp('home') } title="Inicio">
+                                        <FaArrowLeft />
+                                    </button>
+                                    <span className="rp-phone-top-title">Contactos</span>
+                                    <button type="button" className="rp-phone-right-square" onClick={ () => { setActiveChatUserId(null); setPhoneApp('messages'); } } title="Mensajes">
+                                        <img src={ iconMessage } alt="Mensajes" className="rp-mini-nav-sprite" />
+                                    </button>
+                                </div>
+
+                                <div className="rp-phone-contacts-search">
+                                    <div className="rp-white-search">
+                                        <FaSearch className="rp-search-ico" />
+                                        <input
+                                            type="text"
+                                            value={ contactSearch }
+                                            onChange={ e => setContactSearch(e.target.value) }
+                                            placeholder="Buscar contactos" />
+                                    </div>
+                                </div>
+
+                                { requests.length > 0 && (
+                                    <>
+                                        <div className="rp-phone-sec-band">Solicitudes ({ requests.length })</div>
+                                        <div className="rp-phone-contact-list" style={ { flex: 'none' } }>
+                                            { requests.map(req => (
+                                                <div key={ req.id } className="rp-contact-row">
+                                                    <span className="rp-contact-name">{ req.name }</span>
+                                                    <div className="rp-btn-row">
+                                                        <button type="button" className="rp-btn is-green is-xs" onClick={ () => requestResponse && requestResponse(req.id, true) }>Aceptar</button>
+                                                        <button type="button" className="rp-btn is-dark is-xs" onClick={ () => requestResponse && requestResponse(req.id, false) }>No</button>
+                                                    </div>
+                                                </div>
+                                            )) }
+                                        </div>
+                                    </>
+                                ) }
+
+                                <div className="rp-phone-sec-band">Tus contactos</div>
+                                <div className="rp-phone-contact-list">
+                                    { allContacts.length === 0 ? (
+                                        <div className="rp-phone-empty-note">
+                                            Añade amigos desde el menú de un jugador.
+                                        </div>
+                                    ) : allContacts.map(friend => (
+                                        <div key={ friend.id } className="rp-contact-row">
+                                            <div className="rp-contact-left" onClick={ () => openContactChat(friend.id) }>
+                                                <span className={ `rp-contact-dot ${ friend.online ? 'is-on' : '' }` } />
+                                                <img
+                                                    className="rp-contact-head"
+                                                    src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(friend.figure || '') }&headonly=1&size=s&direction=3&head_direction=3` }
+                                                    alt="" />
+                                                <span className="rp-contact-name">{ friend.name }</span>
+                                            </div>
+                                            <div className="rp-btn-row">
+                                                { friend.online && followFriend && (
+                                                    <button type="button" className="rp-btn is-dark is-xs" onClick={ () => followFriend(friend) }>Ir</button>
+                                                ) }
+                                                <button type="button" className="rp-btn is-green is-xs" onClick={ () => openContactChat(friend.id) }>Chat</button>
+                                            </div>
+                                        </div>
+                                    )) }
+                                </div>
+                            </div>
+                        ) }
+
+                        {/* APP MENSAJES DENTRO DEL CELULAR (EXACTA A IMAGEN 5) */}
+                        { phoneApp === 'messages' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button
+                                        type="button"
+                                        className="rp-phone-back-square"
+                                        onClick={ () => {
+                                            if(activeChatUserId !== null) setActiveChatUserId(null);
+                                            else setPhoneApp('home');
+                                        } }
+                                        title="Volver">
+                                        <FaArrowLeft />
+                                    </button>
+                                    <span className="rp-phone-top-title">
+                                        { activeChatUserId !== null && currentPhoneThread?.participant?.name
+                                            ? currentPhoneThread.participant.name
+                                            : 'Mensajes' }
+                                    </span>
+                                    <button type="button" className="rp-phone-right-square" onClick={ () => setPhoneApp('contacts') } title="Contactos">
+                                        <img src={ iconFriends } alt="Contactos" className="rp-mini-nav-sprite" />
+                                    </button>
+                                </div>
+
+                                { activeChatUserId !== null && currentPhoneThread ? (
+                                    <div className="rp-phone-thread-view">
+                                        <div className="rp-phone-thread-scroll">
+                                            { currentPhoneThread.groups.map((grp, gIdx) => (
+                                                <div key={ gIdx } className={ `rp-msg-group ${ grp.userId === GetSessionDataManager().userId ? 'is-own' : '' }` }>
+                                                    { grp.chats.map((c, cIdx) => (
+                                                        c.type === MessengerThreadChat.SECURITY_NOTIFICATION ? null : (
+                                                            <div key={ cIdx } className="rp-msg-bubble">{ c.message }</div>
+                                                        )
+                                                    )) }
+                                                </div>
+                                            )) }
+                                        </div>
+                                        <form className="rp-phone-thread-form" onSubmit={ handlePhoneMsgSend }>
+                                            <input
+                                                type="text"
+                                                value={ phoneChatInput }
+                                                onChange={ e => setPhoneChatInput(e.target.value) }
+                                                placeholder="Escribe un mensaje..."
+                                                maxLength={ 220 } />
+                                            <button type="submit" className="rp-btn is-green is-xs">Enviar</button>
+                                        </form>
+                                    </div>
+                                ) : visibleThreads.length > 0 ? (
+                                    <div className="rp-phone-contact-list">
+                                        { visibleThreads.map(th => (
+                                            <div
+                                                key={ th.threadId }
+                                                className="rp-contact-row"
+                                                onClick={ () => { if(th.participant) openContactChat(th.participant.id); } }
+                                                style={ { cursor: 'pointer' } }>
+                                                <div className="rp-contact-left">
+                                                    <img
+                                                        className="rp-contact-head"
+                                                        src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(th.participant?.figure || '') }&headonly=1&size=s&direction=3&head_direction=3` }
+                                                        alt="" />
+                                                    <span className="rp-contact-name">{ th.participant?.name || 'Contacto' }</span>
+                                                </div>
+                                                { th.unreadCount > 0 && <span className="rp-tag is-pvp">{ th.unreadCount }</span> }
+                                            </div>
+                                        )) }
+                                    </div>
+                                ) : (
+                                    <div className="rp-phone-msg-empty">
+                                        <img src={ iconMessage } alt="" className="rp-msg-empty-sprite" />
+                                        <p>Elige un contacto para empezar a chatear.</p>
+                                        <button type="button" className="rp-habbo-white-btn" onClick={ () => setPhoneApp('contacts') }>
+                                            Contactos
+                                        </button>
+                                    </div>
+                                ) }
+                            </div>
+                        ) }
+
+                        {/* RESTO DE APPS INTERNAS DEL CELULAR */}
+                        { phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && (
                             <div className="rp-phone-appview">
                                 <div className="rp-app-navbar">
                                     <button
@@ -1112,12 +1439,12 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             type="button"
                             className="rp-phone-home-btn"
                             title="Inicio del celular"
-                            onClick={ () => { setSelectedArticle(null); setPhoneApp(phoneUnlocked ? 'home' : 'lock'); } } />
+                            onClick={ () => { setSelectedArticle(null); setActiveChatUserId(null); setPhoneApp(phoneUnlocked ? 'home' : 'lock'); } } />
                     </div>
                 </section>
             ) }
 
-            {/* ==================== CATÁLOGO / TIENDA (3 COLUMNAS — EXACTO A IMAGEN 4) ==================== */}
+            {/* ==================== CATÁLOGO / TIENDA (3 COLUMNAS) ==================== */}
             { sideModal === 'shop' && (
                 <section className="rp-catalog-win" aria-label="Catálogo">
                     <div className="rp-win-header">
@@ -1128,7 +1455,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     </div>
 
                     <div className="rp-catalog-body">
-                        {/* Columna izquierda: Buscador + Categorías */}
                         <div className="rp-cat-sidebar">
                             <div className="rp-white-search">
                                 <FaSearch className="rp-search-ico" />
@@ -1153,7 +1479,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         </div>
 
-                        {/* Columna central: Banner + Cuadrícula de artículos con precio */}
                         <div className="rp-cat-center">
                             <div className="rp-cat-banner" style={ { backgroundImage: `url('${ activeShopMeta.banner }')` } }>
                                 <span>{ activeShopMeta.label }</span>
@@ -1180,7 +1505,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         </div>
 
-                        {/* Columna derecha: Detalle, Precio, Saldo, Cantidad y Comprar */}
                         <div className="rp-cat-detail">
                             { selectedShopItem ? (
                                 <>
@@ -1229,7 +1553,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </section>
             ) }
 
-            {/* ==================== INVENTARIO (3 COLUMNAS — EXACTO A IMAGEN 5) ==================== */}
+            {/* ==================== INVENTARIO (3 COLUMNAS) ==================== */}
             { sideModal === 'inventory' && (
                 <section className="rp-inventory-win" aria-label="Inventario">
                     <div className="rp-win-header">
@@ -1240,7 +1564,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     </div>
 
                     <div className="rp-inventory-body">
-                        {/* Columna izquierda: Categorías */}
                         <div className="rp-inv-sidebar">
                             { INV_CATEGORIES.map(cat => (
                                 <button
@@ -1254,7 +1577,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             )) }
                         </div>
 
-                        {/* Columna central: Buscador + Contador + Cuadrícula */}
                         <div className="rp-inv-center">
                             <div className="rp-white-search">
                                 <FaSearch className="rp-search-ico" />
@@ -1287,7 +1609,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         </div>
 
-                        {/* Columna derecha: Detalle y botones */}
                         <div className="rp-inv-detail">
                             { selectedInvItem ? (
                                 <>
@@ -1326,35 +1647,46 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </section>
             ) }
 
-            {/* ==================== AYUDA Y COMANDOS ==================== */}
+            {/* ==================== AYUDA Y SOPORTE (EXACTA A IMAGEN 2) ==================== */}
             { sideModal === 'help' && (
-                <section className="rp-help-win" aria-label="Ayuda">
+                <section className="rp-help-win" aria-label="Ayuda y Soporte">
                     <div className="rp-win-header">
-                        <span className="rp-win-title">Ayuda y Comandos</span>
+                        <span className="rp-win-title">Ayuda y Soporte</span>
                         <button type="button" className="rp-habbo-close-btn" onClick={ () => setSideModal(null) } title="Cerrar">
                             <FaTimes />
                         </button>
                     </div>
-                    <div className="rp-help-body">
-                        <div className="rp-phone-card">
-                            <b>Celular</b>
-                            <span className="rp-pc-desc">Pulsa el ícono del celular en el dock izquierdo y desliza la flecha verde para desbloquear Contactos, Mensajes, Cámara, GPS, Empleos, Banco, Bandas, Misiones y Ajustes.</span>
+
+                    <div className="rp-help-hero">
+                        <div className="rp-help-hero-copy">
+                            <h3>¿Cómo podemos ayudarte?</h3>
+                            <p>Elige un tema para ver una guía rápida.</p>
                         </div>
-                        <div className="rp-phone-card">
-                            <b>Comandos en la barra de chat</b>
-                            <div className="rp-cmd-list">
-                                <code>:me &lt;acción&gt;</code>
-                                <code>:do &lt;entorno&gt;</code>
-                                <code>:trabajar</code>
-                                <code>:turno</code>
-                                <code>:pagar &lt;user&gt; &lt;$&gt;</code>
-                                <code>:golpear &lt;user&gt;</code>
-                                <code>:esposar &lt;user&gt;</code>
-                                <code>:arrestar &lt;user&gt;</code>
-                                <code>:curar &lt;user&gt;</code>
-                                <code>:robar [tienda|banco]</code>
-                                <code>:911 &lt;mensaje&gt;</code>
-                            </div>
+                        <img src={ helpLifebuoyImg } alt="" className="rp-help-lifebuoy" />
+                    </div>
+
+                    <div className="rp-help-split">
+                        <div className="rp-help-nav">
+                            { helpTopics.map(t => (
+                                <button
+                                    key={ t.id }
+                                    type="button"
+                                    className={ `rp-help-nav-btn ${ helpTopic === t.id ? 'is-active' : '' }` }
+                                    onClick={ () => setHelpTopic(t.id) }>
+                                    <img src={ t.icon } alt="" className="rp-help-nav-ico" />
+                                    <span>{ t.label }</span>
+                                </button>
+                            )) }
+                        </div>
+
+                        <div className="rp-help-content">
+                            <h4>{ activeHelp.title }</h4>
+                            { activeHelp.paragraphs.map((p, idx) => (
+                                <p key={ idx }>{ p }</p>
+                            )) }
+                            <button type="button" className="rp-help-cta" onClick={ activeHelp.ctaAction }>
+                                { activeHelp.ctaLabel }
+                            </button>
                         </div>
                     </div>
                 </section>

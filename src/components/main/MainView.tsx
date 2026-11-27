@@ -219,6 +219,7 @@ export const MainView: FC<{}> = props =>
                 <AvatarEditorView />
                 <FriendsView />
                 <CameraWidgetView />
+                <FloorplanEditorView />
                 <UserProfileView />
                 <UserSettingsView />
                 <ChatHistoryView />
