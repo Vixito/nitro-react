@@ -33,6 +33,7 @@ import { WiredView } from '../wired/WiredView';
 import { EraSelectorModalView } from '../eras/EraSelectorModalView';
 import { DiscordLinkModalView } from '../discord/DiscordLinkModalView';
 import { DiscordActivityReporter } from '../discord/DiscordActivityReporter';
+import { RoleplayHudView } from '../roleplay/RoleplayHudView';
 import { LoginStreakView } from '../streak/LoginStreakView';
 import { InfoStandEditorView } from '../room/widgets/avatar-info/infostand/InfoStandEditorView';
 import { BulletinBoardView } from '../bulletin/BulletinBoardView';
@@ -240,6 +241,7 @@ export const MainView: FC<{}> = props =>
             <EraSelectorModalView />
             <DiscordLinkModalView />
             <DiscordActivityReporter />
+            <RoleplayHudView />
         </Base>
     );
 }
