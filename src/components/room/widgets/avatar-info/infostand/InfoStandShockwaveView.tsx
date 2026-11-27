@@ -386,7 +386,10 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
         if(isUser || isBot)
         {
             const userInfo = avatarInfo as AvatarInfoUser;
-            const seatShift = (isUser && customFurni.furnitureId > 0 && customAction.id === 'sit') ? (customFurni.seatOffsetY || -6) : 0;
+            const isSittingOnFurni = isUser && customFurni.furnitureId > 0 && customAction.id === 'sit';
+            const seatShiftX = isSittingOnFurni ? (customFurni.seatOffsetX ?? 0) : 0;
+            const seatShiftY = isSittingOnFurni ? (customFurni.seatOffsetY ?? 0) : 0;
+            const seatTransform = (seatShiftX !== 0 || seatShiftY !== 0) ? `translate(${ seatShiftX }px, ${ seatShiftY }px)` : undefined;
             return (
                 <>
                     { isUser && customFurniSprite && (
@@ -395,7 +398,7 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                     <div
                         className="stage-avatar-wrapper cursor-pointer"
                         onClick={ () => setIsCardExpanded(!isCardExpanded) }
-                        style={ { cursor: 'pointer', marginBottom: seatShift ? `${ -seatShift }px` : undefined } }
+                        style={ { cursor: 'pointer', transform: seatTransform } }
                     >
                         <LayoutAvatarImageView
                             figure={ userInfo.figure }

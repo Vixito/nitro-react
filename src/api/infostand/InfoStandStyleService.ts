@@ -21,6 +21,7 @@ export interface InfoStandFurniDef
     name: string;
     furnitureId: number;
     price: number;
+    seatOffsetX?: number;
     seatOffsetY?: number;
 }
 
@@ -62,20 +63,20 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
 ];
 
 export const INFOSTAND_FURNIS: InfoStandFurniDef[] = [
-    { id: 'none',           name: 'Sin furni',        furnitureId: 0,    price: 0,   seatOffsetY: 0 },
-    { id: 'chair_plasty',   name: 'Pod Clásico',      furnitureId: 121,  price: 0,   seatOffsetY: -6 },
-    { id: 'chair_plasty_1', name: 'Pod Verde',        furnitureId: 126,  price: 150, seatOffsetY: -6 },
-    { id: 'chair_plasty_2', name: 'Pod Rojo',         furnitureId: 125,  price: 150, seatOffsetY: -6 },
-    { id: 'chair_plasty_3', name: 'Pod Azul',         furnitureId: 147,  price: 150, seatOffsetY: -6 },
-    { id: 'chair_plasty_4', name: 'Pod Naranja',      furnitureId: 124,  price: 200, seatOffsetY: -6 },
-    { id: 'chair_plasty_5', name: 'Pod Rosa',         furnitureId: 1500, price: 200, seatOffsetY: -6 },
-    { id: 'chair_plasty_6', name: 'Pod Morado',       furnitureId: 1499, price: 200, seatOffsetY: -6 },
-    { id: 'chair_norja',    name: 'Silla Norja',      furnitureId: 30,   price: 150, seatOffsetY: -8 },
-    { id: 'pillow_0',       name: 'Almohadón Blanco', furnitureId: 1581, price: 300, seatOffsetY: -4 },
-    { id: 'pillow_1',       name: 'Almohadón Rosa',   furnitureId: 1582, price: 300, seatOffsetY: -4 },
-    { id: 'club_sofa',      name: 'Sofá HC',          furnitureId: 267,  price: 400, seatOffsetY: -8 },
-    { id: 'hc_chr',         name: 'Silla Majestic',   furnitureId: 1527, price: 500, seatOffsetY: -8 },
-    { id: 'throne',         name: 'Trono Clásico',    furnitureId: 230,  price: 800, seatOffsetY: -10 }
+    { id: 'none',           name: 'Sin furni',        furnitureId: 0,    price: 0,   seatOffsetX: 0,  seatOffsetY: 0 },
+    { id: 'chair_plasty',   name: 'Pod Clásico',      furnitureId: 121,  price: 0,   seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'chair_plasty_1', name: 'Pod Verde',        furnitureId: 126,  price: 150, seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'chair_plasty_2', name: 'Pod Rojo',         furnitureId: 125,  price: 150, seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'chair_plasty_3', name: 'Pod Azul',         furnitureId: 147,  price: 150, seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'chair_plasty_4', name: 'Pod Naranja',      furnitureId: 124,  price: 200, seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'chair_plasty_5', name: 'Pod Rosa',         furnitureId: 1500, price: 200, seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'chair_plasty_6', name: 'Pod Morado',       furnitureId: 1499, price: 200, seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'chair_norja',    name: 'Silla Norja',      furnitureId: 30,   price: 150, seatOffsetX: 1,  seatOffsetY: 2 },
+    { id: 'pillow_0',       name: 'Almohadón Blanco', furnitureId: 1581, price: 300, seatOffsetX: 0,  seatOffsetY: 8 },
+    { id: 'pillow_1',       name: 'Almohadón Rosa',   furnitureId: 1582, price: 300, seatOffsetX: 0,  seatOffsetY: 8 },
+    { id: 'club_sofa',      name: 'Sofá HC',          furnitureId: 267,  price: 400, seatOffsetX: -2, seatOffsetY: 4 },
+    { id: 'hc_chr',         name: 'Silla Majestic',   furnitureId: 1527, price: 500, seatOffsetX: 1,  seatOffsetY: 6 },
+    { id: 'throne',         name: 'Trono Clásico',    furnitureId: 230,  price: 800, seatOffsetX: 2,  seatOffsetY: 9 }
 ];
 
 export const INFOSTAND_ACTIONS: InfoStandActionDef[] = [

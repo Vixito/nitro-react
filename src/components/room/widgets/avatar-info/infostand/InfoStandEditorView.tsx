@@ -256,7 +256,10 @@ export const InfoStandEditorView: FC<{}> = () =>
         '--is-plate-emblem': previewPlate.emblemColor
     } as CSSProperties;
 
-    const seatShift = (previewFurni.furnitureId > 0 && previewAction.id === 'sit') ? (previewFurni.seatOffsetY || -6) : 0;
+    const isSittingOnFurni = previewFurni.furnitureId > 0 && previewAction.id === 'sit';
+    const seatShiftX = isSittingOnFurni ? (previewFurni.seatOffsetX ?? 0) : 0;
+    const seatShiftY = isSittingOnFurni ? (previewFurni.seatOffsetY ?? 0) : 0;
+    const avatarSeatTransform = (seatShiftX !== 0 || seatShiftY !== 0) ? `translate(${ seatShiftX }px, ${ seatShiftY }px)` : undefined;
 
     return (
         <NitroCardView uniqueKey="infostand-editor" className="habbten-infostand-editor" theme="primary-slim">
@@ -432,7 +435,7 @@ export const InfoStandEditorView: FC<{}> = () =>
                                         ) }
                                         <div
                                             className="preview-avatar-layer"
-                                            style={ { transform: seatShift ? `translateY(${ seatShift }px)` : undefined } }
+                                            style={ { transform: avatarSeatTransform } }
                                         >
                                             <LayoutAvatarImageView
                                                 figure={ ownFigure }
@@ -484,7 +487,7 @@ export const InfoStandEditorView: FC<{}> = () =>
                                             ) }
                                             <div
                                                 className="preview-card-avatar"
-                                                style={ { transform: seatShift ? `translateY(${ seatShift }px)` : undefined } }
+                                                style={ { transform: avatarSeatTransform } }
                                             >
                                                 <LayoutAvatarImageView
                                                     figure={ ownFigure }
@@ -538,17 +541,7 @@ export const InfoStandEditorView: FC<{}> = () =>
                                     disabled={ busy || pixels < selectedItem.price }
                                     onClick={ handleBuySelected }
                                 >
-                                    { busy ? (
-                                        'Comprando...'
-                                    ) : pixels < selectedItem.price ? (
-                                        'Duckets insuficientes'
-                                    ) : (
-                                        <>
-                                            <span>Comprar por</span>
-                                            <LayoutCurrencyIcon type={ 0 } className="infostand-currency-coin is-sm" />
-                                            <span>{ selectedItem.price.toLocaleString() }</span>
-                                        </>
-                                    ) }
+                                    { busy ? 'Comprando...' : (pixels < selectedItem.price ? 'Duckets insuficientes' : 'Comprar') }
                                 </button>
                             ) : (
                                 <button

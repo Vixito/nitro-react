@@ -47,11 +47,11 @@ body .nitro-infostand-container .nitro-infostand.has-custom-plate,
 
         .infostand-furni-bg {
             position: absolute;
-            bottom: 6px;
+            bottom: 4px;
             left: 50%;
             transform: translateX(-50%);
-            max-width: 64px;
-            max-height: 66px;
+            max-width: 72px;
+            max-height: 92px;
             width: auto;
             height: auto;
             object-fit: contain;
@@ -683,11 +683,11 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
 
                     .preview-card-furni {
                         position: absolute;
-                        bottom: 6px;
+                        bottom: 4px;
                         left: 50%;
                         transform: translateX(-50%);
-                        max-width: 66px;
-                        max-height: 68px;
+                        max-width: 72px;
+                        max-height: 92px;
                         width: auto;
                         height: auto;
                         object-fit: contain;
@@ -749,17 +749,22 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                 }
             }
 
-            // --- B) Preview Shockwave 2006 (plataforma isométrica + cápsula) ---
+            // --- B) Preview Shockwave 2006 (escenario retro oscuro + plataforma pixel-perfect 88x46 + cápsula) ---
             .preview-era-shockwave {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: flex-end;
                 width: 100%;
+                padding: 14px 10px 12px;
+                background: radial-gradient(circle at 50% 42%, #4a6675 0%, #2b3c46 100%);
+                border: 2px solid;
+                border-color: #797979 #ffffff #ffffff #797979;
+                box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.35);
 
                 .preview-pedestal {
                     position: relative;
-                    width: 120px;
+                    width: 88px;
                     height: 136px;
                     display: flex;
                     align-items: flex-end;
@@ -770,23 +775,22 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                         content: '';
                         position: absolute;
                         bottom: 0;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        width: 92px;
-                        height: 48px;
-                        background: url('@/assets/images/eras/shockwave_v14/infostand_stage.png') no-repeat center;
-                        background-size: 92px 48px;
+                        left: 0;
+                        width: 88px;
+                        height: 46px;
+                        background: url('@/assets/images/eras/shockwave_v14/infostand_stage.png') no-repeat 0 0;
+                        background-size: 88px 46px;
                         image-rendering: pixelated;
                         z-index: 0;
                     }
 
                     .preview-furni-layer {
                         position: absolute;
-                        bottom: 16px;
+                        bottom: 14px;
                         left: 50%;
                         transform: translateX(-50%);
-                        max-width: 78px;
-                        max-height: 78px;
+                        max-width: 82px;
+                        max-height: 92px;
                         width: auto;
                         height: auto;
                         object-fit: contain;
@@ -797,7 +801,7 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                     .preview-avatar-layer {
                         position: relative;
                         z-index: 2;
-                        margin-bottom: 16px;
+                        margin-bottom: 18px;
                         display: flex;
                         align-items: flex-end;
                         justify-content: center;
@@ -822,7 +826,7 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                     padding: 0 12px;
                     border-radius: 13px;
                     border: 2px solid #ffffff;
-                    box-shadow: 0 0 0 1px #000000, 0 2px 4px rgba(0, 0, 0, 0.35);
+                    box-shadow: 0 0 0 1px #000000, 0 2px 4px rgba(0, 0, 0, 0.45);
                     color: #ffffff !important;
                     font-size: 11px;
                     font-weight: 800;
@@ -986,6 +990,7 @@ body.era-shockwave-2006 .habbten-infostand-editor {
         &.active {
             background: #4f8096 !important;
             color: #ffffff !important;
+            text-shadow: 1px 1px 0 #000000 !important;
             box-shadow: inset 1px 1px 0 #82b4c9 !important;
         }
     }
@@ -998,7 +1003,34 @@ body.era-shockwave-2006 .habbten-infostand-editor {
         border-radius: 0 !important;
     }
 
-    .infostand-plate-row,
+    .infostand-plate-row {
+        border: 2px solid #797979 !important;
+        background: #ffffff !important;
+
+        &.selected {
+            border-color: #000000 !important;
+            background: #dcebf2 !important;
+        }
+
+        .infostand-mini-pill,
+        .infostand-mini-pill .mini-label,
+        .infostand-mini-pill .mini-emblem {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 0 #000000 !important;
+        }
+
+        .infostand-row-price,
+        .infostand-row-price span {
+            color: #ffffff !important;
+            text-shadow: 1px 1px 0 #000000 !important;
+        }
+
+        .infostand-row-equipped,
+        .infostand-row-equipped svg {
+            color: #ffffff !important;
+        }
+    }
+
     .infostand-tile {
         border: 2px solid #797979 !important;
         background: #ffffff !important;
@@ -1006,6 +1038,17 @@ body.era-shockwave-2006 .habbten-infostand-editor {
         &.selected {
             border-color: #000000 !important;
             background: #dcebf2 !important;
+        }
+
+        .infostand-tile-name {
+            color: #000000 !important;
+        }
+
+        .tile-tag.is-price,
+        .tile-tag.is-price span,
+        .tile-tag.is-eq,
+        .tile-tag.is-eq svg {
+            color: #ffffff !important;
         }
     }
 
@@ -1017,6 +1060,18 @@ body.era-shockwave-2006 .habbten-infostand-editor {
     .infostand-action-btn {
         border: 2px solid #000000 !important;
         box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.45) !important;
+
+        &.is-buy {
+            background: #1f8a2e !important;
+            color: #ffffff !important;
+            text-shadow: 1px 1px 0 #000000 !important;
+        }
+
+        &.is-equip {
+            background: #4f8096 !important;
+            color: #ffffff !important;
+            text-shadow: 1px 1px 0 #000000 !important;
+        }
     }
 }
 

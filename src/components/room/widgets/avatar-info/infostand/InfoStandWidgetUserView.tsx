@@ -180,7 +180,10 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
         '--is-plate-accent': customPlate.accentColor
     } as CSSProperties) : undefined;
     const isOwn = avatarInfo.type === AvatarInfoUser.OWN_USER;
-    const seatShift = (customFurni.furnitureId > 0 && customAction.id === 'sit') ? (customFurni.seatOffsetY || -6) : 0;
+    const isSittingOnFurni = customFurni.furnitureId > 0 && customAction.id === 'sit';
+    const seatShiftX = isSittingOnFurni ? (customFurni.seatOffsetX ?? 0) : 0;
+    const seatShiftY = isSittingOnFurni ? (customFurni.seatOffsetY ?? 0) : 0;
+    const seatTransform = (seatShiftX !== 0 || seatShiftY !== 0) ? `translate(${ seatShiftX }px, ${ seatShiftY }px)` : undefined;
 
     return (
         <Column
@@ -220,7 +223,7 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                             { customFurniSprite && (
                                 <img src={ customFurniSprite } alt={ customFurni.name } className="infostand-furni-bg" />
                             ) }
-                            <div className="infostand-avatar-fg" style={ { transform: seatShift ? `translateY(${ seatShift }px)` : undefined } }>
+                            <div className="infostand-avatar-fg" style={ { transform: seatTransform } }>
                                 <LayoutAvatarImageView
                                     figure={ avatarInfo.figure }
                                     direction={ 4 }
