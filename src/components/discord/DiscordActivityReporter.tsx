@@ -37,7 +37,13 @@ export const DiscordActivityReporter: FC<{}> = () =>
             if(ready)
             {
                 clearInterval(timer);
-                setTimeout(() => CreateLinkEvent(`navigator/goto/${ target }`), 1500);
+                setTimeout(() =>
+                {
+                    if(GetRoomSession()?.roomId !== target)
+                    {
+                        CreateLinkEvent(`navigator/goto/${ target }`);
+                    }
+                }, 1500);
                 return;
             }
 
@@ -55,7 +61,7 @@ export const DiscordActivityReporter: FC<{}> = () =>
             if(event.data && event.data.type === 'habbten-goto-room')
             {
                 const targetRoom = parseInt(String(event.data.roomId || ''), 10);
-                if(Number.isInteger(targetRoom) && targetRoom > 0)
+                if(Number.isInteger(targetRoom) && targetRoom > 0 && GetRoomSession()?.roomId !== targetRoom)
                 {
                     CreateLinkEvent(`navigator/goto/${ targetRoom }`);
                 }

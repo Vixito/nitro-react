@@ -51,12 +51,34 @@ const eraSubscribers = new Set<(era: EraType) => void>();
 const isValidEra = (val: any): val is EraType =>
     val === 'flash2012' || val === 'shockwave2006' || val === 'modern';
 
+const isRpClientUrl = (): boolean =>
+{
+    try
+    {
+        return new URLSearchParams(window.location.search).get('mode') === 'rp';
+    }
+    catch
+    {
+        return false;
+    }
+};
+
 const applyEraToDOM = (era: EraType) =>
 {
     if(typeof document === 'undefined') return;
 
     activeEraMemory = era;
-    document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006');
+    document.body.classList.remove('era-modern', 'era-flash-2012', 'era-shockwave-2006', 'habbten-rp-client', 'is-rp-desktop', 'is-rp-mobile');
+
+    // Cliente Roleplay independiente: solo tiene 2 modos dedicados (Navegador y Móvil), nunca carga eras clásicas 2006/2012
+    if(isRpClientUrl())
+    {
+        const mobile = detectIsMobileViewport();
+        document.body.classList.add('habbten-rp-client', mobile ? 'is-rp-mobile' : 'is-rp-desktop');
+        document.body.classList.toggle('is-mobile-ui', mobile);
+        document.body.dataset.era = mobile ? 'rp-mobile' : 'rp-desktop';
+        return;
+    }
 
     if(detectIsMobileViewport())
     {

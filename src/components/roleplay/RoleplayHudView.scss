@@ -1,807 +1,861 @@
+/* ============================================================================
+ * HABBTEN ROLEPLAY CLIENT SHELL (2 MODOS DEDICADOS: NAVEGADOR Y MÓVIL)
+ * Estética nativa Habbo (carbón #222222 biselado + ventanas NitroCardView)
+ * Cero solapamientos con sala, InfoStand ni chat.
+ * ============================================================================ */
+
+body.habbten-rp-client {
+    // Ocultar controles clásicos duplicados dentro del cliente RP dedicado
+    .nitro-room-chat-input,
+    .nitro-room-tools-container {
+        display: none !important;
+    }
+
+    // Posicionar el InfoStand limpiamente encima de la barra inferior RP (52px)
+    .nitro-infostand-container {
+        bottom: 62px !important;
+        right: 10px !important;
+        z-index: 410 !important;
+    }
+
+    // Notificaciones arriba a la derecha debajo de la barra superior RP (46px)
+    .rp-notifications-slot {
+        position: fixed;
+        top: 52px;
+        right: 10px;
+        z-index: 415;
+        pointer-events: none;
+    }
+
+    &.is-rp-mobile {
+        .nitro-infostand-container {
+            bottom: 56px !important;
+        }
+        .rp-notifications-slot {
+            top: 46px;
+        }
+    }
+}
+
 .habbten-rp-root {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 420;
-    font-family: 'Ubuntu', 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Ubuntu', Verdana, Arial, sans-serif;
 
-    * {
-        box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     .rp-ambient-tint {
         position: fixed;
-        inset: 0;
+        inset: 46px 0 52px 0;
         pointer-events: none;
-        transition: background-color 1.2s ease;
+        transition: background-color 1s ease;
 
         &.phase-day { background-color: transparent; }
-        &.phase-dawn { background-color: rgba(251, 146, 60, 0.06); }
-        &.phase-sunset { background-color: rgba(234, 88, 12, 0.09); }
-        &.phase-night { background-color: rgba(10, 22, 54, 0.22); }
+        &.phase-dawn { background-color: rgba(251, 146, 60, 0.05); }
+        &.phase-sunset { background-color: rgba(234, 88, 12, 0.08); }
+        &.phase-night { background-color: rgba(8, 18, 42, 0.2); }
     }
 
-    .rp-toasts {
+    /* ==================== BARRA SUPERIOR ANCLADA (ESTILO HABBO CARBÓN) ==================== */
+    .rp-topbar {
         position: fixed;
-        top: 12px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        z-index: 460;
-        pointer-events: none;
-        max-width: 90vw;
-
-        .rp-toast {
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #ffffff;
-            background: rgba(15, 23, 42, 0.94);
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
-            text-align: center;
-
-            &.is-ok { border-color: #10b981; background: rgba(6, 78, 59, 0.94); }
-            &.is-err { border-color: #f43f5e; background: rgba(136, 19, 55, 0.94); }
-            &.is-warn { border-color: #f59e0b; background: rgba(120, 53, 15, 0.94); }
-        }
-    }
-
-    .rp-vital-hud {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        width: 274px;
-        padding: 8px 10px;
-        border-radius: 4px;
-        background: #141a23;
-        border: 2px solid #000000;
-        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
-        color: #f8fafc;
-        pointer-events: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-
-        .rp-avatar-head-badge {
-            width: 30px;
-            height: 30px;
-            border-radius: 3px;
-            border: 1px solid #000000;
-            background: #233245;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-
-            .avatar-image {
-                width: 44px !important;
-                height: 44px !important;
-                background-position: center -6px !important;
-                background-repeat: no-repeat !important;
-                image-rendering: pixelated;
-            }
-        }
-
-        .rp-vital-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-        }
-
-        .rp-vital-identity {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            min-width: 0;
-        }
-
-        .rp-level-pill {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 999px;
-            background: #2563eb;
-            color: #ffffff;
-            flex-shrink: 0;
-        }
-
-        .rp-username {
-            font-size: 12px;
-            font-weight: 800;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .rp-clock-pill {
-            font-size: 10px;
-            font-weight: 700;
-            color: #cbd5e1;
-            background: rgba(30, 41, 59, 0.85);
-            padding: 2px 6px;
-            border-radius: 6px;
-            flex-shrink: 0;
-        }
-
-        .rp-job-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-        }
-
-        .rp-job-badge {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 6px;
-            border: 1px solid currentColor;
-            background: rgba(15, 23, 42, 0.7);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .rp-duty-btn {
-            font-size: 9px;
-            font-weight: 800;
-            padding: 3px 7px;
-            border-radius: 6px;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(30, 41, 59, 0.9);
-            color: #94a3b8;
-            cursor: pointer;
-
-            &.is-on {
-                background: rgba(16, 185, 129, 0.22);
-                border-color: #10b981;
-                color: #34d399;
-            }
-        }
-
-        .rp-bars {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .rp-bar-row {
-            display: grid;
-            grid-template-columns: 38px 1fr 44px;
-            align-items: center;
-            gap: 6px;
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .rp-bar-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            color: #cbd5e1;
-        }
-
-        .rp-bar-track {
-            height: 7px;
-            border-radius: 999px;
-            background: rgba(30, 41, 59, 0.95);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .rp-bar-fill {
-            height: 100%;
-            border-radius: 999px;
-            transition: width 0.25s ease;
-
-            &.is-hp { background: linear-gradient(90deg, #ef4444, #f43f5e); }
-            &.is-armor { background: linear-gradient(90deg, #3b82f6, #38bdf8); }
-            &.is-energy { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-            &.is-hunger { background: linear-gradient(90deg, #10b981, #34d399); }
-        }
-
-        .rp-bar-val {
-            text-align: right;
-            color: #94a3b8;
-            font-size: 9px;
-        }
-
-        .rp-xp-thin {
-            height: 3px;
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: 999px;
-            overflow: hidden;
-            margin-top: 2px;
-
-            .rp-xp-fill {
-                height: 100%;
-                background: #a855f7;
-            }
-        }
-
-        .rp-money-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-
-        .rp-money-chip {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            padding: 4px 6px;
-            border-radius: 7px;
-            font-size: 11px;
-            font-weight: 800;
-
-            &.is-cash {
-                background: rgba(16, 185, 129, 0.16);
-                border: 1px solid rgba(16, 185, 129, 0.4);
-                color: #34d399;
-            }
-
-            &.is-bank {
-                background: rgba(56, 189, 248, 0.14);
-                border: 1px solid rgba(56, 189, 248, 0.38);
-                color: #38bdf8;
-            }
-        }
-
-        .rp-location-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            font-size: 10px;
-            color: #cbd5e1;
-            padding-top: 2px;
-            border-top: 1px solid rgba(148, 163, 184, 0.14);
-        }
-
-        .rp-zone-pill {
-            font-size: 9px;
-            font-weight: 800;
-            padding: 1px 6px;
-            border-radius: 4px;
-
-            &.is-safe { background: rgba(16, 185, 129, 0.22); color: #34d399; }
-            &.is-pvp { background: rgba(239, 68, 68, 0.25); color: #fda4af; }
-        }
-
-        .rp-wanted-row {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 10px;
-            font-weight: 800;
-            color: #fbbf24;
-            background: rgba(239, 68, 68, 0.18);
-            border: 1px solid rgba(239, 68, 68, 0.45);
-            padding: 3px 7px;
-            border-radius: 6px;
-
-            .is-lit { color: #facc15; }
-            .is-dim { color: rgba(255, 255, 255, 0.2); }
-            span { margin-left: auto; color: #fda4af; }
-        }
-
-        .rp-status-banner {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 4px 7px;
-            border-radius: 6px;
-            text-align: center;
-
-            &.is-jail { background: rgba(239, 68, 68, 0.28); color: #fecaca; border: 1px solid #ef4444; }
-            &.is-hosp { background: rgba(16, 185, 129, 0.22); color: #a7f3d0; border: 1px solid #10b981; }
-            &.is-cuff { background: rgba(59, 130, 246, 0.28); color: #bfdbfe; border: 1px solid #3b82f6; }
-        }
-
-        .rp-cmd-toggle-row {
-            display: flex;
-            gap: 5px;
-        }
-
-        .rp-mini-btn {
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 4px 6px;
-            border-radius: 6px;
-            border: 1px solid rgba(148, 163, 184, 0.25);
-            background: rgba(30, 41, 59, 0.85);
-            color: #e2e8f0;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-
-            &:hover { background: rgba(51, 65, 85, 0.95); }
-            &.is-accent { flex: 0 0 auto; background: #059669; border-color: #10b981; color: #fff; }
-        }
-
-        .rp-cmd-form {
-            display: flex;
-            gap: 4px;
-
-            input {
-                flex: 1;
-                min-width: 0;
-                padding: 4px 7px;
-                border-radius: 6px;
-                border: 1px solid rgba(148, 163, 184, 0.35);
-                background: #0f172a;
-                color: #fff;
-                font-size: 11px;
-            }
-
-            button {
-                padding: 4px 8px;
-                border-radius: 6px;
-                border: none;
-                background: #2563eb;
-                color: #fff;
-                font-size: 11px;
-                font-weight: 800;
-                cursor: pointer;
-            }
-        }
-    }
-
-    .rp-gang-tag {
-        display: inline-block;
-        padding: 1px 5px;
-        border-radius: 4px;
-        font-size: 9px;
-        font-weight: 900;
-        color: #ffffff;
-    }
-
-    .rp-tactical-dock {
-        position: fixed;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        padding: 6px;
-        border-radius: 4px;
-        background: #141a23;
-        border: 2px solid #000000;
-        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-        pointer-events: auto;
-
-        button {
-            position: relative;
-            width: 58px;
-            padding: 6px 4px;
-            border-radius: 3px;
-            border: 1px solid #000000;
-            background: linear-gradient(180deg, #273242 0%, #1a222d 100%);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-            color: #cbd5e1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            font-size: 13px;
-            cursor: pointer;
-
-            &.has-badge::after {
-                content: '';
-                position: absolute;
-                top: 3px;
-                right: 3px;
-                width: 7px;
-                height: 7px;
-                border-radius: 50%;
-                background: #22c55e;
-                border: 1px solid #000000;
-            }
-
-            span {
-                font-size: 9px;
-                font-weight: 700;
-            }
-
-            &:hover {
-                background: linear-gradient(180deg, #334358 0%, #222c3a 100%);
-                color: #ffffff;
-            }
-
-            &.active {
-                background: linear-gradient(180deg, #2279b8 0%, #114f80 100%);
-                color: #ffffff;
-            }
-        }
-    }
-
-    .rp-modal-window {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: min(740px, 92vw);
-        max-height: 82vh;
-        display: flex;
-        flex-direction: column;
-        border-radius: 4px;
-        background: #141a23;
-        border: 2px solid #000000;
-        box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-        color: #f8fafc;
-        pointer-events: auto;
-        overflow: hidden;
-        z-index: 440;
-    }
-
-    .rp-mission-bar {
-        height: 6px;
-        background: #0b111a;
-        border: 1px solid #000000;
-        overflow: hidden;
-
-        .rp-mission-bar-fill {
-            height: 100%;
-            background: #22c55e;
-        }
-    }
-
-    .rp-modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 16px;
-        background: linear-gradient(90deg, #0f172a, #1e293b);
-        border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-
-        .rp-modal-title {
-            font-size: 14px;
-            font-weight: 800;
-        }
-
-        .rp-modal-close {
-            width: 28px;
-            height: 28px;
-            border-radius: 7px;
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            background: rgba(30, 41, 59, 0.8);
-            color: #e2e8f0;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-
-            &:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
-        }
-    }
-
-    .rp-modal-body {
-        padding: 14px 16px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .rp-city-canvas {
-        position: relative;
-        height: 210px;
-        border-radius: 12px;
-        background: radial-gradient(circle at 50% 50%, #172554 0%, #0b1120 100%);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        overflow: hidden;
-        margin-bottom: 10px;
-
-        .rp-city-grid-lines {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56, 189, 248, 0.1) 1px, transparent 1px);
-            background-size: 28px 28px;
-        }
-
-        .rp-map-pin {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 2px solid #38bdf8;
-            color: #f8fafc;
-            font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: transform 0.15s ease;
-
-            &:hover { transform: translate(-50%, -50%) scale(1.06); z-index: 5; }
-            &.is-here { box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.45); }
-
-            .pin-dot { width: 7px; height: 7px; border-radius: 50%; }
-            .pin-count {
-                background: rgba(255, 255, 255, 0.14);
-                padding: 0 5px;
-                border-radius: 999px;
-                font-size: 9px;
-            }
-        }
-    }
-
-    .rp-map-list {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .rp-loc-card {
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 46px;
+        padding: 0 10px;
+        background: linear-gradient(180deg, #2d2d2d 0%, #1c1c1c 100%);
+        border-bottom: 2px solid #000000;
+        box-shadow: inset 0 1px 0 #474747;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        padding: 8px 10px;
-        border-radius: 9px;
-        background: rgba(30, 41, 59, 0.6);
-        border: 1px solid rgba(148, 163, 184, 0.16);
+        color: #ffffff;
+        pointer-events: auto;
+        z-index: 430;
+    }
 
-        .rp-loc-card-title {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
+    .rp-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex-shrink: 0;
+    }
 
-            .dot { width: 8px; height: 8px; border-radius: 50%; }
-            .zone-tag {
-                font-size: 9px;
-                font-weight: 800;
-                padding: 1px 5px;
-                border-radius: 4px;
-                &.safe { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-                &.pvp { background: rgba(239, 68, 68, 0.22); color: #fda4af; }
-            }
-        }
+    .rp-head-frame {
+        width: 34px;
+        height: 34px;
+        background: #3a4652;
+        border: 1px solid #000000;
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
 
-        small { color: #94a3b8; font-size: 10px; display: block; margin-top: 2px; }
-
-        .rp-loc-card-actions {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
-
-            button {
-                padding: 5px 9px;
-                border-radius: 7px;
-                border: none;
-                background: #2563eb;
-                color: #fff;
-                font-size: 11px;
-                font-weight: 700;
-                cursor: pointer;
-
-                &.is-taxi { background: #d97706; }
-                &:hover { filter: brightness(1.1); }
-            }
+        .avatar-image {
+            width: 48px !important;
+            height: 48px !important;
+            background-position: center -6px !important;
+            background-repeat: no-repeat !important;
+            image-rendering: pixelated;
         }
     }
 
-    .rp-summary-strip,
-    .rp-gym-banner,
-    .rp-bank-panel,
-    .rp-heist-box {
-        padding: 10px 12px;
-        border-radius: 10px;
-        background: rgba(30, 41, 59, 0.65);
-        border: 1px solid rgba(148, 163, 184, 0.2);
+    .rp-identity-col {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .rp-identity-top {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .rp-lvl {
+        background: #0f766e;
+        border: 1px solid #000000;
+        color: #ffffff;
+        font-size: 9px;
+        font-weight: 800;
+        padding: 0 4px;
+    }
+
+    .rp-name {
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .rp-gang-chip {
+        display: inline-block;
+        padding: 0 4px;
+        font-size: 9px;
+        font-weight: 800;
+        color: #ffffff;
+        border: 1px solid #000000;
+    }
+
+    .rp-identity-sub {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+    }
+
+    .rp-job-label {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .rp-duty-toggle {
+        padding: 1px 6px;
+        font-size: 9px;
+        font-weight: 800;
+        border: 1px solid #000000;
+        background: #333333;
+        color: #cccccc;
+        cursor: pointer;
+
+        &.is-on {
+            background: #15803d;
+            color: #ffffff;
+        }
+    }
+
+    /* Barras vitales compactas en línea */
+    .rp-topbar-vitals {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        justify-content: center;
+        max-width: 440px;
+        position: relative;
+    }
+
+    .rp-meter {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        min-width: 96px;
+        flex: 1;
+    }
+
+    .rp-meter-tag {
+        font-size: 9px;
+        font-weight: 800;
+        color: #d4d4d4;
+        width: 16px;
+    }
+
+    .rp-meter-track {
+        flex: 1;
+        height: 9px;
+        background: #0d0d0d;
+        border: 1px solid #000000;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+    }
+
+    .rp-meter-fill {
+        height: 100%;
+        transition: width 0.25s ease;
+
+        &.is-hp { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); }
+        &.is-armor { background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%); }
+        &.is-en { background: linear-gradient(180deg, #facc15 0%, #ca8a04 100%); }
+        &.is-hm { background: linear-gradient(180deg, #4ade80 0%, #15803d 100%); }
+    }
+
+    .rp-meter-num {
+        font-size: 10px;
+        font-weight: 700;
+        color: #e5e5e5;
+        width: 24px;
+        text-align: right;
+    }
+
+    .rp-xp-strip {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -7px;
+        height: 2px;
+        background: #111111;
+
+        .rp-xp-fill {
+            height: 100%;
+            background: #a855f7;
+        }
+    }
+
+    .rp-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-shrink: 0;
+    }
+
+    .rp-wallet-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .rp-money-pill {
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 800;
+        border: 1px solid #000000;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+
+        &.is-cash { background: #14532d; color: #86efac; }
+        &.is-bank { background: #1e3a5f; color: #93c5fd; }
+    }
+
+    .rp-stars-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        padding: 3px 6px;
+        background: #450a0a;
+        border: 1px solid #000000;
+        font-size: 10px;
+
+        .lit { color: #facc15; }
+        .dim { color: rgba(255, 255, 255, 0.2); }
+    }
+
+    .rp-loc-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 8px;
+        background: #2f2f2f;
+        border: 1px solid #000000;
+        box-shadow: inset 0 1px 0 #4b4b4b;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+
+        &:hover { background: #3b3b3b; }
+
+        em {
+            font-style: normal;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 4px;
+            border: 1px solid #000000;
+            &.safe { background: #15803d; color: #ffffff; }
+            &.pvp { background: #b91c1c; color: #ffffff; }
+        }
+    }
+
+    .rp-clock-box {
+        padding: 3px 7px;
+        background: #111111;
+        border: 1px solid #000000;
+        color: #fde047;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    /* Cinta de estado crítico (Prisión / Hospital / Esposas) */
+    .rp-alert-ribbon {
+        position: fixed;
+        top: 48px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 6px;
+        z-index: 432;
+        pointer-events: none;
+
+        .ribbon-item {
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #ffffff;
+            border: 1px solid #000000;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+
+            &.is-jail { background: #991b1b; }
+            &.is-hosp { background: #047857; }
+            &.is-cuff { background: #1d4ed8; }
+        }
+    }
+
+    /* Notificaciones toast RP */
+    .rp-toasts {
+        position: fixed;
+        top: 56px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 455;
+        pointer-events: none;
+        max-width: 90vw;
+
+        .rp-toast {
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            border: 2px solid #000000;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.55);
+            background: #232323;
+
+            &.is-ok { background: #166534; }
+            &.is-err { background: #991b1b; }
+            &.is-warn { background: #92400e; }
+        }
+    }
+
+    /* ==================== BARRA INFERIOR ANCLADA (REEMPLAZA TOOLBAR CLÁSICO) ==================== */
+    .rp-bottombar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 52px;
+        padding: 0 10px;
+        background: linear-gradient(180deg, #2d2d2d 0%, #191919 100%);
+        border-top: 2px solid #000000;
+        box-shadow: inset 0 1px 0 #4a4a4a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        pointer-events: auto;
+        z-index: 430;
+    }
+
+    .rp-bar-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    .rp-bar-btn {
+        position: relative;
+        height: 36px;
+        padding: 0 9px;
+        border: 1px solid #000000;
+        border-radius: 3px;
+        background: linear-gradient(180deg, #3c3c3c 0%, #262626 100%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        color: #f1f5f9;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+
+        span { font-size: 11px; }
+
+        &:hover {
+            background: linear-gradient(180deg, #4b4b4b 0%, #313131 100%);
+        }
+
+        &.active {
+            background: linear-gradient(180deg, #2279b8 0%, #114f80 100%);
+            color: #ffffff;
+        }
+
+        &.is-icon {
+            width: 34px;
+            padding: 0;
+            justify-content: center;
+        }
+
+        &.is-primary {
+            background: linear-gradient(180deg, #279938 0%, #166b23 100%);
+        }
+
+        &.has-dot::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            border: 1px solid #000000;
+        }
+    }
+
+    /* Chat nativo integrado estilo Habbo */
+    .rp-chat-form {
+        flex: 1;
+        min-width: 180px;
+        max-width: 480px;
+        height: 34px;
+        display: flex;
+        align-items: stretch;
+        background: #ffffff;
+        border: 2px solid #000000;
+        border-radius: 4px;
+        overflow: hidden;
+
+        .rp-chat-mode {
+            padding: 0 9px;
+            border: none;
+            border-right: 1px solid #cbd5e1;
+            background: #e2e8f0;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+
+            &.is-shout {
+                background: #fde047;
+                color: #000000;
+            }
+        }
+
+        input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            padding: 0 10px;
+            font-size: 12px;
+            color: #0f172a;
+            background: #ffffff;
+        }
+
+        .rp-quick-work {
+            padding: 0 10px;
+            border: none;
+            border-left: 1px solid #000000;
+            background: linear-gradient(180deg, #2db83d 0%, #177c23 100%);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+
+            &:disabled { opacity: 0.55; }
+        }
+    }
+
+    /* ==================== MODO MÓVIL RP DEDICADO ==================== */
+    &.is-mobile {
+        .rp-ambient-tint { inset: 42px 0 48px 0; }
+        .rp-topbar {
+            height: 42px;
+            padding: 0 6px;
+            gap: 6px;
+        }
+        .rp-head-frame { width: 28px; height: 28px; }
+        .rp-name { max-width: 72px; font-size: 11px; }
+        .rp-topbar-vitals { gap: 4px; }
+        .rp-meter { min-width: 58px; }
+        .rp-meter-num { display: none; }
+        .rp-bottombar {
+            height: 48px;
+            padding: 0 6px;
+            gap: 4px;
+            justify-content: space-around;
+        }
+        .rp-bar-btn {
+            height: 36px;
+            padding: 0 7px;
+            flex-direction: column;
+            gap: 1px;
+            font-size: 12px;
+            span { font-size: 9px; }
+        }
+    }
+
+    .rp-mobile-chat-bar {
+        position: fixed;
+        left: 8px;
+        right: 8px;
+        bottom: 54px;
+        height: 38px;
+        display: flex;
+        background: #ffffff;
+        border: 2px solid #000000;
+        border-radius: 4px;
+        overflow: hidden;
+        pointer-events: auto;
+        z-index: 435;
+
+        .rp-chat-mode {
+            padding: 0 8px;
+            border: none;
+            border-right: 1px solid #cbd5e1;
+            background: #e2e8f0;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 800;
+            &.is-shout { background: #fde047; }
+        }
+        input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            padding: 0 8px;
+            font-size: 12px;
+            color: #0f172a;
+        }
+        .rp-chat-send {
+            padding: 0 12px;
+            border: none;
+            background: #166534;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+        }
+    }
+}
+
+/* ==================== VENTANAS NATIVAS HABBO (NitroCardView) ==================== */
+.habbten-rp-card {
+    width: min(680px, 94vw) !important;
+    max-height: 76vh !important;
+    pointer-events: auto !important;
+
+    .rp-card-content {
+        background: #e9e9e9 !important;
+        color: #1e293b !important;
+        padding: 10px !important;
+        max-height: calc(76vh - 38px);
+        overflow-y: auto;
+    }
+
+    .rp-win-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .rp-strip-bar {
+        background: #ffffff;
+        border: 1px solid #9ca3af;
+        padding: 7px 10px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 8px;
-        font-size: 12px;
+        font-size: 11px;
+        color: #0f172a;
     }
 
-    .rp-bank-panel,
-    .rp-heist-box {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .rp-bank-balances {
+    .rp-section-hdr {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #1e293b;
         display: flex;
-        gap: 16px;
-        font-size: 13px;
+        align-items: center;
+        gap: 5px;
+        border-bottom: 1px solid #cbd5e1;
+        padding-bottom: 3px;
     }
 
-    .rp-bank-controls {
+    /* Mapa de Ciudad Habbten */
+    .rp-city-map-board {
+        position: relative;
+        height: 205px;
+        background: #1b4d6e;
+        border: 2px solid #000000;
+        box-shadow: inset 0 0 0 2px #3c7ea6;
+        overflow: hidden;
+
+        .rp-city-roads {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        .rp-map-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 7px;
+            background: #ffffff;
+            border: 2px solid #000000;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.55);
+            color: #0f172a;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+
+            &:hover { background: #fef08a; z-index: 4; }
+            &.is-here { background: #fde047; }
+
+            .m-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid #000; }
+            .m-cnt { background: #1e293b; color: #fff; padding: 0 4px; font-size: 9px; }
+        }
+    }
+
+    .rp-list-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .rp-item-row {
+        background: #ffffff;
+        border: 1px solid #9ca3af;
+        padding: 7px 9px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+
+        .rp-item-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #0f172a;
+        }
+        .swatch { width: 9px; height: 9px; border: 1px solid #000; display: inline-block; }
+        small { font-size: 10px; color: #475569; display: block; margin-top: 2px; }
+        .rp-feed-txt { font-size: 11px; color: #0f172a; }
+    }
+
+    .rp-tag {
+        font-size: 9px;
+        font-weight: 800;
+        padding: 1px 4px;
+        border: 1px solid #000000;
+        &.is-safe { background: #dcfce7; color: #166534; }
+        &.is-pvp { background: #fee2e2; color: #991b1b; }
+    }
+
+    .rp-win-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+        gap: 7px;
+    }
+
+    .rp-box-card {
+        background: #ffffff;
+        border: 1px solid #9ca3af;
+        padding: 8px 9px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 6px;
+
+        &.is-active {
+            border: 2px solid #0f766e;
+            background: #f0fdf4;
+        }
+
+        .rp-box-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 11px;
+            color: #0f172a;
+        }
+
+        p { margin: 0; font-size: 10px; color: #475569; line-height: 1.4; }
+
+        .rp-box-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+
+            small { font-size: 10px; color: #64748b; }
+        }
+    }
+
+    .rp-price-chip {
+        background: #dcfce7;
+        border: 1px solid #15803d;
+        color: #166534;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 1px 5px;
+        white-space: nowrap;
+    }
+
+    .rp-qty-chip {
+        background: #fef3c7;
+        border: 1px solid #b45309;
+        color: #92400e;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 1px 5px;
+    }
+
+    .rp-prog-track {
+        height: 7px;
+        background: #e2e8f0;
+        border: 1px solid #000000;
+        overflow: hidden;
+        .rp-prog-fill { height: 100%; background: #16a34a; }
+    }
+
+    .rp-tabs-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+
+        .rp-subtab {
+            padding: 4px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid #000000;
+            background: #d4d4d8;
+            color: #18181b;
+            cursor: pointer;
+
+            &.active {
+                background: #1d4ed8;
+                color: #ffffff;
+            }
+        }
+    }
+
+    .rp-form-row {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
 
         input {
             flex: 1;
-            min-width: 120px;
-            padding: 6px 10px;
-            border-radius: 7px;
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            background: #0f172a;
-            color: #ffffff;
-            font-size: 12px;
+            min-width: 110px;
+            padding: 5px 8px;
+            border: 1px solid #64748b;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 11px;
         }
     }
 
-    .rp-inline-btns {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .rp-modal-body button {
-        padding: 6px 11px;
-        border-radius: 7px;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        background: #2563eb;
-        color: #ffffff;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-
-        &:disabled { opacity: 0.45; cursor: not-allowed; }
-        &.is-green { background: #059669; border-color: #10b981; }
-        &.is-danger { background: #be123c; border-color: #f43f5e; }
-    }
-
-    .rp-filter-tabs {
+    .rp-row-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
-
-        button {
-            background: rgba(30, 41, 59, 0.85);
-            color: #cbd5e1;
-            &.active { background: #2563eb; color: #fff; }
-        }
     }
 
-    .rp-cards-grid {
+    /* Botones auténticos biselados estilo Habbo */
+    .hb-win-btn {
+        padding: 4px 9px;
+        font-size: 11px;
+        font-weight: 800;
+        border: 1px solid #000000;
+        box-shadow: 1px 1px 0 #000000, inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        color: #ffffff;
+        cursor: pointer;
+
+        &:disabled { opacity: 0.45; cursor: not-allowed; }
+        &.is-blue { background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%); }
+        &.is-green { background: linear-gradient(180deg, #22c55e 0%, #15803d 100%); }
+        &.is-red { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); }
+        &.is-amber { background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%); }
+        &.is-gray { background: linear-gradient(180deg, #64748b 0%, #475569 100%); }
+    }
+
+    .rp-rank-cols {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
         gap: 8px;
     }
 
-    .rp-card {
-        padding: 10px;
-        border-radius: 10px;
-        background: rgba(15, 23, 42, 0.82);
-        border: 1px solid rgba(148, 163, 184, 0.2);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 6px;
-
-        &.is-selected { border-color: #38bdf8; box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35); }
-
-        .rp-card-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            font-size: 12px;
-        }
-
-        p { margin: 0; font-size: 11px; color: #94a3b8; line-height: 1.4; }
-
-        .rp-card-foot {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            margin-top: 2px;
-
-            small { font-size: 10px; color: #64748b; }
-        }
-    }
-
-    .rp-price-tag {
-        font-size: 10px;
-        font-weight: 800;
-        color: #34d399;
-        background: rgba(16, 185, 129, 0.16);
-        padding: 2px 6px;
-        border-radius: 5px;
-    }
-
-    .rp-qty-tag {
-        font-size: 10px;
-        font-weight: 800;
-        color: #fbbf24;
-        background: rgba(245, 158, 11, 0.16);
-        padding: 2px 6px;
-        border-radius: 5px;
-    }
-
-    .rp-section-title {
-        font-size: 12px;
-        font-weight: 800;
-        color: #38bdf8;
+    .rp-rank-line {
         display: flex;
         align-items: center;
-        gap: 6px;
+        justify-content: space-between;
+        font-size: 11px;
+        padding: 3px 0;
+        border-bottom: 1px solid #e2e8f0;
     }
 
-    .rp-feed-list {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-
-        .rp-feed-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 7px 10px;
-            border-radius: 8px;
-            background: rgba(30, 41, 59, 0.65);
-            font-size: 11px;
-        }
-    }
-
-    .rp-rank-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 10px;
-
-        .rp-rank-col {
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(30, 41, 59, 0.55);
-            border: 1px solid rgba(148, 163, 184, 0.16);
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .rp-rank-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-            padding: 4px 0;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-        }
-    }
-
-    .rp-empty {
-        font-size: 12px;
-        color: #94a3b8;
+    .rp-empty-txt {
         text-align: center;
+        font-size: 11px;
+        color: #64748b;
         padding: 12px;
+        margin: 0;
     }
 
-    .text-emerald { color: #34d399; }
-    .text-sky { color: #38bdf8; }
-    .text-rose { color: #fb7185; }
+    .c-green { color: #15803d; }
+    .c-blue { color: #1d4ed8; }
+    .c-red { color: #b91c1c; }
 }
 
 // Acciones rápidas RP dentro del InfoStand al clicar a otro jugador en sala
 .rp-infostand-actions {
     margin-top: 6px;
     padding: 6px;
-    background: #141a23;
-    border: 2px solid #000000;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    background: #232323;
+    border: 1px solid #000000;
+    box-shadow: inset 0 1px 0 #3f3f3f;
 
     .rp-infostand-actions-title {
         font-size: 9px;
@@ -809,7 +863,6 @@
         text-transform: uppercase;
         color: #fde047;
         margin-bottom: 5px;
-        letter-spacing: 0.04em;
     }
 
     .rp-infostand-actions-grid {
@@ -826,7 +879,7 @@
         border-radius: 2px !important;
         color: #ffffff !important;
         cursor: pointer !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 
         &.is-danger { background: #b91c1c !important; }
         &.is-police { background: #1d4ed8 !important; }

@@ -33,7 +33,9 @@ import { WiredView } from '../wired/WiredView';
 import { EraSelectorModalView } from '../eras/EraSelectorModalView';
 import { DiscordLinkModalView } from '../discord/DiscordLinkModalView';
 import { DiscordActivityReporter } from '../discord/DiscordActivityReporter';
+import { NotificationCenterView } from '../notification-center/NotificationCenterView';
 import { RoleplayHudView } from '../roleplay/RoleplayHudView';
+import { isRoleplayMode } from '../roleplay/RoleplayService';
 import { LoginStreakView } from '../streak/LoginStreakView';
 import { InfoStandEditorView } from '../room/widgets/avatar-info/infostand/InfoStandEditorView';
 import { BulletinBoardView } from '../bulletin/BulletinBoardView';
@@ -44,6 +46,7 @@ export const MainView: FC<{}> = props =>
     const [ isReady, setIsReady ] = useState(false);
     const [ landingViewVisible, setLandingViewVisible ] = useState(true);
     const isMobile = useIsMobile();
+    const isRpClient = isRoleplayMode();
 
     useRoomSessionManagerEvent<RoomSessionEvent>(RoomSessionEvent.CREATED, event => setLandingViewVisible(false));
     useRoomSessionManagerEvent<RoomSessionEvent>(RoomSessionEvent.ENDED, event =>
@@ -203,6 +206,27 @@ export const MainView: FC<{}> = props =>
         return () => RemoveLinkEventTracker(linkTracker);
     }, []);
 
+    // Cliente Roleplay dedicado (independiente del cliente clásico: solo Navegador RP y Móvil RP, sin monedero/barra Holo)
+    if(isRpClient)
+    {
+        return (
+            <Base fit className={ `rp-client-shell ${ isMobile ? 'is-rp-mobile' : 'is-rp-desktop' }` }>
+                <RoomView />
+                <RoleplayHudView isMobile={ isMobile } isInRoom={ !landingViewVisible } />
+                <div className="rp-notifications-slot">
+                    <NotificationCenterView />
+                </div>
+                <AvatarEditorView />
+                <FriendsView />
+                <UserProfileView />
+                <UserSettingsView />
+                <ChatHistoryView />
+                <ModToolsView />
+                <DiscordActivityReporter />
+            </Base>
+        );
+    }
+
     return (
         <Base fit>
             <TransitionAnimation type={ TransitionAnimationTypes.FADE_IN } inProp={ landingViewVisible } timeout={ 300 }>
@@ -241,7 +265,6 @@ export const MainView: FC<{}> = props =>
             <EraSelectorModalView />
             <DiscordLinkModalView />
             <DiscordActivityReporter />
-            <RoleplayHudView />
         </Base>
     );
 }
