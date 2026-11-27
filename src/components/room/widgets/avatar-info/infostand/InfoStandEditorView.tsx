@@ -314,8 +314,8 @@ export const InfoStandEditorView: FC<{}> = () =>
                                                 onClick={ () => setPreview(prev => ({ ...prev, plateId: plate.id })) }
                                             >
                                                 <div
-                                                    className={ `infostand-mini-pill pattern-${ plate.pattern || 'none' }` }
-                                                    style={ { background: plate.bgStyle, borderColor: plate.borderColor } }
+                                                    className={ `infostand-mini-pill infostand-pattern-${ plate.pattern || 'none' }` }
+                                                    style={ { '--is-plate-bg': plate.bgStyle, borderColor: plate.borderColor } as CSSProperties }
                                                 >
                                                     <span className="mini-emblem" style={ { background: plate.emblemColor } }>
                                                         { plate.emblemLabel || '' }
@@ -447,8 +447,8 @@ export const InfoStandEditorView: FC<{}> = () =>
                                         </div>
                                     </div>
                                     <div
-                                        className={ `infostand-preview-pill pattern-${ previewPlate.pattern || 'none' }` }
-                                        style={ { background: previewPlate.bgStyle, borderColor: previewPlate.borderColor } }
+                                        className={ `infostand-preview-pill infostand-pattern-${ previewPlate.pattern || 'none' }` }
+                                        style={ { '--is-plate-bg': previewPlate.bgStyle, borderColor: previewPlate.borderColor } as CSSProperties }
                                     >
                                         { hasPreviewCustomPlate && (
                                             <span className="preview-emblem" style={ { background: previewPlate.emblemColor } }>

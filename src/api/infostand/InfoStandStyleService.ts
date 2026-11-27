@@ -2,6 +2,22 @@ import { AvatarAction, IGetImageListener, ImageResult, TextureUtils, Vector3d } 
 import { useEffect, useState } from 'react';
 import { GetRoomEngine } from '../nitro';
 
+export type InfoStandPlatePattern =
+    | 'none'
+    | 'diamond'
+    | 'stripe'
+    | 'frost'
+    | 'candy'
+    | 'snow'
+    | 'checker'
+    | 'wave'
+    | 'tiles'
+    | 'crest'
+    | 'starlight'
+    | 'circuit'
+    | 'pitch'
+    | 'grid';
+
 export interface InfoStandPlateDef
 {
     id: string;
@@ -12,7 +28,7 @@ export interface InfoStandPlateDef
     bgStyle: string;
     emblemColor: string;
     emblemLabel?: string;
-    pattern?: 'none' | 'diamond' | 'stripe';
+    pattern?: InfoStandPlatePattern;
 }
 
 export interface InfoStandFurniDef
@@ -50,16 +66,35 @@ export const DEFAULT_INFOSTAND_STYLE: UserInfoStandStyle = {
 };
 
 export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
-    { id: 'default',  name: 'Clásico',         price: 0,   accentColor: '#5c6b73', borderColor: '#ffffff', bgStyle: 'rgba(74, 74, 74, 0.78)', emblemColor: '#7a8a93', pattern: 'none' },
-    { id: 'emerald',  name: 'Pod Esmeralda',   price: 0,   accentColor: '#1f8a2e', borderColor: '#66e05c', bgStyle: 'linear-gradient(180deg, #1b6f27 0%, #104818 100%)', emblemColor: '#2fb83d', pattern: 'none' },
-    { id: 'sapphire', name: 'Pod Zafiro',      price: 0,   accentColor: '#1a65b8', borderColor: '#5cb8ff', bgStyle: 'linear-gradient(180deg, #154d92 0%, #0b2d59 100%)', emblemColor: '#2d8bf0', pattern: 'none' },
-    { id: 'amber',    name: 'Ámbar Retro',     price: 250, accentColor: '#c96f12', borderColor: '#ffb84d', bgStyle: 'linear-gradient(180deg, #a6540d 0%, #6b3105 100%)', emblemColor: '#f08c24', pattern: 'none' },
-    { id: 'rose',     name: 'Rosa Club',       price: 250, accentColor: '#b83b72', borderColor: '#ff8cc2', bgStyle: 'linear-gradient(180deg, #982b5c 0%, #611739 100%)', emblemColor: '#e8589a', pattern: 'none' },
-    { id: 'ice',      name: 'Cristal Ártico',  price: 350, accentColor: '#2996b5', borderColor: '#9beeff', bgStyle: 'linear-gradient(180deg, #1c6e8c 0%, #114459 100%)', emblemColor: '#4fd2f5', pattern: 'stripe' },
-    { id: 'violet',   name: 'Neón Galaxia',    price: 400, accentColor: '#7b3bd1', borderColor: '#c490ff', bgStyle: 'linear-gradient(180deg, #5c24a8 0%, #331066 100%)', emblemColor: '#9b5bf5', pattern: 'diamond' },
-    { id: 'crimson',  name: 'Rubí Real',       price: 400, accentColor: '#b01e2b', borderColor: '#ff6b6b', bgStyle: 'linear-gradient(180deg, #8e1420 0%, #520911 100%)', emblemColor: '#e03131', pattern: 'diamond' },
-    { id: 'obsidian', name: 'Obsidiana VIP',   price: 500, accentColor: '#2a2d34', borderColor: '#ff6b35', bgStyle: 'linear-gradient(180deg, #2d3036 0%, #16181c 100%)', emblemColor: '#e85d04', pattern: 'diamond' },
-    { id: 'gold_hc',  name: 'Oro Imperial',    price: 600, accentColor: '#b5891b', borderColor: '#ffe066', bgStyle: 'linear-gradient(180deg, #8f670e 0%, #523905 100%)', emblemColor: '#ffd43b', pattern: 'diamond' }
+    { id: 'default',        name: 'Clásico',             price: 0,   accentColor: '#5c6b73', borderColor: '#ffffff', bgStyle: 'rgba(74, 74, 74, 0.78)', emblemColor: '#7a8a93', pattern: 'none' },
+    { id: 'emerald',        name: 'Pod Esmeralda',       price: 0,   accentColor: '#1f8a2e', borderColor: '#66e05c', bgStyle: 'linear-gradient(180deg, #1b6f27 0%, #104818 100%)', emblemColor: '#2fb83d', pattern: 'none' },
+    { id: 'sapphire',       name: 'Pod Zafiro',          price: 0,   accentColor: '#1a65b8', borderColor: '#5cb8ff', bgStyle: 'linear-gradient(180deg, #154d92 0%, #0b2d59 100%)', emblemColor: '#2d8bf0', pattern: 'none' },
+    { id: 'amber',          name: 'Ámbar Retro',         price: 250, accentColor: '#c96f12', borderColor: '#ffb84d', bgStyle: 'linear-gradient(180deg, #a6540d 0%, #6b3105 100%)', emblemColor: '#f08c24', pattern: 'none' },
+    { id: 'rose',           name: 'Rosa Club',           price: 250, accentColor: '#b83b72', borderColor: '#ff8cc2', bgStyle: 'linear-gradient(180deg, #982b5c 0%, #611739 100%)', emblemColor: '#e8589a', pattern: 'none' },
+    { id: 'ice',            name: 'Cristal Ártico',      price: 350, accentColor: '#2996b5', borderColor: '#9beeff', bgStyle: 'linear-gradient(180deg, #1c6e8c 0%, #114459 100%)', emblemColor: '#4fd2f5', pattern: 'stripe' },
+    { id: 'violet',         name: 'Neón Galaxia',        price: 400, accentColor: '#7b3bd1', borderColor: '#c490ff', bgStyle: 'linear-gradient(180deg, #5c24a8 0%, #331066 100%)', emblemColor: '#9b5bf5', pattern: 'diamond' },
+    { id: 'crimson',        name: 'Rubí Real',           price: 400, accentColor: '#b01e2b', borderColor: '#ff6b6b', bgStyle: 'linear-gradient(180deg, #8e1420 0%, #520911 100%)', emblemColor: '#e03131', pattern: 'diamond' },
+    { id: 'obsidian',       name: 'Obsidiana VIP',       price: 500, accentColor: '#2a2d34', borderColor: '#ff6b35', bgStyle: 'linear-gradient(180deg, #2d3036 0%, #16181c 100%)', emblemColor: '#e85d04', pattern: 'diamond' },
+    { id: 'gold_hc',        name: 'Oro Imperial',        price: 600, accentColor: '#b5891b', borderColor: '#ffe066', bgStyle: 'linear-gradient(180deg, #8f670e 0%, #523905 100%)', emblemColor: '#ffd43b', pattern: 'diamond' },
+    // Navidad / Invierno 2008
+    { id: 'xmas_2008',      name: 'Navidad Helada 2008', price: 450, accentColor: '#3b95c9', borderColor: '#d4f3ff', bgStyle: 'linear-gradient(180deg, #4fa8d6 0%, #246394 55%, #143a5e 100%)', emblemColor: '#9ce6ff', pattern: 'frost' },
+    { id: 'xmas_classic',   name: 'Espíritu Navideño',   price: 400, accentColor: '#b91c1c', borderColor: '#f7d060', bgStyle: 'linear-gradient(180deg, #991b1b 0%, #5c0f15 100%)', emblemColor: '#22c55e', pattern: 'candy' },
+    // Game Center
+    { id: 'gc_snowstorm',   name: 'SnowStorm',           price: 450, accentColor: '#1d5d9b', borderColor: '#e0f2fe', bgStyle: 'linear-gradient(180deg, #1d5d9b 0%, #0d325c 100%)', emblemColor: '#7dd3fc', pattern: 'snow' },
+    { id: 'gc_fastfood',    name: 'FastFood',            price: 400, accentColor: '#c92a2a', borderColor: '#ffd43b', bgStyle: 'linear-gradient(180deg, #b82525 0%, #7d1515 100%)', emblemColor: '#ff922b', pattern: 'checker' },
+    { id: 'gc_wobble',      name: 'Wobble Squabble',     price: 400, accentColor: '#0e9f9e', borderColor: '#7ef9ff', bgStyle: 'linear-gradient(180deg, #0ea5a4 0%, #0b5d69 100%)', emblemColor: '#22d3ee', pattern: 'wave' },
+    { id: 'gc_battleball',  name: 'Battle Ball',         price: 450, accentColor: '#6d28d9', borderColor: '#a3e635', bgStyle: 'linear-gradient(180deg, #6d28d9 0%, #3b0764 100%)', emblemColor: '#84cc16', pattern: 'tiles' },
+    // Mundo Mágico (Harry Potter)
+    { id: 'hp_gryffindor',  name: 'León Escarlata',      price: 500, accentColor: '#7f1d1d', borderColor: '#f5c542', bgStyle: 'linear-gradient(180deg, #7f1d1d 0%, #450a0a 100%)', emblemColor: '#eab308', pattern: 'crest' },
+    { id: 'hp_slytherin',   name: 'Serpiente Esmeralda', price: 500, accentColor: '#14532d', borderColor: '#cbd5e1', bgStyle: 'linear-gradient(180deg, #14532d 0%, #052e16 100%)', emblemColor: '#22c55e', pattern: 'crest' },
+    { id: 'hp_magic',       name: 'Hechicero Nocturno',  price: 550, accentColor: '#312e81', borderColor: '#fde047', bgStyle: 'linear-gradient(180deg, #1e1b4b 0%, #090721 100%)', emblemColor: '#818cf8', pattern: 'starlight' },
+    // Wired / Tech
+    { id: 'wired_tech',     name: 'Maestro Wired',       price: 550, accentColor: '#334155', borderColor: '#38bdf8', bgStyle: 'linear-gradient(180deg, #2b333d 0%, #15191f 100%)', emblemColor: '#00e5ff', pattern: 'circuit' },
+    // Deportes & Retro
+    { id: 'sport_football', name: 'Estadio Fútbol',      price: 350, accentColor: '#15803d', borderColor: '#f8fafc', bgStyle: 'linear-gradient(180deg, #1f7a38 0%, #125224 100%)', emblemColor: '#4ade80', pattern: 'pitch' },
+    { id: 'sport_basket',   name: 'Cancha Basket',       price: 350, accentColor: '#c2410c', borderColor: '#fed7aa', bgStyle: 'linear-gradient(180deg, #c2410c 0%, #7c2d12 100%)', emblemColor: '#fb923c', pattern: 'stripe' },
+    { id: 'arcade_retro',   name: 'Arcade 8-Bit',        price: 450, accentColor: '#3b0764', borderColor: '#f472b6', bgStyle: 'linear-gradient(180deg, #22104a 0%, #0e0626 100%)', emblemColor: '#ec4899', pattern: 'grid' },
+    { id: 'habbo_club',     name: 'VIP Clásico',         price: 650, accentColor: '#166534', borderColor: '#facc15', bgStyle: 'linear-gradient(180deg, #166534 0%, #0b3b1e 100%)', emblemColor: '#fde047', pattern: 'diamond' }
 ];
 
 export const INFOSTAND_FURNIS: InfoStandFurniDef[] = [

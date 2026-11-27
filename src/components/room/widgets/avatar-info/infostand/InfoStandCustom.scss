@@ -2,6 +2,130 @@
  * INFOSTAND PERSONALIZABLE (TODAS LAS ERAS — MODERNA, 2012, 2006 Y MÓVIL)
  * ============================================================================ */
 
+// Mixin compartido de patrones temáticos (aplicado en InfoStand real, 2006, swatches y preview)
+@mixin infostand-plate-patterns {
+    &.infostand-pattern-none {
+        background: var(--is-plate-bg) !important;
+    }
+
+    &.infostand-pattern-diamond {
+        background-image:
+            repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 10px),
+            repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 10px),
+            var(--is-plate-bg) !important;
+    }
+
+    &.infostand-pattern-stripe {
+        background-image:
+            repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0, rgba(255, 255, 255, 0.09) 4px, transparent 4px, transparent 10px),
+            var(--is-plate-bg) !important;
+    }
+
+    // Navidad Helada 2008: escarcha cristalina superior + facetas de hielo + copos
+    &.infostand-pattern-frost {
+        background-image:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(215, 248, 255, 0.2) 16%, transparent 34%),
+            radial-gradient(circle at 18% 24%, rgba(255, 255, 255, 0.55) 0 1.4px, transparent 2px),
+            radial-gradient(circle at 76% 32%, rgba(255, 255, 255, 0.5) 0 1.6px, transparent 2.2px),
+            radial-gradient(circle at 46% 68%, rgba(220, 248, 255, 0.45) 0 1.3px, transparent 2px),
+            radial-gradient(circle at 86% 74%, rgba(255, 255, 255, 0.48) 0 1.5px, transparent 2.1px),
+            repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 2px, transparent 2px, transparent 14px),
+            var(--is-plate-bg) !important;
+        box-shadow: 0 4px 16px rgba(10, 40, 70, 0.55), inset 0 2px 6px rgba(255, 255, 255, 0.58), inset 0 -2px 8px rgba(145, 225, 255, 0.3) !important;
+    }
+
+    // Espíritu Navideño: rayas diagonales tipo caramelo festivo
+    &.infostand-pattern-candy {
+        background-image:
+            repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0, rgba(255, 255, 255, 0.14) 5px, transparent 5px, transparent 12px),
+            repeating-linear-gradient(135deg, transparent 0, transparent 10px, rgba(34, 197, 94, 0.16) 10px, rgba(34, 197, 94, 0.16) 12px),
+            var(--is-plate-bg) !important;
+    }
+
+    // SnowStorm: ventisca ártica y copos de nieve
+    &.infostand-pattern-snow {
+        background-image:
+            radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.65) 0 1.5px, transparent 2.2px),
+            radial-gradient(circle at 38% 48%, rgba(255, 255, 255, 0.55) 0 1.2px, transparent 2px),
+            radial-gradient(circle at 64% 22%, rgba(255, 255, 255, 0.7) 0 1.8px, transparent 2.4px),
+            radial-gradient(circle at 84% 58%, rgba(255, 255, 255, 0.55) 0 1.3px, transparent 2px),
+            radial-gradient(circle at 24% 78%, rgba(255, 255, 255, 0.6) 0 1.6px, transparent 2.2px),
+            radial-gradient(circle at 72% 84%, rgba(255, 255, 255, 0.5) 0 1.2px, transparent 2px),
+            var(--is-plate-bg) !important;
+    }
+
+    // FastFood: cuadros clásicos de diner / mantel de comida rápida
+    &.infostand-pattern-checker {
+        background-image:
+            linear-gradient(45deg, rgba(255, 240, 200, 0.12) 25%, transparent 25%, transparent 75%, rgba(255, 240, 200, 0.12) 75%),
+            linear-gradient(45deg, rgba(255, 240, 200, 0.12) 25%, transparent 25%, transparent 75%, rgba(255, 240, 200, 0.12) 75%),
+            var(--is-plate-bg) !important;
+        background-size: 16px 16px, 16px 16px, 100% 100% !important;
+        background-position: 0 0, 8px 8px, 0 0 !important;
+    }
+
+    // Wobble Squabble: reflejos y azulejos de piscina
+    &.infostand-pattern-wave {
+        background-image:
+            repeating-radial-gradient(circle at 50% 0, rgba(255, 255, 255, 0.11) 0, rgba(255, 255, 255, 0.11) 2px, transparent 2px, transparent 14px),
+            repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 16px),
+            var(--is-plate-bg) !important;
+    }
+
+    // Battle Ball: baldosas de arena neón
+    &.infostand-pattern-tiles {
+        background-image:
+            repeating-linear-gradient(60deg, rgba(163, 230, 53, 0.12) 0, rgba(163, 230, 53, 0.12) 1px, transparent 1px, transparent 12px),
+            repeating-linear-gradient(-60deg, rgba(163, 230, 53, 0.12) 0, rgba(163, 230, 53, 0.12) 1px, transparent 1px, transparent 12px),
+            var(--is-plate-bg) !important;
+    }
+
+    // Mundo Mágico (Harry Potter): rayas diagonales de bufanda/escudo de casa
+    &.infostand-pattern-crest {
+        background-image:
+            repeating-linear-gradient(125deg, rgba(255, 224, 102, 0.18) 0, rgba(255, 224, 102, 0.18) 4px, transparent 4px, transparent 8px, rgba(255, 224, 102, 0.1) 8px, rgba(255, 224, 102, 0.1) 10px, transparent 10px, transparent 22px),
+            var(--is-plate-bg) !important;
+    }
+
+    // Hechicero Nocturno: cielo estrellado con destellos mágicos
+    &.infostand-pattern-starlight {
+        background-image:
+            radial-gradient(circle at 16% 22%, rgba(253, 224, 71, 0.85) 0 1.3px, transparent 2.4px),
+            radial-gradient(circle at 80% 18%, rgba(255, 255, 255, 0.8) 0 1.2px, transparent 2.2px),
+            radial-gradient(circle at 52% 42%, rgba(196, 181, 253, 0.85) 0 1.5px, transparent 2.8px),
+            radial-gradient(circle at 26% 74%, rgba(253, 224, 71, 0.75) 0 1.4px, transparent 2.5px),
+            radial-gradient(circle at 74% 78%, rgba(255, 255, 255, 0.75) 0 1.1px, transparent 2px),
+            var(--is-plate-bg) !important;
+    }
+
+    // Maestro Wired: rejilla y nodos de circuito electrónico
+    &.infostand-pattern-circuit {
+        background-image:
+            radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.32) 1.5px, transparent 2px),
+            linear-gradient(90deg, rgba(56, 189, 248, 0.13) 1px, transparent 1px),
+            linear-gradient(0deg, rgba(56, 189, 248, 0.13) 1px, transparent 1px),
+            var(--is-plate-bg) !important;
+        background-size: 16px 16px, 16px 16px, 16px 16px, 100% 100% !important;
+    }
+
+    // Estadio Fútbol: franjas de césped cortado
+    &.infostand-pattern-pitch {
+        background-image:
+            repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 16px, transparent 16px, transparent 32px),
+            linear-gradient(0deg, transparent 48%, rgba(255, 255, 255, 0.18) 49%, rgba(255, 255, 255, 0.18) 51%, transparent 52%),
+            var(--is-plate-bg) !important;
+    }
+
+    // Arcade 8-Bit: cuadrícula synthwave neón
+    &.infostand-pattern-grid {
+        background-image:
+            linear-gradient(90deg, rgba(244, 114, 182, 0.16) 1px, transparent 1px),
+            linear-gradient(0deg, rgba(56, 189, 248, 0.16) 1px, transparent 1px),
+            var(--is-plate-bg) !important;
+        background-size: 14px 14px, 14px 14px, 100% 100% !important;
+    }
+}
+
 // 1. Estilos compartidos de placas y capas de furni/avatar en InfoStand real (Moderna, 2012, Móvil)
 body .nitro-infostand-container .nitro-infostand.has-custom-plate,
 .nitro-infostand-container .nitro-infostand.has-custom-plate,
@@ -11,22 +135,7 @@ body .nitro-infostand-container .nitro-infostand.has-custom-plate,
     border: 2px solid var(--is-plate-border, #5cb8ff) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
 
-    &.infostand-pattern-diamond {
-        background-image:
-            repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 10px),
-            repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 10px),
-            var(--is-plate-bg) !important;
-    }
-
-    &.infostand-pattern-stripe {
-        background-image:
-            repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 4px, transparent 4px, transparent 10px),
-            var(--is-plate-bg) !important;
-    }
-
-    &.infostand-pattern-none {
-        background: var(--is-plate-bg) !important;
-    }
+    @include infostand-plate-patterns;
 
     .body-image {
         background: rgba(0, 0, 0, 0.28) !important;
@@ -175,18 +284,7 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
         border: 2px solid var(--is-plate-border, #ffffff) !important;
         background: var(--is-plate-bg) !important;
 
-        &.infostand-pattern-diamond {
-            background-image:
-                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 8px),
-                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 8px),
-                var(--is-plate-bg) !important;
-        }
-
-        &.infostand-pattern-stripe {
-            background-image:
-                repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 3px, transparent 3px, transparent 8px),
-                var(--is-plate-bg) !important;
-        }
+        @include infostand-plate-patterns;
 
         .sw-plate-emblem {
             display: inline-flex !important;
@@ -383,16 +481,8 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                     text-overflow: ellipsis;
                 }
 
-                &.pattern-diamond {
-                    background-image:
-                        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 1px, transparent 1px, transparent 8px),
-                        repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 1px, transparent 1px, transparent 8px);
-                }
-
-                &.pattern-stripe {
-                    background-image:
-                        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0, rgba(255, 255, 255, 0.12) 3px, transparent 3px, transparent 8px);
-                }
+                background: var(--is-plate-bg);
+                @include infostand-plate-patterns;
 
                 .mini-emblem {
                     width: 16px;
@@ -610,18 +700,7 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                     border: 2px solid var(--is-plate-border, #5cb8ff) !important;
                     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.14) !important;
 
-                    &.infostand-pattern-diamond {
-                        background-image:
-                            repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 10px),
-                            repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.06) 0, rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 10px),
-                            var(--is-plate-bg) !important;
-                    }
-
-                    &.infostand-pattern-stripe {
-                        background-image:
-                            repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 4px, transparent 4px, transparent 10px),
-                            var(--is-plate-bg) !important;
-                    }
+                    @include infostand-plate-patterns;
 
                     .preview-card-body-image {
                         background: rgba(0, 0, 0, 0.28);
@@ -857,11 +936,14 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                     padding: 0 12px;
                     border-radius: 13px;
                     border: 2px solid #ffffff;
+                    background: var(--is-plate-bg);
                     box-shadow: 0 0 0 1px #000000, 0 2px 4px rgba(0, 0, 0, 0.45);
                     color: #ffffff !important;
                     font-size: 11px;
                     font-weight: 800;
                     text-shadow: 1px 1px 0 #000000;
+
+                    @include infostand-plate-patterns;
 
                     .preview-name {
                         color: #ffffff !important;
