@@ -65,6 +65,7 @@ export const LoginStreakView: FC<{}> = () =>
     const { currentEra } = useEraTheme();
     const { showSingleBubble } = useNotification();
     const dailyNotifiedRef = useRef(false);
+    const voteNotifiedSessionRef = useRef(false);
     const [ isVisible, setIsVisible ] = useState(false);
     const [ targetUserId, setTargetUserId ] = useState<number>(0);
     const [ data, setData ] = useState<StreakData | null>(null);
@@ -251,17 +252,18 @@ export const LoginStreakView: FC<{}> = () =>
         };
     }, [ currentEra, showSingleBubble ]);
 
-    // Notificación diaria de votos disponibles (arriba a la derecha): al hacer clic abre /vote en el overlay
+    // Notificación de votos pendientes (arriba a la derecha): aparece en cada entrada al cliente
+    // mientras falten votos por completar hoy; al hacer clic abre /vote en el overlay.
     useEffect(() =>
     {
-        if(!showSingleBubble) return;
+        if(voteNotifiedSessionRef.current || !showSingleBubble) return;
 
         let cancelled = false;
         let pollTimer: ReturnType<typeof setTimeout> = null;
 
         const checkDailyClientVotes = async (attempt: number) =>
         {
-            if(cancelled) return;
+            if(cancelled || voteNotifiedSessionRef.current) return;
 
             const uid = GetSessionDataManager()?.userId || 0;
             if(uid <= 0)
@@ -276,20 +278,20 @@ export const LoginStreakView: FC<{}> = () =>
                 const json = await res.json();
                 if(cancelled || !json || !json.success) return;
 
+                const totalPlatforms = Array.isArray(json.platforms) && json.platforms.length > 0 ? json.platforms.length : 2;
                 const claimedCount = Number(json.claimedCountToday || 0);
-                if(claimedCount >= 2) return;
+                if(claimedCount >= totalPlatforms)
+                {
+                    voteNotifiedSessionRef.current = true;
+                    return;
+                }
 
-                const todayKey = `${ String(json.today || new Date().toISOString().slice(0, 10)) }_${ claimedCount }`;
-                const storageKey = `habbten_client_vote_notified_${ uid }`;
-                let lastNotified: string | null = null;
-                try { lastNotified = localStorage.getItem(storageKey); } catch {}
+                voteNotifiedSessionRef.current = true;
 
-                if(lastNotified === todayKey) return;
-                try { localStorage.setItem(storageKey, todayKey); } catch {}
-
+                const remaining = totalPlatforms - claimedCount;
                 const msg = claimedCount === 0
                     ? '¡Vota hoy por Habbten y gana hasta 700 Créditos, 400 Duckets y 35 Diamantes! Haz clic aquí para votar.'
-                    : '¡Te falta 1 voto hoy para completar el 2/2 y ganar el Bono Combo! Haz clic aquí para votar.';
+                    : `¡Te ${ remaining === 1 ? 'falta 1 voto' : `faltan ${ remaining } votos` } hoy para completar el ${ totalPlatforms }/${ totalPlatforms } y ganar el Bono Combo! Haz clic aquí para votar.`;
 
                 showSingleBubble(msg, NotificationBubbleType.INFO, voteBubbleImg, 'vote/open', 'Vota y gana');
             }
