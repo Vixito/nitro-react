@@ -29,8 +29,8 @@ import wsWhackImg from '../../assets/images/gamecenter/wobblesquabble/ws_fx_whac
 import wsIconImg from '../../assets/images/gamecenter/wobblesquabble/ws_presence_icon.png';
 import wsRooftopImg from '../../assets/images/gamecenter/wobblesquabble/ws_rooftop_wide.png';
 
+import hcSmallImg from '../../assets/images/catalog/hc_small.png';
 import wiredBannerImg from '../../assets/images/wired/wired_banner_pattern.png';
-import wiredMonitorImg from '../../assets/images/wired/wired_monitor_illustration.png';
 
 export type InfoStandPlatePattern =
     | 'none'
@@ -285,7 +285,7 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         pattern: 'starlight'
     },
 
-    // Wired (textura oficial Wired + cajas Wired reales)
+    // Wired (textura oficial Wired + tríada real de cajas Wired)
     {
         id: 'wired_tech',
         name: 'Maestro Wired',
@@ -299,7 +299,6 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         bgImageOpacity: 0.28,
         topTrim: 'wired_bar',
         decors: [
-            { slot: 'tl', img: wiredMonitorImg, size: 28 },
             { slot: 'bl', furniId: 3668, size: 34 },  // Causante WIRED
             { slot: 'br', furniId: 3663, size: 34 }   // Efecto WIRED
         ],
@@ -360,10 +359,10 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         borderColor: '#facc15',
         bgStyle: 'linear-gradient(180deg, #166534 0%, #0a361b 100%)',
         emblemColor: '#fde047',
-        emblemFurniId: 1506, // Trofeo Pato Dorado
+        emblemImg: hcSmallImg,
         decors: [
             { slot: 'bl', furniId: 267, size: 38 },   // El Club Sofa
-            { slot: 'br', furniId: 1506, size: 36 }   // Trofeo Pato Dorado
+            { slot: 'br', furniId: 1527, size: 38 }   // Silla Majestic HC
         ],
         pattern: 'diamond'
     }

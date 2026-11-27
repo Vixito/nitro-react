@@ -426,9 +426,8 @@ export const InfoStandEditorView: FC<{}> = () =>
 
                         <div className="infostand-preview-stage" style={ platePreviewCss }>
                             { isShockwave2006 ? (
-                                /* Preview Shockwave 2006: plataforma isométrica + adornos temáticos + cápsula */
-                                <div className={ `preview-era-shockwave ${ hasPreviewCustomPlate ? 'has-plate-decors' : '' }` }>
-                                    { hasPreviewCustomPlate && <InfoStandPlateDecor plate={ previewPlate } compact /> }
+                                /* Preview Shockwave 2006: plataforma isométrica + barra/cápsula totalmente decorada */
+                                <div className="preview-era-shockwave">
                                     <div className="preview-pedestal">
                                         { previewFurniUrl && (
                                             <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-furni-layer" />
@@ -447,11 +446,14 @@ export const InfoStandEditorView: FC<{}> = () =>
                                         </div>
                                     </div>
                                     <div
-                                        className={ `infostand-preview-pill infostand-pattern-${ previewPlate.pattern || 'none' }` }
+                                        className={ `infostand-preview-pill ${ hasPreviewCustomPlate ? `has-custom-plate infostand-pattern-${ previewPlate.pattern || 'none' } ${ previewPlate.topBannerImg ? 'has-top-banner' : '' }` : '' }` }
                                         style={ { '--is-plate-bg': previewPlate.bgStyle, borderColor: previewPlate.borderColor } as CSSProperties }
                                     >
-                                        { hasPreviewCustomPlate && <PlateEmblemIcon plate={ previewPlate } className="preview-emblem-slot" /> }
-                                        <span className="preview-name">{ ownName }</span>
+                                        { hasPreviewCustomPlate && <InfoStandPlateDecor plate={ previewPlate } variant="pill" /> }
+                                        <span className="preview-pill-content">
+                                            { hasPreviewCustomPlate && <PlateEmblemIcon plate={ previewPlate } className="preview-emblem-slot" /> }
+                                            <span className="preview-name">{ ownName }</span>
+                                        </span>
                                     </div>
                                 </div>
                             ) : (

@@ -741,6 +741,9 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                     } as CSSProperties) : undefined }
                     onClick={ () => avatarInfo && setIsCardExpanded(!isCardExpanded) }
                 >
+                    { isUser && customPlate.id !== 'default' && (
+                        <InfoStandPlateDecor plate={ customPlate } variant="pill" />
+                    ) }
                     { avatarInfo ? (
                         <>
                             <span className="pill-name d-flex align-items-center" title={ entityName }>
