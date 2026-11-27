@@ -1,4 +1,4 @@
-import { AvatarAction, IGetImageListener, ImageResult, Vector3d } from '@nitrots/nitro-renderer';
+import { AvatarAction, IGetImageListener, ImageResult, TextureUtils, Vector3d } from '@nitrots/nitro-renderer';
 import { useEffect, useState } from 'react';
 import { GetRoomEngine } from '../nitro';
 
@@ -63,13 +63,13 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
 
 export const INFOSTAND_FURNIS: InfoStandFurniDef[] = [
     { id: 'none',           name: 'Sin furni',        furnitureId: 0,    price: 0,   seatOffsetY: 0 },
-    { id: 'chair_plasty',   name: 'Pod Clásico',      furnitureId: 38,   price: 0,   seatOffsetY: -6 },
-    { id: 'chair_plasty_1', name: 'Pod Verde',        furnitureId: 121,  price: 150, seatOffsetY: -6 },
-    { id: 'chair_plasty_2', name: 'Pod Rojo',         furnitureId: 124,  price: 150, seatOffsetY: -6 },
-    { id: 'chair_plasty_3', name: 'Pod Azul',         furnitureId: 125,  price: 150, seatOffsetY: -6 },
-    { id: 'chair_plasty_4', name: 'Pod Ámbar',        furnitureId: 126,  price: 200, seatOffsetY: -6 },
-    { id: 'chair_plasty_5', name: 'Pod Rosa',         furnitureId: 147,  price: 200, seatOffsetY: -6 },
-    { id: 'chair_plasty_6', name: 'Pod Morado',       furnitureId: 151,  price: 200, seatOffsetY: -6 },
+    { id: 'chair_plasty',   name: 'Pod Clásico',      furnitureId: 121,  price: 0,   seatOffsetY: -6 },
+    { id: 'chair_plasty_1', name: 'Pod Verde',        furnitureId: 126,  price: 150, seatOffsetY: -6 },
+    { id: 'chair_plasty_2', name: 'Pod Rojo',         furnitureId: 125,  price: 150, seatOffsetY: -6 },
+    { id: 'chair_plasty_3', name: 'Pod Azul',         furnitureId: 147,  price: 150, seatOffsetY: -6 },
+    { id: 'chair_plasty_4', name: 'Pod Naranja',      furnitureId: 124,  price: 200, seatOffsetY: -6 },
+    { id: 'chair_plasty_5', name: 'Pod Rosa',         furnitureId: 1500, price: 200, seatOffsetY: -6 },
+    { id: 'chair_plasty_6', name: 'Pod Morado',       furnitureId: 1499, price: 200, seatOffsetY: -6 },
     { id: 'chair_norja',    name: 'Silla Norja',      furnitureId: 30,   price: 150, seatOffsetY: -8 },
     { id: 'pillow_0',       name: 'Almohadón Blanco', furnitureId: 1581, price: 300, seatOffsetY: -4 },
     { id: 'pillow_1',       name: 'Almohadón Rosa',   furnitureId: 1582, price: 300, seatOffsetY: -4 },
@@ -212,15 +212,29 @@ export function useInfoStandFurniSprite(furnitureId: number): string | null
         const iconFallback = engine.getFurnitureFloorIconUrl(furnitureId) || null;
         if(iconFallback) setImageUrl(iconFallback);
 
+        const applyResolvedImage = (img: HTMLImageElement | null) =>
+        {
+            if(cancelled || !img || !img.src) return;
+            const commit = () =>
+            {
+                if(cancelled) return;
+                furniImageCache.set(furnitureId, img.src);
+                setImageUrl(img.src);
+            };
+            if(img.complete) commit();
+            else img.onload = commit;
+        };
+
         const listener: IGetImageListener = {
             imageReady: (_id: number, texture, image) =>
             {
                 if(cancelled) return;
-                if(image && image.src)
+                let resolved = image;
+                if(!resolved && texture)
                 {
-                    furniImageCache.set(furnitureId, image.src);
-                    setImageUrl(image.src);
+                    try { resolved = TextureUtils.generateImage(texture); } catch { resolved = null; }
                 }
+                applyResolvedImage(resolved);
             },
             imageFailed: () => {}
         };
@@ -228,14 +242,10 @@ export function useInfoStandFurniSprite(furnitureId: number): string | null
         try
         {
             const result: ImageResult = engine.getFurnitureFloorImage(furnitureId, new Vector3d(180), 64, listener);
-            if(result && result.data)
+            // result.id === 0 means the real furniture asset is already loaded in memory (non-zero is a loading placeholder!)
+            if(result && result.id === 0 && result.data)
             {
-                const img = result.getImage();
-                if(img && img.src)
-                {
-                    furniImageCache.set(furnitureId, img.src);
-                    setImageUrl(img.src);
-                }
+                applyResolvedImage(result.getImage());
             }
         }
         catch

@@ -1,6 +1,6 @@
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
 import { CSSProperties, FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { FaChair, FaCheck, FaLock, FaPalette, FaShoppingBag, FaSmile } from 'react-icons/fa';
+import { FaChair, FaCheck, FaPalette, FaPencilAlt, FaShoppingBag, FaSmile, FaTimes } from 'react-icons/fa';
 import { AddEventLinkTracker, GetSessionDataManager, RemoveLinkEventTracker } from '../../../../../api';
 import {
     broadcastInfoStandUpdate,
@@ -14,8 +14,8 @@ import {
     useInfoStandFurniSprite,
     UserInfoStandStyle
 } from '../../../../../api/infostand/InfoStandStyleService';
-import { Button, LayoutAvatarImageView, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../../../../common';
-import ducketIconImg from '../../../../../assets/images/eras/flash2012/purse/ducket_icon.png';
+import { LayoutAvatarImageView, LayoutCurrencyIcon, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView, UserProfileIconView } from '../../../../../common';
+import { useEraTheme } from '../../../../../hooks/era/useEraTheme';
 import './InfoStandCustom.scss';
 
 type EditorTab = 'plates' | 'furnis' | 'actions' | 'shop';
@@ -37,13 +37,16 @@ const FurniGridSprite: FC<{ furnitureId: number; name: string }> = ({ furnitureI
     }
     if(!spriteUrl)
     {
-        return <span className="infostand-editor-none">...</span>;
+        return <span className="infostand-editor-none">Cargando...</span>;
     }
     return <img src={ spriteUrl } alt={ name } className="infostand-editor-furni-thumb" />;
 };
 
 export const InfoStandEditorView: FC<{}> = () =>
 {
+    const { currentEra } = useEraTheme();
+    const isShockwave2006 = currentEra === 'shockwave2006';
+
     const [ isVisible, setIsVisible ] = useState(false);
     const [ activeTab, setActiveTab ] = useState<EditorTab>('plates');
     const [ shopSubTab, setShopSubTab ] = useState<SubCategory>('plates');
@@ -167,7 +170,7 @@ export const InfoStandEditorView: FC<{}> = () =>
                 setEquipped(json.style);
                 setPreview(json.style);
                 if(ownUserId > 0) broadcastInfoStandUpdate(ownUserId, json.style);
-                setNotice({ type: 'ok', text: '¡Infostand actualizado!' });
+                setNotice({ type: 'ok', text: '¡Info Stand actualizado!' });
             }
             else
             {
@@ -245,12 +248,15 @@ export const InfoStandEditorView: FC<{}> = () =>
         ? INFOSTAND_ACTIONS.filter(a => a.price > 0 && !unlocks.actions.includes(a.id))
         : INFOSTAND_ACTIONS.filter(a => unlocks.actions.includes(a.id));
 
+    const hasPreviewCustomPlate = previewPlate.id !== 'default';
     const platePreviewCss = {
         '--is-plate-bg': previewPlate.bgStyle,
         '--is-plate-border': previewPlate.borderColor,
         '--is-plate-accent': previewPlate.accentColor,
         '--is-plate-emblem': previewPlate.emblemColor
     } as CSSProperties;
+
+    const seatShift = (previewFurni.furnitureId > 0 && previewAction.id === 'sit') ? (previewFurni.seatOffsetY || -6) : 0;
 
     return (
         <NitroCardView uniqueKey="infostand-editor" className="habbten-infostand-editor" theme="primary-slim">
@@ -272,11 +278,13 @@ export const InfoStandEditorView: FC<{}> = () =>
             <NitroCardContentView className="infostand-editor-body">
                 { isShopMode && (
                     <div className="infostand-shop-subtabs">
-                        <button type="button" className={ shopSubTab === 'plates' ? 'active' : '' } onClick={ () => setShopSubTab('plates') }>Placas</button>
-                        <button type="button" className={ shopSubTab === 'furnis' ? 'active' : '' } onClick={ () => setShopSubTab('furnis') }>Furnis</button>
-                        <button type="button" className={ shopSubTab === 'actions' ? 'active' : '' } onClick={ () => setShopSubTab('actions') }>Acciones</button>
+                        <div className="subtab-group">
+                            <button type="button" className={ `subtab-btn ${ shopSubTab === 'plates' ? 'active' : '' }` } onClick={ () => setShopSubTab('plates') }>Placas</button>
+                            <button type="button" className={ `subtab-btn ${ shopSubTab === 'furnis' ? 'active' : '' }` } onClick={ () => setShopSubTab('furnis') }>Furnis</button>
+                            <button type="button" className={ `subtab-btn ${ shopSubTab === 'actions' ? 'active' : '' }` } onClick={ () => setShopSubTab('actions') }>Acciones</button>
+                        </div>
                         <div className="infostand-ducket-balance" title="Tus Duckets disponibles">
-                            <img src={ ducketIconImg } alt="Duckets" />
+                            <LayoutCurrencyIcon type={ 0 } className="infostand-currency-coin" />
                             <span>{ pixels.toLocaleString() }</span>
                         </div>
                     </div>
@@ -311,9 +319,18 @@ export const InfoStandEditorView: FC<{}> = () =>
                                                     </span>
                                                     <span className="mini-label">{ plate.name }</span>
                                                 </div>
-                                                <span className="infostand-row-badge">
-                                                    { isEq ? <FaCheck /> : (!owned ? `${ plate.price } D` : '') }
-                                                </span>
+                                                { isEq ? (
+                                                    <span className="infostand-row-equipped" title="Equipado">
+                                                        <FaCheck />
+                                                    </span>
+                                                ) : !owned ? (
+                                                    <span className="infostand-row-price">
+                                                        <LayoutCurrencyIcon type={ 0 } className="infostand-currency-coin" />
+                                                        <span>{ plate.price.toLocaleString() }</span>
+                                                    </span>
+                                                ) : (
+                                                    <span className="infostand-row-owned">Tuya</span>
+                                                ) }
                                             </button>
                                         );
                                     }) }
@@ -343,8 +360,13 @@ export const InfoStandEditorView: FC<{}> = () =>
                                                     <FurniGridSprite furnitureId={ furni.furnitureId } name={ furni.name } />
                                                 </div>
                                                 <div className="infostand-tile-name">{ furni.name }</div>
-                                                { isEq && <span className="tile-tag is-eq"><FaCheck /></span> }
-                                                { !owned && <span className="tile-tag is-price"><FaLock /> { furni.price }</span> }
+                                                { isEq && <span className="tile-tag is-eq" title="Equipado"><FaCheck /></span> }
+                                                { !owned && (
+                                                    <span className="tile-tag is-price">
+                                                        <LayoutCurrencyIcon type={ 0 } className="infostand-currency-coin is-sm" />
+                                                        <span>{ furni.price }</span>
+                                                    </span>
+                                                ) }
                                             </button>
                                         );
                                     }) }
@@ -381,8 +403,13 @@ export const InfoStandEditorView: FC<{}> = () =>
                                                     />
                                                 </div>
                                                 <div className="infostand-tile-name">{ act.name }</div>
-                                                { isEq && <span className="tile-tag is-eq"><FaCheck /></span> }
-                                                { !owned && <span className="tile-tag is-price"><FaLock /> { act.price }</span> }
+                                                { isEq && <span className="tile-tag is-eq" title="Equipado"><FaCheck /></span> }
+                                                { !owned && (
+                                                    <span className="tile-tag is-price">
+                                                        <LayoutCurrencyIcon type={ 0 } className="infostand-currency-coin is-sm" />
+                                                        <span>{ act.price }</span>
+                                                    </span>
+                                                ) }
                                             </button>
                                         );
                                     }) }
@@ -391,62 +418,147 @@ export const InfoStandEditorView: FC<{}> = () =>
                         ) }
                     </div>
 
-                    {/* Columna derecha: vista previa en vivo (estilo Origins) */}
+                    {/* Columna derecha: vista previa fiel a la era activa */}
                     <div className="infostand-editor-preview">
-                        <div className="infostand-preview-stage" style={ platePreviewCss }>
-                            <div className="preview-pedestal">
-                                { previewFurniUrl && (
-                                    <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-furni-layer" />
-                                ) }
-                                <div
-                                    className="preview-avatar-layer"
-                                    style={ { transform: `translateY(${ previewFurni.furnitureId > 0 && previewAction.id === 'sit' ? (previewFurni.seatOffsetY || -6) : 0 }px)` } }
-                                >
-                                    <LayoutAvatarImageView
-                                        figure={ ownFigure }
-                                        direction={ 4 }
-                                        posture={ previewAction.posture }
-                                        gesture={ previewAction.gesture }
-                                        expression={ previewAction.expression }
-                                        carryItem={ previewAction.carryItem }
-                                    />
-                                </div>
-                            </div>
+                        <div className="infostand-preview-caption">Vista previa</div>
 
-                            <div
-                                className={ `infostand-preview-pill pattern-${ previewPlate.pattern || 'none' }` }
-                                style={ { background: previewPlate.bgStyle, borderColor: previewPlate.borderColor } }
-                            >
-                                { previewPlate.id !== 'default' && (
-                                    <span className="preview-emblem" style={ { background: previewPlate.emblemColor } }>
-                                        { previewPlate.emblemLabel || '' }
-                                    </span>
-                                ) }
-                                <span className="preview-name">{ ownName }</span>
-                            </div>
+                        <div className="infostand-preview-stage" style={ platePreviewCss }>
+                            { isShockwave2006 ? (
+                                /* Preview Shockwave 2006: plataforma isométrica + cápsula */
+                                <div className="preview-era-shockwave">
+                                    <div className="preview-pedestal">
+                                        { previewFurniUrl && (
+                                            <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-furni-layer" />
+                                        ) }
+                                        <div
+                                            className="preview-avatar-layer"
+                                            style={ { transform: seatShift ? `translateY(${ seatShift }px)` : undefined } }
+                                        >
+                                            <LayoutAvatarImageView
+                                                figure={ ownFigure }
+                                                direction={ 4 }
+                                                posture={ previewAction.posture }
+                                                gesture={ previewAction.gesture }
+                                                expression={ previewAction.expression }
+                                                carryItem={ previewAction.carryItem }
+                                            />
+                                        </div>
+                                    </div>
+                                    <div
+                                        className={ `infostand-preview-pill pattern-${ previewPlate.pattern || 'none' }` }
+                                        style={ { background: previewPlate.bgStyle, borderColor: previewPlate.borderColor } }
+                                    >
+                                        { hasPreviewCustomPlate && (
+                                            <span className="preview-emblem" style={ { background: previewPlate.emblemColor } }>
+                                                { previewPlate.emblemLabel || '' }
+                                            </span>
+                                        ) }
+                                        <span className="preview-name">{ ownName }</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                /* Preview Moderna / Flash 2012 / Móvil: réplica exacta de la tarjeta InfoStand */
+                                <div
+                                    className={ `preview-infostand-card ${ hasPreviewCustomPlate ? `has-custom-plate infostand-pattern-${ previewPlate.pattern || 'none' }` : '' }` }
+                                    style={ hasPreviewCustomPlate ? platePreviewCss : undefined }
+                                >
+                                    <div className="preview-card-header">
+                                        <div className="preview-card-user">
+                                            { hasPreviewCustomPlate && (
+                                                <span className="preview-card-emblem" style={ { background: previewPlate.emblemColor } }>
+                                                    { previewPlate.emblemLabel || '' }
+                                                </span>
+                                            ) }
+                                            { ownUserId > 0 && <UserProfileIconView userId={ ownUserId } /> }
+                                            <span className="preview-card-username">{ ownName }</span>
+                                        </div>
+                                        <FaTimes className="preview-card-close" />
+                                    </div>
+
+                                    <div className="preview-card-divider" />
+
+                                    <div className="preview-card-main">
+                                        <div className="preview-card-body-image">
+                                            { previewFurniUrl && (
+                                                <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-card-furni" />
+                                            ) }
+                                            <div
+                                                className="preview-card-avatar"
+                                                style={ { transform: seatShift ? `translateY(${ seatShift }px)` : undefined } }
+                                            >
+                                                <LayoutAvatarImageView
+                                                    figure={ ownFigure }
+                                                    direction={ 4 }
+                                                    posture={ previewAction.posture }
+                                                    gesture={ previewAction.gesture }
+                                                    expression={ previewAction.expression }
+                                                    carryItem={ previewAction.carryItem }
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="preview-card-badges">
+                                            <span className="preview-badge-slot" />
+                                            <span className="preview-badge-slot" />
+                                            <span className="preview-badge-slot" />
+                                            <span className="preview-badge-slot" />
+                                            <span className="preview-badge-slot" />
+                                            <span className="preview-badge-slot" />
+                                        </div>
+                                    </div>
+
+                                    <div className="preview-card-divider" />
+
+                                    <div className="preview-card-motto">
+                                        <FaPencilAlt className="preview-motto-icon" />
+                                        <span>Tu misión aquí</span>
+                                    </div>
+                                </div>
+                            ) }
                         </div>
 
                         <div className="infostand-preview-footer">
                             <div className="preview-selected-meta">
-                                <strong>{ selectedItem.name }</strong>
+                                <span className="preview-selected-name">{ selectedItem.name }</span>
                                 { !isSelectedUnlocked ? (
                                     <span className="price-pill">
-                                        <img src={ ducketIconImg } alt="Duckets" />
-                                        { selectedItem.price.toLocaleString() } Duckets
+                                        <LayoutCurrencyIcon type={ 0 } className="infostand-currency-coin" />
+                                        <span>{ selectedItem.price.toLocaleString() }</span>
                                     </span>
                                 ) : (
-                                    <span className="owned-pill">{ isSelectedEquipped ? 'Equipado' : 'Desbloqueado' }</span>
+                                    <span className={ `owned-pill ${ isSelectedEquipped ? 'is-equipped' : '' }` }>
+                                        { isSelectedEquipped ? 'Equipado' : 'Desbloqueado' }
+                                    </span>
                                 ) }
                             </div>
 
                             { !isSelectedUnlocked ? (
-                                <Button fullWidth variant="success" size="sm" disabled={ busy || pixels < selectedItem.price } onClick={ handleBuySelected }>
-                                    { busy ? 'Comprando...' : (pixels < selectedItem.price ? 'Duckets insuficientes' : `Comprar (${ selectedItem.price } D)`) }
-                                </Button>
+                                <button
+                                    type="button"
+                                    className="infostand-action-btn is-buy"
+                                    disabled={ busy || pixels < selectedItem.price }
+                                    onClick={ handleBuySelected }
+                                >
+                                    { busy ? (
+                                        'Comprando...'
+                                    ) : pixels < selectedItem.price ? (
+                                        'Duckets insuficientes'
+                                    ) : (
+                                        <>
+                                            <span>Comprar por</span>
+                                            <LayoutCurrencyIcon type={ 0 } className="infostand-currency-coin is-sm" />
+                                            <span>{ selectedItem.price.toLocaleString() }</span>
+                                        </>
+                                    ) }
+                                </button>
                             ) : (
-                                <Button fullWidth variant="primary" size="sm" disabled={ busy || !hasUnsavedUnlockedChanges } onClick={ () => handleEquipSelected() }>
+                                <button
+                                    type="button"
+                                    className="infostand-action-btn is-equip"
+                                    disabled={ busy || !hasUnsavedUnlockedChanges }
+                                    onClick={ () => handleEquipSelected() }
+                                >
                                     { busy ? 'Guardando...' : (hasUnsavedUnlockedChanges ? 'Equipar cambios' : 'Equipado') }
-                                </Button>
+                                </button>
                             ) }
                         </div>
 

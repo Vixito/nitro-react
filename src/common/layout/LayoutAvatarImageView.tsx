@@ -74,10 +74,20 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
         avatarImage.setDirection(AvatarSetType.FULL, direction);
         avatarImage.setDirection(setType, (headDirection !== null && headDirection !== undefined) ? headDirection : direction);
 
-        if(posture) avatarImage.appendAction(AvatarAction.POSTURE, posture);
-        if(gesture) avatarImage.appendAction(AvatarAction.GESTURE, gesture);
-        if(expression) avatarImage.appendAction(AvatarAction.EXPRESSION, expression);
-        if(carryItem && carryItem > 0) avatarImage.appendAction(AvatarAction.CARRY_OBJECT, carryItem.toString());
+        if(posture || gesture || expression || (carryItem && carryItem > 0))
+        {
+            avatarImage.initActionAppends();
+            avatarImage.appendAction(AvatarAction.POSTURE, posture || AvatarAction.POSTURE_STAND);
+            if(gesture) avatarImage.appendAction(AvatarAction.GESTURE, gesture);
+            if(expression) avatarImage.appendAction(expression);
+            if(carryItem && carryItem > 0) avatarImage.appendAction(AvatarAction.CARRY_OBJECT, carryItem.toString());
+            avatarImage.endActionAppends();
+
+            if(expression === AvatarAction.EXPRESSION_WAVE)
+            {
+                avatarImage.updateAnimationByFrames(1);
+            }
+        }
 
         const image = avatarImage.getCroppedImage(setType);
 
