@@ -1,7 +1,8 @@
 import { AvatarAction, AvatarExpressionEnum, GroupInformationComposer, GroupInformationEvent, RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, RoomUnitStatusEvent, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, TradingOpenComposer, UserCurrentBadgesEvent, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
-import { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
-import { FaChevronDown, FaChevronUp, FaCog, FaExchangeAlt, FaHandPaper, FaInfoCircle, FaMusic, FaPencilAlt, FaRedo, FaTimes, FaTrash, FaUserCheck, FaUserPlus, FaUserSlash } from 'react-icons/fa';
+import { CSSProperties, Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import { FaChevronDown, FaChevronUp, FaCog, FaExchangeAlt, FaHandPaper, FaInfoCircle, FaMusic, FaPalette, FaPencilAlt, FaRedo, FaTimes, FaTrash, FaUserCheck, FaUserPlus, FaUserSlash } from 'react-icons/fa';
 import { AvatarInfoFurni, AvatarInfoPet, AvatarInfoRentableBot, AvatarInfoUser, CloneObject, CreateLinkEvent, DispatchUiEvent, GetCanStandUp, GetConfiguration, GetGroupInformation, GetNitroInstance, GetOwnPosture, GetRoomEngine, GetSessionDataManager, GetUserProfile, HasHabboVip, LocalizeText, PostureTypeEnum, RoomWidgetUpdateChatInputContentEvent, SendMessageComposer } from '../../../../../api';
+import { getActionDef, getFurniDef, getPlateDef, useInfoStandFurniSprite, useUserInfoStandStyle } from '../../../../../api/infostand/InfoStandStyleService';
 import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, LayoutLimitedEditionCompactPlateView, LayoutPetImageView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { useFriends, useMessageEvent, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent, useSessionInfo } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -29,6 +30,14 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
 
     // Expansion state for the classic retro details card
     const [ isCardExpanded, setIsCardExpanded ] = useState(false);
+
+    const isUser = Boolean(avatarInfo && (avatarInfo.type === AvatarInfoUser.OWN_USER || avatarInfo.type === AvatarInfoUser.PEER));
+    const userWebId = isUser ? (avatarInfo as AvatarInfoUser).webID : 0;
+    const customStyle = useUserInfoStandStyle(userWebId);
+    const customPlate = useMemo(() => getPlateDef(customStyle.plateId), [ customStyle.plateId ]);
+    const customFurni = useMemo(() => getFurniDef(customStyle.furniId), [ customStyle.furniId ]);
+    const customAction = useMemo(() => getActionDef(customStyle.actionId), [ customStyle.actionId ]);
+    const customFurniSprite = useInfoStandFurniSprite(isUser ? customFurni.furnitureId : 0);
 
     // User-specific states
     const [ motto, setMotto ] = useState<string>('');
@@ -360,7 +369,6 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
     // -------------------------------------------------------------------------
     // Determine entity type and active attributes
     // -------------------------------------------------------------------------
-    const isUser = avatarInfo && (avatarInfo.type === AvatarInfoUser.OWN_USER || avatarInfo.type === AvatarInfoUser.PEER);
     const isOwnUser = avatarInfo && avatarInfo.type === AvatarInfoUser.OWN_USER;
     const isFurni = avatarInfo && avatarInfo.type === AvatarInfoFurni.FURNI;
     const isPet = avatarInfo && avatarInfo.type === AvatarInfoPet.PET_INFO;
@@ -378,10 +386,27 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
         if(isUser || isBot)
         {
             const userInfo = avatarInfo as AvatarInfoUser;
+            const seatShift = (isUser && customFurni.furnitureId > 0 && customAction.id === 'sit') ? (customFurni.seatOffsetY || -6) : 0;
             return (
-                <div className="stage-avatar-wrapper cursor-pointer" onClick={ () => setIsCardExpanded(!isCardExpanded) } style={ { cursor: 'pointer' } }>
-                    <LayoutAvatarImageView figure={ userInfo.figure } direction={ 4 } />
-                </div>
+                <>
+                    { isUser && customFurniSprite && (
+                        <img src={ customFurniSprite } alt={ customFurni.name } className="stage-furni-seat-layer" />
+                    ) }
+                    <div
+                        className="stage-avatar-wrapper cursor-pointer"
+                        onClick={ () => setIsCardExpanded(!isCardExpanded) }
+                        style={ { cursor: 'pointer', marginBottom: seatShift ? `${ -seatShift }px` : undefined } }
+                    >
+                        <LayoutAvatarImageView
+                            figure={ userInfo.figure }
+                            direction={ 4 }
+                            posture={ isUser ? customAction.posture : undefined }
+                            gesture={ isUser ? customAction.gesture : undefined }
+                            expression={ isUser ? customAction.expression : undefined }
+                            carryItem={ isUser ? customAction.carryItem : 0 }
+                        />
+                    </div>
+                </>
             );
         }
 
@@ -699,19 +724,43 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                 </div>
 
                 {/* Pill Capsule */}
-                <div className={ `stage-pill ${ !avatarInfo ? 'empty' : '' }` } onClick={ () => avatarInfo && setIsCardExpanded(!isCardExpanded) }>
+                <div
+                    className={ `stage-pill ${ !avatarInfo ? 'empty' : '' } ${ isUser && customPlate.id !== 'default' ? `has-custom-plate infostand-pattern-${ customPlate.pattern || 'none' }` : '' }` }
+                    style={ (isUser && customPlate.id !== 'default') ? ({
+                        '--is-plate-bg': customPlate.bgStyle,
+                        '--is-plate-border': customPlate.borderColor,
+                        '--is-plate-accent': customPlate.accentColor
+                    } as CSSProperties) : undefined }
+                    onClick={ () => avatarInfo && setIsCardExpanded(!isCardExpanded) }
+                >
                     { avatarInfo ? (
                         <>
-                            <span className="pill-name" title={ entityName }>{ entityName }</span>
+                            <span className="pill-name d-flex align-items-center" title={ entityName }>
+                                { isUser && customPlate.id !== 'default' && (
+                                    <span className="sw-plate-emblem" style={ { background: customPlate.emblemColor } }>
+                                        { customPlate.emblemLabel || '' }
+                                    </span>
+                                ) }
+                                <span>{ entityName }</span>
+                            </span>
                             <div className="pill-icons">
                                 { isOwnUser && (
-                                    <div
-                                        className="pill-btn gear-btn"
-                                        onClick={ e => { e.stopPropagation(); handleAction('change_looks'); } }
-                                        title="Cambiar de ropa / armario"
-                                    >
-                                        <FaCog size={ 12 } />
-                                    </div>
+                                    <>
+                                        <div
+                                            className="pill-btn palette-btn"
+                                            onClick={ e => { e.stopPropagation(); CreateLinkEvent('infostand-editor/open'); } }
+                                            title="Personalizar Info Stand"
+                                        >
+                                            <FaPalette size={ 11 } />
+                                        </div>
+                                        <div
+                                            className="pill-btn gear-btn"
+                                            onClick={ e => { e.stopPropagation(); handleAction('change_looks'); } }
+                                            title="Cambiar de ropa / armario"
+                                        >
+                                            <FaCog size={ 12 } />
+                                        </div>
+                                    </>
                                 ) }
                                 <div
                                     className="pill-btn info-btn"

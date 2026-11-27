@@ -1,0 +1,535 @@
+/* ============================================================================
+ * INFOSTAND PERSONALIZABLE (HABBO ORIGINS STYLE — TODAS LAS ERAS)
+ * ============================================================================ */
+
+// 1. Estilos compartidos de placas y capas de furni/avatar en InfoStand (Moderna, 2012, Móvil)
+body .nitro-infostand-container .nitro-infostand.has-custom-plate,
+.nitro-infostand-container .nitro-infostand.has-custom-plate,
+.nitro-infostand.has-custom-plate {
+    background: var(--is-plate-bg) !important;
+    background-color: transparent !important;
+    border: 2px solid var(--is-plate-border, #5cb8ff) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+
+    &.infostand-pattern-diamond {
+        background-image:
+            repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 10px),
+            repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 0, rgba(255, 255, 255, 0.05) 1px, transparent 1px, transparent 10px),
+            var(--is-plate-bg) !important;
+    }
+
+    &.infostand-pattern-stripe {
+        background-image:
+            repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 4px, transparent 4px, transparent 10px),
+            var(--is-plate-bg) !important;
+    }
+
+    &.infostand-pattern-none {
+        background: var(--is-plate-bg) !important;
+    }
+
+    .body-image {
+        background: rgba(0, 0, 0, 0.28) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    }
+}
+
+body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infostand-custom-stage {
+    min-height: 70px !important;
+    max-height: 82px !important;
+
+    .infostand-furni-bg {
+        max-width: 48px !important;
+        max-height: 48px !important;
+    }
+}
+
+.nitro-infostand {
+    .body-image.infostand-custom-stage {
+        position: relative;
+        overflow: hidden;
+        min-height: 92px;
+
+        .infostand-furni-bg {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 66px;
+            max-height: 66px;
+            image-rendering: pixelated;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .infostand-avatar-fg {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+    }
+
+    .infostand-plate-emblem {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.75);
+        box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.45);
+        font-size: 8px;
+        font-weight: 800;
+        color: #ffffff;
+        flex-shrink: 0;
+    }
+
+    .infostand-customize-btn {
+        cursor: pointer;
+        opacity: 0.85;
+        transition: opacity 0.15s ease, transform 0.12s ease;
+
+        &:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+}
+
+// 2. Shockwave 2006 — Placa personalizada en la cápsula + Furni en el pedestal isométrico
+.infostand-shockwave-container {
+    .stage-entity-preview {
+        .stage-furni-seat-layer {
+            position: absolute !important;
+            bottom: -14px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            max-width: 72px !important;
+            max-height: 72px !important;
+            image-rendering: pixelated !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        .stage-avatar-wrapper {
+            z-index: 2 !important;
+        }
+    }
+
+    .stage-pill.has-custom-plate {
+        border: 2px solid var(--is-plate-border, #ffffff) !important;
+        background: var(--is-plate-bg) !important;
+
+        &.infostand-pattern-diamond {
+            background-image:
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 8px),
+                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 1px, transparent 1px, transparent 8px),
+                var(--is-plate-bg) !important;
+        }
+
+        &.infostand-pattern-stripe {
+            background-image:
+                repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 3px, transparent 3px, transparent 8px),
+                var(--is-plate-bg) !important;
+        }
+
+        .sw-plate-emblem {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 14px !important;
+            height: 14px !important;
+            margin-right: 4px !important;
+            border-radius: 50% !important;
+            border: 1px solid #000000 !important;
+            box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.55) !important;
+            font-size: 8px !important;
+            font-weight: 700 !important;
+            color: #ffffff !important;
+            flex-shrink: 0 !important;
+        }
+    }
+}
+
+// 3. Ventana del Editor de Info Stand (estilo Origins)
+.habbten-infostand-editor {
+    width: 560px;
+    max-width: 96vw;
+    min-height: 410px;
+
+    .infostand-editor-body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px !important;
+    }
+
+    .infostand-shop-subtabs {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+
+        button {
+            border: 1px solid rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.08);
+            color: inherit;
+            border-radius: 4px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+
+            &.active {
+                background: #2563eb;
+                color: #ffffff;
+                border-color: #1d4ed8;
+            }
+        }
+
+        .infostand-ducket-balance {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(126, 34, 206, 0.15);
+            border: 1px solid rgba(126, 34, 206, 0.35);
+            font-size: 11px;
+            font-weight: 800;
+
+            img {
+                width: 14px;
+                height: 14px;
+                image-rendering: pixelated;
+            }
+        }
+    }
+
+    .infostand-editor-split {
+        display: grid;
+        grid-template-columns: 1.45fr 1fr;
+        gap: 10px;
+        min-height: 315px;
+
+        @media (max-width: 560px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .infostand-editor-list {
+        max-height: 325px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .infostand-empty-state {
+        padding: 28px 12px;
+        text-align: center;
+        font-size: 12px;
+        opacity: 0.75;
+    }
+
+    .infostand-plates-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .infostand-plate-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            width: 100%;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background: rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: background 0.12s ease, border-color 0.12s ease;
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.12);
+            }
+
+            &.selected {
+                border-color: #2563eb;
+                background: rgba(37, 99, 235, 0.12);
+            }
+
+            .infostand-mini-pill {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                height: 26px;
+                padding: 0 10px 0 6px;
+                border-radius: 13px;
+                border: 2px solid #ffffff;
+                box-shadow: 0 0 0 1px #000000;
+                color: #ffffff;
+                font-size: 11px;
+                font-weight: 700;
+                text-shadow: 1px 1px 0 #000000;
+
+                &.pattern-diamond {
+                    background-image:
+                        repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 1px, transparent 1px, transparent 8px),
+                        repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 1px, transparent 1px, transparent 8px);
+                }
+
+                .mini-emblem {
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    border: 1px solid #000000;
+                    box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.5);
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 8px;
+                    flex-shrink: 0;
+                }
+            }
+
+            .infostand-row-badge {
+                font-size: 10px;
+                font-weight: 800;
+                color: #16a34a;
+                min-width: 34px;
+                text-align: right;
+            }
+        }
+    }
+
+    .infostand-tile-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+
+        .infostand-tile {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 4px;
+            min-height: 88px;
+            border-radius: 6px;
+            border: 2px solid rgba(0, 0, 0, 0.12);
+            background: rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.1);
+            }
+
+            &.selected {
+                border-color: #2563eb;
+                background: rgba(37, 99, 235, 0.14);
+            }
+
+            .infostand-tile-art {
+                width: 64px;
+                height: 60px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+
+                &.is-avatar {
+                    height: 76px;
+                }
+
+                .infostand-editor-furni-thumb {
+                    max-width: 58px;
+                    max-height: 58px;
+                    image-rendering: pixelated;
+                }
+
+                .infostand-editor-none {
+                    font-size: 10px;
+                    opacity: 0.65;
+                }
+            }
+
+            .infostand-tile-name {
+                font-size: 10px;
+                font-weight: 700;
+                text-align: center;
+                line-height: 1.15;
+                margin-top: 2px;
+                word-break: break-word;
+            }
+
+            .tile-tag {
+                position: absolute;
+                top: 3px;
+                right: 3px;
+                font-size: 9px;
+                font-weight: 800;
+                padding: 1px 4px;
+                border-radius: 4px;
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
+
+                &.is-eq {
+                    background: #16a34a;
+                    color: #ffffff;
+                }
+
+                &.is-price {
+                    background: rgba(15, 23, 42, 0.82);
+                    color: #fde047;
+                }
+            }
+        }
+    }
+
+    .infostand-editor-preview {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.1);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+
+        .infostand-preview-stage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            min-height: 190px;
+            padding-bottom: 6px;
+            position: relative;
+
+            .preview-pedestal {
+                position: relative;
+                width: 110px;
+                height: 125px;
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                margin-bottom: 8px;
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    bottom: -2px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 88px;
+                    height: 46px;
+                    background: url('@/assets/images/eras/shockwave_v14/infostand_stage.png') no-repeat center;
+                    background-size: 88px 46px;
+                    image-rendering: pixelated;
+                    z-index: 0;
+                }
+
+                .preview-furni-layer {
+                    position: absolute;
+                    bottom: 12px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    max-width: 72px;
+                    max-height: 72px;
+                    image-rendering: pixelated;
+                    z-index: 1;
+                }
+
+                .preview-avatar-layer {
+                    position: relative;
+                    z-index: 2;
+                    margin-bottom: 14px;
+                }
+            }
+
+            .infostand-preview-pill {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                min-width: 158px;
+                max-width: 100%;
+                height: 24px;
+                padding: 0 12px;
+                border-radius: 12px;
+                border: 2px solid #ffffff;
+                box-shadow: 0 0 0 1px #000000, 0 2px 4px rgba(0, 0, 0, 0.4);
+                color: #ffffff;
+                font-size: 11px;
+                font-weight: 800;
+                text-shadow: 1px 1px 0 #000000;
+
+                .preview-emblem {
+                    width: 15px;
+                    height: 15px;
+                    border-radius: 50%;
+                    border: 1px solid #000000;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 8px;
+                }
+            }
+        }
+
+        .infostand-preview-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .preview-selected-meta {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-size: 11px;
+
+                .price-pill {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-weight: 800;
+                    color: #9333ea;
+
+                    img {
+                        width: 13px;
+                        height: 13px;
+                        image-rendering: pixelated;
+                    }
+                }
+
+                .owned-pill {
+                    font-weight: 700;
+                    color: #16a34a;
+                }
+            }
+        }
+
+        .infostand-editor-notice {
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+
+            &.is-ok {
+                background: rgba(22, 163, 74, 0.16);
+                color: #15803d;
+            }
+
+            &.is-err {
+                background: rgba(220, 38, 38, 0.16);
+                color: #b91c1c;
+            }
+        }
+    }
+}

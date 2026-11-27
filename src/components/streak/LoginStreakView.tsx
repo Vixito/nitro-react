@@ -1,8 +1,8 @@
 import { ILinkEventTracker } from '@nitrots/nitro-renderer';
-import { FC, useCallback, useEffect, useState } from 'react';
-import { AddEventLinkTracker, GetRoomEngine, GetSessionDataManager, RemoveLinkEventTracker } from '../../api';
+import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { AddEventLinkTracker, GetRoomEngine, GetSessionDataManager, NotificationBubbleType, RemoveLinkEventTracker } from '../../api';
 import { Button, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../common';
-import { useEraTheme } from '../../hooks';
+import { useEraTheme, useNotification } from '../../hooks';
 import creditIconImg from '../../assets/images/eras/flash2012/purse/credit_icon.png';
 import ducketIconImg from '../../assets/images/eras/flash2012/purse/ducket_icon.png';
 import iconBonusBagImg from '../../assets/images/eras/flash2012/streak/icon_bonusbag_habbo.png';
@@ -61,6 +61,8 @@ const ITEMS_PER_PAGE = 5;
 export const LoginStreakView: FC<{}> = () =>
 {
     const { currentEra } = useEraTheme();
+    const { showSingleBubble } = useNotification();
+    const dailyNotifiedRef = useRef(false);
     const [ isVisible, setIsVisible ] = useState(false);
     const [ targetUserId, setTargetUserId ] = useState<number>(0);
     const [ data, setData ] = useState<StreakData | null>(null);
@@ -150,6 +152,77 @@ export const LoginStreakView: FC<{}> = () =>
         }, 1000);
         return () => clearInterval(timer);
     }, [ isVisible ]);
+
+    // Notificación diaria en el cliente (arriba a la derecha) al entrar cada nuevo día de racha,
+    // independiente de si el usuario ya la vio en la CMS. Al hacer clic abre la ventana de racha.
+    useEffect(() =>
+    {
+        if(dailyNotifiedRef.current || !showSingleBubble) return;
+
+        let cancelled = false;
+        let pollTimer: ReturnType<typeof setTimeout> = null;
+
+        const checkDailyClientStreak = async (attempt: number) =>
+        {
+            if(cancelled || dailyNotifiedRef.current) return;
+
+            const uid = GetSessionDataManager()?.userId || 0;
+            if(uid <= 0)
+            {
+                if(attempt < 20) pollTimer = setTimeout(() => checkDailyClientStreak(attempt + 1), 1500);
+                return;
+            }
+
+            try
+            {
+                const eraQuery = `?era=${ encodeURIComponent(currentEra || 'modern') }`;
+                const res = await fetch(`/api/client/streak/${ uid }${ eraQuery }`, { credentials: 'include' });
+                const json = await res.json();
+                if(cancelled || !json || !json.success) return;
+
+                const streakDays = Number(json.currentStreak || 0);
+                if(streakDays <= 0) return;
+
+                const dayKey = String(json.lastStreakDate || new Date().toISOString().slice(0, 10));
+                const storageKey = `habbten_client_streak_notified_${ uid }`;
+                let lastNotifiedDay: string | null = null;
+                try { lastNotifiedDay = localStorage.getItem(storageKey); } catch {}
+
+                if(lastNotifiedDay === dayKey)
+                {
+                    dailyNotifiedRef.current = true;
+                    return;
+                }
+
+                dailyNotifiedRef.current = true;
+                try { localStorage.setItem(storageKey, dayKey); } catch {}
+
+                const milestonesList: StreakMilestone[] = Array.isArray(json.milestones) ? json.milestones : [];
+                const claimableCount = milestonesList.filter(m => m.canClaim).length;
+
+                const msg = claimableCount > 0
+                    ? `¡Racha de ${ streakDays } ${ streakDays === 1 ? 'día' : 'días' }! Tienes ${ claimableCount } ${ claimableCount === 1 ? 'recompensa lista' : 'recompensas listas' }. Haz clic aquí para reclamar.`
+                    : `¡Nuevo día de racha! Llevas ${ streakDays } ${ streakDays === 1 ? 'día consecutivo' : 'días consecutivos' }. Haz clic aquí para ver tus premios.`;
+
+                showSingleBubble(msg, NotificationBubbleType.INFO, iconFlameSmallImg, 'streak/open', 'Racha diaria');
+            }
+            catch
+            {
+                if(!cancelled && attempt < 3)
+                {
+                    pollTimer = setTimeout(() => checkDailyClientStreak(attempt + 1), 4000);
+                }
+            }
+        };
+
+        pollTimer = setTimeout(() => checkDailyClientStreak(0), 2200);
+
+        return () =>
+        {
+            cancelled = true;
+            if(pollTimer) clearTimeout(pollTimer);
+        };
+    }, [ currentEra, showSingleBubble ]);
 
     const handleClaim = async (milestone: StreakMilestone) =>
     {

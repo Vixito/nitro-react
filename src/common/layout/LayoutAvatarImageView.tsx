@@ -13,11 +13,13 @@ export interface LayoutAvatarImageViewProps extends BaseProps<HTMLDivElement>
     scale?: number;
     posture?: string;
     gesture?: string;
+    expression?: string;
+    carryItem?: number;
 }
 
 export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
 {
-    const { figure = '', gender = 'M', headOnly = false, direction = 0, headDirection = null, scale = 1, posture = null, gesture = null, classNames = [], style = {}, ...rest } = props;
+    const { figure = '', gender = 'M', headOnly = false, direction = 0, headDirection = null, scale = 1, posture = null, gesture = null, expression = null, carryItem = 0, classNames = [], style = {}, ...rest } = props;
     const [ avatarUrl, setAvatarUrl ] = useState<string>(null);
     const [ randomValue, setRandomValue ] = useState(-1);
     const isDisposed = useRef(false);
@@ -74,13 +76,15 @@ export const LayoutAvatarImageView: FC<LayoutAvatarImageViewProps> = props =>
 
         if(posture) avatarImage.appendAction(AvatarAction.POSTURE, posture);
         if(gesture) avatarImage.appendAction(AvatarAction.GESTURE, gesture);
+        if(expression) avatarImage.appendAction(AvatarAction.EXPRESSION, expression);
+        if(carryItem && carryItem > 0) avatarImage.appendAction(AvatarAction.CARRY_OBJECT, carryItem.toString());
 
         const image = avatarImage.getCroppedImage(setType);
 
         if(image) setAvatarUrl(image.src);
 
         avatarImage.dispose();
-    }, [ figure, gender, direction, headDirection, headOnly, posture, gesture, randomValue ]);
+    }, [ figure, gender, direction, headDirection, headOnly, posture, gesture, expression, carryItem, randomValue ]);
 
     useEffect(() =>
     {

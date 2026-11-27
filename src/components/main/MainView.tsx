@@ -34,6 +34,7 @@ import { EraSelectorModalView } from '../eras/EraSelectorModalView';
 import { DiscordLinkModalView } from '../discord/DiscordLinkModalView';
 import { DiscordActivityReporter } from '../discord/DiscordActivityReporter';
 import { LoginStreakView } from '../streak/LoginStreakView';
+import { InfoStandEditorView } from '../room/widgets/avatar-info/infostand/InfoStandEditorView';
 import { BulletinBoardView } from '../bulletin/BulletinBoardView';
 import { ClientTutorialView } from '../tutorial/ClientTutorialView';
 
@@ -233,6 +234,7 @@ export const MainView: FC<{}> = props =>
             <FloorplanEditorView />
             <BattlePassView />
             <LoginStreakView />
+            <InfoStandEditorView />
             <BulletinBoardView />
             <ClientTutorialView />
             <EraSelectorModalView />

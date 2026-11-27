@@ -1,9 +1,10 @@
 import { RelationshipStatusInfoEvent, RelationshipStatusInfoMessageParser, RoomSessionFavoriteGroupUpdateEvent, RoomSessionUserBadgesEvent, RoomSessionUserFigureUpdateEvent, UserCurrentBadgesEvent, UserRelationshipsComposer } from '@nitrots/nitro-renderer';
-import { Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useEffect, useState } from 'react';
-import { FaPencilAlt, FaTimes } from 'react-icons/fa';
+import { CSSProperties, Dispatch, FC, FocusEvent, KeyboardEvent, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { FaPalette, FaPencilAlt, FaTimes } from 'react-icons/fa';
 import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
 import pencilIconImg from '../../../../../assets/images/infostand/pencil-icon.png';
-import { AvatarInfoUser, CloneObject, GetConfiguration, GetGroupInformation, GetSessionDataManager, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { AvatarInfoUser, CloneObject, CreateLinkEvent, GetConfiguration, GetGroupInformation, GetSessionDataManager, GetUserProfile, LocalizeText, SendMessageComposer } from '../../../../../api';
+import { getActionDef, getFurniDef, getPlateDef, useInfoStandFurniSprite, useUserInfoStandStyle } from '../../../../../api/infostand/InfoStandStyleService';
 import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserProfileIconView } from '../../../../../common';
 import { useEraTheme, useMessageEvent, useRoom, useRoomSessionManagerEvent } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
@@ -25,6 +26,11 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
     const { roomSession = null } = useRoom();
     const { currentEra } = useEraTheme();
     const isFlash2012 = currentEra === 'flash2012';
+    const customStyle = useUserInfoStandStyle(avatarInfo?.webID);
+    const customPlate = useMemo(() => getPlateDef(customStyle.plateId), [ customStyle.plateId ]);
+    const customFurni = useMemo(() => getFurniDef(customStyle.furniId), [ customStyle.furniId ]);
+    const customAction = useMemo(() => getActionDef(customStyle.actionId), [ customStyle.actionId ]);
+    const customFurniSprite = useInfoStandFurniSprite(customFurni.furnitureId);
 
     const saveMotto = (motto: string) =>
     {
@@ -167,25 +173,63 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
 
     if(!avatarInfo) return null;
 
+    const hasCustomPlate = customPlate.id !== 'default';
+    const customPlateVars = hasCustomPlate ? ({
+        '--is-plate-bg': customPlate.bgStyle,
+        '--is-plate-border': customPlate.borderColor,
+        '--is-plate-accent': customPlate.accentColor
+    } as CSSProperties) : undefined;
+    const isOwn = avatarInfo.type === AvatarInfoUser.OWN_USER;
+    const seatShift = (customFurni.furnitureId > 0 && customAction.id === 'sit') ? (customFurni.seatOffsetY || -6) : 0;
+
     return (
-        <Column className="nitro-infostand rounded">
+        <Column
+            className={ `nitro-infostand rounded ${ hasCustomPlate ? `has-custom-plate infostand-pattern-${ customPlate.pattern || 'none' }` : '' }` }
+            style={ customPlateVars }
+        >
             <Column overflow="visible" className="container-fluid content-area" gap={ 1 }>
                 <Column gap={ 1 }>
                     <Flex alignItems="center" justifyContent="between">
                         <Flex alignItems="center" gap={ 1 }>
+                            { hasCustomPlate && (
+                                <span className="infostand-plate-emblem" style={ { background: customPlate.emblemColor } } title={ customPlate.name }>
+                                    { customPlate.emblemLabel || '' }
+                                </span>
+                            ) }
                             <UserProfileIconView userId={ avatarInfo.webID } />
                             <Text bold variant="white" small wrap className="infostand-name fw-bold"><b>{ avatarInfo.name }</b></Text>
                         </Flex>
-                        { isFlash2012
-                            ? <img src={ close2012Img } alt="Cerrar" className="cursor-pointer infostand-close-2012" onClick={ onClose } />
-                            : <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } /> }
+                        <Flex alignItems="center" gap={ 2 }>
+                            { isOwn && (
+                                <FaPalette
+                                    className="cursor-pointer fa-icon infostand-customize-btn"
+                                    title="Personalizar Info Stand"
+                                    onClick={ () => CreateLinkEvent('infostand-editor/open') }
+                                />
+                            ) }
+                            { isFlash2012
+                                ? <img src={ close2012Img } alt="Cerrar" className="cursor-pointer infostand-close-2012" onClick={ onClose } />
+                                : <FaTimes className="cursor-pointer fa-icon" onClick={ onClose } /> }
+                        </Flex>
                     </Flex>
                     <hr className="m-0" />
                 </Column>
                 <Column gap={ 1 }>
                     <Flex gap={ 1 }>
-                        <Column fullWidth pointer className="body-image cursor-pointer" onClick={ event => GetUserProfile(avatarInfo.webID) }>
-                            <LayoutAvatarImageView figure={ avatarInfo.figure } direction={ 4 } />
+                        <Column fullWidth pointer className="body-image infostand-custom-stage cursor-pointer" onClick={ event => GetUserProfile(avatarInfo.webID) }>
+                            { customFurniSprite && (
+                                <img src={ customFurniSprite } alt={ customFurni.name } className="infostand-furni-bg" />
+                            ) }
+                            <div className="infostand-avatar-fg" style={ { transform: seatShift ? `translateY(${ seatShift }px)` : undefined } }>
+                                <LayoutAvatarImageView
+                                    figure={ avatarInfo.figure }
+                                    direction={ 4 }
+                                    posture={ customAction.posture }
+                                    gesture={ customAction.gesture }
+                                    expression={ customAction.expression }
+                                    carryItem={ customAction.carryItem }
+                                />
+                            </div>
                         </Column>
                         <Column grow alignItems="center" gap={ 0 }>
                             <Flex gap={ 1 }>
