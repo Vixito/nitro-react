@@ -213,6 +213,26 @@ export async function rpGetRankings(): Promise<any>
     return await res.json();
 }
 
+export async function rpGetNews(): Promise<{ success: boolean; articles: any[]; events: any[] }>
+{
+    const res = await fetch('/api/rp/news', { credentials: 'include' });
+    return await res.json();
+}
+
+export async function rpSetPhoneHolding(holding: boolean): Promise<void>
+{
+    try
+    {
+        await fetch('/api/rp/phone/hold', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ holding })
+        });
+    }
+    catch (_) {}
+}
+
 export function dispatchRpFeedback(detail: { ok: boolean; message: string; state?: RpFullState | null }): void
 {
     window.dispatchEvent(new CustomEvent('habbten-rp-action-feedback', { detail }));

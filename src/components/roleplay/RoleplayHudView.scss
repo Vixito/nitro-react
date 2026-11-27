@@ -1,895 +1,1149 @@
 /* ============================================================================
- * HABBTEN ROLEPLAY CLIENT SHELL (2 MODOS DEDICADOS: NAVEGADOR Y MÓVIL)
- * Estética nativa Habbo (carbón #222222 biselado + ventanas NitroCardView)
- * Cero solapamientos con sala, InfoStand ni chat.
- * ============================================================================ */
+   HABBTEN ROLEPLAY — CLIENTE MODERNO MINIMALISTA (ESTILO HABBORP + SMARTPHONE)
+   Aislado exclusivamente bajo body.habbten-rp-client (2 modos: Web y Móvil)
+   ============================================================================ */
 
 body.habbten-rp-client {
-    // Ocultar controles clásicos duplicados dentro del cliente RP dedicado
+    background-color: #1a1d21 !important;
+
+    /* Ocultar duplicados del chat/room-tools clásicos para mantener el lienzo 100% limpio */
     .nitro-room-chat-input,
     .nitro-room-tools-container {
         display: none !important;
     }
 
-    // Posicionar el InfoStand limpiamente encima de la barra inferior RP (52px)
     .nitro-infostand-container {
-        bottom: 62px !important;
-        right: 10px !important;
-        z-index: 410 !important;
+        bottom: 72px !important;
+        right: 12px !important;
+        z-index: 60 !important;
     }
 
-    // Notificaciones arriba a la derecha debajo de la barra superior RP (46px)
     .rp-notifications-slot {
         position: fixed;
-        top: 52px;
-        right: 10px;
-        z-index: 415;
+        top: 56px;
+        right: 12px;
+        z-index: 75;
         pointer-events: none;
-    }
 
-    &.is-rp-mobile {
-        .nitro-infostand-container {
-            bottom: 56px !important;
-        }
-        .rp-notifications-slot {
-            top: 46px;
-        }
+        > * { pointer-events: auto; }
     }
 }
 
-.habbten-rp-root {
+.rp-modern-root {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 420;
-    font-family: 'Ubuntu', Verdana, Arial, sans-serif;
+    z-index: 50;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #f3f4f6;
+    user-select: none;
 
-    * { box-sizing: border-box; }
+    > * { pointer-events: auto; }
+}
 
-    .rp-ambient-tint {
-        position: fixed;
-        inset: 46px 0 52px 0;
-        pointer-events: none;
-        transition: background-color 1s ease;
+/* ==================== AVISOS CRÍTICOS / TOASTS ==================== */
+.rp-alert-strip {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 90;
+    pointer-events: none !important;
+}
 
-        &.phase-day { background-color: transparent; }
-        &.phase-dawn { background-color: rgba(251, 146, 60, 0.05); }
-        &.phase-sunset { background-color: rgba(234, 88, 12, 0.08); }
-        &.phase-night { background-color: rgba(8, 18, 42, 0.2); }
+.rp-alert-pill {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+
+    &.is-jail { background: #7f1d1d; color: #fee2e2; }
+    &.is-hosp { background: #1e3a8a; color: #dbeafe; }
+    &.is-cuff { background: #78350f; color: #fef3c7; }
+}
+
+.rp-toast-stack {
+    position: fixed;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 95;
+    pointer-events: none !important;
+}
+
+.rp-toast {
+    padding: 8px 14px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #23272c;
+    border: 1px solid #3a4049;
+    color: #f3f4f6;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    max-width: 440px;
+    text-align: center;
+
+    &.is-ok { border-color: #22c55e; color: #dcfce7; }
+    &.is-err { border-color: #ef4444; color: #fee2e2; }
+    &.is-warn { border-color: #f59e0b; color: #fef3c7; }
+}
+
+/* ==================== BOTONES SUPERIORES DERECHA (ESTILO HABBORP) ==================== */
+.rp-top-right-tools {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 65;
+}
+
+.rp-square-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 7px;
+    background: #2b2f35;
+    border: 1px solid #40464f;
+    color: #e5e7eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    transition: background 0.12s ease, border-color 0.12s ease;
+
+    &:hover { background: #363c44; color: #ffffff; }
+    &.is-active { background: #1ea866; border-color: #34d399; color: #ffffff; }
+}
+
+/* ==================== DOCK VERTICAL IZQUIERDO ==================== */
+.rp-left-dock {
+    position: fixed;
+    left: 12px;
+    bottom: 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px;
+    background: #25282d;
+    border: 1px solid #3a3f47;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    z-index: 65;
+}
+
+.rp-dock-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    background: #1d2024;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+
+    &:hover { background: #31363d; border-color: #4b525c; }
+    &.is-active { background: #1c3d2d; border-color: #22c55e; }
+}
+
+.rp-dock-pixel {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.rp-phone-glyph {
+    width: 17px;
+    height: 26px;
+    border-radius: 4px;
+    background: #111316;
+    border: 2px solid #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 1px;
+}
+
+.rp-phone-glyph-screen {
+    width: 100%;
+    height: 15px;
+    border-radius: 1px;
+    background: linear-gradient(180deg, #38bdf8 0%, #1d4ed8 100%);
+}
+
+.rp-phone-glyph-btn {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #94a3b8;
+}
+
+.rp-dock-dot {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 1.5px solid #25282d;
+}
+
+/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA ==================== */
+.rp-bottom-cluster {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    pointer-events: none !important;
+    z-index: 65;
+
+    > * { pointer-events: auto; }
+}
+
+.rp-char-hud {
+    width: 274px;
+    background: #25282d;
+    border: 1px solid #3a3f47;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.15s ease;
+
+    &:hover { border-color: #525964; }
+}
+
+.rp-char-avatar-box {
+    position: relative;
+    width: 52px;
+    height: 54px;
+    border-radius: 6px;
+    background: #1b1e22;
+    border: 1px solid #353a42;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-char-lvl {
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    min-width: 18px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 4px;
+    background: #4d7c0f;
+    border: 1px solid #1a2e05;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-char-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.rp-char-row-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.rp-char-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #f3f4f6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-cash-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #1a1d21;
+    border: 1px solid #353a42;
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #e5e7eb;
+    flex-shrink: 0;
+
+    .rp-cash-ico { color: #4ade80; font-size: 11px; }
+}
+
+.rp-stat-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rp-bar-ico {
+    font-size: 10px;
+    width: 12px;
+    flex-shrink: 0;
+
+    &.is-hp { color: #e05252; }
+    &.is-en { color: #d8a33a; }
+}
+
+.rp-bar-track {
+    position: relative;
+    flex: 1;
+    height: 13px;
+    border-radius: 3px;
+    background: #181a1e;
+    border: 1px solid #353a42;
+    overflow: hidden;
+}
+
+.rp-bar-fill {
+    height: 100%;
+    transition: width 0.25s ease;
+
+    &.is-hp { background: linear-gradient(180deg, #d15b5b 0%, #a83c3c 100%); }
+    &.is-en { background: linear-gradient(180deg, #c69a47 0%, #9b7329 100%); }
+}
+
+.rp-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.85);
+}
+
+/* Barra blanca moderna de chat (idéntica a HabboRP) */
+.rp-chat-pill {
+    flex: 1;
+    max-width: 680px;
+    display: flex;
+}
+
+.rp-chat-field {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 500;
+    outline: none;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+
+    &::placeholder { color: #9ca3af; }
+    &:focus { border-color: #22c55e; }
+}
+
+/* ==================== SMARTPHONE REALISTA DEL AVATAR (ESTILO HABBORP) ==================== */
+.rp-phone-device {
+    position: fixed;
+    left: 72px;
+    bottom: 96px;
+    width: 294px;
+    height: 552px;
+    max-height: calc(100vh - 116px);
+    background: linear-gradient(180deg, #16181c 0%, #0e1013 100%);
+    border: 2px solid #414750;
+    border-radius: 34px;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.72), inset 0 0 0 2px #090a0c;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 11px 10px;
+    z-index: 80;
+}
+
+.rp-phone-top-bezel {
+    position: relative;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.rp-phone-cam {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #272c35;
+    border: 1px solid #3f4754;
+}
+
+.rp-phone-speaker {
+    width: 44px;
+    height: 4px;
+    border-radius: 99px;
+    background: #2c313a;
+}
+
+.rp-phone-close {
+    position: absolute;
+    right: 2px;
+    top: 1px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #292e36;
+    border: 1px solid #444b57;
+    color: #d1d5db;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover { background: #dc2626; border-color: #ef4444; color: #ffffff; }
+}
+
+.rp-phone-screen {
+    flex: 1;
+    min-height: 0;
+    background-color: #25292e;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
+    background-size: 12px 12px;
+    border: 1px solid #383e47;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.rp-phone-statusbar {
+    height: 24px;
+    padding: 0 9px;
+    background: rgba(14, 16, 19, 0.72);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #e5e7eb;
+    flex-shrink: 0;
+}
+
+.rp-sb-battery {
+    width: 20px;
+    height: 10px;
+    border: 1px solid #9ca3af;
+    border-radius: 2px;
+    padding: 1px;
+    display: inline-flex;
+}
+
+.rp-sb-battery-fill {
+    width: 100%;
+    height: 100%;
+    background: #4ade80;
+    border-radius: 1px;
+}
+
+/* Pantalla de Bloqueo */
+.rp-phone-lock {
+    flex: 1;
+    padding: 26px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.rp-lock-clock-wrap {
+    text-align: center;
+}
+
+.rp-lock-time {
+    font-size: 40px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}
+
+.rp-lock-date {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 4px;
+    text-transform: lowercase;
+}
+
+.rp-lock-loc {
+    font-size: 11px;
+    color: #60a5fa;
+    margin-top: 6px;
+    font-weight: 600;
+}
+
+.rp-lock-notifs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rp-lock-notif {
+    background: rgba(20, 23, 27, 0.85);
+    border: 1px solid #3a404a;
+    border-radius: 8px;
+    padding: 9px 11px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    b { font-size: 11px; color: #f3f4f6; }
+    span { font-size: 11px; color: #9ca3af; line-height: 1.35; }
+    &:hover { border-color: #22c55e; }
+}
+
+.rp-unlock-bar {
+    width: 100%;
+    height: 44px;
+    background: rgba(18, 21, 25, 0.88);
+    border: 1px solid #444b55;
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+
+    &:hover { border-color: #22c55e; }
+}
+
+.rp-unlock-arrow {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: #1ea866;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.rp-unlock-text {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #cbd5e1;
+    padding-right: 16px;
+}
+
+/* Pantalla de Inicio (Home Screen Apps) */
+.rp-phone-home {
+    flex: 1;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rp-home-mini-widget {
+    background: rgba(17, 20, 24, 0.82);
+    border: 1px solid #393f48;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.rp-home-w-left {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    b { font-size: 11.5px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    span { font-size: 10px; color: #9ca3af; }
+}
+
+.rp-home-w-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 10.5px;
+    font-weight: 800;
+
+    .is-cash { color: #4ade80; }
+    .is-bank { color: #38bdf8; }
+}
+
+.rp-app-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px 8px;
+    padding: 4px 2px;
+}
+
+.rp-app-tile {
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+
+    &:hover .rp-app-icon { transform: translateY(-2px); filter: brightness(1.08); }
+}
+
+.rp-app-icon {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.rp-app-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 99px;
+    background: #ef4444;
+    border: 1.5px solid #25292e;
+    color: #ffffff;
+    font-size: 9.5px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-app-label {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #e5e7eb;
+    text-align: center;
+}
+
+.rp-home-quickbar {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* Vista Interna de App del Celular */
+.rp-phone-appview {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.rp-app-navbar {
+    height: 36px;
+    padding: 0 8px;
+    background: #1b1e23;
+    border-bottom: 1px solid #333840;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.rp-app-back {
+    background: transparent;
+    border: none;
+    color: #60a5fa;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+
+    &:hover { color: #93c5fd; }
+}
+
+.rp-app-navtitle {
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.rp-app-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.rp-app-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rp-app-sec-title {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+}
+
+.rp-phone-card {
+    background: #1b1e23;
+    border: 1px solid #323740;
+    border-radius: 7px;
+    padding: 9px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &.is-highlight { border-color: #22c55e; }
+    &.is-compact { padding: 7px 9px; font-size: 11px; color: #d1d5db; }
+}
+
+.rp-pc-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+
+    b { font-size: 12px; color: #ffffff; }
+}
+
+.rp-pc-desc { font-size: 11px; color: #9ca3af; line-height: 1.35; }
+.rp-pc-muted { font-size: 10.5px; color: #9ca3af; }
+.rp-pc-cash { font-size: 11.5px; font-weight: 800; color: #4ade80; }
+
+.rp-pc-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.rp-tag {
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+
+    &.is-safe { background: rgba(34, 197, 94, 0.16); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); }
+    &.is-pvp { background: rgba(239, 68, 68, 0.16); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+}
+
+.rp-phone-news-banner {
+    position: relative;
+    height: 60px;
+    border-radius: 7px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #3a404a;
+    padding: 8px 10px;
+    display: flex;
+    align-items: flex-end;
+    cursor: pointer;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.88) 100%);
     }
 
-    /* ==================== BARRA SUPERIOR ANCLADA (ESTILO HABBO CARBÓN) ==================== */
-    .rp-topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 46px;
-        padding: 0 10px;
-        background: linear-gradient(180deg, #2d2d2d 0%, #1c1c1c 100%);
-        border-bottom: 2px solid #000000;
-        box-shadow: inset 0 1px 0 #474747;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
+    span {
+        position: relative;
+        z-index: 2;
+        font-size: 11.5px;
+        font-weight: 800;
         color: #ffffff;
-        pointer-events: auto;
-        z-index: 430;
     }
+}
 
-    .rp-topbar-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        min-width: 0;
-        flex-shrink: 0;
-    }
+.rp-news-reader {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
-    .rp-head-frame {
-        width: 34px;
-        height: 34px;
-        background: #3a4652;
-        border: 1px solid #000000;
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+    h4 { font-size: 13.5px; font-weight: 800; color: #ffffff; }
+    p { font-size: 11.5px; color: #d1d5db; line-height: 1.5; }
+}
 
-        .avatar-image {
-            width: 48px !important;
-            height: 48px !important;
-            background-position: center -6px !important;
-            background-repeat: no-repeat !important;
-            image-rendering: pixelated;
-        }
-    }
+.rp-news-reader-hero {
+    height: 92px;
+    border-radius: 7px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #3a404a;
+}
 
-    .rp-identity-col {
+.rp-bank-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+
+    > div {
+        background: #1b1e23;
+        border: 1px solid #323740;
+        border-radius: 7px;
+        padding: 8px 10px;
         display: flex;
         flex-direction: column;
         gap: 2px;
-        min-width: 0;
+
+        span { font-size: 10px; color: #9ca3af; }
+        b { font-size: 14px; font-weight: 800; }
+        .is-cash { color: #4ade80; }
+        .is-bank { color: #38bdf8; }
     }
+}
 
-    .rp-identity-top {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
+.rp-p-input {
+    width: 100%;
+    height: 32px;
+    padding: 0 9px;
+    background: #131619;
+    border: 1px solid #353b44;
+    border-radius: 5px;
+    color: #f3f4f6;
+    font-size: 11.5px;
+    outline: none;
 
-    .rp-lvl {
-        background: #0f766e;
-        border: 1px solid #000000;
-        color: #ffffff;
-        font-size: 9px;
-        font-weight: 800;
-        padding: 0 4px;
-    }
+    &:focus { border-color: #22c55e; }
+}
 
-    .rp-name {
-        font-size: 12px;
-        font-weight: 800;
-        white-space: nowrap;
-        max-width: 110px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+.rp-mini-prog {
+    height: 6px;
+    background: #131619;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 2px;
 
-    .rp-gang-chip {
-        display: inline-block;
-        padding: 0 4px;
-        font-size: 9px;
-        font-weight: 800;
-        color: #ffffff;
-        border: 1px solid #000000;
-    }
+    > div { height: 100%; background: #22c55e; }
+}
 
-    .rp-identity-sub {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 10px;
-    }
+.rp-rank-line {
+    background: #1b1e23;
+    border: 1px solid #323740;
+    border-radius: 6px;
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
 
-    .rp-job-label {
-        font-weight: 700;
-        white-space: nowrap;
-    }
+    .is-cash { color: #4ade80; }
+}
 
-    .rp-duty-toggle {
-        padding: 1px 6px;
-        font-size: 9px;
-        font-weight: 800;
-        border: 1px solid #000000;
-        background: #333333;
-        color: #cccccc;
-        cursor: pointer;
+.rp-vitals-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #d1d5db;
 
-        &.is-on {
-            background: #15803d;
-            color: #ffffff;
-        }
-    }
+    span { display: inline-flex; align-items: center; gap: 6px; }
+}
 
-    /* Barras vitales compactas en línea */
-    .rp-topbar-vitals {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex: 1;
-        justify-content: center;
-        max-width: 440px;
-        position: relative;
-    }
+.rp-phone-menu-btn {
+    width: 100%;
+    padding: 9px 11px;
+    background: #1b1e23;
+    border: 1px solid #343a44;
+    border-radius: 7px;
+    color: #f3f4f6;
+    font-size: 11.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
 
-    .rp-meter {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        min-width: 96px;
-        flex: 1;
-    }
+    &:hover { background: #262b33; border-color: #4b5563; }
+    &.is-danger { color: #fca5a5; border-color: #5b2323; }
+}
 
-    .rp-meter-tag {
-        font-size: 9px;
-        font-weight: 800;
-        color: #d4d4d4;
-        width: 16px;
-    }
+.rp-phone-bottom-bezel {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
 
-    .rp-meter-track {
-        flex: 1;
-        height: 9px;
-        background: #0d0d0d;
-        border: 1px solid #000000;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-        overflow: hidden;
-    }
+.rp-phone-home-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #16181c;
+    border: 1.5px solid #454c57;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
 
-    .rp-meter-fill {
-        height: 100%;
-        transition: width 0.25s ease;
+    &:hover { border-color: #9ca3af; }
+}
 
-        &.is-hp { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); }
-        &.is-armor { background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%); }
-        &.is-en { background: linear-gradient(180deg, #facc15 0%, #ca8a04 100%); }
-        &.is-hm { background: linear-gradient(180deg, #4ade80 0%, #15803d 100%); }
-    }
+/* ==================== VENTANAS MODERNAS (TIENDA / MOCHILA / AYUDA) ==================== */
+.rp-modern-modal {
+    position: fixed;
+    left: 72px;
+    bottom: 96px;
+    width: 390px;
+    max-width: calc(100vw - 88px);
+    max-height: min(520px, calc(100vh - 130px));
+    background: #202328;
+    border: 1px solid #3a4049;
+    border-radius: 10px;
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.65);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 78;
+}
 
-    .rp-meter-num {
-        font-size: 10px;
-        font-weight: 700;
-        color: #e5e5e5;
-        width: 24px;
-        text-align: right;
-    }
+.rp-mm-header {
+    height: 40px;
+    padding: 0 14px;
+    background: #181b1f;
+    border-bottom: 1px solid #323740;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #ffffff;
+    flex-shrink: 0;
+}
 
-    .rp-xp-strip {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: -7px;
-        height: 2px;
-        background: #111111;
+.rp-mm-close {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid #383e47;
+    color: #cbd5e1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 
-        .rp-xp-fill {
-            height: 100%;
-            background: #a855f7;
-        }
-    }
+    &:hover { background: #dc2626; border-color: #ef4444; color: #ffffff; }
+}
 
-    .rp-topbar-right {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        flex-shrink: 0;
-    }
+.rp-mm-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
-    .rp-wallet-group {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
+.rp-gym-strip {
+    background: #181b1f;
+    border: 1px solid #323740;
+    border-radius: 7px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 11px;
+    font-weight: 700;
+}
 
-    .rp-money-pill {
-        padding: 3px 8px;
-        font-size: 11px;
-        font-weight: 800;
-        border: 1px solid #000000;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+.rp-cat-tabs {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
 
-        &.is-cash { background: #14532d; color: #86efac; }
-        &.is-bank { background: #1e3a5f; color: #93c5fd; }
-    }
+.rp-cat-tab {
+    padding: 4px 9px;
+    border-radius: 5px;
+    background: #181b1f;
+    border: 1px solid #353b44;
+    color: #9ca3af;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
 
-    .rp-stars-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 2px;
-        padding: 3px 6px;
-        background: #450a0a;
-        border: 1px solid #000000;
-        font-size: 10px;
+    &.is-active { background: #1ea866; border-color: #22c55e; color: #ffffff; }
+}
 
-        .lit { color: #facc15; }
-        .dim { color: rgba(255, 255, 255, 0.2); }
-    }
+.rp-mm-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
-    .rp-loc-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 3px 8px;
-        background: #2f2f2f;
-        border: 1px solid #000000;
-        box-shadow: inset 0 1px 0 #4b4b4b;
-        color: #ffffff;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
+.rp-cmd-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
 
-        &:hover { background: #3b3b3b; }
-
-        em {
-            font-style: normal;
-            font-size: 9px;
-            font-weight: 800;
-            padding: 1px 4px;
-            border: 1px solid #000000;
-            &.safe { background: #15803d; color: #ffffff; }
-            &.pvp { background: #b91c1c; color: #ffffff; }
-        }
-    }
-
-    .rp-clock-box {
-        padding: 3px 7px;
-        background: #111111;
-        border: 1px solid #000000;
+    code {
+        background: #131619;
+        border: 1px solid #323740;
         color: #fde047;
         font-size: 11px;
-        font-weight: 800;
+        padding: 3px 7px;
+        border-radius: 4px;
+    }
+}
+
+/* Botones reutilizables modernos */
+.rp-btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.rp-btn-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+.rp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.12s ease;
+
+    &:hover:not(:disabled) { filter: brightness(1.09); }
+    &:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    &.is-sm { padding: 7px 11px; font-size: 11.5px; }
+    &.is-xs { padding: 4px 8px; font-size: 10.5px; }
+
+    &.is-green { background: #1ea866; color: #ffffff; }
+    &.is-blue { background: #2563eb; color: #ffffff; }
+    &.is-red { background: #dc2626; color: #ffffff; }
+    &.is-gold { background: #d97706; color: #ffffff; }
+    &.is-dark { background: #2d323a; border-color: #414854; color: #f3f4f6; }
+}
+
+/* ==================== MODO MÓVIL RP DEDICADO ==================== */
+.rp-modern-root.is-mobile {
+    .rp-left-dock {
+        left: 8px;
+        bottom: 84px;
     }
 
-    /* Cinta de estado crítico (Prisión / Hospital / Esposas) */
-    .rp-alert-ribbon {
-        position: fixed;
-        top: 48px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 6px;
-        z-index: 432;
-        pointer-events: none;
-
-        .ribbon-item {
-            padding: 3px 10px;
-            font-size: 11px;
-            font-weight: 800;
-            color: #ffffff;
-            border: 1px solid #000000;
-            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-
-            &.is-jail { background: #991b1b; }
-            &.is-hosp { background: #047857; }
-            &.is-cuff { background: #1d4ed8; }
-        }
-    }
-
-    /* Notificaciones toast RP */
-    .rp-toasts {
-        position: fixed;
-        top: 56px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        z-index: 455;
-        pointer-events: none;
-        max-width: 90vw;
-
-        .rp-toast {
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #ffffff;
-            border: 2px solid #000000;
-            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.55);
-            background: #232323;
-
-            &.is-ok { background: #166534; }
-            &.is-err { background: #991b1b; }
-            &.is-warn { background: #92400e; }
-        }
-    }
-
-    /* ==================== BARRA INFERIOR ANCLADA (REEMPLAZA TOOLBAR CLÁSICO) ==================== */
-    .rp-bottombar {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 52px;
-        padding: 0 10px;
-        background: linear-gradient(180deg, #2d2d2d 0%, #191919 100%);
-        border-top: 2px solid #000000;
-        box-shadow: inset 0 1px 0 #4a4a4a;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+    .rp-bottom-cluster {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
         gap: 8px;
-        pointer-events: auto;
-        z-index: 430;
     }
 
-    .rp-bar-group {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        flex-shrink: 0;
+    .rp-char-hud {
+        width: auto;
+        flex: 1;
+        max-width: 245px;
+        padding: 6px 8px;
     }
 
-    .rp-bar-btn {
-        position: relative;
-        height: 36px;
-        padding: 0 9px;
-        border: 1px solid #000000;
-        border-radius: 3px;
-        background: linear-gradient(180deg, #3c3c3c 0%, #262626 100%);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
-        color: #f1f5f9;
+    .rp-char-avatar-box {
+        width: 44px;
+        height: 46px;
+    }
+
+    .rp-mob-chat-btn {
+        height: 44px;
+        padding: 0 14px;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #111827;
+        border: 1px solid #cbd5e1;
+        font-size: 12px;
+        font-weight: 800;
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
+        gap: 6px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 
-        span { font-size: 11px; }
-
-        &:hover {
-            background: linear-gradient(180deg, #4b4b4b 0%, #313131 100%);
-        }
-
-        &.active {
-            background: linear-gradient(180deg, #2279b8 0%, #114f80 100%);
-            color: #ffffff;
-        }
-
-        &.is-icon {
-            width: 34px;
-            padding: 0;
-            justify-content: center;
-        }
-
-        &.is-primary {
-            background: linear-gradient(180deg, #279938 0%, #166b23 100%);
-        }
-
-        &.has-dot::after {
-            content: '';
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #4ade80;
-            border: 1px solid #000000;
-        }
+        &.is-active { background: #1ea866; border-color: #22c55e; color: #ffffff; }
     }
 
-    /* Chat nativo integrado estilo Habbo */
-    .rp-chat-form {
-        flex: 1;
-        min-width: 180px;
-        max-width: 480px;
-        height: 34px;
-        display: flex;
-        align-items: stretch;
-        background: #ffffff;
-        border: 2px solid #000000;
-        border-radius: 4px;
-        overflow: hidden;
-
-        .rp-chat-mode {
-            padding: 0 9px;
-            border: none;
-            border-right: 1px solid #cbd5e1;
-            background: #e2e8f0;
-            color: #0f172a;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-
-            &.is-shout {
-                background: #fde047;
-                color: #000000;
-            }
-        }
-
-        input {
-            flex: 1;
-            min-width: 0;
-            border: none;
-            outline: none;
-            padding: 0 10px;
-            font-size: 12px;
-            color: #0f172a;
-            background: #ffffff;
-        }
-
-        .rp-quick-work {
-            padding: 0 10px;
-            border: none;
-            border-left: 1px solid #000000;
-            background: linear-gradient(180deg, #2db83d 0%, #177c23 100%);
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-
-            &:disabled { opacity: 0.55; }
-        }
-    }
-
-    /* ==================== MODO MÓVIL RP DEDICADO ==================== */
-    &.is-mobile {
-        .rp-ambient-tint { inset: 42px 0 48px 0; }
-        .rp-topbar {
-            height: 42px;
-            padding: 0 6px;
-            gap: 6px;
-        }
-        .rp-head-frame { width: 28px; height: 28px; }
-        .rp-name { max-width: 72px; font-size: 11px; }
-        .rp-topbar-vitals { gap: 4px; }
-        .rp-meter { min-width: 58px; }
-        .rp-meter-num { display: none; }
-        .rp-bottombar {
-            height: 48px;
-            padding: 0 6px;
-            gap: 4px;
-            justify-content: space-around;
-        }
-        .rp-bar-btn {
-            height: 36px;
-            padding: 0 7px;
-            flex-direction: column;
-            gap: 1px;
-            font-size: 12px;
-            span { font-size: 9px; }
-        }
-    }
-
-    .rp-mobile-chat-bar {
+    .rp-mobile-chat-float {
         position: fixed;
         left: 8px;
         right: 8px;
-        bottom: 54px;
-        height: 38px;
+        bottom: 78px;
         display: flex;
-        background: #ffffff;
-        border: 2px solid #000000;
-        border-radius: 4px;
-        overflow: hidden;
-        pointer-events: auto;
-        z-index: 435;
-
-        .rp-chat-mode {
-            padding: 0 8px;
-            border: none;
-            border-right: 1px solid #cbd5e1;
-            background: #e2e8f0;
-            color: #0f172a;
-            font-size: 11px;
-            font-weight: 800;
-            &.is-shout { background: #fde047; }
-        }
-        input {
-            flex: 1;
-            min-width: 0;
-            border: none;
-            outline: none;
-            padding: 0 8px;
-            font-size: 12px;
-            color: #0f172a;
-        }
-        .rp-chat-send {
-            padding: 0 12px;
-            border: none;
-            background: #166534;
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 800;
-        }
-    }
-}
-
-/* ==================== VENTANAS NATIVAS HABBO (NitroCardView) ==================== */
-.habbten-rp-card {
-    width: min(680px, 94vw) !important;
-    max-height: 76vh !important;
-    pointer-events: auto !important;
-
-    .rp-card-content {
-        background: #e9e9e9 !important;
-        color: #1e293b !important;
-        padding: 10px !important;
-        max-height: calc(76vh - 38px);
-        overflow-y: auto;
-    }
-
-    .rp-win-stack {
-        display: flex;
-        flex-direction: column;
-        gap: 9px;
-    }
-
-    .rp-strip-bar {
-        background: #ffffff;
-        border: 1px solid #9ca3af;
-        padding: 7px 10px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        font-size: 11px;
-        color: #0f172a;
-    }
-
-    .rp-section-hdr {
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        border-bottom: 1px solid #cbd5e1;
-        padding-bottom: 3px;
-    }
-
-    /* Mapa de Ciudad Habbten */
-    .rp-city-map-board {
-        position: relative;
-        height: 205px;
-        background: #1b4d6e;
-        border: 2px solid #000000;
-        box-shadow: inset 0 0 0 2px #3c7ea6;
-        overflow: hidden;
-
-        .rp-city-roads {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
-            background-size: 28px 28px;
-        }
-
-        .rp-map-marker {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 7px;
-            background: #ffffff;
-            border: 2px solid #000000;
-            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.55);
-            color: #0f172a;
-            font-size: 10px;
-            font-weight: 800;
-            cursor: pointer;
-            white-space: nowrap;
-
-            &:hover { background: #fef08a; z-index: 4; }
-            &.is-here { background: #fde047; }
-
-            .m-dot { width: 7px; height: 7px; border-radius: 50%; border: 1px solid #000; }
-            .m-cnt { background: #1e293b; color: #fff; padding: 0 4px; font-size: 9px; }
-        }
-    }
-
-    .rp-list-rows {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .rp-item-row {
-        background: #ffffff;
-        border: 1px solid #9ca3af;
-        padding: 7px 9px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-
-        .rp-item-title {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #0f172a;
-        }
-        .swatch { width: 9px; height: 9px; border: 1px solid #000; display: inline-block; }
-        small { font-size: 10px; color: #475569; display: block; margin-top: 2px; }
-        .rp-feed-txt { font-size: 11px; color: #0f172a; }
-    }
-
-    .rp-tag {
-        font-size: 9px;
-        font-weight: 800;
-        padding: 1px 4px;
-        border: 1px solid #000000;
-        &.is-safe { background: #dcfce7; color: #166534; }
-        &.is-pvp { background: #fee2e2; color: #991b1b; }
-    }
-
-    .rp-win-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
-        gap: 7px;
-    }
-
-    .rp-box-card {
-        background: #ffffff;
-        border: 1px solid #9ca3af;
-        padding: 8px 9px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
         gap: 6px;
-
-        &.is-active {
-            border: 2px solid #0f766e;
-            background: #f0fdf4;
-        }
-
-        .rp-box-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            font-size: 11px;
-            color: #0f172a;
-        }
-
-        p { margin: 0; font-size: 10px; color: #475569; line-height: 1.4; }
-
-        .rp-box-foot {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-
-            small { font-size: 10px; color: #64748b; }
-        }
+        z-index: 88;
     }
 
-    .rp-price-chip {
-        background: #dcfce7;
-        border: 1px solid #15803d;
-        color: #166534;
-        font-size: 10px;
-        font-weight: 800;
-        padding: 1px 5px;
-        white-space: nowrap;
+    .rp-phone-device {
+        left: 50%;
+        top: 50%;
+        bottom: auto;
+        transform: translate(-50%, -50%);
+        width: min(312px, 92vw);
+        height: min(540px, 84vh);
     }
 
-    .rp-qty-chip {
-        background: #fef3c7;
-        border: 1px solid #b45309;
-        color: #92400e;
-        font-size: 10px;
-        font-weight: 800;
-        padding: 1px 5px;
-    }
-
-    .rp-prog-track {
-        height: 7px;
-        background: #e2e8f0;
-        border: 1px solid #000000;
-        overflow: hidden;
-        .rp-prog-fill { height: 100%; background: #16a34a; }
-    }
-
-    .rp-tabs-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-
-        .rp-subtab {
-            padding: 4px 9px;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid #000000;
-            background: #d4d4d8;
-            color: #18181b;
-            cursor: pointer;
-
-            &.active {
-                background: #1d4ed8;
-                color: #ffffff;
-            }
-        }
-    }
-
-    .rp-form-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-
-        input {
-            flex: 1;
-            min-width: 110px;
-            padding: 5px 8px;
-            border: 1px solid #64748b;
-            background: #ffffff;
-            color: #0f172a;
-            font-size: 11px;
-        }
-    }
-
-    .rp-row-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-    }
-
-    /* Botones auténticos biselados estilo Habbo */
-    .hb-win-btn {
-        padding: 4px 9px;
-        font-size: 11px;
-        font-weight: 800;
-        border: 1px solid #000000;
-        box-shadow: 1px 1px 0 #000000, inset 0 1px 0 rgba(255, 255, 255, 0.35);
-        color: #ffffff;
-        cursor: pointer;
-
-        &:disabled { opacity: 0.45; cursor: not-allowed; }
-        &.is-blue { background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%); }
-        &.is-green { background: linear-gradient(180deg, #22c55e 0%, #15803d 100%); }
-        &.is-red { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); }
-        &.is-amber { background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%); }
-        &.is-gray { background: linear-gradient(180deg, #64748b 0%, #475569 100%); }
-    }
-
-    .rp-rank-cols {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 8px;
-    }
-
-    .rp-rank-line {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 11px;
-        padding: 3px 0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .rp-empty-txt {
-        text-align: center;
-        font-size: 11px;
-        color: #64748b;
-        padding: 12px;
-        margin: 0;
-    }
-
-    .c-green { color: #15803d; }
-    .c-blue { color: #1d4ed8; }
-    .c-red { color: #b91c1c; }
-}
-
-// Acciones rápidas RP dentro del InfoStand al clicar a otro jugador en sala
-.rp-infostand-actions {
-    margin-top: 6px;
-    padding: 6px;
-    background: #232323;
-    border: 1px solid #000000;
-    box-shadow: inset 0 1px 0 #3f3f3f;
-
-    .rp-infostand-actions-title {
-        font-size: 9px;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: #fde047;
-        margin-bottom: 5px;
-    }
-
-    .rp-infostand-actions-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-
-    .rp-qa-btn {
-        padding: 3px 6px !important;
-        font-size: 10px !important;
-        font-weight: 700 !important;
-        border: 1px solid #000000 !important;
-        border-radius: 2px !important;
-        color: #ffffff !important;
-        cursor: pointer !important;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
-
-        &.is-danger { background: #b91c1c !important; }
-        &.is-police { background: #1d4ed8 !important; }
-        &.is-medic { background: #047857 !important; }
-        &.is-cash { background: #b45309 !important; }
-        &:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
-    }
-
-    &.is-compact {
-        margin-top: 4px;
-        padding: 4px;
+    .rp-modern-modal {
+        left: 50%;
+        top: 50%;
+        bottom: auto;
+        transform: translate(-50%, -50%);
+        width: min(360px, 94vw);
+        max-height: 78vh;
     }
 }
