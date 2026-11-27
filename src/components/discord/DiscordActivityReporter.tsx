@@ -47,6 +47,25 @@ export const DiscordActivityReporter: FC<{}> = () =>
         return () => clearInterval(timer);
     }, []);
 
+    // Permite saltar a una sala específica desde la CMS abierta en overlay (/comunidad, /inicio)
+    useEffect(() =>
+    {
+        const onMessage = (event: MessageEvent) =>
+        {
+            if(event.data && event.data.type === 'habbten-goto-room')
+            {
+                const targetRoom = parseInt(String(event.data.roomId || ''), 10);
+                if(Number.isInteger(targetRoom) && targetRoom > 0)
+                {
+                    CreateLinkEvent(`navigator/goto/${ targetRoom }`);
+                }
+            }
+        };
+
+        window.addEventListener('message', onMessage);
+        return () => window.removeEventListener('message', onMessage);
+    }, []);
+
     useEffect(() =>
     {
         let cancelled = false;
