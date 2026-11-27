@@ -480,18 +480,17 @@ export const InfoStandEditorView: FC<{}> = () =>
                                                 { previewFurniUrl && (
                                                     <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-card-furni" />
                                                 ) }
-                                                <div
-                                                    className="preview-card-avatar"
-                                                    style={ { transform: avatarSeatTransform } }
-                                                >
-                                                    <LayoutAvatarImageView
-                                                        figure={ ownFigure }
-                                                        direction={ 4 }
-                                                        posture={ previewAction.posture }
-                                                        gesture={ previewAction.gesture }
-                                                        expression={ previewAction.expression }
-                                                        carryItem={ previewAction.carryItem }
-                                                    />
+                                                <div className="preview-card-avatar">
+                                                    <div className="avatar-seat-offset" style={ { transform: avatarSeatTransform } }>
+                                                        <LayoutAvatarImageView
+                                                            figure={ ownFigure }
+                                                            direction={ 4 }
+                                                            posture={ previewAction.posture }
+                                                            gesture={ previewAction.gesture }
+                                                            expression={ previewAction.expression }
+                                                            carryItem={ previewAction.carryItem }
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="preview-card-badges">

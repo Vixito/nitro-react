@@ -221,15 +221,17 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                             { customFurniSprite && (
                                 <img src={ customFurniSprite } alt={ customFurni.name } className="infostand-furni-bg" />
                             ) }
-                            <div className="infostand-avatar-fg" style={ { transform: seatTransform } }>
-                                <LayoutAvatarImageView
-                                    figure={ avatarInfo.figure }
-                                    direction={ 4 }
-                                    posture={ customAction.posture }
-                                    gesture={ customAction.gesture }
-                                    expression={ customAction.expression }
-                                    carryItem={ customAction.carryItem }
-                                />
+                            <div className="infostand-avatar-fg">
+                                <div className="avatar-seat-offset" style={ { transform: seatTransform } }>
+                                    <LayoutAvatarImageView
+                                        figure={ avatarInfo.figure }
+                                        direction={ 4 }
+                                        posture={ customAction.posture }
+                                        gesture={ customAction.gesture }
+                                        expression={ customAction.expression }
+                                        carryItem={ customAction.carryItem }
+                                    />
+                                </div>
                             </div>
                         </Column>
                         <Column grow alignItems="center" gap={ 0 }>

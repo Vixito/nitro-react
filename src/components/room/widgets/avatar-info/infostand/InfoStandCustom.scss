@@ -363,39 +363,55 @@ body .nitro-infostand-container .nitro-infostand.has-custom-plate,
     flex-shrink: 0;
 }
 
+.nitro-infostand-container .nitro-infostand,
 .nitro-infostand {
     .body-image.infostand-custom-stage {
-        position: relative;
-        overflow: hidden;
-        min-width: 72px;
-        min-height: 112px;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        padding: 4px 2px;
+        position: relative !important;
+        overflow: hidden !important;
+        min-width: 72px !important;
+        max-width: 78px !important;
+        min-height: 118px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-end !important;
+        justify-content: center !important;
+        padding: 4px 2px !important;
 
         .infostand-furni-bg {
-            position: absolute;
-            bottom: 4px;
-            left: 50%;
-            transform: translateX(-50%);
-            max-width: 72px;
-            max-height: 92px;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-            image-rendering: pixelated;
-            pointer-events: none;
-            z-index: 1;
+            position: absolute !important;
+            bottom: 4px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            max-width: 72px !important;
+            max-height: 92px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
+            image-rendering: pixelated !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
         }
 
         .infostand-avatar-fg {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            width: 100%;
+            position: absolute !important;
+            bottom: 4px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 64px !important;
+            height: 108px !important;
+            z-index: 2 !important;
+            display: flex !important;
+            align-items: flex-end !important;
+            justify-content: center !important;
+            pointer-events: none !important;
+
+            .avatar-seat-offset {
+                display: flex !important;
+                align-items: flex-end !important;
+                justify-content: center !important;
+                width: 64px !important;
+                height: 108px !important;
+            }
 
             .avatar-image {
                 width: 64px !important;
@@ -443,6 +459,8 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
         max-height: 50px !important;
     }
 
+    .infostand-avatar-fg,
+    .infostand-avatar-fg .avatar-seat-offset,
     .infostand-avatar-fg .avatar-image {
         width: 56px !important;
         height: 78px !important;
@@ -1048,12 +1066,25 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
                     }
 
                     .preview-card-avatar {
-                        position: relative;
+                        position: absolute;
+                        bottom: 4px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 64px;
+                        height: 108px;
                         z-index: 2;
                         display: flex;
                         align-items: flex-end;
                         justify-content: center;
-                        width: 100%;
+                        pointer-events: none;
+
+                        .avatar-seat-offset {
+                            display: flex;
+                            align-items: flex-end;
+                            justify-content: center;
+                            width: 64px;
+                            height: 108px;
+                        }
 
                         .avatar-image {
                             width: 64px !important;
