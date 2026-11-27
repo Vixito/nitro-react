@@ -1,5 +1,6 @@
 import { FC, useEffect, useRef } from 'react';
-import { CreateLinkEvent, GetRoomSession, GetSessionDataManager } from '../../api';
+import { CreateLinkEvent, CreateRoomSession, GetRoomSession, GetSessionDataManager } from '../../api';
+import { isRoleplayMode } from '../roleplay/RoleplayService';
 
 /**
  * Informa al CMS de la sala actual para que el agente de rich presence
@@ -41,9 +42,10 @@ export const DiscordActivityReporter: FC<{}> = () =>
                 {
                     if(GetRoomSession()?.roomId !== target)
                     {
-                        CreateLinkEvent(`navigator/goto/${ target }`);
+                        if(isRoleplayMode()) CreateRoomSession(target);
+                        else CreateLinkEvent(`navigator/goto/${ target }`);
                     }
-                }, 1500);
+                }, 1200);
                 return;
             }
 
@@ -63,7 +65,8 @@ export const DiscordActivityReporter: FC<{}> = () =>
                 const targetRoom = parseInt(String(event.data.roomId || ''), 10);
                 if(Number.isInteger(targetRoom) && targetRoom > 0 && GetRoomSession()?.roomId !== targetRoom)
                 {
-                    CreateLinkEvent(`navigator/goto/${ targetRoom }`);
+                    if(isRoleplayMode()) CreateRoomSession(targetRoom);
+                    else CreateLinkEvent(`navigator/goto/${ targetRoom }`);
                 }
             }
         };

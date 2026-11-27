@@ -1,26 +1,25 @@
 /* ============================================================================
-   HABBTEN ROLEPLAY — CLIENTE MODERNO MINIMALISTA (ESTILO HABBORP + SMARTPHONE)
-   Aislado exclusivamente bajo body.habbten-rp-client (2 modos: Web y Móvil)
+   HABBTEN RP — CLIENTE MODERNO 100% PLANO (SIN DEGRADADOS, SIN BISELADOS)
+   Aislado exclusivamente bajo body.habbten-rp-client (Web y Móvil)
    ============================================================================ */
 
 body.habbten-rp-client {
     background-color: #1a1d21 !important;
 
-    /* Ocultar duplicados del chat/room-tools clásicos para mantener el lienzo 100% limpio */
     .nitro-room-chat-input,
     .nitro-room-tools-container {
         display: none !important;
     }
 
     .nitro-infostand-container {
-        bottom: 72px !important;
+        bottom: 76px !important;
         right: 12px !important;
         z-index: 60 !important;
     }
 
     .rp-notifications-slot {
         position: fixed;
-        top: 56px;
+        top: 64px;
         right: 12px;
         z-index: 75;
         pointer-events: none;
@@ -34,14 +33,14 @@ body.habbten-rp-client {
     inset: 0;
     pointer-events: none;
     z-index: 50;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #f3f4f6;
     user-select: none;
 
     > * { pointer-events: auto; }
 }
 
-/* ==================== AVISOS CRÍTICOS / TOASTS ==================== */
+/* ==================== AVISOS CRÍTICOS / TOASTS (PLANOS) ==================== */
 .rp-alert-strip {
     position: fixed;
     top: 12px;
@@ -58,12 +57,11 @@ body.habbten-rp-client {
     border-radius: 6px;
     font-size: 12px;
     font-weight: 700;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    border: 1px solid #3c424b;
 
-    &.is-jail { background: #7f1d1d; color: #fee2e2; }
-    &.is-hosp { background: #1e3a8a; color: #dbeafe; }
-    &.is-cuff { background: #78350f; color: #fef3c7; }
+    &.is-jail { background: #7f1d1d; color: #fee2e2; border-color: #991b1b; }
+    &.is-hosp { background: #1e3a8a; color: #dbeafe; border-color: #1d4ed8; }
+    &.is-cuff { background: #78350f; color: #fef3c7; border-color: #b45309; }
 }
 
 .rp-toast-stack {
@@ -80,22 +78,21 @@ body.habbten-rp-client {
 
 .rp-toast {
     padding: 8px 14px;
-    border-radius: 7px;
+    border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     background: #23272c;
     border: 1px solid #3a4049;
     color: #f3f4f6;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     max-width: 440px;
     text-align: center;
 
-    &.is-ok { border-color: #22c55e; color: #dcfce7; }
-    &.is-err { border-color: #ef4444; color: #fee2e2; }
-    &.is-warn { border-color: #f59e0b; color: #fef3c7; }
+    &.is-ok { border-color: #1ea866; color: #dcfce7; }
+    &.is-err { border-color: #dc2626; color: #fee2e2; }
+    &.is-warn { border-color: #d97706; color: #fef3c7; }
 }
 
-/* ==================== BOTONES SUPERIORES DERECHA (ESTILO HABBORP) ==================== */
+/* ==================== BOTONES SUPERIORES DERECHA (PLANOS + HD) ==================== */
 .rp-top-right-tools {
     position: fixed;
     top: 12px;
@@ -106,44 +103,50 @@ body.habbten-rp-client {
 }
 
 .rp-square-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 7px;
-    background: #2b2f35;
-    border: 1px solid #40464f;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    background: #282c31;
+    border: 1px solid #3c424b;
     color: #e5e7eb;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 19px;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
     transition: background 0.12s ease, border-color 0.12s ease;
 
-    &:hover { background: #363c44; color: #ffffff; }
-    &.is-active { background: #1ea866; border-color: #34d399; color: #ffffff; }
+    &:hover { background: #333840; color: #ffffff; }
+    &.is-active { background: #1ea866; border-color: #1ea866; color: #ffffff; }
 }
 
-/* ==================== DOCK VERTICAL IZQUIERDO ==================== */
+.rp-top-icon-hd {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    image-rendering: auto;
+    display: block;
+}
+
+/* ==================== DOCK VERTICAL IZQUIERDO (PLANO + ÍCONOS HD GRANDES) ==================== */
 .rp-left-dock {
     position: fixed;
     left: 12px;
-    bottom: 96px;
+    bottom: 98px;
     display: flex;
     flex-direction: column;
     gap: 6px;
     padding: 6px;
     background: #25282d;
     border: 1px solid #3a3f47;
-    border-radius: 8px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+    border-radius: 6px;
     z-index: 65;
 }
 
 .rp-dock-btn {
     position: relative;
-    width: 38px;
-    height: 38px;
+    width: 46px;
+    height: 46px;
     border-radius: 6px;
     background: #1d2024;
     border: 1px solid transparent;
@@ -151,58 +154,32 @@ body.habbten-rp-client {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+    transition: background 0.12s ease, border-color 0.12s ease;
 
-    &:hover { background: #31363d; border-color: #4b525c; }
-    &.is-active { background: #1c3d2d; border-color: #22c55e; }
+    &:hover { background: #2f343c; border-color: #4b525c; }
+    &.is-active { background: #193829; border-color: #1ea866; }
 }
 
-.rp-dock-pixel {
-    width: 26px;
-    height: 26px;
+.rp-dock-icon-hd {
+    width: 36px;
+    height: 36px;
     object-fit: contain;
-    image-rendering: pixelated;
-}
-
-.rp-phone-glyph {
-    width: 17px;
-    height: 26px;
-    border-radius: 4px;
-    background: #111316;
-    border: 2px solid #cbd5e1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2px 1px;
-}
-
-.rp-phone-glyph-screen {
-    width: 100%;
-    height: 15px;
-    border-radius: 1px;
-    background: linear-gradient(180deg, #38bdf8 0%, #1d4ed8 100%);
-}
-
-.rp-phone-glyph-btn {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: #94a3b8;
+    image-rendering: auto;
+    display: block;
 }
 
 .rp-dock-dot {
     position: absolute;
     top: 3px;
     right: 3px;
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: #ef4444;
-    border: 1.5px solid #25282d;
+    border: 2px solid #25282d;
 }
 
-/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA ==================== */
+/* ==================== HUD INFERIOR IZQUIERDA + BARRA CHAT BLANCA (PLANO) ==================== */
 .rp-bottom-cluster {
     position: fixed;
     left: 12px;
@@ -218,15 +195,14 @@ body.habbten-rp-client {
 }
 
 .rp-char-hud {
-    width: 274px;
+    width: 280px;
     background: #25282d;
     border: 1px solid #3a3f47;
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 8px 10px;
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
     cursor: pointer;
     flex-shrink: 0;
     transition: border-color 0.15s ease;
@@ -236,8 +212,8 @@ body.habbten-rp-client {
 
 .rp-char-avatar-box {
     position: relative;
-    width: 52px;
-    height: 54px;
+    width: 58px;
+    height: 58px;
     border-radius: 6px;
     background: #1b1e22;
     border: 1px solid #353a42;
@@ -248,19 +224,27 @@ body.habbten-rp-client {
     justify-content: center;
 }
 
+.rp-char-head-img {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    object-position: center;
+    image-rendering: auto;
+    display: block;
+}
+
 .rp-char-lvl {
     position: absolute;
     left: 2px;
     bottom: 2px;
-    min-width: 18px;
+    min-width: 19px;
     height: 17px;
     padding: 0 4px;
-    border-radius: 4px;
+    border-radius: 3px;
     background: #4d7c0f;
-    border: 1px solid #1a2e05;
     color: #ffffff;
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -296,10 +280,10 @@ body.habbten-rp-client {
     gap: 5px;
     background: #1a1d21;
     border: 1px solid #353a42;
-    border-radius: 5px;
+    border-radius: 4px;
     padding: 2px 7px;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     color: #e5e7eb;
     flex-shrink: 0;
 
@@ -317,14 +301,14 @@ body.habbten-rp-client {
     width: 12px;
     flex-shrink: 0;
 
-    &.is-hp { color: #e05252; }
-    &.is-en { color: #d8a33a; }
+    &.is-hp { color: #d15b5b; }
+    &.is-en { color: #c69a47; }
 }
 
 .rp-bar-track {
     position: relative;
     flex: 1;
-    height: 13px;
+    height: 14px;
     border-radius: 3px;
     background: #181a1e;
     border: 1px solid #353a42;
@@ -335,8 +319,8 @@ body.habbten-rp-client {
     height: 100%;
     transition: width 0.25s ease;
 
-    &.is-hp { background: linear-gradient(180deg, #d15b5b 0%, #a83c3c 100%); }
-    &.is-en { background: linear-gradient(180deg, #c69a47 0%, #9b7329 100%); }
+    &.is-hp { background: #b84242; }
+    &.is-en { background: #b58932; }
 }
 
 .rp-bar-label {
@@ -348,10 +332,9 @@ body.habbten-rp-client {
     font-size: 9.5px;
     font-weight: 700;
     color: #ffffff;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.85);
 }
 
-/* Barra blanca moderna de chat (idéntica a HabboRP) */
+/* Barra blanca plana de chat */
 .rp-chat-pill {
     flex: 1;
     max-width: 680px;
@@ -366,27 +349,26 @@ body.habbten-rp-client {
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     color: #111827;
+    font-family: 'Montserrat', sans-serif;
     font-size: 13px;
     font-weight: 500;
     outline: none;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 
     &::placeholder { color: #9ca3af; }
-    &:focus { border-color: #22c55e; }
+    &:focus { border-color: #1ea866; }
 }
 
-/* ==================== SMARTPHONE REALISTA DEL AVATAR (ESTILO HABBORP) ==================== */
+/* ==================== SMARTPHONE DEL AVATAR (100% PLANO, SIN SOMBRAS NI DEGRADADOS) ==================== */
 .rp-phone-device {
     position: fixed;
-    left: 72px;
-    bottom: 96px;
+    left: 78px;
+    bottom: 98px;
     width: 294px;
     height: 552px;
-    max-height: calc(100vh - 116px);
-    background: linear-gradient(180deg, #16181c 0%, #0e1013 100%);
-    border: 2px solid #414750;
-    border-radius: 34px;
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.72), inset 0 0 0 2px #090a0c;
+    max-height: calc(100vh - 118px);
+    background: #131518;
+    border: 2px solid #3d424b;
+    border-radius: 32px;
     display: flex;
     flex-direction: column;
     padding: 12px 11px 10px;
@@ -408,7 +390,6 @@ body.habbten-rp-client {
     height: 7px;
     border-radius: 50%;
     background: #272c35;
-    border: 1px solid #3f4754;
 }
 
 .rp-phone-speaker {
@@ -434,15 +415,13 @@ body.habbten-rp-client {
     justify-content: center;
     cursor: pointer;
 
-    &:hover { background: #dc2626; border-color: #ef4444; color: #ffffff; }
+    &:hover { background: #dc2626; border-color: #dc2626; color: #ffffff; }
 }
 
 .rp-phone-screen {
     flex: 1;
     min-height: 0;
-    background-color: #25292e;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
-    background-size: 12px 12px;
+    background-color: #25282c;
     border: 1px solid #383e47;
     border-radius: 6px;
     overflow: hidden;
@@ -453,8 +432,8 @@ body.habbten-rp-client {
 .rp-phone-statusbar {
     height: 24px;
     padding: 0 9px;
-    background: rgba(14, 16, 19, 0.72);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: #191c20;
+    border-bottom: 1px solid #31363e;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -477,7 +456,6 @@ body.habbten-rp-client {
     width: 100%;
     height: 100%;
     background: #4ade80;
-    border-radius: 1px;
 }
 
 /* Pantalla de Bloqueo */
@@ -489,9 +467,7 @@ body.habbten-rp-client {
     justify-content: space-between;
 }
 
-.rp-lock-clock-wrap {
-    text-align: center;
-}
+.rp-lock-clock-wrap { text-align: center; }
 
 .rp-lock-time {
     font-size: 40px;
@@ -522,9 +498,9 @@ body.habbten-rp-client {
 }
 
 .rp-lock-notif {
-    background: rgba(20, 23, 27, 0.85);
-    border: 1px solid #3a404a;
-    border-radius: 8px;
+    background: #1b1e22;
+    border: 1px solid #343942;
+    border-radius: 6px;
     padding: 9px 11px;
     cursor: pointer;
     display: flex;
@@ -533,29 +509,28 @@ body.habbten-rp-client {
 
     b { font-size: 11px; color: #f3f4f6; }
     span { font-size: 11px; color: #9ca3af; line-height: 1.35; }
-    &:hover { border-color: #22c55e; }
+    &:hover { border-color: #1ea866; }
 }
 
 .rp-unlock-bar {
     width: 100%;
     height: 44px;
-    background: rgba(18, 21, 25, 0.88);
-    border: 1px solid #444b55;
-    border-radius: 8px;
+    background: #1b1e22;
+    border: 1px solid #3e444e;
+    border-radius: 6px;
     padding: 4px;
     display: flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    transition: border-color 0.15s ease;
 
-    &:hover { border-color: #22c55e; }
+    &:hover { border-color: #1ea866; }
 }
 
 .rp-unlock-arrow {
     width: 34px;
     height: 34px;
-    border-radius: 6px;
+    border-radius: 4px;
     background: #1ea866;
     color: #ffffff;
     display: inline-flex;
@@ -568,13 +543,13 @@ body.habbten-rp-client {
 .rp-unlock-text {
     flex: 1;
     text-align: center;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     color: #cbd5e1;
     padding-right: 16px;
 }
 
-/* Pantalla de Inicio (Home Screen Apps) */
+/* Pantalla de Inicio Apps */
 .rp-phone-home {
     flex: 1;
     padding: 12px;
@@ -584,9 +559,9 @@ body.habbten-rp-client {
 }
 
 .rp-home-mini-widget {
-    background: rgba(17, 20, 24, 0.82);
-    border: 1px solid #393f48;
-    border-radius: 8px;
+    background: #1b1e22;
+    border: 1px solid #343942;
+    border-radius: 6px;
     padding: 8px 10px;
     display: flex;
     align-items: center;
@@ -608,7 +583,7 @@ body.habbten-rp-client {
     flex-direction: column;
     align-items: flex-end;
     font-size: 10.5px;
-    font-weight: 800;
+    font-weight: 700;
 
     .is-cash { color: #4ade80; }
     .is-bank { color: #38bdf8; }
@@ -630,21 +605,19 @@ body.habbten-rp-client {
     gap: 5px;
     cursor: pointer;
 
-    &:hover .rp-app-icon { transform: translateY(-2px); filter: brightness(1.08); }
+    &:hover .rp-app-icon { filter: brightness(1.08); }
 }
 
 .rp-app-icon {
     position: relative;
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    border-radius: 10px;
     color: #ffffff;
     font-size: 20px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.28);
-    transition: transform 0.12s ease, filter 0.12s ease;
 }
 
 .rp-app-badge {
@@ -656,10 +629,10 @@ body.habbten-rp-client {
     padding: 0 4px;
     border-radius: 99px;
     background: #ef4444;
-    border: 1.5px solid #25292e;
+    border: 2px solid #25282c;
     color: #ffffff;
     font-size: 9.5px;
-    font-weight: 800;
+    font-weight: 700;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -714,7 +687,7 @@ body.habbten-rp-client {
 
 .rp-app-navtitle {
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 700;
     color: #ffffff;
 }
 
@@ -733,22 +706,22 @@ body.habbten-rp-client {
 
 .rp-app-sec-title {
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     color: #9ca3af;
 }
 
 .rp-phone-card {
     background: #1b1e23;
     border: 1px solid #323740;
-    border-radius: 7px;
+    border-radius: 6px;
     padding: 9px 10px;
     display: flex;
     flex-direction: column;
     gap: 4px;
 
-    &.is-highlight { border-color: #22c55e; }
+    &.is-highlight { border-color: #1ea866; }
     &.is-compact { padding: 7px 9px; font-size: 11px; color: #d1d5db; }
 }
 
@@ -763,7 +736,7 @@ body.habbten-rp-client {
 
 .rp-pc-desc { font-size: 11px; color: #9ca3af; line-height: 1.35; }
 .rp-pc-muted { font-size: 10.5px; color: #9ca3af; }
-.rp-pc-cash { font-size: 11.5px; font-weight: 800; color: #4ade80; }
+.rp-pc-cash { font-size: 11.5px; font-weight: 700; color: #4ade80; }
 
 .rp-pc-foot {
     display: flex;
@@ -775,18 +748,18 @@ body.habbten-rp-client {
 
 .rp-tag {
     font-size: 9.5px;
-    font-weight: 800;
+    font-weight: 700;
     padding: 2px 6px;
     border-radius: 4px;
 
-    &.is-safe { background: rgba(34, 197, 94, 0.16); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); }
-    &.is-pvp { background: rgba(239, 68, 68, 0.16); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+    &.is-safe { background: #183528; color: #4ade80; }
+    &.is-pvp { background: #3f1818; color: #f87171; }
 }
 
 .rp-phone-news-banner {
     position: relative;
     height: 60px;
-    border-radius: 7px;
+    border-radius: 6px;
     overflow: hidden;
     background-size: cover;
     background-position: center;
@@ -800,14 +773,14 @@ body.habbten-rp-client {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.88) 100%);
+        background: rgba(12, 14, 17, 0.62);
     }
 
     span {
         position: relative;
         z-index: 2;
         font-size: 11.5px;
-        font-weight: 800;
+        font-weight: 700;
         color: #ffffff;
     }
 }
@@ -817,13 +790,13 @@ body.habbten-rp-client {
     flex-direction: column;
     gap: 8px;
 
-    h4 { font-size: 13.5px; font-weight: 800; color: #ffffff; }
+    h4 { font-size: 13.5px; font-weight: 700; color: #ffffff; }
     p { font-size: 11.5px; color: #d1d5db; line-height: 1.5; }
 }
 
 .rp-news-reader-hero {
     height: 92px;
-    border-radius: 7px;
+    border-radius: 6px;
     background-size: cover;
     background-position: center;
     border: 1px solid #3a404a;
@@ -837,14 +810,14 @@ body.habbten-rp-client {
     > div {
         background: #1b1e23;
         border: 1px solid #323740;
-        border-radius: 7px;
+        border-radius: 6px;
         padding: 8px 10px;
         display: flex;
         flex-direction: column;
         gap: 2px;
 
         span { font-size: 10px; color: #9ca3af; }
-        b { font-size: 14px; font-weight: 800; }
+        b { font-size: 14px; font-weight: 700; }
         .is-cash { color: #4ade80; }
         .is-bank { color: #38bdf8; }
     }
@@ -858,10 +831,11 @@ body.habbten-rp-client {
     border: 1px solid #353b44;
     border-radius: 5px;
     color: #f3f4f6;
+    font-family: 'Montserrat', sans-serif;
     font-size: 11.5px;
     outline: none;
 
-    &:focus { border-color: #22c55e; }
+    &:focus { border-color: #1ea866; }
 }
 
 .rp-mini-prog {
@@ -871,7 +845,7 @@ body.habbten-rp-client {
     overflow: hidden;
     margin-top: 2px;
 
-    > div { height: 100%; background: #22c55e; }
+    > div { height: 100%; background: #1ea866; }
 }
 
 .rp-rank-line {
@@ -903,10 +877,11 @@ body.habbten-rp-client {
     padding: 9px 11px;
     background: #1b1e23;
     border: 1px solid #343a44;
-    border-radius: 7px;
+    border-radius: 6px;
     color: #f3f4f6;
+    font-family: 'Montserrat', sans-serif;
     font-size: 11.5px;
-    font-weight: 700;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 9px;
@@ -931,23 +906,21 @@ body.habbten-rp-client {
     background: #16181c;
     border: 1.5px solid #454c57;
     cursor: pointer;
-    transition: border-color 0.15s ease;
 
     &:hover { border-color: #9ca3af; }
 }
 
-/* ==================== VENTANAS MODERNAS (TIENDA / MOCHILA / AYUDA) ==================== */
+/* ==================== VENTANAS MODERNAS PLANAS (TIENDA / MOCHILA / AYUDA) ==================== */
 .rp-modern-modal {
     position: fixed;
-    left: 72px;
-    bottom: 96px;
+    left: 78px;
+    bottom: 98px;
     width: 390px;
-    max-width: calc(100vw - 88px);
+    max-width: calc(100vw - 92px);
     max-height: min(520px, calc(100vh - 130px));
     background: #202328;
     border: 1px solid #3a4049;
-    border-radius: 10px;
-    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.65);
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -963,7 +936,7 @@ body.habbten-rp-client {
     align-items: center;
     justify-content: space-between;
     font-size: 12.5px;
-    font-weight: 800;
+    font-weight: 700;
     color: #ffffff;
     flex-shrink: 0;
 }
@@ -980,7 +953,7 @@ body.habbten-rp-client {
     justify-content: center;
     cursor: pointer;
 
-    &:hover { background: #dc2626; border-color: #ef4444; color: #ffffff; }
+    &:hover { background: #dc2626; border-color: #dc2626; color: #ffffff; }
 }
 
 .rp-mm-body {
@@ -996,7 +969,7 @@ body.habbten-rp-client {
 .rp-gym-strip {
     background: #181b1f;
     border: 1px solid #323740;
-    border-radius: 7px;
+    border-radius: 6px;
     padding: 8px 10px;
     display: flex;
     align-items: center;
@@ -1014,16 +987,17 @@ body.habbten-rp-client {
 }
 
 .rp-cat-tab {
-    padding: 4px 9px;
+    padding: 5px 10px;
     border-radius: 5px;
     background: #181b1f;
     border: 1px solid #353b44;
     color: #9ca3af;
+    font-family: 'Montserrat', sans-serif;
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
 
-    &.is-active { background: #1ea866; border-color: #22c55e; color: #ffffff; }
+    &.is-active { background: #1ea866; border-color: #1ea866; color: #ffffff; }
 }
 
 .rp-mm-list {
@@ -1048,7 +1022,7 @@ body.habbten-rp-client {
     }
 }
 
-/* Botones reutilizables modernos */
+/* Botones reutilizables planos */
 .rp-btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
 .rp-btn-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
@@ -1057,23 +1031,23 @@ body.habbten-rp-client {
     align-items: center;
     justify-content: center;
     gap: 5px;
-    border-radius: 6px;
-    border: 1px solid transparent;
+    border-radius: 5px;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
     font-weight: 700;
     cursor: pointer;
-    transition: filter 0.12s ease;
+    transition: background 0.12s ease;
 
-    &:hover:not(:disabled) { filter: brightness(1.09); }
     &:disabled { opacity: 0.55; cursor: not-allowed; }
 
-    &.is-sm { padding: 7px 11px; font-size: 11.5px; }
-    &.is-xs { padding: 4px 8px; font-size: 10.5px; }
+    &.is-sm { padding: 7px 12px; font-size: 11.5px; }
+    &.is-xs { padding: 5px 9px; font-size: 10.5px; }
 
-    &.is-green { background: #1ea866; color: #ffffff; }
-    &.is-blue { background: #2563eb; color: #ffffff; }
-    &.is-red { background: #dc2626; color: #ffffff; }
-    &.is-gold { background: #d97706; color: #ffffff; }
-    &.is-dark { background: #2d323a; border-color: #414854; color: #f3f4f6; }
+    &.is-green { background: #1ea866; color: #ffffff; &:hover:not(:disabled) { background: #19945a; } }
+    &.is-blue { background: #2563eb; color: #ffffff; &:hover:not(:disabled) { background: #1d4ed8; } }
+    &.is-red { background: #dc2626; color: #ffffff; &:hover:not(:disabled) { background: #b91c1c; } }
+    &.is-gold { background: #d97706; color: #ffffff; &:hover:not(:disabled) { background: #b45309; } }
+    &.is-dark { background: #2d323a; color: #f3f4f6; &:hover:not(:disabled) { background: #39404a; } }
 }
 
 /* ==================== MODO MÓVIL RP DEDICADO ==================== */
@@ -1093,30 +1067,35 @@ body.habbten-rp-client {
     .rp-char-hud {
         width: auto;
         flex: 1;
-        max-width: 245px;
+        max-width: 248px;
         padding: 6px 8px;
     }
 
     .rp-char-avatar-box {
+        width: 48px;
+        height: 48px;
+    }
+
+    .rp-char-head-img {
         width: 44px;
-        height: 46px;
+        height: 44px;
     }
 
     .rp-mob-chat-btn {
         height: 44px;
         padding: 0 14px;
-        border-radius: 8px;
+        border-radius: 6px;
         background: #ffffff;
         color: #111827;
         border: 1px solid #cbd5e1;
+        font-family: 'Montserrat', sans-serif;
         font-size: 12px;
-        font-weight: 800;
+        font-weight: 700;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 
-        &.is-active { background: #1ea866; border-color: #22c55e; color: #ffffff; }
+        &.is-active { background: #1ea866; border-color: #1ea866; color: #ffffff; }
     }
 
     .rp-mobile-chat-float {

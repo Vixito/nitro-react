@@ -27,8 +27,7 @@ import {
     FaUserFriends,
     FaUtensils
 } from 'react-icons/fa';
-import { ChatMessageTypeEnum, CreateLinkEvent, GetRoomSession } from '../../api';
-import { LayoutAvatarImageView } from '../../common';
+import { ChatMessageTypeEnum, CreateLinkEvent, CreateRoomSession, GetRoomSession } from '../../api';
 import { useChatInputWidget, useSessionInfo } from '../../hooks';
 import {
     isRoleplayMode,
@@ -114,6 +113,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }, 4200);
     }, []);
 
+    const initialRoomEnteredRef = useRef<boolean>(false);
+
     const refreshState = useCallback(async () =>
     {
         if(!rpActive) return;
@@ -123,12 +124,24 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             if(json && json.success)
             {
                 const nextLocSlug = String(json.character?.current_location || '');
-                if(nextLocSlug && lastServerLocRef.current && nextLocSlug !== lastServerLocRef.current)
+                const targetLoc = (json.locations || []).find(l => l.slug === nextLocSlug) || (json.locations || [])[0];
+
+                if(!initialRoomEnteredRef.current && targetLoc && targetLoc.room_id > 0)
                 {
-                    const targetLoc = (json.locations || []).find(l => l.slug === nextLocSlug);
+                    initialRoomEnteredRef.current = true;
+                    setTimeout(() =>
+                    {
+                        if(!GetRoomSession()?.roomId)
+                        {
+                            CreateRoomSession(targetLoc.room_id);
+                        }
+                    }, 1800);
+                }
+                else if(nextLocSlug && lastServerLocRef.current && nextLocSlug !== lastServerLocRef.current)
+                {
                     if(targetLoc && targetLoc.room_id > 0 && GetRoomSession()?.roomId !== targetLoc.room_id)
                     {
-                        CreateLinkEvent(`navigator/goto/${ targetLoc.room_id }`);
+                        CreateRoomSession(targetLoc.room_id);
                     }
                 }
                 if(nextLocSlug) lastServerLocRef.current = nextLocSlug;
@@ -268,7 +281,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             const targetRoomId = Number(res?.roomId || 0);
             if(targetRoomId > 0 && GetRoomSession()?.roomId !== targetRoomId)
             {
-                CreateLinkEvent(`navigator/goto/${ targetRoomId }`);
+                CreateRoomSession(targetRoomId);
             }
             togglePhone(false);
         });
@@ -377,7 +390,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </div>
             ) }
 
-            {/* ==================== BOTONES SUPERIORES DERECHA (ESTILO HABBORP) ==================== */}
+            {/* ==================== BOTONES SUPERIORES DERECHA (ÍCONOS HD) ==================== */}
             <div className="rp-top-right-tools">
                 <button
                     type="button"
@@ -391,35 +404,32 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     className={ `rp-square-btn ${ sideModal === 'help' ? 'is-active' : '' }` }
                     title="Ayuda y Comandos RP"
                     onClick={ () => openSideModal('help') }>
-                    <FaQuestion />
+                    <img src="/mobile-assets/mob_help.png" alt="Ayuda" className="rp-top-icon-hd" />
                 </button>
             </div>
 
-            {/* ==================== DOCK VERTICAL IZQUIERDO (TIENDA · MOCHILA · CELULAR) ==================== */}
+            {/* ==================== DOCK VERTICAL IZQUIERDO (ÍCONOS HD) ==================== */}
             <aside className="rp-left-dock" aria-label="Herramientas RP">
                 <button
                     type="button"
                     className={ `rp-dock-btn ${ sideModal === 'shop' ? 'is-active' : '' }` }
                     title="Tiendas, Concesionario y Gimnasio"
                     onClick={ () => openSideModal('shop') }>
-                    <img src="/mobile-assets/mob_shop.png" alt="Tienda" className="rp-dock-pixel" />
+                    <img src="/mobile-assets/mob_shop.png" alt="Tienda" className="rp-dock-icon-hd" />
                 </button>
                 <button
                     type="button"
                     className={ `rp-dock-btn ${ sideModal === 'inventory' ? 'is-active' : '' }` }
                     title="Mochila e Inventario"
                     onClick={ () => openSideModal('inventory') }>
-                    <img src="/mobile-assets/mob_inventory.png" alt="Mochila" className="rp-dock-pixel" />
+                    <img src="/mobile-assets/mob_inventory.png" alt="Mochila" className="rp-dock-icon-hd" />
                 </button>
                 <button
                     type="button"
                     className={ `rp-dock-btn is-phone ${ phoneOpen ? 'is-active' : '' }` }
-                    title="Abrir Celular del Avatar"
+                    title="Abrir Celular"
                     onClick={ () => togglePhone() }>
-                    <span className="rp-phone-glyph" aria-hidden="true">
-                        <span className="rp-phone-glyph-screen" />
-                        <span className="rp-phone-glyph-btn" />
-                    </span>
+                    <img src="/img/rp_phone_icon_hd.png" alt="Celular" className="rp-dock-icon-hd" />
                     { (claimableMissions > 0 || !phoneUnlocked) && <span className="rp-dock-dot" /> }
                 </button>
             </aside>
@@ -428,7 +438,10 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             <div className="rp-bottom-cluster">
                 <div className="rp-char-hud" onClick={ () => { if(!phoneOpen) { setPhoneUnlocked(true); setPhoneApp('settings'); togglePhone(true); } } } title="Ver estado completo en tu celular">
                     <div className="rp-char-avatar-box">
-                        <LayoutAvatarImageView figure={ state.user.look } direction={ 2 } headOnly={ true } />
+                        <img
+                            className="rp-char-head-img"
+                            src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(state.user.look || '') }&headonly=1&size=m&direction=2&head_direction=2` }
+                            alt={ state.user.username } />
                         <span className="rp-char-lvl">{ character.rp_level }</span>
                     </div>
 
@@ -939,10 +952,13 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                                 <FaUserFriends /> <span>Contactos y Amigos</span>
                                             </button>
                                             <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/rp') }>
-                                                <FaNewspaper /> <span>Portal de Acceso Habbten RP</span>
+                                                <FaNewspaper /> <span>Inicio de Habbten RP</span>
                                             </button>
-                                            <button type="button" className="rp-phone-menu-btn is-danger" onClick={ () => navigateParent('/') }>
-                                                <FaSignOutAlt /> <span>Volver a Habbten Clásico</span>
+                                            <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/') }>
+                                                <FaSignOutAlt /> <span>Entra a Habbten</span>
+                                            </button>
+                                            <button type="button" className="rp-phone-menu-btn is-danger" onClick={ () => navigateParent('/logout') }>
+                                                <FaSignOutAlt /> <span>Cerrar sesión</span>
                                             </button>
                                         </div>
                                     ) }
