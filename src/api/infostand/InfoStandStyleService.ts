@@ -11,13 +11,10 @@ import bbCannonImg from '../../assets/images/gamecenter/battleball/pu_cannon.png
 import bbSpringImg from '../../assets/images/gamecenter/battleball/pu_spring.png';
 
 import ffArenaImg from '../../assets/images/gamecenter/fastfood/ff_arena_classic.png';
-import ffParachuteImg from '../../assets/images/gamecenter/fastfood/ff_btn_parachute.png';
 import ffBurgerImg from '../../assets/images/gamecenter/fastfood/ff_food_burger.png';
-import ffDrinksImg from '../../assets/images/gamecenter/fastfood/ff_food_drinks.png';
 import ffPizzaImg from '../../assets/images/gamecenter/fastfood/ff_food_pizza.png';
 import ffLogoImg from '../../assets/images/gamecenter/fastfood/ff_logo_habbten.png';
 
-import ssPineImg from '../../assets/images/gamecenter/snowstorm/sprite_pine_tree.png';
 import ssDuckImg from '../../assets/images/gamecenter/snowstorm/sprite_snow_duck.png';
 import ssHorizonImg from '../../assets/images/gamecenter/snowstorm/ss_horizon_bg.png';
 import ssIceSmallImg from '../../assets/images/gamecenter/snowstorm/thumbnails_Icecube_small.png';
@@ -30,7 +27,6 @@ import wsIconImg from '../../assets/images/gamecenter/wobblesquabble/ws_presence
 import wsRooftopImg from '../../assets/images/gamecenter/wobblesquabble/ws_rooftop_wide.png';
 
 import hcSmallImg from '../../assets/images/catalog/hc_small.png';
-import wiredTowerImg from '../../assets/images/catalog/wired_frontpage_tower.png';
 import wiredBannerImg from '../../assets/images/wired/wired_banner_pattern.png';
 
 export type InfoStandPlatePattern =
@@ -125,7 +121,7 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
     { id: 'obsidian',       name: 'Obsidiana VIP',       price: 500, accentColor: '#2a2d34', borderColor: '#ff6b35', bgStyle: 'linear-gradient(180deg, #2d3036 0%, #16181c 100%)', emblemColor: '#e85d04', pattern: 'diamond' },
     { id: 'gold_hc',        name: 'Oro Imperial',        price: 600, accentColor: '#b5891b', borderColor: '#ffe066', bgStyle: 'linear-gradient(180deg, #8f670e 0%, #523905 100%)', emblemColor: '#ffd43b', pattern: 'diamond' },
 
-    // Navidad / Invierno 2008 (con carámbanos congelados y furnis reales xmas08)
+    // Navidad / Invierno 2008 (con carámbanos congelados y furnis reales xmas08 a escala 1:1)
     {
         id: 'xmas_2008',
         name: 'Navidad Helada 2008',
@@ -137,8 +133,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         emblemImg: ssIceSmallImg,
         topTrim: 'icicles',
         decors: [
-            { slot: 'bl', furniId: 2972, size: 34 }, // Pingüino Polo 2008 (xmas08_trph1)
-            { slot: 'br', furniId: 2967, size: 42 }  // Árbol Ártico 2008 (xmas08_icetree)
+            { slot: 'bl', furniId: 2972, size: 40 }, // Pingüino Polo 2008 (xmas08_trph1)
+            { slot: 'br', furniId: 2967, size: 48 }  // Árbol Ártico 2008 (xmas08_icetree)
         ],
         pattern: 'frost'
     },
@@ -150,16 +146,16 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         borderColor: '#f7d060',
         bgStyle: 'linear-gradient(180deg, #9c1a1a 0%, #590d14 100%)',
         emblemColor: '#22c55e',
-        emblemFurniId: 215, // Pato de Navidad (xmasduck)
+        emblemFurniId: 2971, // Pingüino Santa (penguin_elf)
         topTrim: 'garland',
         decors: [
-            { slot: 'bl', furniId: 2971, size: 34 }, // Pingüino Santa (penguin_elf)
-            { slot: 'br', furniId: 4291, size: 42 }  // Arbolito Navideño (xmas2011_tree1)
+            { slot: 'bl', furniId: 2971, size: 40 }, // Pingüino Santa (penguin_elf)
+            { slot: 'br', furniId: 4291, size: 46 }  // Arbolito Navideño (xmas2011_tree1)
         ],
         pattern: 'candy'
     },
 
-    // Game Center (con logos, fondos y sprites originales de los 4 juegos)
+    // Game Center (con logos HD y sprites 1:1 sin encogimiento borroso)
     {
         id: 'gc_snowstorm',
         name: 'SnowStorm',
@@ -174,8 +170,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         topTrim: 'icicles',
         topBannerImg: ssLogoImg,
         decors: [
-            { slot: 'bl', img: ssPineImg, size: 38 },
-            { slot: 'br', img: ssDuckImg, size: 32 }
+            { slot: 'bl', img: ssSnowballImg, size: 36 },
+            { slot: 'br', img: ssDuckImg, size: 30 }
         ],
         pattern: 'snow'
     },
@@ -193,9 +189,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         topTrim: 'awning',
         topBannerImg: ffLogoImg,
         decors: [
-            { slot: 'tl', img: ffParachuteImg, size: 28 },
-            { slot: 'bl', img: ffPizzaImg, size: 34 },
-            { slot: 'br', img: ffBurgerImg, size: 32 }
+            { slot: 'bl', img: ffPizzaImg, size: 44 },
+            { slot: 'br', img: ffBurgerImg, size: 40 }
         ],
         pattern: 'checker'
     },
@@ -211,8 +206,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         bgImageUrl: wsRooftopImg,
         bgImageOpacity: 0.3,
         decors: [
-            { slot: 'bl', img: wsWhackImg, size: 38 },
-            { slot: 'br', img: wsSplashImg, size: 42 }
+            { slot: 'bl', img: wsWhackImg, size: 52 },
+            { slot: 'br', img: wsSplashImg, size: 56 }
         ],
         pattern: 'wave'
     },
@@ -229,27 +224,27 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         bgImageOpacity: 0.34,
         topBannerImg: bbLogoImg,
         decors: [
-            { slot: 'tl', img: bbBombImg, size: 26 },
-            { slot: 'bl', img: bbCannonImg, size: 28 },
-            { slot: 'br', img: bbSpringImg, size: 26 }
+            { slot: 'tl', img: bbBombImg, size: 32 },
+            { slot: 'bl', img: bbCannonImg, size: 36 },
+            { slot: 'br', img: bbSpringImg, size: 33 }
         ],
         pattern: 'tiles'
     },
 
-    // Mundo Mágico (Harry Potter — furnis mágicos reales de Habbo)
+    // Mundo Mágico (Harry Potter — furnis mágicos 3D reales 1:1 sin fondos negros)
     {
         id: 'hp_gryffindor',
         name: 'León Escarlata',
         price: 500,
         accentColor: '#7f1d1d',
         borderColor: '#f5c542',
-        bgStyle: 'linear-gradient(180deg, #7f1d1d 0%, #420909 100%)',
+        bgStyle: 'linear-gradient(180deg, #8b1e1e 0%, #4d0d0d 100%)',
         emblemColor: '#eab308',
-        emblemFurniId: 225, // Velas rojas (rcandleset)
+        emblemFurniId: 225, // Velas Rojas (rcandleset)
         topTrim: 'magic_stars',
         decors: [
-            { slot: 'bl', furniId: 225, size: 34 },   // Velas Rojas
-            { slot: 'br', furniId: 10831, size: 40 }  // Escobas Embrujadas
+            { slot: 'bl', furniId: 225, size: 38 },  // Velas Rojas
+            { slot: 'br', furniId: 1620, size: 46 }  // Dragón de Fuego Rojo
         ],
         pattern: 'crest'
     },
@@ -257,15 +252,15 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         id: 'hp_slytherin',
         name: 'Serpiente Esmeralda',
         price: 500,
-        accentColor: '#14532d',
+        accentColor: '#196b3b',
         borderColor: '#cbd5e1',
-        bgStyle: 'linear-gradient(180deg, #14532d 0%, #052b14 100%)',
+        bgStyle: 'linear-gradient(180deg, #196b3b 0%, #0d4222 100%)',
         emblemColor: '#22c55e',
-        emblemFurniId: 4578, // Poción mágica
+        emblemFurniId: 1622, // Dragón de Fuego Jade (verde esmeralda)
         topTrim: 'magic_stars',
         decors: [
-            { slot: 'bl', furniId: 4578, size: 32 },  // Poción resucitadora
-            { slot: 'br', furniId: 2625, size: 38 }   // Caldero mágico
+            { slot: 'bl', furniId: 2625, size: 40 }, // Caldero burbujeante verde
+            { slot: 'br', furniId: 1622, size: 46 }  // Dragón Jade Esmeralda
         ],
         pattern: 'crest'
     },
@@ -275,18 +270,18 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         price: 550,
         accentColor: '#312e81',
         borderColor: '#fde047',
-        bgStyle: 'linear-gradient(180deg, #1e1b4b 0%, #090721 100%)',
+        bgStyle: 'linear-gradient(180deg, #252163 0%, #100c36 100%)',
         emblemColor: '#818cf8',
-        emblemFurniId: 2997, // Pingüino Abracadabra
+        emblemFurniId: 10826, // Bola de Cristal Embrujada
         topTrim: 'magic_stars',
         decors: [
-            { slot: 'bl', furniId: 2997, size: 36 },  // Pingüino Abracadabra
-            { slot: 'br', furniId: 10789, size: 40 }  // Caldero de la Bruja
+            { slot: 'bl', furniId: 2997, size: 40 },  // Pingüino Abracadabra
+            { slot: 'br', furniId: 10826, size: 42 }  // Bola de Cristal Embrujada
         ],
         pattern: 'starlight'
     },
 
-    // Wired (textura oficial Wired + Torre Wired oficial + Pirámide Oculta)
+    // Wired (textura oficial Wired + Pirámide Oculta + Interruptor de Suelo 1:1 HD)
     {
         id: 'wired_tech',
         name: 'Maestro Wired',
@@ -300,13 +295,13 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         bgImageOpacity: 0.28,
         topTrim: 'wired_bar',
         decors: [
-            { slot: 'bl', furniId: 3672, size: 36 },     // Pirámide Oculta WIRED
-            { slot: 'br', img: wiredTowerImg, size: 84 } // Torre WIRED oficial de Habbo
+            { slot: 'bl', furniId: 3672, size: 40 }, // Pirámide Oculta WIRED
+            { slot: 'br', furniId: 3667, size: 38 }  // Interruptor de Suelo WIRED
         ],
         pattern: 'circuit'
     },
 
-    // Deportes & Retro (furnis deportivos y arcade reales)
+    // Deportes & Retro (furnis deportivos y arcade reales 1:1)
     {
         id: 'sport_football',
         name: 'Estadio Fútbol',
@@ -317,8 +312,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         emblemColor: '#4ade80',
         emblemFurniId: 3508, // Balón Clásico (fball_ball)
         decors: [
-            { slot: 'bl', furniId: 3508, size: 30 },  // Balón Clásico
-            { slot: 'br', furniId: 3505, size: 38 }   // Trofeo Mundial
+            { slot: 'bl', furniId: 3508, size: 32 }, // Balón Clásico
+            { slot: 'br', furniId: 3505, size: 44 }  // Trofeo Mundial
         ],
         pattern: 'pitch'
     },
@@ -332,8 +327,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         emblemColor: '#fb923c',
         emblemFurniId: 280, // Trofeo Baloncesto
         decors: [
-            { slot: 'bl', furniId: 3547, size: 30 },  // Balón
-            { slot: 'br', furniId: 280, size: 38 }    // Trofeo Baloncesto
+            { slot: 'bl', furniId: 3547, size: 32 }, // Balón
+            { slot: 'br', furniId: 280, size: 44 }   // Trofeo Baloncesto
         ],
         pattern: 'stripe'
     },
@@ -347,8 +342,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         emblemColor: '#ec4899',
         emblemFurniId: 5063, // Raro Armario Arcade
         decors: [
-            { slot: 'bl', furniId: 3277, size: 36 },  // Arcade Tank
-            { slot: 'br', furniId: 5063, size: 42 }   // Armario Arcade
+            { slot: 'bl', furniId: 3277, size: 42 }, // Arcade Tank
+            { slot: 'br', furniId: 5063, size: 46 }  // Armario Arcade
         ],
         pattern: 'grid'
     },
@@ -362,8 +357,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
         emblemColor: '#fde047',
         emblemImg: hcSmallImg,
         decors: [
-            { slot: 'bl', furniId: 267, size: 38 },   // El Club Sofa
-            { slot: 'br', furniId: 1527, size: 38 }   // Silla Majestic HC
+            { slot: 'bl', furniId: 267, size: 44 },  // El Club Sofa
+            { slot: 'br', furniId: 1527, size: 44 }  // Silla Majestic HC
         ],
         pattern: 'diamond'
     }
