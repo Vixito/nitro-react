@@ -3,6 +3,7 @@ import {
     FaAmbulance,
     FaBriefcase,
     FaCar,
+    FaClipboardList,
     FaCrosshairs,
     FaDumbbell,
     FaExclamationTriangle,
@@ -23,6 +24,7 @@ import {
     FaUtensils
 } from 'react-icons/fa';
 import { CreateLinkEvent } from '../../api';
+import { LayoutAvatarImageView } from '../../common';
 import {
     isRoleplayMode,
     RpFullState,
@@ -34,7 +36,7 @@ import {
 } from './RoleplayService';
 import './RoleplayHudView.scss';
 
-type RpPanelTab = null | 'map' | 'jobs' | 'bag' | 'shop' | 'bank' | 'gangs' | 'actions' | 'rankings';
+type RpPanelTab = null | 'map' | 'jobs' | 'missions' | 'bag' | 'shop' | 'bank' | 'gangs' | 'actions' | 'rankings';
 
 interface ToastMsg
 {
@@ -88,8 +90,20 @@ export const RoleplayHudView: FC<{}> = () =>
         if(!rpActive) return;
         refreshState();
         const interval = setInterval(refreshState, 12000);
-        return () => clearInterval(interval);
-    }, [ rpActive, refreshState ]);
+        const onFeedback = (ev: Event) =>
+        {
+            const detail = (ev as CustomEvent)?.detail;
+            if(!detail) return;
+            if(detail.state) setState(prev => prev ? { ...prev, ...detail.state } : detail.state);
+            if(detail.message) pushToast(detail.ok ? 'ok' : 'err', detail.message);
+        };
+        window.addEventListener('habbten-rp-action-feedback', onFeedback);
+        return () =>
+        {
+            clearInterval(interval);
+            window.removeEventListener('habbten-rp-action-feedback', onFeedback);
+        };
+    }, [ rpActive, refreshState, pushToast ]);
 
     useEffect(() =>
     {
@@ -183,11 +197,16 @@ export const RoleplayHudView: FC<{}> = () =>
                 )) }
             </div>
 
-            {/* HUD Vital Superior Izquierdo (estilo GTA / HabboSK) */}
+            {/* HUD Vital Superior Izquierdo (estilo Habbo Ciudad biselado) */}
             <div className="rp-vital-hud">
                 <div className="rp-vital-header">
                     <div className="rp-vital-identity">
-                        <span className="rp-level-pill">Nv.{ character.rp_level }</span>
+                        { state.user.look && (
+                            <div className="rp-avatar-head-badge">
+                                <LayoutAvatarImageView figure={ state.user.look } direction={ 2 } headOnly={ true } />
+                            </div>
+                        ) }
+                        <span className="rp-level-pill">NV.{ character.rp_level }</span>
                         <span className="rp-username">{ state.user.username }</span>
                         { state.gang && (
                             <span className="rp-gang-tag" style={ { backgroundColor: state.gang.color } }>
@@ -196,7 +215,7 @@ export const RoleplayHudView: FC<{}> = () =>
                         ) }
                     </div>
                     <div className="rp-clock-pill" title={ `Ciclo de Ciudad Habbten: ${ clock.label }` }>
-                        { clock.phase === 'night' ? '🌙' : clock.phase === 'sunset' ? '🌇' : '☀️' } { clock.formatted }
+                        { clock.formatted } · { clock.label }
                     </div>
                 </div>
 
@@ -318,6 +337,9 @@ export const RoleplayHudView: FC<{}> = () =>
                 <button type="button" className={ activePanel === 'jobs' ? 'active' : '' } onClick={ () => setActivePanel(p => p === 'jobs' ? null : 'jobs') } title="Trabajos y Turnos">
                     <FaBriefcase /><span>Trabajos</span>
                 </button>
+                <button type="button" className={ `${ activePanel === 'missions' ? 'active' : '' } ${ (state.missions || []).some(m => m.canClaim) ? 'has-badge' : '' }` } onClick={ () => setActivePanel(p => p === 'missions' ? null : 'missions') } title="Contratos y Misiones Diarias">
+                    <FaClipboardList /><span>Misiones</span>
+                </button>
                 <button type="button" className={ activePanel === 'bag' ? 'active' : '' } onClick={ () => setActivePanel(p => p === 'bag' ? null : 'bag') } title="Mochila, Armas y Vehículos">
                     <FaShoppingBag /><span>Mochila</span>
                 </button>
@@ -343,14 +365,15 @@ export const RoleplayHudView: FC<{}> = () =>
                 <div className="rp-modal-window">
                     <div className="rp-modal-header">
                         <div className="rp-modal-title">
-                            { activePanel === 'map' && '🗺️ GPS — Mapa de Ciudad Habbten' }
-                            { activePanel === 'jobs' && '💼 Bolsa de Empleo & Turnos' }
-                            { activePanel === 'bag' && '🎒 Mochila RP, Armas y Vehículos' }
-                            { activePanel === 'shop' && '🛒 Tiendas de Ciudad Habbten & Gimnasio' }
-                            { activePanel === 'bank' && '🏦 Banco Central, Atracos & Housing' }
-                            { activePanel === 'gangs' && '🏴 Bandas, Mafias y Territorios' }
-                            { activePanel === 'actions' && '🚨 Combate, Policía HPD, Médicos y 911' }
-                            { activePanel === 'rankings' && '🏆 Rankings de Ciudad Habbten' }
+                            { activePanel === 'map' && 'GPS — Mapa de Ciudad Habbten' }
+                            { activePanel === 'jobs' && 'Bolsa de Empleo & Turnos' }
+                            { activePanel === 'missions' && 'Contratos y Misiones Diarias' }
+                            { activePanel === 'bag' && 'Mochila RP, Armas y Vehículos' }
+                            { activePanel === 'shop' && 'Tiendas de Ciudad Habbten & Gimnasio' }
+                            { activePanel === 'bank' && 'Banco Central, Atracos & Propiedades' }
+                            { activePanel === 'gangs' && 'Bandas, Mafias y Territorios' }
+                            { activePanel === 'actions' && 'Combate, Policía HPD, Médicos y 911' }
+                            { activePanel === 'rankings' && 'Rankings de Ciudad Habbten' }
                         </div>
                         <button type="button" className="rp-modal-close" onClick={ () => setActivePanel(null) }>
                             <FaTimes />
@@ -446,6 +469,45 @@ export const RoleplayHudView: FC<{}> = () =>
                                                         onClick={ () => runAction('/job/join', { jobSlug: j.slug }) }
                                                     >
                                                         { isMine ? '✓ Tu empleo' : 'Postularme' }
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    }) }
+                                </div>
+                            </div>
+                        ) }
+
+                        {/* 2B. MISIONES Y CONTRATOS DIARIOS */}
+                        { activePanel === 'missions' && (
+                            <div className="rp-missions-view">
+                                <div className="rp-summary-strip">
+                                    <span>Completa contratos diarios en Ciudad Habbten para ganar efectivo y XP RP extra.</span>
+                                    <span>Completadas hoy: <b>{ (state.missions || []).filter(m => m.claimed).length }/{ (state.missions || []).length }</b></span>
+                                </div>
+                                <div className="rp-cards-grid">
+                                    { (state.missions || []).map(m =>
+                                    {
+                                        const pct = Math.min(100, Math.round((m.progress / Math.max(1, m.target)) * 100));
+                                        return (
+                                            <div key={ m.slug } className={ `rp-card ${ m.canClaim ? 'is-selected' : '' }` }>
+                                                <div className="rp-card-top">
+                                                    <strong>{ m.title }</strong>
+                                                    <span className="rp-price-tag">+${ m.rewardCash } · +{ m.rewardXp } XP</span>
+                                                </div>
+                                                <p>{ m.description }</p>
+                                                <div className="rp-mission-bar">
+                                                    <div className="rp-mission-bar-fill" style={ { width: `${ pct }%` } } />
+                                                </div>
+                                                <div className="rp-card-foot">
+                                                    <small>Progreso: { m.progress }/{ m.target }</small>
+                                                    <button
+                                                        type="button"
+                                                        className={ m.canClaim ? 'is-green' : '' }
+                                                        disabled={ busy || !m.canClaim }
+                                                        onClick={ () => runAction('/missions/claim', { missionSlug: m.slug }) }
+                                                    >
+                                                        { m.claimed ? 'Reclamada' : m.canClaim ? 'Reclamar' : 'En curso' }
                                                     </button>
                                                 </div>
                                             </div>

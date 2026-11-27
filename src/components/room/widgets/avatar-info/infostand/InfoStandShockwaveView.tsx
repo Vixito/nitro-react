@@ -8,6 +8,7 @@ import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, LayoutLimite
 import { useFriends, useMessageEvent, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent, useSessionInfo } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
+import { RpAvatarQuickActions } from '../../../../roleplay/RpAvatarQuickActions';
 
 interface InfoStandShockwaveViewProps
 {
@@ -513,6 +514,7 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                             <span>Expulsar</span>
                         </button>
                     ) : null }
+                    <RpAvatarQuickActions targetName={ peer.name } compact={ true } />
                 </div>
             );
         }

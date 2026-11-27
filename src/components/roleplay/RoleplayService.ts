@@ -118,6 +118,19 @@ export interface RpProperty
     description: string;
 }
 
+export interface RpMission
+{
+    slug: string;
+    title: string;
+    description: string;
+    target: number;
+    progress: number;
+    rewardCash: number;
+    rewardXp: number;
+    claimed: boolean;
+    canClaim: boolean;
+}
+
 export interface RpGang
 {
     id: number;
@@ -159,6 +172,7 @@ export interface RpFullState
     locations: RpLocation[];
     turfs: RpTurf[];
     properties: RpProperty[];
+    missions?: RpMission[];
     recentEvents: RpEventItem[];
     onDutyCounts: Record<string, number>;
     clock: { hour: number; minute: number; formatted: string; phase: 'dawn' | 'day' | 'sunset' | 'night'; label: string };
@@ -197,6 +211,11 @@ export async function rpGetRankings(): Promise<any>
 {
     const res = await fetch('/api/rp/rankings', { credentials: 'include' });
     return await res.json();
+}
+
+export function dispatchRpFeedback(detail: { ok: boolean; message: string; state?: RpFullState | null }): void
+{
+    window.dispatchEvent(new CustomEvent('habbten-rp-action-feedback', { detail }));
 }
 
 export async function rpPost(path: string, body: Record<string, any> = {}): Promise<any>

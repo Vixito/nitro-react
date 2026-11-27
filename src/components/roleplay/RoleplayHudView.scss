@@ -54,17 +54,38 @@
         position: fixed;
         top: 10px;
         left: 10px;
-        width: 266px;
-        padding: 9px 10px;
-        border-radius: 10px;
-        background: rgba(11, 17, 32, 0.91);
-        border: 1px solid rgba(148, 163, 184, 0.28);
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+        width: 274px;
+        padding: 8px 10px;
+        border-radius: 4px;
+        background: #141a23;
+        border: 2px solid #000000;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.16);
         color: #f8fafc;
         pointer-events: auto;
         display: flex;
         flex-direction: column;
         gap: 6px;
+
+        .rp-avatar-head-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            border: 1px solid #000000;
+            background: #233245;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            .avatar-image {
+                width: 44px !important;
+                height: 44px !important;
+                background-position: center -6px !important;
+                background-repeat: no-repeat !important;
+                image-rendering: pixelated;
+            }
+        }
 
         .rp-vital-header {
             display: flex;
@@ -351,28 +372,41 @@
         transform: translateY(-50%);
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        padding: 7px;
-        border-radius: 12px;
-        background: rgba(11, 17, 32, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.25);
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+        gap: 5px;
+        padding: 6px;
+        border-radius: 4px;
+        background: #141a23;
+        border: 2px solid #000000;
+        box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.14);
         pointer-events: auto;
 
         button {
-            width: 56px;
-            padding: 7px 4px;
-            border-radius: 8px;
-            border: 1px solid transparent;
-            background: rgba(30, 41, 59, 0.72);
+            position: relative;
+            width: 58px;
+            padding: 6px 4px;
+            border-radius: 3px;
+            border: 1px solid #000000;
+            background: linear-gradient(180deg, #273242 0%, #1a222d 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
             color: #cbd5e1;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 3px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
-            transition: all 0.15s ease;
+
+            &.has-badge::after {
+                content: '';
+                position: absolute;
+                top: 3px;
+                right: 3px;
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                background: #22c55e;
+                border: 1px solid #000000;
+            }
 
             span {
                 font-size: 9px;
@@ -380,13 +414,12 @@
             }
 
             &:hover {
-                background: rgba(51, 65, 85, 0.95);
+                background: linear-gradient(180deg, #334358 0%, #222c3a 100%);
                 color: #ffffff;
             }
 
             &.active {
-                background: #2563eb;
-                border-color: #60a5fa;
+                background: linear-gradient(180deg, #2279b8 0%, #114f80 100%);
                 color: #ffffff;
             }
         }
@@ -401,14 +434,26 @@
         max-height: 82vh;
         display: flex;
         flex-direction: column;
-        border-radius: 14px;
-        background: rgba(11, 17, 32, 0.96);
-        border: 1px solid rgba(148, 163, 184, 0.32);
-        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.72);
+        border-radius: 4px;
+        background: #141a23;
+        border: 2px solid #000000;
+        box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14);
         color: #f8fafc;
         pointer-events: auto;
         overflow: hidden;
         z-index: 440;
+    }
+
+    .rp-mission-bar {
+        height: 6px;
+        background: #0b111a;
+        border: 1px solid #000000;
+        overflow: hidden;
+
+        .rp-mission-bar-fill {
+            height: 100%;
+            background: #22c55e;
+        }
     }
 
     .rp-modal-header {
@@ -748,4 +793,50 @@
     .text-emerald { color: #34d399; }
     .text-sky { color: #38bdf8; }
     .text-rose { color: #fb7185; }
+}
+
+// Acciones rápidas RP dentro del InfoStand al clicar a otro jugador en sala
+.rp-infostand-actions {
+    margin-top: 6px;
+    padding: 6px;
+    background: #141a23;
+    border: 2px solid #000000;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+
+    .rp-infostand-actions-title {
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #fde047;
+        margin-bottom: 5px;
+        letter-spacing: 0.04em;
+    }
+
+    .rp-infostand-actions-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .rp-qa-btn {
+        padding: 3px 6px !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        border: 1px solid #000000 !important;
+        border-radius: 2px !important;
+        color: #ffffff !important;
+        cursor: pointer !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+
+        &.is-danger { background: #b91c1c !important; }
+        &.is-police { background: #1d4ed8 !important; }
+        &.is-medic { background: #047857 !important; }
+        &.is-cash { background: #b45309 !important; }
+        &:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
+    }
+
+    &.is-compact {
+        margin-top: 4px;
+        padding: 4px;
+    }
 }

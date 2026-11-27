@@ -10,6 +10,7 @@ import { Column, Flex, LayoutAvatarImageView, LayoutBadgeImageView, Text, UserPr
 import { useEraTheme, useMessageEvent, useRoom, useRoomSessionManagerEvent } from '../../../../../hooks';
 import { InfoStandWidgetUserRelationshipsView } from './InfoStandWidgetUserRelationshipsView';
 import { InfoStandWidgetUserTagsView } from './InfoStandWidgetUserTagsView';
+import { RpAvatarQuickActions } from '../../../../roleplay/RpAvatarQuickActions';
 
 interface InfoStandWidgetUserViewProps
 {
@@ -300,6 +301,9 @@ export const InfoStandWidgetUserView: FC<InfoStandWidgetUserViewProps> = props =
                 <Column gap={ 1 }>
                     <InfoStandWidgetUserRelationshipsView relationships={ relationships } />
                 </Column>
+                { !isOwn && (
+                    <RpAvatarQuickActions targetName={ avatarInfo.name } />
+                ) }
                 { GetConfiguration('user.tags.enabled') &&
                     <Column gap={ 1 } className="mt-1">
                         <InfoStandWidgetUserTagsView tags={ GetSessionDataManager().tags } />
