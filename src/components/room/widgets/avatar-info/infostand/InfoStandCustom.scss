@@ -120,16 +120,16 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
     }
 }
 
-// 2. Shockwave 2006 — Placa personalizada en la cápsula + Furni centrado en el pedestal isométrico
+// 2. Shockwave 2006 — Placa personalizada en la cápsula + Furni y Avatar exactamente centrados en el diamante (x:44, bottom:13)
 .infostand-shockwave-container {
     .stage-entity-preview {
         .stage-furni-seat-layer {
             position: absolute !important;
-            bottom: -10px !important;
+            bottom: -11px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
             max-width: 78px !important;
-            max-height: 78px !important;
+            max-height: 92px !important;
             width: auto !important;
             height: auto !important;
             object-fit: contain !important;
@@ -139,12 +139,30 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
         }
 
         .stage-avatar-wrapper {
+            position: absolute !important;
+            bottom: -11px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 64px !important;
+            height: 110px !important;
             z-index: 2 !important;
             display: flex !important;
             align-items: flex-end !important;
             justify-content: center !important;
 
+            .avatar-seat-offset {
+                display: flex !important;
+                align-items: flex-end !important;
+                justify-content: center !important;
+                width: 64px !important;
+                height: 110px !important;
+            }
+
             .avatar-image {
+                position: relative !important;
+                left: auto !important;
+                bottom: auto !important;
+                transform: none !important;
                 width: 64px !important;
                 height: 110px !important;
                 background-position: center bottom !important;
@@ -786,25 +804,38 @@ body.is-mobile-ui .nitro-infostand-container .nitro-infostand .body-image.infost
 
                     .preview-furni-layer {
                         position: absolute;
-                        bottom: 14px;
+                        bottom: 13px;
                         left: 50%;
                         transform: translateX(-50%);
-                        max-width: 82px;
+                        max-width: 78px;
                         max-height: 92px;
                         width: auto;
                         height: auto;
                         object-fit: contain;
                         image-rendering: pixelated;
                         z-index: 1;
+                        pointer-events: none;
                     }
 
                     .preview-avatar-layer {
-                        position: relative;
+                        position: absolute;
+                        bottom: 13px;
+                        left: 50%;
+                        transform: translateX(-50%);
                         z-index: 2;
-                        margin-bottom: 18px;
+                        width: 64px;
+                        height: 110px;
                         display: flex;
                         align-items: flex-end;
                         justify-content: center;
+
+                        .avatar-seat-offset {
+                            display: flex;
+                            align-items: flex-end;
+                            justify-content: center;
+                            width: 64px;
+                            height: 110px;
+                        }
 
                         .avatar-image {
                             width: 64px !important;

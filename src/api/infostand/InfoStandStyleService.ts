@@ -58,8 +58,8 @@ export const INFOSTAND_PLATES: InfoStandPlateDef[] = [
     { id: 'ice',      name: 'Cristal Ártico',  price: 350, accentColor: '#2996b5', borderColor: '#9beeff', bgStyle: 'linear-gradient(180deg, #1c6e8c 0%, #114459 100%)', emblemColor: '#4fd2f5', pattern: 'stripe' },
     { id: 'violet',   name: 'Neón Galaxia',    price: 400, accentColor: '#7b3bd1', borderColor: '#c490ff', bgStyle: 'linear-gradient(180deg, #5c24a8 0%, #331066 100%)', emblemColor: '#9b5bf5', pattern: 'diamond' },
     { id: 'crimson',  name: 'Rubí Real',       price: 400, accentColor: '#b01e2b', borderColor: '#ff6b6b', bgStyle: 'linear-gradient(180deg, #8e1420 0%, #520911 100%)', emblemColor: '#e03131', pattern: 'diamond' },
-    { id: 'obsidian', name: 'Obsidiana VIP',   price: 500, accentColor: '#2a2d34', borderColor: '#ff6b35', bgStyle: 'linear-gradient(180deg, #2d3036 0%, #16181c 100%)', emblemColor: '#e85d04', emblemLabel: '★', pattern: 'diamond' },
-    { id: 'gold_hc',  name: 'Oro Imperial',    price: 600, accentColor: '#b5891b', borderColor: '#ffe066', bgStyle: 'linear-gradient(180deg, #8f670e 0%, #523905 100%)', emblemColor: '#ffd43b', emblemLabel: 'HC', pattern: 'diamond' }
+    { id: 'obsidian', name: 'Obsidiana VIP',   price: 500, accentColor: '#2a2d34', borderColor: '#ff6b35', bgStyle: 'linear-gradient(180deg, #2d3036 0%, #16181c 100%)', emblemColor: '#e85d04', pattern: 'diamond' },
+    { id: 'gold_hc',  name: 'Oro Imperial',    price: 600, accentColor: '#b5891b', borderColor: '#ffe066', bgStyle: 'linear-gradient(180deg, #8f670e 0%, #523905 100%)', emblemColor: '#ffd43b', pattern: 'diamond' }
 ];
 
 export const INFOSTAND_FURNIS: InfoStandFurniDef[] = [
@@ -71,12 +71,12 @@ export const INFOSTAND_FURNIS: InfoStandFurniDef[] = [
     { id: 'chair_plasty_4', name: 'Pod Naranja',      furnitureId: 124,  price: 200, seatOffsetX: 0,  seatOffsetY: -6 },
     { id: 'chair_plasty_5', name: 'Pod Rosa',         furnitureId: 1500, price: 200, seatOffsetX: 0,  seatOffsetY: -6 },
     { id: 'chair_plasty_6', name: 'Pod Morado',       furnitureId: 1499, price: 200, seatOffsetX: 0,  seatOffsetY: -6 },
-    { id: 'chair_norja',    name: 'Silla Norja',      furnitureId: 30,   price: 150, seatOffsetX: 1,  seatOffsetY: 2 },
-    { id: 'pillow_0',       name: 'Almohadón Blanco', furnitureId: 1581, price: 300, seatOffsetX: 0,  seatOffsetY: 8 },
-    { id: 'pillow_1',       name: 'Almohadón Rosa',   furnitureId: 1582, price: 300, seatOffsetX: 0,  seatOffsetY: 8 },
-    { id: 'club_sofa',      name: 'Sofá HC',          furnitureId: 267,  price: 400, seatOffsetX: -2, seatOffsetY: 4 },
-    { id: 'hc_chr',         name: 'Silla Majestic',   furnitureId: 1527, price: 500, seatOffsetX: 1,  seatOffsetY: 6 },
-    { id: 'throne',         name: 'Trono Clásico',    furnitureId: 230,  price: 800, seatOffsetX: 2,  seatOffsetY: 9 }
+    { id: 'chair_norja',    name: 'Silla Norja',      furnitureId: 30,   price: 150, seatOffsetX: 0,  seatOffsetY: -6 },
+    { id: 'pillow_0',       name: 'Almohadón Blanco', furnitureId: 1581, price: 300, seatOffsetX: 0,  seatOffsetY: 4 },
+    { id: 'pillow_1',       name: 'Almohadón Rosa',   furnitureId: 1582, price: 300, seatOffsetX: 0,  seatOffsetY: 4 },
+    { id: 'club_sofa',      name: 'Sofá HC',          furnitureId: 267,  price: 400, seatOffsetX: -2, seatOffsetY: 0 },
+    { id: 'hc_chr',         name: 'Silla Majestic',   furnitureId: 1527, price: 500, seatOffsetX: 0,  seatOffsetY: -2 },
+    { id: 'throne',         name: 'Trono Clásico',    furnitureId: 230,  price: 800, seatOffsetX: 0,  seatOffsetY: 2 }
 ];
 
 export const INFOSTAND_ACTIONS: InfoStandActionDef[] = [

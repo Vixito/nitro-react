@@ -433,18 +433,17 @@ export const InfoStandEditorView: FC<{}> = () =>
                                         { previewFurniUrl && (
                                             <img src={ previewFurniUrl } alt={ previewFurni.name } className="preview-furni-layer" />
                                         ) }
-                                        <div
-                                            className="preview-avatar-layer"
-                                            style={ { transform: avatarSeatTransform } }
-                                        >
-                                            <LayoutAvatarImageView
-                                                figure={ ownFigure }
-                                                direction={ 4 }
-                                                posture={ previewAction.posture }
-                                                gesture={ previewAction.gesture }
-                                                expression={ previewAction.expression }
-                                                carryItem={ previewAction.carryItem }
-                                            />
+                                        <div className="preview-avatar-layer">
+                                            <div className="avatar-seat-offset" style={ { transform: avatarSeatTransform } }>
+                                                <LayoutAvatarImageView
+                                                    figure={ ownFigure }
+                                                    direction={ 4 }
+                                                    posture={ previewAction.posture }
+                                                    gesture={ previewAction.gesture }
+                                                    expression={ previewAction.expression }
+                                                    carryItem={ previewAction.carryItem }
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                     <div

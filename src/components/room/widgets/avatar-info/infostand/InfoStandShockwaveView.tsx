@@ -398,16 +398,18 @@ export const InfoStandShockwaveView: FC<InfoStandShockwaveViewProps> = props =>
                     <div
                         className="stage-avatar-wrapper cursor-pointer"
                         onClick={ () => setIsCardExpanded(!isCardExpanded) }
-                        style={ { cursor: 'pointer', transform: seatTransform } }
+                        style={ { cursor: 'pointer' } }
                     >
-                        <LayoutAvatarImageView
-                            figure={ userInfo.figure }
-                            direction={ 4 }
-                            posture={ isUser ? customAction.posture : undefined }
-                            gesture={ isUser ? customAction.gesture : undefined }
-                            expression={ isUser ? customAction.expression : undefined }
-                            carryItem={ isUser ? customAction.carryItem : 0 }
-                        />
+                        <div className="avatar-seat-offset" style={ { transform: seatTransform } }>
+                            <LayoutAvatarImageView
+                                figure={ userInfo.figure }
+                                direction={ 4 }
+                                posture={ isUser ? customAction.posture : undefined }
+                                gesture={ isUser ? customAction.gesture : undefined }
+                                expression={ isUser ? customAction.expression : undefined }
+                                carryItem={ isUser ? customAction.carryItem : 0 }
+                            />
+                        </div>
                     </div>
                 </>
             );
