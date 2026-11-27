@@ -5100,11 +5100,11 @@ body[data-era="shockwave2006"] {
         font-smooth: never !important;
         text-rendering: geometricPrecision !important;
 
-        // Default square container for regular alerts/badges
+        // Default square container for regular alerts/badges (50x50 1:1 native pixel-art)
         .bubble-image-container {
-            width: 42px !important;
-            height: 42px !important;
-            min-width: 42px !important;
+            width: 54px !important;
+            height: 54px !important;
+            min-width: 54px !important;
             margin-right: 8px !important;
             display: flex !important;
             align-items: center !important;
@@ -5114,10 +5114,10 @@ body[data-era="shockwave2006"] {
             border-radius: 3px !important;
 
             img, .bubble-icon {
-                width: 36px !important;
-                height: 36px !important;
-                max-width: 36px !important;
-                max-height: 36px !important;
+                width: auto !important;
+                height: auto !important;
+                max-width: 50px !important;
+                max-height: 50px !important;
                 object-fit: contain !important;
                 image-rendering: pixelated !important;
             }

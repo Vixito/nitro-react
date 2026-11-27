@@ -1494,16 +1494,20 @@ body[data-era="flash2012"] {
         }
 
         .bubble-image-container {
-            width: 32px !important;
-            height: 32px !important;
+            width: 50px !important;
+            height: 50px !important;
+            min-width: 50px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
             flex-shrink: 0 !important;
 
             img {
-                max-width: 30px !important;
-                max-height: 30px !important;
+                width: auto !important;
+                height: auto !important;
+                max-width: 50px !important;
+                max-height: 50px !important;
+                object-fit: contain !important;
                 image-rendering: pixelated !important;
             }
         }

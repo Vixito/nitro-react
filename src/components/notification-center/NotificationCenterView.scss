@@ -132,6 +132,11 @@
         flex-shrink: 0;
 
         img {
+            width: auto;
+            height: auto;
+            max-width: 50px;
+            max-height: 50px;
+            object-fit: contain;
             image-rendering: pixelated;
         }
     }
