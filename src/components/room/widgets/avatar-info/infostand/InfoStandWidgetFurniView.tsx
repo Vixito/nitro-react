@@ -17,6 +17,160 @@ const PICKUP_MODE_NONE: number = 0;
 const PICKUP_MODE_EJECT: number = 1;
 const PICKUP_MODE_FULL: number = 2;
 
+/**
+ * Elimina cajas negras rectangulares producidas por capas de brillo aditivo (blendMode ADD)
+ * al extraer sprites de furnis (ej. Máquina de Café), preservando intactos los bordes negros 1px del pixel-art.
+ */
+function stripAdditiveBlackBox(img: HTMLImageElement): string
+{
+    try
+    {
+        const w = img.naturalWidth || img.width;
+        const h = img.naturalHeight || img.height;
+        if(!w || !h || w > 512 || h > 512) return img.src;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if(!ctx) return img.src;
+
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, w, h);
+        const d = imageData.data;
+
+        const isDark = (idx: number) =>
+        {
+            const a = d[idx + 3];
+            if(a === 0) return false;
+            return d[idx] <= 20 && d[idx + 1] <= 20 && d[idx + 2] <= 20;
+        };
+
+        // Detectar bloques sólidos negros (>= 3x3) que tocan transparencia o bordes de imagen (artefacto ADD)
+        const visited = new Uint8Array(w * h);
+        const queue = new Int32Array(w * h);
+        let qHead = 0;
+        let qTail = 0;
+
+        for(let y = 0; y < h; y++)
+        {
+            for(let x = 0; x < w; x++)
+            {
+                const p = y * w + x;
+                const idx = p * 4;
+                if(!isDark(idx)) continue;
+
+                // ¿Toca borde de imagen o un píxel transparente?
+                let touchesExterior = (x === 0 || y === 0 || x === w - 1 || y === h - 1);
+                if(!touchesExterior)
+                {
+                    if(d[((y - 1) * w + x) * 4 + 3] === 0 ||
+                       d[((y + 1) * w + x) * 4 + 3] === 0 ||
+                       d[(y * w + (x - 1)) * 4 + 3] === 0 ||
+                       d[(y * w + (x + 1)) * 4 + 3] === 0)
+                    {
+                        touchesExterior = true;
+                    }
+                }
+                if(!touchesExterior) continue;
+
+                // Verificar que es parte de un bloque negro sólido (>= 3x3 dark) y NO un borde pixel-art de 1px
+                let darkCount = 0;
+                for(let dy = -1; dy <= 1; dy++)
+                {
+                    const ny = y + dy;
+                    if(ny < 0 || ny >= h) continue;
+                    for(let dx = -1; dx <= 1; dx++)
+                    {
+                        const nx = x + dx;
+                        if(nx < 0 || nx >= w) continue;
+                        if(isDark((ny * w + nx) * 4)) darkCount++;
+                    }
+                }
+                if(darkCount >= 6)
+                {
+                    visited[p] = 1;
+                    queue[qTail++] = p;
+                }
+            }
+        }
+
+        if(qTail === 0) return img.src;
+
+        // Expandir por toda la caja oscura/resplandor aditivo conectada
+        while(qHead < qTail)
+        {
+            const p = queue[qHead++];
+            const x = p % w;
+            const y = (p - x) / w;
+            const idx = p * 4;
+            const maxC = Math.max(d[idx], d[idx + 1], d[idx + 2]);
+
+            // Convertir brillo aditivo sobre negro en transparencia suave (negro puro -> alpha 0)
+            if(maxC <= 14)
+            {
+                d[idx + 3] = 0;
+            }
+            else
+            {
+                d[idx + 3] = Math.min(d[idx + 3], Math.round(maxC * 2.4));
+            }
+
+            const neighbors = [
+                x > 0 ? p - 1 : -1,
+                x < w - 1 ? p + 1 : -1,
+                y > 0 ? p - w : -1,
+                y < h - 1 ? p + w : -1
+            ];
+
+            for(const np of neighbors)
+            {
+                if(np < 0 || visited[np]) continue;
+                const nIdx = np * 4;
+                if(d[nIdx + 3] === 0) continue;
+                const nMax = Math.max(d[nIdx], d[nIdx + 1], d[nIdx + 2]);
+                // Continuar en píxeles negros/halo tenue sin invadir contornos de objetos brillantes
+                if(nMax <= 34)
+                {
+                    // Comprobar que no es un contorno 1px pegado a un píxel muy brillante del mueble
+                    const nx = np % w;
+                    const ny = (np - nx) / w;
+                    let brightAdj = false;
+                    if(nMax <= 14)
+                    {
+                        const checkDirs = [
+                            nx > 0 ? (np - 1) * 4 : -1,
+                            nx < w - 1 ? (np + 1) * 4 : -1,
+                            ny > 0 ? (np - w) * 4 : -1,
+                            ny < h - 1 ? (np + w) * 4 : -1
+                        ];
+                        for(const cIdx of checkDirs)
+                        {
+                            if(cIdx >= 0 && d[cIdx + 3] > 200 && Math.max(d[cIdx], d[cIdx + 1], d[cIdx + 2]) > 95)
+                            {
+                                brightAdj = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(!brightAdj)
+                    {
+                        visited[np] = 1;
+                        queue[qTail++] = np;
+                    }
+                }
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL('image/png');
+    }
+    catch (_)
+    {
+        return img.src;
+    }
+}
+
 export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props =>
 {
     const { avatarInfo = null, onClose = null } = props;
@@ -44,7 +198,27 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
     const [ songName, setSongName ] = useState<string>('');
     const [ songCreator, setSongCreator ] = useState<string>('');
     const [ rpOpacity, setRpOpacity ] = useState<number>(100);
+    const [ cleanPreviewSrc, setCleanPreviewSrc ] = useState<string>('');
     const rpMode = isRoleplayMode();
+
+    useEffect(() =>
+    {
+        if(!rpMode || !avatarInfo?.image?.src)
+        {
+            setCleanPreviewSrc('');
+            return;
+        }
+        const img = avatarInfo.image;
+        if(img.complete && img.naturalWidth > 0)
+        {
+            setCleanPreviewSrc(stripAdditiveBlackBox(img));
+            return;
+        }
+        setCleanPreviewSrc(img.src);
+        const onLoad = () => setCleanPreviewSrc(stripAdditiveBlackBox(img));
+        img.addEventListener('load', onLoad, { once: true });
+        return () => img.removeEventListener('load', onLoad);
+    }, [ rpMode, avatarInfo?.id, avatarInfo?.image ]);
 
     useEffect(() =>
     {
@@ -74,6 +248,23 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
             if(roomObj?.model)
             {
                 roomObj.model.setValue(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER, clamped / 100);
+                // Forzar actualización inmediata del visualizador del furni
+                try
+                {
+                    const vis = roomObj.visualization as any;
+                    if(vis)
+                    {
+                        vis._alphaMultiplier = clamped / 100;
+                        if(Array.isArray(vis._sprites))
+                        {
+                            for(const sp of vis._sprites)
+                            {
+                                if(sp) sp.alpha = Math.round(255 * (clamped / 100));
+                            }
+                        }
+                    }
+                }
+                catch (_) {}
                 GetNitroInstance()?.application?.render();
             }
         }
@@ -447,7 +638,10 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
         }
 
         return (
-            <div className="rp-furni-infostand">
+            <div
+                className="rp-furni-infostand"
+                onMouseDown={ e => e.stopPropagation() }
+                onPointerDown={ e => e.stopPropagation() }>
                 <div className="rp-infostand-header">
                     <span className="rp-infostand-title">{ avatarInfo.name }</span>
                     <button type="button" className="rp-habbo-close-btn" onClick={ onClose } title="Cerrar">
@@ -457,8 +651,8 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
 
                 <div className="rp-furni-body">
                     <div className="rp-furni-preview">
-                        { avatarInfo.image && avatarInfo.image.src.length > 0 && (
-                            <img className="rp-furni-preview-img" src={ avatarInfo.image.src } alt={ avatarInfo.name } />
+                        { (cleanPreviewSrc || (avatarInfo.image && avatarInfo.image.src.length > 0)) && (
+                            <img className="rp-furni-preview-img" src={ cleanPreviewSrc || avatarInfo.image.src } alt={ avatarInfo.name } />
                         ) }
                     </div>
 

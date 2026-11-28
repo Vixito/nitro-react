@@ -694,18 +694,16 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         });
     }, []);
 
-    // Casilla roja al pasar el ratón sobre un furni no caminable en sala (estilo HabboRP)
-    useRoomEngineEvent<RoomEngineObjectEvent>([
-        RoomEngineObjectEvent.MOUSE_ENTER,
-        RoomEngineObjectEvent.MOUSE_LEAVE
-    ], event =>
+    // Casilla roja SOLO cuando la baldosa exacta del cursor tiene un furni no caminable (evita falsos positivos por sprites altos)
+    useEffect(() =>
     {
         if(!rpActive) return;
-        const roomId = event.roomId || GetRoomSession()?.roomId || -1;
-        if(roomId <= 0) return;
 
-        const setCursorTint = (hexColor: number) =>
+        let lastTint = 0xFFFFFF;
+        const setCursorTint = (roomId: number, hexColor: number) =>
         {
+            if(hexColor === lastTint) return;
+            lastTint = hexColor;
             try
             {
                 const cursors = GetRoomEngine()?.getRoomObjects(roomId, RoomObjectCategory.CURSOR) || [];
@@ -733,23 +731,76 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             catch (_) {}
         };
 
-        if(event.type === RoomEngineObjectEvent.MOUSE_LEAVE)
+        const evaluateCursorTile = () =>
         {
-            setCursorTint(0xFFFFFF);
-            return;
-        }
+            const roomId = GetRoomSession()?.roomId || GetRoomEngine()?.activeRoomId || -1;
+            if(roomId <= 0) return;
+            try
+            {
+                const engine = GetRoomEngine();
+                const cursors = engine?.getRoomObjects(roomId, RoomObjectCategory.CURSOR) || [];
+                const cursor = cursors[0];
+                if(!cursor)
+                {
+                    setCursorTint(roomId, 0xFFFFFF);
+                    return;
+                }
+                const cLoc = cursor.getLocation();
+                const cx = Math.round(cLoc.x);
+                const cy = Math.round(cLoc.y);
 
-        if(event.category === RoomObjectCategory.FLOOR)
+                const floorObjs = engine.getRoomObjects(roomId, RoomObjectCategory.FLOOR) || [];
+                let isBlocked = false;
+
+                for(const obj of floorObjs)
+                {
+                    if(!obj) continue;
+                    const oLoc = obj.getLocation();
+                    const ox = Math.round(oLoc.x);
+                    const oy = Math.round(oLoc.y);
+
+                    // Filtro rápido por distancia antes de consultar metadata
+                    if(cx < ox - 1 || cy < oy - 1 || cx > ox + 8 || cy > oy + 8) continue;
+
+                    const fData = GetFurnitureDataForRoomObject(roomId, obj.id, RoomObjectCategory.FLOOR);
+                    if(!fData) continue;
+
+                    const dir = (Math.round((obj.getDirection()?.x || 0) / 90) % 4 + 4) % 4;
+                    const rawX = Math.max(1, Number((fData as any).xDimension || (fData as any).tileSizeX || 1));
+                    const rawY = Math.max(1, Number((fData as any).yDimension || (fData as any).tileSizeY || 1));
+                    const spanX = (dir === 1 || dir === 3) ? rawY : rawX;
+                    const spanY = (dir === 1 || dir === 3) ? rawX : rawY;
+
+                    if(cx >= ox && cx < ox + spanX && cy >= oy && cy < oy + spanY)
+                    {
+                        if(!fData.canStandOn && !fData.canSitOn && !fData.canLayOn)
+                        {
+                            isBlocked = true;
+                            break;
+                        }
+                    }
+                }
+
+                setCursorTint(roomId, isBlocked ? 0xEF4444 : 0xFFFFFF);
+            }
+            catch (_) {}
+        };
+
+        let rafPending = false;
+        const scheduleEval = () =>
         {
-            const fData = GetFurnitureDataForRoomObject(roomId, event.objectId, RoomObjectCategory.FLOOR);
-            const blocked = Boolean(fData && !fData.canStandOn && !fData.canSitOn && !fData.canLayOn);
-            setCursorTint(blocked ? 0xEF4444 : 0xFFFFFF);
-        }
-        else
-        {
-            setCursorTint(0xFFFFFF);
-        }
-    });
+            if(rafPending) return;
+            rafPending = true;
+            requestAnimationFrame(() =>
+            {
+                rafPending = false;
+                evaluateCursorTile();
+            });
+        };
+
+        window.addEventListener('pointermove', scheduleEval, { passive: true });
+        return () => window.removeEventListener('pointermove', scheduleEval);
+    }, [ rpActive ]);
 
     // Escuchar selección de otro avatar para el HUD de objetivo (estilo PixelRP)
     useObjectSelectedEvent(event =>

@@ -66,7 +66,7 @@ const DEFAULT_ROOM_STYLE: RoomStyleConfig = {
     lightColor: '#ffc47d',
     lightIntensity: 0,
     lightBrightness: 100,
-    windowBg: 'Habbo · Default sky',
+    windowBg: 'Habbten · Cielo por defecto',
     separateWalls: false,
     hideWalls: false,
     cornerAcross: 0,
@@ -103,19 +103,19 @@ const DEFAULT_ROOM_STYLE: RoomStyleConfig = {
 };
 
 const WINDOW_BG_GROUPS: Array<{ group: string; options: string[] }> = [
-    { group: 'Habbo · Default sky', options: [ 'Habbo · Default sky' ] },
-    { group: 'Habbo · Cityscape', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Cityscape ${ n }`) },
-    { group: 'Habbo · Coast', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Coast ${ n }`) },
-    { group: 'Habbo · Mountain Top', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Mountain Top ${ n }`) },
-    { group: 'Habbo · Forest', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Forest ${ n }`) },
-    { group: 'Habbo · White Clouds', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · White Clouds ${ n }`) },
-    { group: 'Habbo · Dark Clouds', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Dark Clouds ${ n }`) },
-    { group: 'Habbo · Alhambra', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Alhambra ${ n }`) },
-    { group: 'Habbo · Moon Hills', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Moon Hills ${ n }`) },
-    { group: 'Habbo · Arabian', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Arabian ${ n }`) },
-    { group: 'Habbo · Under Water', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Under Water ${ n }`) },
-    { group: 'Habbo · Audience', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Audience ${ n }`) },
-    { group: 'Habbo · Classic', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbo · Classic ${ n }`) }
+    { group: 'Habbten · Cielo por defecto', options: [ 'Habbten · Cielo por defecto' ] },
+    { group: 'Habbten · Ciudad', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Ciudad ${ n }`) },
+    { group: 'Habbten · Costa', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Costa ${ n }`) },
+    { group: 'Habbten · Cima de montaña', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Cima de montaña ${ n }`) },
+    { group: 'Habbten · Bosque', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Bosque ${ n }`) },
+    { group: 'Habbten · Nubes blancas', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Nubes blancas ${ n }`) },
+    { group: 'Habbten · Nubes oscuras', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Nubes oscuras ${ n }`) },
+    { group: 'Habbten · Alhambra', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Alhambra ${ n }`) },
+    { group: 'Habbten · Colinas lunares', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Colinas lunares ${ n }`) },
+    { group: 'Habbten · Árabe', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Árabe ${ n }`) },
+    { group: 'Habbten · Bajo el agua', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Bajo el agua ${ n }`) },
+    { group: 'Habbten · Audiencia', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Audiencia ${ n }`) },
+    { group: 'Habbten · Clásico', options: [ 1, 2, 3, 4, 5, 6, 7 ].map(n => `Habbten · Clásico ${ n }`) }
 ];
 
 const FLOOR_FINISHES = [
@@ -417,8 +417,8 @@ export const RoleplayRoomBuilderPanel: FC<RoleplayRoomBuilderPanelProps> = ({ is
                         minY = Math.max(-16, minY);
                         maxY = Math.min(64, maxY);
 
-                        // 1. Cuadrícula isométrica sutil sobre toda la vista (idéntica a captura HabboRP)
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.085)';
+                        // 1. Cuadrícula isométrica bien visible sobre toda la vista (estilo HabboRP)
+                        ctx.strokeStyle = 'rgba(226, 232, 240, 0.22)';
                         ctx.lineWidth = 1;
                         ctx.beginPath();
                         for(let x = minX; x <= maxX + 1; x++)
@@ -433,6 +433,34 @@ export const RoleplayRoomBuilderPanel: FC<RoleplayRoomBuilderPanelProps> = ({ is
                         }
                         for(let y = minY; y <= maxY + 1; y++)
                         {
+                            const p1 = toScreen(minX - 0.5, y - 0.5, 0);
+                            const p2 = toScreen(maxX + 0.5, y - 0.5, 0);
+                            if(p1 && p2)
+                            {
+                                ctx.moveTo(p1[0], p1[1]);
+                                ctx.lineTo(p2[0], p2[1]);
+                            }
+                        }
+                        ctx.stroke();
+
+                        // Líneas guía sutiles cada 4 baldosas para orientar mejor la cuadrícula
+                        ctx.strokeStyle = 'rgba(226, 232, 240, 0.34)';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        for(let x = minX; x <= maxX + 1; x++)
+                        {
+                            if(x % 4 !== 0) continue;
+                            const p1 = toScreen(x - 0.5, minY - 0.5, 0);
+                            const p2 = toScreen(x - 0.5, maxY + 0.5, 0);
+                            if(p1 && p2)
+                            {
+                                ctx.moveTo(p1[0], p1[1]);
+                                ctx.lineTo(p2[0], p2[1]);
+                            }
+                        }
+                        for(let y = minY; y <= maxY + 1; y++)
+                        {
+                            if(y % 4 !== 0) continue;
                             const p1 = toScreen(minX - 0.5, y - 0.5, 0);
                             const p2 = toScreen(maxX + 0.5, y - 0.5, 0);
                             if(p1 && p2)
@@ -1245,7 +1273,7 @@ export const RoleplayRoomBuilderPanel: FC<RoleplayRoomBuilderPanelProps> = ({ is
                                 </div>
                             ) }
 
-                            {/* 6. EDITOR DE PLANO EN SALA (5 BOTONES EXACTOS A HABBORP) */}
+                            {/* 6. EDITOR DE PLANO EN SALA (5 BOTONES NÍTIDOS ESTILO HABBORP) */}
                             { activeTab === 'floorplan' && (
                                 <div className="rp-builder-content is-floorbar">
                                     <div className="rp-b-floor-tools">
@@ -1254,9 +1282,12 @@ export const RoleplayRoomBuilderPanel: FC<RoleplayRoomBuilderPanelProps> = ({ is
                                             className={ `rp-b-floor-btn ${ floorTool === 'add' ? 'is-active' : '' }` }
                                             title="Añadir baldosas (clic o arrastrar en la cuadrícula)"
                                             onClick={ () => setFloorTool('add') }>
-                                            <svg viewBox="0 0 22 18" width="18" height="15" aria-hidden="true">
-                                                <polygon points="8,3 15,7 8,11 1,7" fill="#d6c5b3" stroke="#181a1e" strokeWidth="1.3" />
-                                                <path d="M16 4v7M12.5 7.5h7" stroke="#16a34a" strokeWidth="2.4" strokeLinecap="round" />
+                                            <svg viewBox="0 0 28 22" width="24" height="19" aria-hidden="true">
+                                                <polygon points="10,4 19,9 10,14 1,9" fill="#e5d4be" stroke="#181a1e" strokeWidth="1.6" strokeLinejoin="round" />
+                                                <polygon points="1,9 10,14 10,17 1,12" fill="#bfa68a" stroke="#181a1e" strokeWidth="1.3" strokeLinejoin="round" />
+                                                <polygon points="19,9 10,14 10,17 19,12" fill="#9e8569" stroke="#181a1e" strokeWidth="1.3" strokeLinejoin="round" />
+                                                <circle cx="21" cy="14" r="6" fill="#16a34a" stroke="#14532d" strokeWidth="1.3" />
+                                                <path d="M21 11v6M18 14h6" stroke="#ffffff" strokeWidth="2.1" strokeLinecap="round" />
                                             </svg>
                                         </button>
                                         <button
@@ -1264,9 +1295,12 @@ export const RoleplayRoomBuilderPanel: FC<RoleplayRoomBuilderPanelProps> = ({ is
                                             className={ `rp-b-floor-btn ${ floorTool === 'remove' ? 'is-active' : '' }` }
                                             title="Quitar baldosas (clic o arrastrar sobre baldosas)"
                                             onClick={ () => setFloorTool('remove') }>
-                                            <svg viewBox="0 0 22 18" width="18" height="15" aria-hidden="true">
-                                                <polygon points="8,3 15,7 8,11 1,7" fill="#d6c5b3" stroke="#181a1e" strokeWidth="1.3" />
-                                                <path d="M13.5 4.5l5.5 5.5M19 4.5l-5.5 5.5" stroke="#dc2626" strokeWidth="2.3" strokeLinecap="round" />
+                                            <svg viewBox="0 0 28 22" width="24" height="19" aria-hidden="true">
+                                                <polygon points="10,4 19,9 10,14 1,9" fill="#e5d4be" stroke="#181a1e" strokeWidth="1.6" strokeLinejoin="round" />
+                                                <polygon points="1,9 10,14 10,17 1,12" fill="#bfa68a" stroke="#181a1e" strokeWidth="1.3" strokeLinejoin="round" />
+                                                <polygon points="19,9 10,14 10,17 19,12" fill="#9e8569" stroke="#181a1e" strokeWidth="1.3" strokeLinejoin="round" />
+                                                <circle cx="21" cy="14" r="6" fill="#dc2626" stroke="#7f1d1d" strokeWidth="1.3" />
+                                                <path d="M18.6 11.6l4.8 4.8M23.4 11.6l-4.8 4.8" stroke="#ffffff" strokeWidth="2.1" strokeLinecap="round" />
                                             </svg>
                                         </button>
                                         <button

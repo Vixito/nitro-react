@@ -14,7 +14,10 @@ body.habbten-rp-client {
     .nitro-infostand-container {
         bottom: 76px !important;
         right: 12px !important;
-        z-index: 60 !important;
+        z-index: 68 !important;
+        pointer-events: none !important;
+
+        > * { pointer-events: auto !important; }
     }
 
     .rp-notifications-slot {
@@ -127,6 +130,7 @@ body.habbten-rp-client {
     border: 1px solid #4c515a;
     border-radius: 8px;
     overflow: hidden;
+    pointer-events: auto;
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #f3f4f6;
 }
@@ -255,6 +259,7 @@ body.habbten-rp-client {
     border: 1px solid #4c515a;
     border-radius: 8px;
     overflow: hidden;
+    pointer-events: auto;
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: #f3f4f6;
 }
