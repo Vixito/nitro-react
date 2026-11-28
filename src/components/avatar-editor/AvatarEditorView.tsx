@@ -5,6 +5,7 @@ import { AddEventLinkTracker, AvatarEditorAction, AvatarEditorUtilities, BodyMod
 import { Button, ButtonGroup, Column, Grid, NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, NitroCardTabsView, NitroCardView } from '../../common';
 import { useMessageEvent } from '../../hooks';
 import { useEraTheme } from '../../hooks/era/useEraTheme';
+import { isRoleplayMode } from '../roleplay/RoleplayService';
 import { AvatarEditorFigurePreviewView } from './views/AvatarEditorFigurePreviewView';
 import { AvatarEditorModelView } from './views/AvatarEditorModelView';
 import { AvatarEditorShockwaveDetailsView } from './views/AvatarEditorShockwaveDetailsView';
@@ -16,6 +17,7 @@ const DEFAULT_FEMALE_FIGURE: string = 'hr-515-33.hd-600-1.ch-635-70.lg-716-66-62
 export const AvatarEditorView: FC<{}> = props =>
 {
     const { currentEra } = useEraTheme();
+    const effectiveEra = isRoleplayMode() ? 'modern' : currentEra;
     const [ isVisible, setIsVisible ] = useState(false);
     const [ figures, setFigures ] = useState<Map<string, FigureData>>(null);
     const [ figureData, setFigureData ] = useState<FigureData>(null);
@@ -278,7 +280,7 @@ export const AvatarEditorView: FC<{}> = props =>
 
     if(!isVisible || !figureData) return null;
 
-    if(currentEra === 'shockwave2006')
+    if(effectiveEra === 'shockwave2006')
     {
         return (
             <AvatarEditorShockwaveDetailsView
@@ -296,7 +298,7 @@ export const AvatarEditorView: FC<{}> = props =>
     }
 
     return (
-        <NitroCardView uniqueKey="avatar-editor" className={ `nitro-avatar-editor ${ currentEra === 'flash2012' ? 'avatar-editor-flash2012' : '' }` }>
+        <NitroCardView uniqueKey="avatar-editor" className={ `nitro-avatar-editor ${ effectiveEra === 'flash2012' ? 'avatar-editor-flash2012' : '' }` }>
             <NitroCardHeaderView headerText={ LocalizeText('avatareditor.title') } onCloseClick={ event => setIsVisible(false) } />
             <NitroCardTabsView>
                 { categories && (categories.size > 0) && Array.from(categories.keys()).map(category =>
@@ -305,14 +307,14 @@ export const AvatarEditorView: FC<{}> = props =>
 
                     return (
                         <NitroCardTabsItemView key={ category } isActive={ isActive } onClick={ event => selectCategory(category) }>
-                            { currentEra === 'flash2012'
+                            { effectiveEra === 'flash2012'
                                 ? <i className={ `ae-tab-icon-2012 ae-tab-${ category }` } title={ LocalizeText(`avatareditor.category.${ category }`) } />
                                 : LocalizeText(`avatareditor.category.${ category }`) }
                         </NitroCardTabsItemView>
                     );
                 }) }
                 <NitroCardTabsItemView isActive={ isWardrobeVisible } onClick={ event => setIsWardrobeVisible(true) }>
-                    { currentEra === 'flash2012'
+                    { effectiveEra === 'flash2012'
                         ? <i className="ae-tab-icon-2012 ae-tab-wardrobe" title={ LocalizeText('avatareditor.category.wardrobe') } />
                         : LocalizeText('avatareditor.category.wardrobe') }
                 </NitroCardTabsItemView>

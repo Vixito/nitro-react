@@ -359,18 +359,24 @@ body.habbten-rp-client .nitro-avatar-editor {
     }
 
     .nitro-card-tabs {
-        background: #25282c !important;
+        background-color: #25282c !important;
         border-bottom: 1px solid #41454d !important;
+        padding: 6px 10px 0 !important;
+        gap: 6px !important;
 
         .nav-item,
         .nav-link {
-            background: #2f3339 !important;
+            background-color: #2f3339 !important;
             color: #cbd5e1 !important;
             border: 1px solid #444952 !important;
-            border-radius: 5px !important;
+            border-bottom: none !important;
+            border-radius: 6px 6px 0 0 !important;
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
 
             &.active {
-                background: #4e5663 !important;
+                background-color: #464e5a !important;
                 color: #ffffff !important;
                 border-color: #6b7688 !important;
             }
