@@ -1,4 +1,4 @@
-import { CrackableDataType, GroupInformationComposer, GroupInformationEvent, NowPlayingEvent, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, SetObjectDataMessageComposer, SongInfoReceivedEvent, StringDataType } from '@nitrots/nitro-renderer';
+import { CrackableDataType, GroupInformationComposer, GroupInformationEvent, NowPlayingEvent, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, SetObjectDataMessageComposer, SongInfoReceivedEvent, StringDataType, Vector3d } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { FaTimes, FaUndo } from 'react-icons/fa';
 import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
@@ -17,6 +17,8 @@ const PICKUP_MODE_NONE: number = 0;
 const PICKUP_MODE_EJECT: number = 1;
 const PICKUP_MODE_FULL: number = 2;
 
+const CLEAN_PREVIEW_CACHE = new Map<string, string>();
+
 /**
  * Elimina cajas negras rectangulares producidas por capas de brillo aditivo (blendMode ADD)
  * al extraer sprites de furnis (ej. Máquina de Café), preservando intactos los bordes negros 1px del pixel-art.
@@ -25,6 +27,7 @@ function stripAdditiveBlackBox(img: HTMLImageElement): string
 {
     try
     {
+        if(img.src && CLEAN_PREVIEW_CACHE.has(img.src)) return CLEAN_PREVIEW_CACHE.get(img.src);
         const w = img.naturalWidth || img.width;
         const h = img.naturalHeight || img.height;
         if(!w || !h || w > 512 || h > 512) return img.src;
@@ -163,7 +166,13 @@ function stripAdditiveBlackBox(img: HTMLImageElement): string
         }
 
         ctx.putImageData(imageData, 0, 0);
-        return canvas.toDataURL('image/png');
+        const out = canvas.toDataURL('image/png');
+        if(img.src)
+        {
+            if(CLEAN_PREVIEW_CACHE.size > 60) CLEAN_PREVIEW_CACHE.clear();
+            CLEAN_PREVIEW_CACHE.set(img.src, out);
+        }
+        return out;
     }
     catch (_)
     {
@@ -515,7 +524,27 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                 GetRoomEngine().processRoomObjectOperation(avatarInfo.id, avatarInfo.category, RoomObjectOperationType.OBJECT_MOVE);
                 break;
             case 'rotate':
-                GetRoomEngine().processRoomObjectOperation(avatarInfo.id, avatarInfo.category, RoomObjectOperationType.OBJECT_ROTATE_POSITIVE);
+                {
+                    const activeRoomId = roomSession?.roomId || GetRoomEngine().activeRoomId;
+                    const roomObj = activeRoomId > 0 ? GetRoomEngine().getRoomObject(activeRoomId, avatarInfo.id, avatarInfo.category) : null;
+                    let nextDirAngle: number | null = null;
+                    if(roomObj && avatarInfo.category === RoomObjectCategory.FLOOR)
+                    {
+                        const allowed = roomObj.model?.getValue<number[]>(RoomObjectVariable.FURNITURE_ALLOWED_DIRECTIONS);
+                        if(Array.isArray(allowed) && allowed.length > 1)
+                        {
+                            const cur = ((Math.round(roomObj.getDirection()?.x || 0) % 360) + 360) % 360;
+                            const idx = allowed.indexOf(cur);
+                            nextDirAngle = allowed[(idx >= 0 ? idx + 1 : 0) % allowed.length];
+                        }
+                    }
+                    GetRoomEngine().processRoomObjectOperation(avatarInfo.id, avatarInfo.category, RoomObjectOperationType.OBJECT_ROTATE_POSITIVE);
+                    // Giro optimista instantáneo (0 ms de espera visual y permite rotar varias veces seguidas sin perder clics)
+                    if(roomObj && nextDirAngle !== null)
+                    {
+                        roomObj.setDirection(new Vector3d(nextDirAngle, 0, 0));
+                    }
+                }
                 break;
             case 'pickup':
                 if(pickupMode === PICKUP_MODE_FULL)
@@ -562,7 +591,7 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                 break;
             }
         }
-    }, [ avatarInfo, pickupMode, customKeys, customValues, getFurniSettingsAsString ]);
+    }, [ avatarInfo, pickupMode, customKeys, customValues, getFurniSettingsAsString, roomSession ]);
 
     const getGroupBadgeCode = useCallback(() =>
     {

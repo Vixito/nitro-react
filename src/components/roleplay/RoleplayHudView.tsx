@@ -694,12 +694,16 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         });
     }, []);
 
-    // Casilla roja SOLO cuando la baldosa exacta del cursor tiene un furni no caminable (evita falsos positivos por sprites altos)
+    // Casilla roja SOLO cuando la baldosa exacta del cursor tiene un furni no caminable (con caché de casilla O(1) para cero lag)
     useEffect(() =>
     {
         if(!rpActive) return;
 
         let lastTint = 0xFFFFFF;
+        let lastRoomId = -1;
+        let lastCx = Number.NaN;
+        let lastCy = Number.NaN;
+
         const setCursorTint = (roomId: number, hexColor: number) =>
         {
             if(hexColor === lastTint) return;
@@ -726,7 +730,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         }
                     }
                 }
-                GetNitroInstance()?.application?.render();
             }
             catch (_) {}
         };
@@ -742,12 +745,20 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 const cursor = cursors[0];
                 if(!cursor)
                 {
+                    lastCx = Number.NaN;
+                    lastCy = Number.NaN;
                     setCursorTint(roomId, 0xFFFFFF);
                     return;
                 }
                 const cLoc = cursor.getLocation();
                 const cx = Math.round(cLoc.x);
                 const cy = Math.round(cLoc.y);
+
+                // Salida inmediata si el cursor sigue en la misma casilla (evita escanear furnis cada píxel)
+                if(roomId === lastRoomId && cx === lastCx && cy === lastCy) return;
+                lastRoomId = roomId;
+                lastCx = cx;
+                lastCy = cy;
 
                 const floorObjs = engine.getRoomObjects(roomId, RoomObjectCategory.FLOOR) || [];
                 let isBlocked = false;
@@ -759,8 +770,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     const ox = Math.round(oLoc.x);
                     const oy = Math.round(oLoc.y);
 
-                    // Filtro rápido por distancia antes de consultar metadata
-                    if(cx < ox - 1 || cy < oy - 1 || cx > ox + 8 || cy > oy + 8) continue;
+                    if(cx < ox || cy < oy || cx > ox + 8 || cy > oy + 8) continue;
 
                     const fData = GetFurnitureDataForRoomObject(roomId, obj.id, RoomObjectCategory.FLOOR);
                     if(!fData) continue;

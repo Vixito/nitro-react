@@ -1,4 +1,4 @@
-import { AdjustmentFilter, ColorConverter, IRoomSession, NitroContainer, NitroSprite, NitroTexture, RoomBackgroundColorEvent, RoomEngineEvent, RoomEngineObjectEvent, RoomGeometry, RoomId, RoomObjectCategory, RoomObjectHSLColorEnabledEvent, RoomObjectOperationType, RoomSessionEvent, RoomVariableEnum, RoomVisualizationSettingsEvent, Vector3d } from '@nitrots/nitro-renderer';
+import { AdjustmentFilter, ColorConverter, IRoomSession, NitroContainer, NitroSprite, NitroTexture, RoomBackgroundColorEvent, RoomEngineEvent, RoomEngineObjectEvent, RoomGeometry, RoomId, RoomObjectCategory, RoomObjectHSLColorEnabledEvent, RoomObjectOperationType, RoomObjectVariable, RoomSessionEvent, RoomVariableEnum, RoomVisualizationSettingsEvent, Vector3d } from '@nitrots/nitro-renderer';
 import { useEffect, useRef, useState } from 'react';
 import { useBetween } from 'use-between';
 import { CanManipulateFurniture, DispatchUiEvent, GetNitroInstance, GetRoomEngine, GetRoomSession, InitializeRoomInstanceRenderingCanvas, IsFurnitureSelectionDisabled, ProcessRoomObjectOperation, RoomWidgetUpdateBackgroundColorPreviewEvent, RoomWidgetUpdateRoomObjectEvent, SetActiveRoomId, StartRoomSession } from '../../api';
@@ -9,6 +9,7 @@ const useRoomState = () =>
     const [ roomSession, setRoomSession ] = useState<IRoomSession>(null);
     const [ roomBackground, setRoomBackground ] = useState<NitroSprite>(null);
     const [ roomFilter, setRoomFilter ] = useState<AdjustmentFilter>(null);
+    const roomMasterRef = useRef<NitroContainer>(null);
     const [ originalRoomBackgroundColor, setOriginalRoomBackgroundColor ] = useState(0);
     const visualizationSettingsRef = useRef<{ hideWalls: boolean, thicknessWall: number, thicknessFloor: number }>(null);
 
@@ -73,6 +74,13 @@ const useRoomState = () =>
         roomFilter.red = (r / 255);
         roomFilter.green = (g / 255);
         roomFilter.blue = (b / 255);
+
+        const master = roomMasterRef.current;
+        if(master)
+        {
+            const isNeutral = (r >= 254 && g >= 254 && b >= 254);
+            master.filters = isNeutral ? null : [ roomFilter ];
+        }
     }
 
     useUiEvent<RoomWidgetUpdateBackgroundColorPreviewEvent>(RoomWidgetUpdateBackgroundColorPreviewEvent.PREVIEW, event => updateRoomBackgroundColor(event.hue, event.saturation, event.lightness));
@@ -212,7 +220,23 @@ const useRoomState = () =>
                 if(CanManipulateFurniture(roomSession, event.objectId, event.category)) ProcessRoomObjectOperation(event.objectId, event.category, RoomObjectOperationType.OBJECT_MOVE);
                 break;
             case RoomEngineObjectEvent.REQUEST_ROTATE:
-                if(CanManipulateFurniture(roomSession, event.objectId, event.category)) ProcessRoomObjectOperation(event.objectId, event.category, RoomObjectOperationType.OBJECT_ROTATE_POSITIVE);
+                if(CanManipulateFurniture(roomSession, event.objectId, event.category))
+                {
+                    const roomObj = GetRoomEngine().getRoomObject(roomSession.roomId, event.objectId, event.category);
+                    let nextDirAngle: number | null = null;
+                    if(roomObj && event.category === RoomObjectCategory.FLOOR)
+                    {
+                        const allowed = roomObj.model?.getValue<number[]>(RoomObjectVariable.FURNITURE_ALLOWED_DIRECTIONS);
+                        if(Array.isArray(allowed) && allowed.length > 1)
+                        {
+                            const cur = ((Math.round(roomObj.getDirection()?.x || 0) % 360) + 360) % 360;
+                            const idx = allowed.indexOf(cur);
+                            nextDirAngle = allowed[(idx >= 0 ? idx + 1 : 0) % allowed.length];
+                        }
+                    }
+                    ProcessRoomObjectOperation(event.objectId, event.category, RoomObjectOperationType.OBJECT_ROTATE_POSITIVE);
+                    if(roomObj && nextDirAngle !== null) roomObj.setDirection(new Vector3d(nextDirAngle, 0, 0));
+                }
                 break;
             case RoomEngineObjectEvent.MOUSE_ENTER:
                 updateEvent = new RoomWidgetUpdateRoomObjectEvent(RoomWidgetUpdateRoomObjectEvent.OBJECT_ROLL_OVER, event.objectId, event.category, event.roomId);
@@ -280,7 +304,9 @@ const useRoomState = () =>
         background.height = height;
 
         master.addChildAt(background, 0);
-        master.filters = [ filter ];
+        // Solo activar el shader AdjustmentFilter cuando el regulador de luz realmente atenúa la sala (evita copia WebGL innecesaria cada frame)
+        master.filters = null;
+        roomMasterRef.current = master;
 
         setRoomBackground(background);
         setRoomFilter(filter);
