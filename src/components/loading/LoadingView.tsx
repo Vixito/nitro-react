@@ -16,20 +16,27 @@ export const LoadingView: FC<LoadingViewProps> = props =>
     const { isError = false, message = '', percent = 0 } = props;
     const { currentEra } = useEraTheme();
     const isRpClient = isRoleplayMode();
+    const isNativeApp = typeof window !== 'undefined' && (typeof (window as any).HabbtenNative !== 'undefined' || /HabbtenMobileApp/i.test(navigator.userAgent || ''));
     const isShockwave2006 = !isError && !isRpClient && currentEra === 'shockwave2006';
     const clampedPercent = Math.max(0, Math.min(100, percent));
     const secondaryPercent = Math.max(12, Math.min(100, Math.round(clampedPercent * 0.72 + 28)));
 
-    const goRpLobby = () =>
+    const goBackHome = () =>
     {
         try
         {
-            if(window.top && window.top !== window) window.top.location.href = '/rp';
-            else window.location.href = '/rp';
+            if(isNativeApp && typeof (window as any).HabbtenNative?.returnToAccountPicker === 'function')
+            {
+                (window as any).HabbtenNative.returnToAccountPicker();
+                return;
+            }
+            const target = isNativeApp ? '/app' : '/rp';
+            if(window.top && window.top !== window) window.top.location.href = target;
+            else window.location.href = target;
         }
         catch (_)
         {
-            window.location.href = '/rp';
+            window.location.href = isNativeApp ? '/app' : '/rp';
         }
     };
 
@@ -65,8 +72,8 @@ export const LoadingView: FC<LoadingViewProps> = props =>
                             <button type="button" className="rp-dc-btn is-primary" onClick={ reload }>
                                 Reconectar
                             </button>
-                            <button type="button" className="rp-dc-btn is-secondary" onClick={ goRpLobby }>
-                                Volver a Habbten RP
+                            <button type="button" className="rp-dc-btn is-secondary" onClick={ goBackHome }>
+                                { isNativeApp ? 'Volver al inicio' : 'Volver a Habbten RP' }
                             </button>
                         </div>
                     </div>
@@ -119,6 +126,16 @@ export const LoadingView: FC<LoadingViewProps> = props =>
                                     </svg>
                                     <span>Reconectar al Hotel</span>
                                 </button>
+                                { isNativeApp && (
+                                    <button
+                                        type="button"
+                                        className="btn btn-dark w-100 fw-bold py-2 mt-2"
+                                        style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                                        onClick={ goBackHome }
+                                    >
+                                        Volver al inicio
+                                    </button>
+                                ) }
                             </div>
                         </div>
                     </div>
