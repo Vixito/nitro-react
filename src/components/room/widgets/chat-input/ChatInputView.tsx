@@ -138,7 +138,7 @@ export const ChatInputView: FC<{}> = props =>
 
     const onKeyDownEvent = useCallback((event: KeyboardEvent) =>
     {
-        if(document.body.classList.contains('lido-diving-active') || document.querySelector('.snowstorm-game-root, .battleball-game-root, .game-center-stage, .game-stage-container, .lido-fullscreen-camera')) return;
+        if(document.body.classList.contains('habbten-rp-client') || document.body.classList.contains('lido-diving-active') || document.querySelector('.snowstorm-game-root, .battleball-game-root, .game-center-stage, .game-stage-container, .lido-fullscreen-camera')) return;
         if(floodBlocked || !inputRef.current || anotherInputHasFocus()) return;
 
         if(document.activeElement !== inputRef.current) setInputFocus();

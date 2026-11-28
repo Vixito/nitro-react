@@ -1,37 +1,50 @@
+import { AvatarExpressionEnum, RoomUnitChatComposer, RoomUnitChatShoutComposer, TextureUtils } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-    FaArrowLeft,
     FaBolt,
     FaChevronLeft,
     FaChevronRight,
     FaCommentDots,
+    FaDownload,
     FaHeart,
     FaMoneyBillWave,
     FaSearch,
-    FaTimes
+    FaTimes,
+    FaTrash
 } from 'react-icons/fa';
+import dockInventoryIcon from '@/assets/images/roleplay/dock-inventory.png';
+import dockShopIcon from '@/assets/images/roleplay/dock-shop.png';
 import helpLifebuoyImg from '@/assets/images/roleplay/help-lifebuoy.png';
 import helpTripleQIcon from '@/assets/images/roleplay/help-triple-q.png';
-import iconBuildersClub from '@/assets/images/toolbar/icons/buildersclub.png';
-import iconCamera from '@/assets/images/toolbar/icons/camera.png';
+import phoneAchievementsIcon from '@/assets/images/roleplay/phone-achievements.png';
+import phoneBackArrowIcon from '@/assets/images/roleplay/phone-back-arrow.png';
+import phoneCameraIcon from '@/assets/images/roleplay/phone-camera.png';
+import phoneContactsIcon from '@/assets/images/roleplay/phone-contacts.png';
+import phoneMessagesIcon from '@/assets/images/roleplay/phone-messages.png';
+import phoneSettingsIcon from '@/assets/images/roleplay/phone-settings.png';
+import questCombIcon from '@/assets/images/roleplay/quest-comb.png';
+import questHangerIcon from '@/assets/images/roleplay/quest-hanger.png';
+import toolFloorPlanIcon from '@/assets/images/roleplay/tool-floor-plan.png';
+import toolRoomBuilderIcon from '@/assets/images/roleplay/tool-room-builder.png';
+import toolRoomDimmerIcon from '@/assets/images/roleplay/tool-room-dimmer.png';
+import toolRoomSettingsIcon from '@/assets/images/roleplay/tool-room-settings.png';
+import toolWallDecorIcon from '@/assets/images/roleplay/tool-wall-decor.png';
+import toolWallsFloorsIcon from '@/assets/images/roleplay/tool-walls-floors.png';
+import toolWindowBgIcon from '@/assets/images/roleplay/tool-window-bg.png';
 import iconCatalog from '@/assets/images/toolbar/icons/catalog.png';
-import iconFriends from '@/assets/images/toolbar/icons/friend_all.png';
 import iconHouse from '@/assets/images/toolbar/icons/house.png';
 import iconInventory from '@/assets/images/toolbar/icons/inventory.png';
-import iconMessage from '@/assets/images/toolbar/icons/message.png';
 import iconModTools from '@/assets/images/toolbar/icons/modtools.png';
-import iconQuest from '@/assets/images/toolbar/icons/quest.png';
 import iconRooms from '@/assets/images/toolbar/icons/rooms.png';
 import iconAnnouncements from '@/assets/images/toolbar/icons/me-menu/announcements.png';
 import iconClothing from '@/assets/images/toolbar/icons/me-menu/clothing.png';
-import iconCog from '@/assets/images/toolbar/icons/me-menu/cog.png';
 import iconForums from '@/assets/images/toolbar/icons/me-menu/forums.png';
 import iconHelperTool from '@/assets/images/toolbar/icons/me-menu/helper-tool.png';
 import iconProfile from '@/assets/images/toolbar/icons/me-menu/profile.png';
 import iconTalents from '@/assets/images/toolbar/icons/me-menu/talents.png';
 import iconHeartSprite from '@/assets/images/icons/sign-heart.png';
-import { ChatMessageTypeEnum, CreateLinkEvent, CreateRoomSession, GetRoomSession, GetSessionDataManager, MessengerThreadChat } from '../../api';
-import { useChatInputWidget, useFriends, useMessenger, useSessionInfo } from '../../hooks';
+import { CreateLinkEvent, CreateRoomSession, GetNitroInstance, GetRoomEngine, GetRoomSession, GetSessionDataManager, MessengerThreadChat, SendMessageComposer } from '../../api';
+import { useFriends, useMessenger, useSessionInfo } from '../../hooks';
 import {
     isRoleplayMode,
     RpFullState,
@@ -48,7 +61,42 @@ import './RoleplayHudView.scss';
 
 type SideModalTab = null | 'shop' | 'inventory' | 'help';
 type HelpTopicId = 'around' | 'rooms' | 'character' | 'phone' | 'chat';
-type PhoneApp = 'lock' | 'home' | 'contacts' | 'messages' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'missions' | 'rankings' | 'settings';
+type PhoneApp = 'lock' | 'home' | 'contacts' | 'messages' | 'camera' | 'photos' | 'achievements' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'rankings' | 'settings';
+
+interface SavedPhoto
+{
+    id: string;
+    dataUrl: string;
+    roomName: string;
+    takenAt: string;
+}
+
+const RP_PHOTOS_KEY = 'habbten_rp_phone_photos_v1';
+const RP_MAX_PHOTOS = 25;
+
+function loadSavedPhotos(): SavedPhoto[]
+{
+    try
+    {
+        const raw = localStorage.getItem(RP_PHOTOS_KEY);
+        if(!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed.slice(0, RP_MAX_PHOTOS) : [];
+    }
+    catch (_)
+    {
+        return [];
+    }
+}
+
+function persistSavedPhotos(photos: SavedPhoto[]): void
+{
+    try
+    {
+        localStorage.setItem(RP_PHOTOS_KEY, JSON.stringify(photos.slice(0, RP_MAX_PHOTOS)));
+    }
+    catch (_) {}
+}
 
 interface ToastMsg
 {
@@ -104,7 +152,6 @@ function getItemSpriteIcon(category: string): string
 export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) =>
 {
     const rpActive = isRoleplayMode();
-    const { sendChat = null } = useChatInputWidget();
     const { chatStyleId = 0 } = useSessionInfo();
     const { onlineFriends = [], offlineFriends = [], requests = [], requestResponse = null, followFriend = null } = useFriends();
     const { visibleThreads = [], activeThread = null, getMessageThread = null, setActiveThreadId = null, sendMessage = null } = useMessenger();
@@ -113,6 +160,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const [ sideModal, setSideModal ] = useState<SideModalTab>(null);
     const [ helpTopic, setHelpTopic ] = useState<HelpTopicId>('around');
     const [ builderOpen, setBuilderOpen ] = useState<boolean>(false);
+    const [ hoveredToolLabel, setHoveredToolLabel ] = useState<string>('');
 
     const [ phoneOpen, setPhoneOpen ] = useState<boolean>(false);
     const [ phoneUnlocked, setPhoneUnlocked ] = useState<boolean>(false);
@@ -120,12 +168,24 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const [ busy, setBusy ] = useState<boolean>(false);
     const [ toasts, setToasts ] = useState<ToastMsg[]>([]);
 
+    // Logros / Misiones dentro del celular
+    const [ achTab, setAchTab ] = useState<'quests' | 'achievements'>('quests');
+
+    // Cámara y Fotos dentro del celular
+    const [ cameraZoom, setCameraZoom ] = useState<number>(1);
+    const [ cameraPreviewUrl, setCameraPreviewUrl ] = useState<string>('');
+    const [ cameraFlash, setCameraFlash ] = useState<boolean>(false);
+    const [ savedPhotos, setSavedPhotos ] = useState<SavedPhoto[]>(() => loadSavedPhotos());
+    const [ selectedPhoto, setSelectedPhoto ] = useState<SavedPhoto | null>(null);
+
     // Swipe-to-unlock real (arrastre físico mouse/touch)
     const unlockTrackRef = useRef<HTMLDivElement | null>(null);
     const dragStartXRef = useRef<number>(0);
     const maxDragRef = useRef<number>(0);
     const [ swipeX, setSwipeX ] = useState<number>(0);
     const [ isSwiping, setIsSwiping ] = useState<boolean>(false);
+    const chatInputRef = useRef<HTMLInputElement | null>(null);
+    const typingSentRef = useRef<boolean>(false);
 
     // Contactos y Mensajes dentro del celular
     const [ contactSearch, setContactSearch ] = useState<string>('');
@@ -244,6 +304,74 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     }, [ rpActive, phoneOpen, phoneApp ]);
 
+    // Captura en vivo de la sala cuando la app Cámara del celular está abierta
+    const captureRoomSnapshot = useCallback((): string =>
+    {
+        try
+        {
+            const session = GetRoomSession();
+            if(session && session.roomId > 0)
+            {
+                const texture = GetRoomEngine()?.createTextureFromRoom(session.roomId, 1);
+                if(texture)
+                {
+                    const url = TextureUtils.generateImageUrl(texture);
+                    if(url) return url;
+                }
+            }
+        }
+        catch (_) {}
+
+        try
+        {
+            const renderer = GetNitroInstance()?.application?.renderer;
+            if(renderer && renderer.view)
+            {
+                GetNitroInstance()?.application?.render();
+                return (renderer.view as HTMLCanvasElement).toDataURL('image/png');
+            }
+        }
+        catch (_) {}
+
+        return '';
+    }, []);
+
+    useEffect(() =>
+    {
+        if(!rpActive || !phoneOpen || phoneApp !== 'camera') return;
+        let cancelled = false;
+        const tick = () =>
+        {
+            if(cancelled) return;
+            const url = captureRoomSnapshot();
+            if(url && !cancelled) setCameraPreviewUrl(url);
+        };
+        tick();
+        const timer = setInterval(tick, 450);
+        return () =>
+        {
+            cancelled = true;
+            clearInterval(timer);
+        };
+    }, [ rpActive, phoneOpen, phoneApp, captureRoomSnapshot ]);
+
+    // Enfocar la barra de chat al escribir directamente en la sala (como Habbo original)
+    useEffect(() =>
+    {
+        if(!rpActive || isMobile) return;
+        const onGlobalKey = (e: KeyboardEvent) =>
+        {
+            if(e.ctrlKey || e.metaKey || e.altKey) return;
+            if(e.key.length !== 1) return;
+            const active = document.activeElement;
+            if(active && (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || (active as HTMLElement).isContentEditable)) return;
+            if(chatInputRef.current) chatInputRef.current.focus();
+        };
+        window.addEventListener('keydown', onGlobalKey);
+        return () => window.removeEventListener('keydown', onGlobalKey);
+    }, [ rpActive, isMobile ]);
+
+    // Al cerrar el celular se vuelve a bloquear siempre para deslizar al abrirlo de nuevo
     const togglePhone = useCallback((forceState?: boolean) =>
     {
         setPhoneOpen(prev =>
@@ -252,18 +380,27 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             if(next !== prev)
             {
                 rpSetPhoneHolding(next);
+                setSwipeX(0);
+                setIsSwiping(false);
                 if(next)
                 {
                     setSideModal(null);
                     setSelectedArticle(null);
-                    setSwipeX(0);
-                    setIsSwiping(false);
-                    setPhoneApp(phoneUnlocked ? 'home' : 'lock');
+                    setSelectedPhoto(null);
+                    setPhoneUnlocked(false);
+                    setPhoneApp('lock');
+                }
+                else
+                {
+                    setPhoneUnlocked(false);
+                    setPhoneApp('lock');
+                    setSelectedPhoto(null);
+                    setActiveChatUserId(null);
                 }
             }
             return next;
         });
-    }, [ phoneUnlocked ]);
+    }, []);
 
     useEffect(() =>
     {
@@ -487,12 +624,38 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     };
 
-    const handleChatSubmit = (e: FormEvent) =>
+    const submitRoomChat = (rawText: string, isShout: boolean = false) =>
     {
-        e.preventDefault();
-        const text = chatText.trim();
+        const text = rawText.trim();
         if(!text) return;
         setChatText('');
+
+        const session = GetRoomSession();
+        if(typingSentRef.current)
+        {
+            typingSentRef.current = false;
+            try { session?.sendChatTypingMessage(false); } catch (_) {}
+        }
+
+        const lower = text.toLowerCase();
+        if(lower === 'o/' || lower === '_o/')
+        {
+            try { session?.sendExpressionMessage(AvatarExpressionEnum.WAVE.ordinal); } catch (_) {}
+            if(isMobile) setMobileChatOpen(false);
+            return;
+        }
+        if(lower === ':idle')
+        {
+            try { session?.sendExpressionMessage(AvatarExpressionEnum.IDLE.ordinal); } catch (_) {}
+            if(isMobile) setMobileChatOpen(false);
+            return;
+        }
+        if(lower === '_b')
+        {
+            try { session?.sendExpressionMessage(AvatarExpressionEnum.RESPECT.ordinal); } catch (_) {}
+            if(isMobile) setMobileChatOpen(false);
+            return;
+        }
 
         if(text.startsWith(':') || text.startsWith('/'))
         {
@@ -505,11 +668,120 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             }
         }
 
-        if(sendChat)
+        const style = Number.isFinite(chatStyleId) ? chatStyleId : 0;
+        try
         {
-            sendChat(text, ChatMessageTypeEnum.CHAT_DEFAULT, '', chatStyleId);
+            if(session)
+            {
+                if(isShout) session.sendShoutMessage(text, style);
+                else session.sendChatMessage(text, style);
+            }
+            else
+            {
+                SendMessageComposer(isShout ? new RoomUnitChatShoutComposer(text, style) : new RoomUnitChatComposer(text, style));
+            }
         }
+        catch (_)
+        {
+            SendMessageComposer(isShout ? new RoomUnitChatShoutComposer(text, style) : new RoomUnitChatComposer(text, style));
+        }
+
         if(isMobile) setMobileChatOpen(false);
+    };
+
+    const handleChatInputChange = (val: string) =>
+    {
+        setChatText(val);
+        const session = GetRoomSession();
+        if(!session) return;
+        const hasText = val.trim().length > 0;
+        if(hasText && !typingSentRef.current)
+        {
+            typingSentRef.current = true;
+            try { session.sendChatTypingMessage(true); } catch (_) {}
+        }
+        else if(!hasText && typingSentRef.current)
+        {
+            typingSentRef.current = false;
+            try { session.sendChatTypingMessage(false); } catch (_) {}
+        }
+    };
+
+    const handleChatSubmit = (e: FormEvent) =>
+    {
+        e.preventDefault();
+        submitRoomChat(chatText, false);
+    };
+
+    const handleTakePhonePhoto = () =>
+    {
+        if(savedPhotos.length >= RP_MAX_PHOTOS)
+        {
+            pushToast('warn', `Has alcanzado el límite de ${ RP_MAX_PHOTOS } fotos. Elimina alguna para tomar nuevas.`);
+            return;
+        }
+        const snap = captureRoomSnapshot() || cameraPreviewUrl;
+        if(!snap)
+        {
+            pushToast('err', 'No se pudo capturar la imagen de la sala.');
+            return;
+        }
+
+        setCameraFlash(true);
+        setTimeout(() => setCameraFlash(false), 180);
+
+        const img = new Image();
+        img.onload = () =>
+        {
+            try
+            {
+                const outSize = 320;
+                const canvas = document.createElement('canvas');
+                canvas.width = outSize;
+                canvas.height = outSize;
+                const ctx = canvas.getContext('2d');
+                if(ctx)
+                {
+                    ctx.fillStyle = '#1b1e23';
+                    ctx.fillRect(0, 0, outSize, outSize);
+                    const minDim = Math.min(img.width, img.height);
+                    const cropSize = Math.max(40, minDim / Math.max(1, cameraZoom));
+                    const sx = (img.width - cropSize) / 2;
+                    const sy = (img.height - cropSize) / 2;
+                    ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, outSize, outSize);
+                    const finalUrl = canvas.toDataURL('image/jpeg', 0.88);
+                    const photo: SavedPhoto = {
+                        id: `${ Date.now() }-${ Math.floor(Math.random() * 999) }`,
+                        dataUrl: finalUrl,
+                        roomName: currentLocation?.name || 'Habbten RP',
+                        takenAt: new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date())
+                    };
+                    setSavedPhotos(prev =>
+                    {
+                        const next = [ photo, ...prev ].slice(0, RP_MAX_PHOTOS);
+                        persistSavedPhotos(next);
+                        return next;
+                    });
+                    pushToast('ok', 'Foto guardada en tu galería.');
+                }
+            }
+            catch (_)
+            {
+                pushToast('err', 'Error al guardar la foto.');
+            }
+        };
+        img.src = snap;
+    };
+
+    const handleDeletePhoto = (photoId: string) =>
+    {
+        setSavedPhotos(prev =>
+        {
+            const next = prev.filter(p => p.id !== photoId);
+            persistSavedPhotos(next);
+            return next;
+        });
+        if(selectedPhoto?.id === photoId) setSelectedPhoto(null);
     };
 
     const navigateParent = (path: string) =>
@@ -566,53 +838,53 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     };
 
-    // Herramientas de sala al hacer hover en el botón Constructor (exacto a HabboRP)
+    // Herramientas de sala horizontales a la izquierda del botón Constructor (exacto a captura HabboRP)
     const roomBuilderTools: Array<{ id: string; label: string; icon: string; action: () => void }> = [
         {
             id: 'room-settings',
             label: 'Ajustes de sala',
-            icon: iconCog,
-            action: () => { setBuilderOpen(false); pushToast('ok', `Sala actual: ${ currentLocation?.name || 'Ciudad Habbten' }`); }
+            icon: toolRoomSettingsIcon,
+            action: () => { setBuilderOpen(false); pushToast('ok', `Sala actual: ${ currentLocation?.name || 'Habbten RP' }`); }
         },
         {
             id: 'room-dimmer',
             label: 'Regulador de luz',
-            icon: iconHelperTool,
-            action: () => { setBuilderOpen(false); pushToast('warn', 'Coloca un regulador de luz en tu sala propia para ajustar la iluminación.'); }
+            icon: toolRoomDimmerIcon,
+            action: () => { setBuilderOpen(false); pushToast('warn', 'Coloca un regulador de luz en tu sala para ajustar el brillo.'); }
         },
         {
             id: 'window-bg',
             label: 'Fondo de ventana',
-            icon: iconCamera,
+            icon: toolWindowBgIcon,
             action: () => { setBuilderOpen(false); openSideModal('shop'); }
         },
         {
             id: 'walls-floors',
             label: 'Paredes y suelos',
-            icon: iconHouse,
+            icon: toolWallsFloorsIcon,
             action: () => { setBuilderOpen(false); openSideModal('shop'); }
         },
         {
             id: 'wall-decor',
             label: 'Decoración de pared',
-            icon: iconCatalog,
+            icon: toolWallDecorIcon,
             action: () => { setBuilderOpen(false); openSideModal('inventory'); }
         },
         {
             id: 'floor-plan',
             label: 'Plano de suelo',
-            icon: iconRooms,
+            icon: toolFloorPlanIcon,
             action: () => { setBuilderOpen(false); CreateLinkEvent('floor-editor/toggle'); }
         }
     ];
 
-    // Apps del Celular con sprites originales del juego (Contactos y Mensajes integrados DENTRO del celular!)
+    // Apps del Celular con sprites HD 1:1 (Contactos, Mensajes, Cámara, Ajustes, Logros integrados DENTRO del celular)
     const phoneApps: Array<{ id: string; label: string; icon: string; badge?: number; action: () => void }> = [
-        { id: 'contacts', label: 'Contactos', icon: iconFriends, badge: requests.length, action: () => setPhoneApp('contacts') },
-        { id: 'messages', label: 'Mensajes', icon: iconMessage, action: () => { setActiveChatUserId(null); setPhoneApp('messages'); } },
-        { id: 'camera', label: 'Cámara', icon: iconCamera, action: () => { CreateLinkEvent('camera/toggle'); } },
-        { id: 'settings', label: 'Ajustes', icon: iconCog, action: () => setPhoneApp('settings') },
-        { id: 'missions', label: 'Misiones', icon: iconQuest, badge: claimableMissions, action: () => setPhoneApp('missions') },
+        { id: 'contacts', label: 'Contactos', icon: phoneContactsIcon, badge: requests.length, action: () => setPhoneApp('contacts') },
+        { id: 'messages', label: 'Mensajes', icon: phoneMessagesIcon, action: () => { setActiveChatUserId(null); setPhoneApp('messages'); } },
+        { id: 'camera', label: 'Cámara', icon: phoneCameraIcon, action: () => { setSelectedPhoto(null); setPhoneApp('camera'); } },
+        { id: 'settings', label: 'Ajustes', icon: phoneSettingsIcon, action: () => setPhoneApp('settings') },
+        { id: 'achievements', label: 'Logros', icon: phoneAchievementsIcon, badge: claimableMissions, action: () => setPhoneApp('achievements') },
         { id: 'map', label: 'GPS Mapa', icon: iconRooms, action: () => setPhoneApp('map') },
         { id: 'jobs', label: 'Empleos', icon: iconProfile, action: () => setPhoneApp('jobs') },
         { id: 'bank', label: 'Banco', icon: iconHouse, action: () => setPhoneApp('bank') },
@@ -627,16 +899,58 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         home: state.user.username,
         contacts: 'Contactos',
         messages: 'Mensajes',
+        camera: 'Cámara',
+        photos: 'Fotos',
+        achievements: 'Logros',
         news: 'Noticias',
         map: 'GPS Mapa',
         jobs: 'Empleos',
         bank: 'Banco',
         gangs: 'Bandas',
         actions: '911 y Acciones',
-        missions: 'Misiones',
         rankings: 'Rankings',
         settings: 'Ajustes'
     };
+
+    const getQuestSprite = (slug: string, idx: number): string =>
+    {
+        const s = (slug || '').toLowerCase();
+        if(s.includes('foto') || s.includes('cam')) return phoneCameraIcon;
+        if(s.includes('ropa') || s.includes('look') || s.includes('estilo')) return questCombIcon;
+        if(idx % 3 === 0) return questHangerIcon;
+        if(idx % 3 === 1) return questCombIcon;
+        return phoneCameraIcon;
+    };
+
+    const rpAchievements = [
+        {
+            id: 'ach-photos',
+            title: 'Captura un recuerdo',
+            xp: 40,
+            desc: 'Toma y guarda una foto con la cámara de tu celular.',
+            progress: Math.min(1, savedPhotos.length),
+            target: 1,
+            icon: phoneCameraIcon
+        },
+        {
+            id: 'ach-level',
+            title: 'Ciudadano activo',
+            xp: 60,
+            desc: 'Alcanza el nivel 5 en Habbten RP.',
+            progress: Math.min(5, character.rp_level),
+            target: 5,
+            icon: questHangerIcon
+        },
+        {
+            id: 'ach-wealth',
+            title: 'Ahorrador urbano',
+            xp: 80,
+            desc: 'Reúne $5,000 entre efectivo y cuenta bancaria.',
+            progress: Math.min(5000, character.cash + character.bank),
+            target: 5000,
+            icon: questCombIcon
+        }
+    ];
 
     const helpTopics: Array<{ id: HelpTopicId; label: string; icon: string; title: string; paragraphs: string[]; ctaLabel: string; ctaAction: () => void }> = [
         {
@@ -732,35 +1046,45 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </div>
             ) }
 
-            {/* ==================== BOTONES SUPERIORES DERECHA (HOVER HERRAMIENTAS DE SALA + AYUDA ???) ==================== */}
+            {/* ==================== BOTONES SUPERIORES DERECHA (BARRA HORIZONTAL HOVER + AYUDA ???) ==================== */}
             <div className="rp-top-right-tools">
                 <div
                     className={ `rp-builder-hover-wrap ${ builderOpen ? 'is-open' : '' }` }
                     onMouseEnter={ () => !isMobile && setBuilderOpen(true) }
-                    onMouseLeave={ () => !isMobile && setBuilderOpen(false) }>
-                    <button
-                        type="button"
-                        className={ `rp-square-btn ${ builderOpen ? 'is-active' : '' }` }
-                        title="Herramientas de sala"
-                        onClick={ () => setBuilderOpen(v => !v) }>
-                        <img src={ iconBuildersClub } alt="Herramientas de sala" className="rp-pixel-sprite" />
-                    </button>
-
+                    onMouseLeave={ () => { if(!isMobile) { setBuilderOpen(false); setHoveredToolLabel(''); } } }>
                     { builderOpen && (
-                        <div className="rp-builder-tray" role="menu" aria-label="Herramientas de sala">
+                        <div className="rp-builder-tray-horizontal" role="menu" aria-label="Herramientas de sala">
                             { roomBuilderTools.map(tool => (
                                 <button
                                     key={ tool.id }
                                     type="button"
-                                    className="rp-builder-item"
+                                    className="rp-builder-sq-btn"
                                     title={ tool.label }
+                                    onMouseEnter={ () => setHoveredToolLabel(tool.label) }
+                                    onMouseLeave={ () => setHoveredToolLabel('') }
                                     onClick={ tool.action }>
-                                    <img src={ tool.icon } alt="" className="rp-builder-sprite" />
-                                    <span>{ tool.label }</span>
+                                    <img src={ tool.icon } alt={ tool.label } className="rp-builder-sprite" />
                                 </button>
                             )) }
                         </div>
                     ) }
+
+                    <div className="rp-builder-trigger-box">
+                        <button
+                            type="button"
+                            className={ `rp-square-btn ${ builderOpen ? 'is-active' : '' }` }
+                            title="Herramientas de sala"
+                            onMouseEnter={ () => setHoveredToolLabel('Herramientas de sala') }
+                            onMouseLeave={ () => setHoveredToolLabel('') }
+                            onClick={ () => setBuilderOpen(v => !v) }>
+                            <img src={ toolRoomBuilderIcon } alt="Herramientas de sala" className="rp-pixel-sprite" />
+                        </button>
+                        { builderOpen && (
+                            <div className="rp-builder-tooltip">
+                                { hoveredToolLabel || 'Herramientas de sala' }
+                            </div>
+                        ) }
+                    </div>
                 </div>
 
                 <button
@@ -772,21 +1096,21 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </button>
             </div>
 
-            {/* ==================== DOCK VERTICAL IZQUIERDO ==================== */}
+            {/* ==================== DOCK VERTICAL IZQUIERDO (SPRITES ORIGINALES HABBO) ==================== */}
             <aside className="rp-left-dock" aria-label="Herramientas RP">
                 <button
                     type="button"
                     className={ `rp-dock-btn ${ sideModal === 'shop' ? 'is-active' : '' }` }
                     title="Catálogo"
                     onClick={ () => openSideModal('shop') }>
-                    <img src="/mobile-assets/mob_shop.png" alt="Catálogo" className="rp-dock-icon-hd" />
+                    <img src={ dockShopIcon } alt="Catálogo" className="rp-dock-pixel-sprite" />
                 </button>
                 <button
                     type="button"
                     className={ `rp-dock-btn ${ sideModal === 'inventory' ? 'is-active' : '' }` }
                     title="Inventario"
                     onClick={ () => openSideModal('inventory') }>
-                    <img src="/mobile-assets/mob_inventory.png" alt="Inventario" className="rp-dock-icon-hd" />
+                    <img src={ dockInventoryIcon } alt="Inventario" className="rp-dock-pixel-sprite" />
                 </button>
                 <button
                     type="button"
@@ -839,12 +1163,22 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 { !isMobile ? (
                     <form className="rp-chat-pill" onSubmit={ handleChatSubmit }>
                         <input
+                            ref={ chatInputRef }
                             type="text"
                             className="rp-chat-field"
                             value={ chatText }
-                            onChange={ e => setChatText(e.target.value) }
+                            onChange={ e => handleChatInputChange(e.target.value) }
+                            onKeyDown={ e => {
+                                e.stopPropagation();
+                                if(e.key === 'Enter' || e.key === 'NumpadEnter')
+                                {
+                                    e.preventDefault();
+                                    submitRoomChat(chatText, e.shiftKey);
+                                }
+                            } }
                             placeholder="Di algo o escribe :me, :do, :trabajar, :911..."
                             maxLength={ 140 } />
+                        <button type="submit" style={ { display: 'none' } } aria-hidden="true" tabIndex={ -1 } />
                     </form>
                 ) : (
                     <div className="rp-mobile-chat-trigger">
@@ -865,7 +1199,15 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         type="text"
                         className="rp-chat-field"
                         value={ chatText }
-                        onChange={ e => setChatText(e.target.value) }
+                        onChange={ e => handleChatInputChange(e.target.value) }
+                        onKeyDown={ e => {
+                            e.stopPropagation();
+                            if(e.key === 'Enter' || e.key === 'NumpadEnter')
+                            {
+                                e.preventDefault();
+                                submitRoomChat(chatText, e.shiftKey);
+                            }
+                        } }
                         placeholder="Escribe en sala o usa :me, :trabajar..."
                         maxLength={ 140 }
                         autoFocus />
@@ -945,16 +1287,16 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* APP CONTACTOS DENTRO DEL CELULAR (EXACTA A IMAGEN 4) */}
+                        {/* APP CONTACTOS DENTRO DEL CELULAR */}
                         { phoneApp === 'contacts' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
                                     <button type="button" className="rp-phone-back-square" onClick={ () => setPhoneApp('home') } title="Inicio">
-                                        <FaArrowLeft />
+                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Contactos</span>
                                     <button type="button" className="rp-phone-right-square" onClick={ () => { setActiveChatUserId(null); setPhoneApp('messages'); } } title="Mensajes">
-                                        <img src={ iconMessage } alt="Mensajes" className="rp-mini-nav-sprite" />
+                                        <img src={ phoneMessagesIcon } alt="Mensajes" className="rp-mini-nav-sprite" />
                                     </button>
                                 </div>
 
@@ -1014,7 +1356,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* APP MENSAJES DENTRO DEL CELULAR (EXACTA A IMAGEN 5) */}
+                        {/* APP MENSAJES DENTRO DEL CELULAR */}
                         { phoneApp === 'messages' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
@@ -1026,7 +1368,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                             else setPhoneApp('home');
                                         } }
                                         title="Volver">
-                                        <FaArrowLeft />
+                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">
                                         { activeChatUserId !== null && currentPhoneThread?.participant?.name
@@ -1034,7 +1376,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                             : 'Mensajes' }
                                     </span>
                                     <button type="button" className="rp-phone-right-square" onClick={ () => setPhoneApp('contacts') } title="Contactos">
-                                        <img src={ iconFriends } alt="Contactos" className="rp-mini-nav-sprite" />
+                                        <img src={ phoneContactsIcon } alt="Contactos" className="rp-mini-nav-sprite" />
                                     </button>
                                 </div>
 
@@ -1082,7 +1424,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                     </div>
                                 ) : (
                                     <div className="rp-phone-msg-empty">
-                                        <img src={ iconMessage } alt="" className="rp-msg-empty-sprite" />
+                                        <img src={ phoneMessagesIcon } alt="" className="rp-msg-empty-sprite" />
                                         <p>Elige un contacto para empezar a chatear.</p>
                                         <button type="button" className="rp-habbo-white-btn" onClick={ () => setPhoneApp('contacts') }>
                                             Contactos
@@ -1092,8 +1434,227 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
+                        {/* APP LOGROS Y MISIONES DENTRO DEL CELULAR (EXACTA A IMAGEN 3) */}
+                        { phoneApp === 'achievements' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button type="button" className="rp-phone-back-square" onClick={ () => setPhoneApp('home') } title="Volver">
+                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                    </button>
+                                    <span className="rp-phone-top-title">Logros</span>
+                                    <span style={ { width: 32 } } />
+                                </div>
+
+                                <div className="rp-ach-body">
+                                    <div className="rp-ach-level-box">
+                                        <div className="rp-ach-level-row">
+                                            <b>Nivel { character.rp_level }</b>
+                                            <span>{ character.rp_xp } XP total</span>
+                                        </div>
+                                        <div className="rp-ach-xp-bar">
+                                            <div className="rp-ach-xp-fill" style={ { width: `${ xpPct }%` } } />
+                                            <span>{ character.rp_xp } / { character.xpForNextLevel } XP</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="rp-ach-tabs">
+                                        <button
+                                            type="button"
+                                            className={ `rp-ach-tab-btn ${ achTab === 'quests' ? 'is-active' : '' }` }
+                                            onClick={ () => setAchTab('quests') }>
+                                            <span>Misiones</span>
+                                            { claimableMissions > 0 && <span className="rp-ach-tab-badge">{ claimableMissions }</span> }
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={ `rp-ach-tab-btn ${ achTab === 'achievements' ? 'is-active' : '' }` }
+                                            onClick={ () => setAchTab('achievements') }>
+                                            <span>Logros</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="rp-ach-list">
+                                        { achTab === 'quests' ? (
+                                            (state.missions || []).map((m, idx) => (
+                                                <div key={ m.slug } className={ `rp-ach-card ${ m.canClaim ? 'is-claimable' : '' }` }>
+                                                    <div className="rp-ach-card-top">
+                                                        <div className="rp-ach-card-ico">
+                                                            <img src={ getQuestSprite(m.slug, idx) } alt="" className="rp-ach-sprite" />
+                                                        </div>
+                                                        <div className="rp-ach-card-meta">
+                                                            <div className="rp-ach-card-title">{ m.title }</div>
+                                                            <div className="rp-ach-card-xp">+{ m.rewardXp } XP{ m.rewardCash > 0 ? ` · +$${ m.rewardCash }` : '' }</div>
+                                                        </div>
+                                                    </div>
+                                                    <p className="rp-ach-card-desc">{ m.description }</p>
+                                                    <div className="rp-ach-card-foot">
+                                                        <span className="rp-ach-card-prog">{ m.progress } / { m.target }</span>
+                                                        { m.claimed ? (
+                                                            <span className="rp-ach-card-status is-done">Completada</span>
+                                                        ) : m.canClaim ? (
+                                                            <button
+                                                                type="button"
+                                                                className="rp-ach-claim-btn"
+                                                                disabled={ busy }
+                                                                onClick={ () => runAction('/missions/claim', { missionSlug: m.slug }) }>
+                                                                Reclamar XP
+                                                            </button>
+                                                        ) : (
+                                                            <span className="rp-ach-card-status">En progreso</span>
+                                                        ) }
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            rpAchievements.map(a => {
+                                                const done = a.progress >= a.target;
+                                                return (
+                                                    <div key={ a.id } className={ `rp-ach-card ${ done ? 'is-claimable' : '' }` }>
+                                                        <div className="rp-ach-card-top">
+                                                            <div className="rp-ach-card-ico">
+                                                                <img src={ a.icon } alt="" className="rp-ach-sprite" />
+                                                            </div>
+                                                            <div className="rp-ach-card-meta">
+                                                                <div className="rp-ach-card-title">{ a.title }</div>
+                                                                <div className="rp-ach-card-xp">+{ a.xp } XP</div>
+                                                            </div>
+                                                        </div>
+                                                        <p className="rp-ach-card-desc">{ a.desc }</p>
+                                                        <div className="rp-ach-card-foot">
+                                                            <span className="rp-ach-card-prog">{ a.progress } / { a.target }</span>
+                                                            <span className={ `rp-ach-card-status ${ done ? 'is-done' : '' }` }>
+                                                                { done ? 'Desbloqueado' : 'En progreso' }
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })
+                                        ) }
+                                    </div>
+                                </div>
+                            </div>
+                        ) }
+
+                        {/* APP CÁMARA DENTRO DEL CELULAR (EXACTA A IMAGEN 4) */}
+                        { phoneApp === 'camera' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button type="button" className="rp-phone-back-square" onClick={ () => setPhoneApp('home') } title="Volver">
+                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                    </button>
+                                    <span className="rp-phone-top-title">Cámara</span>
+                                    <button type="button" className="rp-habbo-white-btn is-nav" onClick={ () => { setSelectedPhoto(null); setPhoneApp('photos'); } }>
+                                        Fotos
+                                    </button>
+                                </div>
+
+                                <div className="rp-cam-body">
+                                    <div className="rp-cam-frame-outer">
+                                        <div className="rp-cam-viewfinder">
+                                            { cameraPreviewUrl ? (
+                                                <img
+                                                    src={ cameraPreviewUrl }
+                                                    alt="Vista previa de sala"
+                                                    className="rp-cam-preview-img"
+                                                    style={ { transform: `scale(${ cameraZoom })` } } />
+                                            ) : (
+                                                <div className="rp-cam-placeholder">Cargando visor...</div>
+                                            ) }
+                                            <div className="rp-cam-grid" aria-hidden="true">
+                                                <span /><span /><span /><span />
+                                            </div>
+                                            { cameraFlash && <div className="rp-cam-flash" /> }
+                                        </div>
+                                    </div>
+
+                                    <div className="rp-cam-room-name">{ currentLocation?.name || 'Habbten RP' }</div>
+
+                                    <div className="rp-cam-zoom-row">
+                                        <span>Zoom</span>
+                                        <input
+                                            type="range"
+                                            min={ 1 }
+                                            max={ 3 }
+                                            step={ 0.25 }
+                                            value={ cameraZoom }
+                                            onChange={ e => setCameraZoom(parseFloat(e.target.value)) } />
+                                        <span className="rp-cam-zoom-val">{ cameraZoom }×</span>
+                                    </div>
+                                </div>
+
+                                <div className="rp-cam-shutter-bar">
+                                    <button
+                                        type="button"
+                                        className="rp-cam-shutter-btn"
+                                        title="Tomar foto"
+                                        onClick={ handleTakePhonePhoto }>
+                                        <span className="rp-cam-shutter-inner" />
+                                    </button>
+                                </div>
+                            </div>
+                        ) }
+
+                        {/* APP FOTOS DENTRO DEL CELULAR (EXACTA A IMAGEN 5) */}
+                        { phoneApp === 'photos' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button
+                                        type="button"
+                                        className="rp-phone-back-square"
+                                        onClick={ () => selectedPhoto ? setSelectedPhoto(null) : setPhoneApp('camera') }
+                                        title="Volver">
+                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                    </button>
+                                    <span className="rp-phone-top-title">Fotos</span>
+                                    <span className="rp-photos-count">{ savedPhotos.length } / { RP_MAX_PHOTOS }</span>
+                                </div>
+
+                                { selectedPhoto ? (
+                                    <div className="rp-photo-detail">
+                                        <img src={ selectedPhoto.dataUrl } alt={ selectedPhoto.roomName } className="rp-photo-full" />
+                                        <div className="rp-photo-meta">
+                                            <b>{ selectedPhoto.roomName }</b>
+                                            <span>{ selectedPhoto.takenAt }</span>
+                                        </div>
+                                        <div className="rp-btn-row" style={ { width: '100%' } }>
+                                            <a
+                                                href={ selectedPhoto.dataUrl }
+                                                download={ `habbten-rp-${ selectedPhoto.id }.jpg` }
+                                                className="rp-btn is-green is-sm"
+                                                style={ { flex: 1, textDecoration: 'none' } }>
+                                                <FaDownload /> Descargar
+                                            </a>
+                                            <button
+                                                type="button"
+                                                className="rp-btn is-red is-sm"
+                                                onClick={ () => handleDeletePhoto(selectedPhoto.id) }>
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : savedPhotos.length === 0 ? (
+                                    <div className="rp-photos-empty">
+                                        Tus fotos guardadas aparecerán aquí.
+                                    </div>
+                                ) : (
+                                    <div className="rp-photos-grid">
+                                        { savedPhotos.map(p => (
+                                            <button
+                                                key={ p.id }
+                                                type="button"
+                                                className="rp-photo-thumb"
+                                                onClick={ () => setSelectedPhoto(p) }
+                                                title={ `${ p.roomName } (${ p.takenAt })` }>
+                                                <img src={ p.dataUrl } alt={ p.roomName } />
+                                            </button>
+                                        )) }
+                                    </div>
+                                ) }
+                            </div>
+                        ) }
+
                         {/* RESTO DE APPS INTERNAS DEL CELULAR */}
-                        { phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && (
+                        { phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && phoneApp !== 'achievements' && phoneApp !== 'camera' && phoneApp !== 'photos' && (
                             <div className="rp-phone-appview">
                                 <div className="rp-app-navbar">
                                     <button
@@ -1347,34 +1908,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                                     <button type="button" className="rp-btn is-blue is-xs" disabled={ busy } onClick={ () => runAction('/police/action', { action: 'arrest', target: targetPlayer, reason: arrestReason }) }>Arrestar</button>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ) }
-
-                                    { phoneApp === 'missions' && (
-                                        <div className="rp-app-stack">
-                                            { (state.missions || []).map(m => {
-                                                const pct = Math.min(100, Math.round((m.progress / Math.max(1, m.target)) * 100));
-                                                return (
-                                                    <div key={ m.slug } className="rp-phone-card">
-                                                        <div className="rp-pc-top">
-                                                            <b>{ m.title }</b>
-                                                            <span className="rp-pc-cash">+${ m.rewardCash }</span>
-                                                        </div>
-                                                        <span className="rp-pc-desc">{ m.description }</span>
-                                                        <div className="rp-mini-prog"><div style={ { width: `${ pct }%` } } /></div>
-                                                        <div className="rp-pc-foot">
-                                                            <span className="rp-pc-muted">{ m.progress }/{ m.target } · +{ m.rewardXp } XP</span>
-                                                            { m.claimed ? (
-                                                                <span className="rp-tag is-safe">Cobrada</span>
-                                                            ) : m.canClaim ? (
-                                                                <button type="button" className="rp-btn is-green is-xs" disabled={ busy } onClick={ () => runAction('/missions/claim', { missionSlug: m.slug }) }>Reclamar</button>
-                                                            ) : (
-                                                                <span className="rp-pc-muted">En curso</span>
-                                                            ) }
-                                                        </div>
-                                                    </div>
-                                                );
-                                            }) }
                                         </div>
                                     ) }
 

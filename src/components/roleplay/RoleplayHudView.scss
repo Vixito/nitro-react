@@ -288,83 +288,118 @@ body.habbten-rp-client {
     &.is-warn { border-color: #d97706; color: #fef3c7; }
 }
 
-/* ==================== BOTONES SUPERIORES DERECHA + MENÚ HOVER DE SALA ==================== */
+/* ==================== BOTONES SUPERIORES DERECHA + BARRA HORIZONTAL DE SALA ==================== */
 .rp-top-right-tools {
     position: fixed;
     top: 12px;
     right: 12px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 6px;
     z-index: 65;
 }
 
 .rp-builder-hover-wrap {
     position: relative;
-    padding-bottom: 6px;
-}
-
-.rp-builder-tray {
-    position: absolute;
-    top: 46px;
-    right: 0;
-    width: 205px;
-    background: #2b2e33;
-    border: 1px solid #4c515a;
-    border-radius: 7px;
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    z-index: 80;
-}
-
-.rp-builder-item {
-    width: 100%;
-    padding: 7px 9px;
-    border-radius: 5px;
-    background: transparent;
-    border: none;
-    color: #e5e7eb;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 11.5px;
-    font-weight: 600;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 9px;
-    text-align: left;
-    cursor: pointer;
+    gap: 6px;
+}
 
-    &:hover { background: #3e434b; color: #ffffff; }
+.rp-builder-tray-horizontal {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 5px;
+    background: #2f302e;
+    border: 1px solid #595853;
+    border-radius: 7px;
+}
+
+.rp-builder-sq-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 5px;
+    background: #55534b;
+    border: 1px solid #262522;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+        background: #6c6a60;
+        border-color: #858378;
+    }
 }
 
 .rp-builder-sprite {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
+    width: auto;
+    height: auto;
+    max-width: 32px;
+    max-height: 32px;
     image-rendering: pixelated;
-    flex-shrink: 0;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+.rp-builder-trigger-box {
+    position: relative;
+    display: inline-flex;
+}
+
+.rp-builder-tooltip {
+    position: absolute;
+    top: calc(100% + 7px);
+    right: -12px;
+    padding: 7px 12px;
+    background: #0a0b0d;
+    border: 1px solid #3c3e42;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 90;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: 26px;
+        width: 8px;
+        height: 8px;
+        background: #0a0b0d;
+        border-left: 1px solid #3c3e42;
+        border-top: 1px solid #3c3e42;
+        transform: rotate(45deg);
+    }
 }
 
 .rp-square-btn {
     width: 42px;
     height: 42px;
     border-radius: 6px;
-    background: #55524d;
-    border: 1px solid #6c6963;
+    background: #55534b;
+    border: 1px solid #6c6a60;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 0;
 
-    &:hover { background: #65625c; }
-    &.is-active { background: #495464; border-color: #7c899c; }
+    &:hover { background: #6b685e; }
+    &.is-active { background: #6b685e; border-color: #939083; }
 }
 
 .rp-pixel-sprite {
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
+    width: auto;
+    height: auto;
+    max-width: 36px;
+    max-height: 36px;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     display: block;
@@ -387,8 +422,8 @@ body.habbten-rp-client {
 
 .rp-dock-btn {
     position: relative;
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
     border-radius: 6px;
     background: #1d2024;
     border: 1px solid transparent;
@@ -396,9 +431,20 @@ body.habbten-rp-client {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 0;
 
     &:hover { background: #2f343c; border-color: #4b525c; }
     &.is-active { background: #38414e; border-color: #6b788a; }
+}
+
+.rp-dock-pixel-sprite {
+    width: auto;
+    height: auto;
+    max-width: 43px;
+    max-height: 43px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
 }
 
 .rp-dock-icon-hd {
@@ -828,9 +874,10 @@ body.habbten-rp-client {
 }
 
 .rp-app-sprite {
-    width: 34px;
-    height: 34px;
-    object-fit: contain;
+    width: auto;
+    height: auto;
+    max-width: 42px;
+    max-height: 42px;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     display: block;
@@ -886,19 +933,28 @@ body.habbten-rp-client {
 }
 
 .rp-phone-back-square {
-    width: 30px;
-    height: 26px;
+    width: 32px;
+    height: 28px;
     border-radius: 5px;
     background: #eef1f5;
-    border: 1px solid #1b1e22;
-    color: #54a82a;
-    font-size: 13px;
+    border: 1.5px solid #181a1e;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 0;
 
     &:hover { background: #ffffff; }
+}
+
+.rp-back-arrow-sprite {
+    width: auto;
+    height: auto;
+    max-width: 24px;
+    max-height: 22px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
 }
 
 .rp-phone-top-title {
@@ -1045,7 +1101,437 @@ body.habbten-rp-client {
     font-weight: 700;
     cursor: pointer;
 
+    &.is-nav {
+        padding: 4px 10px;
+        font-size: 11px;
+        height: 28px;
+    }
+
     &:hover { background: #ffffff; }
+}
+
+/* ==================== APP LOGROS Y MISIONES EN CELULAR ==================== */
+.rp-ach-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.rp-ach-level-box {
+    background: #23262b;
+    border: 1px solid #3c4048;
+    border-radius: 7px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.rp-ach-level-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+
+    b { font-size: 14px; font-weight: 800; color: #ffffff; }
+    span { font-size: 11px; color: #9ca3af; font-weight: 500; }
+}
+
+.rp-ach-xp-bar {
+    position: relative;
+    height: 18px;
+    border-radius: 4px;
+    background: #171b22;
+    border: 1px solid #2e343e;
+    overflow: hidden;
+
+    .rp-ach-xp-fill {
+        height: 100%;
+        background: #22c55e;
+        transition: width 0.25s ease;
+    }
+
+    span {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10.5px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+}
+
+.rp-ach-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.rp-ach-tab-btn {
+    position: relative;
+    height: 30px;
+    border-radius: 5px;
+    background: #e2e5ea;
+    border: 1.5px solid #181a1e;
+    color: #181a1e;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &.is-active { background: #ffffff; }
+    &:hover { background: #ffffff; }
+}
+
+.rp-ach-tab-badge {
+    position: absolute;
+    top: -6px;
+    right: 6px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 99px;
+    background: #3d7a5a;
+    border: 1px solid #181a1e;
+    color: #ffffff;
+    font-size: 9.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-ach-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rp-ach-card {
+    background: #3b3e42;
+    border: 1px solid #52565c;
+    border-radius: 7px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    &.is-claimable {
+        background: #3a473e;
+        border-color: #688f6c;
+    }
+}
+
+.rp-ach-card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rp-ach-card-ico {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.rp-ach-sprite {
+    width: auto;
+    height: auto;
+    max-width: 32px;
+    max-height: 32px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+.rp-ach-card-meta {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rp-ach-card-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.rp-ach-card-xp {
+    font-size: 11px;
+    font-weight: 700;
+    color: #f3c24f;
+}
+
+.rp-ach-card-desc {
+    font-size: 11px;
+    color: #d1d5db;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.rp-ach-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.rp-ach-card-prog {
+    font-size: 11px;
+    font-weight: 700;
+    color: #f3f4f6;
+}
+
+.rp-ach-card-status {
+    font-size: 11px;
+    font-weight: 600;
+    color: #9ca3af;
+
+    &.is-done { color: #4ade80; }
+}
+
+.rp-ach-claim-btn {
+    padding: 6px 12px;
+    border-radius: 5px;
+    background: #0d9f48;
+    border: 1.5px solid #102a19;
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #16b856; }
+    &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+
+/* ==================== APP CÁMARA Y FOTOS EN CELULAR ==================== */
+.rp-cam-body {
+    flex: 1;
+    min-height: 0;
+    padding: 12px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.rp-cam-frame-outer {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 236px;
+    padding: 7px;
+    background: #23262b;
+    border: 1px solid #484d55;
+    border-radius: 6px;
+}
+
+.rp-cam-viewfinder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #1a1d21;
+    border: 1px solid #3c4048;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-cam-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+    transition: transform 0.12s ease;
+    display: block;
+}
+
+.rp-cam-placeholder {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.rp-cam-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    span {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    span:nth-child(1) { left: 33.33%; top: 0; bottom: 0; width: 1px; }
+    span:nth-child(2) { left: 66.66%; top: 0; bottom: 0; width: 1px; }
+    span:nth-child(3) { top: 33.33%; left: 0; right: 0; height: 1px; }
+    span:nth-child(4) { top: 66.66%; left: 0; right: 0; height: 1px; }
+}
+
+.rp-cam-flash {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.85);
+    pointer-events: none;
+}
+
+.rp-cam-room-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #b4bac4;
+    text-align: center;
+}
+
+.rp-cam-zoom-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11.5px;
+    color: #b4bac4;
+
+    input[type='range'] {
+        flex: 1;
+        accent-color: #6b7280;
+        cursor: pointer;
+    }
+
+    .rp-cam-zoom-val {
+        width: 28px;
+        text-align: right;
+        font-weight: 600;
+        color: #d1d5db;
+    }
+}
+
+.rp-cam-shutter-bar {
+    height: 82px;
+    background: #3d4147;
+    border-top: 1px solid #25282c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.rp-cam-shutter-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #3d4147;
+    border: 2.5px solid #e5e7eb;
+    outline: 1.5px solid #181a1e;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    cursor: pointer;
+
+    &:hover .rp-cam-shutter-inner { background: #ffffff; }
+    &:active { transform: scale(0.95); }
+}
+
+.rp-cam-shutter-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #f3f4f6;
+    display: block;
+}
+
+.rp-photos-count {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #b4bac4;
+    min-width: 38px;
+    text-align: right;
+}
+
+.rp-photos-empty {
+    flex: 1;
+    padding: 46px 20px;
+    text-align: center;
+    font-size: 12.5px;
+    color: #9ca3af;
+}
+
+.rp-photos-grid {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    align-content: start;
+}
+
+.rp-photo-thumb {
+    aspect-ratio: 1 / 1;
+    padding: 3px;
+    background: #23262b;
+    border: 1px solid #484d55;
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: pointer;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 3px;
+    }
+
+    &:hover { border-color: #e5e7eb; }
+}
+
+.rp-photo-detail {
+    flex: 1;
+    min-height: 0;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.rp-photo-full {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #484d55;
+}
+
+.rp-photo-meta {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+
+    b { color: #ffffff; }
+    span { color: #9ca3af; }
 }
 
 .rp-phone-thread-view {
