@@ -5,6 +5,7 @@ import { AddEventLinkTracker, CreateLinkEvent, DispatchMainEvent, DispatchUiEven
 import { Button, classNames, Column, Flex, HorizontalRule, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../common';
 import { useCatalogPlaceMultipleItems, useCatalogSkipPurchaseConfirmation, useEraTheme, useMessageEvent } from '../../hooks';
 import { useIsMobile, useMobileDpadSettings } from '../../hooks/mobile/useIsMobile';
+import { isRoleplayMode } from '../roleplay/RoleplayService';
 
 export const UserSettingsView: FC<{}> = props => {
     const [isVisible, setIsVisible] = useState(false);
@@ -158,6 +159,91 @@ export const UserSettingsView: FC<{}> = props => {
     }, [userSettings]);
 
     if (!isVisible || !userSettings) return null;
+
+    // En /rp_client mostrar solo ajustes de sonido e invitaciones adaptados (sin versiones de /client, tutorial, chat antiguo ni monedas clásicas)
+    if (isRoleplayMode()) {
+        return (
+            <section className="rp-sound-modal" aria-label="Sonido de Habbten RP">
+                <div className="rp-win-header">
+                    <span className="rp-win-title">Sonido y Notificaciones</span>
+                    <button type="button" className="rp-habbo-close-btn" onClick={ () => processAction('close_view') } title="Cerrar">
+                        ×
+                    </button>
+                </div>
+                <div className="rp-sound-modal-body">
+                    <label className="rp-pref-row">
+                        <span>Ignorar invitaciones de sala</span>
+                        <input
+                            type="checkbox"
+                            checked={ userSettings.roomInvites }
+                            onChange={ event => processAction('room_invites', event.target.checked) } />
+                    </label>
+
+                    <div className="rp-sound-divider" />
+
+                    <div className="rp-sound-slider-group">
+                        <div className="rp-sound-slider-head">
+                            <span>Sonidos de interfaz</span>
+                            <b>{ Math.round(userSettings.volumeSystem) }%</b>
+                        </div>
+                        <div className="rp-sound-slider-row">
+                            { userSettings.volumeSystem === 0 ? <FaVolumeMute /> : <FaVolumeDown /> }
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value={ userSettings.volumeSystem }
+                                onChange={ event => processAction('system_volume', Number(event.target.value)) }
+                                onMouseUp={ () => saveRangeSlider('volume') }
+                                onTouchEnd={ () => saveRangeSlider('volume') } />
+                            <FaVolumeUp />
+                        </div>
+                    </div>
+
+                    <div className="rp-sound-slider-group">
+                        <div className="rp-sound-slider-head">
+                            <span>Sonidos de sala y furnis</span>
+                            <b>{ Math.round(userSettings.volumeFurni) }%</b>
+                        </div>
+                        <div className="rp-sound-slider-row">
+                            { userSettings.volumeFurni === 0 ? <FaVolumeMute /> : <FaVolumeDown /> }
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value={ userSettings.volumeFurni }
+                                onChange={ event => processAction('furni_volume', Number(event.target.value)) }
+                                onMouseUp={ () => saveRangeSlider('volume') }
+                                onTouchEnd={ () => saveRangeSlider('volume') } />
+                            <FaVolumeUp />
+                        </div>
+                    </div>
+
+                    <div className="rp-sound-slider-group">
+                        <div className="rp-sound-slider-head">
+                            <span>Música ambiental</span>
+                            <b>{ Math.round(userSettings.volumeTrax) }%</b>
+                        </div>
+                        <div className="rp-sound-slider-row">
+                            { userSettings.volumeTrax === 0 ? <FaVolumeMute /> : <FaVolumeDown /> }
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                step="1"
+                                value={ userSettings.volumeTrax }
+                                onChange={ event => processAction('trax_volume', Number(event.target.value)) }
+                                onMouseUp={ () => saveRangeSlider('volume') }
+                                onTouchEnd={ () => saveRangeSlider('volume') } />
+                            <FaVolumeUp />
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    }
 
     if (!isMobile && currentEra === 'flash2012') {
         const renderVolumeRow2012 = (label: string, id: string, val: number, actionType: string) => {

@@ -22,9 +22,33 @@ body.habbten-rp-client {
         top: 64px;
         right: 12px;
         z-index: 75;
+        max-width: 330px;
         pointer-events: none;
 
         > * { pointer-events: auto; }
+
+        .nitro-notification-bubble,
+        .nitro-notification-bubble-item {
+            max-width: 320px !important;
+            width: fit-content !important;
+            padding: 7px 10px !important;
+            border-radius: 6px !important;
+            background: #222529 !important;
+            border: 1px solid #3c424b !important;
+            font-size: 12px !important;
+            line-height: 1.35 !important;
+            white-space: normal !important;
+            word-break: break-word !important;
+        }
+    }
+
+    .nitro-chat-widget {
+        z-index: 42 !important;
+
+        .chat-bubble {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+            font-size: 13px !important;
+        }
     }
 
     /* Menú contextual al hacer clic sobre el avatar (exacto a Imagen 3) */
@@ -660,6 +684,10 @@ body.habbten-rp-client {
     flex-direction: column;
     padding: 12px 11px 10px;
     z-index: 80;
+
+    &.is-dragging {
+        border-color: #6b7280;
+    }
 }
 
 .rp-phone-top-bezel {
@@ -670,6 +698,10 @@ body.habbten-rp-client {
     justify-content: center;
     gap: 8px;
     flex-shrink: 0;
+    cursor: grab;
+    touch-action: none;
+
+    &:active { cursor: grabbing; }
 }
 
 .rp-phone-cam {
@@ -932,26 +964,24 @@ body.habbten-rp-client {
     flex-shrink: 0;
 }
 
-.rp-phone-back-square {
-    width: 32px;
-    height: 28px;
-    border-radius: 5px;
-    background: #eef1f5;
-    border: 1.5px solid #181a1e;
+.rp-phone-back-imgbtn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 0;
+    flex-shrink: 0;
 
-    &:hover { background: #ffffff; }
+    &:hover { filter: brightness(1.06); }
+    &:active { transform: translateY(1px); }
 }
 
-.rp-back-arrow-sprite {
-    width: auto;
-    height: auto;
-    max-width: 24px;
-    max-height: 22px;
+.rp-back-btn-sprite {
+    width: 31px;
+    height: 27px;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     display: block;
@@ -1356,13 +1386,11 @@ body.habbten-rp-client {
     justify-content: center;
 }
 
-.rp-cam-preview-img {
+.rp-cam-preview-canvas {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    image-rendering: pixelated;
-    transition: transform 0.12s ease;
     display: block;
+    image-rendering: pixelated;
 }
 
 .rp-cam-placeholder {
@@ -1532,6 +1560,356 @@ body.habbten-rp-client {
 
     b { color: #ffffff; }
     span { color: #9ca3af; }
+}
+
+/* ==================== APP AJUSTES RP EN CELULAR (PREFERENCIAS + ZOOM) ==================== */
+.rp-settings-scroll {
+    padding: 12px 10px 14px;
+}
+
+.rp-set-user-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+
+    b {
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+    }
+}
+
+.rp-set-gear-sprite {
+    width: auto;
+    height: auto;
+    max-width: 30px;
+    max-height: 34px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+.rp-set-prefs-box {
+    border: 1px solid #4e535c;
+    border-radius: 6px;
+    padding: 10px 10px 11px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    legend {
+        float: none;
+        width: auto;
+        padding: 0 6px;
+        margin: 0;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #e5e7eb;
+    }
+}
+
+.rp-pref-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11.5px;
+    color: #d1d5db;
+    cursor: pointer;
+    margin: 0;
+
+    input[type='checkbox'] {
+        width: 17px;
+        height: 17px;
+        accent-color: #16a34a;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+}
+
+.rp-set-divider {
+    height: 1px;
+    background: #464b53;
+    margin: 2px 0;
+}
+
+.rp-zoom-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.rp-zoom-ctrl-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.rp-zoom-sq-btn {
+    width: 32px;
+    height: 30px;
+    border-radius: 5px;
+    background: #eef1f5;
+    border: 1.5px solid #181a1e;
+    color: #181a1e;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover { background: #ffffff; }
+}
+
+.rp-zoom-pct {
+    font-size: 14px;
+    font-weight: 800;
+    color: #f3c24f;
+}
+
+.rp-set-auto-note {
+    font-size: 10.5px;
+    color: #9ca3af;
+    line-height: 1.35;
+}
+
+.rp-signout-white-btn {
+    width: 100%;
+    height: 36px;
+    margin-top: 4px;
+    border-radius: 5px;
+    background: #f3f4f6;
+    border: 1.5px solid #181a1e;
+    color: #181a1e;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover { background: #ffffff; }
+}
+
+/* ==================== HUD DE OBJETIVO SELECCIONADO (PIXELRP) ==================== */
+.rp-target-hud {
+    position: fixed;
+    left: 12px;
+    top: 12px;
+    width: 268px;
+    background: #25282d;
+    border: 1px solid #444a54;
+    border-radius: 6px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 66;
+}
+
+.rp-target-avatar-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    background: #4e4d48;
+    border: 1px solid #353a42;
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-target-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rp-target-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.rp-target-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rp-target-ctrls {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.rp-target-ico-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: #1b1e23;
+    border: 1px solid #3b414b;
+    color: #cbd5e1;
+    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover { background: #323740; color: #ffffff; }
+    &.is-locked { background: #1ea866; border-color: #126b40; color: #ffffff; }
+}
+
+.rp-target-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+/* ==================== VENTANA SONIDO RP & TABLA :COMANDOS ==================== */
+.rp-sound-modal,
+.rp-commands-win {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #2c2f34;
+    border: 1px solid #4c515a;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 86;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #f3f4f6;
+}
+
+.rp-sound-modal {
+    width: 340px;
+    max-width: 92vw;
+}
+
+.rp-sound-modal-body {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rp-sound-divider {
+    height: 1px;
+    background: #444952;
+}
+
+.rp-sound-slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.rp-sound-slider-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: #d1d5db;
+
+    b { color: #ffffff; }
+}
+
+.rp-sound-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9ca3af;
+    font-size: 12px;
+
+    input[type='range'] {
+        flex: 1;
+        accent-color: #1ea866;
+        cursor: pointer;
+    }
+}
+
+.rp-commands-win {
+    width: 600px;
+    max-width: 94vw;
+    max-height: 76vh;
+}
+
+.rp-commands-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    flex: 1;
+}
+
+.rp-commands-table-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1px solid #41454d;
+    border-radius: 6px;
+}
+
+.rp-commands-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5px;
+
+    th {
+        position: sticky;
+        top: 0;
+        background: #23262b;
+        color: #9ca3af;
+        text-align: left;
+        padding: 8px 10px;
+        font-size: 10.5px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #41454d;
+    }
+
+    td {
+        padding: 7px 10px;
+        border-bottom: 1px solid #353941;
+        color: #e5e7eb;
+    }
+
+    tbody tr {
+        cursor: pointer;
+
+        &:hover { background: #383d46; }
+    }
+
+    code {
+        background: #1a1d21;
+        color: #4ade80;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+}
+
+.rp-cmd-group {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #3d434e;
+    color: #e5e7eb;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
 .rp-phone-thread-view {

@@ -7,6 +7,7 @@ import { useFriends, useHelp, useRoom, useSessionInfo } from '../../../../../hoo
 import { ContextMenuHeaderView } from '../../context-menu/ContextMenuHeaderView';
 import { ContextMenuListItemView } from '../../context-menu/ContextMenuListItemView';
 import { ContextMenuView } from '../../context-menu/ContextMenuView';
+import { isRoleplayMode } from '../../../../roleplay/RoleplayService';
 
 interface AvatarInfoWidgetAvatarViewProps
 {
@@ -224,7 +225,7 @@ export const AvatarInfoWidgetAvatarView: FC<AvatarInfoWidgetAvatarViewProps> = p
                     <ContextMenuListItemView onClick={ event => processAction('whisper') }>
                         { LocalizeText('infostand.button.whisper') }
                     </ContextMenuListItemView>
-                    { (userRespectRemaining > 0) &&
+                    { (!isRoleplayMode() && userRespectRemaining > 0) &&
                         <ContextMenuListItemView onClick={ event => processAction('respect') }>
                             { LocalizeText('infostand.button.respect', [ 'count' ], [ userRespectRemaining.toString() ]) }
                         </ContextMenuListItemView> }

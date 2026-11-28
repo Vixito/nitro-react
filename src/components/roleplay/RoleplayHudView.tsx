@@ -1,13 +1,16 @@
-import { AvatarExpressionEnum, RoomUnitChatComposer, RoomUnitChatShoutComposer, TextureUtils } from '@nitrots/nitro-renderer';
+import { AvatarExpressionEnum, RoomObjectCategory, RoomUnitChatComposer, RoomUnitChatShoutComposer, UserSettingsCameraFollowComposer } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     FaBolt,
-    FaChevronLeft,
     FaChevronRight,
     FaCommentDots,
     FaDownload,
     FaHeart,
+    FaLock,
+    FaLockOpen,
+    FaMinus,
     FaMoneyBillWave,
+    FaPlus,
     FaSearch,
     FaTimes,
     FaTrash
@@ -17,7 +20,7 @@ import dockShopIcon from '@/assets/images/roleplay/dock-shop.png';
 import helpLifebuoyImg from '@/assets/images/roleplay/help-lifebuoy.png';
 import helpTripleQIcon from '@/assets/images/roleplay/help-triple-q.png';
 import phoneAchievementsIcon from '@/assets/images/roleplay/phone-achievements.png';
-import phoneBackArrowIcon from '@/assets/images/roleplay/phone-back-arrow.png';
+import phoneBackBtnIcon from '@/assets/images/roleplay/phone-back-btn.png';
 import phoneCameraIcon from '@/assets/images/roleplay/phone-camera.png';
 import phoneContactsIcon from '@/assets/images/roleplay/phone-contacts.png';
 import phoneMessagesIcon from '@/assets/images/roleplay/phone-messages.png';
@@ -43,8 +46,8 @@ import iconHelperTool from '@/assets/images/toolbar/icons/me-menu/helper-tool.pn
 import iconProfile from '@/assets/images/toolbar/icons/me-menu/profile.png';
 import iconTalents from '@/assets/images/toolbar/icons/me-menu/talents.png';
 import iconHeartSprite from '@/assets/images/icons/sign-heart.png';
-import { CreateLinkEvent, CreateRoomSession, GetNitroInstance, GetRoomEngine, GetRoomSession, GetSessionDataManager, MessengerThreadChat, SendMessageComposer } from '../../api';
-import { useFriends, useMessenger, useSessionInfo } from '../../hooks';
+import { CreateLinkEvent, CreateRoomSession, GetNitroInstance, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile, MessengerThreadChat, SendMessageComposer } from '../../api';
+import { useFriends, useMessenger, useObjectSelectedEvent, useSessionInfo } from '../../hooks';
 import {
     isRoleplayMode,
     RpFullState,
@@ -59,7 +62,7 @@ import {
 } from './RoleplayService';
 import './RoleplayHudView.scss';
 
-type SideModalTab = null | 'shop' | 'inventory' | 'help';
+type SideModalTab = null | 'shop' | 'inventory' | 'help' | 'commands';
 type HelpTopicId = 'around' | 'rooms' | 'character' | 'phone' | 'chat';
 type PhoneApp = 'lock' | 'home' | 'contacts' | 'messages' | 'camera' | 'photos' | 'achievements' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'rankings' | 'settings';
 
@@ -71,8 +74,91 @@ interface SavedPhoto
     takenAt: string;
 }
 
+interface RpClientPrefs
+{
+    furniPopup: boolean;
+    furniGlow: boolean;
+    followChar: boolean;
+    roomZoom: number;
+}
+
+interface TargetHudInfo
+{
+    webId: number;
+    name: string;
+    figure: string;
+    motto: string;
+}
+
 const RP_PHOTOS_KEY = 'habbten_rp_phone_photos_v1';
+const RP_PREFS_KEY = 'habbten_rp_client_prefs_v1';
 const RP_MAX_PHOTOS = 25;
+
+const DEFAULT_RP_PREFS: RpClientPrefs = {
+    furniPopup: true,
+    furniGlow: true,
+    followChar: true,
+    roomZoom: 100
+};
+
+function loadRpPrefs(): RpClientPrefs
+{
+    try
+    {
+        const raw = localStorage.getItem(RP_PREFS_KEY);
+        if(!raw) return DEFAULT_RP_PREFS;
+        const p = JSON.parse(raw);
+        return {
+            furniPopup: typeof p.furniPopup === 'boolean' ? p.furniPopup : true,
+            furniGlow: typeof p.furniGlow === 'boolean' ? p.furniGlow : true,
+            followChar: typeof p.followChar === 'boolean' ? p.followChar : true,
+            roomZoom: Math.max(50, Math.min(200, Number(p.roomZoom) || 100))
+        };
+    }
+    catch (_)
+    {
+        return DEFAULT_RP_PREFS;
+    }
+}
+
+function saveRpPrefs(prefs: RpClientPrefs): void
+{
+    try
+    {
+        localStorage.setItem(RP_PREFS_KEY, JSON.stringify(prefs));
+    }
+    catch (_) {}
+}
+
+function shouldShowContactAvatar(id?: number, name?: string, figure?: string): boolean
+{
+    if(!id || id <= 0) return false;
+    if(!figure || !figure.trim()) return false;
+    const n = (name || '').trim().toLowerCase();
+    if(n.includes('staff chat') || n === 'staff' || n.includes('sistema')) return false;
+    return true;
+}
+
+const RP_COMMANDS_CATALOG: Array<{ cmd: string; group: string; desc: string }> = [
+    { cmd: ':me <acción>', group: 'Rol', desc: 'Describe una acción de tu personaje en sala.' },
+    { cmd: ':do <entorno>', group: 'Rol', desc: 'Describe un detalle del entorno o escena.' },
+    { cmd: ':comandos', group: 'General', desc: 'Abre esta tabla filtrable de comandos RP.' },
+    { cmd: ':ayuda', group: 'General', desc: 'Muestra ayuda rápida de comandos RP.' },
+    { cmd: ':trabajar', group: 'Empleo', desc: 'Realiza un turno de tu empleo actual.' },
+    { cmd: ':turno', group: 'Empleo', desc: 'Activa o desactiva tu turno de servicio.' },
+    { cmd: ':pagar <usuario> <monto>', group: 'Economía', desc: 'Entrega dinero en efectivo a otro jugador.' },
+    { cmd: ':golpear <usuario>', group: 'Combate', desc: 'Ataque cuerpo a cuerpo en zonas PVP.' },
+    { cmd: ':disparar <usuario>', group: 'Combate', desc: 'Dispara tu arma equipada al objetivo.' },
+    { cmd: ':robar <usuario>', group: 'Combate', desc: 'Intenta robar efectivo en zonas PVP.' },
+    { cmd: ':esposar <usuario>', group: 'Policía y Médicos', desc: 'Esposa a un sospechoso (Policía HPD).' },
+    { cmd: ':arrestar <usuario>', group: 'Policía y Médicos', desc: 'Envía a prisión a un jugador esposado.' },
+    { cmd: ':curar <usuario>', group: 'Policía y Médicos', desc: 'Sana heridas de un ciudadano (Médicos).' },
+    { cmd: ':revivir <usuario>', group: 'Policía y Médicos', desc: 'Reanima a un ciudadano abatido.' },
+    { cmd: ':911 <mensaje>', group: 'Policía y Médicos', desc: 'Envía una alerta de emergencia.' },
+    { cmd: 'o/', group: 'Sala', desc: 'Saluda con la mano.' },
+    { cmd: ':sit / :stand', group: 'Sala', desc: 'Sentarse o levantarse en la sala.' },
+    { cmd: ':idle', group: 'Sala', desc: 'Pone tu personaje en estado ausente (zZz).' }
+];
 
 function loadSavedPhotos(): SavedPhoto[]
 {
@@ -171,12 +257,27 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     // Logros / Misiones dentro del celular
     const [ achTab, setAchTab ] = useState<'quests' | 'achievements'>('quests');
 
-    // Cámara y Fotos dentro del celular
+    // Cámara (lente detrás del celular) y Fotos
     const [ cameraZoom, setCameraZoom ] = useState<number>(1);
-    const [ cameraPreviewUrl, setCameraPreviewUrl ] = useState<string>('');
     const [ cameraFlash, setCameraFlash ] = useState<boolean>(false);
     const [ savedPhotos, setSavedPhotos ] = useState<SavedPhoto[]>(() => loadSavedPhotos());
     const [ selectedPhoto, setSelectedPhoto ] = useState<SavedPhoto | null>(null);
+    const camViewfinderRef = useRef<HTMLDivElement | null>(null);
+    const camCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+    // Arrastre del celular desde la barra superior (al lado del botón de cerrar)
+    const phoneDeviceRef = useRef<HTMLElement | null>(null);
+    const [ phonePos, setPhonePos ] = useState<{ x: number; y: number } | null>(null);
+    const [ isDraggingPhone, setIsDraggingPhone ] = useState<boolean>(false);
+    const phoneDragOffsetRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+
+    // Preferencias del cliente RP + Zoom de sala
+    const [ rpPrefs, setRpPrefs ] = useState<RpClientPrefs>(() => loadRpPrefs());
+
+    // HUD de objetivo en sala (estilo PixelRP) + filtro :comandos
+    const [ targetHud, setTargetHud ] = useState<TargetHudInfo | null>(null);
+    const [ targetLocked, setTargetLocked ] = useState<boolean>(false);
+    const [ cmdFilter, setCmdFilter ] = useState<string>('');
 
     // Swipe-to-unlock real (arrastre físico mouse/touch)
     const unlockTrackRef = useRef<HTMLDivElement | null>(null);
@@ -304,56 +405,149 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     }, [ rpActive, phoneOpen, phoneApp ]);
 
-    // Captura en vivo de la sala cuando la app Cámara del celular está abierta
-    const captureRoomSnapshot = useCallback((): string =>
+    // Lente real detrás del celular: enfoca exactamente lo que está detrás del visor de la cámara
+    const renderCameraBehindPhone = useCallback(() =>
     {
-        try
-        {
-            const session = GetRoomSession();
-            if(session && session.roomId > 0)
-            {
-                const texture = GetRoomEngine()?.createTextureFromRoom(session.roomId, 1);
-                if(texture)
-                {
-                    const url = TextureUtils.generateImageUrl(texture);
-                    if(url) return url;
-                }
-            }
-        }
-        catch (_) {}
+        const vf = camViewfinderRef.current;
+        const outCanvas = camCanvasRef.current;
+        if(!vf || !outCanvas) return;
+
+        const ctx = outCanvas.getContext('2d');
+        if(!ctx) return;
 
         try
         {
-            const renderer = GetNitroInstance()?.application?.renderer;
-            if(renderer && renderer.view)
-            {
-                GetNitroInstance()?.application?.render();
-                return (renderer.view as HTMLCanvasElement).toDataURL('image/png');
-            }
+            const nitro = GetNitroInstance();
+            const srcCanvas = nitro?.application?.renderer?.view as HTMLCanvasElement | undefined;
+            if(!srcCanvas || srcCanvas.width <= 0 || srcCanvas.height <= 0) return;
+
+            nitro?.application?.render();
+
+            const srcRect = srcCanvas.getBoundingClientRect();
+            const vfRect = vf.getBoundingClientRect();
+            if(srcRect.width <= 0 || srcRect.height <= 0 || vfRect.width <= 0 || vfRect.height <= 0) return;
+
+            const scaleX = srcCanvas.width / srcRect.width;
+            const scaleY = srcCanvas.height / srcRect.height;
+
+            const rawW = vfRect.width * scaleX;
+            const rawH = vfRect.height * scaleY;
+            const zoom = Math.max(1, cameraZoom);
+            const cropW = rawW / zoom;
+            const cropH = rawH / zoom;
+
+            const centerX = ((vfRect.left - srcRect.left) + (vfRect.width / 2)) * scaleX;
+            const centerY = ((vfRect.top - srcRect.top) + (vfRect.height / 2)) * scaleY;
+
+            const sx = centerX - (cropW / 2);
+            const sy = centerY - (cropH / 2);
+
+            ctx.fillStyle = '#1a1d21';
+            ctx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(srcCanvas, sx, sy, cropW, cropH, 0, 0, outCanvas.width, outCanvas.height);
         }
         catch (_) {}
-
-        return '';
-    }, []);
+    }, [ cameraZoom ]);
 
     useEffect(() =>
     {
         if(!rpActive || !phoneOpen || phoneApp !== 'camera') return;
-        let cancelled = false;
-        const tick = () =>
+        renderCameraBehindPhone();
+        const timer = setInterval(renderCameraBehindPhone, 65);
+        return () => clearInterval(timer);
+    }, [ rpActive, phoneOpen, phoneApp, phonePos, cameraZoom, renderCameraBehindPhone ]);
+
+    // Aplicar zoom guardado y preferencias del cliente RP
+    const updateRpPrefs = useCallback((patch: Partial<RpClientPrefs>) =>
+    {
+        setRpPrefs(prev =>
         {
-            if(cancelled) return;
-            const url = captureRoomSnapshot();
-            if(url && !cancelled) setCameraPreviewUrl(url);
-        };
-        tick();
-        const timer = setInterval(tick, 450);
-        return () =>
+            const next: RpClientPrefs = {
+                ...prev,
+                ...patch,
+                roomZoom: Math.max(50, Math.min(200, patch.roomZoom ?? prev.roomZoom))
+            };
+            saveRpPrefs(next);
+
+            if(typeof patch.roomZoom === 'number')
+            {
+                const roomId = GetRoomSession()?.roomId || GetRoomEngine()?.activeRoomId || -1;
+                if(roomId > 0)
+                {
+                    try
+                    {
+                        GetRoomEngine().setRoomInstanceRenderingCanvasScale(roomId, 1, next.roomZoom / 100, null, null, false);
+                    }
+                    catch (_) {}
+                }
+            }
+            if(typeof patch.followChar === 'boolean')
+            {
+                try { SendMessageComposer(new UserSettingsCameraFollowComposer(!next.followChar)); } catch (_) {}
+            }
+            return next;
+        });
+    }, []);
+
+    // Escuchar selección de otro avatar para el HUD de objetivo (estilo PixelRP)
+    useObjectSelectedEvent(event =>
+    {
+        if(!rpActive) return;
+        if(event.category !== RoomObjectCategory.UNIT)
         {
-            cancelled = true;
-            clearInterval(timer);
-        };
-    }, [ rpActive, phoneOpen, phoneApp, captureRoomSnapshot ]);
+            if(!targetLocked) setTargetHud(null);
+            return;
+        }
+        const session = GetRoomSession();
+        const userData = session?.userDataManager?.getUserDataByIndex(event.id);
+        const ownId = GetSessionDataManager()?.userId;
+        if(!userData || userData.type !== 1 || userData.webID === ownId)
+        {
+            if(!targetLocked) setTargetHud(null);
+            return;
+        }
+        if(targetLocked && targetHud && targetHud.webId !== userData.webID) return;
+        setTargetHud({
+            webId: userData.webID,
+            name: userData.name || 'Ciudadano',
+            figure: userData.figure || '',
+            motto: userData.custom || ''
+        });
+    });
+
+    // Arrastrar el celular desde la barra superior (al lado del botón cerrar)
+    const onPhoneDragStart = (e: PointerEvent<HTMLDivElement>) =>
+    {
+        if(isMobile) return;
+        const target = e.target as HTMLElement | null;
+        if(target && target.closest('button')) return;
+        const dev = phoneDeviceRef.current;
+        if(!dev) return;
+        const rect = dev.getBoundingClientRect();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        phoneDragOffsetRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+        setPhonePos({ x: rect.left, y: rect.top });
+        setIsDraggingPhone(true);
+    };
+
+    const onPhoneDragMove = (e: PointerEvent<HTMLDivElement>) =>
+    {
+        if(!isDraggingPhone) return;
+        const dev = phoneDeviceRef.current;
+        const w = dev ? dev.offsetWidth : 294;
+        const h = dev ? dev.offsetHeight : 552;
+        const maxX = Math.max(8, window.innerWidth - w - 8);
+        const maxY = Math.max(8, window.innerHeight - h - 8);
+        const nextX = Math.max(8, Math.min(maxX, e.clientX - phoneDragOffsetRef.current.dx));
+        const nextY = Math.max(8, Math.min(maxY, e.clientY - phoneDragOffsetRef.current.dy));
+        setPhonePos({ x: nextX, y: nextY });
+    };
+
+    const onPhoneDragEnd = () =>
+    {
+        if(isDraggingPhone) setIsDraggingPhone(false);
+    };
 
     // Enfocar la barra de chat al escribir directamente en la sala (como Habbo original)
     useEffect(() =>
@@ -657,6 +851,14 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             return;
         }
 
+        if(lower === ':commands' || lower === ':comandos')
+        {
+            setCmdFilter('');
+            openSideModal('commands');
+            if(isMobile) setMobileChatOpen(false);
+            return;
+        }
+
         if(text.startsWith(':') || text.startsWith('/'))
         {
             const firstWord = text.slice(1).split(/\s+/)[0].toLowerCase();
@@ -720,57 +922,39 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             pushToast('warn', `Has alcanzado el límite de ${ RP_MAX_PHOTOS } fotos. Elimina alguna para tomar nuevas.`);
             return;
         }
-        const snap = captureRoomSnapshot() || cameraPreviewUrl;
-        if(!snap)
+
+        renderCameraBehindPhone();
+        const outCanvas = camCanvasRef.current;
+        if(!outCanvas)
         {
-            pushToast('err', 'No se pudo capturar la imagen de la sala.');
+            pushToast('err', 'No se pudo capturar la imagen del visor.');
             return;
         }
 
         setCameraFlash(true);
         setTimeout(() => setCameraFlash(false), 180);
 
-        const img = new Image();
-        img.onload = () =>
+        try
         {
-            try
+            const finalUrl = outCanvas.toDataURL('image/jpeg', 0.9);
+            const photo: SavedPhoto = {
+                id: `${ Date.now() }-${ Math.floor(Math.random() * 999) }`,
+                dataUrl: finalUrl,
+                roomName: currentLocation?.name || 'Habbten RP',
+                takenAt: new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date())
+            };
+            setSavedPhotos(prev =>
             {
-                const outSize = 320;
-                const canvas = document.createElement('canvas');
-                canvas.width = outSize;
-                canvas.height = outSize;
-                const ctx = canvas.getContext('2d');
-                if(ctx)
-                {
-                    ctx.fillStyle = '#1b1e23';
-                    ctx.fillRect(0, 0, outSize, outSize);
-                    const minDim = Math.min(img.width, img.height);
-                    const cropSize = Math.max(40, minDim / Math.max(1, cameraZoom));
-                    const sx = (img.width - cropSize) / 2;
-                    const sy = (img.height - cropSize) / 2;
-                    ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, outSize, outSize);
-                    const finalUrl = canvas.toDataURL('image/jpeg', 0.88);
-                    const photo: SavedPhoto = {
-                        id: `${ Date.now() }-${ Math.floor(Math.random() * 999) }`,
-                        dataUrl: finalUrl,
-                        roomName: currentLocation?.name || 'Habbten RP',
-                        takenAt: new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date())
-                    };
-                    setSavedPhotos(prev =>
-                    {
-                        const next = [ photo, ...prev ].slice(0, RP_MAX_PHOTOS);
-                        persistSavedPhotos(next);
-                        return next;
-                    });
-                    pushToast('ok', 'Foto guardada en tu galería.');
-                }
-            }
-            catch (_)
-            {
-                pushToast('err', 'Error al guardar la foto.');
-            }
-        };
-        img.src = snap;
+                const next = [ photo, ...prev ].slice(0, RP_MAX_PHOTOS);
+                persistSavedPhotos(next);
+                return next;
+            });
+            pushToast('ok', `Foto guardada (${ Math.min(RP_MAX_PHOTOS, savedPhotos.length + 1) } / ${ RP_MAX_PHOTOS }).`);
+        }
+        catch (_)
+        {
+            pushToast('err', 'Error al guardar la foto.');
+        }
     };
 
     const handleDeletePhoto = (photoId: string) =>
@@ -1215,10 +1399,58 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </form>
             ) }
 
-            {/* ==================== SMARTPHONE DEL AVATAR ==================== */}
+            {/* ==================== HUD DE OBJETIVO SELECCIONADO (ESTILO PIXELRP) ==================== */}
+            { targetHud && (
+                <div className="rp-target-hud" aria-label="Jugador seleccionado">
+                    <div className="rp-target-avatar-box">
+                        <img
+                            className="rp-char-head-img"
+                            src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(targetHud.figure) }&headonly=1&size=m&direction=3&head_direction=3` }
+                            alt={ targetHud.name } />
+                    </div>
+                    <div className="rp-target-meta">
+                        <div className="rp-target-top">
+                            <span className="rp-target-name">{ targetHud.name }</span>
+                            <div className="rp-target-ctrls">
+                                <button
+                                    type="button"
+                                    className={ `rp-target-ico-btn ${ targetLocked ? 'is-locked' : '' }` }
+                                    title={ targetLocked ? 'Desfijar objetivo' : 'Fijar objetivo' }
+                                    onClick={ () => setTargetLocked(v => !v) }>
+                                    { targetLocked ? <FaLock /> : <FaLockOpen /> }
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rp-target-ico-btn"
+                                    title="Cerrar"
+                                    onClick={ () => { setTargetLocked(false); setTargetHud(null); } }>
+                                    <FaTimes />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="rp-target-actions">
+                            <button type="button" className="rp-btn is-dark is-xs" onClick={ () => GetUserProfile(targetHud.webId) }>Perfil</button>
+                            <button type="button" className="rp-btn is-green is-xs" onClick={ () => { setTargetPlayer(targetHud.name); togglePhone(true); } }>Acción</button>
+                            <button type="button" className="rp-btn is-red is-xs" disabled={ busy } onClick={ () => runAction('/combat/attack', { target: targetHud.name }) }>Golpear</button>
+                        </div>
+                    </div>
+                </div>
+            ) }
+
+            {/* ==================== SMARTPHONE DEL AVATAR (ARRASTRABLE) ==================== */}
             { phoneOpen && (
-                <section className="rp-phone-device" aria-label="Celular Habbten RP">
-                    <div className="rp-phone-top-bezel">
+                <section
+                    ref={ phoneDeviceRef }
+                    className={ `rp-phone-device ${ isDraggingPhone ? 'is-dragging' : '' }` }
+                    style={ phonePos && !isMobile ? { left: phonePos.x, top: phonePos.y, bottom: 'auto' } : undefined }
+                    aria-label="Celular Habbten RP">
+                    <div
+                        className="rp-phone-top-bezel"
+                        title="Arrastra para mover el celular"
+                        onPointerDown={ onPhoneDragStart }
+                        onPointerMove={ onPhoneDragMove }
+                        onPointerUp={ onPhoneDragEnd }
+                        onPointerCancel={ onPhoneDragEnd }>
                         <span className="rp-phone-cam" />
                         <span className="rp-phone-speaker" />
                         <button type="button" className="rp-phone-close" onClick={ () => togglePhone(false) } title="Guardar celular">
@@ -1291,8 +1523,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         { phoneApp === 'contacts' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
-                                    <button type="button" className="rp-phone-back-square" onClick={ () => setPhoneApp('home') } title="Inicio">
-                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Inicio">
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Contactos</span>
                                     <button type="button" className="rp-phone-right-square" onClick={ () => { setActiveChatUserId(null); setPhoneApp('messages'); } } title="Mensajes">
@@ -1338,14 +1570,16 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         <div key={ friend.id } className="rp-contact-row">
                                             <div className="rp-contact-left" onClick={ () => openContactChat(friend.id) }>
                                                 <span className={ `rp-contact-dot ${ friend.online ? 'is-on' : '' }` } />
-                                                <img
-                                                    className="rp-contact-head"
-                                                    src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(friend.figure || '') }&headonly=1&size=s&direction=3&head_direction=3` }
-                                                    alt="" />
+                                                { shouldShowContactAvatar(friend.id, friend.name, friend.figure) && (
+                                                    <img
+                                                        className="rp-contact-head"
+                                                        src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(friend.figure || '') }&headonly=1&size=s&direction=3&head_direction=3` }
+                                                        alt="" />
+                                                ) }
                                                 <span className="rp-contact-name">{ friend.name }</span>
                                             </div>
                                             <div className="rp-btn-row">
-                                                { friend.online && followFriend && (
+                                                { friend.online && followFriend && shouldShowContactAvatar(friend.id, friend.name, friend.figure) && (
                                                     <button type="button" className="rp-btn is-dark is-xs" onClick={ () => followFriend(friend) }>Ir</button>
                                                 ) }
                                                 <button type="button" className="rp-btn is-green is-xs" onClick={ () => openContactChat(friend.id) }>Chat</button>
@@ -1362,13 +1596,13 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                 <div className="rp-phone-top-nav">
                                     <button
                                         type="button"
-                                        className="rp-phone-back-square"
+                                        className="rp-phone-back-imgbtn"
                                         onClick={ () => {
                                             if(activeChatUserId !== null) setActiveChatUserId(null);
                                             else setPhoneApp('home');
                                         } }
                                         title="Volver">
-                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">
                                         { activeChatUserId !== null && currentPhoneThread?.participant?.name
@@ -1412,10 +1646,12 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                                 onClick={ () => { if(th.participant) openContactChat(th.participant.id); } }
                                                 style={ { cursor: 'pointer' } }>
                                                 <div className="rp-contact-left">
-                                                    <img
-                                                        className="rp-contact-head"
-                                                        src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(th.participant?.figure || '') }&headonly=1&size=s&direction=3&head_direction=3` }
-                                                        alt="" />
+                                                    { shouldShowContactAvatar(th.participant?.id, th.participant?.name, th.participant?.figure) && (
+                                                        <img
+                                                            className="rp-contact-head"
+                                                            src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(th.participant?.figure || '') }&headonly=1&size=s&direction=3&head_direction=3` }
+                                                            alt="" />
+                                                    ) }
                                                     <span className="rp-contact-name">{ th.participant?.name || 'Contacto' }</span>
                                                 </div>
                                                 { th.unreadCount > 0 && <span className="rp-tag is-pvp">{ th.unreadCount }</span> }
@@ -1434,12 +1670,12 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* APP LOGROS Y MISIONES DENTRO DEL CELULAR (EXACTA A IMAGEN 3) */}
+                        {/* APP LOGROS Y MISIONES DENTRO DEL CELULAR */}
                         { phoneApp === 'achievements' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
-                                    <button type="button" className="rp-phone-back-square" onClick={ () => setPhoneApp('home') } title="Volver">
-                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Volver">
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Logros</span>
                                     <span style={ { width: 32 } } />
@@ -1535,12 +1771,12 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* APP CÁMARA DENTRO DEL CELULAR (EXACTA A IMAGEN 4) */}
+                        {/* APP CÁMARA DENTRO DEL CELULAR (ENFOCA LO QUE ESTÁ DETRÁS DEL CELULAR) */}
                         { phoneApp === 'camera' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
-                                    <button type="button" className="rp-phone-back-square" onClick={ () => setPhoneApp('home') } title="Volver">
-                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Volver">
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Cámara</span>
                                     <button type="button" className="rp-habbo-white-btn is-nav" onClick={ () => { setSelectedPhoto(null); setPhoneApp('photos'); } }>
@@ -1550,16 +1786,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
 
                                 <div className="rp-cam-body">
                                     <div className="rp-cam-frame-outer">
-                                        <div className="rp-cam-viewfinder">
-                                            { cameraPreviewUrl ? (
-                                                <img
-                                                    src={ cameraPreviewUrl }
-                                                    alt="Vista previa de sala"
-                                                    className="rp-cam-preview-img"
-                                                    style={ { transform: `scale(${ cameraZoom })` } } />
-                                            ) : (
-                                                <div className="rp-cam-placeholder">Cargando visor...</div>
-                                            ) }
+                                        <div ref={ camViewfinderRef } className="rp-cam-viewfinder">
+                                            <canvas ref={ camCanvasRef } className="rp-cam-preview-canvas" width={ 240 } height={ 240 } />
                                             <div className="rp-cam-grid" aria-hidden="true">
                                                 <span /><span /><span /><span />
                                             </div>
@@ -1594,16 +1822,16 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* APP FOTOS DENTRO DEL CELULAR (EXACTA A IMAGEN 5) */}
+                        {/* APP FOTOS DENTRO DEL CELULAR */}
                         { phoneApp === 'photos' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
                                     <button
                                         type="button"
-                                        className="rp-phone-back-square"
+                                        className="rp-phone-back-imgbtn"
                                         onClick={ () => selectedPhoto ? setSelectedPhoto(null) : setPhoneApp('camera') }
                                         title="Volver">
-                                        <img src={ phoneBackArrowIcon } alt="Volver" className="rp-back-arrow-sprite" />
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Fotos</span>
                                     <span className="rp-photos-count">{ savedPhotos.length } / { RP_MAX_PHOTOS }</span>
@@ -1653,19 +1881,110 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
+                        {/* APP AJUSTES DENTRO DEL CELULAR (PREFERENCIAS + ZOOM + ACCESOS RP) */}
+                        { phoneApp === 'settings' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Volver">
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
+                                    </button>
+                                    <span className="rp-phone-top-title">Ajustes</span>
+                                    <span style={ { width: 32 } } />
+                                </div>
+
+                                <div className="rp-app-scroll rp-settings-scroll">
+                                    <div className="rp-set-user-head">
+                                        <img src={ phoneSettingsIcon } alt="" className="rp-set-gear-sprite" />
+                                        <b>{ state.user.username }</b>
+                                    </div>
+
+                                    <fieldset className="rp-set-prefs-box">
+                                        <legend>Preferencias del cliente</legend>
+
+                                        <label className="rp-pref-row">
+                                            <span>Ventana de furni al hacer clic</span>
+                                            <input
+                                                type="checkbox"
+                                                checked={ rpPrefs.furniPopup }
+                                                onChange={ e => updateRpPrefs({ furniPopup: e.target.checked }) } />
+                                        </label>
+
+                                        <label className="rp-pref-row">
+                                            <span>Resaltado al seleccionar furni</span>
+                                            <input
+                                                type="checkbox"
+                                                checked={ rpPrefs.furniGlow }
+                                                onChange={ e => updateRpPrefs({ furniGlow: e.target.checked }) } />
+                                        </label>
+
+                                        <label className="rp-pref-row">
+                                            <span>Seguir a mi personaje</span>
+                                            <input
+                                                type="checkbox"
+                                                checked={ rpPrefs.followChar }
+                                                onChange={ e => updateRpPrefs({ followChar: e.target.checked }) } />
+                                        </label>
+
+                                        <div className="rp-set-divider" />
+
+                                        <div className="rp-zoom-title">Zoom de sala</div>
+                                        <div className="rp-zoom-ctrl-row">
+                                            <button
+                                                type="button"
+                                                className="rp-zoom-sq-btn"
+                                                title="Alejar"
+                                                onClick={ () => updateRpPrefs({ roomZoom: rpPrefs.roomZoom - 10 }) }>
+                                                <FaMinus />
+                                            </button>
+                                            <span className="rp-zoom-pct">{ rpPrefs.roomZoom }%</span>
+                                            <button
+                                                type="button"
+                                                className="rp-zoom-sq-btn"
+                                                title="Acercar"
+                                                onClick={ () => updateRpPrefs({ roomZoom: rpPrefs.roomZoom + 10 }) }>
+                                                <FaPlus />
+                                            </button>
+                                        </div>
+                                        <div className="rp-set-auto-note">Se guarda automáticamente en este dispositivo.</div>
+                                    </fieldset>
+
+                                    <div className="rp-app-stack" style={ { marginTop: 10 } }>
+                                        <button type="button" className="rp-phone-menu-btn" onClick={ () => CreateLinkEvent('user-settings/toggle') }>
+                                            Sonido y Notificaciones
+                                        </button>
+                                        <button type="button" className="rp-phone-menu-btn" onClick={ () => CreateLinkEvent('avatar-editor/toggle') }>
+                                            Cambiar Ropa / Aspecto
+                                        </button>
+                                        <button type="button" className="rp-phone-menu-btn" onClick={ () => { setCmdFilter(''); openSideModal('commands'); } }>
+                                            Lista de Comandos (:comandos)
+                                        </button>
+                                        <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/rp') }>
+                                            Inicio de Habbten RP
+                                        </button>
+                                        <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/') }>
+                                            Entra a Habbten
+                                        </button>
+                                        <button type="button" className="rp-signout-white-btn" onClick={ () => navigateParent('/logout') }>
+                                            Cerrar sesión
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ) }
+
                         {/* RESTO DE APPS INTERNAS DEL CELULAR */}
-                        { phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && phoneApp !== 'achievements' && phoneApp !== 'camera' && phoneApp !== 'photos' && (
-                            <div className="rp-phone-appview">
-                                <div className="rp-app-navbar">
+                        { phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && phoneApp !== 'achievements' && phoneApp !== 'camera' && phoneApp !== 'photos' && phoneApp !== 'settings' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
                                     <button
                                         type="button"
-                                        className="rp-app-back"
-                                        onClick={ () => selectedArticle ? setSelectedArticle(null) : setPhoneApp('home') }>
-                                        <FaChevronLeft />
-                                        <span>{ selectedArticle ? 'Noticias' : 'Inicio' }</span>
+                                        className="rp-phone-back-imgbtn"
+                                        onClick={ () => selectedArticle ? setSelectedArticle(null) : setPhoneApp('home') }
+                                        title="Volver">
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
-                                    <span className="rp-app-navtitle">{ phoneAppTitle[phoneApp] }</span>
-                                    <span style={ { width: 48 } } />
+                                    <span className="rp-phone-top-title">{ phoneAppTitle[phoneApp] }</span>
+                                    <span style={ { width: 32 } } />
                                 </div>
 
                                 <div className="rp-app-scroll">
@@ -1930,38 +2249,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         </div>
                                     ) }
 
-                                    { phoneApp === 'settings' && (
-                                        <div className="rp-app-stack">
-                                            <div className="rp-phone-card">
-                                                <div className="rp-pc-top">
-                                                    <b>{ state.user.username }</b>
-                                                    <span className="rp-tag is-safe">Nv.{ character.rp_level } ({ xpPct }%)</span>
-                                                </div>
-                                                <div className="rp-vitals-mini">
-                                                    <span>Vida: { character.hp }/{ character.max_hp } · Energía: { character.energy }%</span>
-                                                    <span>Hambre: { hunPct }% · Chaleco: { character.armor }%</span>
-                                                    <span>Fuerza: { character.strength } · Resistencia: { character.stamina_stat }</span>
-                                                    <span>Ubicación: { currentLocation?.name || 'Plaza Central' }</span>
-                                                </div>
-                                            </div>
-
-                                            <button type="button" className="rp-phone-menu-btn" onClick={ () => CreateLinkEvent('user-settings/toggle') }>
-                                                Ajustes de Sonido y Cliente
-                                            </button>
-                                            <button type="button" className="rp-phone-menu-btn" onClick={ () => CreateLinkEvent('avatar-editor/toggle') }>
-                                                Cambiar Ropa / Aspecto
-                                            </button>
-                                            <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/rp') }>
-                                                Inicio de Habbten RP
-                                            </button>
-                                            <button type="button" className="rp-phone-menu-btn" onClick={ () => navigateParent('/') }>
-                                                Entra a Habbten
-                                            </button>
-                                            <button type="button" className="rp-phone-menu-btn is-danger" onClick={ () => navigateParent('/logout') }>
-                                                Cerrar sesión
-                                            </button>
-                                        </div>
-                                    ) }
                                 </div>
                             </div>
                         ) }
@@ -2220,6 +2507,58 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             <button type="button" className="rp-help-cta" onClick={ activeHelp.ctaAction }>
                                 { activeHelp.ctaLabel }
                             </button>
+                        </div>
+                    </div>
+                </section>
+            ) }
+            {/* ==================== TABLA FILTRABLE DE COMANDOS (:comandos) ==================== */}
+            { sideModal === 'commands' && (
+                <section className="rp-commands-win" aria-label="Comandos de Habbten RP">
+                    <div className="rp-win-header">
+                        <span className="rp-win-title">Comandos de Habbten RP</span>
+                        <button type="button" className="rp-habbo-close-btn" onClick={ () => setSideModal(null) } title="Cerrar">
+                            <FaTimes />
+                        </button>
+                    </div>
+                    <div className="rp-commands-body">
+                        <div className="rp-white-search">
+                            <FaSearch className="rp-search-ico" />
+                            <input
+                                type="text"
+                                value={ cmdFilter }
+                                onChange={ e => setCmdFilter(e.target.value) }
+                                placeholder="Filtrar comandos (ej: :me, policía, curar...)" />
+                        </div>
+                        <div className="rp-commands-table-wrap">
+                            <table className="rp-commands-table">
+                                <thead>
+                                    <tr>
+                                        <th>Comando</th>
+                                        <th>Categoría</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    { RP_COMMANDS_CATALOG.filter(c => {
+                                        const q = cmdFilter.trim().toLowerCase();
+                                        if(!q) return true;
+                                        return c.cmd.toLowerCase().includes(q) || c.group.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q);
+                                    }).map(c => (
+                                        <tr
+                                            key={ c.cmd }
+                                            onClick={ () => {
+                                                const baseCmd = c.cmd.split(' ')[0];
+                                                setChatText(baseCmd + ' ');
+                                                setSideModal(null);
+                                                setTimeout(() => chatInputRef.current?.focus(), 40);
+                                            } }>
+                                            <td><code>{ c.cmd }</code></td>
+                                            <td><span className="rp-cmd-group">{ c.group }</span></td>
+                                            <td>{ c.desc }</td>
+                                        </tr>
+                                    )) }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </section>
