@@ -7,6 +7,7 @@ import { BadgesContainerView } from './views/BadgesContainerView';
 import { FriendsContainerView } from './views/FriendsContainerView';
 import { GroupsContainerView } from './views/GroupsContainerView';
 import { UserContainerView } from './views/UserContainerView';
+import { isRoleplayMode } from '../roleplay/RoleplayService';
 import iconRooms2012Img from '../../assets/images/eras/flash2012/profile/icon_rooms_2012.png';
 import iconLevel2012Img from '../../assets/images/eras/flash2012/profile/icon_level_2012.png';
 import iconBadges2012Img from '../../assets/images/eras/flash2012/profile/icon_badges_2012.png';
@@ -55,6 +56,19 @@ export const UserProfileView: FC<{}> = props =>
     useMessageEvent<UserProfileEvent>(UserProfileEvent, event =>
     {
         const parser = event.getParser();
+
+        // En /rp_client, cualquier apertura de perfil abre el modal "Mi perfil / Perfil RP" en lugar de la ficha clásica
+        if(isRoleplayMode())
+        {
+            window.dispatchEvent(new CustomEvent('habbten-rp-open-profile', {
+                detail: {
+                    userId: parser.id,
+                    username: parser.username,
+                    figure: parser.figure
+                }
+            }));
+            return;
+        }
 
         let isSameProfile = false;
 

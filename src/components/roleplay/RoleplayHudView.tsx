@@ -49,6 +49,8 @@ import phoneMessagesIcon from '@/assets/images/roleplay/phone-messages.png';
 import phoneSettingsIcon from '@/assets/images/roleplay/phone-settings.png';
 import questCombIcon from '@/assets/images/roleplay/quest-comb.png';
 import questHangerIcon from '@/assets/images/roleplay/quest-hanger.png';
+import statFarmingIcon from '@/assets/images/roleplay/stat-farming.png';
+import statFishingIcon from '@/assets/images/roleplay/stat-fishing.png';
 import toolFloorPlanIcon from '@/assets/images/roleplay/tool-floor-plan.png';
 import toolRoomBuilderIcon from '@/assets/images/roleplay/tool-room-builder.png';
 import toolRoomDimmerIcon from '@/assets/images/roleplay/tool-room-dimmer.png';
@@ -73,6 +75,7 @@ import {
     RpItem,
     rpGetGangs,
     rpGetNews,
+    rpGetProfile,
     rpGetRankings,
     rpGetState,
     rpPost,
@@ -80,7 +83,7 @@ import {
 } from './RoleplayService';
 import './RoleplayHudView.scss';
 
-type SideModalTab = null | 'shop' | 'inventory' | 'help' | 'commands';
+type SideModalTab = null | 'shop' | 'inventory' | 'help' | 'commands' | 'profile';
 type HelpTopicId = 'around' | 'rooms' | 'character' | 'phone' | 'chat';
 type PhoneApp = 'lock' | 'home' | 'contacts' | 'messages' | 'camera' | 'photos' | 'achievements' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'rankings' | 'settings';
 
@@ -344,10 +347,11 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     // Preferencias del cliente RP + Zoom de sala
     const [ rpPrefs, setRpPrefs ] = useState<RpClientPrefs>(() => loadRpPrefs());
 
-    // HUD de objetivo en sala (estilo PixelRP) + filtro :comandos
+    // HUD de objetivo en sala (estilo PixelRP) + filtro :comandos + perfil de otro jugador
     const [ targetHud, setTargetHud ] = useState<TargetHudInfo | null>(null);
     const [ targetLocked, setTargetLocked ] = useState<boolean>(false);
     const [ cmdFilter, setCmdFilter ] = useState<string>('');
+    const [ viewedProfile, setViewedProfile ] = useState<{ isOwn: boolean; user: { id: number; username: string; look: string }; character: any } | null>(null);
 
     // Swipe-to-unlock real (arrastre físico mouse/touch)
     const unlockTrackRef = useRef<HTMLDivElement | null>(null);
@@ -450,11 +454,51 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             if(detail.state) setState(prev => prev ? { ...prev, ...detail.state } : detail.state);
             if(detail.message) pushToast(detail.ok ? 'ok' : 'err', detail.message);
         };
+        const onOpenProfile = (ev: Event) =>
+        {
+            const detail = (ev as CustomEvent)?.detail;
+            const uid = Number(detail?.userId || 0);
+            const ownId = GetSessionDataManager()?.userId;
+            if(!uid || uid === ownId)
+            {
+                setViewedProfile(null);
+                setSideModal('profile');
+                return;
+            }
+            setViewedProfile({
+                isOwn: false,
+                user: { id: uid, username: detail?.username || 'Ciudadano', look: detail?.figure || '' },
+                character: {
+                    rp_level: 1,
+                    rp_xp: 0,
+                    xpForNextLevel: 100,
+                    hp: 100,
+                    max_hp: 100,
+                    energy: 100,
+                    max_energy: 100,
+                    stat_health: 0,
+                    stat_energy: 0,
+                    stat_farming: 0,
+                    stat_fishing: 0,
+                    availableSkillPoints: 0
+                }
+            });
+            setSideModal('profile');
+            rpGetProfile(uid).then(res =>
+            {
+                if(res?.success && res.user && res.character)
+                {
+                    setViewedProfile({ isOwn: false, user: res.user, character: res.character });
+                }
+            }).catch(() => {});
+        };
         window.addEventListener('habbten-rp-action-feedback', onFeedback);
+        window.addEventListener('habbten-rp-open-profile', onOpenProfile);
         return () =>
         {
             clearInterval(interval);
             window.removeEventListener('habbten-rp-action-feedback', onFeedback);
+            window.removeEventListener('habbten-rp-open-profile', onOpenProfile);
         };
     }, [ rpActive, refreshState, pushToast ]);
 
@@ -1415,9 +1459,12 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </button>
             </aside>
 
-            {/* ==================== HUD INFERIOR IZQUIERDA (CABEZA FRONTAL) + CHAT BLANCO ==================== */}
+            {/* ==================== HUD INFERIOR IZQUIERDA (CLIC -> MI PERFIL) + CHAT BLANCO ==================== */}
             <div className="rp-bottom-cluster">
-                <div className="rp-char-hud" onClick={ () => togglePhone(true) } title="Abrir celular">
+                <div
+                    className="rp-char-hud"
+                    onClick={ () => { setViewedProfile(null); openSideModal('profile'); } }
+                    title="Abrir Mi perfil">
                     <div className="rp-char-avatar-box">
                         <img
                             className="rp-char-head-img"
@@ -2631,6 +2678,200 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     </div>
                 </section>
             ) }
+            {/* ==================== MI PERFIL / PERFIL RP (EXACTO A CAPTURA) ==================== */}
+            { sideModal === 'profile' && (() => {
+                const isOwnProf = !viewedProfile || viewedProfile.isOwn;
+                const profUser = isOwnProf ? state.user : viewedProfile.user;
+                const profChar = isOwnProf ? character : viewedProfile.character;
+                const pLevel = Number(profChar?.rp_level ?? 1);
+                const pXp = Number(profChar?.rp_xp ?? 0);
+                const pXpNext = Math.max(1, Number(profChar?.xpForNextLevel ?? 100));
+                const pXpPct = Math.max(0, Math.min(100, Math.round((pXp / pXpNext) * 100)));
+                const pHp = Number(profChar?.hp ?? 100);
+                const pMaxHp = Math.max(1, Number(profChar?.max_hp ?? 100));
+                const pHpPct = Math.max(0, Math.min(100, Math.round((pHp / pMaxHp) * 100)));
+                const pEn = Number(profChar?.energy ?? 100);
+                const pMaxEn = Math.max(1, Number(profChar?.max_energy ?? 100));
+                const pEnPct = Math.max(0, Math.min(100, Math.round((pEn / pMaxEn) * 100)));
+                const sHealth = Number(profChar?.stat_health ?? 0);
+                const sEnergy = Number(profChar?.stat_energy ?? 0);
+                const sFarming = Number(profChar?.stat_farming ?? 0);
+                const sFishing = Number(profChar?.stat_fishing ?? 0);
+                const availPts = Math.max(0, Number(profChar?.availableSkillPoints ?? (pLevel - (sHealth + sEnergy + sFarming + sFishing))));
+
+                return (
+                    <section className="rp-profile-win" aria-label={ isOwnProf ? 'Mi perfil' : `Perfil de ${ profUser.username }` }>
+                        <div className="rp-win-header">
+                            <span className="rp-win-title">{ isOwnProf ? 'Mi perfil' : `Perfil de ${ profUser.username }` }</span>
+                            <button type="button" className="rp-habbo-close-btn" onClick={ () => setSideModal(null) } title="Cerrar">
+                                <FaTimes />
+                            </button>
+                        </div>
+
+                        <div className="rp-profile-scroll">
+                            <div className="rp-profile-top">
+                                <div className="rp-profile-avatar-stage">
+                                    <span className="rp-profile-tile" />
+                                    <img
+                                        className="rp-profile-avatar-img"
+                                        src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(profUser.look || '') }&direction=3&head_direction=3&size=m` }
+                                        alt={ profUser.username } />
+                                </div>
+
+                                <div className="rp-profile-summary">
+                                    <div className="rp-profile-name">{ profUser.username }</div>
+                                    <div className="rp-profile-lvl">Nivel { pLevel }</div>
+
+                                    <div className="rp-profile-bar">
+                                        <div className="rp-profile-bar-fill is-xp" style={ { width: `${ pXpPct }%` } } />
+                                        <span>{ pXp } / { pXpNext } XP</span>
+                                    </div>
+
+                                    <div className="rp-profile-bar-group">
+                                        <label>Vida</label>
+                                        <div className="rp-profile-bar">
+                                            <div className="rp-profile-bar-fill is-hp" style={ { width: `${ pHpPct }%` } } />
+                                            <span>{ pHp } / { pMaxHp }</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="rp-profile-bar-group">
+                                        <label>Energía</label>
+                                        <div className="rp-profile-bar">
+                                            <div className="rp-profile-bar-fill is-en" style={ { width: `${ pEnPct }%` } } />
+                                            <span>{ pEn } / { pMaxEn }</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="rp-profile-divider" />
+
+                            <div className="rp-profile-stats-head">
+                                <h4>Estadísticas del personaje</h4>
+                                { isOwnProf && (
+                                    <>
+                                        <span className="rp-profile-pts">
+                                            { availPts } { availPts === 1 ? 'punto de habilidad disponible' : 'puntos de habilidad disponibles' }
+                                        </span>
+                                        <p>Ganas 1 punto por cada nivel de personaje. Cada mejora cuesta 1 punto; el máximo por estadística es 10.</p>
+                                    </>
+                                ) }
+                            </div>
+
+                            <div className="rp-profile-stats-grid">
+                                <div className="rp-stat-card">
+                                    <div className="rp-stat-card-top">
+                                        <span className="rp-stat-card-title">
+                                            <FaHeart style={ { color: '#d45a6a' } } />
+                                            <span>Vida</span>
+                                        </span>
+                                        <span className="rp-stat-card-right">
+                                            <span>{ sHealth } / 10</span>
+                                            { isOwnProf && (
+                                                <button
+                                                    type="button"
+                                                    className="rp-stat-plus-btn"
+                                                    disabled={ busy || availPts < 1 || sHealth >= 10 }
+                                                    title="Mejorar Vida (+10 HP)"
+                                                    onClick={ () => runAction('/profile/upgrade', { stat: 'health' }) }>
+                                                    <FaPlus />
+                                                </button>
+                                            ) }
+                                        </span>
+                                    </div>
+                                    <div className="rp-stat-mini-track"><div style={ { width: `${ sHealth * 10 }%` } } /></div>
+                                    <p className="rp-stat-card-desc">
+                                        Vida máxima: { pMaxHp } HP. Cada punto añade 10 de vida máxima y restaura 10 HP al instante.
+                                    </p>
+                                </div>
+
+                                <div className="rp-stat-card">
+                                    <div className="rp-stat-card-top">
+                                        <span className="rp-stat-card-title">
+                                            <FaBolt style={ { color: '#dfc374' } } />
+                                            <span>Energía</span>
+                                        </span>
+                                        <span className="rp-stat-card-right">
+                                            <span>{ sEnergy } / 10</span>
+                                            { isOwnProf && (
+                                                <button
+                                                    type="button"
+                                                    className="rp-stat-plus-btn"
+                                                    disabled={ busy || availPts < 1 || sEnergy >= 10 }
+                                                    title="Mejorar Energía (+10 Energía)"
+                                                    onClick={ () => runAction('/profile/upgrade', { stat: 'energy' }) }>
+                                                    <FaPlus />
+                                                </button>
+                                            ) }
+                                        </span>
+                                    </div>
+                                    <div className="rp-stat-mini-track"><div style={ { width: `${ sEnergy * 10 }%` } } /></div>
+                                    <p className="rp-stat-card-desc">
+                                        Energía máxima: { pMaxEn }. Cada punto añade 10 de energía para trabajar, entrenar y desplazarte.
+                                    </p>
+                                </div>
+
+                                <div className="rp-stat-card">
+                                    <div className="rp-stat-card-top">
+                                        <span className="rp-stat-card-title">
+                                            <img src={ statFarmingIcon } alt="" className="rp-stat-ico-sprite" />
+                                            <span>Agricultura</span>
+                                        </span>
+                                        <span className="rp-stat-card-right">
+                                            <span>{ sFarming } / 10</span>
+                                            { isOwnProf && (
+                                                <button
+                                                    type="button"
+                                                    className="rp-stat-plus-btn"
+                                                    disabled={ busy || availPts < 1 || sFarming >= 10 }
+                                                    title="Mejorar Agricultura"
+                                                    onClick={ () => runAction('/profile/upgrade', { stat: 'farming' }) }>
+                                                    <FaPlus />
+                                                </button>
+                                            ) }
+                                        </span>
+                                    </div>
+                                    <div className="rp-stat-mini-track"><div style={ { width: `${ sFarming * 10 }%` } } /></div>
+                                    <p className="rp-stat-card-desc">
+                                        0 / { 3 + sFarming } parcelas en uso en tus salas. Cada punto desbloquea una parcela adicional.
+                                    </p>
+                                </div>
+
+                                <div className="rp-stat-card">
+                                    <div className="rp-stat-card-top">
+                                        <span className="rp-stat-card-title">
+                                            <img src={ statFishingIcon } alt="" className="rp-stat-ico-sprite" />
+                                            <span>Pesca</span>
+                                        </span>
+                                        <span className="rp-stat-card-right">
+                                            <span>{ sFishing } / 10</span>
+                                            { isOwnProf && (
+                                                <button
+                                                    type="button"
+                                                    className="rp-stat-plus-btn"
+                                                    disabled={ busy || availPts < 1 || sFishing >= 10 }
+                                                    title="Mejorar Pesca"
+                                                    onClick={ () => runAction('/profile/upgrade', { stat: 'fishing' }) }>
+                                                    <FaPlus />
+                                                </button>
+                                            ) }
+                                        </span>
+                                    </div>
+                                    <div className="rp-stat-mini-track"><div style={ { width: `${ sFishing * 10 }%` } } /></div>
+                                    <p className="rp-stat-card-desc">
+                                        Reservada para el sistema de pesca en el Muelle. Tus mejoras se guardan automáticamente.
+                                    </p>
+                                </div>
+
+                                <div className="rp-stat-slot-empty" aria-hidden="true" />
+                                <div className="rp-stat-slot-empty" aria-hidden="true" />
+                            </div>
+                        </div>
+                    </section>
+                );
+            })() }
+
             {/* ==================== TABLA FILTRABLE DE COMANDOS (:comandos) ==================== */}
             { sideModal === 'commands' && (
                 <section className="rp-commands-win" aria-label="Comandos de Habbten RP">

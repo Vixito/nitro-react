@@ -14,6 +14,11 @@ export interface RpCharacter
     xpForNextLevel: number;
     strength: number;
     stamina_stat: number;
+    stat_health?: number;
+    stat_energy?: number;
+    stat_farming?: number;
+    stat_fishing?: number;
+    availableSkillPoints?: number;
     job_slug: string;
     job_rank: number;
     job_xp: number;
@@ -216,6 +221,12 @@ export async function rpGetRankings(): Promise<any>
 export async function rpGetNews(): Promise<{ success: boolean; articles: any[]; events: any[] }>
 {
     const res = await fetch('/api/rp/news', { credentials: 'include' });
+    return await res.json();
+}
+
+export async function rpGetProfile(userId: number): Promise<any>
+{
+    const res = await fetch(`/api/rp/profile/${ userId }`, { credentials: 'include' });
     return await res.json();
 }
 
