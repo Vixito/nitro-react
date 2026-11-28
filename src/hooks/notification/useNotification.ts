@@ -16,6 +16,12 @@ const getTimeZeroPadded = (time: number) =>
 let modDisclaimerTimeout: ReturnType<typeof setTimeout> = null;
 
 const isShockwaveEra = () => (typeof document !== 'undefined') && (document.body?.dataset?.era === 'shockwave2006' || document.body?.classList?.contains('era-shockwave-2006'));
+const isRpClient = () => (typeof document !== 'undefined') && document.body?.classList?.contains('habbten-rp-client');
+const isClassicCurrencyNotice = (text?: string, type?: string, iconUrl?: string) => Boolean(
+    (text && /(diamante|diamond|ducket|crédito|credito|credit|loyalty|pixel|habbo club|hc gift)/i.test(text)) ||
+    (type && /(diamond|loyalty|ducket|credit|currency|club_gift|hc_gift)/i.test(type)) ||
+    (iconUrl && /(currency|diamond|ducket|credit|loyalty|\/5\.png|\/0\.png)/i.test(iconUrl))
+);
 
 const useNotificationState = () =>
 {
@@ -72,6 +78,7 @@ const useNotificationState = () =>
     const showSingleBubble = useCallback((message: string, type: string, imageUrl: string = null, internalLink: string = null, title: string = null) =>
     {
         if(bubblesDisabled) return;
+        if(isRpClient() && isClassicCurrencyNotice(message, type, imageUrl)) return;
 
         const notificationItem = new NotificationBubbleItem(message, type, imageUrl, internalLink, title);
 
@@ -93,6 +100,8 @@ const useNotificationState = () =>
         const linkTitle = getNotificationPart(options, type, 'linkTitle', false);
         const linkUrl = getNotificationPart(options, type, 'linkUrl', false);
         const image = getNotificationImageUrl(options, type);
+
+        if(isRpClient() && isClassicCurrencyNotice(`${ title || '' } ${ message || '' }`, type, image)) return;
 
         const isShockwaveBubble = isShockwaveEra() && (type.toLowerCase().includes('event') || type.toLowerCase().includes('staff') || type.toLowerCase().includes('broadcast'));
 
@@ -245,6 +254,8 @@ const useNotificationState = () =>
 
     useMessageEvent<ClubGiftNotificationEvent>(ClubGiftNotificationEvent, event =>
     {
+        if(isRpClient()) return;
+
         const parser = event.getParser();
 
         if(parser.numGifts <= 0) return;
@@ -261,6 +272,8 @@ const useNotificationState = () =>
 
     useMessageEvent<ActivityPointNotificationMessageEvent>(ActivityPointNotificationMessageEvent, event =>
     {
+        if(isRpClient()) return;
+
         const parser = event.getParser();
 
         if((parser.amountChanged <= 0) || (parser.type !== 5)) return;
@@ -332,6 +345,8 @@ const useNotificationState = () =>
 
     useMessageEvent<ClubGiftSelectedEvent>(ClubGiftSelectedEvent, event =>
     {
+        if(isRpClient()) return;
+
         const parser = event.getParser();
 
         if(!parser.products || !parser.products.length) return;

@@ -1345,7 +1345,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             {
                 setPhoneApp('home');
                 setPhoneUnlocking(false);
-            }, 320);
+            }, 660);
         }
         else
         {
@@ -1585,11 +1585,11 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
 
             {/* ==================== HUD INFERIOR IZQUIERDA (CLIC -> MI PERFIL) + CHAT BLANCO ==================== */}
             <div className="rp-bottom-cluster">
-                <div
-                    className="rp-char-hud"
-                    onClick={ () => { setViewedProfile(null); openSideModal('profile'); } }
-                    title="Abrir Mi perfil">
-                    <div className="rp-char-avatar-box">
+                <div className="rp-char-hud">
+                    <div
+                        className="rp-char-avatar-box"
+                        onClick={ () => { setViewedProfile(null); openSideModal('profile'); } }
+                        title="Abrir Mi perfil">
                         <img
                             className="rp-char-head-img"
                             src={ `/habbo-imaging/avatarimage?figure=${ encodeURIComponent(state.user.look || '') }&headonly=1&size=m&direction=3&head_direction=3` }

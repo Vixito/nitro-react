@@ -84,6 +84,17 @@ export const FloorplanEditorView: FC<{}> = props =>
     {
         const parser = event.getParser();
 
+        try
+        {
+            const w = window as any;
+            w.__habbtenFloorplanCache = {
+                ...(w.__habbtenFloorplanCache || {}),
+                tilemap: parser.model,
+                wallHeight: (parser.wallHeight + 1)
+            };
+        }
+        catch (_) {}
+
         setOriginalFloorplanSettings(prevValue =>
         {
             const newValue = { ...prevValue };
@@ -107,6 +118,17 @@ export const FloorplanEditorView: FC<{}> = props =>
     useMessageEvent<RoomVisualizationSettingsEvent>(RoomVisualizationSettingsEvent, event =>
     {
         const parser = event.getParser();
+
+        try
+        {
+            const w = window as any;
+            w.__habbtenFloorplanCache = {
+                ...(w.__habbtenFloorplanCache || {}),
+                thicknessFloor: convertSettingToNumber(parser.thicknessFloor),
+                thicknessWall: convertSettingToNumber(parser.thicknessWall)
+            };
+        }
+        catch (_) {}
 
         setOriginalFloorplanSettings(prevValue =>
         {
