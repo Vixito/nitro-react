@@ -1,10 +1,11 @@
 import { CrackableDataType, GroupInformationComposer, GroupInformationEvent, NowPlayingEvent, RoomControllerLevel, RoomObjectCategory, RoomObjectOperationType, RoomObjectVariable, RoomWidgetEnumItemExtradataParameter, RoomWidgetFurniInfoUsagePolicyEnum, SetObjectDataMessageComposer, SongInfoReceivedEvent, StringDataType } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useState } from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaUndo } from 'react-icons/fa';
 import close2012Img from '../../../../../assets/images/infostand/close-2012.png';
 import { AvatarInfoFurni, CreateLinkEvent, GetFurnitureDataForRoomObject, GetGroupInformation, GetNitroInstance, GetRoomEngine, LocalizeText, SendMessageComposer } from '../../../../../api';
 import { Base, Button, Column, Flex, LayoutBadgeImageView, LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, Text, UserProfileIconView } from '../../../../../common';
 import { useEraTheme, useMessageEvent, useRoom, useSoundEvent } from '../../../../../hooks';
+import { isRoleplayMode } from '../../../../roleplay/RoleplayService';
 
 interface InfoStandWidgetFurniViewProps
 {
@@ -42,6 +43,42 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
     const [ songId, setSongId ] = useState<number>(-1);
     const [ songName, setSongName ] = useState<string>('');
     const [ songCreator, setSongCreator ] = useState<string>('');
+    const [ rpOpacity, setRpOpacity ] = useState<number>(100);
+    const rpMode = isRoleplayMode();
+
+    useEffect(() =>
+    {
+        if(!rpMode || !roomSession || !avatarInfo) return;
+        try
+        {
+            const cat = avatarInfo.isWallItem ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR;
+            const roomObj = GetRoomEngine()?.getRoomObject(roomSession.roomId, avatarInfo.id, cat);
+            const alpha = roomObj?.model?.getValue<number>(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER);
+            setRpOpacity(typeof alpha === 'number' && !isNaN(alpha) ? Math.round(Math.max(10, Math.min(100, alpha * 100))) : 100);
+        }
+        catch (_)
+        {
+            setRpOpacity(100);
+        }
+    }, [ rpMode, roomSession, avatarInfo ]);
+
+    const applyRpFurniOpacity = useCallback((nextPct: number) =>
+    {
+        const clamped = Math.max(10, Math.min(100, Math.round(nextPct)));
+        setRpOpacity(clamped);
+        if(!roomSession || !avatarInfo) return;
+        try
+        {
+            const cat = avatarInfo.isWallItem ? RoomObjectCategory.WALL : RoomObjectCategory.FLOOR;
+            const roomObj = GetRoomEngine()?.getRoomObject(roomSession.roomId, avatarInfo.id, cat);
+            if(roomObj?.model)
+            {
+                roomObj.model.setValue(RoomObjectVariable.FURNITURE_ALPHA_MULTIPLIER, clamped / 100);
+                GetNitroInstance()?.application?.render();
+            }
+        }
+        catch (_) {}
+    }, [ roomSession, avatarInfo ]);
 
     useSoundEvent<NowPlayingEvent>(NowPlayingEvent.NPE_SONG_CHANGED, event =>
     {
@@ -346,6 +383,82 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
     }, [ avatarInfo ]);
 
     if(!avatarInfo) return null;
+
+    // En /rp_client mostrar tarjeta plana limpia (con Opacidad + botones Habbo blancos si hay permisos, o solo vista previa si no)
+    if(rpMode)
+    {
+        try
+        {
+            const rawPrefs = localStorage.getItem('habbten_rp_client_prefs_v1');
+            if(rawPrefs)
+            {
+                const parsed = JSON.parse(rawPrefs);
+                if(parsed && parsed.furniPopup === false) return null;
+            }
+        }
+        catch (_) {}
+
+        const canManage = canMove || canRotate || (pickupMode !== PICKUP_MODE_NONE);
+        const hasAnyAction = canManage || canUse;
+
+        return (
+            <div className="rp-furni-infostand">
+                <div className="rp-infostand-header">
+                    <span className="rp-infostand-title">{ avatarInfo.name }</span>
+                    <button type="button" className="rp-habbo-close-btn" onClick={ onClose } title="Cerrar">
+                        <FaTimes />
+                    </button>
+                </div>
+
+                <div className="rp-furni-body">
+                    <div className="rp-furni-preview">
+                        { avatarInfo.image && avatarInfo.image.src.length > 0 && (
+                            <img className="rp-furni-preview-img" src={ avatarInfo.image.src } alt={ avatarInfo.name } />
+                        ) }
+                    </div>
+
+                    { canManage && (
+                        <div className="rp-furni-opacity-row">
+                            <span>Opacidad</span>
+                            <input
+                                type="range"
+                                min={ 10 }
+                                max={ 100 }
+                                step={ 5 }
+                                value={ rpOpacity }
+                                onChange={ e => applyRpFurniOpacity(Number(e.target.value)) } />
+                            <span className="rp-furni-opacity-val">{ rpOpacity }%</span>
+                        </div>
+                    ) }
+
+                    { hasAnyAction && (
+                        <div className="rp-furni-btns">
+                            { canMove && (
+                                <button type="button" className="rp-furni-white-btn" onClick={ () => processButtonAction('move') }>
+                                    Mover
+                                </button>
+                            ) }
+                            { canUse && (
+                                <button type="button" className="rp-furni-white-btn" onClick={ () => processButtonAction('use') }>
+                                    Usar
+                                </button>
+                            ) }
+                            { canRotate && (
+                                <button type="button" className="rp-furni-white-btn" onClick={ () => processButtonAction('rotate') }>
+                                    <FaUndo style={ { fontSize: 10 } } /> Rotar
+                                </button>
+                            ) }
+                            { (pickupMode !== PICKUP_MODE_NONE) && (
+                                <button type="button" className="rp-furni-white-btn" onClick={ () => processButtonAction('pickup') }>
+                                    { pickupMode === PICKUP_MODE_EJECT ? 'Expulsar' : 'Recoger' }
+                                </button>
+                            ) }
+                        </div>
+                    ) }
+                </div>
+            </div>
+        );
+    }
 
     return (
         <Column gap={ 1 } alignItems="end">

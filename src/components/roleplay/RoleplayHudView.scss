@@ -248,6 +248,136 @@ body.habbten-rp-client {
     padding-top: 8px;
 }
 
+/* ==================== INFOSTAND DE FURNI RP (CON OPACIDAD + BOTONES BLANCOS HABBO) ==================== */
+.rp-furni-infostand {
+    width: 266px;
+    background: #2b2e33;
+    border: 1px solid #4c515a;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #f3f4f6;
+}
+
+.rp-furni-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.rp-furni-preview {
+    width: 100%;
+    height: 128px;
+    background: #393e46;
+    border: 1px solid #535964;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 8px;
+}
+
+.rp-furni-preview-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+}
+
+.rp-furni-opacity-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11.5px;
+    color: #d1d5db;
+
+    input[type='range'] {
+        flex: 1;
+        min-width: 0;
+        accent-color: #ffffff;
+        cursor: pointer;
+    }
+
+    .rp-furni-opacity-val {
+        width: 34px;
+        text-align: right;
+        font-size: 11px;
+        font-weight: 600;
+        color: #e5e7eb;
+    }
+}
+
+.rp-furni-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.rp-furni-white-btn {
+    flex: 1 1 70px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 5px;
+    background: #eef1f5;
+    border: 1.5px solid #181a1e;
+    color: #181a1e;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+
+    &:hover { background: #ffffff; }
+    &:active { transform: translateY(1px); }
+}
+
+/* ==================== EDITOR DE ROPA PLANO OSCURO EN /RP_CLIENT ==================== */
+body.habbten-rp-client .nitro-avatar-editor {
+    background: #2c2f34 !important;
+    border: 1px solid #4d515a !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    color: #f3f4f6 !important;
+
+    .nitro-card-header {
+        background: #3a3d43 !important;
+        border-bottom: 1px solid #4d515a !important;
+        color: #ffffff !important;
+    }
+
+    .nitro-card-tabs {
+        background: #25282c !important;
+        border-bottom: 1px solid #41454d !important;
+
+        .nav-item,
+        .nav-link {
+            background: #2f3339 !important;
+            color: #cbd5e1 !important;
+            border: 1px solid #444952 !important;
+            border-radius: 5px !important;
+
+            &.active {
+                background: #4e5663 !important;
+                color: #ffffff !important;
+                border-color: #6b7688 !important;
+            }
+        }
+    }
+
+    .content-area {
+        background: #2c2f34 !important;
+        color: #f3f4f6 !important;
+    }
+}
+
 /* ==================== CONTENEDOR PRINCIPAL HUD RP ==================== */
 .rp-modern-root {
     position: fixed;
@@ -535,22 +665,33 @@ body.habbten-rp-client {
     gap: 10px;
     cursor: pointer;
     flex-shrink: 0;
+    transition: border-color 0.18s ease, background-color 0.18s ease;
 
-    &:hover { border-color: #525964; }
+    &:hover {
+        border-color: #5b626e;
+        background: #2b2f35;
+
+        .rp-char-avatar-box {
+            border-color: #9e9f94;
+            box-shadow: inset 0 0 0 2px #d8d9d0, 0 0 0 1px #5e5f57;
+            background: #5b5a53;
+        }
+    }
 }
 
 .rp-char-avatar-box {
     position: relative;
     width: 58px;
     height: 58px;
-    border-radius: 6px;
+    border-radius: 7px;
     background: #4e4d48;
-    border: 1px solid #353a42;
+    border: 2px solid #353a42;
     overflow: hidden;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
 }
 
 .rp-char-head-img {

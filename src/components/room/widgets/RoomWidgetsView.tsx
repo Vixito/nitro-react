@@ -1,7 +1,8 @@
 import { RoomEngineObjectEvent, RoomEngineRoomAdEvent, RoomEngineTriggerWidgetEvent, RoomEngineUseProductEvent, RoomId, RoomObjectVariable, RoomSessionErrorMessageEvent, RoomZoomEvent } from '@nitrots/nitro-renderer';
 import { FC } from 'react';
-import { DispatchUiEvent, GetRoomEngine, LocalizeText, NotificationAlertType, OpenUrl, RoomWidgetUpdateRoomObjectEvent } from '../../../api';
+import { CreateLinkEvent, DispatchUiEvent, GetFurnitureDataForRoomObject, GetRoomEngine, LocalizeText, NotificationAlertType, OpenUrl, RoomWidgetUpdateRoomObjectEvent } from '../../../api';
 import { useNotification, useRoom, useRoomEngineEvent, useRoomSessionManagerEvent } from '../../../hooks';
+import { isRoleplayMode } from '../../roleplay/RoleplayService';
 import { AvatarInfoWidgetView } from './avatar-info/AvatarInfoWidgetView';
 import { ChatInputView } from './chat-input/ChatInputView';
 import { ChatWidgetView } from './chat/ChatWidgetView';
@@ -56,7 +57,7 @@ export const RoomWidgetsView: FC<{}> = props =>
                     //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_PLACEHOLDER, objectId, category, event.roomId));
                     break;
                 case RoomEngineTriggerWidgetEvent.REQUEST_CLOTHING_CHANGE:
-                    //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_CLOTHING_CHANGE, objectId, category, event.roomId));
+                    if(isRoleplayMode()) CreateLinkEvent('avatar-editor/show');
                     break;
                 case RoomEngineTriggerWidgetEvent.REQUEST_PLAYLIST_EDITOR:
                     //widgetHandler.processWidgetMessage(new RoomWidgetFurniToWidgetMessage(RoomWidgetFurniToWidgetMessage.REQUEST_PLAYLIST_EDITOR, objectId, category, event.roomId));
@@ -86,6 +87,16 @@ export const RoomWidgetsView: FC<{}> = props =>
                     }
                     break;
                 case RoomEngineRoomAdEvent.FURNI_DOUBLE_CLICK:
+                    if(isRoleplayMode())
+                    {
+                        const fData = GetFurnitureDataForRoomObject(event.roomId, objectId, category);
+                        const cn = String(fData?.className || '').toLowerCase();
+                        const fn = String(fData?.name || '').toLowerCase();
+                        if(cn.includes('booth') || cn.includes('wardrobe') || cn.includes('change') || fn.includes('vestidor') || fn.includes('probador'))
+                        {
+                            CreateLinkEvent('avatar-editor/show');
+                        }
+                    }
                     break;
                 case RoomEngineRoomAdEvent.TOOLTIP_SHOW:
                 case RoomEngineRoomAdEvent.TOOLTIP_HIDE:

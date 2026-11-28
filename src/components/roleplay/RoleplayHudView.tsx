@@ -1,4 +1,4 @@
-import { AvatarExpressionEnum, RoomObjectCategory, RoomUnitChatComposer, RoomUnitChatShoutComposer, UserSettingsCameraFollowComposer } from '@nitrots/nitro-renderer';
+import { AvatarExpressionEnum, RoomEngineObjectEvent, RoomObjectCategory, RoomUnitChatComposer, RoomUnitChatShoutComposer, UserSettingsCameraFollowComposer } from '@nitrots/nitro-renderer';
 import { FC, FormEvent, PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     FaBolt,
@@ -66,8 +66,8 @@ import iconAnnouncements from '@/assets/images/toolbar/icons/me-menu/announcemen
 import iconForums from '@/assets/images/toolbar/icons/me-menu/forums.png';
 import iconProfile from '@/assets/images/toolbar/icons/me-menu/profile.png';
 import iconTalents from '@/assets/images/toolbar/icons/me-menu/talents.png';
-import { CreateLinkEvent, CreateRoomSession, GetNitroInstance, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile, MessengerThreadChat, SendMessageComposer } from '../../api';
-import { useFriends, useMessenger, useObjectSelectedEvent, useSessionInfo } from '../../hooks';
+import { CreateLinkEvent, CreateRoomSession, GetFurnitureDataForRoomObject, GetNitroInstance, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile, MessengerThreadChat, SendMessageComposer } from '../../api';
+import { useFriends, useMessenger, useObjectSelectedEvent, useRoomEngineEvent, useSessionInfo } from '../../hooks';
 import {
     isRoleplayMode,
     RpFullState,
@@ -637,6 +637,63 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             return next;
         });
     }, []);
+
+    // Casilla roja al pasar el ratón sobre un furni no caminable en sala (estilo HabboRP)
+    useRoomEngineEvent<RoomEngineObjectEvent>([
+        RoomEngineObjectEvent.MOUSE_ENTER,
+        RoomEngineObjectEvent.MOUSE_LEAVE
+    ], event =>
+    {
+        if(!rpActive) return;
+        const roomId = event.roomId || GetRoomSession()?.roomId || -1;
+        if(roomId <= 0) return;
+
+        const setCursorTint = (hexColor: number) =>
+        {
+            try
+            {
+                const cursors = GetRoomEngine()?.getRoomObjects(roomId, RoomObjectCategory.CURSOR) || [];
+                for(const cur of cursors)
+                {
+                    const vis = cur?.visualization as any;
+                    if(vis && Array.isArray(vis._sprites))
+                    {
+                        for(const sp of vis._sprites)
+                        {
+                            if(sp) sp.color = hexColor;
+                        }
+                    }
+                    else if(vis && typeof vis.getSprite === 'function')
+                    {
+                        for(let i = 0; i < 4; i++)
+                        {
+                            const sp = vis.getSprite(i);
+                            if(sp) sp.color = hexColor;
+                        }
+                    }
+                }
+                GetNitroInstance()?.application?.render();
+            }
+            catch (_) {}
+        };
+
+        if(event.type === RoomEngineObjectEvent.MOUSE_LEAVE)
+        {
+            setCursorTint(0xFFFFFF);
+            return;
+        }
+
+        if(event.category === RoomObjectCategory.FLOOR)
+        {
+            const fData = GetFurnitureDataForRoomObject(roomId, event.objectId, RoomObjectCategory.FLOOR);
+            const blocked = Boolean(fData && !fData.canStandOn && !fData.canSitOn && !fData.canLayOn);
+            setCursorTint(blocked ? 0xEF4444 : 0xFFFFFF);
+        }
+        else
+        {
+            setCursorTint(0xFFFFFF);
+        }
+    });
 
     // Escuchar selección de otro avatar para el HUD de objetivo (estilo PixelRP)
     useObjectSelectedEvent(event =>
