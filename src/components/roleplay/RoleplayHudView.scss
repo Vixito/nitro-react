@@ -338,6 +338,25 @@ body.habbten-rp-client {
     background: #2f302e;
     border: 1px solid #595853;
     border-radius: 7px;
+    max-width: 280px;
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    overflow: hidden;
+    transition: max-width 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.18s ease,
+                transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                padding 0.22s ease,
+                border-color 0.18s ease;
+
+    &:not(.is-open) {
+        max-width: 0;
+        opacity: 0;
+        padding-left: 0;
+        padding-right: 0;
+        border-color: transparent;
+        transform: translateX(14px) scale(0.94);
+        pointer-events: none;
+    }
 }
 
 .rp-builder-sq-btn {
@@ -854,6 +873,65 @@ body.habbten-rp-client {
     pointer-events: none;
 }
 
+/* Pantalla de carga de app / transición dentro del celular (exacta a captura) */
+@keyframes rpPhoneFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rpPhoneLoadSlide {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(65%); }
+    100% { transform: translateX(210%); }
+}
+
+.rp-phone-splash {
+    flex: 1;
+    min-height: 0;
+    background: #2f3338;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    animation: rpPhoneFadeIn 0.14s ease-out;
+}
+
+.rp-phone-splash-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 11px;
+    background: #464b52;
+    border: 1px solid #6a717c;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rp-phone-splash-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.rp-phone-splash-bar {
+    width: 68px;
+    height: 4px;
+    border-radius: 99px;
+    background: #474d56;
+    overflow: hidden;
+    position: relative;
+
+    > span {
+        display: block;
+        width: 44%;
+        height: 100%;
+        border-radius: 99px;
+        background: #52d681;
+        animation: rpPhoneLoadSlide 0.55s ease-in-out infinite;
+    }
+}
+
 /* Home Screen Apps */
 .rp-phone-home {
     flex: 1;
@@ -863,6 +941,7 @@ body.habbten-rp-client {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    animation: rpPhoneFadeIn 0.18s ease-out;
 }
 
 .rp-phone-home-user {
@@ -947,6 +1026,7 @@ body.habbten-rp-client {
     min-height: 0;
     display: flex;
     flex-direction: column;
+    animation: rpPhoneFadeIn 0.18s ease-out;
 }
 
 .rp-phone-solid-bg {
@@ -1365,13 +1445,13 @@ body.habbten-rp-client {
 }
 
 .rp-cam-frame-outer {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    max-height: 236px;
-    padding: 7px;
+    width: 232px;
+    height: 232px;
+    padding: 6px;
     background: #23262b;
     border: 1px solid #484d55;
     border-radius: 6px;
+    flex-shrink: 0;
 }
 
 .rp-cam-viewfinder {

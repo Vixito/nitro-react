@@ -19,6 +19,28 @@ import dockInventoryIcon from '@/assets/images/roleplay/dock-inventory.png';
 import dockShopIcon from '@/assets/images/roleplay/dock-shop.png';
 import helpLifebuoyImg from '@/assets/images/roleplay/help-lifebuoy.png';
 import helpTripleQIcon from '@/assets/images/roleplay/help-triple-q.png';
+import itemBandageIcon from '@/assets/images/roleplay/item-bandage.png';
+import itemBatIcon from '@/assets/images/roleplay/item-bat.png';
+import itemBikeIcon from '@/assets/images/roleplay/item-bike.png';
+import itemBurgerIcon from '@/assets/images/roleplay/item-burger.png';
+import itemCarIcon from '@/assets/images/roleplay/item-car.png';
+import itemCoffeeIcon from '@/assets/images/roleplay/item-coffee.png';
+import itemEnergyIcon from '@/assets/images/roleplay/item-energy.png';
+import itemFistsIcon from '@/assets/images/roleplay/item-fists.png';
+import itemGymIcon from '@/assets/images/roleplay/item-gym.png';
+import itemHandcuffsIcon from '@/assets/images/roleplay/item-handcuffs.png';
+import itemKevlarIcon from '@/assets/images/roleplay/item-kevlar.png';
+import itemLockpickIcon from '@/assets/images/roleplay/item-lockpick.png';
+import itemMedkitIcon from '@/assets/images/roleplay/item-medkit.png';
+import itemMotoIcon from '@/assets/images/roleplay/item-moto.png';
+import itemPistolIcon from '@/assets/images/roleplay/item-pistol.png';
+import itemPoliceCarIcon from '@/assets/images/roleplay/item-police-car.png';
+import itemRifleIcon from '@/assets/images/roleplay/item-rifle.png';
+import itemShotgunIcon from '@/assets/images/roleplay/item-shotgun.png';
+import itemTaserIcon from '@/assets/images/roleplay/item-taser.png';
+import itemTurboIcon from '@/assets/images/roleplay/item-turbo.png';
+import itemVestIcon from '@/assets/images/roleplay/item-vest.png';
+import phone911Icon from '@/assets/images/roleplay/phone-911.png';
 import phoneAchievementsIcon from '@/assets/images/roleplay/phone-achievements.png';
 import phoneBackBtnIcon from '@/assets/images/roleplay/phone-back-btn.png';
 import phoneCameraIcon from '@/assets/images/roleplay/phone-camera.png';
@@ -37,15 +59,11 @@ import toolWindowBgIcon from '@/assets/images/roleplay/tool-window-bg.png';
 import iconCatalog from '@/assets/images/toolbar/icons/catalog.png';
 import iconHouse from '@/assets/images/toolbar/icons/house.png';
 import iconInventory from '@/assets/images/toolbar/icons/inventory.png';
-import iconModTools from '@/assets/images/toolbar/icons/modtools.png';
 import iconRooms from '@/assets/images/toolbar/icons/rooms.png';
 import iconAnnouncements from '@/assets/images/toolbar/icons/me-menu/announcements.png';
-import iconClothing from '@/assets/images/toolbar/icons/me-menu/clothing.png';
 import iconForums from '@/assets/images/toolbar/icons/me-menu/forums.png';
-import iconHelperTool from '@/assets/images/toolbar/icons/me-menu/helper-tool.png';
 import iconProfile from '@/assets/images/toolbar/icons/me-menu/profile.png';
 import iconTalents from '@/assets/images/toolbar/icons/me-menu/talents.png';
-import iconHeartSprite from '@/assets/images/icons/sign-heart.png';
 import { CreateLinkEvent, CreateRoomSession, GetNitroInstance, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile, MessengerThreadChat, SendMessageComposer } from '../../api';
 import { useFriends, useMessenger, useObjectSelectedEvent, useSessionInfo } from '../../hooks';
 import {
@@ -203,35 +221,84 @@ const RP_CHAT_COMMANDS = new Set([
 ]);
 
 const SHOP_CATEGORIES: Array<{ id: string; label: string; icon: string; banner: string }> = [
-    { id: 'all', label: 'Todo', icon: iconCatalog, banner: '/img/rp_city_banner_hd.jpg' },
-    { id: 'food', label: 'Comida y Café', icon: iconHeartSprite, banner: '/img/rp_city_night_hd.jpg' },
-    { id: 'medical', label: 'Farmacia', icon: iconHelperTool, banner: '/img/rp_city_banner_hd.jpg' },
-    { id: 'weapon', label: 'Armería', icon: iconModTools, banner: '/img/rp_city_night_hd.jpg' },
-    { id: 'armor', label: 'Chalecos', icon: iconProfile, banner: '/img/rp_city_banner_hd.jpg' },
-    { id: 'vehicle', label: 'Vehículos', icon: iconRooms, banner: '/img/rp_city_night_hd.jpg' },
-    { id: 'gym', label: 'Gimnasio', icon: iconTalents, banner: '/img/rp_city_night_hd.jpg' }
+    { id: 'all', label: 'Todo', icon: dockShopIcon, banner: '/img/rp_city_banner_hd.jpg' },
+    { id: 'food', label: 'Comida y Café', icon: itemBurgerIcon, banner: '/img/rp_city_night_hd.jpg' },
+    { id: 'medical', label: 'Farmacia', icon: itemMedkitIcon, banner: '/img/rp_city_banner_hd.jpg' },
+    { id: 'weapon', label: 'Armería', icon: itemPistolIcon, banner: '/img/rp_city_night_hd.jpg' },
+    { id: 'armor', label: 'Chalecos', icon: itemKevlarIcon, banner: '/img/rp_city_banner_hd.jpg' },
+    { id: 'tool', label: 'Herramientas', icon: itemHandcuffsIcon, banner: '/img/rp_city_banner_hd.jpg' },
+    { id: 'vehicle', label: 'Vehículos', icon: itemCarIcon, banner: '/img/rp_city_night_hd.jpg' },
+    { id: 'gym', label: 'Gimnasio', icon: itemGymIcon, banner: '/img/rp_city_night_hd.jpg' }
 ];
 
 const INV_CATEGORIES: Array<{ id: string; label: string; icon: string }> = [
-    { id: 'all', label: 'Todo', icon: iconInventory },
-    { id: 'weapon', label: 'Armas', icon: iconModTools },
-    { id: 'armor', label: 'Chalecos', icon: iconClothing },
-    { id: 'food', label: 'Comida', icon: iconHeartSprite },
-    { id: 'medical', label: 'Salud', icon: iconHelperTool },
-    { id: 'vehicle', label: 'Vehículos', icon: iconRooms }
+    { id: 'all', label: 'Todo', icon: dockInventoryIcon },
+    { id: 'weapon', label: 'Armas', icon: itemPistolIcon },
+    { id: 'armor', label: 'Chalecos', icon: itemKevlarIcon },
+    { id: 'food', label: 'Comida', icon: itemBurgerIcon },
+    { id: 'medical', label: 'Salud', icon: itemMedkitIcon },
+    { id: 'tool', label: 'Útiles', icon: itemHandcuffsIcon },
+    { id: 'vehicle', label: 'Vehículos', icon: itemCarIcon }
 ];
 
-function getItemSpriteIcon(category: string): string
+function getItemSpriteIcon(slugOrCategory: string, category?: string): string
 {
-    switch(category)
+    const s = (slugOrCategory || '').toLowerCase();
+    switch(s)
     {
-        case 'food': return iconHeartSprite;
-        case 'medical': return iconHelperTool;
-        case 'weapon': return iconModTools;
-        case 'armor': return iconClothing;
-        case 'vehicle': return iconRooms;
-        case 'gym': return iconTalents;
+        case 'coffee': return itemCoffeeIcon;
+        case 'burger': return itemBurgerIcon;
+        case 'pizza': return toolWallDecorIcon;
+        case 'energy_drink': return itemEnergyIcon;
+        case 'bandage': return itemBandageIcon;
+        case 'medkit': return itemMedkitIcon;
+        case 'vest_light': return itemVestIcon;
+        case 'vest_kevlar': return itemKevlarIcon;
+        case 'fists': return itemFistsIcon;
+        case 'bat': return itemBatIcon;
+        case 'taser': return itemTaserIcon;
+        case 'pistol_9mm': return itemPistolIcon;
+        case 'shotgun': return itemShotgunIcon;
+        case 'assault_rifle': return itemRifleIcon;
+        case 'handcuffs': return itemHandcuffsIcon;
+        case 'lockpick': return itemLockpickIcon;
+        case 'bike_urban': return itemBikeIcon;
+        case 'moto_sport': return itemMotoIcon;
+        case 'car_sedan': return itemCarIcon;
+        case 'car_police': return itemPoliceCarIcon;
+        case 'car_turbo': return itemTurboIcon;
+        case '__gym_strength':
+        case '__gym_stamina':
+            return itemGymIcon;
+    }
+
+    switch(category || s)
+    {
+        case 'food': return itemBurgerIcon;
+        case 'medical': return itemMedkitIcon;
+        case 'weapon': return itemPistolIcon;
+        case 'armor': return itemVestIcon;
+        case 'tool': return itemHandcuffsIcon;
+        case 'vehicle': return itemCarIcon;
+        case 'gym': return itemGymIcon;
         default: return iconCatalog;
+    }
+}
+
+function formatLocalTime24(d: Date): string
+{
+    return `${ String(d.getHours()).padStart(2, '0') }:${ String(d.getMinutes()).padStart(2, '0') }`;
+}
+
+function formatLocalDateLabel(d: Date): string
+{
+    try
+    {
+        return new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(d);
+    }
+    catch (_)
+    {
+        return 'Habbten RP';
     }
 }
 
@@ -251,6 +318,9 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const [ phoneOpen, setPhoneOpen ] = useState<boolean>(false);
     const [ phoneUnlocked, setPhoneUnlocked ] = useState<boolean>(false);
     const [ phoneApp, setPhoneApp ] = useState<PhoneApp>('lock');
+    const [ phoneSplash, setPhoneSplash ] = useState<{ label: string; icon: string } | null>(null);
+    const phoneSplashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [ nowClock, setNowClock ] = useState<Date>(() => new Date());
     const [ busy, setBusy ] = useState<boolean>(false);
     const [ toasts, setToasts ] = useState<ToastMsg[]>([]);
 
@@ -405,7 +475,40 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     }, [ rpActive, phoneOpen, phoneApp ]);
 
-    // Lente real detrás del celular: enfoca exactamente lo que está detrás del visor de la cámara
+    // Reloj local sincronizado entre la barra del celular, la pantalla de bloqueo y las fotos
+    useEffect(() =>
+    {
+        if(!rpActive) return;
+        const timer = setInterval(() => setNowClock(new Date()), 10000);
+        return () => clearInterval(timer);
+    }, [ rpActive ]);
+
+    // Navegación animada dentro del celular con pantalla de carga (estilo captura HabboRP)
+    const navigatePhoneApp = useCallback((nextApp: PhoneApp, splashMeta?: { label: string; icon: string }) =>
+    {
+        if(phoneSplashTimerRef.current)
+        {
+            clearTimeout(phoneSplashTimerRef.current);
+            phoneSplashTimerRef.current = null;
+        }
+        if(splashMeta)
+        {
+            setPhoneSplash(splashMeta);
+            phoneSplashTimerRef.current = setTimeout(() =>
+            {
+                setPhoneApp(nextApp);
+                setPhoneSplash(null);
+                phoneSplashTimerRef.current = null;
+            }, 280);
+        }
+        else
+        {
+            setPhoneSplash(null);
+            setPhoneApp(nextApp);
+        }
+    }, []);
+
+    // Lente real detrás del celular: recorte estricto 1:1 sin deformación
     const renderCameraBehindPhone = useCallback(() =>
     {
         const vf = camViewfinderRef.current;
@@ -430,11 +533,12 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             const scaleX = srcCanvas.width / srcRect.width;
             const scaleY = srcCanvas.height / srcRect.height;
 
-            const rawW = vfRect.width * scaleX;
-            const rawH = vfRect.height * scaleY;
+            // Usar el mismo lado cuadrado en píxeles CSS para evitar estiramiento vertical/horizontal
+            const baseSideCss = Math.min(vfRect.width, vfRect.height);
             const zoom = Math.max(1, cameraZoom);
-            const cropW = rawW / zoom;
-            const cropH = rawH / zoom;
+            const cropCss = baseSideCss / zoom;
+            const cropW = cropCss * scaleX;
+            const cropH = cropCss * scaleY;
 
             const centerX = ((vfRect.left - srcRect.left) + (vfRect.width / 2)) * scaleX;
             const centerY = ((vfRect.top - srcRect.top) + (vfRect.height / 2)) * scaleY;
@@ -565,7 +669,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         return () => window.removeEventListener('keydown', onGlobalKey);
     }, [ rpActive, isMobile ]);
 
-    // Al cerrar el celular se vuelve a bloquear siempre para deslizar al abrirlo de nuevo
+    // Al cerrar o abrir el celular se reinicia su ubicación inicial y vuelve a bloquearse
     const togglePhone = useCallback((forceState?: boolean) =>
     {
         setPhoneOpen(prev =>
@@ -574,22 +678,25 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             if(next !== prev)
             {
                 rpSetPhoneHolding(next);
+                if(phoneSplashTimerRef.current)
+                {
+                    clearTimeout(phoneSplashTimerRef.current);
+                    phoneSplashTimerRef.current = null;
+                }
+                setPhoneSplash(null);
+                setPhonePos(null);
+                setIsDraggingPhone(false);
                 setSwipeX(0);
                 setIsSwiping(false);
+                setPhoneUnlocked(false);
+                setPhoneApp('lock');
+                setSelectedPhoto(null);
+                setSelectedArticle(null);
+                setActiveChatUserId(null);
                 if(next)
                 {
                     setSideModal(null);
-                    setSelectedArticle(null);
-                    setSelectedPhoto(null);
-                    setPhoneUnlocked(false);
-                    setPhoneApp('lock');
-                }
-                else
-                {
-                    setPhoneUnlocked(false);
-                    setPhoneApp('lock');
-                    setSelectedPhoto(null);
-                    setActiveChatUserId(null);
+                    setNowClock(new Date());
                 }
             }
             return next;
@@ -851,7 +958,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             return;
         }
 
-        if(lower === ':commands' || lower === ':comandos')
+        if(lower === ':cmds' || lower === ':commands' || lower === ':comandos')
         {
             setCmdFilter('');
             openSideModal('commands');
@@ -936,12 +1043,16 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
 
         try
         {
+            const now = new Date();
+            setNowClock(now);
             const finalUrl = outCanvas.toDataURL('image/jpeg', 0.9);
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
             const photo: SavedPhoto = {
                 id: `${ Date.now() }-${ Math.floor(Math.random() * 999) }`,
                 dataUrl: finalUrl,
                 roomName: currentLocation?.name || 'Habbten RP',
-                takenAt: new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date())
+                takenAt: `${ day }/${ month }, ${ formatLocalTime24(now) }`
             };
             setSavedPhotos(prev =>
             {
@@ -1014,7 +1125,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         {
             setSwipeX(0);
             setPhoneUnlocked(true);
-            setPhoneApp('home');
+            navigatePhoneApp('home', { label: 'Habbten RP', icon: iconHouse });
         }
         else
         {
@@ -1062,20 +1173,20 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         }
     ];
 
-    // Apps del Celular con sprites HD 1:1 (Contactos, Mensajes, Cámara, Ajustes, Logros integrados DENTRO del celular)
+    // Apps del Celular con sprites HD 1:1 y transición de carga al abrir cada app
     const phoneApps: Array<{ id: string; label: string; icon: string; badge?: number; action: () => void }> = [
-        { id: 'contacts', label: 'Contactos', icon: phoneContactsIcon, badge: requests.length, action: () => setPhoneApp('contacts') },
-        { id: 'messages', label: 'Mensajes', icon: phoneMessagesIcon, action: () => { setActiveChatUserId(null); setPhoneApp('messages'); } },
-        { id: 'camera', label: 'Cámara', icon: phoneCameraIcon, action: () => { setSelectedPhoto(null); setPhoneApp('camera'); } },
-        { id: 'settings', label: 'Ajustes', icon: phoneSettingsIcon, action: () => setPhoneApp('settings') },
-        { id: 'achievements', label: 'Logros', icon: phoneAchievementsIcon, badge: claimableMissions, action: () => setPhoneApp('achievements') },
-        { id: 'map', label: 'GPS Mapa', icon: iconRooms, action: () => setPhoneApp('map') },
-        { id: 'jobs', label: 'Empleos', icon: iconProfile, action: () => setPhoneApp('jobs') },
-        { id: 'bank', label: 'Banco', icon: iconHouse, action: () => setPhoneApp('bank') },
-        { id: 'gangs', label: 'Bandas', icon: iconForums, action: () => setPhoneApp('gangs') },
-        { id: 'news', label: 'Noticias', icon: iconAnnouncements, action: () => { setSelectedArticle(null); setPhoneApp('news'); } },
-        { id: 'actions', label: '911', icon: iconModTools, action: () => setPhoneApp('actions') },
-        { id: 'rankings', label: 'Rankings', icon: iconTalents, action: () => setPhoneApp('rankings') }
+        { id: 'contacts', label: 'Contactos', icon: phoneContactsIcon, badge: requests.length, action: () => navigatePhoneApp('contacts', { label: 'Contactos', icon: phoneContactsIcon }) },
+        { id: 'messages', label: 'Mensajes', icon: phoneMessagesIcon, action: () => { setActiveChatUserId(null); navigatePhoneApp('messages', { label: 'Mensajes', icon: phoneMessagesIcon }); } },
+        { id: 'camera', label: 'Cámara', icon: phoneCameraIcon, action: () => { setSelectedPhoto(null); navigatePhoneApp('camera', { label: 'Cámara', icon: phoneCameraIcon }); } },
+        { id: 'settings', label: 'Ajustes', icon: phoneSettingsIcon, action: () => navigatePhoneApp('settings', { label: 'Ajustes', icon: phoneSettingsIcon }) },
+        { id: 'achievements', label: 'Logros', icon: phoneAchievementsIcon, badge: claimableMissions, action: () => navigatePhoneApp('achievements', { label: 'Logros', icon: phoneAchievementsIcon }) },
+        { id: 'map', label: 'GPS Mapa', icon: iconRooms, action: () => navigatePhoneApp('map', { label: 'GPS Mapa', icon: iconRooms }) },
+        { id: 'jobs', label: 'Empleos', icon: iconProfile, action: () => navigatePhoneApp('jobs', { label: 'Empleos', icon: iconProfile }) },
+        { id: 'bank', label: 'Banco', icon: iconHouse, action: () => navigatePhoneApp('bank', { label: 'Banco', icon: iconHouse }) },
+        { id: 'gangs', label: 'Bandas', icon: iconForums, action: () => navigatePhoneApp('gangs', { label: 'Bandas', icon: iconForums }) },
+        { id: 'news', label: 'Noticias', icon: iconAnnouncements, action: () => { setSelectedArticle(null); navigatePhoneApp('news', { label: 'Noticias', icon: iconAnnouncements }); } },
+        { id: 'actions', label: '911', icon: phone911Icon, action: () => navigatePhoneApp('actions', { label: '911', icon: phone911Icon }) },
+        { id: 'rankings', label: 'Rankings', icon: iconTalents, action: () => navigatePhoneApp('rankings', { label: 'Rankings', icon: iconTalents }) }
     ];
 
     const phoneAppTitle: Record<PhoneApp, string> = {
@@ -1165,7 +1276,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         {
             id: 'character',
             label: 'Tu personaje',
-            icon: iconClothing,
+            icon: questHangerIcon,
             title: 'Tu personaje',
             paragraphs: [
                 'Controla tu Vida (barra roja), Energía (barra dorada), Nivel RP y Efectivo desde la tarjeta inferior izquierda.',
@@ -1236,22 +1347,20 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     className={ `rp-builder-hover-wrap ${ builderOpen ? 'is-open' : '' }` }
                     onMouseEnter={ () => !isMobile && setBuilderOpen(true) }
                     onMouseLeave={ () => { if(!isMobile) { setBuilderOpen(false); setHoveredToolLabel(''); } } }>
-                    { builderOpen && (
-                        <div className="rp-builder-tray-horizontal" role="menu" aria-label="Herramientas de sala">
-                            { roomBuilderTools.map(tool => (
-                                <button
-                                    key={ tool.id }
-                                    type="button"
-                                    className="rp-builder-sq-btn"
-                                    title={ tool.label }
-                                    onMouseEnter={ () => setHoveredToolLabel(tool.label) }
-                                    onMouseLeave={ () => setHoveredToolLabel('') }
-                                    onClick={ tool.action }>
-                                    <img src={ tool.icon } alt={ tool.label } className="rp-builder-sprite" />
-                                </button>
-                            )) }
-                        </div>
-                    ) }
+                    <div className={ `rp-builder-tray-horizontal ${ builderOpen ? 'is-open' : '' }` } role="menu" aria-label="Herramientas de sala">
+                        { roomBuilderTools.map(tool => (
+                            <button
+                                key={ tool.id }
+                                type="button"
+                                className="rp-builder-sq-btn"
+                                title={ tool.label }
+                                onMouseEnter={ () => setHoveredToolLabel(tool.label) }
+                                onMouseLeave={ () => setHoveredToolLabel('') }
+                                onClick={ tool.action }>
+                                <img src={ tool.icon } alt={ tool.label } className="rp-builder-sprite" />
+                            </button>
+                        )) }
+                    </div>
 
                     <div className="rp-builder-trigger-box">
                         <button
@@ -1461,18 +1570,29 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                     <div className="rp-phone-screen">
                         <div className="rp-phone-statusbar">
                             <span className="rp-sb-carrier">Habbten RP</span>
-                            <span className="rp-sb-time">{ clock.formatted }</span>
+                            <span className="rp-sb-time">{ formatLocalTime24(nowClock) }</span>
                             <span className="rp-sb-battery" title="Batería 100%">
                                 <span className="rp-sb-battery-fill" />
                             </span>
                         </div>
 
+                        {/* PANTALLA DE CARGA AL DESBLOQUEAR / ABRIR O VOLVER DE UNA APP */}
+                        { phoneSplash && (
+                            <div className="rp-phone-splash">
+                                <span className="rp-phone-splash-box">
+                                    <img src={ phoneSplash.icon } alt="" className="rp-app-sprite" />
+                                </span>
+                                <span className="rp-phone-splash-title">{ phoneSplash.label }</span>
+                                <div className="rp-phone-splash-bar"><span /></div>
+                            </div>
+                        ) }
+
                         {/* PANTALLA DE BLOQUEO CON SLIDER REAL */}
-                        { phoneApp === 'lock' && (
+                        { !phoneSplash && phoneApp === 'lock' && (
                             <div className="rp-phone-lock">
                                 <div className="rp-lock-clock-wrap">
-                                    <div className="rp-lock-time">{ clock.formatted }</div>
-                                    <div className="rp-lock-date">{ formattedDate }</div>
+                                    <div className="rp-lock-time">{ formatLocalTime24(nowClock) }</div>
+                                    <div className="rp-lock-date">{ formatLocalDateLabel(nowClock) }</div>
                                 </div>
 
                                 <div className="rp-unlock-track" ref={ unlockTrackRef }>
@@ -1498,7 +1618,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* PANTALLA DE INICIO CON ÍCONOS ORIGINALES */}
-                        { phoneApp === 'home' && (
+                        { !phoneSplash && phoneApp === 'home' && (
                             <div className="rp-phone-home">
                                 <div className="rp-phone-home-user">{ state.user.username }</div>
                                 <div className="rp-app-grid">
@@ -1520,14 +1640,14 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* APP CONTACTOS DENTRO DEL CELULAR */}
-                        { phoneApp === 'contacts' && (
+                        { !phoneSplash && phoneApp === 'contacts' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
-                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Inicio">
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse }) } title="Inicio">
                                         <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Contactos</span>
-                                    <button type="button" className="rp-phone-right-square" onClick={ () => { setActiveChatUserId(null); setPhoneApp('messages'); } } title="Mensajes">
+                                    <button type="button" className="rp-phone-right-square" onClick={ () => { setActiveChatUserId(null); navigatePhoneApp('messages', { label: 'Mensajes', icon: phoneMessagesIcon }); } } title="Mensajes">
                                         <img src={ phoneMessagesIcon } alt="Mensajes" className="rp-mini-nav-sprite" />
                                     </button>
                                 </div>
@@ -1591,7 +1711,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* APP MENSAJES DENTRO DEL CELULAR */}
-                        { phoneApp === 'messages' && (
+                        { !phoneSplash && phoneApp === 'messages' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
                                     <button
@@ -1599,7 +1719,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                         className="rp-phone-back-imgbtn"
                                         onClick={ () => {
                                             if(activeChatUserId !== null) setActiveChatUserId(null);
-                                            else setPhoneApp('home');
+                                            else navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse });
                                         } }
                                         title="Volver">
                                         <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
@@ -1609,7 +1729,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                             ? currentPhoneThread.participant.name
                                             : 'Mensajes' }
                                     </span>
-                                    <button type="button" className="rp-phone-right-square" onClick={ () => setPhoneApp('contacts') } title="Contactos">
+                                    <button type="button" className="rp-phone-right-square" onClick={ () => navigatePhoneApp('contacts', { label: 'Contactos', icon: phoneContactsIcon }) } title="Contactos">
                                         <img src={ phoneContactsIcon } alt="Contactos" className="rp-mini-nav-sprite" />
                                     </button>
                                 </div>
@@ -1671,10 +1791,10 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* APP LOGROS Y MISIONES DENTRO DEL CELULAR */}
-                        { phoneApp === 'achievements' && (
+                        { !phoneSplash && phoneApp === 'achievements' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
-                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Volver">
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse }) } title="Volver">
                                         <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Logros</span>
@@ -1772,14 +1892,14 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* APP CÁMARA DENTRO DEL CELULAR (ENFOCA LO QUE ESTÁ DETRÁS DEL CELULAR) */}
-                        { phoneApp === 'camera' && (
+                        { !phoneSplash && phoneApp === 'camera' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
-                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Volver">
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse }) } title="Volver">
                                         <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Cámara</span>
-                                    <button type="button" className="rp-habbo-white-btn is-nav" onClick={ () => { setSelectedPhoto(null); setPhoneApp('photos'); } }>
+                                    <button type="button" className="rp-habbo-white-btn is-nav" onClick={ () => { setSelectedPhoto(null); navigatePhoneApp('photos', { label: 'Fotos', icon: phoneCameraIcon }); } }>
                                         Fotos
                                     </button>
                                 </div>
@@ -1823,13 +1943,13 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* APP FOTOS DENTRO DEL CELULAR */}
-                        { phoneApp === 'photos' && (
+                        { !phoneSplash && phoneApp === 'photos' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
                                     <button
                                         type="button"
                                         className="rp-phone-back-imgbtn"
-                                        onClick={ () => selectedPhoto ? setSelectedPhoto(null) : setPhoneApp('camera') }
+                                        onClick={ () => selectedPhoto ? setSelectedPhoto(null) : navigatePhoneApp('camera', { label: 'Cámara', icon: phoneCameraIcon }) }
                                         title="Volver">
                                         <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
@@ -1882,10 +2002,10 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* APP AJUSTES DENTRO DEL CELULAR (PREFERENCIAS + ZOOM + ACCESOS RP) */}
-                        { phoneApp === 'settings' && (
+                        { !phoneSplash && phoneApp === 'settings' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
-                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => setPhoneApp('home') } title="Volver">
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse }) } title="Volver">
                                         <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
                                     <span className="rp-phone-top-title">Ajustes</span>
@@ -1973,13 +2093,13 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                         ) }
 
                         {/* RESTO DE APPS INTERNAS DEL CELULAR */}
-                        { phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && phoneApp !== 'achievements' && phoneApp !== 'camera' && phoneApp !== 'photos' && phoneApp !== 'settings' && (
+                        { !phoneSplash && phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && phoneApp !== 'achievements' && phoneApp !== 'camera' && phoneApp !== 'photos' && phoneApp !== 'settings' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
                                     <button
                                         type="button"
                                         className="rp-phone-back-imgbtn"
-                                        onClick={ () => selectedArticle ? setSelectedArticle(null) : setPhoneApp('home') }
+                                        onClick={ () => selectedArticle ? setSelectedArticle(null) : navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse }) }
                                         title="Volver">
                                         <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
                                     </button>
@@ -2315,7 +2435,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                             onClick={ () => { setSelectedShopSlug(item.slug || ''); setShopQty(1); } }
                                             title={ item.name }>
                                             <img
-                                                src={ getItemSpriteIcon(shopCategory === 'gym' ? 'gym' : item.category) }
+                                                src={ getItemSpriteIcon(item.slug || '', shopCategory === 'gym' ? 'gym' : item.category) }
                                                 alt={ item.name }
                                                 className="rp-slot-sprite" />
                                             <span className="rp-slot-price">${ item.price }</span>
@@ -2331,7 +2451,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                     <div className="rp-detail-name">{ selectedShopItem.name }</div>
                                     <div className="rp-detail-preview">
                                         <img
-                                            src={ getItemSpriteIcon(shopCategory === 'gym' ? 'gym' : selectedShopItem.category) }
+                                            src={ getItemSpriteIcon(selectedShopItem.slug || '', shopCategory === 'gym' ? 'gym' : selectedShopItem.category) }
                                             alt={ selectedShopItem.name }
                                             className="rp-detail-sprite" />
                                     </div>
@@ -2421,7 +2541,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                             className={ `rp-cat-slot ${ active ? 'is-selected' : '' }` }
                                             onClick={ () => setSelectedInvSlug(slug) }
                                             title={ item.name }>
-                                            <img src={ getItemSpriteIcon(item.category) } alt={ item.name } className="rp-slot-sprite" />
+                                            <img src={ getItemSpriteIcon(item.item_slug || item.slug || '', item.category) } alt={ item.name } className="rp-slot-sprite" />
                                             <span className="rp-slot-price">×{ item.quantity || 1 }</span>
                                         </button>
                                     );
@@ -2434,7 +2554,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                 <>
                                     <div className="rp-detail-name">{ selectedInvItem.name }</div>
                                     <div className="rp-detail-preview">
-                                        <img src={ getItemSpriteIcon(selectedInvItem.category) } alt={ selectedInvItem.name } className="rp-detail-sprite" />
+                                        <img src={ getItemSpriteIcon(selectedInvItem.item_slug || selectedInvItem.slug || '', selectedInvItem.category) } alt={ selectedInvItem.name } className="rp-detail-sprite" />
                                     </div>
                                     <p className="rp-detail-desc">{ selectedInvItem.description }</p>
                                     <div className="rp-inv-actions">
