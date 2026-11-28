@@ -18,6 +18,7 @@ export interface RpCharacter
     stat_energy?: number;
     stat_farming?: number;
     stat_fishing?: number;
+    activeFarmPlots?: number;
     availableSkillPoints?: number;
     job_slug: string;
     job_rank: number;
@@ -227,6 +228,18 @@ export async function rpGetNews(): Promise<{ success: boolean; articles: any[]; 
 export async function rpGetProfile(userId: number): Promise<any>
 {
     const res = await fetch(`/api/rp/profile/${ userId }`, { credentials: 'include' });
+    return await res.json();
+}
+
+export async function rpGetFarming(): Promise<any>
+{
+    const res = await fetch('/api/rp/farming/state', { credentials: 'include' });
+    return await res.json();
+}
+
+export async function rpGetFishing(): Promise<any>
+{
+    const res = await fetch('/api/rp/fishing/state', { credentials: 'include' });
     return await res.json();
 }
 

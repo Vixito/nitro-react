@@ -12,6 +12,7 @@ import {
     FaMoneyBillWave,
     FaPlus,
     FaSearch,
+    FaShoppingCart,
     FaTimes,
     FaTrash
 } from 'react-icons/fa';
@@ -51,13 +52,7 @@ import questCombIcon from '@/assets/images/roleplay/quest-comb.png';
 import questHangerIcon from '@/assets/images/roleplay/quest-hanger.png';
 import statFarmingIcon from '@/assets/images/roleplay/stat-farming.png';
 import statFishingIcon from '@/assets/images/roleplay/stat-fishing.png';
-import toolFloorPlanIcon from '@/assets/images/roleplay/tool-floor-plan.png';
-import toolRoomBuilderIcon from '@/assets/images/roleplay/tool-room-builder.png';
-import toolRoomDimmerIcon from '@/assets/images/roleplay/tool-room-dimmer.png';
-import toolRoomSettingsIcon from '@/assets/images/roleplay/tool-room-settings.png';
 import toolWallDecorIcon from '@/assets/images/roleplay/tool-wall-decor.png';
-import toolWallsFloorsIcon from '@/assets/images/roleplay/tool-walls-floors.png';
-import toolWindowBgIcon from '@/assets/images/roleplay/tool-window-bg.png';
 import iconCatalog from '@/assets/images/toolbar/icons/catalog.png';
 import iconHouse from '@/assets/images/toolbar/icons/house.png';
 import iconInventory from '@/assets/images/toolbar/icons/inventory.png';
@@ -68,11 +63,14 @@ import iconProfile from '@/assets/images/toolbar/icons/me-menu/profile.png';
 import iconTalents from '@/assets/images/toolbar/icons/me-menu/talents.png';
 import { CreateLinkEvent, CreateRoomSession, GetFurnitureDataForRoomObject, GetNitroInstance, GetRoomEngine, GetRoomSession, GetSessionDataManager, GetUserProfile, MessengerThreadChat, SendMessageComposer } from '../../api';
 import { useFriends, useMessenger, useObjectSelectedEvent, useRoomEngineEvent, useSessionInfo } from '../../hooks';
+import { RoleplayRoomBuilderPanel } from './RoleplayRoomBuilderPanel';
 import {
     isRoleplayMode,
     RpFullState,
     RpGang,
     RpItem,
+    rpGetFarming,
+    rpGetFishing,
     rpGetGangs,
     rpGetNews,
     rpGetProfile,
@@ -85,7 +83,7 @@ import './RoleplayHudView.scss';
 
 type SideModalTab = null | 'shop' | 'inventory' | 'help' | 'commands' | 'profile';
 type HelpTopicId = 'around' | 'rooms' | 'character' | 'phone' | 'chat';
-type PhoneApp = 'lock' | 'home' | 'contacts' | 'messages' | 'camera' | 'photos' | 'achievements' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'rankings' | 'settings';
+type PhoneApp = 'lock' | 'home' | 'contacts' | 'messages' | 'camera' | 'photos' | 'achievements' | 'farming' | 'fishing' | 'news' | 'map' | 'jobs' | 'bank' | 'gangs' | 'actions' | 'rankings' | 'settings';
 
 interface SavedPhoto
 {
@@ -167,6 +165,9 @@ const RP_COMMANDS_CATALOG: Array<{ cmd: string; group: string; desc: string }> =
     { cmd: ':ayuda', group: 'General', desc: 'Muestra ayuda rápida de comandos RP.' },
     { cmd: ':trabajar', group: 'Empleo', desc: 'Realiza un turno de tu empleo actual.' },
     { cmd: ':turno', group: 'Empleo', desc: 'Activa o desactiva tu turno de servicio.' },
+    { cmd: ':plantar', group: 'Agricultura', desc: 'Planta semillas en una parcela libre.' },
+    { cmd: ':cosechar', group: 'Agricultura', desc: 'Cosecha todas las parcelas listas.' },
+    { cmd: ':pescar', group: 'Pesca', desc: 'Lanza la caña para pescar (bonus en el Muelle).' },
     { cmd: ':pagar <usuario> <monto>', group: 'Economía', desc: 'Entrega dinero en efectivo a otro jugador.' },
     { cmd: ':golpear <usuario>', group: 'Combate', desc: 'Ataque cuerpo a cuerpo en zonas PVP.' },
     { cmd: ':disparar <usuario>', group: 'Combate', desc: 'Dispara tu arma equipada al objetivo.' },
@@ -315,17 +316,22 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const [ state, setState ] = useState<RpFullState | null>(null);
     const [ sideModal, setSideModal ] = useState<SideModalTab>(null);
     const [ helpTopic, setHelpTopic ] = useState<HelpTopicId>('around');
-    const [ builderOpen, setBuilderOpen ] = useState<boolean>(false);
-    const [ hoveredToolLabel, setHoveredToolLabel ] = useState<string>('');
 
     const [ phoneOpen, setPhoneOpen ] = useState<boolean>(false);
     const [ phoneUnlocked, setPhoneUnlocked ] = useState<boolean>(false);
+    const [ phoneUnlocking, setPhoneUnlocking ] = useState<boolean>(false);
     const [ phoneApp, setPhoneApp ] = useState<PhoneApp>('lock');
     const [ phoneSplash, setPhoneSplash ] = useState<{ label: string; icon: string } | null>(null);
     const phoneSplashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [ nowClock, setNowClock ] = useState<Date>(() => new Date());
     const [ busy, setBusy ] = useState<boolean>(false);
     const [ toasts, setToasts ] = useState<ToastMsg[]>([]);
+
+    // Agricultura, Pesca y Carrito de Tienda Física en sala
+    const [ farmingData, setFarmingData ] = useState<any>(null);
+    const [ selectedCropSlug, setSelectedCropSlug ] = useState<string>('wheat');
+    const [ fishingData, setFishingData ] = useState<any>(null);
+    const [ shopCart, setShopCart ] = useState<Array<{ slug: string; name: string; price: number; qty: number }>>([]);
 
     // Logros / Misiones dentro del celular
     const [ achTab, setAchTab ] = useState<'quests' | 'achievements'>('quests');
@@ -492,13 +498,32 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 }
             }).catch(() => {});
         };
+        const onAddToCart = (ev: Event) =>
+        {
+            const d = (ev as CustomEvent)?.detail;
+            if(!d || !d.slug) return;
+            setShopCart(prev =>
+            {
+                const idx = prev.findIndex(x => x.slug === d.slug);
+                if(idx >= 0)
+                {
+                    const copy = [ ...prev ];
+                    copy[idx] = { ...copy[idx], qty: Math.min(20, copy[idx].qty + 1) };
+                    return copy;
+                }
+                return [ ...prev, { slug: d.slug, name: d.name || d.slug, price: Number(d.price || 0), qty: 1 } ];
+            });
+            pushToast('ok', `${ d.name || 'Artículo' } añadido al carrito ($${ d.price || 0 }).`);
+        };
         window.addEventListener('habbten-rp-action-feedback', onFeedback);
         window.addEventListener('habbten-rp-open-profile', onOpenProfile);
+        window.addEventListener('habbten-rp-add-to-cart', onAddToCart);
         return () =>
         {
             clearInterval(interval);
             window.removeEventListener('habbten-rp-action-feedback', onFeedback);
             window.removeEventListener('habbten-rp-open-profile', onOpenProfile);
+            window.removeEventListener('habbten-rp-add-to-cart', onAddToCart);
         };
     }, [ rpActive, refreshState, pushToast ]);
 
@@ -517,6 +542,37 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         {
             rpGetNews().then(r => { if(r?.success) setNewsData({ articles: r.articles || [], events: r.events || [] }); }).catch(() => {});
         }
+        else if(phoneApp === 'farming')
+        {
+            rpGetFarming().then(r => { if(r?.success) setFarmingData(r); }).catch(() => {});
+        }
+        else if(phoneApp === 'fishing')
+        {
+            rpGetFishing().then(r => { if(r?.success) setFishingData(r); }).catch(() => {});
+        }
+    }, [ rpActive, phoneOpen, phoneApp ]);
+
+    // Cuenta regresiva en vivo de cultivos mientras la app Granja está abierta
+    useEffect(() =>
+    {
+        if(!rpActive || !phoneOpen || phoneApp !== 'farming') return;
+        const t = setInterval(() =>
+        {
+            setFarmingData((prev: any) =>
+            {
+                if(!prev || !Array.isArray(prev.plots)) return prev;
+                const nowSec = Math.floor(Date.now() / 1000);
+                return {
+                    ...prev,
+                    plots: prev.plots.map((p: any) =>
+                    {
+                        const left = Math.max(0, Number(p.ready_at || 0) - nowSec);
+                        return { ...p, secondsLeft: left, ready: left === 0 };
+                    })
+                };
+            });
+        }, 1000);
+        return () => clearInterval(t);
     }, [ rpActive, phoneOpen, phoneApp ]);
 
     // Reloj local sincronizado entre la barra del celular, la pantalla de bloqueo y las fotos
@@ -789,6 +845,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 setIsDraggingPhone(false);
                 setSwipeX(0);
                 setIsSwiping(false);
+                setPhoneUnlocking(false);
                 setPhoneUnlocked(false);
                 setPhoneApp('lock');
                 setSelectedPhoto(null);
@@ -1059,6 +1116,25 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
             return;
         }
 
+        if(lower === ':plantar')
+        {
+            runAction('/farming/plant', { cropSlug: selectedCropSlug }, r => { if(r?.farming) setFarmingData(r.farming); });
+            if(isMobile) setMobileChatOpen(false);
+            return;
+        }
+        if(lower === ':cosechar')
+        {
+            runAction('/farming/harvest', {}, r => { if(r?.farming) setFarmingData(r.farming); });
+            if(isMobile) setMobileChatOpen(false);
+            return;
+        }
+        if(lower === ':pescar')
+        {
+            runAction('/fishing/cast', {}, r => { if(r?.fishing) setFishingData(r.fishing); });
+            if(isMobile) setMobileChatOpen(false);
+            return;
+        }
+
         if(lower === ':cmds' || lower === ':commands' || lower === ':comandos')
         {
             setCmdFilter('');
@@ -1196,7 +1272,6 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const openSideModal = (tab: SideModalTab) =>
     {
         if(tab && phoneOpen) togglePhone(false);
-        setBuilderOpen(false);
         setSideModal(prev => (prev === tab ? null : tab));
     };
 
@@ -1218,6 +1293,45 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         setSwipeX(delta);
     };
 
+    const handleCheckoutCart = async () =>
+    {
+        if(shopCart.length === 0 || busy) return;
+        setBusy(true);
+        try
+        {
+            let boughtCount = 0;
+            let lastState: any = null;
+            for(const entry of shopCart)
+            {
+                for(let i = 0; i < entry.qty; i++)
+                {
+                    const res = await rpPost('/shop/buy', { itemSlug: entry.slug });
+                    if(!res?.success)
+                    {
+                        pushToast('err', res?.error || `No se pudo comprar ${ entry.name }.`);
+                        break;
+                    }
+                    boughtCount++;
+                    if(res.state) lastState = res.state;
+                }
+            }
+            if(lastState) setState(prev => prev ? { ...prev, ...lastState } : lastState);
+            if(boughtCount > 0)
+            {
+                setShopCart([]);
+                pushToast('ok', `Compra completada (${ boughtCount } artículo(s) añadidos a tu inventario).`);
+            }
+        }
+        catch (_)
+        {
+            pushToast('err', 'Error al procesar el carrito.');
+        }
+        finally
+        {
+            setBusy(false);
+        }
+    };
+
     const onSwipeEnd = () =>
     {
         if(!isSwiping) return;
@@ -1226,53 +1340,18 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         {
             setSwipeX(0);
             setPhoneUnlocked(true);
-            navigatePhoneApp('home', { label: 'Habbten RP', icon: iconHouse });
+            setPhoneUnlocking(true);
+            setTimeout(() =>
+            {
+                setPhoneApp('home');
+                setPhoneUnlocking(false);
+            }, 320);
         }
         else
         {
             setSwipeX(0);
         }
     };
-
-    // Herramientas de sala horizontales a la izquierda del botón Constructor (exacto a captura HabboRP)
-    const roomBuilderTools: Array<{ id: string; label: string; icon: string; action: () => void }> = [
-        {
-            id: 'room-settings',
-            label: 'Ajustes de sala',
-            icon: toolRoomSettingsIcon,
-            action: () => { setBuilderOpen(false); pushToast('ok', `Sala actual: ${ currentLocation?.name || 'Habbten RP' }`); }
-        },
-        {
-            id: 'room-dimmer',
-            label: 'Regulador de luz',
-            icon: toolRoomDimmerIcon,
-            action: () => { setBuilderOpen(false); pushToast('warn', 'Coloca un regulador de luz en tu sala para ajustar el brillo.'); }
-        },
-        {
-            id: 'window-bg',
-            label: 'Fondo de ventana',
-            icon: toolWindowBgIcon,
-            action: () => { setBuilderOpen(false); openSideModal('shop'); }
-        },
-        {
-            id: 'walls-floors',
-            label: 'Paredes y suelos',
-            icon: toolWallsFloorsIcon,
-            action: () => { setBuilderOpen(false); openSideModal('shop'); }
-        },
-        {
-            id: 'wall-decor',
-            label: 'Decoración de pared',
-            icon: toolWallDecorIcon,
-            action: () => { setBuilderOpen(false); openSideModal('inventory'); }
-        },
-        {
-            id: 'floor-plan',
-            label: 'Plano de suelo',
-            icon: toolFloorPlanIcon,
-            action: () => { setBuilderOpen(false); CreateLinkEvent('floor-editor/toggle'); }
-        }
-    ];
 
     // Apps del Celular con sprites HD 1:1 y transición de carga al abrir cada app
     const phoneApps: Array<{ id: string; label: string; icon: string; badge?: number; action: () => void }> = [
@@ -1281,6 +1360,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         { id: 'camera', label: 'Cámara', icon: phoneCameraIcon, action: () => { setSelectedPhoto(null); navigatePhoneApp('camera', { label: 'Cámara', icon: phoneCameraIcon }); } },
         { id: 'settings', label: 'Ajustes', icon: phoneSettingsIcon, action: () => navigatePhoneApp('settings', { label: 'Ajustes', icon: phoneSettingsIcon }) },
         { id: 'achievements', label: 'Logros', icon: phoneAchievementsIcon, badge: claimableMissions, action: () => navigatePhoneApp('achievements', { label: 'Logros', icon: phoneAchievementsIcon }) },
+        { id: 'farming', label: 'Granja', icon: statFarmingIcon, action: () => navigatePhoneApp('farming', { label: 'Granja', icon: statFarmingIcon }) },
+        { id: 'fishing', label: 'Pesca', icon: statFishingIcon, action: () => navigatePhoneApp('fishing', { label: 'Pesca', icon: statFishingIcon }) },
         { id: 'map', label: 'GPS Mapa', icon: iconRooms, action: () => navigatePhoneApp('map', { label: 'GPS Mapa', icon: iconRooms }) },
         { id: 'jobs', label: 'Empleos', icon: iconProfile, action: () => navigatePhoneApp('jobs', { label: 'Empleos', icon: iconProfile }) },
         { id: 'bank', label: 'Banco', icon: iconHouse, action: () => navigatePhoneApp('bank', { label: 'Banco', icon: iconHouse }) },
@@ -1298,6 +1379,8 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
         camera: 'Cámara',
         photos: 'Fotos',
         achievements: 'Logros',
+        farming: 'Granja',
+        fishing: 'Pesca',
         news: 'Noticias',
         map: 'GPS Mapa',
         jobs: 'Empleos',
@@ -1442,44 +1525,28 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 </div>
             ) }
 
-            {/* ==================== BOTONES SUPERIORES DERECHA (BARRA HORIZONTAL HOVER + AYUDA ???) ==================== */}
-            <div className="rp-top-right-tools">
-                <div
-                    className={ `rp-builder-hover-wrap ${ builderOpen ? 'is-open' : '' }` }
-                    onMouseEnter={ () => !isMobile && setBuilderOpen(true) }
-                    onMouseLeave={ () => { if(!isMobile) { setBuilderOpen(false); setHoveredToolLabel(''); } } }>
-                    <div className={ `rp-builder-tray-horizontal ${ builderOpen ? 'is-open' : '' }` } role="menu" aria-label="Herramientas de sala">
-                        { roomBuilderTools.map(tool => (
-                            <button
-                                key={ tool.id }
-                                type="button"
-                                className="rp-builder-sq-btn"
-                                title={ tool.label }
-                                onMouseEnter={ () => setHoveredToolLabel(tool.label) }
-                                onMouseLeave={ () => setHoveredToolLabel('') }
-                                onClick={ tool.action }>
-                                <img src={ tool.icon } alt={ tool.label } className="rp-builder-sprite" />
-                            </button>
-                        )) }
-                    </div>
-
-                    <div className="rp-builder-trigger-box">
-                        <button
-                            type="button"
-                            className={ `rp-square-btn ${ builderOpen ? 'is-active' : '' }` }
-                            title="Herramientas de sala"
-                            onMouseEnter={ () => setHoveredToolLabel('Herramientas de sala') }
-                            onMouseLeave={ () => setHoveredToolLabel('') }
-                            onClick={ () => setBuilderOpen(v => !v) }>
-                            <img src={ toolRoomBuilderIcon } alt="Herramientas de sala" className="rp-pixel-sprite" />
-                        </button>
-                        { builderOpen && (
-                            <div className="rp-builder-tooltip">
-                                { hoveredToolLabel || 'Herramientas de sala' }
-                            </div>
-                        ) }
-                    </div>
+            {/* ==================== CARRITO DE TIENDA FÍSICA EN SALA ==================== */}
+            { shopCart.length > 0 && (
+                <div className="rp-shop-cart-bar" aria-label="Carrito de tienda">
+                    <FaShoppingCart style={ { color: '#4ade80' } } />
+                    <span className="rp-cart-summary">
+                        { shopCart.reduce((acc, it) => acc + it.qty, 0) } art. · <b>${ shopCart.reduce((acc, it) => acc + (it.price * it.qty), 0).toLocaleString() }</b>
+                    </span>
+                    <button type="button" className="rp-btn is-green is-xs" disabled={ busy } onClick={ handleCheckoutCart }>
+                        Comprar
+                    </button>
+                    <button type="button" className="rp-btn is-dark is-xs" onClick={ () => setShopCart([]) } title="Vaciar carrito">
+                        <FaTimes />
+                    </button>
                 </div>
+            ) }
+
+            {/* ==================== BOTONES SUPERIORES DERECHA (HERRAMIENTAS DE SALA + AYUDA ???) ==================== */}
+            <div className="rp-top-right-tools">
+                <RoleplayRoomBuilderPanel
+                    isMobile={ isMobile }
+                    currentRoomName={ currentLocation?.name || 'Habbten RP' }
+                    onToast={ pushToast } />
 
                 <button
                     type="button"
@@ -1691,39 +1758,56 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
-                        {/* PANTALLA DE BLOQUEO CON SLIDER REAL */}
+                        {/* PANTALLA DE BLOQUEO CON SLIDE-UP REVELANDO AL INSTANTE LOS ÍCONOS DEL MENÚ */}
                         { !phoneSplash && phoneApp === 'lock' && (
-                            <div className="rp-phone-lock">
-                                <div className="rp-lock-clock-wrap">
-                                    <div className="rp-lock-time">{ formatLocalTime24(nowClock) }</div>
-                                    <div className="rp-lock-date">{ formatLocalDateLabel(nowClock) }</div>
+                            <div className="rp-phone-lock-stage">
+                                <div className="rp-phone-home is-underlay">
+                                    <div className="rp-phone-home-user">{ state.user.username }</div>
+                                    <div className="rp-app-grid">
+                                        { phoneApps.map(app => (
+                                            <div key={ app.id } className="rp-app-tile">
+                                                <span className="rp-app-icon-box">
+                                                    <img src={ app.icon } alt={ app.label } className="rp-app-sprite" />
+                                                    { !!app.badge && app.badge > 0 && <span className="rp-app-badge">{ app.badge }</span> }
+                                                </span>
+                                                <span className="rp-app-label">{ app.label }</span>
+                                            </div>
+                                        )) }
+                                    </div>
                                 </div>
 
-                                <div className="rp-unlock-track" ref={ unlockTrackRef }>
-                                    <div
-                                        className={ `rp-unlock-thumb ${ isSwiping ? 'is-dragging' : '' }` }
-                                        style={ { transform: `translateX(${ swipeX }px)` } }
-                                        onPointerDown={ onSwipeStart }
-                                        onPointerMove={ onSwipeMove }
-                                        onPointerUp={ onSwipeEnd }
-                                        onPointerCancel={ onSwipeEnd }
-                                        role="slider"
-                                        aria-label="Desliza para desbloquear"
-                                        aria-valuemin={ 0 }
-                                        aria-valuemax={ 100 }
-                                        aria-valuenow={ maxDragRef.current > 0 ? Math.round((swipeX / maxDragRef.current) * 100) : 0 }>
-                                        <FaChevronRight />
+                                <div className={ `rp-phone-lock ${ phoneUnlocking ? 'is-unlocking' : '' }` }>
+                                    <div className="rp-lock-clock-wrap">
+                                        <div className="rp-lock-time">{ formatLocalTime24(nowClock) }</div>
+                                        <div className="rp-lock-date">{ formatLocalDateLabel(nowClock) }</div>
                                     </div>
-                                    <span className="rp-unlock-text" style={ { opacity: swipeFade } }>
-                                        Desliza para desbloquear
-                                    </span>
+
+                                    <div className="rp-unlock-track" ref={ unlockTrackRef }>
+                                        <div
+                                            className={ `rp-unlock-thumb ${ isSwiping ? 'is-dragging' : '' }` }
+                                            style={ { transform: `translateX(${ swipeX }px)` } }
+                                            onPointerDown={ onSwipeStart }
+                                            onPointerMove={ onSwipeMove }
+                                            onPointerUp={ onSwipeEnd }
+                                            onPointerCancel={ onSwipeEnd }
+                                            role="slider"
+                                            aria-label="Desliza para desbloquear"
+                                            aria-valuemin={ 0 }
+                                            aria-valuemax={ 100 }
+                                            aria-valuenow={ maxDragRef.current > 0 ? Math.round((swipeX / maxDragRef.current) * 100) : 0 }>
+                                            <FaChevronRight />
+                                        </div>
+                                        <span className="rp-unlock-text" style={ { opacity: swipeFade } }>
+                                            Desliza para desbloquear
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         ) }
 
                         {/* PANTALLA DE INICIO CON ÍCONOS ORIGINALES */}
                         { !phoneSplash && phoneApp === 'home' && (
-                            <div className="rp-phone-home">
+                            <div className="rp-phone-home is-instant">
                                 <div className="rp-phone-home-user">{ state.user.username }</div>
                                 <div className="rp-app-grid">
                                     { phoneApps.map(app => (
@@ -2196,8 +2280,165 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                             </div>
                         ) }
 
+                        {/* APP GRANJA / AGRICULTURA DENTRO DEL CELULAR */}
+                        { !phoneSplash && phoneApp === 'farming' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse }) } title="Volver">
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
+                                    </button>
+                                    <span className="rp-phone-top-title">Granja</span>
+                                    <span className="rp-photos-count">
+                                        { (farmingData?.plots || []).length } / { farmingData?.maxPlots ?? (3 + Number(character.stat_farming || 0)) }
+                                    </span>
+                                </div>
+
+                                <div className="rp-app-scroll">
+                                    <div className="rp-app-stack">
+                                        <div className="rp-phone-card">
+                                            <div className="rp-pc-top">
+                                                <b>Sembrar cultivo</b>
+                                                <span className="rp-tag is-safe">Agr. { character.stat_farming || 0 }/10</span>
+                                            </div>
+                                            <select
+                                                className="rp-p-input"
+                                                value={ selectedCropSlug }
+                                                onChange={ e => setSelectedCropSlug(e.target.value) }>
+                                                { (farmingData?.crops || [
+                                                    { slug: 'wheat', name: 'Trigo Dorado', seedPrice: 15, sellPrice: 45, growSec: 30 },
+                                                    { slug: 'tomato', name: 'Tomate Urbano', seedPrice: 35, sellPrice: 95, growSec: 55 },
+                                                    { slug: 'coffee_bean', name: 'Grano de Café', seedPrice: 70, sellPrice: 185, growSec: 90 },
+                                                    { slug: 'strawberry', name: 'Fresa Dulce', seedPrice: 110, sellPrice: 290, growSec: 120 },
+                                                    { slug: 'golden_melon', name: 'Melón Dorado', seedPrice: 220, sellPrice: 580, growSec: 180 }
+                                                ]).map((c: any) => (
+                                                    <option key={ c.slug } value={ c.slug }>
+                                                        { c.name } (${ c.seedPrice } → ${ c.sellPrice } · { c.growSec }s)
+                                                    </option>
+                                                )) }
+                                            </select>
+                                            <div className="rp-btn-row" style={ { marginTop: 4 } }>
+                                                <button
+                                                    type="button"
+                                                    className="rp-btn is-green is-sm"
+                                                    style={ { flex: 1 } }
+                                                    disabled={ busy }
+                                                    onClick={ () => runAction('/farming/plant', { cropSlug: selectedCropSlug }, r => { if(r?.farming) setFarmingData(r.farming); }) }>
+                                                    Plantar
+                                                </button>
+                                                { (farmingData?.plots || []).some((p: any) => p.ready) && (
+                                                    <button
+                                                        type="button"
+                                                        className="rp-btn is-gold is-sm"
+                                                        disabled={ busy }
+                                                        onClick={ () => runAction('/farming/harvest', {}, r => { if(r?.farming) setFarmingData(r.farming); }) }>
+                                                        Cosechar todo
+                                                    </button>
+                                                ) }
+                                            </div>
+                                        </div>
+
+                                        <div className="rp-app-sec-title">Tus parcelas activas</div>
+                                        { (farmingData?.plots || []).length === 0 ? (
+                                            <div className="rp-phone-card">
+                                                <span className="rp-pc-desc">No tienes cultivos sembrados. Elige una semilla arriba y pulsa Plantar.</span>
+                                            </div>
+                                        ) : (farmingData?.plots || []).map((plot: any) => (
+                                            <div key={ plot.slot_index } className={ `rp-phone-card ${ plot.ready ? 'is-highlight' : '' }` }>
+                                                <div className="rp-pc-top">
+                                                    <b>Parcela #{ plot.slot_index + 1 } · { plot.crop_name }</b>
+                                                    <span className="rp-pc-cash">+${ plot.sell_price }</span>
+                                                </div>
+                                                <div className="rp-pc-foot">
+                                                    <span className="rp-pc-muted">
+                                                        { plot.ready ? '¡Lista para cosechar!' : `Creciendo... ${ plot.secondsLeft }s` }
+                                                    </span>
+                                                    { plot.ready && (
+                                                        <button
+                                                            type="button"
+                                                            className="rp-btn is-green is-xs"
+                                                            disabled={ busy }
+                                                            onClick={ () => runAction('/farming/harvest', { slotIndex: plot.slot_index }, r => { if(r?.farming) setFarmingData(r.farming); }) }>
+                                                            Cosechar
+                                                        </button>
+                                                    ) }
+                                                </div>
+                                            </div>
+                                        )) }
+                                    </div>
+                                </div>
+                            </div>
+                        ) }
+
+                        {/* APP PESCA DENTRO DEL CELULAR */}
+                        { !phoneSplash && phoneApp === 'fishing' && (
+                            <div className="rp-phone-appview rp-phone-solid-bg">
+                                <div className="rp-phone-top-nav">
+                                    <button type="button" className="rp-phone-back-imgbtn" onClick={ () => navigatePhoneApp('home', { label: 'Inicio', icon: iconHouse }) } title="Volver">
+                                        <img src={ phoneBackBtnIcon } alt="Volver" className="rp-back-btn-sprite" />
+                                    </button>
+                                    <span className="rp-phone-top-title">Pesca</span>
+                                    <span className="rp-photos-count">Nv.{ character.stat_fishing || 0 }/10</span>
+                                </div>
+
+                                <div className="rp-app-scroll">
+                                    <div className="rp-app-stack">
+                                        <div className="rp-phone-card is-highlight">
+                                            <div className="rp-pc-top">
+                                                <b>{ character.current_location === 'harbor_beach' ? 'Muelle & Playa (+15% Bonus)' : 'Pesca Urbana' }</b>
+                                                <span className="rp-tag is-safe">-6 ⚡</span>
+                                            </div>
+                                            <span className="rp-pc-desc">
+                                                { character.current_location === 'harbor_beach'
+                                                    ? 'Estás en el Muelle: mayor probabilidad de especies raras y +15% valor.'
+                                                    : 'Puedes pescar desde aquí o viajar al Muelle & Playa para obtener +15% de valor.' }
+                                            </span>
+                                            <div className="rp-btn-row" style={ { marginTop: 4 } }>
+                                                <button
+                                                    type="button"
+                                                    className="rp-btn is-green is-sm"
+                                                    style={ { flex: 1 } }
+                                                    disabled={ busy }
+                                                    onClick={ () => runAction('/fishing/cast', {}, r => { if(r?.fishing) setFishingData(r.fishing); }) }>
+                                                    Lanzar caña
+                                                </button>
+                                                { character.current_location !== 'harbor_beach' && (
+                                                    <button
+                                                        type="button"
+                                                        className="rp-btn is-blue is-sm"
+                                                        disabled={ busy }
+                                                        onClick={ () => handleTravel('harbor_beach', false) }>
+                                                        Ir al Muelle
+                                                    </button>
+                                                ) }
+                                            </div>
+                                        </div>
+
+                                        <div className="rp-bank-summary">
+                                            <div><span>Capturas</span><b className="is-bank">{ fishingData?.totalCatches || 0 }</b></div>
+                                            <div><span>Ganado</span><b className="is-cash">${ Number(fishingData?.totalEarned || 0).toLocaleString() }</b></div>
+                                        </div>
+
+                                        <div className="rp-app-sec-title">Capturas recientes</div>
+                                        { (fishingData?.recent || []).length === 0 ? (
+                                            <div className="rp-phone-card">
+                                                <span className="rp-pc-desc">Aún no has pescado nada. Pulsa Lanzar caña para empezar.</span>
+                                            </div>
+                                        ) : (fishingData?.recent || []).map((f: any) => (
+                                            <div key={ f.id } className="rp-phone-card is-compact">
+                                                <div className="rp-pc-top">
+                                                    <b>{ f.fish_name }</b>
+                                                    <span className="rp-pc-cash">+${ f.value_cash }</span>
+                                                </div>
+                                                <span className="rp-pc-muted">{ f.weight_kg } kg · { f.rarity }</span>
+                                            </div>
+                                        )) }
+                                    </div>
+                                </div>
+                            </div>
+                        ) }
+
                         {/* RESTO DE APPS INTERNAS DEL CELULAR */}
-                        { !phoneSplash && phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && phoneApp !== 'achievements' && phoneApp !== 'camera' && phoneApp !== 'photos' && phoneApp !== 'settings' && (
+                        { !phoneSplash && phoneApp !== 'lock' && phoneApp !== 'home' && phoneApp !== 'contacts' && phoneApp !== 'messages' && phoneApp !== 'achievements' && phoneApp !== 'camera' && phoneApp !== 'photos' && phoneApp !== 'settings' && phoneApp !== 'farming' && phoneApp !== 'fishing' && (
                             <div className="rp-phone-appview rp-phone-solid-bg">
                                 <div className="rp-phone-top-nav">
                                     <button
@@ -2891,7 +3132,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                     </div>
                                     <div className="rp-stat-mini-track"><div style={ { width: `${ sFarming * 10 }%` } } /></div>
                                     <p className="rp-stat-card-desc">
-                                        0 / { 3 + sFarming } parcelas en uso en tus salas. Cada punto desbloquea una parcela adicional.
+                                        { Number(profChar?.activeFarmPlots ?? 0) } / { 3 + sFarming } parcelas en uso. Cada punto añade +1 parcela y +6% valor de cosecha.
                                     </p>
                                 </div>
 
@@ -2917,7 +3158,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                                     </div>
                                     <div className="rp-stat-mini-track"><div style={ { width: `${ sFishing * 10 }%` } } /></div>
                                     <p className="rp-stat-card-desc">
-                                        Reservada para el sistema de pesca en el Muelle. Tus mejoras se guardan automáticamente.
+                                        Bonus activo: +{ sFishing * 18 }% probabilidad de peces raros y +{ sFishing * 5 }% de valor en el Muelle.
                                     </p>
                                 </div>
 

@@ -401,6 +401,51 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
         const canManage = canMove || canRotate || (pickupMode !== PICKUP_MODE_NONE);
         const hasAnyAction = canManage || canUse;
 
+        // Tiendas físicas en sala: detectar furnis de exhibición/máquinas/maniquíes para "Añadir al carrito — $X"
+        const rawName = String(avatarInfo.name || '').toLowerCase();
+        const furniMeta = roomSession ? GetFurnitureDataForRoomObject(roomSession.roomId, avatarInfo.id, avatarInfo.category) : null;
+        const rawClass = String(furniMeta?.className || '').toLowerCase();
+        const hay = `${ rawName } ${ rawClass }`;
+        const currentRoomId = roomSession?.roomId || 0;
+        let physicalShopOffer: { slug: string; name: string; price: number } | null = null;
+
+        if(hay.includes('coffee') || hay.includes('café') || hay.includes('cafe') || hay.includes('espresso'))
+        {
+            physicalShopOffer = { slug: 'coffee', name: 'Café Expreso', price: 35 };
+        }
+        else if(hay.includes('pizza') || hay.includes('pizzeria'))
+        {
+            physicalShopOffer = { slug: 'pizza', name: 'Pizza Familiar', price: 105 };
+        }
+        else if(hay.includes('burger') || hay.includes('diner') || hay.includes('food'))
+        {
+            physicalShopOffer = { slug: 'burger', name: 'Hamburguesa Habbten', price: 60 };
+        }
+        else if(hay.includes('vending') || hay.includes('soda') || hay.includes('cola') || hay.includes('drink') || hay.includes('fridge'))
+        {
+            physicalShopOffer = { slug: 'energy_drink', name: 'Bebida Energética', price: 55 };
+        }
+        else if(hay.includes('hosp') || hay.includes('med') || hay.includes('firstaid') || hay.includes('cabinet'))
+        {
+            physicalShopOffer = { slug: 'medkit', name: 'Botiquín Profesional', price: 240 };
+        }
+        else if(hay.includes('car') || hay.includes('limo') || hay.includes('moto') || hay.includes('bike'))
+        {
+            physicalShopOffer = { slug: 'moto_sport', name: 'Moto Deportiva', price: 1650 };
+        }
+        else if(hay.includes('mannequin') || hay.includes('outfit') || hay.includes('hat') || hay.includes('uniform') || hay.includes('clothing'))
+        {
+            physicalShopOffer = { slug: '__clothing_shop', name: avatarInfo.name || 'Prenda de Tienda', price: 85 };
+        }
+        else if(currentRoomId === 214)
+        {
+            physicalShopOffer = { slug: 'coffee', name: 'Café Expreso', price: 35 };
+        }
+        else if(currentRoomId === 217)
+        {
+            physicalShopOffer = { slug: 'vest_light', name: 'Chaleco Ligero', price: 450 };
+        }
+
         return (
             <div className="rp-furni-infostand">
                 <div className="rp-infostand-header">
@@ -416,6 +461,27 @@ export const InfoStandWidgetFurniView: FC<InfoStandWidgetFurniViewProps> = props
                             <img className="rp-furni-preview-img" src={ avatarInfo.image.src } alt={ avatarInfo.name } />
                         ) }
                     </div>
+
+                    { physicalShopOffer && (
+                        <button
+                            type="button"
+                            className="rp-furni-cart-btn"
+                            onClick={ () =>
+                            {
+                                if(physicalShopOffer.slug === '__clothing_shop')
+                                {
+                                    CreateLinkEvent('avatar-editor/show');
+                                }
+                                else
+                                {
+                                    window.dispatchEvent(new CustomEvent('habbten-rp-add-to-cart', { detail: physicalShopOffer }));
+                                }
+                            } }>
+                            { physicalShopOffer.slug === '__clothing_shop'
+                                ? `Probar y comprar — $${ physicalShopOffer.price }`
+                                : `Añadir al carrito — $${ physicalShopOffer.price }` }
+                        </button>
+                    ) }
 
                     { canManage && (
                         <div className="rp-furni-opacity-row">
