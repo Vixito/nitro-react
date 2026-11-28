@@ -198,7 +198,8 @@ export const DraggableWindow: FC<DraggableWindowProps> = props =>
         {
             const vw = window.innerWidth || document.documentElement.clientWidth;
             const vh = window.innerHeight || document.documentElement.clientHeight;
-            const bottomDockReserve = 66;
+            // En Habbten RP no existe el dock móvil clásico inferior: no se reserva espacio
+            const bottomDockReserve = document.body.classList.contains('habbten-rp-client') ? 8 : 66;
             const topPad = 8;
             const usableH = Math.max(120, vh - topPad - bottomDockReserve);
             const w = element.offsetWidth;

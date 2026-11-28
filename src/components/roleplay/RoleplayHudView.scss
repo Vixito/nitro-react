@@ -3757,6 +3757,7 @@ body.habbten-rp-client .nitro-avatar-editor {
 }
 
 /* ==================== MODO MÓVIL RP DEDICADO ==================== */
+/* Base común (vertical y horizontal) */
 .rp-modern-root.is-mobile {
     .rp-left-dock {
         left: 8px;
@@ -3813,40 +3814,242 @@ body.habbten-rp-client .nitro-avatar-editor {
         gap: 6px;
         z-index: 88;
     }
+}
 
-    .rp-phone-device {
-        left: 50%;
-        top: 50%;
-        bottom: auto;
-        transform: translate(-50%, -50%);
-        width: min(312px, 92vw);
-        height: min(540px, 84vh);
+/* ── Vertical (portrait): ventanas en una sola columna ── */
+@media (orientation: portrait) {
+    .rp-modern-root.is-mobile {
+        .rp-phone-device {
+            left: 50%;
+            top: 50%;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+            width: min(312px, 92vw);
+            height: min(540px, 84dvh);
+            max-height: none;
+        }
+
+        .rp-catalog-win,
+        .rp-inventory-win,
+        .rp-help-win {
+            width: 96vw;
+            height: 82dvh;
+            max-height: 82dvh;
+        }
+
+        .rp-catalog-body,
+        .rp-inventory-body,
+        .rp-help-split {
+            grid-template-columns: 1fr;
+        }
+
+        .rp-cat-sidebar,
+        .rp-inv-sidebar,
+        .rp-help-nav {
+            border-right: none;
+            border-bottom: 1px solid #41454d;
+            max-height: 118px;
+        }
+
+        .rp-cat-detail,
+        .rp-inv-detail {
+            border-left: none;
+            border-top: 1px solid #41454d;
+        }
+    }
+}
+
+/* ── Horizontal (landscape): la app móvil siempre va así (sensorLandscape) ──
+   Se mantienen las columnas y se compacta todo para que quepa en ~360-420px de alto. */
+@media (orientation: landscape) {
+    body.habbten-rp-client.is-mobile-ui {
+        /* Ventanas nativas de Nitro: sin la reserva del dock móvil clásico (en RP no existe) */
+        .draggable-window,
+        .nitro-card {
+            max-height: calc(100dvh - 16px) !important;
+        }
+
+        .nitro-infostand-container {
+            bottom: 8px !important;
+            right: 8px !important;
+        }
+
+        .rp-furni-infostand,
+        .rp-infostand-card {
+            width: 232px;
+            max-height: calc(100dvh - 72px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+        }
     }
 
-    .rp-catalog-win,
-    .rp-inventory-win,
-    .rp-help-win {
-        width: 96vw;
-        height: 82vh;
-    }
+    .rp-modern-root.is-mobile {
+        /* ---------- Dock, HUD, avisos ---------- */
+        .rp-left-dock {
+            left: 8px;
+            bottom: 72px;
+            padding: 4px;
+            gap: 4px;
+        }
 
-    .rp-catalog-body,
-    .rp-inventory-body,
-    .rp-help-split {
-        grid-template-columns: 1fr;
-    }
+        .rp-dock-btn {
+            width: 40px;
+            height: 40px;
+        }
 
-    .rp-cat-sidebar,
-    .rp-inv-sidebar,
-    .rp-help-nav {
-        border-right: none;
-        border-bottom: 1px solid #41454d;
-        max-height: 118px;
-    }
+        .rp-dock-pixel-sprite {
+            max-width: 34px;
+            max-height: 34px;
+        }
 
-    .rp-cat-detail,
-    .rp-inv-detail {
-        border-left: none;
-        border-top: 1px solid #41454d;
+        .rp-dock-icon-hd {
+            width: 30px;
+            height: 30px;
+        }
+
+        .rp-bottom-cluster {
+            left: 8px;
+            right: 8px;
+            bottom: 6px;
+        }
+
+        .rp-char-hud {
+            max-width: 236px;
+            padding: 5px 8px;
+        }
+
+        .rp-mobile-chat-float { bottom: 68px; }
+        .rp-mob-chat-btn { height: 40px; }
+
+        .rp-target-hud {
+            top: 6px;
+            left: 8px;
+            width: 224px;
+            padding: 6px 8px;
+        }
+
+        .rp-alert-strip { top: 6px; }
+        .rp-toast-stack { top: 40px; }
+        .rp-shop-cart-bar { top: 6px; }
+
+        /* ---------- Herramientas de sala (arriba a la derecha) ---------- */
+        .rp-top-right-tools {
+            top: 6px;
+            right: 6px;
+        }
+
+        .rp-builder-tooltip { display: none; }
+
+        .rp-builder-dock-card.has-panel {
+            width: 276px;
+            max-width: calc(100vw - 120px);
+            max-height: calc(100dvh - 14px);
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+        }
+
+        .rp-builder-ribbon { margin: 0 -7px 2px; }
+
+        .rp-builder-drawer {
+            margin-top: 6px;
+            gap: 8px;
+        }
+
+        /* ---------- Celular: siempre vertical, escalado para caber en el alto ---------- */
+        .rp-phone-device {
+            left: 50%;
+            top: 50%;
+            bottom: auto;
+            width: 294px;
+            height: 450px;
+            max-height: none;
+            transform: translate(-50%, -50%) scale(var(--rp-phone-fit, 0.8));
+            transform-origin: center center;
+        }
+
+        /* ---------- Catálogo / Inventario / Ayuda / Perfil / Comandos ---------- */
+        .rp-catalog-win,
+        .rp-inventory-win,
+        .rp-help-win,
+        .rp-profile-win,
+        .rp-commands-win {
+            max-width: none;
+            width: min(96vw, 780px);
+        }
+
+        .rp-catalog-win {
+            height: min(540px, calc(100dvh - 16px));
+            max-height: calc(100dvh - 16px);
+        }
+
+        .rp-inventory-win {
+            width: min(96vw, 740px);
+            height: min(380px, calc(100dvh - 16px));
+            max-height: calc(100dvh - 16px);
+        }
+
+        .rp-help-win,
+        .rp-commands-win {
+            height: calc(100dvh - 16px);
+            max-height: calc(100dvh - 16px);
+        }
+
+        .rp-profile-win {
+            width: min(94vw, 540px);
+            max-height: calc(100dvh - 16px);
+        }
+
+        .rp-sound-modal {
+            max-width: min(92vw, 360px);
+            max-height: calc(100dvh - 16px);
+            overflow-y: auto;
+        }
+
+        .rp-win-header { height: 32px; }
+        .rp-win-title { font-size: 12.5px; }
+
+        .rp-catalog-body { grid-template-columns: 150px 1fr 188px; }
+        .rp-inventory-body { grid-template-columns: 130px 1fr 188px; }
+
+        .rp-cat-sidebar,
+        .rp-inv-sidebar {
+            padding: 8px;
+            gap: 8px;
+        }
+
+        .rp-cat-detail,
+        .rp-inv-detail {
+            padding: 10px;
+            gap: 8px;
+        }
+
+        .rp-detail-preview { height: 68px; }
+
+        .rp-detail-sprite {
+            width: 46px;
+            height: 46px;
+        }
+
+        .rp-cat-banner { height: 46px; }
+
+        .rp-help-split {
+            grid-template-columns: 168px 1fr;
+            min-height: 0;
+        }
+
+        .rp-help-hero { padding: 8px 16px; }
+        .rp-help-hero-copy h3 { font-size: 16px; margin-bottom: 3px; }
+        .rp-help-hero-copy p { font-size: 11.5px; }
+        .rp-help-lifebuoy { width: 56px; }
+        .rp-help-nav { padding: 8px; gap: 4px; }
+        .rp-help-nav-btn { padding: 7px 10px; }
+        .rp-help-content { padding: 12px 16px; gap: 8px; }
+
+        .rp-profile-scroll { padding: 12px 14px 14px; gap: 12px; }
+        .rp-commands-body { padding: 8px; gap: 8px; }
     }
 }

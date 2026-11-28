@@ -1,5 +1,5 @@
 import { AvatarExpressionEnum, RoomEngineObjectEvent, RoomObjectCategory, RoomUnitChatComposer, RoomUnitChatShoutComposer, UserSettingsCameraFollowComposer } from '@nitrots/nitro-renderer';
-import { FC, FormEvent, PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, FC, FormEvent, PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     FaBolt,
     FaChevronRight,
@@ -363,6 +363,40 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const unlockTrackRef = useRef<HTMLDivElement | null>(null);
     const dragStartXRef = useRef<number>(0);
     const maxDragRef = useRef<number>(0);
+
+    // Escala del celular en móvil horizontal: se mantiene vertical y entra completo en el alto de la pantalla
+    const [ phoneFit, setPhoneFit ] = useState<number>(1);
+    const phoneFitRef = useRef<number>(1);
+
+    useEffect(() =>
+    {
+        if(!isMobile)
+        {
+            phoneFitRef.current = 1;
+            setPhoneFit(1);
+            return;
+        }
+
+        const update = () =>
+        {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            const fit = (w > h) ? Math.max(0.5, Math.min(1, (h - 12) / 450)) : 1;
+
+            phoneFitRef.current = fit;
+            setPhoneFit(fit);
+        };
+
+        update();
+        window.addEventListener('resize', update);
+        window.addEventListener('orientationchange', update);
+
+        return () =>
+        {
+            window.removeEventListener('resize', update);
+            window.removeEventListener('orientationchange', update);
+        };
+    }, [ isMobile ]);
     const [ swipeX, setSwipeX ] = useState<number>(0);
     const [ isSwiping, setIsSwiping ] = useState<boolean>(false);
     const chatInputRef = useRef<HTMLInputElement | null>(null);
@@ -1350,7 +1384,7 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
     const onSwipeMove = (e: PointerEvent<HTMLDivElement>) =>
     {
         if(!isSwiping) return;
-        const delta = Math.max(0, Math.min(maxDragRef.current, e.clientX - dragStartXRef.current));
+        const delta = Math.max(0, Math.min(maxDragRef.current, (e.clientX - dragStartXRef.current) / (phoneFitRef.current || 1)));
         setSwipeX(delta);
     };
 
@@ -1783,7 +1817,9 @@ export const RoleplayHudView: FC<RoleplayHudViewProps> = ({ isMobile = false }) 
                 <section
                     ref={ phoneDeviceRef }
                     className={ `rp-phone-device ${ isDraggingPhone ? 'is-dragging' : '' }` }
-                    style={ phonePos && !isMobile ? { left: phonePos.x, top: phonePos.y, bottom: 'auto' } : undefined }
+                    style={ isMobile
+                        ? ({ '--rp-phone-fit': phoneFit } as CSSProperties)
+                        : (phonePos ? { left: phonePos.x, top: phonePos.y, bottom: 'auto' } : undefined) }
                     aria-label="Celular Habbten RP">
                     <div
                         className="rp-phone-top-bezel"
